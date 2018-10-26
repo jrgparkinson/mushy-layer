@@ -108,11 +108,12 @@ class SlurmTask:
 		'cd ' + self.folder +  '; \n \n ']
 
         if self.customCommand:
-            file_contents = [file_contents, self.customCommand]
+            file_contents.append(self.customCommand)
 
         else:
-            file_contents = [file_contents, self.preprocessCommand + ' ' + mpiStr + ' ' + self.execFile + ' ' + os.path.join(self.folder, inputsFileName)]
+            file_contents.append(self.preprocessCommand + ' ' + mpiStr + ' ' + self.execFile + ' ' + os.path.join(self.folder, inputsFileName))
 		
+
 
     	fh.writelines(file_contents)
 
