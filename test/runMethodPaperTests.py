@@ -70,7 +70,7 @@ for Da_Ra in Da_Ra_vals:
 		extra_params['bc.porosityHiVal']= str(chi) + ' ' + str(chi) # 0.4 0.4
 		extra_params['bc.porosityLoVal']= str(chi) + ' ' + str(chi)
 
-	    output_dir = 'chi'+str(chi)+'-Da' + str(Da) + '-Ra' +  params['parameters.rayleighTemp']
+		output_dir = 'chi'+str(chi)+'-Da' + str(Da) + '-Ra' +  params['parameters.rayleighTemp']
 
 		#extra_params = {}
 		runTest(dataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command, extra_params)
