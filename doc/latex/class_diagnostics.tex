@@ -1,0 +1,114 @@
+\hypertarget{class_diagnostics}{\section{Diagnostics Class Reference}
+\label{class_diagnostics}\index{Diagnostics@{Diagnostics}}
+}
+
+
+Class to contain diagnostics.  
+
+
+
+
+{\ttfamily \#include $<$Diagnostics.\-h$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{class_diagnostics_a773b8651afdbc8f9d6106c01a093814f}{diagnostic\-Names} \{ \\*
+{\bfseries m\-\_\-time}, 
+{\bfseries m\-\_\-dt}, 
+{\bfseries m\-\_\-average\-Vertical\-Salt\-Flux}, 
+{\bfseries m\-\_\-\-L2\-Fs\-Vert\-Diffusion}, 
+\\*
+{\bfseries m\-\_\-\-L2\-Fs\-Vert\-Fluid}, 
+{\bfseries m\-\_\-\-L2\-Fs\-Vert\-Frame}, 
+{\bfseries m\-\_\-\-L1\-Fs\-Vert\-Diffusion}, 
+{\bfseries m\-\_\-\-L1\-Fs\-Vert\-Fluid}, 
+\\*
+{\bfseries m\-\_\-\-L1\-Fs\-Vert\-Frame}, 
+{\bfseries m\-\_\-\-L0\-Fs\-Vert\-Diffusion}, 
+{\bfseries m\-\_\-\-L0\-Fs\-Vert\-Fluid}, 
+{\bfseries m\-\_\-\-L0\-Fs\-Vert\-Frame}, 
+\\*
+{\bfseries m\-\_\-solute\-Flux\-Top}, 
+{\bfseries m\-\_\-solute\-Flux\-Bottom}, 
+{\bfseries m\-\_\-solute\-Flux\-Sponge}, 
+{\bfseries m\-\_\-heat\-Flux\-Bottom}, 
+\\*
+{\bfseries m\-\_\-heat\-Flux\-Top}, 
+{\bfseries m\-\_\-d\-Udt}, 
+{\bfseries m\-\_\-d\-Sdt}, 
+{\bfseries m\-\_\-d\-Tdt}, 
+\\*
+{\bfseries m\-\_\-chimney\-Spacing}, 
+{\bfseries m\-\_\-chimney\-Width}, 
+{\bfseries m\-\_\-\-Horiz\-Av\-Salinity0}, 
+{\bfseries m\-\_\-\-Horiz\-Av\-Salinity20}, 
+\\*
+{\bfseries m\-\_\-\-Horiz\-Av\-Salinity40}, 
+{\bfseries m\-\_\-\-Horiz\-Av\-Salinity60}, 
+{\bfseries m\-\_\-av\-Salinity}, 
+{\bfseries m\-\_\-mush\-Depth}, 
+\\*
+{\bfseries m\-\_\-\-Nu}, 
+{\bfseries m\-\_\-heat\-Flux\-Abs\-Mismatch}, 
+{\bfseries m\-\_\-salt\-Flux\-Abs\-Mismatch}, 
+{\bfseries m\-\_\-heat\-Flux\-Rel\-Mismatch}, 
+\\*
+{\bfseries m\-\_\-salt\-Flux\-Rel\-Mismatch}, 
+{\bfseries m\-\_\-max\-Lambda}, 
+{\bfseries m\-\_\-sum\-Lambda}, 
+{\bfseries m\-\_\-max\-Vel}, 
+\\*
+{\bfseries m\-\_\-num\-Diagnostics}
+ \}
+\begin{DoxyCompactList}\small\item\em Different diagnostics we consider. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_diagnostics_a24c4f22a9628a083b82a194089cfdd19}{\hyperlink{class_diagnostics_a24c4f22a9628a083b82a194089cfdd19}{Diagnostics} ()}\label{class_diagnostics_a24c4f22a9628a083b82a194089cfdd19}
+
+\begin{DoxyCompactList}\small\item\em Default constructore. \end{DoxyCompactList}\item 
+\hypertarget{class_diagnostics_a33a91e98836bc1c3bf022c09a97b5e51}{void \hyperlink{class_diagnostics_a33a91e98836bc1c3bf022c09a97b5e51}{define} (Real a\-\_\-moving\-Average\-Timescale, int a\-\_\-verbosity, Real a\-\_\-conv\-Crit)}\label{class_diagnostics_a33a91e98836bc1c3bf022c09a97b5e51}
+
+\begin{DoxyCompactList}\small\item\em Define object. \end{DoxyCompactList}\item 
+\hypertarget{class_diagnostics_a4051c6c9cfa8a2c0fa30ee2bdd3ff8b5}{void \hyperlink{class_diagnostics_a4051c6c9cfa8a2c0fa30ee2bdd3ff8b5}{add\-Diagnostic} (int a\-\_\-diagnostic, Real a\-\_\-time, Real value)}\label{class_diagnostics_a4051c6c9cfa8a2c0fa30ee2bdd3ff8b5}
+
+\begin{DoxyCompactList}\small\item\em Add a diagnostic. \end{DoxyCompactList}\item 
+\hypertarget{class_diagnostics_adbcc14b64242b09e780950d8814608db}{Real \hyperlink{class_diagnostics_adbcc14b64242b09e780950d8814608db}{get\-Diagnostic} (int a\-\_\-diagnostic, Real a\-\_\-time, int timestep\-Offset=0)}\label{class_diagnostics_adbcc14b64242b09e780950d8814608db}
+
+\begin{DoxyCompactList}\small\item\em Get the value of a diagnostic, $ \alpha $. \end{DoxyCompactList}\item 
+\hypertarget{class_diagnostics_a8213d3b6dc239506777f7161a07b5635}{Real \hyperlink{class_diagnostics_a8213d3b6dc239506777f7161a07b5635}{get\-Moving\-Average} (int a\-\_\-diagnostic, Real a\-\_\-end\-Time, Real a\-\_\-time\-Span)}\label{class_diagnostics_a8213d3b6dc239506777f7161a07b5635}
+
+\begin{DoxyCompactList}\small\item\em Get the moving average of a diagnostic. \end{DoxyCompactList}\item 
+\hypertarget{class_diagnostics_a7b5123f8f4ba2972d02f09026b7532c9}{Real \hyperlink{class_diagnostics_a7b5123f8f4ba2972d02f09026b7532c9}{get\-Rate\-Of\-Change} (int a\-\_\-diagnostic, Real a\-\_\-end\-Time, Real a\-\_\-dt)}\label{class_diagnostics_a7b5123f8f4ba2972d02f09026b7532c9}
+
+\begin{DoxyCompactList}\small\item\em Get $ \frac{d \alpha}{d t} $. \end{DoxyCompactList}\item 
+\hypertarget{class_diagnostics_a1785a5913fda81eb98c9f72a44aca154}{Real \hyperlink{class_diagnostics_a1785a5913fda81eb98c9f72a44aca154}{get\-Second\-Rate\-Of\-Change} (int a\-\_\-diagnostic, Real a\-\_\-end\-Time, Real a\-\_\-dt)}\label{class_diagnostics_a1785a5913fda81eb98c9f72a44aca154}
+
+\begin{DoxyCompactList}\small\item\em Calculate $ \frac{d^2 \alpha}{dt^2} $. \end{DoxyCompactList}\item 
+\hypertarget{class_diagnostics_a26cd9476e6f736d2fead8380db0f9fa2}{bool \hyperlink{class_diagnostics_a26cd9476e6f736d2fead8380db0f9fa2}{moving\-Average\-Has\-Converged} (int a\-\_\-diagnostic, Real m\-\_\-time, Real a\-\_\-dt)}\label{class_diagnostics_a26cd9476e6f736d2fead8380db0f9fa2}
+
+\begin{DoxyCompactList}\small\item\em Determine if the moving average has reached steady state. \end{DoxyCompactList}\item 
+\hypertarget{class_diagnostics_a2868f16188ebe067533afd6c0a27ff6a}{void {\bfseries print\-Header} ()}\label{class_diagnostics_a2868f16188ebe067533afd6c0a27ff6a}
+
+\item 
+\hypertarget{class_diagnostics_a69849023434b32047f39b51e0630f568}{void {\bfseries print\-Header} (std\-::ofstream \&a\-\_\-file)}\label{class_diagnostics_a69849023434b32047f39b51e0630f568}
+
+\item 
+\hypertarget{class_diagnostics_acd87da429ff720d80cbb2e82431fadb7}{void {\bfseries print\-Diagnostics} (Real a\-\_\-time)}\label{class_diagnostics_acd87da429ff720d80cbb2e82431fadb7}
+
+\item 
+\hypertarget{class_diagnostics_a510534ea0fa2b5e49f9f0aec1d7f8693}{void {\bfseries print\-Diagnostics} (Real a\-\_\-time, std\-::ofstream \&a\-\_\-file)}\label{class_diagnostics_a510534ea0fa2b5e49f9f0aec1d7f8693}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class to contain diagnostics. 
+
+This class manages various diagnostics that we want to track during simulations 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/src/Diagnostics.\-h\item 
+/home/parkinsonjl/mushy-\/layer/src/Diagnostics.\-cpp\end{DoxyCompactItemize}

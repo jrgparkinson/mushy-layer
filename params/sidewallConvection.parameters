@@ -1,0 +1,59 @@
+#For fixed porous medium flow
+
+##############################################
+## Parameters the control the problem type
+##############################################
+
+parameters.problem_type = 3
+parameters.fixedTempDirection = 0  # 0 for sidewall heating, 1 for vertical heating
+
+##################################################
+# How to calculate permeability
+# 0: permeability = 1
+# 1: permeability = (1-solid fraction)^3
+# 2: permeability = kozeny-carman
+# 3: permeability = log()
+# 4: permeability = x^2 (or whatever function I want)
+################################################
+parameters.permeabilityFunction = 1
+parameters.heleShaw=false
+
+#############################################
+#Physical parameters
+#############################################
+##Katz & Worster 2008 parameters for NH4Cl
+parameters.viscosity 				= 1.4e-3 	# Pa s
+parameters.heatConductivityLiquid   = 0.54 		# W/(m K)
+parameters.heatConductivitySolid    = 2.2 		# W/(m K)
+parameters.specificHeatLiquid 		= 3.5e3 	# J/(kg K)
+parameters.specificHeatSolid 		= 1.5e3 	# J/(kg K)
+parameters.liquidDensity			= 1050		# kg/(m^3)
+parameters.latentHeatDissolution	= 2.76e5	# J/kg
+parameters.thermalExpansivity		= 2.1e-4	# 1/K
+parameters.solutalExpansivity		= -0.30		# 1/(wt. frac.)
+parameters.eutecticTemp				= 0			# celcius
+parameters.eutecticComposition		= 0.2		# wt. frac.
+parameters.liquidusSlope			= 471.4 	# celcius/(wt. frac.)
+parameters.waterDistributionCoeff	= 1e-5 #1e-5		# dimensionless
+parameters.heleShawCoolingCoeff		= 1600		# J/(m^3 s celcius)
+parameters.liquidSoluteDiffusivity	= 1e-9		# m^2/s   (guess, approx 100x smaller than heat diffusivity)
+parameters.d						= 5e-3		# m
+parameters.height					= 0.5		# m
+parameters.width					= 6e-2		# m
+parameters.referencePermeability 	= 1e-12		# m^2
+parameters.gravitationalAcceleration= 9.8		# m/s
+parameters.V						= 0			# m/s
+
+#Initial and boundary conditions
+parameters.initialComposition		= 0.7		# wt. frac. 
+parameters.bottomTemp 				= 10.0     #-28.0		# celcius
+parameters.topTemp					= 0.0		# celcius
+
+# non dimensional parameters - these will overwrite parameters
+parameters.rayleighTemp 			= 50
+parameters.rayleighComposition 		= 0
+parameters.stefan 					= 0 # 0 means H = theta
+parameters.K						= 1
+parameters.lewis 					= 10e200
+parameters.deltaTemp = 10
+

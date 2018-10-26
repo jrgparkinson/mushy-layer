@@ -1,0 +1,255 @@
+\hypertarget{class_divergence}{\section{Divergence Class Reference}
+\label{class_divergence}\index{Divergence@{Divergence}}
+}
+
+
+Class to encapsulate \hyperlink{class_divergence}{Divergence} functions.  
+
+
+
+
+{\ttfamily \#include $<$Divergence.\-H$>$}
+
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \hyperlink{class_divergence_a85ddcbfb1ed4cd7e6624c33d0bd918f3}{level\-Divergence\-C\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Crse\-Ptr, const Real a\-\_\-dx, const int a\-\_\-n\-Ref\-Crse, const Problem\-Domain \&a\-\_\-d\-Problem, const bool a\-\_\-quad\-Interp)
+\item 
+static void \hyperlink{class_divergence_a832809fde8a4344564e82a2a4881dccb}{level\-Divergence\-C\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Crse\-Ptr, const Real a\-\_\-dx, const int a\-\_\-n\-Ref\-Crse, const Box \&a\-\_\-d\-Problem, const bool a\-\_\-quad\-Interp)
+\item 
+static void \hyperlink{class_divergence_a8714fec933884a4b9e6f8173e22574e3}{level\-Divergence\-C\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Crse\-Ptr, const Real a\-\_\-dx, const bool a\-\_\-quad\-Interp, Quad\-C\-F\-Interp \&a\-\_\-cf\-Interp)
+\item 
+\hypertarget{class_divergence_ae2ca2377231f1c6a272151d3ffe95432}{static void \hyperlink{class_divergence_ae2ca2377231f1c6a272151d3ffe95432}{level\-Divergence\-C\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u, const Real a\-\_\-dx)}\label{class_divergence_ae2ca2377231f1c6a272151d3ffe95432}
+
+\begin{DoxyCompactList}\small\item\em Version for a single level, assumes B\-Cs all set. \end{DoxyCompactList}\item 
+static void \hyperlink{class_divergence_a77ec6a5b421cc2360223b7b0879786e8}{level\-Divergence\-C\-C\-New} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Crse\-Ptr, const Real a\-\_\-dx, const bool a\-\_\-quad\-Interp, Quad\-C\-F\-Interp \&a\-\_\-cf\-Interp)
+\item 
+static void \hyperlink{class_divergence_af3bff43b62b95d79fcd50484019e3e41}{comp\-Divergence\-C\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Crse\-Ptr, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Fine\-Ptr, const Real a\-\_\-dx, const int a\-\_\-n\-Ref\-Crse, const int a\-\_\-n\-Ref\-Fine, const Problem\-Domain \&a\-\_\-d\-Problem, const bool a\-\_\-quad\-Interp)
+\item 
+static void \hyperlink{class_divergence_ad1d85e2db60cacec07a004c9d0b19b24}{comp\-Divergence\-C\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Crse\-Ptr, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Fine\-Ptr, const Real a\-\_\-dx, const int a\-\_\-n\-Ref\-Crse, const int a\-\_\-n\-Ref\-Fine, const Box \&a\-\_\-d\-Problem, const bool a\-\_\-quad\-Interp)
+\item 
+static void \hyperlink{class_divergence_a4bafaf6a0fee4270b05bfb1b31c915ed}{comp\-Divergence\-C\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Crse\-Ptr, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Fine\-Ptr, const Real a\-\_\-dx, const int a\-\_\-n\-Ref\-Fine, const int a\-\_\-n\-Ref\-Crse, const Problem\-Domain \&a\-\_\-d\-Problem, const bool a\-\_\-quad\-Interp, Level\-Flux\-Register $\ast$a\-\_\-flux\-Reg\-Fine\-Ptr, Quad\-C\-F\-Interp \&a\-\_\-cf\-Interp\-Crse, Quad\-C\-F\-Interp \&a\-\_\-cf\-Interp\-Fine)
+\item 
+static void \hyperlink{class_divergence_ab20b13344306e041cbf99e4234a46244}{comp\-Divergence\-C\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Crse\-Ptr, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-u\-Fine\-Ptr, const Real a\-\_\-dx, const int a\-\_\-n\-Ref\-Fine, const int a\-\_\-n\-Ref\-Crse, const Box \&a\-\_\-d\-Problem, const bool a\-\_\-quad\-Interp, Level\-Flux\-Register $\ast$a\-\_\-flux\-Reg\-Fine\-Ptr, Quad\-C\-F\-Interp \&a\-\_\-cf\-Interp\-Crse, Quad\-C\-F\-Interp \&a\-\_\-cf\-Interp\-Fine)
+\item 
+static void \hyperlink{class_divergence_a9004d4f62127cfaecab354769b4fcd58}{level\-Divergence\-M\-A\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, const Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-u\-Edge, const Real a\-\_\-dx)
+\item 
+static void \hyperlink{class_divergence_a6e222e89a13a45cbc06f380302aebf13}{level\-Divergence\-M\-A\-C\-Multi\-Comp} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, const Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-u\-Edge, const Real a\-\_\-dx)
+\begin{DoxyCompactList}\small\item\em Computes divergence of fields containing multiple components. \end{DoxyCompactList}\item 
+\hypertarget{class_divergence_acc40ffe25f3b5a7eeb35cfab48873180}{static void \hyperlink{class_divergence_acc40ffe25f3b5a7eeb35cfab48873180}{simple\-Divergence\-M\-A\-C} (F\-Array\-Box \&a\-\_\-div, const Flux\-Box \&a\-\_\-u\-Edge, const Real a\-\_\-dx)}\label{class_divergence_acc40ffe25f3b5a7eeb35cfab48873180}
+
+\begin{DoxyCompactList}\small\item\em really basic single-\/fab M\-A\-C divergence \end{DoxyCompactList}\item 
+static void \hyperlink{class_divergence_acd62afebbe823676309ba7301578ea96}{comp\-Divergence\-M\-A\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-u\-Edge, Level\-Data$<$ Flux\-Box $>$ $\ast$a\-\_\-u\-Edge\-Fine\-Ptr, const Real a\-\_\-dx, const Real $\ast$a\-\_\-dx\-Fine, const int a\-\_\-n\-Ref\-Fine, const Problem\-Domain \&a\-\_\-d\-Problem)
+\item 
+static void \hyperlink{class_divergence_ab223946c8b00bee70b0f73530ef274fe}{comp\-Divergence\-M\-A\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-u\-Edge, Level\-Data$<$ Flux\-Box $>$ $\ast$a\-\_\-u\-Edge\-Fine\-Ptr, const Real a\-\_\-dx, const Real $\ast$a\-\_\-dx\-Fine, const int a\-\_\-n\-Ref\-Fine, const Box \&a\-\_\-d\-Problem)
+\item 
+static void \hyperlink{class_divergence_a7ea9ccc4a12abac5f0141e67c69f9c0f}{comp\-Divergence\-M\-A\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-u\-Edge, Level\-Data$<$ Flux\-Box $>$ $\ast$a\-\_\-u\-Edge\-Fine\-Ptr, Level\-Flux\-Register $\ast$a\-\_\-flux\-Reg\-Ptr, const Real a\-\_\-dx, const Real $\ast$a\-\_\-dx\-Fine, const int a\-\_\-n\-Refine, const Problem\-Domain \&a\-\_\-d\-Problem)
+\item 
+static void \hyperlink{class_divergence_a6edc8c244f67ac7fcaf54386a1fed40b}{comp\-Divergence\-M\-A\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-div, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-u\-Edge, Level\-Data$<$ Flux\-Box $>$ $\ast$a\-\_\-u\-Edge\-Fine\-Ptr, Level\-Flux\-Register $\ast$a\-\_\-flux\-Reg\-Ptr, const Real a\-\_\-dx, const Real $\ast$a\-\_\-dx\-Fine, const int a\-\_\-n\-Refine, const Box \&a\-\_\-d\-Problem)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class to encapsulate \hyperlink{class_divergence}{Divergence} functions. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_divergence_af3bff43b62b95d79fcd50484019e3e41}{\index{Divergence@{Divergence}!comp\-Divergence\-C\-C@{comp\-Divergence\-C\-C}}
+\index{comp\-Divergence\-C\-C@{comp\-Divergence\-C\-C}!Divergence@{Divergence}}
+\subsubsection[{comp\-Divergence\-C\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::comp\-Divergence\-C\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-u, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Crse\-Ptr, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Fine\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const int}]{a\-\_\-n\-Ref\-Crse, }
+\item[{const int}]{a\-\_\-n\-Ref\-Fine, }
+\item[{const Problem\-Domain \&}]{a\-\_\-d\-Problem, }
+\item[{const bool}]{a\-\_\-quad\-Interp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_af3bff43b62b95d79fcd50484019e3e41}
+computes cell-\/centered composite-\/operator divergence of cell-\/centered vector field u; uses same coarse-\/fine B\-C's as level\-Divergence\-C\-C -- if u\-Fine != N\-U\-L\-L, also does flux-\/matching B\-C with finer level u\-Fine, using same coarse-\/fine B\-C's as used for coarse level B\-C. N\-O\-T\-E -\/ this expects 1 (one) ghost cell! \hypertarget{class_divergence_ad1d85e2db60cacec07a004c9d0b19b24}{\index{Divergence@{Divergence}!comp\-Divergence\-C\-C@{comp\-Divergence\-C\-C}}
+\index{comp\-Divergence\-C\-C@{comp\-Divergence\-C\-C}!Divergence@{Divergence}}
+\subsubsection[{comp\-Divergence\-C\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::comp\-Divergence\-C\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-u, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Crse\-Ptr, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Fine\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const int}]{a\-\_\-n\-Ref\-Crse, }
+\item[{const int}]{a\-\_\-n\-Ref\-Fine, }
+\item[{const Box \&}]{a\-\_\-d\-Problem, }
+\item[{const bool}]{a\-\_\-quad\-Interp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_ad1d85e2db60cacec07a004c9d0b19b24}
+computes cell-\/centered composite-\/operator divergence of cell-\/centered vector field u; uses same coarse-\/fine B\-C's as level\-Divergence\-C\-C -- if u\-Fine != N\-U\-L\-L, also does flux-\/matching B\-C with finer level u\-Fine, using same coarse-\/fine B\-C's as used for coarse level B\-C. This (deprecated) interface uses a Box instead of a Problem\-Domain \hypertarget{class_divergence_a4bafaf6a0fee4270b05bfb1b31c915ed}{\index{Divergence@{Divergence}!comp\-Divergence\-C\-C@{comp\-Divergence\-C\-C}}
+\index{comp\-Divergence\-C\-C@{comp\-Divergence\-C\-C}!Divergence@{Divergence}}
+\subsubsection[{comp\-Divergence\-C\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::comp\-Divergence\-C\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-u, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Crse\-Ptr, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Fine\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const int}]{a\-\_\-n\-Ref\-Fine, }
+\item[{const int}]{a\-\_\-n\-Ref\-Crse, }
+\item[{const Problem\-Domain \&}]{a\-\_\-d\-Problem, }
+\item[{const bool}]{a\-\_\-quad\-Interp, }
+\item[{Level\-Flux\-Register $\ast$}]{a\-\_\-flux\-Reg\-Fine\-Ptr, }
+\item[{Quad\-C\-F\-Interp \&}]{a\-\_\-cf\-Interp\-Crse, }
+\item[{Quad\-C\-F\-Interp \&}]{a\-\_\-cf\-Interp\-Fine}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_a4bafaf6a0fee4270b05bfb1b31c915ed}
+computes cell-\/centered composite-\/operator divergence of cell-\/centered vector field u; uses same coarse-\/fine B\-C's as level\-Divergence\-C\-C -- if u\-Fine != N\-U\-L\-L, also does flux-\/matching B\-C with finer level u\-Fine, using same coarse-\/fine B\-C's as used for coarse level B\-C. In this one, pre-\/allocated Level\-Flux\-Register and Quad\-C\-F\-Interp objects are passed in as an argument (saves allocation inside fn.) \hypertarget{class_divergence_ab20b13344306e041cbf99e4234a46244}{\index{Divergence@{Divergence}!comp\-Divergence\-C\-C@{comp\-Divergence\-C\-C}}
+\index{comp\-Divergence\-C\-C@{comp\-Divergence\-C\-C}!Divergence@{Divergence}}
+\subsubsection[{comp\-Divergence\-C\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::comp\-Divergence\-C\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-u, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Crse\-Ptr, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Fine\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const int}]{a\-\_\-n\-Ref\-Fine, }
+\item[{const int}]{a\-\_\-n\-Ref\-Crse, }
+\item[{const Box \&}]{a\-\_\-d\-Problem, }
+\item[{const bool}]{a\-\_\-quad\-Interp, }
+\item[{Level\-Flux\-Register $\ast$}]{a\-\_\-flux\-Reg\-Fine\-Ptr, }
+\item[{Quad\-C\-F\-Interp \&}]{a\-\_\-cf\-Interp\-Crse, }
+\item[{Quad\-C\-F\-Interp \&}]{a\-\_\-cf\-Interp\-Fine}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_ab20b13344306e041cbf99e4234a46244}
+computes cell-\/centered composite-\/operator divergence of cell-\/centered vector field u; uses same coarse-\/fine B\-C's as level\-Divergence\-C\-C -- if u\-Fine != N\-U\-L\-L, also does flux-\/matching B\-C with finer level u\-Fine, using same coarse-\/fine B\-C's as used for coarse level B\-C. In this one, pre-\/allocated Level\-Flux\-Register and Quad\-C\-F\-Interp objects are passed in as an argument (saves allocation inside fn.) This (deprecated) interface uses a Box instead of a Problem\-Domain. \hypertarget{class_divergence_acd62afebbe823676309ba7301578ea96}{\index{Divergence@{Divergence}!comp\-Divergence\-M\-A\-C@{comp\-Divergence\-M\-A\-C}}
+\index{comp\-Divergence\-M\-A\-C@{comp\-Divergence\-M\-A\-C}!Divergence@{Divergence}}
+\subsubsection[{comp\-Divergence\-M\-A\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::comp\-Divergence\-M\-A\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-u\-Edge, }
+\item[{Level\-Data$<$ Flux\-Box $>$ $\ast$}]{a\-\_\-u\-Edge\-Fine\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const Real $\ast$}]{a\-\_\-dx\-Fine, }
+\item[{const int}]{a\-\_\-n\-Ref\-Fine, }
+\item[{const Problem\-Domain \&}]{a\-\_\-d\-Problem}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_acd62afebbe823676309ba7301578ea96}
+computes composite cell-\/centered divergence of edge-\/centered vector field u\-Edge; if finer level data u\-Edge\-Fine exists, use flux-\/matching condition to compute divergence along coarse-\/fine interface. \hypertarget{class_divergence_ab223946c8b00bee70b0f73530ef274fe}{\index{Divergence@{Divergence}!comp\-Divergence\-M\-A\-C@{comp\-Divergence\-M\-A\-C}}
+\index{comp\-Divergence\-M\-A\-C@{comp\-Divergence\-M\-A\-C}!Divergence@{Divergence}}
+\subsubsection[{comp\-Divergence\-M\-A\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::comp\-Divergence\-M\-A\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-u\-Edge, }
+\item[{Level\-Data$<$ Flux\-Box $>$ $\ast$}]{a\-\_\-u\-Edge\-Fine\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const Real $\ast$}]{a\-\_\-dx\-Fine, }
+\item[{const int}]{a\-\_\-n\-Ref\-Fine, }
+\item[{const Box \&}]{a\-\_\-d\-Problem}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_ab223946c8b00bee70b0f73530ef274fe}
+computes composite cell-\/centered divergence of edge-\/centered vector field u\-Edge; if finer level data u\-Edge\-Fine exists, use flux-\/matching condition to compute divergence along coarse-\/fine interface. This (deprecated) interface uses a Box instead of a Problem\-Domain \hypertarget{class_divergence_a7ea9ccc4a12abac5f0141e67c69f9c0f}{\index{Divergence@{Divergence}!comp\-Divergence\-M\-A\-C@{comp\-Divergence\-M\-A\-C}}
+\index{comp\-Divergence\-M\-A\-C@{comp\-Divergence\-M\-A\-C}!Divergence@{Divergence}}
+\subsubsection[{comp\-Divergence\-M\-A\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::comp\-Divergence\-M\-A\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-u\-Edge, }
+\item[{Level\-Data$<$ Flux\-Box $>$ $\ast$}]{a\-\_\-u\-Edge\-Fine\-Ptr, }
+\item[{Level\-Flux\-Register $\ast$}]{a\-\_\-flux\-Reg\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const Real $\ast$}]{a\-\_\-dx\-Fine, }
+\item[{const int}]{a\-\_\-n\-Refine, }
+\item[{const Problem\-Domain \&}]{a\-\_\-d\-Problem}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_a7ea9ccc4a12abac5f0141e67c69f9c0f}
+just like normal comp\-Divergence\-M\-A\-C, but pass in a predefined flux register (more efficient) \hypertarget{class_divergence_a6edc8c244f67ac7fcaf54386a1fed40b}{\index{Divergence@{Divergence}!comp\-Divergence\-M\-A\-C@{comp\-Divergence\-M\-A\-C}}
+\index{comp\-Divergence\-M\-A\-C@{comp\-Divergence\-M\-A\-C}!Divergence@{Divergence}}
+\subsubsection[{comp\-Divergence\-M\-A\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::comp\-Divergence\-M\-A\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-u\-Edge, }
+\item[{Level\-Data$<$ Flux\-Box $>$ $\ast$}]{a\-\_\-u\-Edge\-Fine\-Ptr, }
+\item[{Level\-Flux\-Register $\ast$}]{a\-\_\-flux\-Reg\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const Real $\ast$}]{a\-\_\-dx\-Fine, }
+\item[{const int}]{a\-\_\-n\-Refine, }
+\item[{const Box \&}]{a\-\_\-d\-Problem}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_a6edc8c244f67ac7fcaf54386a1fed40b}
+just like normal comp\-Divergence\-M\-A\-C, but pass in a predefined flux register (more efficient). This (deprecated) interface uses a Box instead of a Problem\-Domain. \hypertarget{class_divergence_a85ddcbfb1ed4cd7e6624c33d0bd918f3}{\index{Divergence@{Divergence}!level\-Divergence\-C\-C@{level\-Divergence\-C\-C}}
+\index{level\-Divergence\-C\-C@{level\-Divergence\-C\-C}!Divergence@{Divergence}}
+\subsubsection[{level\-Divergence\-C\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::level\-Divergence\-C\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-u, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Crse\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const int}]{a\-\_\-n\-Ref\-Crse, }
+\item[{const Problem\-Domain \&}]{a\-\_\-d\-Problem, }
+\item[{const bool}]{a\-\_\-quad\-Interp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_a85ddcbfb1ed4cd7e6624c33d0bd918f3}
+computes cell-\/centered level-\/operator divergence of cell-\/centered vector field u; if u\-Crse != N\-U\-L\-L, does coarse-\/fine boundary conditions for u -- if quad\-Interp == true, uses quadratic coarse-\/fine boundary conditions, otherwise, use extrap B\-C's \hypertarget{class_divergence_a832809fde8a4344564e82a2a4881dccb}{\index{Divergence@{Divergence}!level\-Divergence\-C\-C@{level\-Divergence\-C\-C}}
+\index{level\-Divergence\-C\-C@{level\-Divergence\-C\-C}!Divergence@{Divergence}}
+\subsubsection[{level\-Divergence\-C\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::level\-Divergence\-C\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-u, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Crse\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const int}]{a\-\_\-n\-Ref\-Crse, }
+\item[{const Box \&}]{a\-\_\-d\-Problem, }
+\item[{const bool}]{a\-\_\-quad\-Interp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_a832809fde8a4344564e82a2a4881dccb}
+computes cell-\/centered level-\/operator divergence of cell-\/centered vector field u; if u\-Crse != N\-U\-L\-L, does coarse-\/fine boundary conditions for u -- if quad\-Interp == true, uses quadratic coarse-\/fine boundary conditions, otherwise, use extrap B\-C's. This (deprecated) interface uses a Box instead of a Problem\-Domain. \hypertarget{class_divergence_a8714fec933884a4b9e6f8173e22574e3}{\index{Divergence@{Divergence}!level\-Divergence\-C\-C@{level\-Divergence\-C\-C}}
+\index{level\-Divergence\-C\-C@{level\-Divergence\-C\-C}!Divergence@{Divergence}}
+\subsubsection[{level\-Divergence\-C\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::level\-Divergence\-C\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-u, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Crse\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const bool}]{a\-\_\-quad\-Interp, }
+\item[{Quad\-C\-F\-Interp \&}]{a\-\_\-cf\-Interp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_a8714fec933884a4b9e6f8173e22574e3}
+computes cell-\/centered level-\/operator divergence of cell-\/centered vector field u; if u\-Crse != N\-U\-L\-L, does coarse-\/fine boundary conditions for u -- if quad\-Interp == true, uses quadratic coarse-\/fine boundary conditions, otherwise, use extrap B\-C's. This one takes a pre-\/allocated Quad\-C\-F\-Interp object as an argument \hypertarget{class_divergence_a77ec6a5b421cc2360223b7b0879786e8}{\index{Divergence@{Divergence}!level\-Divergence\-C\-C\-New@{level\-Divergence\-C\-C\-New}}
+\index{level\-Divergence\-C\-C\-New@{level\-Divergence\-C\-C\-New}!Divergence@{Divergence}}
+\subsubsection[{level\-Divergence\-C\-C\-New}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::level\-Divergence\-C\-C\-New (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-u, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ $\ast$}]{a\-\_\-u\-Crse\-Ptr, }
+\item[{const Real}]{a\-\_\-dx, }
+\item[{const bool}]{a\-\_\-quad\-Interp, }
+\item[{Quad\-C\-F\-Interp \&}]{a\-\_\-cf\-Interp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_a77ec6a5b421cc2360223b7b0879786e8}
+New method that uses one sided diffs everywhere for smooth error.
+
+computes cell-\/centered level-\/operator divergence of cell-\/centered vector field u; if u\-Crse != N\-U\-L\-L, does coarse-\/fine boundary conditions for u -- if quad\-Interp == true, uses quadratic coarse-\/fine boundary conditions, otherwise, use extrap B\-C's. This one takes a pre-\/allocated Quad\-C\-F\-Interp object as an argument \hypertarget{class_divergence_a9004d4f62127cfaecab354769b4fcd58}{\index{Divergence@{Divergence}!level\-Divergence\-M\-A\-C@{level\-Divergence\-M\-A\-C}}
+\index{level\-Divergence\-M\-A\-C@{level\-Divergence\-M\-A\-C}!Divergence@{Divergence}}
+\subsubsection[{level\-Divergence\-M\-A\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::level\-Divergence\-M\-A\-C (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{const Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-u\-Edge, }
+\item[{const Real}]{a\-\_\-dx}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_a9004d4f62127cfaecab354769b4fcd58}
+computes cell-\/centered level-\/operator divergence of edge-\/centered vector field u\-Edge; assumes all coarse-\/fine B\-C's have already been set. \hypertarget{class_divergence_a6e222e89a13a45cbc06f380302aebf13}{\index{Divergence@{Divergence}!level\-Divergence\-M\-A\-C\-Multi\-Comp@{level\-Divergence\-M\-A\-C\-Multi\-Comp}}
+\index{level\-Divergence\-M\-A\-C\-Multi\-Comp@{level\-Divergence\-M\-A\-C\-Multi\-Comp}!Divergence@{Divergence}}
+\subsubsection[{level\-Divergence\-M\-A\-C\-Multi\-Comp}]{\setlength{\rightskip}{0pt plus 5cm}void Divergence\-::level\-Divergence\-M\-A\-C\-Multi\-Comp (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-div, }
+\item[{const Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-u\-Edge, }
+\item[{const Real}]{a\-\_\-dx}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{class_divergence_a6e222e89a13a45cbc06f380302aebf13}
+
+
+Computes divergence of fields containing multiple components. 
+
+\&\&Multi component version\&\& computes cell-\/centered level-\/operator divergence of edge-\/centered vector field u\-Edge; assumes all coarse-\/fine B\-C's have already been set. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/util/Divergence.\-H\item 
+/home/parkinsonjl/mushy-\/layer/util/Divergence.\-cpp\end{DoxyCompactItemize}

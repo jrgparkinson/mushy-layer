@@ -1,0 +1,175 @@
+C      _______              __
+C     / ___/ /  ___  __ _  / /  ___
+C    / /__/ _ \/ _ \/  V \/ _ \/ _ \
+C    \___/_//_/\___/_/_/_/_.__/\___/
+C    Please refer to Copyright.txt, in Chombo's root directory.
+
+C
+C     Implement solid wall conserved variable boundary fluxes and primitive
+C     variable boundary slopes
+C
+
+#include "CONSTANTS.H"
+
+        subroutine SOLIDBCF(
+     &    CHF_FRA[Wgdnv],
+     &    CHF_CONST_FRA[Wextrap],
+     &    CHF_CONST_REAL[bcVal],
+     &    CHF_CONST_INT[lohisign],
+     &    CHF_CONST_REAL[dx],
+     &    CHF_CONST_INT[dir],
+     &    CHF_BOX[box],
+     &    CHF_INT[n])
+
+        integer CHF_DDECL[i;j;k]
+        
+        
+        CHF_MULTIDO[box;i;j;k]
+          Wgdnv(CHF_IX[i;j;k],n) = bcVal
+        CHF_ENDDO
+        
+
+        return
+        end
+        
+        subroutine NEUMANN(
+     &    CHF_FRA[Wgdnv],
+     &    CHF_CONST_REAL[bcVal],
+     &    CHF_CONST_INT[isign],
+     &    CHF_CONST_REAL[dx],
+     &    CHF_CONST_INT[idir],
+     &    CHF_BOX[box],
+     &    CHF_INT[n])
+
+        integer CHF_DDECL[i;j;k]
+        REAL_T phi1
+
+        CHF_MULTIDO[box;i;j;k]
+          if (idir .eq. 0) then
+	       phi1 = Wgdnv(CHF_IX[i-isign;j;k],n)
+	     else if (idir .eq. 1) then
+	       phi1 = Wgdnv(CHF_IX[i;j-isign;k],n)
+	     else if (idir .eq. 2) then
+	       phi1 = Wgdnv(CHF_IX[i;j;k-isign],n)
+	     endif 
+          
+         Wgdnv(CHF_IX[i;j;k],n) = phi1 + isign*dx*bcVal
+        CHF_ENDDO
+
+        return
+        end
+
+        subroutine SOLIDEXTRAPBCF(
+     &    CHF_FRA[Wgdnv],
+     &    CHF_CONST_FRA[Wextrap],
+     &    CHF_CONST_REAL[bcVal],
+     &    CHF_CONST_INT[lohisign],
+     &    CHF_CONST_REAL[dx],
+     &    CHF_CONST_INT[dir],
+     &    CHF_BOX[box],
+     &    CHF_INT[n])
+
+        integer CHF_DDECL[i;j;k]
+
+        CHF_MULTIDO[box;i;j;k]
+          Wgdnv(CHF_IX[i;j;k],n) = Wextrap(CHF_IX[i;j;k],n)
+        CHF_ENDDO
+
+        return
+        end
+        
+        subroutine ADVINFLOWOUTFLOW(
+     &    CHF_FRA[Wgdnv],
+     &    CHF_CONST_FRA[advVelDir],
+     &    CHF_CONST_FRA[Wextrap],
+     &    CHF_CONST_REAL[bcVal],
+     &    CHF_CONST_INT[lohisign],
+     &    CHF_CONST_REAL[dx],
+     &    CHF_CONST_INT[dir],
+     &    CHF_BOX[box],
+     &    CHF_INT[n])
+
+        integer CHF_DDECL[i;j;k]
+        REAL_T inOut
+
+        CHF_MULTIDO[box;i;j;k]
+          inOut = advVelDir(CHF_IX[i;j;k],0)*lohisign
+          if (inOut .gt. 0) then
+            Wgdnv(CHF_IX[i;j;k],n) = Wextrap(CHF_IX[i;j;k],n)
+C           Wgdnv(CHF_IX[i;j;k],n) = 2*Wgdnv(CHF_IX[i;j+1;k],n) - Wgdnv(CHF_IX[i;j+2;k],n) 
+C           Wgdnv(CHF_IX[i;j;k],n) = Wgdnv(CHF_IX[i;j+1;k],n)
+C           Wgdnv(CHF_IX[i;j;k],n) = 0
+          else
+            Wgdnv(CHF_IX[i;j;k],n) = bcVal
+          endif
+            
+        CHF_ENDDO
+
+        return
+        end
+
+        subroutine ADVINFLOWPLUME(
+     &    CHF_FRA[Wgdnv],
+     &    CHF_CONST_FRA[Wextrap],
+     &    CHF_CONST_REAL[bcVal],
+     &    CHF_CONST_REAL[bcValPlume],
+     &    CHF_CONST_REAL[plumeStart],
+     &    CHF_CONST_REAL[plumeEnd],
+     &    CHF_CONST_INT[lohisign],
+     &    CHF_CONST_REAL[dx],
+     &    CHF_CONST_INT[dir],
+     &    CHF_BOX[box],
+     &    CHF_INT[n])
+
+        integer CHF_DDECL[i;j;k]
+        REAL_T facePos
+
+        CHF_MULTIDO[box;i;j;k]
+          
+          facePos = (i+0.5)*dx
+          if (facePos .gt. plumeStart .AND. facePos .lt. plumeEnd) then
+             Wgdnv(CHF_IX[i;j;k],n) = bcValPlume
+          else
+             Wgdnv(CHF_IX[i;j;k],n) = bcVal
+          endif
+            
+        CHF_ENDDO
+
+        return
+        end
+
+
+        subroutine SLOPEBCSF(
+     &    CHF_FRA[dW],
+     &    CHF_CONST_FRA[W],
+     &    CHF_CONST_REAL[dx],
+     &    CHF_CONST_INT[dir],
+     &    CHF_CONST_REAL[loVal],
+     &    CHF_BOX[loBox],
+     &    CHF_CONST_INT[hasLo],
+     &    CHF_CONST_REAL[hiVal],
+     &    CHF_BOX[hiBox],
+     &    CHF_CONST_INT[hasHi])
+
+        integer CHF_DDECL[i;j;k]
+        integer spacedim, n
+
+        spacedim = CH_SPACEDIM
+
+        do n=0, CHF_NCOMP[dW]-1
+        if (hasLo .eq. 1) then
+          CHF_MULTIDO[loBox;i;j;k]
+            dW(CHF_IX[i;j;k],n) = loVal
+          CHF_ENDDO
+        endif
+
+        if (hasHi .eq. 1) then
+          CHF_MULTIDO[hiBox;i;j;k]
+            dW(CHF_IX[i;j;k],n) = hiVal
+          CHF_ENDDO
+        endif
+
+        enddo
+
+        return
+        end

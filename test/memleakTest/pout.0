@@ -1,0 +1,194 @@
+Mercurial repository revision: 970+
+
+defineAMR
+procID: 0  opening gridfile 
+
+numLevels = 2
+level 0: ((0,0) (15,15) (0,0))
+level 1 numGrids = 2
+Grids: ((24,0) (31,31) (0,0))
+((0,0) (7,31) (0,0))
+PhysBCUtil::PhysBCUtil
+Diagnostics::define with timescale = 0.01
+Parameters: 
+physicalProblem: 14
+viscosity: -999
+heatConductivityLiquid: -999
+heatConductivitySolid: -999
+specificHeatLiquid: -999
+specificHeatSolid: -999
+liquidDensity: -999
+latentHeatDissolution: -999
+thermalExpansivity: -999
+solutalExpansivity: -999
+eutecticTemp: -23
+eutecticComposition: 230
+initialComposition: 35
+liquidusSlope: -0.1
+waterDistributionCoeff: 0.001
+heleShawCoolingCoeff: -999
+liquidSoluteDiffusivity: -999
+d: -999
+height: -999
+referencePermeability: -999
+gravitationalAcceleration: -999
+V: -999
+deltaTemp: 19.5
+stefan: 0
+compositionRatio: 5
+liquidHeatDiffusivity: -0.001001
+heatConductivityRatio: 1
+specificHeatRatio: 1
+lewis: 1e+300
+rayleighTemp: 100
+rayleighComposition: 0
+nonDimVel: 0
+nonDimHeleShawCooling: 998001
+timescale: -9.97003e+08
+nonDimReluctance: -0.012012
+thetaEutectic: -1
+thetaInf: -999
+thetaInitialLiquidus: -999
+thetaInitial: -999
+thetaInterface: -999
+ThetaEutectic: 1
+ThetaInitial: 0
+ThetaInf: 0
+ThetaLInitial: -999
+Hinitial: 0
+PhysBCUtil::PhysBCUtil
+Diagnostics::define with timescale = 0.01
+PhysBCUtil::PhysBCUtil
+Diagnostics::define with timescale = 0.01
+MushyLayerSubcycleUtils::defined AMR
+MushyLayerSubcycleUtils::check for timestepping
+AMR::verbosity  m_verbosity=2
+procID: 0  opening gridfile 
+
+numLevels = 2
+level 0: ((0,0) (15,15) (0,0))
+level 1 numGrids = 2
+Grids: ((24,0) (31,31) (0,0))
+((0,0) (7,31) (0,0))
+AMRLevelMushyLayer::initialData
+AMRLevelMushyLayer::initialData
+Sum(RHS) for IVP solve = 0.000000e+00
+Sum(RHS) for sync solve = 0.000000e+00
+Time = 0.000000e+00 Sum(RHS) for VD solve on level 0 (divided by eta) = -2.414633e-14
+Projection 0, sum of div(U) = 4.333350e-02
+Projection 0, sum of div(U) = 4.227570e-01
+Projection 0, sum of div(U) = 3.142397e-02
+Projection 0, sum of div(U) = 4.584960e-01
+checkpoint file name = output/chkVariableMesh2SubcycleRefluxFreestream0.45-convectionDB-128-ref2-000000.2d.hdf5
+plot file name = output/VariableMesh2SubcycleRefluxFreestream0.45-convectionDB-128-ref2-000000.2d.hdf5
+AMRLevelMushyLayer::advance (level 0, time = 0.000000e+00)
+AMRLevelMushyLayer::advance (time=0.000000e+00, dt = 1.000000e-02, CFL=9.849265e-04)
+Projection 0, sum of div(U) = 8.623854e-02
+AMRLevelMushyLayer::advance (level 1, time = 0.000000e+00)
+Projection 0, sum of div(U) = 9.426964e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::advance (level 1, time = 5.000000e-03)
+Projection 0, sum of div(U) = 9.363537e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::postTimeStep 0
+sum (reflux RHS) = -1.162470e-08
+Sum(RHS) for sync solve = -1.660185e-19
+Time = 1.000000e-02 Sum(RHS) for VD solve on level 0 (divided by eta) = -1.878836e-08
+coarse time step   0  old time = 0.000000e+00  old dt = 1.000000e-02  wallclocktime = 2.10e+01
+d/dt (Enthalpy            ) = 1.378561e-02 
+d/dt (Bulk concentration  ) = 2.575864e-02 
+d/dt (Darcy velocity      ) = 7.810279e+01 
+AMRLevelMushyLayer::advance (level 0, time = 1.00000e-02)
+AMRLevelMushyLayer::advance (time=1.00000e-02, dt = 1.00000e-02, CFL=3.90531e-03)
+Projection 0, sum of div(U) = 6.96330e-02
+AMRLevelMushyLayer::advance (level 1, time = 1.00000e-02)
+Projection 0, sum of div(U) = 9.13272e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::advance (level 1, time = 1.50000e-02)
+Projection 0, sum of div(U) = 9.40921e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::postTimeStep 0
+sum (reflux RHS) = 1.43313e-08
+Sum(RHS) for sync solve = 1.47384e-19
+Time = 2.00000e-02 Sum(RHS) for VD solve on level 0 (divided by eta) = 7.50156e-06
+coarse time step   1  old time = 1.000000e-02  old dt = 1.000000e-02  wallclocktime = 1.76e+01
+d/dt (Enthalpy            ) = 1.650731e-02 
+d/dt (Bulk concentration  ) = 1.362392e-02 
+d/dt (Darcy velocity      ) = 2.345341e+01 
+AMRLevelMushyLayer::advance (level 0, time = 2.00000e-02)
+AMRLevelMushyLayer::advance (time=2.00000e-02, dt = 1.00000e-02, CFL=9.95328e-03)
+Projection 0, sum of div(U) = 5.74548e-02
+AMRLevelMushyLayer::advance (level 1, time = 2.00000e-02)
+Projection 0, sum of div(U) = 9.08689e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::advance (level 1, time = 2.50000e-02)
+Projection 0, sum of div(U) = 9.18690e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::postTimeStep 0
+sum (reflux RHS) = -2.70947e-08
+Sum(RHS) for sync solve = 1.76183e-19
+Time = 3.00000e-02 Sum(RHS) for VD solve on level 0 (divided by eta) = 7.53593e-06
+coarse time step   2  old time = 2.000000e-02  old dt = 1.000000e-02  wallclocktime = 1.51e+01
+d/dt (Enthalpy            ) = 2.455433e-02 
+d/dt (Bulk concentration  ) = 7.803495e-03 
+d/dt (Darcy velocity      ) = 9.511236e+00 
+AMRLevelMushyLayer::advance (level 0, time = 3.00000e-02)
+AMRLevelMushyLayer::advance (time=3.00000e-02, dt = 1.00000e-02, CFL=1.33454e-02)
+Projection 0, sum of div(U) = 4.81403e-02
+AMRLevelMushyLayer::advance (level 1, time = 3.00000e-02)
+Projection 0, sum of div(U) = 8.92536e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::advance (level 1, time = 3.50000e-02)
+Projection 0, sum of div(U) = 8.94983e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::postTimeStep 0
+sum (reflux RHS) = -7.65554e-08
+Sum(RHS) for sync solve = 2.23617e-19
+Time = 4.00000e-02 Sum(RHS) for VD solve on level 0 (divided by eta) = 6.43016e-06
+coarse time step   3  old time = 3.000000e-02  old dt = 1.000000e-02  wallclocktime = 1.74e+01
+d/dt (Enthalpy            ) = 2.602775e-02 
+d/dt (Bulk concentration  ) = 4.904815e-03 
+d/dt (Darcy velocity      ) = 4.259743e+00 
+AMRLevelMushyLayer::advance (level 0, time = 4.00000e-02)
+AMRLevelMushyLayer::advance (time=4.00000e-02, dt = 1.00000e-02, CFL=1.49569e-02)
+Projection 0, sum of div(U) = 4.07698e-02
+AMRLevelMushyLayer::advance (level 1, time = 4.00000e-02)
+Projection 0, sum of div(U) = 8.91261e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::advance (level 1, time = 4.50000e-02)
+Projection 0, sum of div(U) = 8.88657e-01
+AMRLevelMushyLayer::postTimeStep 1
+AMRLevelMushyLayer::postTimeStep 0
+sum (reflux RHS) = -1.20156e-07
+Sum(RHS) for sync solve = -2.10064e-19
+Time = 5.00000e-02 Sum(RHS) for VD solve on level 0 (divided by eta) = 5.52795e-06
+coarse time step   4  old time = 4.000000e-02  old dt = 1.000000e-02  wallclocktime = 1.22e+01
+d/dt (Enthalpy            ) = 2.429884e-02 
+d/dt (Bulk concentration  ) = 3.460031e-03 
+d/dt (Darcy velocity      ) = 1.995486e+00 
+plot file name = output/VariableMesh2SubcycleRefluxFreestream0.45-convectionDB-128-ref2-000005.2d.hdf5
+checkpoint file name = output/chkVariableMesh2SubcycleRefluxFreestream0.45-convectionDB-128-ref2-000005.2d.hdf5
+number of points updated at level 0 = 1280
+number of points updated at level 1 = 5120
+total number of points updated = 6400
+Vector d: 216 bytes (0 Mb)
+Vector i: 432 bytes (0 Mb)
+Arena 20BasicCCVelBCFunction: 326592 bytes (0 Mb)
+Arena 39BasicPorosityPermeabilityFaceBCFunction: 600880 bytes (0 Mb)
+Arena 35BasicPorosityPermeabilityBCFunction: 1335600 bytes (1 Mb)
+Arena 21AdvectDiffuseScalarBC: 1512000 bytes (1 Mb)
+Arena 17ViscousBCFunction: 6144 bytes (0 Mb)
+Arena 32BasicPressureBCFunctionSubcycled: 173280 bytes (0 Mb)
+Arena 24FreestreamCorrBCFunction: 17856 bytes (0 Mb)
+Arena 22DomainExtrapBCFunction: 141360 bytes (0 Mb)
+Arena 27BasicGradPressureBCFunction: 38688 bytes (0 Mb)
+Arena 16StreamFunctionBC: 22800 bytes (0 Mb)
+Arena 20BasicECVelBCFunction: 189504 bytes (0 Mb)
+Arena 22DarcyBrinkmanOpFactory: 14592 bytes (0 Mb)
+Arena 17AMRLevelOpFactoryI9LevelDataI9FArrayBoxEE: -14592 bytes (0 Mb)
+Arena 15AMRFASMultiGridI9LevelDataI9FArrayBoxEE: 10488 bytes (0 Mb)
+Arena 12AMRMultiGridI9LevelDataI9FArrayBoxEE: -10488 bytes (0 Mb)
+Arena 10BCFunction: -4364704 bytes (-4 Mb)
+---------------------------------
+Total Unfreed : 648 bytes (0 Mb)
+peak memory usage: 10160332 bytes (9 Mb)

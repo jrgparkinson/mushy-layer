@@ -1,0 +1,62 @@
+\hypertarget{class_coarse_average_edge}{\section{Coarse\-Average\-Edge Class Reference}
+\label{class_coarse_average_edge}\index{Coarse\-Average\-Edge@{Coarse\-Average\-Edge}}
+}
+
+
+replaces edge-\/centered coarse-\/level data w/ averaged fine-\/level data  
+
+
+
+
+{\ttfamily \#include $<$Coarse\-Average\-Edge.\-H$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_coarse_average_edge_ab19f8a588cdb3b2ecaacd58e0340aa6d}{\hyperlink{class_coarse_average_edge_ab19f8a588cdb3b2ecaacd58e0340aa6d}{Coarse\-Average\-Edge} ()}\label{class_coarse_average_edge_ab19f8a588cdb3b2ecaacd58e0340aa6d}
+
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_coarse_average_edge_a587bc75ddb480a189e5e619a3b23dc62}{\hyperlink{class_coarse_average_edge_a587bc75ddb480a189e5e619a3b23dc62}{Coarse\-Average\-Edge} (const Disjoint\-Box\-Layout \&a\-\_\-fine\-Grids, int a\-\_\-n\-Comp, int a\-\_\-n\-Ref)}\label{class_coarse_average_edge_a587bc75ddb480a189e5e619a3b23dc62}
+
+\begin{DoxyCompactList}\small\item\em defining constructor \end{DoxyCompactList}\item 
+\hypertarget{class_coarse_average_edge_a9f9f40f39d1de2bee0f060e8a1829df6}{\hyperlink{class_coarse_average_edge_a9f9f40f39d1de2bee0f060e8a1829df6}{$\sim$\-Coarse\-Average\-Edge} ()}\label{class_coarse_average_edge_a9f9f40f39d1de2bee0f060e8a1829df6}
+
+\begin{DoxyCompactList}\small\item\em destructor \end{DoxyCompactList}\item 
+\hypertarget{class_coarse_average_edge_afd652746f2915f00ed0b2aaad8888f4f}{void \hyperlink{class_coarse_average_edge_afd652746f2915f00ed0b2aaad8888f4f}{define} (const Disjoint\-Box\-Layout \&a\-\_\-fine\-Grids, int a\-\_\-n\-Comp, int a\-\_\-n\-Ref)}\label{class_coarse_average_edge_afd652746f2915f00ed0b2aaad8888f4f}
+
+\begin{DoxyCompactList}\small\item\em defines the object \end{DoxyCompactList}\item 
+\hypertarget{class_coarse_average_edge_acb4c74b4b3af18340fffd63b9e088efe}{bool \hyperlink{class_coarse_average_edge_acb4c74b4b3af18340fffd63b9e088efe}{is\-Defined} () const }\label{class_coarse_average_edge_acb4c74b4b3af18340fffd63b9e088efe}
+
+\begin{DoxyCompactList}\small\item\em is object defined? \end{DoxyCompactList}\item 
+\hypertarget{class_coarse_average_edge_a66df1f9dfcd7c36e5f03c777ad3889fb}{void \hyperlink{class_coarse_average_edge_a66df1f9dfcd7c36e5f03c777ad3889fb}{average\-To\-Coarse} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-coarse\-\_\-data, const Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-fine\-\_\-data)}\label{class_coarse_average_edge_a66df1f9dfcd7c36e5f03c777ad3889fb}
+
+\begin{DoxyCompactList}\small\item\em averages fine-\/level data to coarse level \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_coarse_average_edge_a9da8d288b5030bce697f2a862e2e0732}{void \hyperlink{class_coarse_average_edge_a9da8d288b5030bce697f2a862e2e0732}{average\-Grid\-Data} (Flux\-Box \&a\-\_\-coarsened\-Fine, const Flux\-Box \&fine) const }\label{class_coarse_average_edge_a9da8d288b5030bce697f2a862e2e0732}
+
+\begin{DoxyCompactList}\small\item\em averages entire single grid data from fine-\/$>$crse \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_coarse_average_edge_a4a9be01bec3331bb86caceb272a8e7ea}{bool \hyperlink{class_coarse_average_edge_a4a9be01bec3331bb86caceb272a8e7ea}{m\-\_\-is\-Defined}}\label{class_coarse_average_edge_a4a9be01bec3331bb86caceb272a8e7ea}
+
+\begin{DoxyCompactList}\small\item\em is object defined? \end{DoxyCompactList}\item 
+\hypertarget{class_coarse_average_edge_a3a1d2d45d28e7b8c06287c0f5cc5cdd6}{int \hyperlink{class_coarse_average_edge_a3a1d2d45d28e7b8c06287c0f5cc5cdd6}{m\-\_\-n\-Ref}}\label{class_coarse_average_edge_a3a1d2d45d28e7b8c06287c0f5cc5cdd6}
+
+\begin{DoxyCompactList}\small\item\em refinement ratio \end{DoxyCompactList}\item 
+\hypertarget{class_coarse_average_edge_a4a8c9e61ce976a3e28ec52bb8ff78a64}{Level\-Data$<$ Flux\-Box $>$ \hyperlink{class_coarse_average_edge_a4a8c9e61ce976a3e28ec52bb8ff78a64}{m\-\_\-coarsened\-Fine\-Data}}\label{class_coarse_average_edge_a4a8c9e61ce976a3e28ec52bb8ff78a64}
+
+\begin{DoxyCompactList}\small\item\em work array for coarsening of fine data, same \char`\"{}shape\char`\"{} as fine data \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+replaces edge-\/centered coarse-\/level data w/ averaged fine-\/level data 
+
+This class replaces edge-\/centered data on a coarse level of refinement with the average of the finer-\/level data which overlays the edge. This class is similar to Coarse\-Average 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/util/Coarse\-Average\-Edge.\-H\item 
+/home/parkinsonjl/mushy-\/layer/util/Coarse\-Average\-Edge.\-cpp\end{DoxyCompactItemize}

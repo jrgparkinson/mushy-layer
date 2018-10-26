@@ -1,0 +1,1801 @@
+-----------
+Timer report 0 (399 timers)
+--------------
+---------------------------------------------------------
+[0]main 1.01094 1
+    41.4%    0.41894        1 AMRLevelMushyLayer::computeDiagnostics [1] f=0
+    15.1%    0.15256        1 AMRLevelMushyLayer::defineSolvers [2] f=0
+     6.2%    0.06265        1 AMRLevelMushyLayer::updateEnthalpyVariables [7] f=0
+     6.0%    0.06072      217 Copier::define [8] f=0
+     5.5%    0.05554       49 copyTo [9] f=0
+     1.6%    0.01622       24 LevelData<T>::define(dbl,comps,ghost,factory) [24] f=0
+     1.0%    0.00966        6 read [36] f=0
+     0.7%    0.00665        1 MushyLayerParams::getParameters() [55] f=0
+     0.2%    0.00157        2 AMRPoissonOpFactory::define [99] f=0
+     0.1%    0.00133        2 AMRMultiGrid::define [106] f=0
+     0.1%    0.00087        4 exchange+copier [117] f=0
+     0.0%    0.00040       54 ~Copier [144] f=0
+     0.0%    0.00008        1 DisjointBoxLayout::computeNeighbors [206] f=0
+     0.0%    0.00007       11 ~LayoutData [211] f=0
+     0.0%    0.00002        1 LoadBalance:VectorBoxEntry [241] f=0
+     0.0%    0.00000        2 QuadCFInterp::define [278] f=0
+     0.0%    0.00000        3 ~BoxLayoutData [292] f=0
+     0.0%    0.00000        3 ~LevelData [382] f=0
+    77.9%                  Total 
+---------------------------------------------------------
+[1]AMRLevelMushyLayer::computeDiagnostics 0.41894 1
+    35.7%    0.14952        2 AMRLevelMushyLayer::computeScalarAdvectiveFlux [3] f=0
+    22.8%    0.09559       32 AMRNonLinearMultiCompOp::getFlux [4] f=0
+    19.8%    0.08299        2 AMRLevelMushyLayer::computeScalDiffusion [5] f=0
+     2.1%    0.00899        1 AMRNonLinearMultiCompOpFactory::AMRnewOp [39] f=0
+     2.0%    0.00829      128 FORT_DIVERGENCE [44] f=0
+     1.7%    0.00726        7 cornerCopier define [53] f=0
+     1.2%    0.00492       64 FORT_EDGETOCELL [61] f=0
+     1.1%    0.00450       23 Copier::define [64] f=0
+     1.0%    0.00435        6 copyTo [67] f=0
+     0.6%    0.00272        9 exchange+copier [82] f=0
+     0.2%    0.00086        7 exchange [120] f=0
+     0.1%    0.00053       96 BCFunctions::applyCorrectScalarBC [134] f=0
+     0.0%    0.00019       30 ~LayoutData [174] f=0
+     0.0%    0.00006       37 ~Copier [216] f=0
+     0.0%    0.00001       22 ~BoxLayoutData [267] f=0
+     0.0%    0.00000        4 ~LayoutData [272] f=0
+     0.0%    0.00000        4 ~LayoutData [273] f=0
+     0.0%    0.00000       21 ~LevelData [300] f=0
+    88.5%                  Total 
+---------------------------------------------------------
+[2]AMRLevelMushyLayer::defineSolvers 0.15256 1
+    47.9%    0.07309        1 AMRFASMultiGrid::define [6] f=0
+     4.4%    0.00671        6 cornerCopier define [54] f=0
+     2.9%    0.00436        6 copyTo [66] f=0
+     2.4%    0.00371       16 Copier::define [74] f=0
+     1.8%    0.00274       32 FORT_CELLTOEDGEGEOMETRIC [81] f=0
+     1.4%    0.00208        7 exchange+copier [92] f=0
+     0.8%    0.00119      128 CFIVS::define(fast) [108] f=0
+     0.6%    0.00085        1 AMRNonLinearMultiCompOpFactory::define [123] f=0
+     0.3%    0.00049        6 exchange [140] f=0
+     0.3%    0.00039       80 BCFunctions::applyCorrectScalarBC [146] f=0
+     0.1%    0.00012        2 AMRPoissonOp::define4 [188] f=0
+     0.1%    0.00008       12 ~LayoutData [208] f=0
+     0.0%    0.00004       20 ~Copier [228] f=0
+     0.0%    0.00000        4 ~BoxLayoutData [288] f=0
+     0.0%    0.00000        4 ~LevelData [312] f=0
+    62.8%                  Total 
+---------------------------------------------------------
+[3]AMRLevelMushyLayer::computeScalarAdvectiveFlux 0.14952 2
+    12.5%    0.01863      128 FORT_RIEMANNF [20] f=0
+    12.4%    0.01853      128 FORT_QUASILINEARUPDATE [21] f=0
+    11.3%    0.01696       64 FORT_SECONDSLOPEDIFFSF [23] f=0
+     6.4%    0.00950       32 FORT_PLMNORMALPREDF [37] f=0
+     6.1%    0.00917       32 FORT_PPMNORMALPREDF [38] f=0
+     5.0%    0.00746       32 FORT_PPMFACEVALUESF [51] f=0
+     4.4%    0.00658       32 FORT_VANLEERLIMITERF [56] f=0
+     3.6%    0.00540       32 FORT_PPMLIMITERF [58] f=0
+     2.7%    0.00407       64 FORT_CELLTOEDGE [70] f=0
+     1.3%    0.00200        2 copyTo [96] f=0
+     0.5%    0.00068        4 Copier::define [129] f=0
+     0.1%    0.00009       64 FORT_NEUMANN [201] f=0
+     0.0%    0.00006       64 FORT_ADVINFLOWOUTFLOW [218] f=0
+     0.0%    0.00003        2 ~LayoutData [230] f=0
+     0.0%    0.00001        4 ~Copier [249] f=0
+     0.0%    0.00000        2 ~BoxLayoutData [294] f=0
+     0.0%    0.00000        2 ~LevelData [322] f=0
+    66.3%                  Total 
+---------------------------------------------------------
+[4]AMRNonLinearMultiCompOp::getFlux 0.09559 32
+    19.1%    0.01830       32 FORT_CALCULATE_T_CL [22] f=0
+    11.5%    0.01104       32 FORT_CALCULATE_BOUNDING_ENERGY [33] f=0
+     0.9%    0.00085      256 BCFunctions::applyCorrectScalarBC [121] f=0
+    31.6%                  Total 
+---------------------------------------------------------
+[5]AMRLevelMushyLayer::computeScalDiffusion 0.08299 2
+    52.9%    0.04391        2 AMRNonLinearMultiCompOp::applyOpI [12] f=0
+    18.4%    0.01524        2 AMRNonLinearMultiCompOpFactory::AMRnewOp [25] f=0
+     6.2%    0.00516        6 cornerCopier define [59] f=0
+     2.6%    0.00218        4 copyTo [90] f=0
+     2.0%    0.00162       10 Copier::define [98] f=0
+     1.0%    0.00079        6 exchange+copier [125] f=0
+     0.5%    0.00042        6 exchange [142] f=0
+     0.5%    0.00040       64 FORT_VISCOUSBC [145] f=0
+     0.4%    0.00029       64 BCFunctions::applyCorrectScalarBC [161] f=0
+     0.1%    0.00010       30 ~LayoutData [197] f=0
+     0.1%    0.00004       28 ~Copier [227] f=0
+     0.0%    0.00001        8 ~LayoutData [264] f=0
+     0.0%    0.00001        8 ~LayoutData [268] f=0
+     0.0%    0.00000       14 ~BoxLayoutData [286] f=0
+     0.0%    0.00000       12 ~LevelData [303] f=0
+    84.5%                  Total 
+---------------------------------------------------------
+[6]AMRFASMultiGrid::define 0.07309 1
+    66.6%    0.04867        1 AMRMultiGrid::define [11] f=0
+    33.0%    0.02409        1 MultiGrid::define [16] f=0
+     0.2%    0.00014       40 ~LayoutData [183] f=0
+     0.0%    0.00003       30 ~Copier [235] f=0
+     0.0%    0.00001        8 ~LayoutData [265] f=0
+     0.0%    0.00001        8 ~LayoutData [266] f=0
+     0.0%    0.00000       24 ~BoxLayoutData [275] f=0
+     0.0%    0.00000       22 ~LevelData [306] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[7]AMRLevelMushyLayer::updateEnthalpyVariables 0.06265 1
+    13.8%    0.00867       16 FORT_CALCULATECL [42] f=0
+    13.7%    0.00855       16 FORT_CALCULATET [43] f=0
+    13.0%    0.00815       16 FORT_CALCULATECS [46] f=0
+    12.9%    0.00809       16 FORT_CALCULATEPOROSITY [47] f=0
+     8.2%    0.00514       16 FORT_CALCULATE_BOUNDING_ENERGY [60] f=0
+     3.6%    0.00227        2 cornerCopier define [88] f=0
+     2.4%    0.00149        2 copyTo [104] f=0
+     1.9%    0.00121        5 Copier::define [107] f=0
+     0.5%    0.00032        2 exchange+copier [155] f=0
+     0.3%    0.00017        2 exchange [176] f=0
+     0.2%    0.00014       32 BCFunctions::applyCorrectScalarBC [179] f=0
+     0.0%    0.00002        3 ~LayoutData [237] f=0
+     0.0%    0.00002        7 ~Copier [246] f=0
+     0.0%    0.00000        3 ~BoxLayoutData [291] f=0
+     0.0%    0.00000        3 ~LevelData [372] f=0
+    70.6%                  Total 
+---------------------------------------------------------
+[8]Copier::define 0.06072 217
+---------------------------------------------------------
+[9]copyTo 0.05554 49
+    99.7%    0.05535       49 local copying [10] f=0
+     0.1%    0.00008       49 MPI_allocateBuffers [210] f=0
+     0.0%    0.00000       49 unpack_messages [279] f=0
+     0.0%    0.00000       49 write Data to buffers [283] f=0
+     0.0%    0.00000       49 completePendingSends [284] f=0
+     0.0%    0.00000       49 post_messages [287] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[10]local copying 0.05535 49
+---------------------------------------------------------
+[11]AMRMultiGrid::define 0.04867 1
+    76.7%    0.03733        1 MultiGrid::define [14] f=0
+    23.2%    0.01130        1 AMRNonLinearMultiCompOpFactory::AMRnewOp [31] f=0
+     0.0%    0.00000        2 ~Copier [307] f=0
+    99.9%                  Total 
+---------------------------------------------------------
+[12]AMRNonLinearMultiCompOp::applyOpI 0.04391 2
+    99.3%    0.04361        2 AMRNonLinearMultiCompOp::applyOpNoBoundary [13] f=0
+     0.5%    0.00023       64 BCFunctions::applyCorrectScalarBC [166] f=0
+    99.9%                  Total 
+---------------------------------------------------------
+[13]AMRNonLinearMultiCompOp::applyOpNoBoundary 0.04361 2
+    50.3%    0.02193        2 AMRNonLinearMultiCompOp::computeDerivedVar [18] f=0
+    46.0%    0.02008       32 FORT_NLVCCOMPUTEOP2D [19] f=0
+     0.8%    0.00034        2 exchange [151] f=0
+     0.7%    0.00031        2 Copier::define [159] f=0
+     0.0%    0.00002        2 ~LayoutData [244] f=0
+     0.0%    0.00001        2 ~Copier [256] f=0
+     0.0%    0.00000        2 ~BoxLayoutData [296] f=0
+     0.0%    0.00000        2 ~LevelData [356] f=0
+    97.9%                  Total 
+---------------------------------------------------------
+[14]MultiGrid::define 0.03733 1
+    99.8%    0.03725        3 AMRNonLinearMultiCompOpFactory::MGnewOp [15] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[15]AMRNonLinearMultiCompOpFactory::MGnewOp 0.03725 3
+    37.5%    0.01395        8 CoarseAverage::computeAverages [28] f=0
+    12.0%    0.00447        4 CoarseAverage::define2 [65] f=0
+    10.5%    0.00392        2 AMRNonLinearMultiCompOp::computeLambda [71] f=0
+    10.4%    0.00386       12 LevelData<T>::define(dbl,comps,ghost,factory) [72] f=0
+     9.0%    0.00335       64 FORT_AVERAGEFACE [78] f=0
+     8.6%    0.00321       16 ~LayoutData [80] f=0
+     4.1%    0.00151        2 copyTo [102] f=0
+     1.3%    0.00050        2 Copier::define [135] f=0
+     0.3%    0.00012        2 AMRPoissonOp::define4 [187] f=0
+     0.1%    0.00002       16 ~Copier [240] f=0
+     0.0%    0.00000        8 ~BoxLayoutData [285] f=0
+     0.0%    0.00000        8 ~LevelData [344] f=0
+    93.7%                  Total 
+---------------------------------------------------------
+[16]MultiGrid::define 0.02409 1
+    99.7%    0.02402        3 AMRNonLinearMultiCompOpFactory::MGnewOp [17] f=0
+    99.7%                  Total 
+---------------------------------------------------------
+[17]AMRNonLinearMultiCompOpFactory::MGnewOp 0.02402 3
+    36.2%    0.00869        8 CoarseAverage::computeAverages [41] f=0
+    19.7%    0.00473        2 AMRNonLinearMultiCompOp::computeLambda [62] f=0
+    14.7%    0.00352       12 LevelData<T>::define(dbl,comps,ghost,factory) [75] f=0
+    14.0%    0.00336       64 FORT_AVERAGEFACE [77] f=0
+     6.4%    0.00153        2 copyTo [100] f=0
+     2.7%    0.00065        4 CoarseAverage::define2 [130] f=0
+     2.1%    0.00049        2 Copier::define [136] f=0
+     0.5%    0.00012       16 ~LayoutData [190] f=0
+     0.5%    0.00012        2 AMRPoissonOp::define4 [191] f=0
+     0.1%    0.00002       16 ~Copier [239] f=0
+     0.0%    0.00000        8 ~BoxLayoutData [289] f=0
+     0.0%    0.00000        8 ~LevelData [339] f=0
+    96.7%                  Total 
+---------------------------------------------------------
+[18]AMRNonLinearMultiCompOp::computeDerivedVar 0.02193 2
+    60.9%    0.01335       32 FORT_CALCULATE_T_CL [29] f=0
+    34.3%    0.00752       32 FORT_CALCULATE_BOUNDING_ENERGY [49] f=0
+     2.2%    0.00049      256 BCFunctions::applyCorrectScalarBC [138] f=0
+     1.6%    0.00035        2 AMRNonLinearMultiCompOp::computeDiffusedVar::exchange [149] f=0
+    99.0%                  Total 
+---------------------------------------------------------
+[19]FORT_NLVCCOMPUTEOP2D 0.02008 32
+---------------------------------------------------------
+[20]FORT_RIEMANNF 0.01863 128
+---------------------------------------------------------
+[21]FORT_QUASILINEARUPDATE 0.01853 128
+---------------------------------------------------------
+[22]FORT_CALCULATE_T_CL 0.01830 32
+---------------------------------------------------------
+[23]FORT_SECONDSLOPEDIFFSF 0.01696 64
+---------------------------------------------------------
+[24]LevelData<T>::define(dbl,comps,ghost,factory) 0.01622 24
+    20.1%    0.00326       14 Copier::define [79] f=0
+    20.1%                  Total 
+---------------------------------------------------------
+[25]AMRNonLinearMultiCompOpFactory::AMRnewOp 0.01524 2
+    98.4%    0.01499        2 AMRNonLinearMultiCompOp::computeLambda [26] f=0
+     0.8%    0.00013        2 AMRPoissonOp::define4 [184] f=0
+    99.2%                  Total 
+---------------------------------------------------------
+[26]AMRNonLinearMultiCompOp::computeLambda 0.01499 2
+    93.1%    0.01396        2 AMRNonLinearMultiCompOp::resetLambda [27] f=0
+     6.8%    0.00103        2 LevelData<T>::define(dbl,comps,ghost,factory) [113] f=0
+    100.0%                  Total 
+---------------------------------------------------------
+[27]AMRNonLinearMultiCompOp::resetLambda 0.01396 2
+    72.1%    0.01007       64 FORT_SUMFACESNLVC [35] f=0
+    72.1%                  Total 
+---------------------------------------------------------
+[28]CoarseAverage::computeAverages 0.01395 8
+    91.6%    0.01278      128 FORT_AVERAGE [30] f=0
+     7.5%    0.00105        8 copyTo [110] f=0
+    99.1%                  Total 
+---------------------------------------------------------
+[29]FORT_CALCULATE_T_CL 0.01335 32
+---------------------------------------------------------
+[30]FORT_AVERAGE 0.01278 128
+---------------------------------------------------------
+[31]AMRNonLinearMultiCompOpFactory::AMRnewOp 0.01130 1
+    98.9%    0.01117        1 AMRNonLinearMultiCompOp::computeLambda [32] f=0
+     0.6%    0.00006        1 AMRPoissonOp::define4 [214] f=0
+    99.5%                  Total 
+---------------------------------------------------------
+[32]AMRNonLinearMultiCompOp::computeLambda 0.01117 1
+    94.6%    0.01057        1 AMRNonLinearMultiCompOp::resetLambda [34] f=0
+     5.4%    0.00060        1 LevelData<T>::define(dbl,comps,ghost,factory) [131] f=0
+    100.0%                  Total 
+---------------------------------------------------------
+[33]FORT_CALCULATE_BOUNDING_ENERGY 0.01104 32
+---------------------------------------------------------
+[34]AMRNonLinearMultiCompOp::resetLambda 0.01057 1
+    74.0%    0.00782       32 FORT_SUMFACESNLVC [48] f=0
+    74.0%                  Total 
+---------------------------------------------------------
+[35]FORT_SUMFACESNLVC 0.01007 64
+---------------------------------------------------------
+[36]read 0.00966 6
+    76.5%    0.00739       96 H5Dread [52] f=0
+    76.5%                  Total 
+---------------------------------------------------------
+[37]FORT_PLMNORMALPREDF 0.00950 32
+---------------------------------------------------------
+[38]FORT_PPMNORMALPREDF 0.00917 32
+---------------------------------------------------------
+[39]AMRNonLinearMultiCompOpFactory::AMRnewOp 0.00899 1
+    97.7%    0.00879        1 AMRNonLinearMultiCompOp::computeLambda [40] f=0
+     1.5%    0.00014        1 AMRPoissonOp::define4 [182] f=0
+    99.3%                  Total 
+---------------------------------------------------------
+[40]AMRNonLinearMultiCompOp::computeLambda 0.00879 1
+    93.1%    0.00819        1 AMRNonLinearMultiCompOp::resetLambda [45] f=0
+     6.8%    0.00060        1 LevelData<T>::define(dbl,comps,ghost,factory) [132] f=0
+    100.0%                  Total 
+---------------------------------------------------------
+[41]CoarseAverage::computeAverages 0.00869 8
+    86.2%    0.00749      128 FORT_AVERAGE [50] f=0
+    12.3%    0.00107        8 copyTo [109] f=0
+    98.5%                  Total 
+---------------------------------------------------------
+[42]FORT_CALCULATECL 0.00867 16
+---------------------------------------------------------
+[43]FORT_CALCULATET 0.00855 16
+---------------------------------------------------------
+[44]FORT_DIVERGENCE 0.00829 128
+---------------------------------------------------------
+[45]AMRNonLinearMultiCompOp::resetLambda 0.00819 1
+    72.0%    0.00589       32 FORT_SUMFACESNLVC [57] f=0
+    72.0%                  Total 
+---------------------------------------------------------
+[46]FORT_CALCULATECS 0.00815 16
+---------------------------------------------------------
+[47]FORT_CALCULATEPOROSITY 0.00809 16
+---------------------------------------------------------
+[48]FORT_SUMFACESNLVC 0.00782 32
+---------------------------------------------------------
+[49]FORT_CALCULATE_BOUNDING_ENERGY 0.00752 32
+---------------------------------------------------------
+[50]FORT_AVERAGE 0.00749 128
+---------------------------------------------------------
+[51]FORT_PPMFACEVALUESF 0.00746 32
+---------------------------------------------------------
+[52]H5Dread 0.00739 96
+---------------------------------------------------------
+[53]cornerCopier define 0.00726 7
+---------------------------------------------------------
+[54]cornerCopier define 0.00671 6
+---------------------------------------------------------
+[55]MushyLayerParams::getParameters() 0.00665 1
+---------------------------------------------------------
+[56]FORT_VANLEERLIMITERF 0.00658 32
+---------------------------------------------------------
+[57]FORT_SUMFACESNLVC 0.00589 32
+---------------------------------------------------------
+[58]FORT_PPMLIMITERF 0.00540 32
+---------------------------------------------------------
+[59]cornerCopier define 0.00516 6
+---------------------------------------------------------
+[60]FORT_CALCULATE_BOUNDING_ENERGY 0.00514 16
+---------------------------------------------------------
+[61]FORT_EDGETOCELL 0.00492 64
+---------------------------------------------------------
+[62]AMRNonLinearMultiCompOp::computeLambda 0.00473 2
+    96.9%    0.00458        2 AMRNonLinearMultiCompOp::resetLambda [63] f=0
+     3.0%    0.00014        2 LevelData<T>::define(dbl,comps,ghost,factory) [181] f=0
+    99.9%                  Total 
+---------------------------------------------------------
+[63]AMRNonLinearMultiCompOp::resetLambda 0.00458 2
+    74.9%    0.00343       64 FORT_SUMFACESNLVC [76] f=0
+    74.9%                  Total 
+---------------------------------------------------------
+[64]Copier::define 0.00450 23
+---------------------------------------------------------
+[65]CoarseAverage::define2 0.00447 4
+     8.5%    0.00038        4 Copier::define [147] f=0
+     7.7%    0.00034        4 LevelData<T>::define(dbl,comps,ghost,factory) [152] f=0
+    16.3%                  Total 
+---------------------------------------------------------
+[66]copyTo 0.00436 6
+    99.6%    0.00435        6 local copying [68] f=0
+     0.1%    0.00000        6 MPI_allocateBuffers [271] f=0
+     0.0%    0.00000        6 unpack_messages [313] f=0
+     0.0%    0.00000        6 post_messages [324] f=0
+     0.0%    0.00000        6 write Data to buffers [346] f=0
+     0.0%    0.00000        6 completePendingSends [353] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[67]copyTo 0.00435 6
+    99.6%    0.00433        6 local copying [69] f=0
+     0.1%    0.00001        6 MPI_allocateBuffers [262] f=0
+     0.0%    0.00000        6 unpack_messages [319] f=0
+     0.0%    0.00000        6 post_messages [331] f=0
+     0.0%    0.00000        6 write Data to buffers [352] f=0
+     0.0%    0.00000        6 completePendingSends [358] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[68]local copying 0.00435 6
+---------------------------------------------------------
+[69]local copying 0.00433 6
+---------------------------------------------------------
+[70]FORT_CELLTOEDGE 0.00407 64
+---------------------------------------------------------
+[71]AMRNonLinearMultiCompOp::computeLambda 0.00392 2
+    96.1%    0.00376        2 AMRNonLinearMultiCompOp::resetLambda [73] f=0
+     3.8%    0.00015        2 LevelData<T>::define(dbl,comps,ghost,factory) [178] f=0
+    99.9%                  Total 
+---------------------------------------------------------
+[72]LevelData<T>::define(dbl,comps,ghost,factory) 0.00386 12
+    58.7%    0.00227       10 Copier::define [87] f=0
+    58.7%                  Total 
+---------------------------------------------------------
+[73]AMRNonLinearMultiCompOp::resetLambda 0.00376 2
+    58.6%    0.00221       64 FORT_SUMFACESNLVC [89] f=0
+    58.6%                  Total 
+---------------------------------------------------------
+[74]Copier::define 0.00371 16
+---------------------------------------------------------
+[75]LevelData<T>::define(dbl,comps,ghost,factory) 0.00352 12
+    71.5%    0.00252       10 Copier::define [86] f=0
+    71.5%                  Total 
+---------------------------------------------------------
+[76]FORT_SUMFACESNLVC 0.00343 64
+---------------------------------------------------------
+[77]FORT_AVERAGEFACE 0.00336 64
+---------------------------------------------------------
+[78]FORT_AVERAGEFACE 0.00335 64
+---------------------------------------------------------
+[79]Copier::define 0.00326 14
+---------------------------------------------------------
+[80]~LayoutData 0.00321 16
+---------------------------------------------------------
+[81]FORT_CELLTOEDGEGEOMETRIC 0.00274 32
+---------------------------------------------------------
+[82]exchange+copier 0.00272 9
+    99.8%    0.00272        9 actual_exchange [83] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[83]actual_exchange 0.00272 9
+    99.9%    0.00271        9 exchange [84] f=0
+    99.9%                  Total 
+---------------------------------------------------------
+[84]exchange 0.00271 9
+    99.0%    0.00269        9 local copying [85] f=0
+     0.5%    0.00001        9 MPI_allocateBuffers [248] f=0
+     0.0%    0.00000        9 post_messages [304] f=0
+     0.0%    0.00000        9 unpack_messages [305] f=0
+     0.0%    0.00000        9 completePendingSends [308] f=0
+     0.0%    0.00000        9 write Data to buffers [326] f=0
+    99.5%                  Total 
+---------------------------------------------------------
+[85]local copying 0.00269 9
+---------------------------------------------------------
+[86]Copier::define 0.00252 10
+---------------------------------------------------------
+[87]Copier::define 0.00227 10
+---------------------------------------------------------
+[88]cornerCopier define 0.00227 2
+---------------------------------------------------------
+[89]FORT_SUMFACESNLVC 0.00221 64
+---------------------------------------------------------
+[90]copyTo 0.00218 4
+    99.6%    0.00217        4 local copying [91] f=0
+     0.1%    0.00000        4 MPI_allocateBuffers [274] f=0
+     0.0%    0.00000        4 post_messages [345] f=0
+     0.0%    0.00000        4 write Data to buffers [368] f=0
+     0.0%    0.00000        4 unpack_messages [373] f=0
+     0.0%    0.00000        4 completePendingSends [380] f=0
+    99.7%                  Total 
+---------------------------------------------------------
+[91]local copying 0.00217 4
+---------------------------------------------------------
+[92]exchange+copier 0.00208 7
+    99.9%    0.00208        6 actual_exchange [93] f=0
+    99.9%                  Total 
+---------------------------------------------------------
+[93]actual_exchange 0.00208 6
+    99.9%    0.00208        6 exchange [94] f=0
+    99.9%                  Total 
+---------------------------------------------------------
+[94]exchange 0.00208 6
+    99.0%    0.00206        6 local copying [95] f=0
+     0.4%    0.00001        6 MPI_allocateBuffers [252] f=0
+     0.0%    0.00000        6 unpack_messages [321] f=0
+     0.0%    0.00000        6 post_messages [327] f=0
+     0.0%    0.00000        6 completePendingSends [330] f=0
+     0.0%    0.00000        6 write Data to buffers [348] f=0
+    99.5%                  Total 
+---------------------------------------------------------
+[95]local copying 0.00206 6
+---------------------------------------------------------
+[96]copyTo 0.00200 2
+    99.4%    0.00198        2 local copying [97] f=0
+     0.3%    0.00001        2 MPI_allocateBuffers [259] f=0
+     0.0%    0.00000        2 post_messages [360] f=0
+     0.0%    0.00000        2 completePendingSends [376] f=0
+     0.0%    0.00000        2 write Data to buffers [391] f=0
+     0.0%    0.00000        2 unpack_messages [394] f=0
+    99.7%                  Total 
+---------------------------------------------------------
+[97]local copying 0.00198 2
+---------------------------------------------------------
+[98]Copier::define 0.00162 10
+---------------------------------------------------------
+[99]AMRPoissonOpFactory::define 0.00157 2
+    59.5%    0.00093      128 CFIVS::define(fast) [115] f=0
+    18.4%    0.00029        2 Copier::exchangeDefine [162] f=0
+     0.4%    0.00001        8 ~LayoutData [261] f=0
+     0.3%    0.00000        4 ~Copier [269] f=0
+    78.6%                  Total 
+---------------------------------------------------------
+[100]copyTo 0.00153 2
+    98.9%    0.00152        2 local copying [101] f=0
+     0.6%    0.00001        2 MPI_allocateBuffers [254] f=0
+     0.0%    0.00000        2 unpack_messages [314] f=0
+     0.0%    0.00000        2 write Data to buffers [341] f=0
+     0.0%    0.00000        2 post_messages [363] f=0
+     0.0%    0.00000        2 completePendingSends [377] f=0
+    99.5%                  Total 
+---------------------------------------------------------
+[101]local copying 0.00152 2
+---------------------------------------------------------
+[102]copyTo 0.00151 2
+    98.8%    0.00149        2 local copying [103] f=0
+     0.7%    0.00001        2 MPI_allocateBuffers [250] f=0
+     0.0%    0.00000        2 write Data to buffers [337] f=0
+     0.0%    0.00000        2 unpack_messages [354] f=0
+     0.0%    0.00000        2 post_messages [366] f=0
+     0.0%    0.00000        2 completePendingSends [381] f=0
+    99.6%                  Total 
+---------------------------------------------------------
+[103]local copying 0.00149 2
+---------------------------------------------------------
+[104]copyTo 0.00149 2
+    99.5%    0.00148        2 local copying [105] f=0
+     0.1%    0.00000        2 MPI_allocateBuffers [282] f=0
+     0.0%    0.00000        2 post_messages [384] f=0
+     0.0%    0.00000        2 unpack_messages [390] f=0
+     0.0%    0.00000        2 write Data to buffers [393] f=0
+     0.0%    0.00000        2 completePendingSends [397] f=0
+    99.6%                  Total 
+---------------------------------------------------------
+[105]local copying 0.00148 2
+---------------------------------------------------------
+[106]AMRMultiGrid::define 0.00133 2
+    76.9%    0.00102        2 MultiGrid::define [114] f=0
+    15.9%    0.00021        2 AMRPoissonOpFactory::AMRnewOp [169] f=0
+     0.1%    0.00000        4 ~Copier [299] f=0
+    92.9%                  Total 
+---------------------------------------------------------
+[107]Copier::define 0.00121 5
+---------------------------------------------------------
+[108]CFIVS::define(fast) 0.00119 128
+---------------------------------------------------------
+[109]copyTo 0.00107 8
+    97.8%    0.00105        8 local copying [111] f=0
+     0.8%    0.00001        8 MPI_allocateBuffers [253] f=0
+     0.1%    0.00000        8 post_messages [295] f=0
+     0.0%    0.00000        8 write Data to buffers [323] f=0
+     0.0%    0.00000        8 unpack_messages [328] f=0
+     0.0%    0.00000        8 completePendingSends [332] f=0
+    98.8%                  Total 
+---------------------------------------------------------
+[110]copyTo 0.00105 8
+    98.1%    0.00103        8 local copying [112] f=0
+     0.7%    0.00001        8 MPI_allocateBuffers [257] f=0
+     0.0%    0.00000        8 post_messages [310] f=0
+     0.0%    0.00000        8 unpack_messages [311] f=0
+     0.0%    0.00000        8 write Data to buffers [316] f=0
+     0.0%    0.00000        8 completePendingSends [320] f=0
+    99.0%                  Total 
+---------------------------------------------------------
+[111]local copying 0.00105 8
+---------------------------------------------------------
+[112]local copying 0.00103 8
+---------------------------------------------------------
+[113]LevelData<T>::define(dbl,comps,ghost,factory) 0.00103 2
+---------------------------------------------------------
+[114]MultiGrid::define 0.00102 2
+    90.2%    0.00092        6 AMRPoissonOpFactory::MGnewOp [116] f=0
+    90.2%                  Total 
+---------------------------------------------------------
+[115]CFIVS::define(fast) 0.00093 128
+---------------------------------------------------------
+[116]AMRPoissonOpFactory::MGnewOp 0.00092 6
+    26.0%    0.00024        4 AMRPoissonOp::define4 [165] f=0
+     8.2%    0.00008       16 ~LayoutData [209] f=0
+     0.7%    0.00001        4 ~Copier [258] f=0
+    34.9%                  Total 
+---------------------------------------------------------
+[117]exchange+copier 0.00087 4
+    99.8%    0.00087        4 actual_exchange [118] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[118]actual_exchange 0.00087 4
+    99.9%    0.00087        4 exchange [119] f=0
+    99.9%                  Total 
+---------------------------------------------------------
+[119]exchange 0.00087 4
+    98.3%    0.00085        4 local copying [122] f=0
+     0.7%    0.00001        4 MPI_allocateBuffers [260] f=0
+     0.0%    0.00000        4 post_messages [343] f=0
+     0.0%    0.00000        4 unpack_messages [361] f=0
+     0.0%    0.00000        4 write Data to buffers [364] f=0
+     0.0%    0.00000        4 completePendingSends [365] f=0
+    99.1%                  Total 
+---------------------------------------------------------
+[120]exchange 0.00086 7
+    97.5%    0.00084        7 local copying [124] f=0
+     1.0%    0.00001        7 MPI_allocateBuffers [255] f=0
+     0.1%    0.00000        7 post_messages [302] f=0
+     0.0%    0.00000        7 completePendingSends [318] f=0
+     0.0%    0.00000        7 write Data to buffers [336] f=0
+     0.0%    0.00000        7 unpack_messages [347] f=0
+    98.6%                  Total 
+---------------------------------------------------------
+[121]BCFunctions::applyCorrectScalarBC 0.00085 256
+    63.6%    0.00054       64 BCFunctions::InflowOutflowBC [133] f=0
+    23.5%    0.00020      128 BCFunctions::ConstantNeumBC [171] f=0
+     7.0%    0.00006       64 BCFunctions::ConstantDiriBC [217] f=0
+    94.1%                  Total 
+---------------------------------------------------------
+[122]local copying 0.00085 4
+---------------------------------------------------------
+[123]AMRNonLinearMultiCompOpFactory::define 0.00085 1
+    57.3%    0.00049       64 CFIVS::define(fast) [139] f=0
+    16.5%    0.00014        1 Copier::exchangeDefine [180] f=0
+     0.4%    0.00000        4 ~LayoutData [276] f=0
+     0.3%    0.00000        2 ~Copier [280] f=0
+    74.4%                  Total 
+---------------------------------------------------------
+[124]local copying 0.00084 7
+---------------------------------------------------------
+[125]exchange+copier 0.00079 6
+    99.8%    0.00079        6 actual_exchange [126] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[126]actual_exchange 0.00079 6
+    99.8%    0.00079        6 exchange [127] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[127]exchange 0.00079 6
+    97.8%    0.00077        6 local copying [128] f=0
+     0.7%    0.00001        6 MPI_allocateBuffers [263] f=0
+     0.0%    0.00000        6 post_messages [315] f=0
+     0.0%    0.00000        6 unpack_messages [325] f=0
+     0.0%    0.00000        6 completePendingSends [349] f=0
+     0.0%    0.00000        6 write Data to buffers [355] f=0
+    98.6%                  Total 
+---------------------------------------------------------
+[128]local copying 0.00077 6
+---------------------------------------------------------
+[129]Copier::define 0.00068 4
+---------------------------------------------------------
+[130]CoarseAverage::define2 0.00065 4
+    55.7%    0.00036        4 Copier::define [148] f=0
+    31.7%    0.00021        4 LevelData<T>::define(dbl,comps,ghost,factory) [170] f=0
+    87.4%                  Total 
+---------------------------------------------------------
+[131]LevelData<T>::define(dbl,comps,ghost,factory) 0.00060 1
+---------------------------------------------------------
+[132]LevelData<T>::define(dbl,comps,ghost,factory) 0.00060 1
+---------------------------------------------------------
+[133]BCFunctions::InflowOutflowBC 0.00054 64
+    90.6%    0.00049       64 InflowOutflowBC::findAdvVel [137] f=0
+    90.6%                  Total 
+---------------------------------------------------------
+[134]BCFunctions::applyCorrectScalarBC 0.00053 96
+    48.2%    0.00026       48 BCFunctions::ConstantNeumBC [164] f=0
+    36.5%    0.00019       24 BCFunctions::InflowOutflowBC [172] f=0
+    12.5%    0.00007       24 BCFunctions::ConstantDiriBC [212] f=0
+    97.2%                  Total 
+---------------------------------------------------------
+[135]Copier::define 0.00050 2
+---------------------------------------------------------
+[136]Copier::define 0.00049 2
+---------------------------------------------------------
+[137]InflowOutflowBC::findAdvVel 0.00049 64
+    12.8%    0.00006       64 FORT_INFLOWOUTFLOWBC [215] f=0
+    12.8%                  Total 
+---------------------------------------------------------
+[138]BCFunctions::applyCorrectScalarBC 0.00049 256
+    60.1%    0.00029       64 BCFunctions::InflowOutflowBC [160] f=0
+    24.1%    0.00012      128 BCFunctions::ConstantNeumBC [189] f=0
+     9.9%    0.00005       64 BCFunctions::ConstantDiriBC [222] f=0
+    94.1%                  Total 
+---------------------------------------------------------
+[139]CFIVS::define(fast) 0.00049 64
+---------------------------------------------------------
+[140]exchange 0.00049 6
+    97.2%    0.00047        6 local copying [141] f=0
+     1.0%    0.00000        6 MPI_allocateBuffers [270] f=0
+     0.1%    0.00000        6 completePendingSends [317] f=0
+     0.0%    0.00000        6 post_messages [333] f=0
+     0.0%    0.00000        6 unpack_messages [338] f=0
+     0.0%    0.00000        6 write Data to buffers [351] f=0
+    98.3%                  Total 
+---------------------------------------------------------
+[141]local copying 0.00047 6
+---------------------------------------------------------
+[142]exchange 0.00042 6
+    97.6%    0.00041        6 local copying [143] f=0
+     0.6%    0.00000        6 MPI_allocateBuffers [281] f=0
+     0.0%    0.00000        6 post_messages [334] f=0
+     0.0%    0.00000        6 write Data to buffers [335] f=0
+     0.0%    0.00000        6 unpack_messages [357] f=0
+     0.0%    0.00000        6 completePendingSends [359] f=0
+    98.3%                  Total 
+---------------------------------------------------------
+[143]local copying 0.00041 6
+---------------------------------------------------------
+[144]~Copier 0.00040 54
+---------------------------------------------------------
+[145]FORT_VISCOUSBC 0.00040 64
+---------------------------------------------------------
+[146]BCFunctions::applyCorrectScalarBC 0.00039 80
+    54.7%    0.00021       40 BCFunctions::ConstantNeumBC [168] f=0
+    25.3%    0.00010       32 BCFunctions::ConstantDiriBC [196] f=0
+    16.6%    0.00006        8 BCFunctions::InflowOutflowBC [213] f=0
+    96.6%                  Total 
+---------------------------------------------------------
+[147]Copier::define 0.00038 4
+---------------------------------------------------------
+[148]Copier::define 0.00036 4
+---------------------------------------------------------
+[149]AMRNonLinearMultiCompOp::computeDiffusedVar::exchange 0.00035 2
+    98.7%    0.00035        2 exchange [150] f=0
+    98.7%                  Total 
+---------------------------------------------------------
+[150]exchange 0.00035 2
+    97.8%    0.00034        2 local copying [153] f=0
+     0.2%    0.00000        2 MPI_allocateBuffers [297] f=0
+     0.0%    0.00000        2 post_messages [387] f=0
+     0.0%    0.00000        2 completePendingSends [388] f=0
+     0.0%    0.00000        2 write Data to buffers [395] f=0
+     0.0%    0.00000        2 unpack_messages [396] f=0
+    98.1%                  Total 
+---------------------------------------------------------
+[151]exchange 0.00034 2
+    98.4%    0.00034        2 local copying [154] f=0
+     0.4%    0.00000        2 MPI_allocateBuffers [290] f=0
+     0.1%    0.00000        2 write Data to buffers [340] f=0
+     0.0%    0.00000        2 post_messages [362] f=0
+     0.0%    0.00000        2 unpack_messages [367] f=0
+     0.0%    0.00000        2 completePendingSends [398] f=0
+    99.0%                  Total 
+---------------------------------------------------------
+[152]LevelData<T>::define(dbl,comps,ghost,factory) 0.00034 4
+---------------------------------------------------------
+[153]local copying 0.00034 2
+---------------------------------------------------------
+[154]local copying 0.00034 2
+---------------------------------------------------------
+[155]exchange+copier 0.00032 2
+    99.6%    0.00032        2 actual_exchange [156] f=0
+    99.6%                  Total 
+---------------------------------------------------------
+[156]actual_exchange 0.00032 2
+    99.8%    0.00032        2 exchange [157] f=0
+    99.8%                  Total 
+---------------------------------------------------------
+[157]exchange 0.00032 2
+    97.8%    0.00031        2 local copying [158] f=0
+     0.3%    0.00000        2 MPI_allocateBuffers [293] f=0
+     0.1%    0.00000        2 unpack_messages [329] f=0
+     0.0%    0.00000        2 completePendingSends [374] f=0
+     0.0%    0.00000        2 post_messages [383] f=0
+     0.0%    0.00000        2 write Data to buffers [389] f=0
+    98.3%                  Total 
+---------------------------------------------------------
+[158]local copying 0.00031 2
+---------------------------------------------------------
+[159]Copier::define 0.00031 2
+---------------------------------------------------------
+[160]BCFunctions::InflowOutflowBC 0.00029 64
+    90.6%    0.00027       64 InflowOutflowBC::findAdvVel [163] f=0
+    90.6%                  Total 
+---------------------------------------------------------
+[161]BCFunctions::applyCorrectScalarBC 0.00029 64
+    43.7%    0.00013       32 BCFunctions::ConstantNeumBC [185] f=0
+    38.5%    0.00011       16 BCFunctions::InflowOutflowBC [192] f=0
+    14.6%    0.00004       16 BCFunctions::ConstantDiriBC [226] f=0
+    96.8%                  Total 
+---------------------------------------------------------
+[162]Copier::exchangeDefine 0.00029 2
+---------------------------------------------------------
+[163]InflowOutflowBC::findAdvVel 0.00027 64
+    16.8%    0.00004       64 FORT_INFLOWOUTFLOWBC [225] f=0
+    16.8%                  Total 
+---------------------------------------------------------
+[164]BCFunctions::ConstantNeumBC 0.00026 48
+    89.2%    0.00023       48 FORT_NEUMBC [167] f=0
+    89.2%                  Total 
+---------------------------------------------------------
+[165]AMRPoissonOp::define4 0.00024 4
+---------------------------------------------------------
+[166]BCFunctions::applyCorrectScalarBC 0.00023 64
+    42.5%    0.00010       16 BCFunctions::InflowOutflowBC [195] f=0
+    40.4%    0.00009       32 BCFunctions::ConstantNeumBC [199] f=0
+    13.5%    0.00003       16 BCFunctions::ConstantDiriBC [231] f=0
+    96.4%                  Total 
+---------------------------------------------------------
+[167]FORT_NEUMBC 0.00023 48
+---------------------------------------------------------
+[168]BCFunctions::ConstantNeumBC 0.00021 40
+    89.5%    0.00019       40 FORT_NEUMBC [173] f=0
+    89.5%                  Total 
+---------------------------------------------------------
+[169]AMRPoissonOpFactory::AMRnewOp 0.00021 2
+    59.2%    0.00013        2 AMRPoissonOp::define4 [186] f=0
+    59.2%                  Total 
+---------------------------------------------------------
+[170]LevelData<T>::define(dbl,comps,ghost,factory) 0.00021 4
+---------------------------------------------------------
+[171]BCFunctions::ConstantNeumBC 0.00020 128
+    40.4%    0.00008      128 FORT_NEUMBC [207] f=0
+    40.4%                  Total 
+---------------------------------------------------------
+[172]BCFunctions::InflowOutflowBC 0.00019 24
+    92.1%    0.00018       24 InflowOutflowBC::findAdvVel [175] f=0
+    92.1%                  Total 
+---------------------------------------------------------
+[173]FORT_NEUMBC 0.00019 40
+---------------------------------------------------------
+[174]~LayoutData 0.00019 30
+---------------------------------------------------------
+[175]InflowOutflowBC::findAdvVel 0.00018 24
+    48.7%    0.00009       24 FORT_INFLOWOUTFLOWBC [202] f=0
+    48.7%                  Total 
+---------------------------------------------------------
+[176]exchange 0.00017 2
+    94.7%    0.00016        2 local copying [177] f=0
+     1.7%    0.00000        2 MPI_allocateBuffers [277] f=0
+     0.0%    0.00000        2 post_messages [378] f=0
+     0.0%    0.00000        2 unpack_messages [385] f=0
+     0.0%    0.00000        2 completePendingSends [386] f=0
+     0.0%    0.00000        2 write Data to buffers [392] f=0
+    96.5%                  Total 
+---------------------------------------------------------
+[177]local copying 0.00016 2
+---------------------------------------------------------
+[178]LevelData<T>::define(dbl,comps,ghost,factory) 0.00015 2
+---------------------------------------------------------
+[179]BCFunctions::applyCorrectScalarBC 0.00014 32
+    65.8%    0.00010       16 BCFunctions::ConstantNeumBC [198] f=0
+    15.7%    0.00002        8 BCFunctions::InflowOutflowBC [238] f=0
+    13.9%    0.00002        8 BCFunctions::ConstantDiriBC [242] f=0
+    95.4%                  Total 
+---------------------------------------------------------
+[180]Copier::exchangeDefine 0.00014 1
+---------------------------------------------------------
+[181]LevelData<T>::define(dbl,comps,ghost,factory) 0.00014 2
+---------------------------------------------------------
+[182]AMRPoissonOp::define4 0.00014 1
+---------------------------------------------------------
+[183]~LayoutData 0.00014 40
+---------------------------------------------------------
+[184]AMRPoissonOp::define4 0.00013 2
+---------------------------------------------------------
+[185]BCFunctions::ConstantNeumBC 0.00013 32
+    87.5%    0.00011       32 FORT_NEUMBC [193] f=0
+    87.5%                  Total 
+---------------------------------------------------------
+[186]AMRPoissonOp::define4 0.00013 2
+---------------------------------------------------------
+[187]AMRPoissonOp::define4 0.00012 2
+---------------------------------------------------------
+[188]AMRPoissonOp::define4 0.00012 2
+---------------------------------------------------------
+[189]BCFunctions::ConstantNeumBC 0.00012 128
+    39.2%    0.00005      128 FORT_NEUMBC [223] f=0
+    39.2%                  Total 
+---------------------------------------------------------
+[190]~LayoutData 0.00012 16
+---------------------------------------------------------
+[191]AMRPoissonOp::define4 0.00012 2
+---------------------------------------------------------
+[192]BCFunctions::InflowOutflowBC 0.00011 16
+    93.0%    0.00011       16 InflowOutflowBC::findAdvVel [194] f=0
+    93.0%                  Total 
+---------------------------------------------------------
+[193]FORT_NEUMBC 0.00011 32
+---------------------------------------------------------
+[194]InflowOutflowBC::findAdvVel 0.00011 16
+    52.2%    0.00006       16 FORT_INFLOWOUTFLOWBC [220] f=0
+    52.2%                  Total 
+---------------------------------------------------------
+[195]BCFunctions::InflowOutflowBC 0.00010 16
+    94.1%    0.00009       16 InflowOutflowBC::findAdvVel [200] f=0
+    94.1%                  Total 
+---------------------------------------------------------
+[196]BCFunctions::ConstantDiriBC 0.00010 32
+    83.8%    0.00008       32 FORT_DIRIBC [205] f=0
+    83.8%                  Total 
+---------------------------------------------------------
+[197]~LayoutData 0.00010 30
+---------------------------------------------------------
+[198]BCFunctions::ConstantNeumBC 0.00010 16
+    89.2%    0.00008       16 FORT_NEUMBC [203] f=0
+    89.2%                  Total 
+---------------------------------------------------------
+[199]BCFunctions::ConstantNeumBC 0.00009 32
+    88.0%    0.00008       32 FORT_NEUMBC [204] f=0
+    88.0%                  Total 
+---------------------------------------------------------
+[200]InflowOutflowBC::findAdvVel 0.00009 16
+    48.5%    0.00005       16 FORT_INFLOWOUTFLOWBC [224] f=0
+    48.5%                  Total 
+---------------------------------------------------------
+[201]FORT_NEUMANN 0.00009 64
+---------------------------------------------------------
+[202]FORT_INFLOWOUTFLOWBC 0.00009 24
+---------------------------------------------------------
+[203]FORT_NEUMBC 0.00008 16
+---------------------------------------------------------
+[204]FORT_NEUMBC 0.00008 32
+---------------------------------------------------------
+[205]FORT_DIRIBC 0.00008 32
+---------------------------------------------------------
+[206]DisjointBoxLayout::computeNeighbors 0.00008 1
+---------------------------------------------------------
+[207]FORT_NEUMBC 0.00008 128
+---------------------------------------------------------
+[208]~LayoutData 0.00008 12
+---------------------------------------------------------
+[209]~LayoutData 0.00008 16
+---------------------------------------------------------
+[210]MPI_allocateBuffers 0.00008 49
+---------------------------------------------------------
+[211]~LayoutData 0.00007 11
+---------------------------------------------------------
+[212]BCFunctions::ConstantDiriBC 0.00007 24
+    80.7%    0.00005       24 FORT_DIRIBC [221] f=0
+    80.7%                  Total 
+---------------------------------------------------------
+[213]BCFunctions::InflowOutflowBC 0.00006 8
+    91.9%    0.00006        8 InflowOutflowBC::findAdvVel [219] f=0
+    91.9%                  Total 
+---------------------------------------------------------
+[214]AMRPoissonOp::define4 0.00006 1
+---------------------------------------------------------
+[215]FORT_INFLOWOUTFLOWBC 0.00006 64
+---------------------------------------------------------
+[216]~Copier 0.00006 37
+---------------------------------------------------------
+[217]BCFunctions::ConstantDiriBC 0.00006 64
+    45.7%    0.00003       64 FORT_DIRIBC [233] f=0
+    45.7%                  Total 
+---------------------------------------------------------
+[218]FORT_ADVINFLOWOUTFLOW 0.00006 64
+---------------------------------------------------------
+[219]InflowOutflowBC::findAdvVel 0.00006 8
+    47.9%    0.00003        8 FORT_INFLOWOUTFLOWBC [232] f=0
+    47.9%                  Total 
+---------------------------------------------------------
+[220]FORT_INFLOWOUTFLOWBC 0.00006 16
+---------------------------------------------------------
+[221]FORT_DIRIBC 0.00005 24
+---------------------------------------------------------
+[222]BCFunctions::ConstantDiriBC 0.00005 64
+    51.8%    0.00003       64 FORT_DIRIBC [236] f=0
+    51.8%                  Total 
+---------------------------------------------------------
+[223]FORT_NEUMBC 0.00005 128
+---------------------------------------------------------
+[224]FORT_INFLOWOUTFLOWBC 0.00005 16
+---------------------------------------------------------
+[225]FORT_INFLOWOUTFLOWBC 0.00004 64
+---------------------------------------------------------
+[226]BCFunctions::ConstantDiriBC 0.00004 16
+    82.1%    0.00004       16 FORT_DIRIBC [229] f=0
+    82.1%                  Total 
+---------------------------------------------------------
+[227]~Copier 0.00004 28
+---------------------------------------------------------
+[228]~Copier 0.00004 20
+---------------------------------------------------------
+[229]FORT_DIRIBC 0.00004 16
+---------------------------------------------------------
+[230]~LayoutData 0.00003 2
+---------------------------------------------------------
+[231]BCFunctions::ConstantDiriBC 0.00003 16
+    81.8%    0.00003       16 FORT_DIRIBC [234] f=0
+    81.8%                  Total 
+---------------------------------------------------------
+[232]FORT_INFLOWOUTFLOWBC 0.00003 8
+---------------------------------------------------------
+[233]FORT_DIRIBC 0.00003 64
+---------------------------------------------------------
+[234]FORT_DIRIBC 0.00003 16
+---------------------------------------------------------
+[235]~Copier 0.00003 30
+---------------------------------------------------------
+[236]FORT_DIRIBC 0.00003 64
+---------------------------------------------------------
+[237]~LayoutData 0.00002 3
+---------------------------------------------------------
+[238]BCFunctions::InflowOutflowBC 0.00002 8
+    81.2%    0.00002        8 BCFunctions::ConstantDiriBC [243] f=0
+    81.2%                  Total 
+---------------------------------------------------------
+[239]~Copier 0.00002 16
+---------------------------------------------------------
+[240]~Copier 0.00002 16
+---------------------------------------------------------
+[241]LoadBalance:VectorBoxEntry 0.00002 1
+    48.5%    0.00001        1 LoadBalance:VectorBoxSimple [251] f=0
+    48.5%                  Total 
+---------------------------------------------------------
+[242]BCFunctions::ConstantDiriBC 0.00002 8
+    78.2%    0.00002        8 FORT_DIRIBC [245] f=0
+    78.2%                  Total 
+---------------------------------------------------------
+[243]BCFunctions::ConstantDiriBC 0.00002 8
+    82.0%    0.00002        8 FORT_DIRIBC [247] f=0
+    82.0%                  Total 
+---------------------------------------------------------
+[244]~LayoutData 0.00002 2
+---------------------------------------------------------
+[245]FORT_DIRIBC 0.00002 8
+---------------------------------------------------------
+[246]~Copier 0.00002 7
+---------------------------------------------------------
+[247]FORT_DIRIBC 0.00002 8
+---------------------------------------------------------
+[248]MPI_allocateBuffers 0.00001 9
+---------------------------------------------------------
+[249]~Copier 0.00001 4
+---------------------------------------------------------
+[250]MPI_allocateBuffers 0.00001 2
+---------------------------------------------------------
+[251]LoadBalance:VectorBoxSimple 0.00001 1
+---------------------------------------------------------
+[252]MPI_allocateBuffers 0.00001 6
+---------------------------------------------------------
+[253]MPI_allocateBuffers 0.00001 8
+---------------------------------------------------------
+[254]MPI_allocateBuffers 0.00001 2
+---------------------------------------------------------
+[255]MPI_allocateBuffers 0.00001 7
+---------------------------------------------------------
+[256]~Copier 0.00001 2
+---------------------------------------------------------
+[257]MPI_allocateBuffers 0.00001 8
+---------------------------------------------------------
+[258]~Copier 0.00001 4
+---------------------------------------------------------
+[259]MPI_allocateBuffers 0.00001 2
+---------------------------------------------------------
+[260]MPI_allocateBuffers 0.00001 4
+---------------------------------------------------------
+[261]~LayoutData 0.00001 8
+---------------------------------------------------------
+[262]MPI_allocateBuffers 0.00001 6
+---------------------------------------------------------
+[263]MPI_allocateBuffers 0.00001 6
+---------------------------------------------------------
+[264]~LayoutData 0.00001 8
+---------------------------------------------------------
+[265]~LayoutData 0.00001 8
+---------------------------------------------------------
+[266]~LayoutData 0.00001 8
+---------------------------------------------------------
+[267]~BoxLayoutData 0.00001 22
+    13.8%    0.00000       22 completePendingSends [298] f=0
+    13.8%                  Total 
+---------------------------------------------------------
+[268]~LayoutData 0.00001 8
+---------------------------------------------------------
+[269]~Copier 0.00000 4
+---------------------------------------------------------
+[270]MPI_allocateBuffers 0.00000 6
+---------------------------------------------------------
+[271]MPI_allocateBuffers 0.00000 6
+---------------------------------------------------------
+[272]~LayoutData 0.00000 4
+---------------------------------------------------------
+[273]~LayoutData 0.00000 4
+---------------------------------------------------------
+[274]MPI_allocateBuffers 0.00000 4
+---------------------------------------------------------
+[275]~BoxLayoutData 0.00000 24
+    22.0%    0.00000       24 completePendingSends [301] f=0
+    22.0%                  Total 
+---------------------------------------------------------
+[276]~LayoutData 0.00000 4
+---------------------------------------------------------
+[277]MPI_allocateBuffers 0.00000 2
+---------------------------------------------------------
+[278]QuadCFInterp::define 0.00000 2
+---------------------------------------------------------
+[279]unpack_messages 0.00000 49
+---------------------------------------------------------
+[280]~Copier 0.00000 2
+---------------------------------------------------------
+[281]MPI_allocateBuffers 0.00000 6
+---------------------------------------------------------
+[282]MPI_allocateBuffers 0.00000 2
+---------------------------------------------------------
+[283]write Data to buffers 0.00000 49
+---------------------------------------------------------
+[284]completePendingSends 0.00000 49
+---------------------------------------------------------
+[285]~BoxLayoutData 0.00000 8
+     7.9%    0.00000        8 completePendingSends [350] f=0
+     7.9%                  Total 
+---------------------------------------------------------
+[286]~BoxLayoutData 0.00000 14
+    16.8%    0.00000       14 completePendingSends [309] f=0
+    16.8%                  Total 
+---------------------------------------------------------
+[287]post_messages 0.00000 49
+---------------------------------------------------------
+[288]~BoxLayoutData 0.00000 4
+     6.1%    0.00000        4 completePendingSends [371] f=0
+     6.1%                  Total 
+---------------------------------------------------------
+[289]~BoxLayoutData 0.00000 8
+    11.1%    0.00000        8 completePendingSends [342] f=0
+    11.1%                  Total 
+---------------------------------------------------------
+[290]MPI_allocateBuffers 0.00000 2
+---------------------------------------------------------
+[291]~BoxLayoutData 0.00000 3
+     6.6%    0.00000        3 completePendingSends [369] f=0
+     6.6%                  Total 
+---------------------------------------------------------
+[292]~BoxLayoutData 0.00000 3
+     6.0%    0.00000        3 completePendingSends [379] f=0
+     6.0%                  Total 
+---------------------------------------------------------
+[293]MPI_allocateBuffers 0.00000 2
+---------------------------------------------------------
+[294]~BoxLayoutData 0.00000 2
+     8.4%    0.00000        2 completePendingSends [375] f=0
+     8.4%                  Total 
+---------------------------------------------------------
+[295]post_messages 0.00000 8
+---------------------------------------------------------
+[296]~BoxLayoutData 0.00000 2
+    11.8%    0.00000        2 completePendingSends [370] f=0
+    11.8%                  Total 
+---------------------------------------------------------
+[297]MPI_allocateBuffers 0.00000 2
+---------------------------------------------------------
+[298]completePendingSends 0.00000 22
+---------------------------------------------------------
+[299]~Copier 0.00000 4
+---------------------------------------------------------
+[300]~LevelData 0.00000 21
+---------------------------------------------------------
+[301]completePendingSends 0.00000 24
+---------------------------------------------------------
+[302]post_messages 0.00000 7
+---------------------------------------------------------
+[303]~LevelData 0.00000 12
+---------------------------------------------------------
+[304]post_messages 0.00000 9
+---------------------------------------------------------
+[305]unpack_messages 0.00000 9
+---------------------------------------------------------
+[306]~LevelData 0.00000 22
+---------------------------------------------------------
+[307]~Copier 0.00000 2
+---------------------------------------------------------
+[308]completePendingSends 0.00000 9
+---------------------------------------------------------
+[309]completePendingSends 0.00000 14
+---------------------------------------------------------
+[310]post_messages 0.00000 8
+---------------------------------------------------------
+[311]unpack_messages 0.00000 8
+---------------------------------------------------------
+[312]~LevelData 0.00000 4
+---------------------------------------------------------
+[313]unpack_messages 0.00000 6
+---------------------------------------------------------
+[314]unpack_messages 0.00000 2
+---------------------------------------------------------
+[315]post_messages 0.00000 6
+---------------------------------------------------------
+[316]write Data to buffers 0.00000 8
+---------------------------------------------------------
+[317]completePendingSends 0.00000 6
+---------------------------------------------------------
+[318]completePendingSends 0.00000 7
+---------------------------------------------------------
+[319]unpack_messages 0.00000 6
+---------------------------------------------------------
+[320]completePendingSends 0.00000 8
+---------------------------------------------------------
+[321]unpack_messages 0.00000 6
+---------------------------------------------------------
+[322]~LevelData 0.00000 2
+---------------------------------------------------------
+[323]write Data to buffers 0.00000 8
+---------------------------------------------------------
+[324]post_messages 0.00000 6
+---------------------------------------------------------
+[325]unpack_messages 0.00000 6
+---------------------------------------------------------
+[326]write Data to buffers 0.00000 9
+---------------------------------------------------------
+[327]post_messages 0.00000 6
+---------------------------------------------------------
+[328]unpack_messages 0.00000 8
+---------------------------------------------------------
+[329]unpack_messages 0.00000 2
+---------------------------------------------------------
+[330]completePendingSends 0.00000 6
+---------------------------------------------------------
+[331]post_messages 0.00000 6
+---------------------------------------------------------
+[332]completePendingSends 0.00000 8
+---------------------------------------------------------
+[333]post_messages 0.00000 6
+---------------------------------------------------------
+[334]post_messages 0.00000 6
+---------------------------------------------------------
+[335]write Data to buffers 0.00000 6
+---------------------------------------------------------
+[336]write Data to buffers 0.00000 7
+---------------------------------------------------------
+[337]write Data to buffers 0.00000 2
+---------------------------------------------------------
+[338]unpack_messages 0.00000 6
+---------------------------------------------------------
+[339]~LevelData 0.00000 8
+---------------------------------------------------------
+[340]write Data to buffers 0.00000 2
+---------------------------------------------------------
+[341]write Data to buffers 0.00000 2
+---------------------------------------------------------
+[342]completePendingSends 0.00000 8
+---------------------------------------------------------
+[343]post_messages 0.00000 4
+---------------------------------------------------------
+[344]~LevelData 0.00000 8
+---------------------------------------------------------
+[345]post_messages 0.00000 4
+---------------------------------------------------------
+[346]write Data to buffers 0.00000 6
+---------------------------------------------------------
+[347]unpack_messages 0.00000 7
+---------------------------------------------------------
+[348]write Data to buffers 0.00000 6
+---------------------------------------------------------
+[349]completePendingSends 0.00000 6
+---------------------------------------------------------
+[350]completePendingSends 0.00000 8
+---------------------------------------------------------
+[351]write Data to buffers 0.00000 6
+---------------------------------------------------------
+[352]write Data to buffers 0.00000 6
+---------------------------------------------------------
+[353]completePendingSends 0.00000 6
+---------------------------------------------------------
+[354]unpack_messages 0.00000 2
+---------------------------------------------------------
+[355]write Data to buffers 0.00000 6
+---------------------------------------------------------
+[356]~LevelData 0.00000 2
+---------------------------------------------------------
+[357]unpack_messages 0.00000 6
+---------------------------------------------------------
+[358]completePendingSends 0.00000 6
+---------------------------------------------------------
+[359]completePendingSends 0.00000 6
+---------------------------------------------------------
+[360]post_messages 0.00000 2
+---------------------------------------------------------
+[361]unpack_messages 0.00000 4
+---------------------------------------------------------
+[362]post_messages 0.00000 2
+---------------------------------------------------------
+[363]post_messages 0.00000 2
+---------------------------------------------------------
+[364]write Data to buffers 0.00000 4
+---------------------------------------------------------
+[365]completePendingSends 0.00000 4
+---------------------------------------------------------
+[366]post_messages 0.00000 2
+---------------------------------------------------------
+[367]unpack_messages 0.00000 2
+---------------------------------------------------------
+[368]write Data to buffers 0.00000 4
+---------------------------------------------------------
+[369]completePendingSends 0.00000 3
+---------------------------------------------------------
+[370]completePendingSends 0.00000 2
+---------------------------------------------------------
+[371]completePendingSends 0.00000 4
+---------------------------------------------------------
+[372]~LevelData 0.00000 3
+---------------------------------------------------------
+[373]unpack_messages 0.00000 4
+---------------------------------------------------------
+[374]completePendingSends 0.00000 2
+---------------------------------------------------------
+[375]completePendingSends 0.00000 2
+---------------------------------------------------------
+[376]completePendingSends 0.00000 2
+---------------------------------------------------------
+[377]completePendingSends 0.00000 2
+---------------------------------------------------------
+[378]post_messages 0.00000 2
+---------------------------------------------------------
+[379]completePendingSends 0.00000 3
+---------------------------------------------------------
+[380]completePendingSends 0.00000 4
+---------------------------------------------------------
+[381]completePendingSends 0.00000 2
+---------------------------------------------------------
+[382]~LevelData 0.00000 3
+---------------------------------------------------------
+[383]post_messages 0.00000 2
+---------------------------------------------------------
+[384]post_messages 0.00000 2
+---------------------------------------------------------
+[385]unpack_messages 0.00000 2
+---------------------------------------------------------
+[386]completePendingSends 0.00000 2
+---------------------------------------------------------
+[387]post_messages 0.00000 2
+---------------------------------------------------------
+[388]completePendingSends 0.00000 2
+---------------------------------------------------------
+[389]write Data to buffers 0.00000 2
+---------------------------------------------------------
+[390]unpack_messages 0.00000 2
+---------------------------------------------------------
+[391]write Data to buffers 0.00000 2
+---------------------------------------------------------
+[392]write Data to buffers 0.00000 2
+---------------------------------------------------------
+[393]write Data to buffers 0.00000 2
+---------------------------------------------------------
+[394]unpack_messages 0.00000 2
+---------------------------------------------------------
+[395]write Data to buffers 0.00000 2
+---------------------------------------------------------
+[396]unpack_messages 0.00000 2
+---------------------------------------------------------
+[397]completePendingSends 0.00000 2
+---------------------------------------------------------
+[398]completePendingSends 0.00000 2
+=======================================================
+    0.02       32  FORT_NLVCCOMPUTEOP2D [19]
+    0.02      128  FORT_RIEMANNF [20]
+    0.02      128  FORT_QUASILINEARUPDATE [21]
+    0.02       32  FORT_CALCULATE_T_CL [22]
+    0.02       64  FORT_SECONDSLOPEDIFFSF [23]
+    0.01       32  FORT_CALCULATE_T_CL [29]
+    0.01      128  FORT_AVERAGE [30]
+    0.01       32  FORT_CALCULATE_BOUNDING_ENERGY [33]
+    0.01       64  FORT_SUMFACESNLVC [35]
+    0.01       32  FORT_PLMNORMALPREDF [37]
+    0.01       32  FORT_PPMNORMALPREDF [38]
+    0.01       16  FORT_CALCULATECL [42]
+    0.01       16  FORT_CALCULATET [43]
+    0.01      128  FORT_DIVERGENCE [44]
+    0.01       16  FORT_CALCULATECS [46]
+    0.01       16  FORT_CALCULATEPOROSITY [47]
+    0.01       32  FORT_SUMFACESNLVC [48]
+    0.01       32  FORT_CALCULATE_BOUNDING_ENERGY [49]
+    0.01      128  FORT_AVERAGE [50]
+    0.01       32  FORT_PPMFACEVALUESF [51]
+    0.01       32  FORT_VANLEERLIMITERF [56]
+    0.01       32  FORT_SUMFACESNLVC [57]
+    0.01       32  FORT_PPMLIMITERF [58]
+    0.01       16  FORT_CALCULATE_BOUNDING_ENERGY [60]
+    0.00       64  FORT_EDGETOCELL [61]
+    0.00       64  FORT_CELLTOEDGE [70]
+    0.00       64  FORT_SUMFACESNLVC [76]
+    0.00       64  FORT_AVERAGEFACE [77]
+    0.00       64  FORT_AVERAGEFACE [78]
+    0.00       32  FORT_CELLTOEDGEGEOMETRIC [81]
+    0.00       64  FORT_SUMFACESNLVC [89]
+    0.00       64  FORT_VISCOUSBC [145]
+    0.00       48  FORT_NEUMBC [167]
+    0.00       40  FORT_NEUMBC [173]
+    0.00       32  FORT_NEUMBC [193]
+    0.00       64  FORT_NEUMANN [201]
+    0.00       24  FORT_INFLOWOUTFLOWBC [202]
+    0.00       16  FORT_NEUMBC [203]
+    0.00       32  FORT_NEUMBC [204]
+    0.00       32  FORT_DIRIBC [205]
+    0.00      128  FORT_NEUMBC [207]
+    0.00       64  FORT_INFLOWOUTFLOWBC [215]
+    0.00       64  FORT_ADVINFLOWOUTFLOW [218]
+    0.00       16  FORT_INFLOWOUTFLOWBC [220]
+    0.00       24  FORT_DIRIBC [221]
+    0.00      128  FORT_NEUMBC [223]
+    0.00       16  FORT_INFLOWOUTFLOWBC [224]
+    0.00       64  FORT_INFLOWOUTFLOWBC [225]
+    0.00       16  FORT_DIRIBC [229]
+    0.00        8  FORT_INFLOWOUTFLOWBC [232]
+    0.00       64  FORT_DIRIBC [233]
+    0.00       16  FORT_DIRIBC [234]
+    0.00       64  FORT_DIRIBC [236]
+    0.00        8  FORT_DIRIBC [245]
+    0.00        8  FORT_DIRIBC [247]
+     0.27952   27.6%    Total
+=======================================================
+    0.00       49  MPI_allocateBuffers [210]
+    0.00        9  MPI_allocateBuffers [248]
+    0.00        2  MPI_allocateBuffers [250]
+    0.00        6  MPI_allocateBuffers [252]
+    0.00        8  MPI_allocateBuffers [253]
+    0.00        2  MPI_allocateBuffers [254]
+    0.00        7  MPI_allocateBuffers [255]
+    0.00        8  MPI_allocateBuffers [257]
+    0.00        2  MPI_allocateBuffers [259]
+    0.00        4  MPI_allocateBuffers [260]
+    0.00        6  MPI_allocateBuffers [262]
+    0.00        6  MPI_allocateBuffers [263]
+    0.00        6  MPI_allocateBuffers [270]
+    0.00        6  MPI_allocateBuffers [271]
+    0.00        4  MPI_allocateBuffers [274]
+    0.00        2  MPI_allocateBuffers [277]
+    0.00        6  MPI_allocateBuffers [281]
+    0.00        2  MPI_allocateBuffers [282]
+    0.00        2  MPI_allocateBuffers [290]
+    0.00        2  MPI_allocateBuffers [293]
+    0.00        2  MPI_allocateBuffers [297]
+     0.00019    0.0%    Total
+[0] main 1.01094 100.0% 1 0 0 MFlops 
+   [1] AMRLevelMushyLayer::computeDiagnostics 0.41894 41.4% 1 0 0 MFlops 
+      [3] AMRLevelMushyLayer::computeScalarAdvectiveFlux 0.14952 14.8% 2 0 0 MFlops 
+         [20] FORT_RIEMANNF 0.01863  1.8% 128 0 0 MFlops 
+         [21] FORT_QUASILINEARUPDATE 0.01853  1.8% 128 0 0 MFlops 
+         [23] FORT_SECONDSLOPEDIFFSF 0.01696  1.7% 64 0 0 MFlops 
+         [37] FORT_PLMNORMALPREDF 0.00950  0.9% 32 0 0 MFlops 
+         [38] FORT_PPMNORMALPREDF 0.00917  0.9% 32 0 0 MFlops 
+         [51] FORT_PPMFACEVALUESF 0.00746  0.7% 32 0 0 MFlops 
+         [56] FORT_VANLEERLIMITERF 0.00658  0.7% 32 0 0 MFlops 
+         [58] FORT_PPMLIMITERF 0.00540  0.5% 32 0 0 MFlops 
+         [70] FORT_CELLTOEDGE 0.00407  0.4% 64 0 0 MFlops 
+         [96] copyTo 0.00200  0.2% 2 0 0 MFlops 
+            [97] local copying 0.00198  0.2% 2 0 0 MFlops 
+            [259] MPI_allocateBuffers 0.00001  0.0% 2 0 0 MFlops 
+            [360] post_messages 0.00000  0.0% 2 0 0 MFlops 
+            [376] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+            [391] write Data to buffers 0.00000  0.0% 2 0 0 MFlops 
+            [394] unpack_messages 0.00000  0.0% 2 0 0 MFlops 
+         [129] Copier::define 0.00068  0.1% 4 0 0 MFlops 
+         [201] FORT_NEUMANN 0.00009  0.0% 64 0 0 MFlops 
+         [218] FORT_ADVINFLOWOUTFLOW 0.00006  0.0% 64 0 0 MFlops 
+         [230] ~LayoutData 0.00003  0.0% 2 0 0 MFlops 
+         [249] ~Copier 0.00001  0.0% 4 0 0 MFlops 
+         [294] ~BoxLayoutData 0.00000  0.0% 2 0 0 MFlops 
+            [375] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+         [322] ~LevelData 0.00000  0.0% 2 0 0 MFlops 
+      [4] AMRNonLinearMultiCompOp::getFlux 0.09559  9.5% 32 0 0 MFlops 
+         [22] FORT_CALCULATE_T_CL 0.01830  1.8% 32 0 0 MFlops 
+         [33] FORT_CALCULATE_BOUNDING_ENERGY 0.01104  1.1% 32 0 0 MFlops 
+         [121] BCFunctions::applyCorrectScalarBC 0.00085  0.1% 256 0 0 MFlops 
+            [133] BCFunctions::InflowOutflowBC 0.00054  0.1% 64 0 0 MFlops 
+               [137] InflowOutflowBC::findAdvVel 0.00049  0.0% 64 0 0 MFlops 
+                  [215] FORT_INFLOWOUTFLOWBC 0.00006  0.0% 64 0 0 MFlops 
+            [171] BCFunctions::ConstantNeumBC 0.00020  0.0% 128 0 0 MFlops 
+               [207] FORT_NEUMBC 0.00008  0.0% 128 0 0 MFlops 
+            [217] BCFunctions::ConstantDiriBC 0.00006  0.0% 64 0 0 MFlops 
+               [233] FORT_DIRIBC 0.00003  0.0% 64 0 0 MFlops 
+      [5] AMRLevelMushyLayer::computeScalDiffusion 0.08299  8.2% 2 0 0 MFlops 
+         [12] AMRNonLinearMultiCompOp::applyOpI 0.04391  4.3% 2 0 0 MFlops 
+            [13] AMRNonLinearMultiCompOp::applyOpNoBoundary 0.04361  4.3% 2 0 0 MFlops 
+               [18] AMRNonLinearMultiCompOp::computeDerivedVar 0.02193  2.2% 2 0 0 MFlops 
+                  [29] FORT_CALCULATE_T_CL 0.01335  1.3% 32 0 0 MFlops 
+                  [49] FORT_CALCULATE_BOUNDING_ENERGY 0.00752  0.7% 32 0 0 MFlops 
+                  [138] BCFunctions::applyCorrectScalarBC 0.00049  0.0% 256 0 0 MFlops 
+                     [160] BCFunctions::InflowOutflowBC 0.00029  0.0% 64 0 0 MFlops 
+                        [163] InflowOutflowBC::findAdvVel 0.00027  0.0% 64 0 0 MFlops 
+                           [225] FORT_INFLOWOUTFLOWBC 0.00004  0.0% 64 0 0 MFlops 
+                     [189] BCFunctions::ConstantNeumBC 0.00012  0.0% 128 0 0 MFlops 
+                        [223] FORT_NEUMBC 0.00005  0.0% 128 0 0 MFlops 
+                     [222] BCFunctions::ConstantDiriBC 0.00005  0.0% 64 0 0 MFlops 
+                        [236] FORT_DIRIBC 0.00003  0.0% 64 0 0 MFlops 
+                  [149] AMRNonLinearMultiCompOp::computeDiffusedVar::exchange 0.00035  0.0% 2 0 0 MFlops 
+                     [150] exchange 0.00035  0.0% 2 0 0 MFlops 
+                        [153] local copying 0.00034  0.0% 2 0 0 MFlops 
+                        [297] MPI_allocateBuffers 0.00000  0.0% 2 0 0 MFlops 
+                        [387] post_messages 0.00000  0.0% 2 0 0 MFlops 
+                        [388] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+                        [395] write Data to buffers 0.00000  0.0% 2 0 0 MFlops 
+                        [396] unpack_messages 0.00000  0.0% 2 0 0 MFlops 
+               [19] FORT_NLVCCOMPUTEOP2D 0.02008  2.0% 32 0 0 MFlops 
+               [151] exchange 0.00034  0.0% 2 0 0 MFlops 
+                  [154] local copying 0.00034  0.0% 2 0 0 MFlops 
+                  [290] MPI_allocateBuffers 0.00000  0.0% 2 0 0 MFlops 
+                  [340] write Data to buffers 0.00000  0.0% 2 0 0 MFlops 
+                  [362] post_messages 0.00000  0.0% 2 0 0 MFlops 
+                  [367] unpack_messages 0.00000  0.0% 2 0 0 MFlops 
+                  [398] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+               [159] Copier::define 0.00031  0.0% 2 0 0 MFlops 
+               [244] ~LayoutData 0.00002  0.0% 2 0 0 MFlops 
+               [256] ~Copier 0.00001  0.0% 2 0 0 MFlops 
+               [296] ~BoxLayoutData 0.00000  0.0% 2 0 0 MFlops 
+                  [370] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+               [356] ~LevelData 0.00000  0.0% 2 0 0 MFlops 
+            [166] BCFunctions::applyCorrectScalarBC 0.00023  0.0% 64 0 0 MFlops 
+               [195] BCFunctions::InflowOutflowBC 0.00010  0.0% 16 0 0 MFlops 
+                  [200] InflowOutflowBC::findAdvVel 0.00009  0.0% 16 0 0 MFlops 
+                     [224] FORT_INFLOWOUTFLOWBC 0.00005  0.0% 16 0 0 MFlops 
+               [199] BCFunctions::ConstantNeumBC 0.00009  0.0% 32 0 0 MFlops 
+                  [204] FORT_NEUMBC 0.00008  0.0% 32 0 0 MFlops 
+               [231] BCFunctions::ConstantDiriBC 0.00003  0.0% 16 0 0 MFlops 
+                  [234] FORT_DIRIBC 0.00003  0.0% 16 0 0 MFlops 
+         [25] AMRNonLinearMultiCompOpFactory::AMRnewOp 0.01524  1.5% 2 0 0 MFlops 
+            [26] AMRNonLinearMultiCompOp::computeLambda 0.01499  1.5% 2 0 0 MFlops 
+               [27] AMRNonLinearMultiCompOp::resetLambda 0.01396  1.4% 2 0 0 MFlops 
+                  [35] FORT_SUMFACESNLVC 0.01007  1.0% 64 0 0 MFlops 
+               [113] LevelData<T>::define(dbl,comps,ghost,factory) 0.00103  0.1% 2 0 0 MFlops 
+            [184] AMRPoissonOp::define4 0.00013  0.0% 2 0 0 MFlops 
+         [59] cornerCopier define 0.00516  0.5% 6 0 0 MFlops 
+         [90] copyTo 0.00218  0.2% 4 0 0 MFlops 
+            [91] local copying 0.00217  0.2% 4 0 0 MFlops 
+            [274] MPI_allocateBuffers 0.00000  0.0% 4 0 0 MFlops 
+            [345] post_messages 0.00000  0.0% 4 0 0 MFlops 
+            [368] write Data to buffers 0.00000  0.0% 4 0 0 MFlops 
+            [373] unpack_messages 0.00000  0.0% 4 0 0 MFlops 
+            [380] completePendingSends 0.00000  0.0% 4 0 0 MFlops 
+         [98] Copier::define 0.00162  0.2% 10 0 0 MFlops 
+         [125] exchange+copier 0.00079  0.1% 6 0 0 MFlops 
+            [126] actual_exchange 0.00079  0.1% 6 0 0 MFlops 
+               [127] exchange 0.00079  0.1% 6 0 0 MFlops 
+                  [128] local copying 0.00077  0.1% 6 0 0 MFlops 
+                  [263] MPI_allocateBuffers 0.00001  0.0% 6 0 0 MFlops 
+                  [315] post_messages 0.00000  0.0% 6 0 0 MFlops 
+                  [325] unpack_messages 0.00000  0.0% 6 0 0 MFlops 
+                  [349] completePendingSends 0.00000  0.0% 6 0 0 MFlops 
+                  [355] write Data to buffers 0.00000  0.0% 6 0 0 MFlops 
+         [142] exchange 0.00042  0.0% 6 0 0 MFlops 
+            [143] local copying 0.00041  0.0% 6 0 0 MFlops 
+            [281] MPI_allocateBuffers 0.00000  0.0% 6 0 0 MFlops 
+            [334] post_messages 0.00000  0.0% 6 0 0 MFlops 
+            [335] write Data to buffers 0.00000  0.0% 6 0 0 MFlops 
+            [357] unpack_messages 0.00000  0.0% 6 0 0 MFlops 
+            [359] completePendingSends 0.00000  0.0% 6 0 0 MFlops 
+         [145] FORT_VISCOUSBC 0.00040  0.0% 64 0 0 MFlops 
+         [161] BCFunctions::applyCorrectScalarBC 0.00029  0.0% 64 0 0 MFlops 
+            [185] BCFunctions::ConstantNeumBC 0.00013  0.0% 32 0 0 MFlops 
+               [193] FORT_NEUMBC 0.00011  0.0% 32 0 0 MFlops 
+            [192] BCFunctions::InflowOutflowBC 0.00011  0.0% 16 0 0 MFlops 
+               [194] InflowOutflowBC::findAdvVel 0.00011  0.0% 16 0 0 MFlops 
+                  [220] FORT_INFLOWOUTFLOWBC 0.00006  0.0% 16 0 0 MFlops 
+            [226] BCFunctions::ConstantDiriBC 0.00004  0.0% 16 0 0 MFlops 
+               [229] FORT_DIRIBC 0.00004  0.0% 16 0 0 MFlops 
+         [197] ~LayoutData 0.00010  0.0% 30 0 0 MFlops 
+         [227] ~Copier 0.00004  0.0% 28 0 0 MFlops 
+         [264] ~LayoutData 0.00001  0.0% 8 0 0 MFlops 
+         [268] ~LayoutData 0.00001  0.0% 8 0 0 MFlops 
+         [286] ~BoxLayoutData 0.00000  0.0% 14 0 0 MFlops 
+            [309] completePendingSends 0.00000  0.0% 14 0 0 MFlops 
+         [303] ~LevelData 0.00000  0.0% 12 0 0 MFlops 
+      [39] AMRNonLinearMultiCompOpFactory::AMRnewOp 0.00899  0.9% 1 0 0 MFlops 
+         [40] AMRNonLinearMultiCompOp::computeLambda 0.00879  0.9% 1 0 0 MFlops 
+            [45] AMRNonLinearMultiCompOp::resetLambda 0.00819  0.8% 1 0 0 MFlops 
+               [57] FORT_SUMFACESNLVC 0.00589  0.6% 32 0 0 MFlops 
+            [132] LevelData<T>::define(dbl,comps,ghost,factory) 0.00060  0.1% 1 0 0 MFlops 
+         [182] AMRPoissonOp::define4 0.00014  0.0% 1 0 0 MFlops 
+      [44] FORT_DIVERGENCE 0.00829  0.8% 128 0 0 MFlops 
+      [53] cornerCopier define 0.00726  0.7% 7 0 0 MFlops 
+      [61] FORT_EDGETOCELL 0.00492  0.5% 64 0 0 MFlops 
+      [64] Copier::define 0.00450  0.4% 23 0 0 MFlops 
+      [67] copyTo 0.00435  0.4% 6 0 0 MFlops 
+         [69] local copying 0.00433  0.4% 6 0 0 MFlops 
+         [262] MPI_allocateBuffers 0.00001  0.0% 6 0 0 MFlops 
+         [319] unpack_messages 0.00000  0.0% 6 0 0 MFlops 
+         [331] post_messages 0.00000  0.0% 6 0 0 MFlops 
+         [352] write Data to buffers 0.00000  0.0% 6 0 0 MFlops 
+         [358] completePendingSends 0.00000  0.0% 6 0 0 MFlops 
+      [82] exchange+copier 0.00272  0.3% 9 0 0 MFlops 
+         [83] actual_exchange 0.00272  0.3% 9 0 0 MFlops 
+            [84] exchange 0.00271  0.3% 9 0 0 MFlops 
+               [85] local copying 0.00269  0.3% 9 0 0 MFlops 
+               [248] MPI_allocateBuffers 0.00001  0.0% 9 0 0 MFlops 
+               [304] post_messages 0.00000  0.0% 9 0 0 MFlops 
+               [305] unpack_messages 0.00000  0.0% 9 0 0 MFlops 
+               [308] completePendingSends 0.00000  0.0% 9 0 0 MFlops 
+               [326] write Data to buffers 0.00000  0.0% 9 0 0 MFlops 
+      [120] exchange 0.00086  0.1% 7 0 0 MFlops 
+         [124] local copying 0.00084  0.1% 7 0 0 MFlops 
+         [255] MPI_allocateBuffers 0.00001  0.0% 7 0 0 MFlops 
+         [302] post_messages 0.00000  0.0% 7 0 0 MFlops 
+         [318] completePendingSends 0.00000  0.0% 7 0 0 MFlops 
+         [336] write Data to buffers 0.00000  0.0% 7 0 0 MFlops 
+         [347] unpack_messages 0.00000  0.0% 7 0 0 MFlops 
+      [134] BCFunctions::applyCorrectScalarBC 0.00053  0.1% 96 0 0 MFlops 
+         [164] BCFunctions::ConstantNeumBC 0.00026  0.0% 48 0 0 MFlops 
+            [167] FORT_NEUMBC 0.00023  0.0% 48 0 0 MFlops 
+         [172] BCFunctions::InflowOutflowBC 0.00019  0.0% 24 0 0 MFlops 
+            [175] InflowOutflowBC::findAdvVel 0.00018  0.0% 24 0 0 MFlops 
+               [202] FORT_INFLOWOUTFLOWBC 0.00009  0.0% 24 0 0 MFlops 
+         [212] BCFunctions::ConstantDiriBC 0.00007  0.0% 24 0 0 MFlops 
+            [221] FORT_DIRIBC 0.00005  0.0% 24 0 0 MFlops 
+      [174] ~LayoutData 0.00019  0.0% 30 0 0 MFlops 
+      [216] ~Copier 0.00006  0.0% 37 0 0 MFlops 
+      [267] ~BoxLayoutData 0.00001  0.0% 22 0 0 MFlops 
+         [298] completePendingSends 0.00000  0.0% 22 0 0 MFlops 
+      [272] ~LayoutData 0.00000  0.0% 4 0 0 MFlops 
+      [273] ~LayoutData 0.00000  0.0% 4 0 0 MFlops 
+      [300] ~LevelData 0.00000  0.0% 21 0 0 MFlops 
+   [2] AMRLevelMushyLayer::defineSolvers 0.15256 15.1% 1 0 0 MFlops 
+      [6] AMRFASMultiGrid::define 0.07309  7.2% 1 0 0 MFlops 
+         [11] AMRMultiGrid::define 0.04867  4.8% 1 0 0 MFlops 
+            [14] MultiGrid::define 0.03733  3.7% 1 0 0 MFlops 
+               [15] AMRNonLinearMultiCompOpFactory::MGnewOp 0.03725  3.7% 3 0 0 MFlops 
+                  [28] CoarseAverage::computeAverages 0.01395  1.4% 8 0 0 MFlops 
+                     [30] FORT_AVERAGE 0.01278  1.3% 128 0 0 MFlops 
+                     [110] copyTo 0.00105  0.1% 8 0 0 MFlops 
+                        [112] local copying 0.00103  0.1% 8 0 0 MFlops 
+                        [257] MPI_allocateBuffers 0.00001  0.0% 8 0 0 MFlops 
+                        [310] post_messages 0.00000  0.0% 8 0 0 MFlops 
+                        [311] unpack_messages 0.00000  0.0% 8 0 0 MFlops 
+                        [316] write Data to buffers 0.00000  0.0% 8 0 0 MFlops 
+                        [320] completePendingSends 0.00000  0.0% 8 0 0 MFlops 
+                  [65] CoarseAverage::define2 0.00447  0.4% 4 0 0 MFlops 
+                     [147] Copier::define 0.00038  0.0% 4 0 0 MFlops 
+                     [152] LevelData<T>::define(dbl,comps,ghost,factory) 0.00034  0.0% 4 0 0 MFlops 
+                  [71] AMRNonLinearMultiCompOp::computeLambda 0.00392  0.4% 2 0 0 MFlops 
+                     [73] AMRNonLinearMultiCompOp::resetLambda 0.00376  0.4% 2 0 0 MFlops 
+                        [89] FORT_SUMFACESNLVC 0.00221  0.2% 64 0 0 MFlops 
+                     [178] LevelData<T>::define(dbl,comps,ghost,factory) 0.00015  0.0% 2 0 0 MFlops 
+                  [72] LevelData<T>::define(dbl,comps,ghost,factory) 0.00386  0.4% 12 0 0 MFlops 
+                     [87] Copier::define 0.00227  0.2% 10 0 0 MFlops 
+                  [78] FORT_AVERAGEFACE 0.00335  0.3% 64 0 0 MFlops 
+                  [80] ~LayoutData 0.00321  0.3% 16 0 0 MFlops 
+                  [102] copyTo 0.00151  0.1% 2 0 0 MFlops 
+                     [103] local copying 0.00149  0.1% 2 0 0 MFlops 
+                     [250] MPI_allocateBuffers 0.00001  0.0% 2 0 0 MFlops 
+                     [337] write Data to buffers 0.00000  0.0% 2 0 0 MFlops 
+                     [354] unpack_messages 0.00000  0.0% 2 0 0 MFlops 
+                     [366] post_messages 0.00000  0.0% 2 0 0 MFlops 
+                     [381] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+                  [135] Copier::define 0.00050  0.0% 2 0 0 MFlops 
+                  [187] AMRPoissonOp::define4 0.00012  0.0% 2 0 0 MFlops 
+                  [240] ~Copier 0.00002  0.0% 16 0 0 MFlops 
+                  [285] ~BoxLayoutData 0.00000  0.0% 8 0 0 MFlops 
+                     [350] completePendingSends 0.00000  0.0% 8 0 0 MFlops 
+                  [344] ~LevelData 0.00000  0.0% 8 0 0 MFlops 
+            [31] AMRNonLinearMultiCompOpFactory::AMRnewOp 0.01130  1.1% 1 0 0 MFlops 
+               [32] AMRNonLinearMultiCompOp::computeLambda 0.01117  1.1% 1 0 0 MFlops 
+                  [34] AMRNonLinearMultiCompOp::resetLambda 0.01057  1.0% 1 0 0 MFlops 
+                     [48] FORT_SUMFACESNLVC 0.00782  0.8% 32 0 0 MFlops 
+                  [131] LevelData<T>::define(dbl,comps,ghost,factory) 0.00060  0.1% 1 0 0 MFlops 
+               [214] AMRPoissonOp::define4 0.00006  0.0% 1 0 0 MFlops 
+            [307] ~Copier 0.00000  0.0% 2 0 0 MFlops 
+         [16] MultiGrid::define 0.02409  2.4% 1 0 0 MFlops 
+            [17] AMRNonLinearMultiCompOpFactory::MGnewOp 0.02402  2.4% 3 0 0 MFlops 
+               [41] CoarseAverage::computeAverages 0.00869  0.9% 8 0 0 MFlops 
+                  [50] FORT_AVERAGE 0.00749  0.7% 128 0 0 MFlops 
+                  [109] copyTo 0.00107  0.1% 8 0 0 MFlops 
+                     [111] local copying 0.00105  0.1% 8 0 0 MFlops 
+                     [253] MPI_allocateBuffers 0.00001  0.0% 8 0 0 MFlops 
+                     [295] post_messages 0.00000  0.0% 8 0 0 MFlops 
+                     [323] write Data to buffers 0.00000  0.0% 8 0 0 MFlops 
+                     [328] unpack_messages 0.00000  0.0% 8 0 0 MFlops 
+                     [332] completePendingSends 0.00000  0.0% 8 0 0 MFlops 
+               [62] AMRNonLinearMultiCompOp::computeLambda 0.00473  0.5% 2 0 0 MFlops 
+                  [63] AMRNonLinearMultiCompOp::resetLambda 0.00458  0.5% 2 0 0 MFlops 
+                     [76] FORT_SUMFACESNLVC 0.00343  0.3% 64 0 0 MFlops 
+                  [181] LevelData<T>::define(dbl,comps,ghost,factory) 0.00014  0.0% 2 0 0 MFlops 
+               [75] LevelData<T>::define(dbl,comps,ghost,factory) 0.00352  0.3% 12 0 0 MFlops 
+                  [86] Copier::define 0.00252  0.2% 10 0 0 MFlops 
+               [77] FORT_AVERAGEFACE 0.00336  0.3% 64 0 0 MFlops 
+               [100] copyTo 0.00153  0.2% 2 0 0 MFlops 
+                  [101] local copying 0.00152  0.2% 2 0 0 MFlops 
+                  [254] MPI_allocateBuffers 0.00001  0.0% 2 0 0 MFlops 
+                  [314] unpack_messages 0.00000  0.0% 2 0 0 MFlops 
+                  [341] write Data to buffers 0.00000  0.0% 2 0 0 MFlops 
+                  [363] post_messages 0.00000  0.0% 2 0 0 MFlops 
+                  [377] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+               [130] CoarseAverage::define2 0.00065  0.1% 4 0 0 MFlops 
+                  [148] Copier::define 0.00036  0.0% 4 0 0 MFlops 
+                  [170] LevelData<T>::define(dbl,comps,ghost,factory) 0.00021  0.0% 4 0 0 MFlops 
+               [136] Copier::define 0.00049  0.0% 2 0 0 MFlops 
+               [190] ~LayoutData 0.00012  0.0% 16 0 0 MFlops 
+               [191] AMRPoissonOp::define4 0.00012  0.0% 2 0 0 MFlops 
+               [239] ~Copier 0.00002  0.0% 16 0 0 MFlops 
+               [289] ~BoxLayoutData 0.00000  0.0% 8 0 0 MFlops 
+                  [342] completePendingSends 0.00000  0.0% 8 0 0 MFlops 
+               [339] ~LevelData 0.00000  0.0% 8 0 0 MFlops 
+         [183] ~LayoutData 0.00014  0.0% 40 0 0 MFlops 
+         [235] ~Copier 0.00003  0.0% 30 0 0 MFlops 
+         [265] ~LayoutData 0.00001  0.0% 8 0 0 MFlops 
+         [266] ~LayoutData 0.00001  0.0% 8 0 0 MFlops 
+         [275] ~BoxLayoutData 0.00000  0.0% 24 0 0 MFlops 
+            [301] completePendingSends 0.00000  0.0% 24 0 0 MFlops 
+         [306] ~LevelData 0.00000  0.0% 22 0 0 MFlops 
+      [54] cornerCopier define 0.00671  0.7% 6 0 0 MFlops 
+      [66] copyTo 0.00436  0.4% 6 0 0 MFlops 
+         [68] local copying 0.00435  0.4% 6 0 0 MFlops 
+         [271] MPI_allocateBuffers 0.00000  0.0% 6 0 0 MFlops 
+         [313] unpack_messages 0.00000  0.0% 6 0 0 MFlops 
+         [324] post_messages 0.00000  0.0% 6 0 0 MFlops 
+         [346] write Data to buffers 0.00000  0.0% 6 0 0 MFlops 
+         [353] completePendingSends 0.00000  0.0% 6 0 0 MFlops 
+      [74] Copier::define 0.00371  0.4% 16 0 0 MFlops 
+      [81] FORT_CELLTOEDGEGEOMETRIC 0.00274  0.3% 32 0 0 MFlops 
+      [92] exchange+copier 0.00208  0.2% 7 0 0 MFlops 
+         [93] actual_exchange 0.00208  0.2% 6 0 0 MFlops 
+            [94] exchange 0.00208  0.2% 6 0 0 MFlops 
+               [95] local copying 0.00206  0.2% 6 0 0 MFlops 
+               [252] MPI_allocateBuffers 0.00001  0.0% 6 0 0 MFlops 
+               [321] unpack_messages 0.00000  0.0% 6 0 0 MFlops 
+               [327] post_messages 0.00000  0.0% 6 0 0 MFlops 
+               [330] completePendingSends 0.00000  0.0% 6 0 0 MFlops 
+               [348] write Data to buffers 0.00000  0.0% 6 0 0 MFlops 
+      [108] CFIVS::define(fast) 0.00119  0.1% 128 0 0 MFlops 
+      [123] AMRNonLinearMultiCompOpFactory::define 0.00085  0.1% 1 0 0 MFlops 
+         [139] CFIVS::define(fast) 0.00049  0.0% 64 0 0 MFlops 
+         [180] Copier::exchangeDefine 0.00014  0.0% 1 0 0 MFlops 
+         [276] ~LayoutData 0.00000  0.0% 4 0 0 MFlops 
+         [280] ~Copier 0.00000  0.0% 2 0 0 MFlops 
+      [140] exchange 0.00049  0.0% 6 0 0 MFlops 
+         [141] local copying 0.00047  0.0% 6 0 0 MFlops 
+         [270] MPI_allocateBuffers 0.00000  0.0% 6 0 0 MFlops 
+         [317] completePendingSends 0.00000  0.0% 6 0 0 MFlops 
+         [333] post_messages 0.00000  0.0% 6 0 0 MFlops 
+         [338] unpack_messages 0.00000  0.0% 6 0 0 MFlops 
+         [351] write Data to buffers 0.00000  0.0% 6 0 0 MFlops 
+      [146] BCFunctions::applyCorrectScalarBC 0.00039  0.0% 80 0 0 MFlops 
+         [168] BCFunctions::ConstantNeumBC 0.00021  0.0% 40 0 0 MFlops 
+            [173] FORT_NEUMBC 0.00019  0.0% 40 0 0 MFlops 
+         [196] BCFunctions::ConstantDiriBC 0.00010  0.0% 32 0 0 MFlops 
+            [205] FORT_DIRIBC 0.00008  0.0% 32 0 0 MFlops 
+         [213] BCFunctions::InflowOutflowBC 0.00006  0.0% 8 0 0 MFlops 
+            [219] InflowOutflowBC::findAdvVel 0.00006  0.0% 8 0 0 MFlops 
+               [232] FORT_INFLOWOUTFLOWBC 0.00003  0.0% 8 0 0 MFlops 
+      [188] AMRPoissonOp::define4 0.00012  0.0% 2 0 0 MFlops 
+      [208] ~LayoutData 0.00008  0.0% 12 0 0 MFlops 
+      [228] ~Copier 0.00004  0.0% 20 0 0 MFlops 
+      [288] ~BoxLayoutData 0.00000  0.0% 4 0 0 MFlops 
+         [371] completePendingSends 0.00000  0.0% 4 0 0 MFlops 
+      [312] ~LevelData 0.00000  0.0% 4 0 0 MFlops 
+   [7] AMRLevelMushyLayer::updateEnthalpyVariables 0.06265  6.2% 1 0 0 MFlops 
+      [42] FORT_CALCULATECL 0.00867  0.9% 16 0 0 MFlops 
+      [43] FORT_CALCULATET 0.00855  0.8% 16 0 0 MFlops 
+      [46] FORT_CALCULATECS 0.00815  0.8% 16 0 0 MFlops 
+      [47] FORT_CALCULATEPOROSITY 0.00809  0.8% 16 0 0 MFlops 
+      [60] FORT_CALCULATE_BOUNDING_ENERGY 0.00514  0.5% 16 0 0 MFlops 
+      [88] cornerCopier define 0.00227  0.2% 2 0 0 MFlops 
+      [104] copyTo 0.00149  0.1% 2 0 0 MFlops 
+         [105] local copying 0.00148  0.1% 2 0 0 MFlops 
+         [282] MPI_allocateBuffers 0.00000  0.0% 2 0 0 MFlops 
+         [384] post_messages 0.00000  0.0% 2 0 0 MFlops 
+         [390] unpack_messages 0.00000  0.0% 2 0 0 MFlops 
+         [393] write Data to buffers 0.00000  0.0% 2 0 0 MFlops 
+         [397] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+      [107] Copier::define 0.00121  0.1% 5 0 0 MFlops 
+      [155] exchange+copier 0.00032  0.0% 2 0 0 MFlops 
+         [156] actual_exchange 0.00032  0.0% 2 0 0 MFlops 
+            [157] exchange 0.00032  0.0% 2 0 0 MFlops 
+               [158] local copying 0.00031  0.0% 2 0 0 MFlops 
+               [293] MPI_allocateBuffers 0.00000  0.0% 2 0 0 MFlops 
+               [329] unpack_messages 0.00000  0.0% 2 0 0 MFlops 
+               [374] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+               [383] post_messages 0.00000  0.0% 2 0 0 MFlops 
+               [389] write Data to buffers 0.00000  0.0% 2 0 0 MFlops 
+      [176] exchange 0.00017  0.0% 2 0 0 MFlops 
+         [177] local copying 0.00016  0.0% 2 0 0 MFlops 
+         [277] MPI_allocateBuffers 0.00000  0.0% 2 0 0 MFlops 
+         [378] post_messages 0.00000  0.0% 2 0 0 MFlops 
+         [385] unpack_messages 0.00000  0.0% 2 0 0 MFlops 
+         [386] completePendingSends 0.00000  0.0% 2 0 0 MFlops 
+         [392] write Data to buffers 0.00000  0.0% 2 0 0 MFlops 
+      [179] BCFunctions::applyCorrectScalarBC 0.00014  0.0% 32 0 0 MFlops 
+         [198] BCFunctions::ConstantNeumBC 0.00010  0.0% 16 0 0 MFlops 
+            [203] FORT_NEUMBC 0.00008  0.0% 16 0 0 MFlops 
+         [238] BCFunctions::InflowOutflowBC 0.00002  0.0% 8 0 0 MFlops 
+            [243] BCFunctions::ConstantDiriBC 0.00002  0.0% 8 0 0 MFlops 
+               [247] FORT_DIRIBC 0.00002  0.0% 8 0 0 MFlops 
+         [242] BCFunctions::ConstantDiriBC 0.00002  0.0% 8 0 0 MFlops 
+            [245] FORT_DIRIBC 0.00002  0.0% 8 0 0 MFlops 
+      [237] ~LayoutData 0.00002  0.0% 3 0 0 MFlops 
+      [246] ~Copier 0.00002  0.0% 7 0 0 MFlops 
+      [291] ~BoxLayoutData 0.00000  0.0% 3 0 0 MFlops 
+         [369] completePendingSends 0.00000  0.0% 3 0 0 MFlops 
+      [372] ~LevelData 0.00000  0.0% 3 0 0 MFlops 
+   [8] Copier::define 0.06072  6.0% 217 0 0 MFlops 
+   [9] copyTo 0.05554  5.5% 49 0 0 MFlops 
+      [10] local copying 0.05535  5.5% 49 0 0 MFlops 
+      [210] MPI_allocateBuffers 0.00008  0.0% 49 0 0 MFlops 
+      [279] unpack_messages 0.00000  0.0% 49 0 0 MFlops 
+      [283] write Data to buffers 0.00000  0.0% 49 0 0 MFlops 
+      [284] completePendingSends 0.00000  0.0% 49 0 0 MFlops 
+      [287] post_messages 0.00000  0.0% 49 0 0 MFlops 
+   [24] LevelData<T>::define(dbl,comps,ghost,factory) 0.01622  1.6% 24 0 0 MFlops 
+      [79] Copier::define 0.00326  0.3% 14 0 0 MFlops 
+   [36] read 0.00966  1.0% 6 0 0 MFlops 
+      [52] H5Dread 0.00739  0.7% 96 0 0 MFlops 
+   [55] MushyLayerParams::getParameters() 0.00665  0.7% 1 0 0 MFlops 
+   [99] AMRPoissonOpFactory::define 0.00157  0.2% 2 0 0 MFlops 
+      [115] CFIVS::define(fast) 0.00093  0.1% 128 0 0 MFlops 
+      [162] Copier::exchangeDefine 0.00029  0.0% 2 0 0 MFlops 
+      [261] ~LayoutData 0.00001  0.0% 8 0 0 MFlops 
+      [269] ~Copier 0.00000  0.0% 4 0 0 MFlops 
+   [106] AMRMultiGrid::define 0.00133  0.1% 2 0 0 MFlops 
+      [114] MultiGrid::define 0.00102  0.1% 2 0 0 MFlops 
+         [116] AMRPoissonOpFactory::MGnewOp 0.00092  0.1% 6 0 0 MFlops 
+            [165] AMRPoissonOp::define4 0.00024  0.0% 4 0 0 MFlops 
+            [209] ~LayoutData 0.00008  0.0% 16 0 0 MFlops 
+            [258] ~Copier 0.00001  0.0% 4 0 0 MFlops 
+      [169] AMRPoissonOpFactory::AMRnewOp 0.00021  0.0% 2 0 0 MFlops 
+         [186] AMRPoissonOp::define4 0.00013  0.0% 2 0 0 MFlops 
+      [299] ~Copier 0.00000  0.0% 4 0 0 MFlops 
+   [117] exchange+copier 0.00087  0.1% 4 0 0 MFlops 
+      [118] actual_exchange 0.00087  0.1% 4 0 0 MFlops 
+         [119] exchange 0.00087  0.1% 4 0 0 MFlops 
+            [122] local copying 0.00085  0.1% 4 0 0 MFlops 
+            [260] MPI_allocateBuffers 0.00001  0.0% 4 0 0 MFlops 
+            [343] post_messages 0.00000  0.0% 4 0 0 MFlops 
+            [361] unpack_messages 0.00000  0.0% 4 0 0 MFlops 
+            [364] write Data to buffers 0.00000  0.0% 4 0 0 MFlops 
+            [365] completePendingSends 0.00000  0.0% 4 0 0 MFlops 
+   [144] ~Copier 0.00040  0.0% 54 0 0 MFlops 
+   [206] DisjointBoxLayout::computeNeighbors 0.00008  0.0% 1 0 0 MFlops 
+   [211] ~LayoutData 0.00007  0.0% 11 0 0 MFlops 
+   [241] LoadBalance:VectorBoxEntry 0.00002  0.0% 1 0 0 MFlops 
+      [251] LoadBalance:VectorBoxSimple 0.00001  0.0% 1 0 0 MFlops 
+   [278] QuadCFInterp::define 0.00000  0.0% 2 0 0 MFlops 
+   [292] ~BoxLayoutData 0.00000  0.0% 3 0 0 MFlops 
+      [379] completePendingSends 0.00000  0.0% 3 0 0 MFlops 
+   [382] ~LevelData 0.00000  0.0% 3 0 0 MFlops 
+stack top 0x790afc, stack bottom 0x6e9be1, stack size =    0.652 MB 
+[20] FORT_RIEMANNF

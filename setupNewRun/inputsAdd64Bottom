@@ -1,0 +1,26 @@
+
+inFile="/home/parkinsonjl/mnt/sharedStorage/narrowDarcySameBCsAsBrinkman/deeper/chkCR6.0RaC35Le200ChiCubedPermeabilitypts168-034287.2d.hdf5"
+run_inputs="/home/parkinsonjl/mnt/sharedStorage/narrowDarcySameBCsAsBrinkman/deeper/inputs"
+
+outFile  = /home/parkinsonjl/mnt/sharedStorage/narrowDarcySameBCsAsBrinkman/evenDeeper.2d.hdf5
+
+
+# If this is different to previous Nx,
+# then change domain
+# Ny, H stays the same
+deltaNxLeft=0
+#deltaNxRight=0
+#deltaNzTop = 0
+#deltaNzBottom = 192
+
+
+# Shift all data by xShift cells in the x direction
+# only works if periodic
+#xShift = -15
+
+# New max_box_size
+box_size = 64
+
+refinement = 1
+
+newDx = 0.00375

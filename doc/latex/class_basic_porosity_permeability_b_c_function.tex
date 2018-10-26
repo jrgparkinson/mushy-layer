@@ -1,0 +1,53 @@
+\hypertarget{class_basic_porosity_permeability_b_c_function}{\section{Basic\-Porosity\-Permeability\-B\-C\-Function Class Reference}
+\label{class_basic_porosity_permeability_b_c_function}\index{Basic\-Porosity\-Permeability\-B\-C\-Function@{Basic\-Porosity\-Permeability\-B\-C\-Function}}
+}
+
+
+Boundary conditions for $\Pi$ (permeability)  
+
+
+Inheritance diagram for Basic\-Porosity\-Permeability\-B\-C\-Function\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{class_basic_porosity_permeability_b_c_function}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_basic_porosity_permeability_b_c_function_a0b9bf045ea7a47fee8064ca8a0437eee}{{\bfseries Basic\-Porosity\-Permeability\-B\-C\-Function} (bool a\-\_\-is\-Defined, \hyperlink{class_mushy_layer_params}{Mushy\-Layer\-Params} a\-\_\-params, bool a\-\_\-homogeneous, Level\-Data$<$ Flux\-Box $>$ $\ast$a\-\_\-adv\-Vel, Real a\-\_\-dx, Vector$<$ Real $>$ a\-\_\-plume\-Val, Interval intvl, Vector$<$ Vector$<$ int $>$ $>$ \&a\-\_\-custom\-Lo\-B\-C, Vector$<$ Vector$<$ int $>$ $>$ \&a\-\_\-custom\-Hi\-B\-C, Vector$<$ Vector$<$ Real $>$ $>$ \&a\-\_\-custom\-Lo\-B\-C\-Val, Vector$<$ Vector$<$ Real $>$ $>$ \&a\-\_\-custom\-Hi\-B\-C\-Val)}\label{class_basic_porosity_permeability_b_c_function_a0b9bf045ea7a47fee8064ca8a0437eee}
+
+\item 
+void \hyperlink{class_basic_porosity_permeability_b_c_function_a436d10317f86cbf27980f1b3a694386a}{operator()} (F\-Array\-Box \&a\-\_\-state, const Box \&a\-\_\-valid, const Problem\-Domain \&a\-\_\-domain, Real a\-\_\-dx, bool a\-\_\-homogeneous)
+\begin{DoxyCompactList}\small\item\em Apply B\-C. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Boundary conditions for $\Pi$ (permeability) 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_basic_porosity_permeability_b_c_function_a436d10317f86cbf27980f1b3a694386a}{\index{Basic\-Porosity\-Permeability\-B\-C\-Function@{Basic\-Porosity\-Permeability\-B\-C\-Function}!operator()@{operator()}}
+\index{operator()@{operator()}!BasicPorosityPermeabilityBCFunction@{Basic\-Porosity\-Permeability\-B\-C\-Function}}
+\subsubsection[{operator()}]{\setlength{\rightskip}{0pt plus 5cm}void Basic\-Porosity\-Permeability\-B\-C\-Function\-::operator() (
+\begin{DoxyParamCaption}
+\item[{F\-Array\-Box \&}]{a\-\_\-state, }
+\item[{const Box \&}]{a\-\_\-valid, }
+\item[{const Problem\-Domain \&}]{a\-\_\-domain, }
+\item[{Real}]{a\-\_\-dx, }
+\item[{bool}]{a\-\_\-homogeneous}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{class_basic_porosity_permeability_b_c_function_a436d10317f86cbf27980f1b3a694386a}
+
+
+Apply B\-C. 
+
+assuming we only have one component to fill here 
+
+Reimplemented from \hyperlink{class_advect_diffuse_scalar_b_c_ab55b1f2a27a3ff1ecda0d56acdbf0d77}{Advect\-Diffuse\-Scalar\-B\-C}.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/\-B\-Cutil/Phys\-B\-C\-Util.\-cpp\end{DoxyCompactItemize}

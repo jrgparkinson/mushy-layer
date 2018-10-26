@@ -1,0 +1,128 @@
+
+Initializing...
+PhysBCUtil::PhysBCUtil
+Diagnostics::define with timescale = 200
+Parameters: 
+physicalProblem: 0
+viscosity: -999
+heatConductivityLiquid: -999
+heatConductivitySolid: -999
+specificHeatLiquid: -999
+specificHeatSolid: -999
+liquidDensity: -999
+latentHeatDissolution: -999
+thermalExpansivity: -999
+solutalExpansivity: -999
+eutecticTemp: -23
+eutecticComposition: 230
+initialComposition: 30
+liquidusSlope: -0.1
+waterDistributionCoeff: 1e-05
+heleShawCoolingCoeff: -999
+liquidSoluteDiffusivity: -999
+d: -999
+height: -999
+referencePermeability: -999
+gravitationalAcceleration: -999
+V: -999
+deltaTemp: 20
+stefan: 5
+compositionRatio: 16
+liquidHeatDiffusivity: -0.001001
+heatConductivityRatio: 1
+specificHeatRatio: 1
+lewis: 200
+rayleighTemp: 0
+rayleighComposition: 500
+nonDimVel: 0.0005
+nonDimHeleShawCooling: 998001
+timescale: -9.97003e+08
+nonDimReluctance: 1e-45
+thetaEutectic: 0
+thetaInf: -999
+thetaInitialLiquidus: -999
+thetaInitial: -999
+thetaInterface: -999
+ThetaEutectic: 0
+ThetaInitial: -1
+ThetaInf: -1
+ThetaLInitial: -999
+Hinitial: 6.3
+read ref_ratio = 2
+read tag_buffer_size = 4
+read dx = 0.00390625
+read dt = 0.0540094
+read time = 5293.68
+dt reduced by factor 1 to 0.0540094
+Processing level 0...
+  Creating data holders...
+New box (0,0) - (59,63)
+New box (0,64) - (59,127)
+New box (0,128) - (59,191)
+New box (0,192) - (59,255)
+Reshaping data for new grids
+Reshaping scalars
+Reshaping vectors
+Finished reshaping data for new grids
+ Write checkpoint header
+ Write checkpoint data for level: 0
+Vector 13ProblemDomain: 64 bytes (0 Mb)
+Vector 13RefCountedPtrI9LevelDataI7FluxBoxE16RCPPointerPolicyE: 16 bytes (0 Mb)
+Vector 13RefCountedPtrI9LevelDataI9FArrayBoxE16RCPPointerPolicyE: 4160 bytes (0 Mb)
+Vector 17DisjointBoxLayout: 1000 bytes (0 Mb)
+Vector 3Box: 80 bytes (0 Mb)
+Vector 5Entry: 672 bytes (0 Mb)
+Vector 6Copier: 5840 bytes (0 Mb)
+Vector 6VectorISt4pairIi11LayoutIndexEE: 256 bytes (0 Mb)
+Vector 6VectorIdE: 512 bytes (0 Mb)
+Vector 6VectorIiE: 512 bytes (0 Mb)
+Vector 7IntVect: 640 bytes (0 Mb)
+Vector 8CFRegion: 688 bytes (0 Mb)
+Vector 9DataIndex: 192 bytes (0 Mb)
+Vector P10AMRLevelOpI9LevelDataI9FArrayBoxEE: 24 bytes (0 Mb)
+Vector P10IntVectSet: 64 bytes (0 Mb)
+Vector P10MotionItem: 15168 bytes (0 Mb)
+Vector P14LevelTGAHelmOpI9LevelDataI9FArrayBoxE7FluxBoxE: 16 bytes (0 Mb)
+Vector P5CFIVS: 2688 bytes (0 Mb)
+Vector P6VectorIdE: 264 bytes (0 Mb)
+Vector P7FluxBox: 480 bytes (0 Mb)
+Vector P9FArrayBox: 10624 bytes (0 Mb)
+Vector P9LevelDataI9FArrayBoxE: 360 bytes (0 Mb)
+Vector P9MGLevelOpI9LevelDataI9FArrayBoxEE: 144 bytes (0 Mb)
+Vector P9MultiGridI9LevelDataI9FArrayBoxEE: 24 bytes (0 Mb)
+Vector Ss: 768 bytes (0 Mb)
+Vector St4pairIi11LayoutIndexE: 384 bytes (0 Mb)
+Vector c: 3 bytes (0 Mb)
+Vector d: 888 bytes (0 Mb)
+Vector i: 1632 bytes (0 Mb)
+Arena d: 55845888 bytes (53 Mb)
+Arena 20BasicCCVelBCFunction: 3152 bytes (0 Mb)
+Arena 39BasicPorosityPermeabilityFaceBCFunction: 6752 bytes (0 Mb)
+Arena 35BasicPorosityPermeabilityBCFunction: 1744 bytes (0 Mb)
+Arena 21AdvectDiffuseScalarBC: 15696 bytes (0 Mb)
+Arena 17ViscousBCFunction: 24 bytes (0 Mb)
+Arena 32BasicPressureBCFunctionSubcycled: 3168 bytes (0 Mb)
+Arena 29CoefficientInterpolatorLinear: 360 bytes (0 Mb)
+Arena 33CoefficientInterpolatorLinearFace: 360 bytes (0 Mb)
+Arena 11DataFactoryI9FArrayBoxE: 320 bytes (0 Mb)
+Arena 6VectorI9DataIndexE: 12680 bytes (0 Mb)
+Arena 12DataIterator: 77280 bytes (0 Mb)
+Arena b: 26514 bytes (0 Mb)
+Arena i: 17616 bytes (0 Mb)
+Arena 6VectorI5EntryE: 58920 bytes (0 Mb)
+Arena 6VectorIS_ISt4pairIi11LayoutIndexEEE: 80 bytes (0 Mb)
+Arena 12PatchGodunov: 240 bytes (0 Mb)
+Arena 13AdvectPhysics: 224 bytes (0 Mb)
+Arena 12AMRPoissonOp: 15104 bytes (0 Mb)
+Arena 17AMRLevelOpFactoryI9LevelDataI9FArrayBoxEE: 16 bytes (0 Mb)
+Arena 15AMRFASMultiGridI9LevelDataI9FArrayBoxEE: 584 bytes (0 Mb)
+Arena 12AMRMultiGridI9LevelDataI9FArrayBoxEE: 816 bytes (0 Mb)
+Arena 18LevelBackwardEuler: 192 bytes (0 Mb)
+Arena 8LevelTGA: 232 bytes (0 Mb)
+Arena 9LevelDataI7FluxBoxE: 6720 bytes (0 Mb)
+Arena 9LevelDataI9FArrayBoxE: 313600 bytes (0 Mb)
+Arena 10BCFunction: -17352 bytes (0 Mb)
+Arena 6VectorI11LayoutIndexE: 77600 bytes (0 Mb)
+---------------------------------
+Total Unfreed : 56516693 bytes (53 Mb)
+peak memory usage: 58230372 bytes (55 Mb)

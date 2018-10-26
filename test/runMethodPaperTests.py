@@ -1,0 +1,37 @@
+# Run all convergence tests for the methods paper
+
+from runAMRConvergenceTest import runTest
+
+
+output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
+
+
+# 1) Diffusive solidification problem
+physicalProblem = 'noFlow'
+AMRSetup = [{'max_level': 0, 'ref_rat': 0},
+	{'max_level': 1, 'ref_rat': 2},
+    {'max_level': 1, 'ref_rat': 4},
+    {'max_level': 2, 'ref_rat': 2}]
+
+Nzs = [16, 32, 64, 128]
+num_procs = [1]
+
+dataFolder = os.path.join(output_dir, 'NoFlow')
+figureName = os.path.join(output_dir, 'NoFlow', 'noFlow.pdf')
+
+analysis_command = 'matlab -nodisplay -nosplash -nodesktop -r "noFlowSolution(\'' + dataFolder + '\', \'' +figureName+ '\'); exit;"' 
+
+runTest(output_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command)
+
+# 2) Convection in a fixed porous medium
+physicalProblem = 'convectionDB'
+#runTest(output_dir, physicalProblem, AMRSetup, Nzs, num_procs)
+
+
+# 3) Convection in a fixed porous medium with variable porosity
+
+# 4) Fully coupled porous hole
+
+# 5) Fixed chill Hele-Shaw cell
+
+

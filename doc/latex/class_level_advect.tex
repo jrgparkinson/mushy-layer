@@ -1,0 +1,302 @@
+\hypertarget{class_level_advect}{\section{Level\-Advect Class Reference}
+\label{class_level_advect}\index{Level\-Advect@{Level\-Advect}}
+}
+
+
+Advection integrator on a level.  
+
+
+
+
+{\ttfamily \#include $<$Level\-Advect.\-H$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_level_advect_a87b0274e58afdb0058368ac6554592e5}{Level\-Advect} ()
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\hyperlink{class_level_advect_aeb34ed4774fb8e581789fd5a6ee2b4dd}{$\sim$\-Level\-Advect} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+void \hyperlink{class_level_advect_aae945fee39376ceabd3fc46ea395e2fe}{define} (const Advect\-Physics \&a\-\_\-gphys, const Disjoint\-Box\-Layout \&a\-\_\-this\-Disjoint\-Box\-Layout, const Disjoint\-Box\-Layout \&a\-\_\-coarser\-Disjoint\-Box\-Layout, const Problem\-Domain \&a\-\_\-domain, const int \&a\-\_\-refine\-Coarse, const bool \&a\-\_\-use\-Limiting, const Real \&a\-\_\-dx, const bool \&a\-\_\-has\-Coarser, const bool \&a\-\_\-has\-Finer, const int \&a\-\_\-num\-Ghost)
+\begin{DoxyCompactList}\small\item\em Actual constructor. \end{DoxyCompactList}\item 
+Real \hyperlink{class_level_advect_a074ad96105762bb9796d642f07970c36}{step} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-\-U, Level\-Flux\-Register \&a\-\_\-finer\-Flux\-Register, Level\-Flux\-Register \&a\-\_\-coarser\-Flux\-Register, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-advection\-Velocity, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-\-S, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-\-U\-Coarse\-Old, const Real \&a\-\_\-\-T\-Coarse\-Old, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-\-U\-Coarse\-New, const Real \&a\-\_\-\-T\-Coarse\-New, const Real \&a\-\_\-time, const Real \&a\-\_\-dt, const bool a\-\_\-do\-F\-Rupdates=true, const bool a\-\_\-fill\-Ghosts=true)
+\begin{DoxyCompactList}\small\item\em Advance the solution by one timestep on this grid level. \end{DoxyCompactList}\item 
+void \hyperlink{class_level_advect_ab4af138371be3b5d2c4624b761e74941}{average\-Vel\-To\-C\-C} (F\-Array\-Box \&a\-\_\-normal\-Vel, const Flux\-Box \&a\-\_\-advection\-Vel, const Box \&a\-\_\-box) const 
+\begin{DoxyCompactList}\small\item\em Convert velocity from face-\/centered to cell-\/centered. \end{DoxyCompactList}\item 
+void \hyperlink{class_level_advect_a6e0534084ef26a19f41fbafe4bcba15e}{fill\-Ghost} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-\-U, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-\-U\-Coarse\-Old, const Real \&a\-\_\-\-T\-Coarse\-Old, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-\-U\-Coarse\-New, const Real \&a\-\_\-\-T\-Coarse\-New, const Real \&a\-\_\-dt, const Real \&a\-\_\-time)
+\begin{DoxyCompactList}\small\item\em Fill in ghost cells by exchange at this level and then by interpolation from coarser level (if any). \end{DoxyCompactList}\item 
+Real \hyperlink{class_level_advect_a81626f8255195ae94d01248c3c90e6d5}{get\-Max\-Wave\-Speed} (const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-\-U, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-advection\-Velocity)
+\begin{DoxyCompactList}\small\item\em Get maximum wave speed. \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a2dec4b6dd1075da650a811c8d0a32fe9}{void \hyperlink{class_level_advect_a2dec4b6dd1075da650a811c8d0a32fe9}{get\-Patch\-Godunov} (Patch\-Godunov \&patch\-Godunov)}\label{class_level_advect_a2dec4b6dd1075da650a811c8d0a32fe9}
+
+\begin{DoxyCompactList}\small\item\em Get Patch\-Godunov object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_level_advect_a7e53aeeaa7bcd9e5371e5edf0a91956d}{Disjoint\-Box\-Layout \hyperlink{class_level_advect_a7e53aeeaa7bcd9e5371e5edf0a91956d}{m\-\_\-grids}}\label{class_level_advect_a7e53aeeaa7bcd9e5371e5edf0a91956d}
+
+\begin{DoxyCompactList}\small\item\em layout for this level \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a5b9741fc6de32a21ea3dfa449288c6ac}{Patch\-Godunov \hyperlink{class_level_advect_a5b9741fc6de32a21ea3dfa449288c6ac}{m\-\_\-patch\-Godunov}}\label{class_level_advect_a5b9741fc6de32a21ea3dfa449288c6ac}
+
+\begin{DoxyCompactList}\small\item\em patch integrator \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a26ff856333114236e82dbcfd712ba912}{Advect\-Physics $\ast$ \hyperlink{class_level_advect_a26ff856333114236e82dbcfd712ba912}{m\-\_\-advect\-Physics}}\label{class_level_advect_a26ff856333114236e82dbcfd712ba912}
+
+\begin{DoxyCompactList}\small\item\em physics class \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a68fb9b1ed68cf6f6965e082e8f18e3ba}{int \hyperlink{class_level_advect_a68fb9b1ed68cf6f6965e082e8f18e3ba}{m\-\_\-num\-Ghost}}\label{class_level_advect_a68fb9b1ed68cf6f6965e082e8f18e3ba}
+
+\begin{DoxyCompactList}\small\item\em number of ghost cells need locally for this level \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a752c22422040ef2e8b3d7e391155a0a7}{Copier \hyperlink{class_level_advect_a752c22422040ef2e8b3d7e391155a0a7}{m\-\_\-exchange\-Copier}}\label{class_level_advect_a752c22422040ef2e8b3d7e391155a0a7}
+
+\begin{DoxyCompactList}\small\item\em exchange copier \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a5719da936000c1a7e4dcffc9d43aaf97}{Piecewise\-Linear\-Fill\-Patch \hyperlink{class_level_advect_a5719da936000c1a7e4dcffc9d43aaf97}{m\-\_\-patcher}}\label{class_level_advect_a5719da936000c1a7e4dcffc9d43aaf97}
+
+\begin{DoxyCompactList}\small\item\em interpolator for filling in ghost cells from the next coarser level \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a3ee22e9a3df1f1c2400e6fd989158922}{Real \hyperlink{class_level_advect_a3ee22e9a3df1f1c2400e6fd989158922}{m\-\_\-dx}}\label{class_level_advect_a3ee22e9a3df1f1c2400e6fd989158922}
+
+\begin{DoxyCompactList}\small\item\em grid spacing \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_acc95fd3bf2296642ceb3cd97e733ac41}{Problem\-Domain \hyperlink{class_level_advect_acc95fd3bf2296642ceb3cd97e733ac41}{m\-\_\-domain}}\label{class_level_advect_acc95fd3bf2296642ceb3cd97e733ac41}
+
+\begin{DoxyCompactList}\small\item\em problem domain -\/ index space for this level \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_aba7ddca5882201cdbab13efc47e8635c}{int \hyperlink{class_level_advect_aba7ddca5882201cdbab13efc47e8635c}{m\-\_\-refine\-Coarse}}\label{class_level_advect_aba7ddca5882201cdbab13efc47e8635c}
+
+\begin{DoxyCompactList}\small\item\em refinement ratio between this level and the next coarser \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a4c6b16c657ec5bf5053dfeae3dae64c0}{bool \hyperlink{class_level_advect_a4c6b16c657ec5bf5053dfeae3dae64c0}{m\-\_\-has\-Coarser}}\label{class_level_advect_a4c6b16c657ec5bf5053dfeae3dae64c0}
+
+\begin{DoxyCompactList}\small\item\em whether a coarser level exists \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a71f2193804df1cdb778e7f8f98eb05d0}{bool \hyperlink{class_level_advect_a71f2193804df1cdb778e7f8f98eb05d0}{m\-\_\-has\-Finer}}\label{class_level_advect_a71f2193804df1cdb778e7f8f98eb05d0}
+
+\begin{DoxyCompactList}\small\item\em whether a finer level exists \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a8a72b368d22f9f10fa9366365038a9bb}{int \hyperlink{class_level_advect_a8a72b368d22f9f10fa9366365038a9bb}{m\-\_\-num\-Cons}}\label{class_level_advect_a8a72b368d22f9f10fa9366365038a9bb}
+
+\begin{DoxyCompactList}\small\item\em number of conserved variables (= 1) \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a554f4194c313e68690e2eaf3bd405630}{int \hyperlink{class_level_advect_a554f4194c313e68690e2eaf3bd405630}{m\-\_\-normal\-Pred\-Order}}\label{class_level_advect_a554f4194c313e68690e2eaf3bd405630}
+
+\begin{DoxyCompactList}\small\item\em order of normal predictor \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a1eb9a05109cd588504185e3c5ee360af}{bool \hyperlink{class_level_advect_a1eb9a05109cd588504185e3c5ee360af}{m\-\_\-use\-Fourth\-Order\-Slopes}}\label{class_level_advect_a1eb9a05109cd588504185e3c5ee360af}
+
+\begin{DoxyCompactList}\small\item\em whether to use 4th-\/order slope computations (otherwise, use 2nd order) \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_ac75d3b654493d0b22955e9c573449089}{bool \hyperlink{class_level_advect_ac75d3b654493d0b22955e9c573449089}{m\-\_\-use\-Prim\-Limiting}}\label{class_level_advect_ac75d3b654493d0b22955e9c573449089}
+
+\begin{DoxyCompactList}\small\item\em whether to do slope limiting in the primitive variables \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a586ff8dcb0832298bd962d061eb4ef56}{bool \hyperlink{class_level_advect_a586ff8dcb0832298bd962d061eb4ef56}{m\-\_\-use\-Char\-Limiting}}\label{class_level_advect_a586ff8dcb0832298bd962d061eb4ef56}
+
+\begin{DoxyCompactList}\small\item\em whether to do slope limiting in the characteristic variables \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a14bfed42bbb2388494f60443ec92d4db}{bool \hyperlink{class_level_advect_a14bfed42bbb2388494f60443ec92d4db}{m\-\_\-use\-Flattening}}\label{class_level_advect_a14bfed42bbb2388494f60443ec92d4db}
+
+\begin{DoxyCompactList}\small\item\em whether to do slope flattening -\/ M\-U\-S\-T B\-E U\-S\-I\-N\-G 4th-\/order slopes \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a3971ab078e31ce2d6815e813583804a5}{bool \hyperlink{class_level_advect_a3971ab078e31ce2d6815e813583804a5}{m\-\_\-use\-Artificial\-Viscosity}}\label{class_level_advect_a3971ab078e31ce2d6815e813583804a5}
+
+\begin{DoxyCompactList}\small\item\em whether to apply artificial viscosity of a set value \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a3555480c3e66811829d48d3ace711dbc}{Real \hyperlink{class_level_advect_a3555480c3e66811829d48d3ace711dbc}{m\-\_\-artificial\-Viscosity}}\label{class_level_advect_a3555480c3e66811829d48d3ace711dbc}
+
+\begin{DoxyCompactList}\small\item\em artificial viscosity coefficient \end{DoxyCompactList}\item 
+\hypertarget{class_level_advect_a3f6eda4ee5c690fa4c2ca76404510f0a}{bool \hyperlink{class_level_advect_a3f6eda4ee5c690fa4c2ca76404510f0a}{m\-\_\-is\-Defined}}\label{class_level_advect_a3f6eda4ee5c690fa4c2ca76404510f0a}
+
+\begin{DoxyCompactList}\small\item\em whether this object has been defined \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Advection integrator on a level. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_level_advect_a87b0274e58afdb0058368ac6554592e5}{\index{Level\-Advect@{Level\-Advect}!Level\-Advect@{Level\-Advect}}
+\index{Level\-Advect@{Level\-Advect}!LevelAdvect@{Level\-Advect}}
+\subsubsection[{Level\-Advect}]{\setlength{\rightskip}{0pt plus 5cm}Level\-Advect\-::\-Level\-Advect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{class_level_advect_a87b0274e58afdb0058368ac6554592e5}
+
+
+Default constructor. 
+
+Object requires \hyperlink{class_level_advect_aae945fee39376ceabd3fc46ea395e2fe}{define()} to be called before all other functions. \hypertarget{class_level_advect_aeb34ed4774fb8e581789fd5a6ee2b4dd}{\index{Level\-Advect@{Level\-Advect}!$\sim$\-Level\-Advect@{$\sim$\-Level\-Advect}}
+\index{$\sim$\-Level\-Advect@{$\sim$\-Level\-Advect}!LevelAdvect@{Level\-Advect}}
+\subsubsection[{$\sim$\-Level\-Advect}]{\setlength{\rightskip}{0pt plus 5cm}Level\-Advect\-::$\sim$\-Level\-Advect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{class_level_advect_aeb34ed4774fb8e581789fd5a6ee2b4dd}
+
+
+Destructor. 
+
+Destroys all objects created by \hyperlink{class_level_advect_aae945fee39376ceabd3fc46ea395e2fe}{define()}. Passed in data references of \hyperlink{class_level_advect_aae945fee39376ceabd3fc46ea395e2fe}{define()} are left alone. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_level_advect_ab4af138371be3b5d2c4624b761e74941}{\index{Level\-Advect@{Level\-Advect}!average\-Vel\-To\-C\-C@{average\-Vel\-To\-C\-C}}
+\index{average\-Vel\-To\-C\-C@{average\-Vel\-To\-C\-C}!LevelAdvect@{Level\-Advect}}
+\subsubsection[{average\-Vel\-To\-C\-C}]{\setlength{\rightskip}{0pt plus 5cm}void Level\-Advect\-::average\-Vel\-To\-C\-C (
+\begin{DoxyParamCaption}
+\item[{F\-Array\-Box \&}]{a\-\_\-normal\-Vel, }
+\item[{const Flux\-Box \&}]{a\-\_\-advection\-Vel, }
+\item[{const Box \&}]{a\-\_\-box}
+\end{DoxyParamCaption}
+) const}}\label{class_level_advect_ab4af138371be3b5d2c4624b761e74941}
+
+
+Convert velocity from face-\/centered to cell-\/centered. 
+
+In each direction, take average of normal component of velocity on the neighboring faces in that direction. 
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-normal\-Vel} & cell-\/centered velocity \\
+\hline
+{\em a\-\_\-advection\-Vel} & face-\/centered velocity \\
+\hline
+{\em a\-\_\-box} & Box on which to return a\-\_\-normal\-Vel \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_level_advect_aae945fee39376ceabd3fc46ea395e2fe}{\index{Level\-Advect@{Level\-Advect}!define@{define}}
+\index{define@{define}!LevelAdvect@{Level\-Advect}}
+\subsubsection[{define}]{\setlength{\rightskip}{0pt plus 5cm}void Level\-Advect\-::define (
+\begin{DoxyParamCaption}
+\item[{const Advect\-Physics \&}]{a\-\_\-gphys, }
+\item[{const Disjoint\-Box\-Layout \&}]{a\-\_\-this\-Disjoint\-Box\-Layout, }
+\item[{const Disjoint\-Box\-Layout \&}]{a\-\_\-coarser\-Disjoint\-Box\-Layout, }
+\item[{const Problem\-Domain \&}]{a\-\_\-domain, }
+\item[{const int \&}]{a\-\_\-refine\-Coarse, }
+\item[{const bool \&}]{a\-\_\-use\-Limiting, }
+\item[{const Real \&}]{a\-\_\-dx, }
+\item[{const bool \&}]{a\-\_\-has\-Coarser, }
+\item[{const bool \&}]{a\-\_\-has\-Finer, }
+\item[{const int \&}]{a\-\_\-num\-Ghost}
+\end{DoxyParamCaption}
+)}}\label{class_level_advect_aae945fee39376ceabd3fc46ea395e2fe}
+
+
+Actual constructor. 
+
+Inside the routine, we cast away const-\/ness on the data members for the assignment. The arguments passed in are maintained const (coding standards). 
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-gphys} & advection physics class \\
+\hline
+{\em a\-\_\-this\-Disjoint\-Box\-Layout} & box layout at this level \\
+\hline
+{\em a\-\_\-coarser\-Disjoint\-Box\-Layout} & box layout at next coarser level (or empty if this is coarsest level) \\
+\hline
+{\em a\-\_\-domain} & problem domain at this level \\
+\hline
+{\em a\-\_\-refine\-Coarse} & refinement ratio between this level and next coarser level \\
+\hline
+{\em a\-\_\-use\-Limiting} & whether to use limiting \\
+\hline
+{\em a\-\_\-dx} & grid spacing at this level \\
+\hline
+{\em a\-\_\-has\-Coarser} & whether there is a coarser level \\
+\hline
+{\em a\-\_\-has\-Finer} & whether there is a finer level \\
+\hline
+{\em a\-\_\-num\-Ghost} & number of ghost cells \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_level_advect_a6e0534084ef26a19f41fbafe4bcba15e}{\index{Level\-Advect@{Level\-Advect}!fill\-Ghost@{fill\-Ghost}}
+\index{fill\-Ghost@{fill\-Ghost}!LevelAdvect@{Level\-Advect}}
+\subsubsection[{fill\-Ghost}]{\setlength{\rightskip}{0pt plus 5cm}void Level\-Advect\-::fill\-Ghost (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-\-U, }
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-\-U\-Coarse\-Old, }
+\item[{const Real \&}]{a\-\_\-\-T\-Coarse\-Old, }
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-\-U\-Coarse\-New, }
+\item[{const Real \&}]{a\-\_\-\-T\-Coarse\-New, }
+\item[{const Real \&}]{a\-\_\-dt, }
+\item[{const Real \&}]{a\-\_\-time}
+\end{DoxyParamCaption}
+)}}\label{class_level_advect_a6e0534084ef26a19f41fbafe4bcba15e}
+
+
+Fill in ghost cells by exchange at this level and then by interpolation from coarser level (if any). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-\-U} & conserved variables at this level, with ghosts cells to be filled in \\
+\hline
+{\em a\-\_\-\-U\-Coarse\-Old} & conserved variables at coarser level at time of last coarser-\/level update, or empty if no coarser level; may be empty if interpolation not required \\
+\hline
+{\em a\-\_\-\-T\-Coarse\-Old} & time of last update at coarser level \\
+\hline
+{\em a\-\_\-\-U\-Coarse\-New} & conserved variables at coarser level at time of next coarser-\/level update, or empty if no coarser level; may be empty if interpolation not required \\
+\hline
+{\em a\-\_\-\-T\-Coarse\-New} & time of next update at coarser level \\
+\hline
+{\em a\-\_\-dt} & time step \\
+\hline
+{\em a\-\_\-time} & current time \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_level_advect_a81626f8255195ae94d01248c3c90e6d5}{\index{Level\-Advect@{Level\-Advect}!get\-Max\-Wave\-Speed@{get\-Max\-Wave\-Speed}}
+\index{get\-Max\-Wave\-Speed@{get\-Max\-Wave\-Speed}!LevelAdvect@{Level\-Advect}}
+\subsubsection[{get\-Max\-Wave\-Speed}]{\setlength{\rightskip}{0pt plus 5cm}Real Level\-Advect\-::get\-Max\-Wave\-Speed (
+\begin{DoxyParamCaption}
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-\-U, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-advection\-Velocity}
+\end{DoxyParamCaption}
+)}}\label{class_level_advect_a81626f8255195ae94d01248c3c90e6d5}
+
+
+Get maximum wave speed. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-\-U} & conserved variables at this level \\
+\hline
+{\em a\-\_\-advection\-Velocity} & face-\/centered velocities \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_level_advect_a074ad96105762bb9796d642f07970c36}{\index{Level\-Advect@{Level\-Advect}!step@{step}}
+\index{step@{step}!LevelAdvect@{Level\-Advect}}
+\subsubsection[{step}]{\setlength{\rightskip}{0pt plus 5cm}Real Level\-Advect\-::step (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-\-U, }
+\item[{Level\-Flux\-Register \&}]{a\-\_\-finer\-Flux\-Register, }
+\item[{Level\-Flux\-Register \&}]{a\-\_\-coarser\-Flux\-Register, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-advection\-Velocity, }
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-\-S, }
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-\-U\-Coarse\-Old, }
+\item[{const Real \&}]{a\-\_\-\-T\-Coarse\-Old, }
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-\-U\-Coarse\-New, }
+\item[{const Real \&}]{a\-\_\-\-T\-Coarse\-New, }
+\item[{const Real \&}]{a\-\_\-time, }
+\item[{const Real \&}]{a\-\_\-dt, }
+\item[{const bool}]{a\-\_\-do\-F\-Rupdates = {\ttfamily true}, }
+\item[{const bool}]{a\-\_\-fill\-Ghosts = {\ttfamily true}}
+\end{DoxyParamCaption}
+)}}\label{class_level_advect_a074ad96105762bb9796d642f07970c36}
+
+
+Advance the solution by one timestep on this grid level. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-\-U} & conserved variables at this level, defined on a\-\_\-this\-Disjoint\-Box\-Layout in \hyperlink{class_level_advect_aae945fee39376ceabd3fc46ea395e2fe}{define()}; gets updated in this routine \\
+\hline
+{\em a\-\_\-finer\-Flux\-Register} & flux register with next finer level \\
+\hline
+{\em a\-\_\-coarser\-Flux\-Register} & flux register with next coarser level \\
+\hline
+{\em a\-\_\-advection\-Velocity} & advection velocity on faces \\
+\hline
+{\em a\-\_\-\-S} & source term, or if no source term then this is null constructed and not defined \\
+\hline
+{\em a\-\_\-\-U\-Coarse\-Old} & conserved variables at coarser level at time of last coarser-\/level update, or empty if no coarser level; may be empty if interpolation not required \\
+\hline
+{\em a\-\_\-\-T\-Coarse\-Old} & time of last update at coarser level \\
+\hline
+{\em a\-\_\-\-U\-Coarse\-New} & conserved variables at coarser level at time of next coarser-\/level update, or empty if no coarser level; may be empty if interpolation not required \\
+\hline
+{\em a\-\_\-\-T\-Coarse\-New} & time of next update at coarser level \\
+\hline
+{\em a\-\_\-time} & current time \\
+\hline
+{\em a\-\_\-dt} & time step \\
+\hline
+{\em a\-\_\-do\-F\-Rupdates} & whether or not to do flux register updates \\
+\hline
+{\em a\-\_\-fill\-Ghosts} & whether or not to fill ghost cells \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/src/Level\-Advect.\-H\item 
+/home/parkinsonjl/mushy-\/layer/src/Level\-Advect.\-cpp\end{DoxyCompactItemize}

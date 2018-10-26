@@ -1,0 +1,102 @@
+Parameters: 
+problemType: 2
+viscosity: 0.0014
+heatConductivityLiquid: 0.5
+heatConductivitySolid: 2.2
+specificHeatLiquid: 3500
+specificHeatSolid: 3500
+liquidDensity: 1000
+latentHeatDissolution: 276000
+thermalExpansivity: 0.00021
+solutalExpansivity: -0.3
+eutecticTemp: 0
+bottomTemp: 10
+topTemp: 0
+eutecticComposition: 0.9
+initialComposition: 0.7
+liquidusSlope: 50
+waterDistributionCoeff: 1e-05
+heleShawCoolingCoeff: 0
+liquidSoluteDiffusivity: 1e-09
+d: 0.005
+height: 0.5
+width: 0.06
+referencePermeability: 1e-12
+gravitationalAcceleration: 9.8
+V: 0
+deltaTemp: 10
+stefan: 0
+compositionRatio: 1.4
+liquidHeatDiffusivity: 1.42857e-07
+heatConductivityRatio: 1
+specificHeatRatio: 1
+lewis: 1e+201
+darcy: 4.8e-07
+rayleighTemp: 50
+rayleighComposition: 0
+nonDimVel: 0
+nonDimHeleShawCooling: 0
+timescale: 1.75e+06
+thetaEutectic: 0
+thetaInf: 0
+thetaInitialLiquidus: -1
+thetaInitial: 0
+thetaInterface: -1
+thetaBottom: 1
+thetaTop: 0
+ThetaEutectic: -0
+ThetaInitial: 1
+ThetaInf: 1
+ThetaCold: -0
+ThetaHot: 1
+ThetaLBottom: 1
+ThetaLInitial: 1
+ThetaLTop: 1
+porosityTop: 1
+porosityBottom: 1
+HBottom: 1
+HTop: 0
+Hinitial: 0
+amrMushyLayer::initGrids
+amrMushyLayer::initData
+amrMushyLayerInit::setupIBCs
+     CCProjectorComp - sum of div(U^*) = -1.33227e-15
+    AMRMultiGrid:: iteration = 0, residual norm = 4194.28
+    AMRMultiGrid:: iteration = 12, residual norm = 9.74587e-08
+amrMushyLayerInit::setupIBCs
+amrMushyLayer::calculateAnalyticSolution
+amrMushyLayer::run -- max_time= 10, max_step = 99999
+amrMushyLayer::computeInitialDt
+amrMushyLayer::writePlotFile
+Timestep 0 Advancing solution from time 0 with dt = 0.01
+Finest level = 0
+     CCProjectorComp - sum of div(U^*) = -1.33227e-15
+    AMRMultiGrid:: iteration = 0, residual norm = 4194.28
+    AMRMultiGrid:: iteration = 12, residual norm = 9.74587e-08
+  BackwardEuler:: making rhs
+  BackwardEuler:: solving
+BackwardEuler:: WARNING: solver exitStatus == 1
+    amrMushyLayer::timestep() Iteration 0. Heat Residual = -0.726622 (converged = 0, rate = 0), Concentration residual = 0 (converged = 1, rate = 0)
+     CCProjectorComp - sum of div(U^*) = -1.77636e-15
+    AMRMultiGrid:: iteration = 0, residual norm = 4194.13
+    AMRMultiGrid:: iteration = 12, residual norm = 9.68957e-08
+  BackwardEuler:: making rhs
+  BackwardEuler:: solving
+BackwardEuler:: WARNING: solver exitStatus == 1
+    amrMushyLayer::timestep() Iteration 1. Heat Residual = 4.24458e-07 (converged = 1, rate = 0.999999), Concentration residual = 0 (converged = 1, rate = -nan)
+amrMushyLayer::timestep 1,      end time =     0.010000( 17500.000000 secs) , dt =     0.010000( 17500.000000 secs) 
+(delta T)/(delta t) = 72.662223, (delta Theta)/(delta t) = 0.000000
+Needs to be < 0.001000 for convergence
+Timestep 1 Advancing solution from time 0.010000 with dt = 0.010000
+Finest level = 0
+     CCProjectorComp - sum of div(U^*) = 0.000000
+    AMRMultiGrid:: iteration = 0, residual norm = 4193.974312
+    AMRMultiGrid:: iteration = 12, residual norm = 0.000000
+  BackwardEuler:: making rhs
+  BackwardEuler:: solving
+    amrMushyLayer::timestep() Iteration 0. Heat Residual = -0.182493 (converged = 0, rate = 0.000000), Concentration residual = 0.000000 (converged = 1, rate = 0.000000)
+     CCProjectorComp - sum of div(U^*) = 0.000000
+    AMRMultiGrid:: iteration = 0, residual norm = 4193.334019
+    AMRMultiGrid:: iteration = 12, residual norm = 0.000000
+  BackwardEuler:: making rhs
+  BackwardEuler:: solving

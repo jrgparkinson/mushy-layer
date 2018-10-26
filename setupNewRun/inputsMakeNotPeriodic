@@ -1,0 +1,26 @@
+
+inFile="/home/parkinsonjl/mnt/sharedStorage/channelSpacing/CR1.25RaC0Le200ChiCubedPermeabilitypts2048-unsteady/chkchannelSpacing-CR1.25RaC0Le200ChiCubedPermeabilitypts2048.2d.hdf5"
+run_inputs="/home/parkinsonjl/mnt/sharedStorage/channelSpacing/CR1.25RaC0Le200ChiCubedPermeabilitypts2048-unsteady/inputs"
+
+outFile  = /home/parkinsonjl/mnt/sharedStorage/channelSpacing/CR1.25RaC0Le200ChiCubedPermeabilitypts2048-insulating.2d.hdf5
+
+
+# If this is different to previous Nx,
+# then change domain
+# Ny, H stays the same
+deltaNxLeft=0
+deltaNxRight=0
+deltaNzTop = 0
+deltaNzBottom = 0
+
+
+# Shift all data by xShift cells in the x direction
+# only works if periodic
+#xShift = -15
+
+# New max_box_size
+box_size = 128
+
+refinement = 1
+
+periodic = 0 0 0

@@ -1,0 +1,369 @@
+C      _______              __
+C     / ___/ /  ___  __ _  / /  ___
+C    / /__/ _ \/ _ \/  V \/ _ \/ _ \
+C    \___/_//_/\___/_/_/_/_.__/\___/
+C    Please refer to Copyright.txt, in Chombo's root directory.
+
+#include "CONSTANTS.H"
+
+C     --------------------------------------------------------------
+C     isign should be -1 (lo side) or +1 (high side)
+C     
+C
+C
+      subroutine DIRIBC(
+     &     CHF_FRA[phi],
+     &     chf_real[bcVal],
+     &     chf_box[region],
+     &     chf_int[order],
+     &     chf_int[isign],
+     &     chf_int[idir],
+     &     chf_int[comp])
+     
+      integer chf_ddecl[i;j;k]
+     
+      REAL_T phi1, phi2
+      
+    
+
+      chf_multido[region;i;j;k]
+       if (idir .eq. 0) then
+         phi1 = phi(CHF_IX[i-isign;j;k],comp)
+         phi2 = phi(CHF_IX[i-2*isign;j;k],comp)
+       else if (idir .eq. 1) then
+         phi1 = phi(CHF_IX[i;j-isign;k],comp)
+         phi2 = phi(CHF_IX[i;j-2*isign;k],comp)
+       else if (idir .eq. 2) then
+         phi1 = phi(CHF_IX[i;j;k-isign],comp)
+         phi2 = phi(CHF_IX[i;j;k-isign*2],comp)
+       endif 
+      
+       if (order .eq. 0) then
+         phi(CHF_IX[i;j;k],comp) = bcVal
+       else if (order .eq. 1) then
+         phi(CHF_IX[i;j;k],comp) = 2*bcVal - phi1
+       else if (order .eq. 2) then
+         phi(CHF_IX[i;j;k],comp) = (8/3)*bcVal  - 2*phi1 + (1/3)*phi2
+       else
+         
+       endif
+     
+      CHF_ENDDO
+      
+      
+      
+      return
+      end
+      
+C     --------------------------------------------------------------
+C     isign should be -1 (lo side) or +1 (high side)
+C     
+C
+C
+      subroutine NEUMBC(
+     &     CHF_FRA[phi],
+     &     chf_real[bcVal],
+     &     chf_box[region],
+     &     chf_int[isign],
+     &     chf_int[idir],
+     &     chf_real[dx],
+     &     chf_int[comp])
+     
+      integer chf_ddecl[i;j;k]
+      REAL_T phi1
+      
+
+      chf_multido[region;i;j;k]
+       if (idir .eq. 0) then
+         phi1 = phi(CHF_IX[i-isign;j;k],comp)
+       else if (idir .eq. 1) then
+         phi1 = phi(CHF_IX[i;j-isign;k],comp)
+       else if (idir .eq. 2) then
+         phi1 = phi(CHF_IX[i;j;k-isign],comp)
+       endif 
+          
+       phi(CHF_IX[i;j;k],comp) = phi1 + isign*dx*bcVal
+
+      CHF_ENDDO
+      
+      
+      
+      return
+      end     
+      
+C     --------------------------------------------------------------
+C     isign should be -1 (lo side) or +1 (high side)
+C     assumes we have at least three cells inside the box
+      subroutine EXTRAPBC(
+     &     CHF_FRA[phi],
+     &     chf_box[region],
+     &     chf_int[isign],
+     &     chf_int[idir],
+     &     chf_int[order],
+     &     chf_int[comp])
+     
+      integer chf_ddecl[i;j;k]
+      REAL_T phi1, phi2, phi3
+      
+
+      chf_multido[region;i;j;k]
+       if (idir .eq. 0) then
+         phi1 = phi(CHF_IX[i-isign;j;k],comp)
+         
+         if (order .gt. 0) then
+           phi2 = phi(CHF_IX[i-2*isign;j;k],comp)
+         endif
+         
+         if (order .gt. 1) then
+           phi3 = phi(CHF_IX[i-3*isign;j;k],comp)
+         endif
+       else if (idir .eq. 1) then
+         phi1 = phi(CHF_IX[i;j-isign;k],comp)
+         
+         if (order .gt. 0) then
+           phi2 = phi(CHF_IX[i;j-2*isign;k],comp)
+         endif
+         
+         if (order .gt. 1) then
+           phi3 = phi(CHF_IX[i;j-3*isign;k],comp)
+         endif 
+       else if (idir .eq. 2) then
+         phi1 = phi(CHF_IX[i;j;k-isign],comp)
+         
+         if (order .gt. 0) then
+           phi2 = phi(CHF_IX[i;j;k-2*isign],comp)
+         endif
+         
+         if (order .gt. 1) then
+           phi3 = phi(CHF_IX[i;j;k-3*isign],comp)
+         endif
+         
+       endif 
+       
+       if (order .eq. 0) then
+         phi(CHF_IX[i;j;k],comp) = phi1
+       else if (order .eq. 1) then
+         phi(CHF_IX[i;j;k],comp) = 2*phi1-phi2
+       else if (order .eq. 2) then
+         phi(CHF_IX[i;j;k],comp) = 3*phi1 - 3*phi2 + phi3
+       else
+         print*, 'BCFunc:ExtrapBC - can only do 0th, 1st or 2nd order'
+         call MAYDAYERROR()
+       endif
+
+      CHF_ENDDO
+
+      
+      return
+      end
+      
+C     --------------------------------------------------------------
+C     isign should be -1 (lo side) or +1 (high side)
+C     Enforce dirichlet BCs with a_value if it's inflow,
+C     constant flux BCs if outflow
+C     If boundary vel*isign is negative, we have inflow. Else outflow.
+C
+      subroutine INFLOWOUTFLOWBC(
+     &     CHF_FRA[phi],
+     &     CHF_CONST_FRA[vel],
+     &     chf_real[bcVal],
+     &     chf_box[region],
+     &     chf_int[order],
+     &     chf_int[isign],
+     &     chf_int[idir],
+     &     chf_int[comp])
+     
+      integer chf_ddecl[i;j;k]
+      integer velSign
+      REAL_T phi1, phi2, phi3, veli, inOut
+      integer velComp
+      
+      velComp = 0
+      
+
+      chf_multido[region;i;j;k]
+       
+       if (isign .eq. -1) then
+         velSign = -1
+       else
+         velSign = 1
+       endif
+       
+C       print *, inOut
+       
+       if (idir .eq. 0) then
+         phi1 = phi(CHF_IX[i-isign;j;k],comp)
+         phi2 = phi(CHF_IX[i-2*isign;j;k],comp)
+         phi3 = phi(CHF_IX[i-3*isign;j;k],comp)
+         veli = vel(CHF_IX[i-velSign;j;k],velComp)
+       else if (idir .eq. 1) then
+         phi1 = phi(CHF_IX[i;j-isign;k],comp)
+         phi2 = phi(CHF_IX[i;j-2*isign;k],comp)
+         phi3 = phi(CHF_IX[i;j-3*isign;k],comp)
+         veli = vel(CHF_IX[i;j-velSign;k],velComp)
+       else if (idir .eq. 2) then
+         phi1 = phi(CHF_IX[i;j;k-isign],comp)
+         phi2 = phi(CHF_IX[i;j;k-isign*2],comp)
+         phi3 = phi(CHF_IX[i;j;k-isign*3],comp)
+         veli = vel(CHF_IX[i;j;k-velSign],velComp)
+       endif 
+       
+       inOut = veli*isign
+       
+       if (inOut .lt. 0) then
+C        inflow BC - dirichlet  
+        if (order .eq. 0) then
+           phi(CHF_IX[i;j;k],comp) = bcVal
+         else if (order .eq. 1) then
+           phi(CHF_IX[i;j;k],comp) = 2*bcVal - phi1
+         else if (order .eq. 2) then
+           phi(CHF_IX[i;j;k],comp) = (8/3)*bcVal  - 2*phi1 + (1/3)*phi2
+         endif
+         
+         
+       else
+C         outflow BC
+C         Neuman:
+C         phi(CHF_IX[i;j;k],comp) = phi1
+C        1st order extrap:
+C         phi(CHF_IX[i;j;k],comp) = 2*phi1-phi2
+C        2nd order extrapolation:         
+         phi(CHF_IX[i;j;k],comp) = 3*phi1 - 3*phi2 + phi3
+         
+       endif
+     
+      CHF_ENDDO
+      
+      
+      
+      return
+      end    
+      
+C     --------------------------------------------------------------
+C     isign should be -1 (lo side) or +1 (high side)
+C     Enforce dirichlet BCs with diriValue if it's inflow,
+C     and otherValue if it's not inflow
+C     If boundary vel*isign is negative, we have inflow.
+C
+      subroutine INFLOWBC(
+     &     CHF_FRA[phi],
+     &     chf_real[inVal],
+     &     chf_real[outVal],
+     &     chf_real[plumeStart],
+     &     chf_real[plumeEnd],
+     &     chf_real[dx],
+     &     chf_box[region],
+     &     chf_int[order],
+     &     chf_int[isign],
+     &     chf_int[idir],
+     &     chf_int[comp])
+     
+      integer chf_ddecl[i;j;k]
+      REAL_T phi1, phi2
+      REAL_T facePos
+      
+
+      chf_multido[region;i;j;k]
+       facePos = (i+0.5)*dx
+C       print *, facePos
+       
+       
+       if (idir .eq. 0) then
+         phi1 = phi(CHF_IX[i-isign;j;k],comp)
+         phi2 = phi(CHF_IX[i-2*isign;j;k],comp)
+       else if (idir .eq. 1) then
+         phi1 = phi(CHF_IX[i;j-isign;k],comp)
+         phi2 = phi(CHF_IX[i;j-2*isign;k],comp)
+       else if (idir .eq. 2) then
+         phi1 = phi(CHF_IX[i;j;k-isign],comp)
+         phi2 = phi(CHF_IX[i;j;k-isign*2],comp)
+       endif 
+       
+       if (facePos .gt. plumeStart .AND. facePos .lt. plumeEnd) then
+  
+        if (order .eq. 0) then
+           phi(CHF_IX[i;j;k],comp) = inVal
+         else if (order .eq. 1) then
+           phi(CHF_IX[i;j;k],comp) = 2*inVal - phi1
+         else if (order .eq. 2) then
+           phi(CHF_IX[i;j;k],comp) = (8/3)*inVal  - 2*phi1 + (1/3)*phi2
+         endif
+         
+         
+       else
+C         phi(CHF_IX[i;j;k],comp) = phi1
+         if (order .eq. 0) then
+           phi(CHF_IX[i;j;k],comp) = outVal
+         else if (order .eq. 1) then
+           phi(CHF_IX[i;j;k],comp) = 2*outVal - phi1
+         else if (order .eq. 2) then
+           phi(CHF_IX[i;j;k],comp) = (8/3)*outVal  - 2*phi1 + (1/3)*phi2
+         endif
+         
+       endif
+     
+      CHF_ENDDO
+      
+      
+      
+      return
+      end  
+      
+      
+C     --------------------------------------------------------------
+C     isign should be -1 (lo side) or +1 (high side)
+C     Enforce neumann BCs with a_value if it's in the plume,
+C     dirichlet BCs elsewhere
+C
+      subroutine PRESSUREPLUMEBC(
+     &     CHF_FRA[phi],
+     &     chf_real[inNeumVal],
+     &     chf_real[outDiriVal],
+     &     chf_real[plumeStart],
+     &     chf_real[plumeEnd],
+     &     chf_real[dx],
+     &     chf_box[region],
+     &     chf_int[order],
+     &     chf_int[isign],
+     &     chf_int[idir],
+     &     chf_int[comp])
+     
+      integer chf_ddecl[i;j;k]
+      REAL_T phi1, phi2, veli, facePos
+      
+
+      chf_multido[region;i;j;k]
+       facePos = (i+0.5)*dx
+      
+       if (idir .eq. 0) then
+         phi1 = phi(CHF_IX[i-isign;j;k],comp)
+         phi2 = phi(CHF_IX[i-2*isign;j;k],comp)
+       else if (idir .eq. 1) then
+         phi1 = phi(CHF_IX[i;j-isign;k],comp)
+         phi2 = phi(CHF_IX[i;j-2*isign;k],comp)
+       else if (idir .eq. 2) then
+         phi1 = phi(CHF_IX[i;j;k-isign],comp)
+         phi2 = phi(CHF_IX[i;j;k-isign*2],comp)
+       endif 
+       
+       if (facePos .gt. plumeStart .AND. facePos .lt. plumeEnd) then
+  	     phi(CHF_IX[i;j;k],comp) = phi1 + isign*inNeumVal*dx
+        
+       else
+         
+         if (order .eq. 0) then
+           phi(CHF_IX[i;j;k],comp) = outDiriVal
+         else if (order .eq. 1) then
+           phi(CHF_IX[i;j;k],comp) = 2*outDiriVal - phi1
+         else if (order .eq. 2) then
+           phi(CHF_IX[i;j;k],comp) = (8/3)*outDiriVal  - 2*phi1 + (1/3)*phi2
+         endif
+         
+       endif
+     
+      CHF_ENDDO
+      
+      
+      
+      return
+      end           

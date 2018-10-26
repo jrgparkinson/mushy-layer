@@ -1,0 +1,176 @@
+
+amrmultigrid.MGtype=1
+amrmultigrid.hang_eps=1.0e-10
+amrmultigrid.max_iter=10
+amrmultigrid.norm_thresh=1.0e-10
+amrmultigrid.num_mg=1
+amrmultigrid.num_smooth=8
+amrmultigrid.relaxMode=1
+amrmultigrid.tolerance=1.0e-10
+amrmultigrid.verbosity=0
+bc.bulkConcentrationHiVal=-1 -1
+bc.bulkConcentrationLoVal=-1 -1
+bc.enthalpyHiVal=0.0 0.1
+bc.enthalpyLoVal=0.0 6.2
+bc.scalarHi=1 0 0
+bc.scalarLo=1 2 2
+bc.velHi=6 0 0
+bc.velLo=6 3 0
+concise_run_name=Uniform64MushyDB
+machineCodeIsRunOn=atmlxmaster
+main.addSubtractGradP=1
+main.advPorosityLimit=0.01
+main.block_factor=8
+main.ccvel_porosity_cap=0.01
+main.cfl=0.8
+main.checkpoint_interval=200
+main.chk_interval=8
+main.chk_prefix=chk
+main.debug=false
+main.doEuler=1
+main.doProjection=1
+main.doVCreflux=0
+main.domain_width=1.0
+main.dt_tolerance_factor=1.01
+main.enforceAnalyticSoln=false
+main.fill_ratio=0.75
+main.grid_buffer_size=0 0 0
+main.ignoreSolverFails=false
+main.implicitAdvectionSolve=false
+main.initialPerturbation=0.0
+main.initial_cfl=0.1
+main.initialize_pressure=true
+main.iter_plot_interval=-1
+main.iteration_plot_interval=-1
+main.maxRestartWavenumber=1
+main.max_dt=500.0
+main.max_dt_growth=1.01
+main.max_grid_size=64
+main.max_level=0
+main.max_step=10000000
+main.max_time=5000000.0
+main.min_time=4.0
+main.nondimensionalisation=1
+main.num_cells=256 128
+main.output_folder=/network/group/aopp/oceans/AW002_PARKINSON_MUSH/directionalSolidification/CR100.000RaC200Le100KozenyPermeabilityDa2.0e-03R1.0e-03pts256-St5-domWidth6.0-np4-0
+main.periodic_bc=0 0 0
+main.perturbationSin=true
+main.perturbationWavenumber=1
+main.plot_interval=50
+main.plot_prefix=plt
+main.project_initial_vel=true
+main.ref_ratio=2 2 2
+main.refine_thresh=0.09375
+main.refluxType=2
+main.reflux_scalar=1
+main.regrid_interval=8 8 8
+main.restart_newTime=0.0
+main.restart_perturbation=0.0
+main.restart_wavenumber=1
+main.scalePwithChi=1
+main.solverFailRestartMethod=0
+main.steady_state=1e-9
+main.symmetric_domain=false
+main.tag_buffer_size=4
+main.time_integration_order=1
+main.usePhiForImplicitAdvectionSolve=false
+main.use_limiting=true
+main.use_subcycling=1
+main.verbosity=5
+main.viscous_solver_tol=1e-15
+mercurialRepository=1093+
+parameters.K=1
+parameters.bottomBulkConc=-1.0
+parameters.bottomEnthalpy=6.3
+parameters.compositionRatio=100.0
+parameters.darcy=0.002
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.heatConductivityRatio=1
+parameters.heleShaw=true
+parameters.initialComposition=30
+parameters.lewis=100
+parameters.liquidusSlope=-0.1
+parameters.nonDimReluctance=1e-3
+parameters.nonDimVel=0.0002
+parameters.permeabilityFunction=2
+parameters.prandtl=10.0
+parameters.problem_type=0
+parameters.rayleighComp=200
+parameters.rayleighTemp=0
+parameters.specificHeatRatio=1
+parameters.stefan=5
+parameters.topBulkConc=-1.0
+parameters.waterDistributionCoeff=1e-5
+picardSolver.max_iter=8
+picardSolver.tol=1e-5
+projection.MACbcScale=-0.5
+projection.eta=0.0
+projection.numSmoothDown=16
+projection.numSmoothUp=16
+projection.phiScale=1.0
+projection.solverTol=1e-15
+projection.usePiAdvectionBCs=true
+projector.verbosity=0
+regrid.marginalPorosityLimit=0.99
+run_name=Uniform
+
+main.output_folder=/home/parkinsonjl/convection-in-sea-ice/MushyLayer/execSubcycle/output/
+main.num_cells=32 32
+main.plot_interval=1
+#parameters.compositionRatio=100.0
+parameters.rayleighComp=1
+parameters.darcy=1e-1
+parameters.nonDimVel=0.0 #1e-3
+#parameters.nonDimReluctance=1e-2
+main.debug=true
+bc.enthalpyHiVal=0.0 -1.0
+main.advectionMethod=2
+#advSrc.darcy=0
+#advSrc.viscous=0
+#main.domain_width=2.0
+#main.num_cells=64 64
+
+main.advectionMethod=2
+main.advPorosityLimit=1e-10
+main.ccvel_porosity_cap=1e-10
+main.checkpoint_interval=1
+main.cfl=0.4
+advSrc.darcy=0
+advSrc.viscous=1
+ccSrc.advection=0
+main.uDeluMethod=1 # irrelevant as ccSrc.advection=0
+main.single_level_lambda_corr=0 #turn off single level sync, definitely need this off (and should correct this for AMR by setting u(chi=0)=0 after sync)
+
+main.max_step=1000
+
+# Above works
+main.advectionMethod=1 # also works
+advSrc.darcy=0 # this doesn't crash, but is very wierd. Do some tests (for chi>0 everywhere) and see if we actually need this term?
+ccSrc.advection=1 # this works now that we kill the src term a cell away from chi=0 interfaces
+main.uDeluMethod=0
+main.uDelu_porosity=1e-10 # needed for above
+
+advSrc.darcy=1
+main.uDelU_grow=2
+
+## This all seems better now - we have all the source terms turned on
+# Now try more difficult parameters
+parameters.compositionRatio=2.0
+ccSrc.advection=1 # with lower C, we find chi=0 regions within the mush which are difficult to handle (currently crashes)
+main.uDelu_porosity=1e-3
+main.advVelSrcChiLimit=1e-3
+
+# the above runs, but it's messy
+parameters.rayleighComp=50
+parameters.darcy=1e-2
+parameters.nonDimVel=1e-3
+
+# With smaller domain, above params now work quite well.
+# Let's try pushing C even smaller
+parameters.compositionRatio=10.0
+parameters.rayleighComp=100
+parameters.darcy=1e-3
+parameters.nonDimVel=1e-4
+
+parameters.theta_infinity=1.2

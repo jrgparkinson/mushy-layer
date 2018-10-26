@@ -1,0 +1,66 @@
+Mercurial repository revision: 1122+
+
+defineAMR
+PhysBCUtil::PhysBCUtil
+Diagnostics::define with timescale = 1
+Parameters: 
+physicalProblem: 0
+viscosity: -999
+heatConductivityLiquid: -999
+heatConductivitySolid: -999
+specificHeatLiquid: -999
+specificHeatSolid: -999
+liquidDensity: -999
+latentHeatDissolution: -999
+thermalExpansivity: -999
+solutalExpansivity: -999
+eutecticTemp: -23
+eutecticComposition: 230
+initialComposition: 30
+liquidusSlope: -0.1
+waterDistributionCoeff: 1e-05
+heleShawCoolingCoeff: -999
+liquidSoluteDiffusivity: -999
+d: -999
+height: -999
+referencePermeability: -999
+gravitationalAcceleration: -999
+V: -999
+deltaTemp: 20
+stefan: 5
+compositionRatio: 1.18
+liquidHeatDiffusivity: -0.001001
+heatConductivityRatio: 1
+specificHeatRatio: 1
+lewis: 100
+rayleighTemp: 0
+rayleighComposition: 80
+nonDimVel: 0
+nonDimHeleShawCooling: 998001
+timescale: -9.97003e+08
+nonDimReluctance: 0.1
+thetaEutectic: 0
+thetaInf: -999
+thetaInitialLiquidus: -999
+thetaInitial: -999
+thetaInterface: -999
+ThetaEutectic: 0
+ThetaInitial: -1
+ThetaInf: -1
+ThetaLInitial: -999
+Hinitial: 6.03
+PhysBCUtil::PhysBCUtil
+Diagnostics::define with timescale = 1
+PhysBCUtil::PhysBCUtil
+Diagnostics::define with timescale = 1
+MushyLayerSubcycleUtils::defined AMR
+MushyLayerSubcycleUtils::check for timestepping
+ AMR::verbosity  m_verbosity=2
+AMR::initialGrid: top level = 0
+AMRLevelMushyLayer::initialData
+AMRLevelMushyLayer::tagCells - refine plume mush - 0
+AMRLevelMushyLayer::initialData
+AMRLevelMushyLayer::initialData
+Sum(RHS) for IVP solve = 0.000000e+00
+Computing initial VD correction with dt = 2.000000e-10
+Sum(RHS) for sync solve = 0.000000e+00

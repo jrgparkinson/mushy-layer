@@ -1,0 +1,49 @@
+numCrseStart 0
+exact Filename = /home/parkinsonjl/convection-in-sea-ice/test/rayleighBenard/rayleighBenard-64pts-steady.2d.hdf5
+computed Filename = /home/parkinsonjl/convection-in-sea-ice/test/rayleighBenard/rayleighBenard-32pts-steady.2d.hdf5
+error Filename = err32-64.hdf5
+error, step 0: L1, L2, Max, sum
+Enthalpy: 2.1780e-03, 1.3420e-03, 1.7846e-03, 4.6257e-07
+Bulk concentration: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+Temperature: 2.1780e-03, 1.3420e-03, 1.7846e-03, 4.6257e-07
+Porosity: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+Liquid concentration: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+Solid concentration: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+Pressure: 1.6649e+00, 8.1522e-01, 7.2614e-01, -3.4617e-01
+Permeability: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+lambda: 2.8632e-03, 1.5017e-03, 1.6858e-03, 1.2951e-08
+Salt src term godunov: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+Salt src term finite: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+Salt op: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+T analytic: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+Porosity analytic: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+T err: 2.1780e-03, 1.3420e-03, 1.7846e-03, -4.6257e-07
+H opp: 2.1479e-01, 1.4623e-01, 2.3248e-01, -2.8511e-05
+H src: 2.2013e-01, 1.4921e-01, 2.3598e-01, 2.5602e-05
+div U: 4.2983e-01, 3.0269e-01, 5.8772e-01, -3.4385e-02
+dHdt: 8.5787e-03, 4.9797e-03, 7.9677e-03, -2.4434e-06
+xDarcy velocity: 9.1389e-02, 5.5506e-02, 8.8350e-02, -2.2864e-16
+yDarcy velocity: 1.4696e-01, 7.2102e-02, 6.6995e-02, -1.3349e-03
+xU divided by porosity: 9.5990e-02, 6.1208e-02, 1.1105e-01, -3.5258e-16
+yU divided by porosity: 1.5122e-01, 7.4316e-02, 6.8961e-02, -2.7337e-03
+xU star: 1.5023e+00, 7.4364e-01, 5.8951e-01, -2.5349e-16
+yU star: 6.5715e+00, 2.9768e+00, 2.2937e+00, -6.5490e+00
+xDarcy Vel Analytic: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+yDarcy Vel Analytic: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+xDarcy Vel Error: 9.1389e-02, 5.5506e-02, 8.8350e-02, -2.2864e-16
+yDarcy Vel Error: 1.4696e-01, 7.2102e-02, 6.6995e-02, -1.3349e-03
+xVel flux reg mismatch: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+yVel flux reg mismatch: 0.0000e+00, 0.0000e+00, 0.0000e+00, 0.0000e+00
+xAdvection Source: 1.9847e+03, 9.8985e+02, 8.8192e+02, 2.9865e-13
+yAdvection Source: 8.5463e+03, 3.8527e+03, 3.0510e+03, -8.5106e+03
+xViscous solve src: 4.4830e+01, 2.4942e+01, 3.3530e+01, 5.8425e-15
+yViscous solve src: 1.9717e+02, 2.9256e+02, 7.3173e+02, -1.4275e+02
+xAdvection velocity: 8.4131e-02, 5.2010e-02, 8.3960e-02, -2.2750e-16
+yAdvection velocity: 1.7288e-01, 8.0599e-02, 7.2642e-02, -9.0983e-10
+xdUdt: 4.7946e+00, 2.7110e+00, 5.1933e+00, 1.5409e-13
+ydUdt: 1.7872e+01, 1.8036e+01, 4.2140e+01, -8.8038e+00
+
+Vector Ss: 312 bytes (0 Mb)
+---------------------------------
+Total Unfreed : 312 bytes (0 Mb)
+peak memory usage: 22883042 bytes (21 Mb)

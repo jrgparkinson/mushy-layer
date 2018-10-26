@@ -1,0 +1,102 @@
+##############################################
+## Convection in a mixed liquid-porous medium
+## with no phase change (c.f. Le Bars and Worster (2006) section 5.3
+##############################################
+
+parameters.problem_type = 14
+
+main.periodic_bc = 0 0 1 
+main.domain_length = 1.0
+main.symmetric_domain = false
+
+main.cfl = 0.5
+main.initial_cfl = 0.01
+
+# Optional flag to let us reach steady state even if salinity is still changing
+main.ignoreBulkConcentrationSteadyState = true
+
+# Refluxing
+main.reflux_momentum = 1
+main.reflux_normal_momentum = 0
+main.reflux_scalar = 1
+main.refluxType = 2
+
+#projection
+projection.eta = 0.46 #0.5 seems to be largest stable value. Should be -ve at the moment...
+
+# refinement
+main.taggingVar = 0 # 0=enthalpy
+main.taggingVectorVar = -1 # 0=darcy vel
+main.refine_thresh = 0.1 # 0.02
+main.refineMethod = 0 # 0=undivided gradient, 1 = absolute value
+
+
+main.ignoreBulkConcentrationSteadyState = true
+##################################################
+# How to calculate permeability
+# 0: permeability = 1
+# 1: permeability = (1-solid fraction)^3
+# 2: permeability = kozeny-carman
+# 3: permeability = log()
+# 4: permeability = x^2 (or whatever function I want)
+# Porosity function:
+# 0 - fixed porosity, equal to boundary porosity
+# 1 - linear variation from boundary towards middle
+################################################
+parameters.porosityFunction = 0
+parameters.permeabilityFunction = 2
+parameters.heleShaw=false
+
+#############################################
+#Physical parameters
+#############################################
+parameters.eutecticTemp				= -23		# celcius
+parameters.initialComposition		= 35		# psu - standard sea water 
+parameters.eutecticComposition		= 230		# psu
+parameters.liquidusSlope			= -0.1 	# celcius/psu
+parameters.waterDistributionCoeff	= 1e-3 #1e-5		# dimensionless
+parameters.nonDimVel				= 0.0 #1.5e-7		# m/s
+
+#Initial and boundary conditions (non dimensional)
+parameters.referenceTemperature = -3.5 # Determine dimensionless fields
+parameters.referenceSalinity = 35  # Determine dimensionless fields
+
+bc.scalarLo = 0 1
+bc.scalarHi = 0 1
+
+bc.velLo = 0 0 # solid walls
+bc.velHi = 0 0 # solid walls
+bc.scalarLo = 0 1
+bc.scalarHi = 0 1
+
+bc.enthalpyLoVal = 1.0 0.0
+bc.enthalpyHiVal = 0.0 0.0
+
+bc.bulkConcentrationLoVal = 0.01 0.01
+bc.bulkConcentrationHiVal = 0.01 0.01
+bc.liquidConcentrationLoVal = 0.01 0.01
+bc.liquidConcentrationHiVal = 0.01 0.01
+bc.temperatureLoVal = 1.0 0.0
+bc.temperatureHiVal = 0.0 0.0
+bc.porosityLoVal = 0.4 0.4
+bc.porosityHiVal = 0.4 0.4
+
+# non dimensional parameters - these will overwrite parameters
+parameters.stefan 			= 0 # no solidification in this problem
+parameters.compositionRatio = 5
+parameters.K				= 1 # 4
+parameters.specificHeatRatio= 1 # 0.5
+parameters.lewis			= 1e300 # 1e300  # (infinite)
+parameters.heatConductivityRatio = 1
+
+parameters.rayleighTemp				= 1e4 # 1e4 # turn on/off buoyancy forcing
+parameters.rayleighComp				= 0.0 # turn on/off buoyancy forcing
+parameters.darcy 					=  0.05625 # modified(Da) = 1e-2 and porosity = 0.4 
+parameters.prandtl				 	= 1.0
+
+# momentum equation
+main.doEuler = 1 
+main.doProjection = 1
+main.addSubtractGradP = 1
+main.scalePwithChi = 1 
+main.doSyncOperations = 1

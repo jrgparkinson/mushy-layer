@@ -1,0 +1,313 @@
+\hypertarget{class_a_m_r_non_linear_v_c_op}{\section{A\-M\-R\-Non\-Linear\-V\-C\-Op Class Reference}
+\label{class_a_m_r_non_linear_v_c_op}\index{A\-M\-R\-Non\-Linear\-V\-C\-Op@{A\-M\-R\-Non\-Linear\-V\-C\-Op}}
+}
+
+
+Nonlinear variable coefficient operator.  
+
+
+
+
+{\ttfamily \#include $<$A\-M\-R\-Non\-Linear\-V\-C\-Op.\-H$>$}
+
+Inheritance diagram for A\-M\-R\-Non\-Linear\-V\-C\-Op\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_a_m_r_non_linear_v_c_op}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{class_a_m_r_non_linear_v_c_op_a325a5f93d334682aee9b727684c2ddc7}{m\-\_\-primary\-Vars} \{ {\bfseries m\-\_\-enthalpy\-Var}, 
+{\bfseries m\-\_\-bulk\-Concentration\-Var}
+ \}
+\begin{DoxyCompactList}\small\item\em Primary variables. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_a_m_r_non_linear_v_c_op_a36b3867478140856f329e3c145c12d98}{finer\-Operator\-Changed} (const M\-G\-Level\-Op$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ \&a\-\_\-operator, int a\-\_\-coarsening\-Factor)
+\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a8d5ae09f2da749b7a1c916f239369c14}{Level\-Data$<$ F\-Array\-Box $>$ \& \hyperlink{class_a_m_r_non_linear_v_c_op_a8d5ae09f2da749b7a1c916f239369c14}{identity\-Coef} ()}\label{class_a_m_r_non_linear_v_c_op_a8d5ae09f2da749b7a1c916f239369c14}
+
+\begin{DoxyCompactList}\small\item\em Returns identity coefficient data. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_non_linear_v_c_op_aca3691384e09691970d00da4afb566d1}{set\-B\-Coef\-Interpolator} (Ref\-Counted\-Ptr$<$ \hyperlink{class_coefficient_interpolator_linear_face}{Coefficient\-Interpolator\-Linear\-Face} $>$ \&a\-\_\-b\-Coef\-Interpolator)
+\item 
+void \hyperlink{class_a_m_r_non_linear_v_c_op_a3ccd0ded6d61f3d6e6e82d54c008f698}{set\-A\-Coef\-Interpolator} (Ref\-Counted\-Ptr$<$ \hyperlink{class_coefficient_interpolator_linear}{Coefficient\-Interpolator\-Linear} $>$ \&a\-\_\-a\-Coef\-Interpolator)
+\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a49f6071abe9cdf2d8c3eb56637554c5e}{Level\-Data$<$ Flux\-Box $>$ \& \hyperlink{class_a_m_r_non_linear_v_c_op_a49f6071abe9cdf2d8c3eb56637554c5e}{B\-Coef} ()}\label{class_a_m_r_non_linear_v_c_op_a49f6071abe9cdf2d8c3eb56637554c5e}
+
+\begin{DoxyCompactList}\small\item\em Returns the B coefficient. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_af4a0c714b466366e249458d2d90a222a}{Ref\-Counted\-Ptr\\*
+$<$ \hyperlink{class_coefficient_interpolator_linear_face}{Coefficient\-Interpolator\-Linear\-Face} $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_af4a0c714b466366e249458d2d90a222a}{B\-Coef\-Interpolator} ()}\label{class_a_m_r_non_linear_v_c_op_af4a0c714b466366e249458d2d90a222a}
+
+\begin{DoxyCompactList}\small\item\em Allows access to the B coefficient interpolator. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_aefc844d769dd086c3b9a12d59c6132b8}{Ref\-Counted\-Ptr\\*
+$<$ \hyperlink{class_coefficient_interpolator_linear}{Coefficient\-Interpolator\-Linear} $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_aefc844d769dd086c3b9a12d59c6132b8}{A\-Coef\-Interpolator} ()}\label{class_a_m_r_non_linear_v_c_op_aefc844d769dd086c3b9a12d59c6132b8}
+
+\begin{DoxyCompactList}\small\item\em Allows access to the A coefficient interpolator. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_non_linear_v_c_op_a55da192e61bf0998503c4af24729266a}{set\-Time} (Real a\-\_\-time)
+\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a15596196a1227672fd35ee1a82007363}{void \hyperlink{class_a_m_r_non_linear_v_c_op_a15596196a1227672fd35ee1a82007363}{compute\-Derived\-Var} (Level\-Data$<$ F\-Array\-Box $>$ \&liquid\-Conc, const Level\-Data$<$ F\-Array\-Box $>$ \&bulk\-Conc, bool a\-\_\-homogeneous=false)}\label{class_a_m_r_non_linear_v_c_op_a15596196a1227672fd35ee1a82007363}
+
+\begin{DoxyCompactList}\small\item\em Compute temperature, liquid concentration from enthalpy, bulk concentration etc. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_ac8708b04b01443026361b4378cbcefde}{void \hyperlink{class_a_m_r_non_linear_v_c_op_ac8708b04b01443026361b4378cbcefde}{compute\-Derived\-Var} (F\-Array\-Box \&a\-\_\-calculated\-Var, const F\-Array\-Box \&a\-\_\-primary\-Var, const Data\-Index dit, bool a\-\_\-homogeneous=false)}\label{class_a_m_r_non_linear_v_c_op_ac8708b04b01443026361b4378cbcefde}
+
+\begin{DoxyCompactList}\small\item\em Compute temperature, liquid concentration from enthalpy, bulk concentration etc. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{Indent}{\bf A\-M\-R\-Non\-Linear\-V\-C\-Op functions}\par
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a3a6584c70d2e7593fe1d535379e21225}{{\bfseries A\-M\-R\-Non\-Linear\-V\-C\-Op} ()}\label{class_a_m_r_non_linear_v_c_op_a3a6584c70d2e7593fe1d535379e21225}
+
+\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_afd2c49ec3bfd649a6638b2052c4ca41a}{virtual {\bfseries $\sim$\-A\-M\-R\-Non\-Linear\-V\-C\-Op} ()}\label{class_a_m_r_non_linear_v_c_op_afd2c49ec3bfd649a6638b2052c4ca41a}
+
+\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_aa682e64a49a2e326c03a99e2212b2abf}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_aa682e64a49a2e326c03a99e2212b2abf}{residual\-I} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lhs, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs, bool a\-\_\-homogeneous=false)}\label{class_a_m_r_non_linear_v_c_op_aa682e64a49a2e326c03a99e2212b2abf}
+
+\begin{DoxyCompactList}\small\item\em Compute residual. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_ad7c0f6f588dec89aed959fe11efce16e}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_ad7c0f6f588dec89aed959fe11efce16e}{pre\-Cond} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-correction, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-residual)}\label{class_a_m_r_non_linear_v_c_op_ad7c0f6f588dec89aed959fe11efce16e}
+
+\begin{DoxyCompactList}\small\item\em Preconditioner. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a459cdb2442f34a5acf5bdd8df385e122}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a459cdb2442f34a5acf5bdd8df385e122}{apply\-Op\-I} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lhs, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, bool a\-\_\-homogeneous=false)}\label{class_a_m_r_non_linear_v_c_op_a459cdb2442f34a5acf5bdd8df385e122}
+
+\begin{DoxyCompactList}\small\item\em Apply operator. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_ab7ee93671f9ee147209ecec8ed3d95f8}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_ab7ee93671f9ee147209ecec8ed3d95f8}{apply\-Op\-No\-Boundary} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lhs, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi)}\label{class_a_m_r_non_linear_v_c_op_ab7ee93671f9ee147209ecec8ed3d95f8}
+
+\begin{DoxyCompactList}\small\item\em Apply operator. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a1a0649bf51184c96d80719e59de68f14}{void \hyperlink{class_a_m_r_non_linear_v_c_op_a1a0649bf51184c96d80719e59de68f14}{apply\-Op\-No\-Boundary2} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lhs, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, bool a\-\_\-homogeneous)}\label{class_a_m_r_non_linear_v_c_op_a1a0649bf51184c96d80719e59de68f14}
+
+\begin{DoxyCompactList}\small\item\em Apply operator. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a1d8179e4ce988c0e9c4fcfb0b8b8275f}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a1d8179e4ce988c0e9c4fcfb0b8b8275f}{diagonal\-Scale} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs, bool a\-\_\-kappa\-Weighted)}\label{class_a_m_r_non_linear_v_c_op_a1d8179e4ce988c0e9c4fcfb0b8b8275f}
+
+\begin{DoxyCompactList}\small\item\em Scale with identity coefficient. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_ab31eebdb41dae0e42962b983c4f1e44f}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_ab31eebdb41dae0e42962b983c4f1e44f}{divide\-By\-Identity\-Coef} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_a_m_r_non_linear_v_c_op_ab31eebdb41dae0e42962b983c4f1e44f}
+
+\begin{DoxyCompactList}\small\item\em Divide by identity coefficient. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a9090e8b4e8214c34b3f0cf712fdada6c}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a9090e8b4e8214c34b3f0cf712fdada6c}{set\-Alpha\-And\-Beta} (const Real \&a\-\_\-alpha, const Real \&a\-\_\-beta)}\label{class_a_m_r_non_linear_v_c_op_a9090e8b4e8214c34b3f0cf712fdada6c}
+
+\begin{DoxyCompactList}\small\item\em For tga stuff. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a1f3457e488c5186bd90b34934a0ce02d}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a1f3457e488c5186bd90b34934a0ce02d}{set\-Coefs} (const Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ \&a\-\_\-a\-Coef, const Ref\-Counted\-Ptr$<$ Level\-Data$<$ Flux\-Box $>$ $>$ \&a\-\_\-b\-Coef, const Real \&a\-\_\-alpha, const Real \&a\-\_\-beta)}\label{class_a_m_r_non_linear_v_c_op_a1f3457e488c5186bd90b34934a0ce02d}
+
+\begin{DoxyCompactList}\small\item\em Also calls reset lambda. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_add4e1fcde22b295a038e786cf0c1152a}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_add4e1fcde22b295a038e786cf0c1152a}{reset\-Lambda} ()}\label{class_a_m_r_non_linear_v_c_op_add4e1fcde22b295a038e786cf0c1152a}
+
+\begin{DoxyCompactList}\small\item\em Should be called before the relaxation parameter is needed. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a5402fd312e465c8b1d07357987d66085}{void \hyperlink{class_a_m_r_non_linear_v_c_op_a5402fd312e465c8b1d07357987d66085}{reset\-Lambda\-Non\-Linear} (const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi)}\label{class_a_m_r_non_linear_v_c_op_a5402fd312e465c8b1d07357987d66085}
+
+\begin{DoxyCompactList}\small\item\em Recalculate lambda for nonlinear calculations (not actually current used) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a17172466afb18a9c19b568b03b96c7dc}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a17172466afb18a9c19b568b03b96c7dc}{compute\-Lambda} ()}\label{class_a_m_r_non_linear_v_c_op_a17172466afb18a9c19b568b03b96c7dc}
+
+\begin{DoxyCompactList}\small\item\em Compute lambda once alpha, a\-Coef, beta, b\-Coef are defined. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_af7fb4be874164fa69b4bb444fe5b44a6}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_af7fb4be874164fa69b4bb444fe5b44a6}{reflux} (const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-Fine, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-residual, A\-M\-R\-Level\-Op$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $\ast$a\-\_\-finer\-Op)}\label{class_a_m_r_non_linear_v_c_op_af7fb4be874164fa69b4bb444fe5b44a6}
+
+\begin{DoxyCompactList}\small\item\em Increment flux registers and calculate reflux. \end{DoxyCompactList}\item 
+virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_acabeefd40cc36448de809287222d5611}{get\-Flux} (Flux\-Box \&a\-\_\-flux, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-data, const Box \&a\-\_\-grid, const Data\-Index \&a\-\_\-dit, Real a\-\_\-scale)
+\begin{DoxyCompactList}\small\item\em get\-Flux function which matches interface to A\-M\-R\-Poisson\-Op \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a2399bd4d0e95ed775a47c38340548b99}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a2399bd4d0e95ed775a47c38340548b99}{get\-Flux} (Flux\-Box \&a\-\_\-flux, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-data, const Flux\-Box \&a\-\_\-b\-Coef, const Box \&a\-\_\-grid, const Data\-Index \&a\-\_\-dit, Real a\-\_\-scale)}\label{class_a_m_r_non_linear_v_c_op_a2399bd4d0e95ed775a47c38340548b99}
+
+\begin{DoxyCompactList}\small\item\em get diffusive flux \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf M\-G\-Level\-Op functions}\par
+{\em \subsection*{$<$$<$$<$$<$$<$$<$$<$ \hyperlink{_a_m_r_non_linear_v_c_op_8_h_source}{A\-M\-R\-Non\-Linear\-V\-C\-Op.\-H} }}\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_ad79ab87f7439844df8c7d57cbf4e33cb}{restrict\-Residual} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-res\-Coarse, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-Fine, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs\-Fine)
+\begin{DoxyCompactList}\small\item\em calculate restricted residual \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_aaa6bf1730066db6c608e871e34393de8}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_aaa6bf1730066db6c608e871e34393de8}{restrict\-Residual} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-res\-Coarse, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-Fine, const Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-phi\-Coarse, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs\-Fine, bool homogeneous)}\label{class_a_m_r_non_linear_v_c_op_aaa6bf1730066db6c608e871e34393de8}
+
+\begin{DoxyCompactList}\small\item\em calculate restricted residual \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a5aabcacbf3457aed7f6e31672ce9d564}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a5aabcacbf3457aed7f6e31672ce9d564}{create\-Coarser} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-coarse, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-fine, bool a\-\_\-ghosted)}\label{class_a_m_r_non_linear_v_c_op_a5aabcacbf3457aed7f6e31672ce9d564}
+
+\begin{DoxyCompactList}\small\item\em Create coarser version of field. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_acf575f4522cd352a22d4c6da84c12b4d}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_acf575f4522cd352a22d4c6da84c12b4d}{prolong\-Increment} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-This\-Level, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-correct\-Coarse)}\label{class_a_m_r_non_linear_v_c_op_acf575f4522cd352a22d4c6da84c12b4d}
+
+\begin{DoxyCompactList}\small\item\em Prolong correction. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_addbabef7e850c8df43dcf5087a94619d}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_addbabef7e850c8df43dcf5087a94619d}{restrict} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-Coarse, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-Fine)}\label{class_a_m_r_non_linear_v_c_op_addbabef7e850c8df43dcf5087a94619d}
+
+\begin{DoxyCompactList}\small\item\em Restrict solution to coarser level. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a0c3e7099442fbf2672ec0ccfe21c3837}{void \hyperlink{class_a_m_r_non_linear_v_c_op_a0c3e7099442fbf2672ec0ccfe21c3837}{apply\-Op\-Mg} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lhs, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-phi\-Coarse, bool a\-\_\-homogeneous)}\label{class_a_m_r_non_linear_v_c_op_a0c3e7099442fbf2672ec0ccfe21c3837}
+
+\begin{DoxyCompactList}\small\item\em Apply operator. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_ac338ad3b423fc508795f783a30b0eb7c}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_ac338ad3b423fc508795f783a30b0eb7c}{m\-\_\-a\-Coef}}\label{class_a_m_r_non_linear_v_c_op_ac338ad3b423fc508795f783a30b0eb7c}
+
+\begin{DoxyCompactList}\small\item\em Identity operator spatially varying coefficient storage (cell-\/centered) --- if you change this call \hyperlink{class_a_m_r_non_linear_v_c_op_add4e1fcde22b295a038e786cf0c1152a}{reset\-Lambda()} \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a6e44e525541b678e49dddf508a75c880}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_a6e44e525541b678e49dddf508a75c880}{m\-\_\-secondary\-Var}}\label{class_a_m_r_non_linear_v_c_op_a6e44e525541b678e49dddf508a75c880}
+
+\begin{DoxyCompactList}\small\item\em Which of enthalpy or bulk concentration we're not solving for. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a46cb57e3f91ff79146559815861f86f8}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_a46cb57e3f91ff79146559815861f86f8}{m\-\_\-enthalpy\-Solidus}}\label{class_a_m_r_non_linear_v_c_op_a46cb57e3f91ff79146559815861f86f8}
+
+\begin{DoxyCompactList}\small\item\em Enthalpy solidus. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a3554fae4dfab2b59184a29ef3256ff15}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_a3554fae4dfab2b59184a29ef3256ff15}{m\-\_\-enthalpy\-Liquidus}}\label{class_a_m_r_non_linear_v_c_op_a3554fae4dfab2b59184a29ef3256ff15}
+
+\begin{DoxyCompactList}\small\item\em Enthalpy liquidus. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a624b9245703e37de72d5a57d70ab0c7d}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_a624b9245703e37de72d5a57d70ab0c7d}{m\-\_\-enthalpy\-Eutectic}}\label{class_a_m_r_non_linear_v_c_op_a624b9245703e37de72d5a57d70ab0c7d}
+
+\begin{DoxyCompactList}\small\item\em Eutectic enthalpy. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_aa7ed20fe362ea8b486d5b7c590d27cd1}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ Flux\-Box $>$ $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_aa7ed20fe362ea8b486d5b7c590d27cd1}{m\-\_\-b\-Coef}}\label{class_a_m_r_non_linear_v_c_op_aa7ed20fe362ea8b486d5b7c590d27cd1}
+
+\begin{DoxyCompactList}\small\item\em Laplacian operator spatially varying coefficient storage (face-\/centered) --- if you change this call \hyperlink{class_a_m_r_non_linear_v_c_op_add4e1fcde22b295a038e786cf0c1152a}{reset\-Lambda()} \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_acddda1cd5b8dafa273165635b9944d8a}{Level\-Data$<$ F\-Array\-Box $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_acddda1cd5b8dafa273165635b9944d8a}{m\-\_\-lambda}}\label{class_a_m_r_non_linear_v_c_op_acddda1cd5b8dafa273165635b9944d8a}
+
+\begin{DoxyCompactList}\small\item\em Reciprocal of the diagonal entry of the operator matrix. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a1cbdc0704eb5746e13d571fe9b091057}{\hyperlink{class_mushy_layer_params}{Mushy\-Layer\-Params} $\ast$ \hyperlink{class_a_m_r_non_linear_v_c_op_a1cbdc0704eb5746e13d571fe9b091057}{m\-\_\-params}}\label{class_a_m_r_non_linear_v_c_op_a1cbdc0704eb5746e13d571fe9b091057}
+
+\begin{DoxyCompactList}\small\item\em Physical parameters for problems. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_aaae922c07d59e1371e874cf5bf6560ea}{\hyperlink{class_compute_enthalpy_vars}{Compute\-Enthalpy\-Vars} \hyperlink{class_a_m_r_non_linear_v_c_op_aaae922c07d59e1371e874cf5bf6560ea}{m\-\_\-compute\-Enthalpy\-Vars}}\label{class_a_m_r_non_linear_v_c_op_aaae922c07d59e1371e874cf5bf6560ea}
+
+\begin{DoxyCompactList}\small\item\em Object to compute enthalpy method variables. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a86f0f6c7aaf6c894ae44714299b8392d}{\hyperlink{class_edge_vel_b_c_holder}{Edge\-Vel\-B\-C\-Holder} \hyperlink{class_a_m_r_non_linear_v_c_op_a86f0f6c7aaf6c894ae44714299b8392d}{m\-\_\-porosity\-Edge\-B\-C}}\label{class_a_m_r_non_linear_v_c_op_a86f0f6c7aaf6c894ae44714299b8392d}
+
+\begin{DoxyCompactList}\small\item\em Boundary conditions for porosity. \end{DoxyCompactList}\item 
+int \hyperlink{class_a_m_r_non_linear_v_c_op_ac47daa8121191060133d61b1cdedccc1}{m\-\_\-primary\-Var}
+\begin{DoxyCompactList}\small\item\em The primary variable for this solver. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a1840e213652c5bc1d31fd4883233052a}{bool \hyperlink{class_a_m_r_non_linear_v_c_op_a1840e213652c5bc1d31fd4883233052a}{m\-\_\-\-F\-A\-S}}\label{class_a_m_r_non_linear_v_c_op_a1840e213652c5bc1d31fd4883233052a}
+
+\begin{DoxyCompactList}\small\item\em true if we're running in F\-A\-S mode (much quicker for nonlinear problems) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_aa9aa7b75934e71ec35cba40b27363eb0}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_aa9aa7b75934e71ec35cba40b27363eb0}{level\-G\-S\-R\-B} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_a_m_r_non_linear_v_c_op_aa9aa7b75934e71ec35cba40b27363eb0}
+
+\begin{DoxyCompactList}\small\item\em Gauss-\/seidel relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a464b0395451b59ecb0a7a776c3543047}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a464b0395451b59ecb0a7a776c3543047}{level\-Multi\-Color} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_a_m_r_non_linear_v_c_op_a464b0395451b59ecb0a7a776c3543047}
+
+\begin{DoxyCompactList}\small\item\em Multicolor relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a81eecf4b5e7ac459e6e2f7679010fb44}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a81eecf4b5e7ac459e6e2f7679010fb44}{loose\-G\-S\-R\-B} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_a_m_r_non_linear_v_c_op_a81eecf4b5e7ac459e6e2f7679010fb44}
+
+\begin{DoxyCompactList}\small\item\em Gauss-\/seidel relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_adaec2d3df86f1a67c76408c75c650157}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_adaec2d3df86f1a67c76408c75c650157}{overlap\-G\-S\-R\-B} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_a_m_r_non_linear_v_c_op_adaec2d3df86f1a67c76408c75c650157}
+
+\begin{DoxyCompactList}\small\item\em Gauss-\/seidel relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a0ebf9dc34f48b1e4e6e0b8b53d44c2c6}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a0ebf9dc34f48b1e4e6e0b8b53d44c2c6}{level\-G\-S\-R\-B\-Lazy} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_a_m_r_non_linear_v_c_op_a0ebf9dc34f48b1e4e6e0b8b53d44c2c6}
+
+\begin{DoxyCompactList}\small\item\em Gauss-\/seidel relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a1c3aac6be1fe083f7dab208827cc703c}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a1c3aac6be1fe083f7dab208827cc703c}{level\-Jacobi} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_a_m_r_non_linear_v_c_op_a1c3aac6be1fe083f7dab208827cc703c}
+
+\begin{DoxyCompactList}\small\item\em Jacobi relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a0926e9cc4f623acaa5a09fe9f1a46f3a}{virtual void \hyperlink{class_a_m_r_non_linear_v_c_op_a0926e9cc4f623acaa5a09fe9f1a46f3a}{get\-Flux} (F\-Array\-Box \&a\-\_\-flux, const F\-Array\-Box \&a\-\_\-data, const Flux\-Box \&a\-\_\-b\-Coef, const Box \&a\-\_\-facebox, int a\-\_\-dir, const Data\-Index \&a\-\_\-dit, int a\-\_\-ref=1) const }\label{class_a_m_r_non_linear_v_c_op_a0926e9cc4f623acaa5a09fe9f1a46f3a}
+
+\begin{DoxyCompactList}\small\item\em computes flux over face-\/centered a\-\_\-facebox. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a3c546833333954c5165a66cfc0605209}{Layout\-Data$<$ C\-F\-I\-V\-S $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_a3c546833333954c5165a66cfc0605209}{m\-\_\-lo\-C\-F\-I\-V\-S} \mbox{[}Space\-Dim\mbox{]}}\label{class_a_m_r_non_linear_v_c_op_a3c546833333954c5165a66cfc0605209}
+
+\begin{DoxyCompactList}\small\item\em Intvects on coarse-\/fine interfaces. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a74dc9950a5472215007a08f458953bdc}{Layout\-Data$<$ C\-F\-I\-V\-S $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_a74dc9950a5472215007a08f458953bdc}{m\-\_\-hi\-C\-F\-I\-V\-S} \mbox{[}Space\-Dim\mbox{]}}\label{class_a_m_r_non_linear_v_c_op_a74dc9950a5472215007a08f458953bdc}
+
+\begin{DoxyCompactList}\small\item\em Intvects on coarse-\/fine interfaces. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a554b708171f46343306385bb23bd23c4}{Ref\-Counted\-Ptr\\*
+$<$ \hyperlink{class_coefficient_interpolator_linear_face}{Coefficient\-Interpolator\-Linear\-Face} $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_a554b708171f46343306385bb23bd23c4}{m\-\_\-b\-Coef\-Interpolator}}\label{class_a_m_r_non_linear_v_c_op_a554b708171f46343306385bb23bd23c4}
+
+\begin{DoxyCompactList}\small\item\em Interpolator for b coefficient data. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a8d3b1b177ad5517b1c5fe89332318dfc}{Ref\-Counted\-Ptr\\*
+$<$ \hyperlink{class_coefficient_interpolator_linear}{Coefficient\-Interpolator\-Linear} $>$ \hyperlink{class_a_m_r_non_linear_v_c_op_a8d3b1b177ad5517b1c5fe89332318dfc}{m\-\_\-a\-Coef\-Interpolator}}\label{class_a_m_r_non_linear_v_c_op_a8d3b1b177ad5517b1c5fe89332318dfc}
+
+\begin{DoxyCompactList}\small\item\em Interpolator for a coefficient data. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a4039e4ab4ab8b19cb7177ec2566dcc29}{Real \hyperlink{class_a_m_r_non_linear_v_c_op_a4039e4ab4ab8b19cb7177ec2566dcc29}{m\-\_\-time}}\label{class_a_m_r_non_linear_v_c_op_a4039e4ab4ab8b19cb7177ec2566dcc29}
+
+\begin{DoxyCompactList}\small\item\em Current time. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_non_linear_v_c_op_a23d2e2dc92ec1790af8e661b64ebe7d8}{bool \hyperlink{class_a_m_r_non_linear_v_c_op_a23d2e2dc92ec1790af8e661b64ebe7d8}{m\-\_\-lambda\-Needs\-Resetting}}\label{class_a_m_r_non_linear_v_c_op_a23d2e2dc92ec1790af8e661b64ebe7d8}
+
+\begin{DoxyCompactList}\small\item\em Does the relaxation coefficient need to be reset? \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Nonlinear variable coefficient operator. 
+
+Operator for solving variable-\/coefficient (alpha $\ast$ a\-Coef(x) $\ast$ I -\/ beta $\ast$ Div(b\-Coef(x) . Grad)) phi = rho over an A\-M\-R hierarchy. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_a_m_r_non_linear_v_c_op_a36b3867478140856f329e3c145c12d98}{\index{A\-M\-R\-Non\-Linear\-V\-C\-Op@{A\-M\-R\-Non\-Linear\-V\-C\-Op}!finer\-Operator\-Changed@{finer\-Operator\-Changed}}
+\index{finer\-Operator\-Changed@{finer\-Operator\-Changed}!AMRNonLinearVCOp@{A\-M\-R\-Non\-Linear\-V\-C\-Op}}
+\subsubsection[{finer\-Operator\-Changed}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Non\-Linear\-V\-C\-Op\-::finer\-Operator\-Changed (
+\begin{DoxyParamCaption}
+\item[{const M\-G\-Level\-Op$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ \&}]{a\-\_\-operator, }
+\item[{int}]{a\-\_\-coarsening\-Factor}
+\end{DoxyParamCaption}
+)}}\label{class_a_m_r_non_linear_v_c_op_a36b3867478140856f329e3c145c12d98}
+Has finer operator changed? This is called on multigrid operators when their A\-M\-R operators are altered. \hypertarget{class_a_m_r_non_linear_v_c_op_acabeefd40cc36448de809287222d5611}{\index{A\-M\-R\-Non\-Linear\-V\-C\-Op@{A\-M\-R\-Non\-Linear\-V\-C\-Op}!get\-Flux@{get\-Flux}}
+\index{get\-Flux@{get\-Flux}!AMRNonLinearVCOp@{A\-M\-R\-Non\-Linear\-V\-C\-Op}}
+\subsubsection[{get\-Flux}]{\setlength{\rightskip}{0pt plus 5cm}virtual void A\-M\-R\-Non\-Linear\-V\-C\-Op\-::get\-Flux (
+\begin{DoxyParamCaption}
+\item[{Flux\-Box \&}]{a\-\_\-flux, }
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-data, }
+\item[{const Box \&}]{a\-\_\-grid, }
+\item[{const Data\-Index \&}]{a\-\_\-dit, }
+\item[{Real}]{a\-\_\-scale}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{class_a_m_r_non_linear_v_c_op_acabeefd40cc36448de809287222d5611}
+
+
+get\-Flux function which matches interface to A\-M\-R\-Poisson\-Op 
+
+assumes we want to use member-\/data b\-Coef, then calls second get\-Flux function Note that a\-\_\-data is the thing we take the gradient of, i.\-e. we calculate $ \chi \nabla \phi $ where $ \phi $ is a\-\_\-data. a\-\_\-data is N\-O\-T the bulk concentration or enthalpy \hypertarget{class_a_m_r_non_linear_v_c_op_ad79ab87f7439844df8c7d57cbf4e33cb}{\index{A\-M\-R\-Non\-Linear\-V\-C\-Op@{A\-M\-R\-Non\-Linear\-V\-C\-Op}!restrict\-Residual@{restrict\-Residual}}
+\index{restrict\-Residual@{restrict\-Residual}!AMRNonLinearVCOp@{A\-M\-R\-Non\-Linear\-V\-C\-Op}}
+\subsubsection[{restrict\-Residual}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Non\-Linear\-V\-C\-Op\-::restrict\-Residual (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-res\-Coarse, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-phi\-Fine, }
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-rhs\-Fine}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_a_m_r_non_linear_v_c_op_ad79ab87f7439844df8c7d57cbf4e33cb}
+
+
+calculate restricted residual 
+
+a\-\_\-res\-Coarse\mbox{[}2h\mbox{]} = I\mbox{[}h-\/$>$2h\mbox{]} (rhs\-Fine\mbox{[}h\mbox{]} -\/ L\mbox{[}h\mbox{]}(phi\-Fine\mbox{[}h\mbox{]}) \hypertarget{class_a_m_r_non_linear_v_c_op_a3ccd0ded6d61f3d6e6e82d54c008f698}{\index{A\-M\-R\-Non\-Linear\-V\-C\-Op@{A\-M\-R\-Non\-Linear\-V\-C\-Op}!set\-A\-Coef\-Interpolator@{set\-A\-Coef\-Interpolator}}
+\index{set\-A\-Coef\-Interpolator@{set\-A\-Coef\-Interpolator}!AMRNonLinearVCOp@{A\-M\-R\-Non\-Linear\-V\-C\-Op}}
+\subsubsection[{set\-A\-Coef\-Interpolator}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Non\-Linear\-V\-C\-Op\-::set\-A\-Coef\-Interpolator (
+\begin{DoxyParamCaption}
+\item[{Ref\-Counted\-Ptr$<$ {\bf Coefficient\-Interpolator\-Linear} $>$ \&}]{a\-\_\-a\-Coef\-Interpolator}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{class_a_m_r_non_linear_v_c_op_a3ccd0ded6d61f3d6e6e82d54c008f698}
+Sets up a model that modifies a coefficient data when the operator's time is set. 
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-a\-Coef\-Interpolator} & A Coefficient\-Interpolator that will be used to compute the a coefficient at specific times. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_a_m_r_non_linear_v_c_op_aca3691384e09691970d00da4afb566d1}{\index{A\-M\-R\-Non\-Linear\-V\-C\-Op@{A\-M\-R\-Non\-Linear\-V\-C\-Op}!set\-B\-Coef\-Interpolator@{set\-B\-Coef\-Interpolator}}
+\index{set\-B\-Coef\-Interpolator@{set\-B\-Coef\-Interpolator}!AMRNonLinearVCOp@{A\-M\-R\-Non\-Linear\-V\-C\-Op}}
+\subsubsection[{set\-B\-Coef\-Interpolator}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Non\-Linear\-V\-C\-Op\-::set\-B\-Coef\-Interpolator (
+\begin{DoxyParamCaption}
+\item[{Ref\-Counted\-Ptr$<$ {\bf Coefficient\-Interpolator\-Linear\-Face} $>$ \&}]{a\-\_\-b\-Coef\-Interpolator}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{class_a_m_r_non_linear_v_c_op_aca3691384e09691970d00da4afb566d1}
+Sets up a model that modifies b coefficient data when the operator's time is set. 
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-b\-Coef\-Interpolator} & A Coefficient\-Interpolator that will be used to compute the b coefficient at specific times. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_a_m_r_non_linear_v_c_op_a55da192e61bf0998503c4af24729266a}{\index{A\-M\-R\-Non\-Linear\-V\-C\-Op@{A\-M\-R\-Non\-Linear\-V\-C\-Op}!set\-Time@{set\-Time}}
+\index{set\-Time@{set\-Time}!AMRNonLinearVCOp@{A\-M\-R\-Non\-Linear\-V\-C\-Op}}
+\subsubsection[{set\-Time}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Non\-Linear\-V\-C\-Op\-::set\-Time (
+\begin{DoxyParamCaption}
+\item[{Real}]{a\-\_\-time}
+\end{DoxyParamCaption}
+)}}\label{class_a_m_r_non_linear_v_c_op_a55da192e61bf0998503c4af24729266a}
+Sets the time centering of the operator. This interpolates b coefficient data at the given time if an interpolator is set. 
+
+\subsection{Member Data Documentation}
+\hypertarget{class_a_m_r_non_linear_v_c_op_ac47daa8121191060133d61b1cdedccc1}{\index{A\-M\-R\-Non\-Linear\-V\-C\-Op@{A\-M\-R\-Non\-Linear\-V\-C\-Op}!m\-\_\-primary\-Var@{m\-\_\-primary\-Var}}
+\index{m\-\_\-primary\-Var@{m\-\_\-primary\-Var}!AMRNonLinearVCOp@{A\-M\-R\-Non\-Linear\-V\-C\-Op}}
+\subsubsection[{m\-\_\-primary\-Var}]{\setlength{\rightskip}{0pt plus 5cm}int A\-M\-R\-Non\-Linear\-V\-C\-Op\-::m\-\_\-primary\-Var}}\label{class_a_m_r_non_linear_v_c_op_ac47daa8121191060133d61b1cdedccc1}
+
+
+The primary variable for this solver. 
+
+Solves depend on both enthalpy and bulk concentration, but we only solve for one at a time. This variable specifies which, whilst the other is lagged in calculations. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+src/A\-M\-R\-Non\-Linear\-V\-C\-Op.\-H\item 
+src/A\-M\-R\-Non\-Linear\-V\-C\-Op.\-cpp\end{DoxyCompactItemize}

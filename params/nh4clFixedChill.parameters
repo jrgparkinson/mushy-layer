@@ -1,0 +1,87 @@
+##############################################
+## Parameters the control the problem type
+##############################################
+parameters.problem_type = 0 # 0
+
+main.periodic_bc = 1 0 1 
+main.domain_length = 1.0
+main.symmetric_domain = false
+
+projection.eta = 0.0 # Not convinced this really helps for darcy flow
+
+##################################################
+# How to calculate permeability
+# 0: permeability = 1
+# 1: permeability = (1-solid fraction)^3
+# 2: permeability = kozeny-carman
+# 3: permeability = log()
+# 4: permeability = x^2 (or whatever function I want)
+################################################
+parameters.permeabilityFunction = 2
+
+#############################################
+#Physical parameters
+#############################################
+
+parameters.eutecticTemp				= -16		# celcius
+parameters.eutecticComposition		= 0.8		# g/kg
+parameters.liquidusSlope			= 471.4 	# celcius/(g/kg). Note - positive!
+parameters.waterDistributionCoeff	= 1e-5 #1e-5		# dimensionless
+parameters.nonDimVel                = 1.0 # fixed chill
+
+#Initial and boundary conditions
+parameters.initialComposition		= 0.75		#
+parameters.topEnthalpy 				= 6.2		# non dimensional, enthalpy at top of eutectic (2.5)
+parameters.bottomEnthalpy			= -0.1	    # non dim
+parameters.topBulkConc				= -1.0		# -1.0 non dim
+parameters.bottomBulkConc			= -1.0	# -1.0 non dim
+
+# 4 for inflow/outflow vel bc
+bc.velLo = 0 0 # x-dir, y-dir, z-dir
+bc.velHi = 0 0 # x-dir, y-dir, z-dir
+bc.scalarLo = 1 0
+bc.scalarHi = 1 0
+
+bc.velHi = 0 3 # x-dir, y-dir, z-dir
+bc.scalarHi = 1 2
+
+# For reflect BCs:
+main.periodic_bc = 0 0 1 
+bc.velLo = 6 3 # x-dir, y-dir, z-dir
+bc.velHi = 6 0 # x-dir, y-dir, z-dir
+bc.scalarLo = 1 2
+bc.scalarHi = 1 0
+
+# non dimensional parameters - these will overwrite parameters
+parameters.stefan 			= 5.0 # 5.7
+parameters.compositionRatio = 20.0
+parameters.K				= 1 # 4
+parameters.specificHeatRatio= 1 # 0.5
+parameters.lewis			= 200 # (infinite)
+parameters.heatConductivityRatio = 1
+
+main.doProjection = 1
+main.scalePwithChi = 1
+parameters.rayleighTemp				= 0.0 # turn on/off buoyancy forcing
+
+parameters.heleShaw=true
+
+# Darcy version:
+main.doEuler = 0
+main.addSubtractGradP = 0
+
+parameters.rayleighComp				= 80 # turn on/off buoyancy forcing (about 30 for kozeny, 80 for cubic permeability)
+parameters.darcy 					= 0.0       # should be around 10^(-3)
+parameters.prandtl                  = 0.0 # should be about 13
+parameters.nonDimReluctance         = 0.1
+
+# Darcy brinkman version:
+main.doEuler = 1
+main.addSubtractGradP = 1
+
+parameters.rayleighComp				= -80000 # turn on/off buoyancy forcing (about 30 for kozeny, 80 for cubic permeability)
+parameters.rayleighComp				= -4e4 # turn on/off buoyancy forcing (about 30 for kozeny, 80 for cubic permeability)
+parameters.darcy 					= 5e-3 # should be around 10^(-3)
+parameters.prandtl                  = 10.0 # should be about 13 for cold sea water
+parameters.nonDimReluctance         = 1e-10 # this needs to be much smaller than the darcy number so that the darcy term goes to zero in the liquid
+

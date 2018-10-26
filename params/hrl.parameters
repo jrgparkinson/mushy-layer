@@ -1,0 +1,82 @@
+##############################################
+## Parameters the control the problem type
+##############################################
+
+parameters.problem_type = 8
+parameters.fixedTempDirection = 1  # 0 for sidewall heating, 1 for vertical heating
+
+main.periodic_bc = 1 0 1 
+main.domain_length = 1.0
+main.symmetric_domain = false
+
+# Optional flag to let us reach steady state even if salinity is still changing
+main.ignoreBulkConcentrationSteadyState = true
+
+# Refluxing
+main.reflux_momentum = 1
+main.reflux_normal_momentum = 0
+main.reflux_scalar = 1
+main.refluxType = 2
+
+#projection
+projection.eta = 0.5 #0.5 seems to be largest stable value. Should be -ve at the moment...
+
+# refinement
+main.taggingVar = 0 # 0=enthalpy
+main.taggingVectorVar = -1 # 0=darcy vel
+main.refine_thresh = 0.1 # 0.02
+main.refineMethod = 0 # 0=undivided gradient, 1 = absolute value
+
+##################################################
+# How to calculate permeability
+# 0: permeability = 1
+# 1: permeability = (1-solid fraction)^3
+# 2: permeability = kozeny-carman
+# 3: permeability = log()
+# 4: permeability = x^2 (or whatever function I want)
+################################################
+parameters.permeabilityFunction = 0
+parameters.heleShaw=false
+
+#############################################
+#Physical parameters
+#############################################
+parameters.eutecticTemp				= -23		# celcius
+parameters.initialComposition		= 35		# psu - standard sea water 
+parameters.eutecticComposition		= 230		# psu
+parameters.liquidusSlope			= -0.1 	# celcius/psu
+parameters.waterDistributionCoeff	= 1e-3 #1e-5		# dimensionless
+parameters.nonDimVel				= 0.0 #1.5e-7		# m/s
+
+#Initial and boundary conditions (non dimensional)
+parameters.referenceTemperature = -23 # Determine dimensionless fields
+parameters.referenceSalinity = 230  # Determine dimensionless fields
+parameters.topEnthalpy 				= 3.0	
+parameters.bottomEnthalpy			= 4.0	   
+parameters.topBulkConc				= -1.0	
+parameters.bottomBulkConc			= -1.0	
+
+# non dimensional parameters - these will overwrite parameters
+parameters.stefan 			= 0 # no solidification in this problem
+parameters.compositionRatio = 2
+parameters.K				= 1 # 4
+parameters.specificHeatRatio= 1 # 0.5
+parameters.lewis			= 1e300 # 1e300  # (infinite)
+parameters.heatConductivityRatio = 1
+
+parameters.rayleighTemp				= 50.0 # turn on/off buoyancy forcing
+parameters.rayleighComp				= 0.0 # turn on/off buoyancy forcing
+parameters.darcy 					= 0.00 # turn on/off viscosity - 0
+parameters.reynolds 				= 0.0
+
+# momentum equation
+main.doEuler = 0
+main.doProjection = 1
+main.addSubtractGradP = 0
+main.scalePwithChi = 1 
+
+# Solid walls on all sides
+bc.velLo = 0 0 # should be 3 x-dir, y-dir, z-dir
+bc.velHi = 0 0 # x-dir, y-dir, z-dir
+bc.scalarLo = 1 0
+bc.scalarHi = 1 0

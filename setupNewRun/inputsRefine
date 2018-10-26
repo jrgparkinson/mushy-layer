@@ -1,0 +1,24 @@
+
+inFile="/home/parkinsonjl/mnt/sharedStorage/highLeBifurcationDarcy/CR2.0RaC200Le2e10ChiCubedPermeabilitypts16-steady/chkCR2.0RaC200Le2e10ChiCubedPermeabilitypts16-162798.2d.hdf5"
+run_inputs="/home/parkinsonjl/mnt/sharedStorage/highLeBifurcationDarcy/CR2.0RaC200Le2e10ChiCubedPermeabilitypts16-steady/inputs"
+
+outFile  = /home/parkinsonjl/convection-in-sea-ice/MushyLayer/setupNewRun/test.2d.hdf5
+
+
+# If this is different to previous Nx,
+# then change domain
+# Ny, H stays the same
+deltaNxLeft=0
+deltaNxRight=0
+deltaNzTop = 0
+deltaNzBottom = 0
+
+
+# Shift all data by xShift cells in the x direction
+# only works if periodic
+#xShift = -15
+
+# New max_box_size
+box_size = 64
+
+refinement = 4

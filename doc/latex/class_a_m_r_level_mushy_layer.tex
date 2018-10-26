@@ -1,0 +1,1529 @@
+\hypertarget{class_a_m_r_level_mushy_layer}{\section{A\-M\-R\-Level\-Mushy\-Layer Class Reference}
+\label{class_a_m_r_level_mushy_layer}\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}}
+}
+
+
+A\-M\-R\-Level for mushy layer calculations.  
+
+
+
+
+{\ttfamily \#include $<$A\-M\-R\-Level\-Mushy\-Layer.\-H$>$}
+
+Inheritance diagram for A\-M\-R\-Level\-Mushy\-Layer\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_a_m_r_level_mushy_layer}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_adfca912f4bbd65b9d39f205a57bc651d}{\hyperlink{class_a_m_r_level_mushy_layer_adfca912f4bbd65b9d39f205a57bc651d}{A\-M\-R\-Level\-Mushy\-Layer} ()}\label{class_a_m_r_level_mushy_layer_adfca912f4bbd65b9d39f205a57bc651d}
+
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ad86102015982967da21a13e87f13e065}{\hyperlink{class_a_m_r_level_mushy_layer_ad86102015982967da21a13e87f13e065}{A\-M\-R\-Level\-Mushy\-Layer} (const Real \&a\-\_\-cfl, const Real \&a\-\_\-domain\-Width, const Real \&a\-\_\-refine\-Thresh, const int \&a\-\_\-tag\-Buffer\-Size, const bool \&a\-\_\-use\-Limiting)}\label{class_a_m_r_level_mushy_layer_ad86102015982967da21a13e87f13e065}
+
+\begin{DoxyCompactList}\small\item\em Full constructor. Arguments are same as in \hyperlink{class_a_m_r_level_mushy_layer_a1510d27c94955086af90d133d3932610}{define()} \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_a1510d27c94955086af90d133d3932610}{define} (const Real \&a\-\_\-cfl, const Real \&a\-\_\-domain\-Width, const Real \&a\-\_\-refine\-Thresh, const int \&a\-\_\-tag\-Buffer\-Size, const bool \&a\-\_\-use\-Limiting)
+\begin{DoxyCompactList}\small\item\em Defines this \hyperlink{class_a_m_r_level_mushy_layer}{A\-M\-R\-Level\-Mushy\-Layer}. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a4520425f77deb76db6fd3eb789e4c68b}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_a4520425f77deb76db6fd3eb789e4c68b}{define} (A\-M\-R\-Level $\ast$a\-\_\-coarser\-Level\-Ptr, const Box \&a\-\_\-problem\-Domain, int a\-\_\-level, int a\-\_\-ref\-Ratio)}\label{class_a_m_r_level_mushy_layer_a4520425f77deb76db6fd3eb789e4c68b}
+
+\begin{DoxyCompactList}\small\item\em Never called\-: historical. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a1ed163b80b24d3dc053097d24dc55be5}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_a1ed163b80b24d3dc053097d24dc55be5}{define} (A\-M\-R\-Level $\ast$a\-\_\-coarser\-Level\-Ptr, const Problem\-Domain \&a\-\_\-problem\-Domain, int a\-\_\-level, int a\-\_\-ref\-Ratio)}\label{class_a_m_r_level_mushy_layer_a1ed163b80b24d3dc053097d24dc55be5}
+
+\begin{DoxyCompactList}\small\item\em Define new \hyperlink{class_a_m_r_level_mushy_layer}{A\-M\-R\-Level\-Mushy\-Layer} from coarser. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa303a6233d0a9cf8701035e98e6d028d}{virtual Real \hyperlink{class_a_m_r_level_mushy_layer_aa303a6233d0a9cf8701035e98e6d028d}{advance} ()}\label{class_a_m_r_level_mushy_layer_aa303a6233d0a9cf8701035e98e6d028d}
+
+\begin{DoxyCompactList}\small\item\em Advance by one timestep. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9c9c444cc77e9f623ddc9132ee4bc532}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_a9c9c444cc77e9f623ddc9132ee4bc532}{post\-Time\-Step} ()}\label{class_a_m_r_level_mushy_layer_a9c9c444cc77e9f623ddc9132ee4bc532}
+
+\begin{DoxyCompactList}\small\item\em Things to do after a timestep. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a296b5accca2569adda4f91b90f0213e0}{void {\bfseries do\-Explicit\-Reflux} (int a\-\_\-var)}\label{class_a_m_r_level_mushy_layer_a296b5accca2569adda4f91b90f0213e0}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ad6c20b4a85790c49eab030f6909a0a0b}{Real {\bfseries do\-H\-Creflux} ()}\label{class_a_m_r_level_mushy_layer_ad6c20b4a85790c49eab030f6909a0a0b}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a74d98dd94e04f4732f7ac6b71e7b484c}{void {\bfseries do\-Momentum\-Reflux} (Vector$<$ Level\-Data$<$ F\-Array\-Box $>$ $\ast$ $>$ \&comp\-Vel)}\label{class_a_m_r_level_mushy_layer_a74d98dd94e04f4732f7ac6b71e7b484c}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aff274f3682a706271fc3a26eefb0be20}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_aff274f3682a706271fc3a26eefb0be20}{tag\-Cells} (Int\-Vect\-Set \&a\-\_\-tags)}\label{class_a_m_r_level_mushy_layer_aff274f3682a706271fc3a26eefb0be20}
+
+\begin{DoxyCompactList}\small\item\em Create tags for regridding. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3bfdf4f5d7260b8f6f834777ce8a7650}{void \hyperlink{class_a_m_r_level_mushy_layer_a3bfdf4f5d7260b8f6f834777ce8a7650}{tag\-Mush\-Liquid\-Boundary} (Int\-Vect\-Set \&local\-Tags)}\label{class_a_m_r_level_mushy_layer_a3bfdf4f5d7260b8f6f834777ce8a7650}
+
+\begin{DoxyCompactList}\small\item\em Tags cells on the mush side of the mush-\/liquid boundary. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a4581ecc244c826a19c696e5b8d01abf3}{void \hyperlink{class_a_m_r_level_mushy_layer_a4581ecc244c826a19c696e5b8d01abf3}{tag\-Boundary\-Layer\-Cells} (Int\-Vect\-Set \&local\-Tags)}\label{class_a_m_r_level_mushy_layer_a4581ecc244c826a19c696e5b8d01abf3}
+
+\begin{DoxyCompactList}\small\item\em Tag cells on the domain boundary. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6eee1db20d8b07c958a1e19af1dbbe4a}{void \hyperlink{class_a_m_r_level_mushy_layer_a6eee1db20d8b07c958a1e19af1dbbe4a}{tag\-Center\-Cells} (Int\-Vect\-Set \&local\-Tags, Real radius=0)}\label{class_a_m_r_level_mushy_layer_a6eee1db20d8b07c958a1e19af1dbbe4a}
+
+\begin{DoxyCompactList}\small\item\em Tag cells inside grid. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a921f860820c88cc804345a20c2bd596d}{void \hyperlink{class_a_m_r_level_mushy_layer_a921f860820c88cc804345a20c2bd596d}{tag\-Mushy\-Cells} (Int\-Vect\-Set \&local\-Tags)}\label{class_a_m_r_level_mushy_layer_a921f860820c88cc804345a20c2bd596d}
+
+\begin{DoxyCompactList}\small\item\em Tag cells with porosity $<$ 1. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac2a65f143504a09f92cb01907f15f124}{void \hyperlink{class_a_m_r_level_mushy_layer_ac2a65f143504a09f92cb01907f15f124}{tag\-Cells\-Var} (Int\-Vect\-Set \&local\-Tags, Real refine\-Thresh, int tagging\-Var, int vector\-Tagging\-Var, int tagging\-Method, int comp=-\/1)}\label{class_a_m_r_level_mushy_layer_ac2a65f143504a09f92cb01907f15f124}
+
+\begin{DoxyCompactList}\small\item\em Add cells that specify criteria. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_a5064704173348a8efa158f400983a101}{set\-Eta} (Real a\-\_\-eta)
+\begin{DoxyCompactList}\small\item\em Set eta on all projection operators. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a2771f661ce974eec626324cf2b07fd59}{Real \hyperlink{class_a_m_r_level_mushy_layer_a2771f661ce974eec626324cf2b07fd59}{max\-Allowed\-Eta} ()}\label{class_a_m_r_level_mushy_layer_a2771f661ce974eec626324cf2b07fd59}
+
+\begin{DoxyCompactList}\small\item\em Maximum allowed eta. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac44c7ebcf787be031046fb732ac4aa96}{void \hyperlink{class_a_m_r_level_mushy_layer_ac44c7ebcf787be031046fb732ac4aa96}{set\-Adv\-Vel\-Centering} (Real a\-\_\-fraction)}\label{class_a_m_r_level_mushy_layer_ac44c7ebcf787be031046fb732ac4aa96}
+
+\begin{DoxyCompactList}\small\item\em Set adv\-\_\-vel\-\_\-centering on all levels. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3239fcf9157c4b6174aba461e4e4b327}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_a3239fcf9157c4b6174aba461e4e4b327}{tag\-Cells\-Init} (Int\-Vect\-Set \&a\-\_\-tags)}\label{class_a_m_r_level_mushy_layer_a3239fcf9157c4b6174aba461e4e4b327}
+
+\begin{DoxyCompactList}\small\item\em Create tags at initialization. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a92be42a12813c7e9bebb3ab6f025616f}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_a92be42a12813c7e9bebb3ab6f025616f}{regrid} (const Vector$<$ Box $>$ \&a\-\_\-new\-Grids)}\label{class_a_m_r_level_mushy_layer_a92be42a12813c7e9bebb3ab6f025616f}
+
+\begin{DoxyCompactList}\small\item\em Set up data on this level after regridding. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_adc885cc04926a87b4c4f97e3803fc749}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_adc885cc04926a87b4c4f97e3803fc749}{initial\-Grid} (const Vector$<$ Box $>$ \&a\-\_\-new\-Grids)}\label{class_a_m_r_level_mushy_layer_adc885cc04926a87b4c4f97e3803fc749}
+
+\begin{DoxyCompactList}\small\item\em Initialize grids. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a7d430606668cadfa432d81d521d5cf79}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_a7d430606668cadfa432d81d521d5cf79}{post\-Initial\-Grid} (const bool a\-\_\-restart)}\label{class_a_m_r_level_mushy_layer_a7d430606668cadfa432d81d521d5cf79}
+
+\begin{DoxyCompactList}\small\item\em Operations to do after initial grids have been set up. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9b299b200bf4fadfb4ad7221177d4585}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_a9b299b200bf4fadfb4ad7221177d4585}{post\-Regrid} (int a\-\_\-base\-\_\-level)}\label{class_a_m_r_level_mushy_layer_a9b299b200bf4fadfb4ad7221177d4585}
+
+\begin{DoxyCompactList}\small\item\em Operations to execute after we've done regridding. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6763c8a7fef3e4f0c5da3c90df096e98}{void \hyperlink{class_a_m_r_level_mushy_layer_a6763c8a7fef3e4f0c5da3c90df096e98}{create\-Data\-Structures} ()}\label{class_a_m_r_level_mushy_layer_a6763c8a7fef3e4f0c5da3c90df096e98}
+
+\begin{DoxyCompactList}\small\item\em Create structures to hold data. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac0291e7b321a6f26a057dfd2d6fb9466}{void \hyperlink{class_a_m_r_level_mushy_layer_ac0291e7b321a6f26a057dfd2d6fb9466}{init\-Data\-Structures} ()}\label{class_a_m_r_level_mushy_layer_ac0291e7b321a6f26a057dfd2d6fb9466}
+
+\begin{DoxyCompactList}\small\item\em Initialize data structures -\/ resize arrays etc. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a8dcd4deaca137c36c34b377c1f27d8af}{void {\bfseries compute\-All\-Velocities} (bool do\-F\-Rupdates)}\label{class_a_m_r_level_mushy_layer_a8dcd4deaca137c36c34b377c1f27d8af}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_adae77fea47630fd1e3c2dea1c59e4c3a}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_adae77fea47630fd1e3c2dea1c59e4c3a}{initial\-Data} ()}\label{class_a_m_r_level_mushy_layer_adae77fea47630fd1e3c2dea1c59e4c3a}
+
+\begin{DoxyCompactList}\small\item\em Initialize data. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ae1b467d34bd12136bab9f15b2186fd56}{void {\bfseries initial\-Data\-Corner\-Flow} ()}\label{class_a_m_r_level_mushy_layer_ae1b467d34bd12136bab9f15b2186fd56}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3018e7aa05879f67daa66025f1a5dc02}{void {\bfseries initial\-Data\-H\-R\-L} ()}\label{class_a_m_r_level_mushy_layer_a3018e7aa05879f67daa66025f1a5dc02}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3b71c86932fba19e9ff28e40503bc299}{void {\bfseries initial\-Data\-Convection\-Mixed\-Porous} ()}\label{class_a_m_r_level_mushy_layer_a3b71c86932fba19e9ff28e40503bc299}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a19fb2e0f21a8e3f92e6a6f4622dd9654}{void {\bfseries initial\-Data\-Poiseuille} ()}\label{class_a_m_r_level_mushy_layer_a19fb2e0f21a8e3f92e6a6f4622dd9654}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af0a22602d233dba91f217a4a2a9136b3}{void {\bfseries initial\-Data\-Ice\-Block} ()}\label{class_a_m_r_level_mushy_layer_af0a22602d233dba91f217a4a2a9136b3}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a601849adc5f5b5fc9e9999b568020922}{void {\bfseries initial\-Data\-Mushy\-Layer} ()}\label{class_a_m_r_level_mushy_layer_a601849adc5f5b5fc9e9999b568020922}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a68a589a8bddf6c0ef6a0ef4987c1e1ce}{void {\bfseries initial\-Data\-Zero\-Porosity\-Test} ()}\label{class_a_m_r_level_mushy_layer_a68a589a8bddf6c0ef6a0ef4987c1e1ce}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ab258a56bea5c0a889040d751c074f1ce}{void {\bfseries initial\-Data\-Diffusion} ()}\label{class_a_m_r_level_mushy_layer_ab258a56bea5c0a889040d751c074f1ce}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a2890289b25f3e4ea6b698ddb0d6b9223}{void {\bfseries initial\-Data\-Vortex\-Pair} ()}\label{class_a_m_r_level_mushy_layer_a2890289b25f3e4ea6b698ddb0d6b9223}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa17f3ed72486c33689944f8c9ec5cce1}{void {\bfseries add\-Vortex} (Real\-Vect center, Real strength, Real radius)}\label{class_a_m_r_level_mushy_layer_aa17f3ed72486c33689944f8c9ec5cce1}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a376041439f9a4d8a2d62fbbd199f81f5}{void {\bfseries initial\-Data\-Rayleigh\-Benard} ()}\label{class_a_m_r_level_mushy_layer_a376041439f9a4d8a2d62fbbd199f81f5}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a36fcaecdd8d8033bdfb0d3492df1be20}{void {\bfseries initial\-Data\-Solute\-Flux} ()}\label{class_a_m_r_level_mushy_layer_a36fcaecdd8d8033bdfb0d3492df1be20}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a975f7e7062b5944e9e13c3d13fc27115}{void {\bfseries initial\-Data\-Sidewall\-Heating} ()}\label{class_a_m_r_level_mushy_layer_a975f7e7062b5944e9e13c3d13fc27115}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aeb53defbc82746d0570b7d39e6aa5b8f}{void {\bfseries initial\-Data\-Burgers} ()}\label{class_a_m_r_level_mushy_layer_aeb53defbc82746d0570b7d39e6aa5b8f}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_adb8038e986c8d16f3116e267f2532409}{void {\bfseries initial\-Data\-Reflux\-Test} ()}\label{class_a_m_r_level_mushy_layer_adb8038e986c8d16f3116e267f2532409}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0b73c4a7644eea767d6cf1d16676809d}{virtual bool \hyperlink{class_a_m_r_level_mushy_layer_a0b73c4a7644eea767d6cf1d16676809d}{converged\-To\-Steady\-State} ()}\label{class_a_m_r_level_mushy_layer_a0b73c4a7644eea767d6cf1d16676809d}
+
+\begin{DoxyCompactList}\small\item\em Have we converged to steady state? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a596d008b356f29abf0973a88136739a9}{virtual void \hyperlink{class_a_m_r_level_mushy_layer_a596d008b356f29abf0973a88136739a9}{post\-Initialize} ()}\label{class_a_m_r_level_mushy_layer_a596d008b356f29abf0973a88136739a9}
+
+\begin{DoxyCompactList}\small\item\em Things to do after initialization. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac26973f409362a3b1aae6828737afbb3}{void \hyperlink{class_a_m_r_level_mushy_layer_ac26973f409362a3b1aae6828737afbb3}{compute\-Vorticity\-Streamfunction} ()}\label{class_a_m_r_level_mushy_layer_ac26973f409362a3b1aae6828737afbb3}
+
+\begin{DoxyCompactList}\small\item\em Calculate vorticity and streamfunction so we can plot them. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a559c35e8c90e8da2003dac3aa6cbdf8e}{void {\bfseries compute\-Vorticity} ()}\label{class_a_m_r_level_mushy_layer_a559c35e8c90e8da2003dac3aa6cbdf8e}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a318160aa2298ae805cbb19b5f2a7f750}{void {\bfseries get\-Extra\-Plot\-Fields} ()}\label{class_a_m_r_level_mushy_layer_a318160aa2298ae805cbb19b5f2a7f750}
+
+\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_abedf24a1dd03d1de3c42222da1fcac3d}{write\-A\-M\-R\-Hierarchy} (string filename)
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3918643e41cb27879557d6cf06ac2f2b}{virtual Real \hyperlink{class_a_m_r_level_mushy_layer_a3918643e41cb27879557d6cf06ac2f2b}{compute\-Dt} ()}\label{class_a_m_r_level_mushy_layer_a3918643e41cb27879557d6cf06ac2f2b}
+
+\begin{DoxyCompactList}\small\item\em Returns the dt computed earlier for this level. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af9995d5aaa7f7ce624b934ba3ad9306c}{virtual Real \hyperlink{class_a_m_r_level_mushy_layer_af9995d5aaa7f7ce624b934ba3ad9306c}{compute\-Initial\-Dt} ()}\label{class_a_m_r_level_mushy_layer_af9995d5aaa7f7ce624b934ba3ad9306c}
+
+\begin{DoxyCompactList}\small\item\em Compute dt using initial data. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac4dc44ed82584911b5d702070f493c73}{void \hyperlink{class_a_m_r_level_mushy_layer_ac4dc44ed82584911b5d702070f493c73}{compute\-Diagnostics} ()}\label{class_a_m_r_level_mushy_layer_ac4dc44ed82584911b5d702070f493c73}
+
+\begin{DoxyCompactList}\small\item\em Compute nusselt number, salt fluxes etc. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a5fc6a3c2fe287b52b6ab73d265d11cf2}{void \hyperlink{class_a_m_r_level_mushy_layer_a5fc6a3c2fe287b52b6ab73d265d11cf2}{define\-Solvers} (Real a\-\_\-time, bool a\-\_\-homogeneous=false, Real alpha=1.\-0, Real beta=1.\-0)}\label{class_a_m_r_level_mushy_layer_a5fc6a3c2fe287b52b6ab73d265d11cf2}
+
+\begin{DoxyCompactList}\small\item\em Define solvers. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af1f23fee3ffae8ab4a84caae3a87c4fc}{void {\bfseries compute\-Chimney\-Diagnostics} ()}\label{class_a_m_r_level_mushy_layer_af1f23fee3ffae8ab4a84caae3a87c4fc}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_afbb2adb1dd99e2b69bcb58d5395fe3b5}{Disjoint\-Box\-Layout {\bfseries grids} ()}\label{class_a_m_r_level_mushy_layer_afbb2adb1dd99e2b69bcb58d5395fe3b5}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a03805c646cd80400874095a6960545cd}{void {\bfseries shift\-Data} (int dir, int distance)}\label{class_a_m_r_level_mushy_layer_a03805c646cd80400874095a6960545cd}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ab8b44ec14b5ddfb4d42358ae2a2f72ea}{void {\bfseries dx} (Real new\-Dx)}\label{class_a_m_r_level_mushy_layer_ab8b44ec14b5ddfb4d42358ae2a2f72ea}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a8032590f0d7a8160dc1a56151648f7c8}{void \hyperlink{class_a_m_r_level_mushy_layer_a8032590f0d7a8160dc1a56151648f7c8}{reshape\-Data} (Disjoint\-Box\-Layout new\-Grids, Problem\-Domain new\-Domain)}\label{class_a_m_r_level_mushy_layer_a8032590f0d7a8160dc1a56151648f7c8}
+
+\begin{DoxyCompactList}\small\item\em Changed to allow changes in either x or y directions. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a1afe0bf8c7646e56849d90da107afe1d}{void {\bfseries refine} (Real ref\-\_\-ratio, Disjoint\-Box\-Layout a\-\_\-grids, Problem\-Domain a\-\_\-domain)}\label{class_a_m_r_level_mushy_layer_a1afe0bf8c7646e56849d90da107afe1d}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aaeccaad92142479afdc82e3b127be495}{void \hyperlink{class_a_m_r_level_mushy_layer_aaeccaad92142479afdc82e3b127be495}{do\-Post\-Regrid\-Smoothing} (bool a\-\_\-smooth\-Vel=true, bool a\-\_\-smooth\-Scalar=true)}\label{class_a_m_r_level_mushy_layer_aaeccaad92142479afdc82e3b127be495}
+
+\begin{DoxyCompactList}\small\item\em Do smoothing after regridding. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3c89f5bbdbe135424e8cdfd75fc03061}{void {\bfseries set\-Smoothing\-Coeff} (Real a\-\_\-coeff)}\label{class_a_m_r_level_mushy_layer_a3c89f5bbdbe135424e8cdfd75fc03061}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aca6ded080c70e8ea040576861d832e09}{void \hyperlink{class_a_m_r_level_mushy_layer_aca6ded080c70e8ea040576861d832e09}{set\-Vel\-Zero} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-vel, Real a\-\_\-limit=-\/1, int a\-\_\-radius=0)}\label{class_a_m_r_level_mushy_layer_aca6ded080c70e8ea040576861d832e09}
+
+\begin{DoxyCompactList}\small\item\em Make sure zero porosity regions have no velocity (cell centred velocity) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a14cee19cc957db8f3cce3e09fca9edf3}{void \hyperlink{class_a_m_r_level_mushy_layer_a14cee19cc957db8f3cce3e09fca9edf3}{set\-Vel\-Zero} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-vel, Real a\-\_\-limit=-\/1)}\label{class_a_m_r_level_mushy_layer_a14cee19cc957db8f3cce3e09fca9edf3}
+
+\begin{DoxyCompactList}\small\item\em Make sure zero porosity regions have no velocity (face centred velocity) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ae3dcf62f2464245d7a3035cd1508061f}{void {\bfseries set\-C\-C\-Vel\-Zero} (Real a\-\_\-limit)}\label{class_a_m_r_level_mushy_layer_ae3dcf62f2464245d7a3035cd1508061f}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a8679a53e5cbddc3af173ea3ff5b574de}{void \hyperlink{class_a_m_r_level_mushy_layer_a8679a53e5cbddc3af173ea3ff5b574de}{update\-Enthalpy\-Variables} ()}\label{class_a_m_r_level_mushy_layer_a8679a53e5cbddc3af173ea3ff5b574de}
+
+\begin{DoxyCompactList}\small\item\em Update thermodynamic variables based on phase diagram. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a2e827a3ed1a3ced10f1b47bb0014731b}{void \hyperlink{class_a_m_r_level_mushy_layer_a2e827a3ed1a3ced10f1b47bb0014731b}{compute\-Lambda\-Porosity} ()}\label{class_a_m_r_level_mushy_layer_a2e827a3ed1a3ced10f1b47bb0014731b}
+
+\begin{DoxyCompactList}\small\item\em Compute lambda/porosity. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a280fdf87f2f58ddc25250fff6b6c9f19}{\hyperlink{class_diagnostics}{Diagnostics} \hyperlink{class_a_m_r_level_mushy_layer_a280fdf87f2f58ddc25250fff6b6c9f19}{m\-\_\-diagnostics}}\label{class_a_m_r_level_mushy_layer_a280fdf87f2f58ddc25250fff6b6c9f19}
+
+\begin{DoxyCompactList}\small\item\em \hyperlink{class_diagnostics}{Diagnostics} e.\-g. Nusselt number, solute flux. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_afd5628964f3f9b398facc7098e27945b}{bool {\bfseries m\-\_\-compute\-Diagnostics}}\label{class_a_m_r_level_mushy_layer_afd5628964f3f9b398facc7098e27945b}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{class_a_m_r_level_mushy_layer_a664250846ba0de6313177ed258c1d9f4}{scalar\-Vars} \{ \\*
+{\bfseries m\-\_\-enthalpy}, 
+{\bfseries m\-\_\-bulk\-Concentration}, 
+{\bfseries m\-\_\-temperature}, 
+{\bfseries m\-\_\-porosity}, 
+\\*
+{\bfseries m\-\_\-liquid\-Concentration}, 
+{\bfseries m\-\_\-solid\-Concentration}, 
+{\bfseries m\-\_\-pressure}, 
+{\bfseries m\-\_\-permeability}, 
+\\*
+{\bfseries m\-\_\-lambda}, 
+{\bfseries m\-\_\-lambda\-\_\-porosity}, 
+{\bfseries m\-\_\-enthalpy\-Solidus}, 
+{\bfseries m\-\_\-enthalpy\-Liquidus}, 
+\\*
+{\bfseries m\-\_\-enthalpy\-Eutectic}, 
+{\bfseries m\-\_\-porosity\-Analytic}, 
+{\bfseries m\-\_\-temperature\-Analytic}, 
+{\bfseries m\-\_\-salt\-Eqn\-Src\-Godunov}, 
+\\*
+{\bfseries m\-\_\-salt\-Eqn\-Src\-Finite\-Diff}, 
+{\bfseries m\-\_\-salt\-Eqn\-Op}, 
+{\bfseries m\-\_\-\-Terr}, 
+{\bfseries m\-\_\-enthalpy\-Op}, 
+\\*
+{\bfseries m\-\_\-enthalpy\-Src}, 
+{\bfseries m\-\_\-div\-Uadv}, 
+{\bfseries m\-\_\-d\-Hdt}, 
+{\bfseries m\-\_\-d\-Sdt}, 
+\\*
+{\bfseries m\-\_\-average\-Vertical\-Flux}, 
+{\bfseries m\-\_\-solute\-Flux\-Analytic}, 
+{\bfseries m\-\_\-vertical\-Flux}, 
+{\bfseries m\-\_\-salt\-Residual}, 
+\\*
+{\bfseries m\-\_\-div\-U}, 
+{\bfseries m\-\_\-average\-Heat\-Flux}, 
+{\bfseries m\-\_\-streamfunction}, 
+{\bfseries m\-\_\-vorticity}, 
+\\*
+{\bfseries m\-\_\-\-Fs\-Vert\-Diffusion}, 
+{\bfseries m\-\_\-\-Fs\-Vert\-Fluid}, 
+{\bfseries m\-\_\-\-Fs\-Vert\-Frame}, 
+{\bfseries m\-\_\-div\-Ucorr}, 
+\\*
+{\bfseries m\-\_\-pi}, 
+{\bfseries m\-\_\-phi}, 
+{\bfseries m\-\_\-\-M\-A\-C\-B\-C}, 
+{\bfseries m\-\_\-\-M\-A\-Crhs}, 
+\\*
+{\bfseries m\-\_\-\-C\-Crhs}, 
+{\bfseries m\-\_\-num\-Scalar\-Vars}
+ \}
+\begin{DoxyCompactList}\small\item\em Identifiers for different scalar variables. \end{DoxyCompactList}\item 
+enum \hyperlink{class_a_m_r_level_mushy_layer_ac7a25361b1895a85f5916a1adfd3153b}{vector\-Vars} \{ \\*
+{\bfseries m\-\_\-fluid\-Vel}, 
+{\bfseries m\-\_\-\-U\-\_\-porosity}, 
+{\bfseries m\-\_\-\-Ustar}, 
+{\bfseries m\-\_\-adv\-Ustar}, 
+\\*
+{\bfseries m\-\_\-advection\-Vel}, 
+{\bfseries m\-\_\-viscous\-Solve\-Src}, 
+{\bfseries m\-\_\-\-Udel\-U}, 
+{\bfseries m\-\_\-advection\-Src}, 
+\\*
+{\bfseries m\-\_\-fluid\-Vel\-Analytic}, 
+{\bfseries m\-\_\-fluid\-Vel\-Err}, 
+{\bfseries m\-\_\-d\-Udt}, 
+{\bfseries m\-\_\-\-Fs\-Diffusion}, 
+\\*
+{\bfseries m\-\_\-\-Fs\-Fluid}, 
+{\bfseries m\-\_\-\-Fs}, 
+{\bfseries m\-\_\-freestream\-Correction}, 
+{\bfseries m\-\_\-\-Upre\-Projection}, 
+\\*
+{\bfseries m\-\_\-advection\-Implicit\-Src}, 
+{\bfseries m\-\_\-\-M\-A\-Ccorrection}, 
+{\bfseries m\-\_\-\-C\-Ccorrection}, 
+{\bfseries m\-\_\-adv\-Src\-Lap\-U}, 
+\\*
+{\bfseries m\-\_\-adv\-Upre\-Projection}, 
+{\bfseries m\-\_\-body\-Force}, 
+{\bfseries m\-\_\-adv\-Vel\-Corr}, 
+{\bfseries m\-\_\-num\-Vector\-Vars}
+ \}
+\begin{DoxyCompactList}\small\item\em Identifiers for vector variables. \end{DoxyCompactList}\item 
+enum \hyperlink{class_a_m_r_level_mushy_layer_ac96810ce869ac7ad58404b43a823cba3}{M\-Gmethod} \{ \hyperlink{class_a_m_r_level_mushy_layer_ac96810ce869ac7ad58404b43a823cba3a7fcd73cadaa66126997b4e1183712951}{m\-\_\-standard}, 
+\hyperlink{class_a_m_r_level_mushy_layer_ac96810ce869ac7ad58404b43a823cba3a2b0b946b439cf26fb2ee3648f4ea7744}{m\-\_\-\-F\-A\-S}
+ \}
+\begin{DoxyCompactList}\small\item\em Different multigrid methods. \end{DoxyCompactList}\item 
+enum \hyperlink{class_a_m_r_level_mushy_layer_ae580be53bf92a5bad64ba0032282458b}{solver\-Restart} \{ {\bfseries m\-\_\-restart\-Halve\-Dt}, 
+{\bfseries m\-\_\-restart\-Reset\-Data}
+ \}
+\begin{DoxyCompactList}\small\item\em What to do when restarting after a failed timestep. \end{DoxyCompactList}\item 
+enum {\bfseries velocity\-Advection\-Types} \{ {\bfseries m\-\_\-porosity\-In\-Advection}, 
+{\bfseries m\-\_\-porosity\-Outside\-Advection}, 
+{\bfseries m\-\_\-no\-Porosity}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aad8e3d2cda90acb68c1086e0e08096a6}{Real \hyperlink{class_a_m_r_level_mushy_layer_aad8e3d2cda90acb68c1086e0e08096a6}{converged\-To\-Steady\-State} (const int a\-\_\-var, bool vector=false)}\label{class_a_m_r_level_mushy_layer_aad8e3d2cda90acb68c1086e0e08096a6}
+
+\begin{DoxyCompactList}\small\item\em Has a particular variable converged to steady state? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0f76ac50feba2ebcf8cd431948690a76}{void {\bfseries compute\-\_\-d\-\_\-dt} (const int a\-\_\-var, Level\-Data$<$ F\-Array\-Box $>$ \&diff, bool vector=false)}\label{class_a_m_r_level_mushy_layer_a0f76ac50feba2ebcf8cd431948690a76}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ab86dcb9c77a0696fbb3fbc7d6a1d09b3}{bool \hyperlink{class_a_m_r_level_mushy_layer_ab86dcb9c77a0696fbb3fbc7d6a1d09b3}{solving\-Full\-Darcy\-Brinkman} ()}\label{class_a_m_r_level_mushy_layer_ab86dcb9c77a0696fbb3fbc7d6a1d09b3}
+
+\begin{DoxyCompactList}\small\item\em Determine if we're solving the full time dependent equation, or just darcy's law. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a540bac726905fcc0af2fcfe7a8b7fed1}{void \hyperlink{class_a_m_r_level_mushy_layer_a540bac726905fcc0af2fcfe7a8b7fed1}{update\-Enthalpy\-Variables\-Old} ()}\label{class_a_m_r_level_mushy_layer_a540bac726905fcc0af2fcfe7a8b7fed1}
+
+\begin{DoxyCompactList}\small\item\em Update thermodynamic variables based on phase diagram (old time) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ad978d1a9a28c1ef557aa348807534eb4}{bool \hyperlink{class_a_m_r_level_mushy_layer_ad978d1a9a28c1ef557aa348807534eb4}{finest\-Level} ()}\label{class_a_m_r_level_mushy_layer_ad978d1a9a28c1ef557aa348807534eb4}
+
+\begin{DoxyCompactList}\small\item\em Returns true if there is not a finer level with a grid defined on it. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a52cfb93ecc1e44063a1db80fb417017b}{int \hyperlink{class_a_m_r_level_mushy_layer_a52cfb93ecc1e44063a1db80fb417017b}{get\-Finest\-Level} ()}\label{class_a_m_r_level_mushy_layer_a52cfb93ecc1e44063a1db80fb417017b}
+
+\begin{DoxyCompactList}\small\item\em Return the finest level. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a38c3d474a125f8cf66dd07e08ee02709}{Real \hyperlink{class_a_m_r_level_mushy_layer_a38c3d474a125f8cf66dd07e08ee02709}{compute\-Dt} (Real cfl)}\label{class_a_m_r_level_mushy_layer_a38c3d474a125f8cf66dd07e08ee02709}
+
+\begin{DoxyCompactList}\small\item\em Returns $ \Delta t $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa758dba965ec2072e89a8bb75620db1b}{Real {\bfseries get\-Max\-Velocity} ()}\label{class_a_m_r_level_mushy_layer_aa758dba965ec2072e89a8bb75620db1b}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3eee3de4d8921d0778ed037698c5d5c4}{Real \hyperlink{class_a_m_r_level_mushy_layer_a3eee3de4d8921d0778ed037698c5d5c4}{compute\-Dt} (bool growdt)}\label{class_a_m_r_level_mushy_layer_a3eee3de4d8921d0778ed037698c5d5c4}
+
+\begin{DoxyCompactList}\small\item\em Returns $ \Delta t $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa98ba6180396656e312b6449f4ebd8eb}{void \hyperlink{class_a_m_r_level_mushy_layer_aa98ba6180396656e312b6449f4ebd8eb}{compute\-Salt\-Residual} (Level\-Data$<$ Flux\-Box $>$ \&total\-Solute\-Flux)}\label{class_a_m_r_level_mushy_layer_aa98ba6180396656e312b6449f4ebd8eb}
+
+\begin{DoxyCompactList}\small\item\em Compute salt equation residual. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_adaba898a184c0cd44d6d1b12f52ef503}{void \hyperlink{class_a_m_r_level_mushy_layer_adaba898a184c0cd44d6d1b12f52ef503}{restart\-Timestep\-From\-Backup} (bool ignore\-Pressure=false)}\label{class_a_m_r_level_mushy_layer_adaba898a184c0cd44d6d1b12f52ef503}
+
+\begin{DoxyCompactList}\small\item\em Replace with data from before the last backup. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a165220ab8589f345f78556bf427e3745}{void \hyperlink{class_a_m_r_level_mushy_layer_a165220ab8589f345f78556bf427e3745}{backup\-Timestep} ()}\label{class_a_m_r_level_mushy_layer_a165220ab8589f345f78556bf427e3745}
+
+\begin{DoxyCompactList}\small\item\em Save the current data. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a2c8c30594b0753f915713ca0e701eb3a}{void \hyperlink{class_a_m_r_level_mushy_layer_a2c8c30594b0753f915713ca0e701eb3a}{get\-Hierarchy\-And\-Grids} (Vector$<$ \hyperlink{class_a_m_r_level_mushy_layer}{A\-M\-R\-Level\-Mushy\-Layer} $\ast$ $>$ \&a\-\_\-hierarchy, Vector$<$ Disjoint\-Box\-Layout $>$ \&a\-\_\-grids, Vector$<$ int $>$ \&a\-\_\-ref\-Rat, Problem\-Domain \&a\-\_\-lev0\-Dom, Real \&a\-\_\-lev0\-Dx)}\label{class_a_m_r_level_mushy_layer_a2c8c30594b0753f915713ca0e701eb3a}
+
+\begin{DoxyCompactList}\small\item\em Get information on the entire A\-M\-R hierarchy. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aef9f77f57da892bd8930943bfbec9a6b}{void \hyperlink{class_a_m_r_level_mushy_layer_aef9f77f57da892bd8930943bfbec9a6b}{calculate\-Permeability} ()}\label{class_a_m_r_level_mushy_layer_aef9f77f57da892bd8930943bfbec9a6b}
+
+\begin{DoxyCompactList}\small\item\em Calculate permeability $ \Pi $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3b0111c15c91c012d328e42b43fa954f}{void \hyperlink{class_a_m_r_level_mushy_layer_a3b0111c15c91c012d328e42b43fa954f}{calculate\-Coarse\-Fine\-Boundaries} (int a\-\_\-var, bool vector=false)}\label{class_a_m_r_level_mushy_layer_a3b0111c15c91c012d328e42b43fa954f}
+
+\begin{DoxyCompactList}\small\item\em Fills coarse-\/fine boundaries on variable by quadratic interpolation. \end{DoxyCompactList}\item 
+int \hyperlink{class_a_m_r_level_mushy_layer_adc086e9a094b35435de36aadb3891ab7}{multi\-Comp\-Advect\-Diffuse} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-\_\-old, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-\_\-new, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-src, bool do\-F\-Rupdates=false, bool compute\-Advective\-Src=true)
+\begin{DoxyCompactList}\small\item\em Advect and diffuse a scalar field. Returns multigrid status. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af640c8b9d905e16e6b90b6c4f1c7fda2}{void \hyperlink{class_a_m_r_level_mushy_layer_af640c8b9d905e16e6b90b6c4f1c7fda2}{compute\-Scalar\-Advective\-Src} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-src, int a\-\_\-var, bool converged, int a\-\_\-comp=0)}\label{class_a_m_r_level_mushy_layer_af640c8b9d905e16e6b90b6c4f1c7fda2}
+
+\begin{DoxyCompactList}\small\item\em Compute src term and add it to a\-\_\-src. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ab376d561af9e6d98881d71bb00184b7f}{void \hyperlink{class_a_m_r_level_mushy_layer_ab376d561af9e6d98881d71bb00184b7f}{compute\-Scalar\-Advective\-Src\-H\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-src, Level\-Data$<$ Flux\-Box $>$ \&edge\-Scal\-Total, bool converged)}\label{class_a_m_r_level_mushy_layer_ab376d561af9e6d98881d71bb00184b7f}
+
+\begin{DoxyCompactList}\small\item\em Compute multi component source term\-: $ (\mathbf{U} \cdot \nabla T, \mathbf{U} \cdot \nabla S_l)$. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3ea7646ada59f1476523b7a71fa7c40d}{void {\bfseries increment\-Flux\-Registers} (Level\-Data$<$ Flux\-Box $>$ \&flux, Real flux\-Mult)}\label{class_a_m_r_level_mushy_layer_a3ea7646ada59f1476523b7a71fa7c40d}
+
+\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_a8f04027bc844bd17a8bed1e073978436}{compute\-Total\-Advective\-Fluxes} (Level\-Data$<$ Flux\-Box $>$ \&edge\-Scal\-Total)
+\begin{DoxyCompactList}\small\item\em Compute total fluxes that provide the source term for implicit enthalpy-\/salinity updates. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_a367dd316723860bb7bd1c8b97895a3f4}{advect\-Scalar} (const int a\-\_\-scalar\-Var, const int a\-\_\-advection\-Var, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel, bool do\-F\-Rupdates=true)
+\begin{DoxyCompactList}\small\item\em Update a scalar field by advection. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aec550a75ccdfb94eef6efb396228f075}{void {\bfseries advect\-Scalar} (const int a\-\_\-scalar\-Var, const int a\-\_\-advection\-Var, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel, bool do\-F\-Rupdates, Level\-Data$<$ Flux\-Box $>$ \&flux)}\label{class_a_m_r_level_mushy_layer_aec550a75ccdfb94eef6efb396228f075}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0d28eb0d78389d0fc13f0b6c69b8157b}{void {\bfseries update\-Scalar\-Flux\-Register} (int a\-\_\-scalar\-Var, Level\-Data$<$ Flux\-Box $>$ \&flux, Real scale)}\label{class_a_m_r_level_mushy_layer_a0d28eb0d78389d0fc13f0b6c69b8157b}
+
+\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_acfd7a12794a564615d7b507717ea0d70}{advect\-Lambda} (bool do\-F\-Rupdates=true)
+\begin{DoxyCompactList}\small\item\em Advect lambda field (for freestream preservation) \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_a4c5ae9f4b8016a17944e103389ac6c1f}{compute\-Advection\-Vel\-Source\-Term} (Level\-Data$<$ F\-Array\-Box $>$ \&advection\-Source\-Term)
+\begin{DoxyCompactList}\small\item\em Time integration by the T\-G\-A method (2nd order accurate) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a51a93e1db4963170b0cc831bf87bdbda}{void \hyperlink{class_a_m_r_level_mushy_layer_a51a93e1db4963170b0cc831bf87bdbda}{horizontally\-Average} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-averaged, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-phi)}\label{class_a_m_r_level_mushy_layer_a51a93e1db4963170b0cc831bf87bdbda}
+
+\begin{DoxyCompactList}\small\item\em Average vertical fluxes in the horizontal direction. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a59d164085c308e534cdb44f558c56aed}{void {\bfseries horizontally\-Average} (Vector$<$ Real $>$ \&average\-Vector, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-phi)}\label{class_a_m_r_level_mushy_layer_a59d164085c308e534cdb44f558c56aed}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ace588d01606542a417a8d2d05c80c392}{void {\bfseries horizontally\-Average} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-averaged, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-phi, Vector$<$ Real $>$ \&average\-Vector)}\label{class_a_m_r_level_mushy_layer_ace588d01606542a417a8d2d05c80c392}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a4467aac78f7a23f22a7d65d3441ffb8b}{void \hyperlink{class_a_m_r_level_mushy_layer_a4467aac78f7a23f22a7d65d3441ffb8b}{horizontally\-Average} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-averaged, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi)}\label{class_a_m_r_level_mushy_layer_a4467aac78f7a23f22a7d65d3441ffb8b}
+
+\begin{DoxyCompactList}\small\item\em Average vertical fluxes in the horizontal direction. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a56619b718d89610566ede8f9a6f74270}{void {\bfseries horizontally\-Average} (Vector$<$ Real $>$ \&average\-Vector, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi)}\label{class_a_m_r_level_mushy_layer_a56619b718d89610566ede8f9a6f74270}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af2c7dbb0a17702772ed44fd557aff2ae}{void {\bfseries horizontally\-Average} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-averaged, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, Vector$<$ Real $>$ \&global\-Averaged)}\label{class_a_m_r_level_mushy_layer_af2c7dbb0a17702772ed44fd557aff2ae}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a7173a5848825f83a3692ff35bcb91631}{Real {\bfseries average\-Over\-Liquid\-Region} (int a\-\_\-val)}\label{class_a_m_r_level_mushy_layer_a7173a5848825f83a3692ff35bcb91631}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6741ef0d7091e2c65c4e4b9f9d5a172a}{void {\bfseries get\-Total\-Flux} (Level\-Data$<$ Flux\-Box $>$ \&total\-Flux)}\label{class_a_m_r_level_mushy_layer_a6741ef0d7091e2c65c4e4b9f9d5a172a}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a4a641297a46991e7aca4ab750b347a1f}{void \hyperlink{class_a_m_r_level_mushy_layer_a4a641297a46991e7aca4ab750b347a1f}{compute\-Lap\-Vel} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lap\-Vel, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-vel, const Level\-Data$<$ F\-Array\-Box $>$ $\ast$a\-\_\-crse\-Vel\-Ptr)}\label{class_a_m_r_level_mushy_layer_a4a641297a46991e7aca4ab750b347a1f}
+
+\begin{DoxyCompactList}\small\item\em Compute $ \nabla^2 \mathbf{U} $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ae23a8e865baef2bc23d79e7839c2a31b}{void \hyperlink{class_a_m_r_level_mushy_layer_ae23a8e865baef2bc23d79e7839c2a31b}{compute\-Scal\-Diffusion} (const int a\-\_\-var, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lap\-Scal, Real a\-\_\-time)}\label{class_a_m_r_level_mushy_layer_ae23a8e865baef2bc23d79e7839c2a31b}
+
+\begin{DoxyCompactList}\small\item\em Compute $ \nabla^2 \phi $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a00dc47be23a770c7a546a2b79a7bcf5c}{void \hyperlink{class_a_m_r_level_mushy_layer_a00dc47be23a770c7a546a2b79a7bcf5c}{compute\-Scal\-Diffusion} (Level\-Data$<$ F\-Array\-Box $>$ \&diffusive\-Src, Real a\-\_\-time)}\label{class_a_m_r_level_mushy_layer_a00dc47be23a770c7a546a2b79a7bcf5c}
+
+\begin{DoxyCompactList}\small\item\em Compute $ \nabla^2 (H, S) $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9af796bb0c94d60cb54d97c3c935bfdf}{void {\bfseries compute\-Scal\-Diffusion} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-src, int a\-\_\-var)}\label{class_a_m_r_level_mushy_layer_a9af796bb0c94d60cb54d97c3c935bfdf}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_add5a2303e20f8efa62a09005dc48bc6d}{void {\bfseries compute\-C\-Cvelocity} (Level\-Data$<$ F\-Array\-Box $>$ \&advection\-Source\-Term, Real a\-\_\-old\-Time, Real a\-\_\-dt, bool do\-F\-Rupdates=false, bool a\-\_\-do\-Projection=true, bool compute\-\_\-u\-Del\-U=true, bool a\-\_\-\-M\-A\-Cprojection=false)}\label{class_a_m_r_level_mushy_layer_add5a2303e20f8efa62a09005dc48bc6d}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a059eedd6197f85a0d1638ca6183295d4}{void \hyperlink{class_a_m_r_level_mushy_layer_a059eedd6197f85a0d1638ca6183295d4}{compute\-Ustar} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u\-Delu, Real a\-\_\-old\-Time, Real a\-\_\-dt, bool do\-F\-Rupdates, bool a\-\_\-\-M\-A\-Cprojection=false)}\label{class_a_m_r_level_mushy_layer_a059eedd6197f85a0d1638ca6183295d4}
+
+\begin{DoxyCompactList}\small\item\em Compute $ \mathbf{U}^* $, the velocity before we project it. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aeaec7664c5366f241354c00436e4a87f}{void \hyperlink{class_a_m_r_level_mushy_layer_aeaec7664c5366f241354c00436e4a87f}{compute\-Ustar\-Src} (Level\-Data$<$ F\-Array\-Box $>$ \&src, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u\-Delu, Real src\-\_\-time, bool a\-\_\-\-M\-A\-Cprojection=false)}\label{class_a_m_r_level_mushy_layer_aeaec7664c5366f241354c00436e4a87f}
+
+\begin{DoxyCompactList}\small\item\em Compute the source term for the $\mathbf{U}^* $ solve. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a1699a841bc8d8371f55c6ac45152d4ea}{void \hyperlink{class_a_m_r_level_mushy_layer_a1699a841bc8d8371f55c6ac45152d4ea}{set\-Vel\-Zero} (F\-Array\-Box \&a\-\_\-vel, const F\-Array\-Box \&a\-\_\-porosity, const Real a\-\_\-limit, const int a\-\_\-radius=0)}\label{class_a_m_r_level_mushy_layer_a1699a841bc8d8371f55c6ac45152d4ea}
+
+\begin{DoxyCompactList}\small\item\em F\-A\-B version. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ad1e22532941e086464363b556c60b82c}{void \hyperlink{class_a_m_r_level_mushy_layer_ad1e22532941e086464363b556c60b82c}{compute\-Grad\-P} (Level\-Data$<$ F\-Array\-Box $>$ \&grad\-P, Real a\-\_\-time, bool a\-\_\-mac\-Projection=false)}\label{class_a_m_r_level_mushy_layer_ad1e22532941e086464363b556c60b82c}
+
+\begin{DoxyCompactList}\small\item\em Returns $ \nabla P $ at the specified time. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a1da14630642f32edf8ab0c3d27ecf60e}{void \hyperlink{class_a_m_r_level_mushy_layer_a1da14630642f32edf8ab0c3d27ecf60e}{trace\-Advection\-Vel} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-old\-\_\-vel, Level\-Data$<$ F\-Array\-Box $>$ \&U\-\_\-chi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-viscous\-Source, Patch\-Godunov \&a\-\_\-patch\-God\-Velocity, Real a\-\_\-old\-\_\-time, Real a\-\_\-dt)}\label{class_a_m_r_level_mushy_layer_a1da14630642f32edf8ab0c3d27ecf60e}
+
+\begin{DoxyCompactList}\small\item\em Trace the advection velocity forward in time. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a93fde307e987b4d1e5dbdb06b29d23d0}{void \hyperlink{class_a_m_r_level_mushy_layer_a93fde307e987b4d1e5dbdb06b29d23d0}{compute\-Predicted\-Velocities} (Level\-Data$<$ Flux\-Box $>$ \&U\-\_\-chi\-\_\-new, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-trace\-Vel, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel, Level\-Data$<$ F\-Array\-Box $>$ \&U\-\_\-chi, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-viscous\-Source, Patch\-Godunov \&a\-\_\-patch\-God\-Velocity, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-grad\-\_\-e\-Lambda, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-grad\-Phi, Level\-Data$<$ Flux\-Box $>$ \&porosity\-Face, Real a\-\_\-old\-\_\-time, Real a\-\_\-dt, bool legacy\-Compute=false)}\label{class_a_m_r_level_mushy_layer_a93fde307e987b4d1e5dbdb06b29d23d0}
+
+\begin{DoxyCompactList}\small\item\em Compute advection velocities at the half time step. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_a77914a8f6be67642c366b4da8e0a2829}{compute\-Scalar\-Advective\-Flux} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-edge\-Scal, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-old\-\_\-scal, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-\_\-vel, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-inflow\-Outflow\-Vel, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-old\-\_\-vel, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-diffusive\-Src, Patch\-Godunov \&a\-\_\-patch\-God, Real a\-\_\-old\-\_\-time, Real a\-\_\-dt)
+\begin{DoxyCompactList}\small\item\em Compute the advective flux given the scalar field, advection velocity and source term specified. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6d02158d0d0bc38c7d7841f526b6a5f8}{void \hyperlink{class_a_m_r_level_mushy_layer_a6d02158d0d0bc38c7d7841f526b6a5f8}{upwind} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-edge\-Scal, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-old\-\_\-scal, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-\_\-vel, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-inflow\-Outflow\-Vel, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-old\-\_\-vel, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-diffusive\-Src, Patch\-Godunov \&a\-\_\-patch\-God, Real a\-\_\-old\-\_\-time, Real a\-\_\-dt)}\label{class_a_m_r_level_mushy_layer_a6d02158d0d0bc38c7d7841f526b6a5f8}
+
+\begin{DoxyCompactList}\small\item\em Refactored this so we can also use for velocities if we want. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_af3fc0d2c619ba6ad099b1ad6c39b352e}{compute\-Scalar\-Advective\-Flux} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-edge\-Scal, int a\-\_\-advection\-Var, int a\-\_\-diffusion\-Var, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel, Real a\-\_\-old\-\_\-time, Real a\-\_\-dt)
+\begin{DoxyCompactList}\small\item\em Compute the advective flux. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_a496393891a2db8a73b2f398f90324af5}{compute\-Scalar\-Advective\-Flux\-Multi\-Comp} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-edge\-Scal, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel, Patch\-Godunov \&a\-\_\-patch\-God, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-scal\-Old, Real a\-\_\-old\-\_\-time, Real a\-\_\-dt)
+\begin{DoxyCompactList}\small\item\em Compute the advective flux for the enthalpy and salinity equations,. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ab3565edc2fa5413b5ef6a6488494fe75}{void \hyperlink{class_a_m_r_level_mushy_layer_ab3565edc2fa5413b5ef6a6488494fe75}{predict\-Velocities} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-u\-Del\-U, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel, Level\-Data$<$ F\-Array\-Box $>$ \&viscous\-Source, Real old\-\_\-time, Real a\-\_\-dt, bool do\-F\-Rupdates)}\label{class_a_m_r_level_mushy_layer_ab3565edc2fa5413b5ef6a6488494fe75}
+
+\begin{DoxyCompactList}\small\item\em Calculate $ \mathbf{u} \cdot \nabla \left( \mathbf{u}/\chi \right) $. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_a0169d83decd5824058e36a4b126f762a}{calculate\-Time\-Ind\-Advection\-Vel} (Real a\-\_\-time, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel)
+\begin{DoxyCompactList}\small\item\em Calculate velocity for momentum equations which are time independent. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac2c8316afa057d4697ed7f7a5b8435b2}{void \hyperlink{class_a_m_r_level_mushy_layer_ac2c8316afa057d4697ed7f7a5b8435b2}{fill\-Adv\-Vel} (Real time, Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel)}\label{class_a_m_r_level_mushy_layer_ac2c8316afa057d4697ed7f7a5b8435b2}
+
+\begin{DoxyCompactList}\small\item\em Fill advection velocity ghost cells. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a12544df6a861f6b25411c1bb88247622}{void {\bfseries fill\-Analytic\-Vel} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel)}\label{class_a_m_r_level_mushy_layer_a12544df6a861f6b25411c1bb88247622}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa31ea2f84b91e961b747c4cc471482f6}{void {\bfseries fill\-Analytic\-Vel} (F\-Array\-Box \&vel\-Dir, int dir, int comp, bool project)}\label{class_a_m_r_level_mushy_layer_aa31ea2f84b91e961b747c4cc471482f6}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9ec0b80e9c4c2fb7eca849a4cb37b540}{void {\bfseries fill\-Analytic\-Vel} (Level\-Data$<$ F\-Array\-Box $>$ \&vel\-Dir)}\label{class_a_m_r_level_mushy_layer_a9ec0b80e9c4c2fb7eca849a4cb37b540}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa6503b22c51b51c10ce48907d7a97960}{void {\bfseries fill\-Buoyancy} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-buoyancy, Real a\-\_\-time)}\label{class_a_m_r_level_mushy_layer_aa6503b22c51b51c10ce48907d7a97960}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af42680f8ea7ca8a032d99316025c4430}{void {\bfseries fill\-Buoyancy} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-buoyancy, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-temperature, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-liquid\-Conc, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-porosity)}\label{class_a_m_r_level_mushy_layer_af42680f8ea7ca8a032d99316025c4430}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a33522b27aabe2763e57c66c2ab4e2e09}{void {\bfseries fill\-Buoyancy} (F\-Array\-Box \&buoyancy, F\-Array\-Box \&temperature, F\-Array\-Box \&liquid\-Conc, F\-Array\-Box \&porosity, F\-Array\-Box \&body\-Force)}\label{class_a_m_r_level_mushy_layer_a33522b27aabe2763e57c66c2ab4e2e09}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a7e993cb0263c611cd4062a720e9674d2}{void {\bfseries fill\-Pressure\-Src\-Term} (Level\-Data$<$ F\-Array\-Box $>$ \&grad\-P, Level\-Data$<$ F\-Array\-Box $>$ \&porosity\-Centred, Real a\-\_\-time, bool a\-\_\-\-M\-A\-Cprojection)}\label{class_a_m_r_level_mushy_layer_a7e993cb0263c611cd4062a720e9674d2}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a36ec8a3c5ba9f94da4d1fe0e1e7463cb}{void {\bfseries fill\-A\-M\-R\-Vel\-Porosity} (Vector$<$ Level\-Data$<$ F\-Array\-Box $>$ $\ast$ $>$ \&amr\-Vel, Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ Flux\-Box $>$ $>$ $>$ \&amr\-Porosity\-Face, Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&amr\-Porosity)}\label{class_a_m_r_level_mushy_layer_a36ec8a3c5ba9f94da4d1fe0e1e7463cb}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aeb42507e6f3613a4ea88070e858b0f48}{void \hyperlink{class_a_m_r_level_mushy_layer_aeb42507e6f3613a4ea88070e858b0f48}{fill\-H\-C} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, Real a\-\_\-time, bool do\-Interior=true, bool quad\-Interp=true)}\label{class_a_m_r_level_mushy_layer_aeb42507e6f3613a4ea88070e858b0f48}
+
+\begin{DoxyCompactList}\small\item\em Should include correct exchange calls. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a870c44d49909c5c650ea96bc09bff69e}{void {\bfseries fill\-Fixed\-Porosity} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-porosity)}\label{class_a_m_r_level_mushy_layer_a870c44d49909c5c650ea96bc09bff69e}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a2b9e24e70db3c56fbf196b0a75dc4640}{void \hyperlink{class_a_m_r_level_mushy_layer_a2b9e24e70db3c56fbf196b0a75dc4640}{fill\-T\-Cl} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, Real a\-\_\-time, bool do\-Interior=true, bool quad\-Interp=true)}\label{class_a_m_r_level_mushy_layer_a2b9e24e70db3c56fbf196b0a75dc4640}
+
+\begin{DoxyCompactList}\small\item\em Should include correct exchange calls. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ab5c5ff020d63ce90bbae72a367b9ce8f}{void \hyperlink{class_a_m_r_level_mushy_layer_ab5c5ff020d63ce90bbae72a367b9ce8f}{fill\-Multi\-Comp} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, Real a\-\_\-time, int scal1, int scal2, bool do\-Interior=true, bool quad\-Interp=true)}\label{class_a_m_r_level_mushy_layer_ab5c5ff020d63ce90bbae72a367b9ce8f}
+
+\begin{DoxyCompactList}\small\item\em Should include correct exchange calls. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_afafb4a5c5aa7d19d6f817d70d922ed37}{void {\bfseries fill\-A\-M\-R\-Lambda} (Vector$<$ Level\-Data$<$ F\-Array\-Box $>$ $\ast$ $>$ \&amr\-Lambda)}\label{class_a_m_r_level_mushy_layer_afafb4a5c5aa7d19d6f817d70d922ed37}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a7aef043fd3a6055c2240b297c0c62de1}{void \hyperlink{class_a_m_r_level_mushy_layer_a7aef043fd3a6055c2240b297c0c62de1}{calculate\-Analytic\-Solns} (bool enforce\-Solutions=true)}\label{class_a_m_r_level_mushy_layer_a7aef043fd3a6055c2240b297c0c62de1}
+
+\begin{DoxyCompactList}\small\item\em Calculate analytic solution to this problem (if possible) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a649d148960a286ead48d991f696ef945}{void \hyperlink{class_a_m_r_level_mushy_layer_a649d148960a286ead48d991f696ef945}{set\-Porosity} (F\-Array\-Box \&a\-\_\-porosity)}\label{class_a_m_r_level_mushy_layer_a649d148960a286ead48d991f696ef945}
+
+\begin{DoxyCompactList}\small\item\em Set fixed porosity. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aec845e1d2322bb91f229e21fe9131362}{void \hyperlink{class_a_m_r_level_mushy_layer_aec845e1d2322bb91f229e21fe9131362}{fill\-Frame\-Velocity} ()}\label{class_a_m_r_level_mushy_layer_aec845e1d2322bb91f229e21fe9131362}
+
+\begin{DoxyCompactList}\small\item\em Fill frame advection velocity. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a78e4a88f5513ac4af2b60516f429d148}{void \hyperlink{class_a_m_r_level_mushy_layer_a78e4a88f5513ac4af2b60516f429d148}{add\-Perturbation} (int a\-\_\-var, Real alpha, int wave\-Number=-\/1, Real phase\-Shift=0)}\label{class_a_m_r_level_mushy_layer_a78e4a88f5513ac4af2b60516f429d148}
+
+\begin{DoxyCompactList}\small\item\em Add a small perturbation to the solution. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a7b7760d193911a689cb815b254fd5e5e}{void \hyperlink{class_a_m_r_level_mushy_layer_a7b7760d193911a689cb815b254fd5e5e}{add\-Melt\-Pond} ()}\label{class_a_m_r_level_mushy_layer_a7b7760d193911a689cb815b254fd5e5e}
+
+\begin{DoxyCompactList}\small\item\em Add a melt pond if we want. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a042642fed8f9a314bc7b42a8c2766f0d}{void \hyperlink{class_a_m_r_level_mushy_layer_a042642fed8f9a314bc7b42a8c2766f0d}{define\-Ustar\-Solver} (Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Backward\-Euler $>$ $>$ \&a\-\_\-\-Ustar\-B\-E, Vector$<$ Ref\-Counted\-Ptr$<$ Level\-T\-G\-A $>$ $>$ \&a\-\_\-\-Ustar\-T\-G\-A)}\label{class_a_m_r_level_mushy_layer_a042642fed8f9a314bc7b42a8c2766f0d}
+
+\begin{DoxyCompactList}\small\item\em Define implicit solver for $ \mathbf{u}^* $ including timestepping. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a21d85bbce02a400b103637203a57a3b3}{void \hyperlink{class_a_m_r_level_mushy_layer_a21d85bbce02a400b103637203a57a3b3}{define\-Ustar\-Solver} ()}\label{class_a_m_r_level_mushy_layer_a21d85bbce02a400b103637203a57a3b3}
+
+\begin{DoxyCompactList}\small\item\em Define implicit solver for $ \mathbf{u}^* $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0f1af6cfb8e2c45d129ad1915ede5dde}{void \hyperlink{class_a_m_r_level_mushy_layer_a0f1af6cfb8e2c45d129ad1915ede5dde}{initialize\-Level\-Pressure} (Real a\-\_\-current\-Time, Real a\-\_\-dt\-Init)}\label{class_a_m_r_level_mushy_layer_a0f1af6cfb8e2c45d129ad1915ede5dde}
+
+\begin{DoxyCompactList}\small\item\em Initialize pressure on this level. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a1f0fe62753524750fe9b697cfef36f7f}{void \hyperlink{class_a_m_r_level_mushy_layer_a1f0fe62753524750fe9b697cfef36f7f}{initialize\-Global\-Pressure} (Real dt\-Init=-\/1, bool init=true)}\label{class_a_m_r_level_mushy_layer_a1f0fe62753524750fe9b697cfef36f7f}
+
+\begin{DoxyCompactList}\small\item\em Initialize pressure across all levels. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ab47973fd99a94257b3221d1be16b1bf1}{void {\bfseries compute\-Init\-Advection\-Vel} ()}\label{class_a_m_r_level_mushy_layer_ab47973fd99a94257b3221d1be16b1bf1}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ad60f55a32e4f04bb5d3ddd101fb4c540}{bool {\bfseries new\-Level\-Added} ()}\label{class_a_m_r_level_mushy_layer_ad60f55a32e4f04bb5d3ddd101fb4c540}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a28479bc8ab69c855a8d79628cddd5b28}{void {\bfseries reset\-Lambda} ()}\label{class_a_m_r_level_mushy_layer_a28479bc8ab69c855a8d79628cddd5b28}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a57a9b87c77a7e0aa8b9082dc1a20959d}{void {\bfseries A\-M\-R\-Reflux\-Lambda} ()}\label{class_a_m_r_level_mushy_layer_a57a9b87c77a7e0aa8b9082dc1a20959d}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9ea8d57926a8281f053c6277f5b39291}{void \hyperlink{class_a_m_r_level_mushy_layer_a9ea8d57926a8281f053c6277f5b39291}{define\-Regrid\-A\-M\-R\-Op} (A\-M\-R\-Poisson\-Op\-Factory \&a\-\_\-factory, const Vector$<$ Disjoint\-Box\-Layout $>$ \&a\-\_\-grids, const Vector$<$ Problem\-Domain $>$ \&a\-\_\-domains, const Vector$<$ Real $>$ \&a\-\_\-amr\-Dx, const Vector$<$ int $>$ \&a\-\_\-ref\-Ratios, const int \&a\-\_\-l\-Base)}\label{class_a_m_r_level_mushy_layer_a9ea8d57926a8281f053c6277f5b39291}
+
+\begin{DoxyCompactList}\small\item\em Define operator for post regrid smoothing. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a28cfa197f9958818d1e115e92321684d}{void \hyperlink{class_a_m_r_level_mushy_layer_a28cfa197f9958818d1e115e92321684d}{smooth\-Velocity\-Field} (int a\-\_\-lbase)}\label{class_a_m_r_level_mushy_layer_a28cfa197f9958818d1e115e92321684d}
+
+\begin{DoxyCompactList}\small\item\em Smooth the velocity field. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0e1a5d490de9799a0579aa3bcc35a021}{void \hyperlink{class_a_m_r_level_mushy_layer_a0e1a5d490de9799a0579aa3bcc35a021}{get\-Coarse\-Scalar\-Data\-Pointers} (const int a\-\_\-scalar\-Var, Level\-Data$<$ F\-Array\-Box $>$ $\ast$$\ast$a\-\_\-coarser\-Data\-Old\-Ptr, Level\-Data$<$ F\-Array\-Box $>$ $\ast$$\ast$a\-\_\-coarser\-Data\-New\-Ptr, Level\-Flux\-Register $\ast$$\ast$a\-\_\-coarser\-F\-R\-Ptr, Level\-Flux\-Register $\ast$$\ast$a\-\_\-finer\-F\-R\-Ptr, Real \&a\-\_\-t\-Coarser\-Old, Real \&a\-\_\-t\-Coarser\-New)}\label{class_a_m_r_level_mushy_layer_a0e1a5d490de9799a0579aa3bcc35a021}
+
+\begin{DoxyCompactList}\small\item\em Utility function to get pointers to coarse level objects. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_abc19ce85374efbff3c5c05d8bd71b330}{void \hyperlink{class_a_m_r_level_mushy_layer_abc19ce85374efbff3c5c05d8bd71b330}{get\-Coarse\-Vector\-Data\-Pointers} (const int a\-\_\-vector\-Var, Level\-Data$<$ F\-Array\-Box $>$ $\ast$$\ast$a\-\_\-coarser\-Data\-Old\-Ptr, Level\-Data$<$ F\-Array\-Box $>$ $\ast$$\ast$a\-\_\-coarser\-Data\-New\-Ptr, Level\-Flux\-Register $\ast$$\ast$a\-\_\-coarser\-F\-R\-Ptr, Level\-Flux\-Register $\ast$$\ast$a\-\_\-finer\-F\-R\-Ptr, Real \&a\-\_\-t\-Coarser\-Old, Real \&a\-\_\-t\-Coarser\-New)}\label{class_a_m_r_level_mushy_layer_abc19ce85374efbff3c5c05d8bd71b330}
+
+\begin{DoxyCompactList}\small\item\em Utility function to get pointers to coarse level objects. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af9d9ba5a4bed0091b9e5ecd4d84cd12d}{void \hyperlink{class_a_m_r_level_mushy_layer_af9d9ba5a4bed0091b9e5ecd4d84cd12d}{fill\-Vector\-Field} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-vector, Real a\-\_\-time, int a\-\_\-var, bool do\-Interior=false, bool quad\-Interp=false)}\label{class_a_m_r_level_mushy_layer_af9d9ba5a4bed0091b9e5ecd4d84cd12d}
+
+\begin{DoxyCompactList}\small\item\em Doesn't do any time interpolation -\/ just fills ghost cells if necessary. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aebd51c6e4d51d6459c089771f958a30e}{void \hyperlink{class_a_m_r_level_mushy_layer_aebd51c6e4d51d6459c089771f958a30e}{fill\-Scalars} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-scal, Real a\-\_\-time, const int a\-\_\-var, bool do\-Interior=false, bool quad\-Interp=false)}\label{class_a_m_r_level_mushy_layer_aebd51c6e4d51d6459c089771f958a30e}
+
+\begin{DoxyCompactList}\small\item\em Fill ghost cells of scalar field. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0d83bb04c2d1d070bfaf5ee68d9fbb8e}{void \hyperlink{class_a_m_r_level_mushy_layer_a0d83bb04c2d1d070bfaf5ee68d9fbb8e}{fill\-Buoyancy} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-buoyancy, Real a\-\_\-time, bool quad\-Interp)}\label{class_a_m_r_level_mushy_layer_a0d83bb04c2d1d070bfaf5ee68d9fbb8e}
+
+\begin{DoxyCompactList}\small\item\em Helper function. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a88670451228818765118f873401b7810}{void \hyperlink{class_a_m_r_level_mushy_layer_a88670451228818765118f873401b7810}{fill\-Buoyancy\-Face} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-buoyancy, Real a\-\_\-time, bool quad\-Interp)}\label{class_a_m_r_level_mushy_layer_a88670451228818765118f873401b7810}
+
+\begin{DoxyCompactList}\small\item\em Helper function. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a1b8c487cd378d7aa409a59ecc18a1e66}{void \hyperlink{class_a_m_r_level_mushy_layer_a1b8c487cd378d7aa409a59ecc18a1e66}{fill\-Scalar\-Face} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-scal, Real a\-\_\-time, const int a\-\_\-var, bool do\-Interior=false, bool quad\-Interp=false)}\label{class_a_m_r_level_mushy_layer_a1b8c487cd378d7aa409a59ecc18a1e66}
+
+\begin{DoxyCompactList}\small\item\em Fill ghost cells of scalar field (edge-\/centred) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a20fcbe7201a07b0e90405b45f806ffc7}{void {\bfseries fill\-Scalar\-Face} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-scal, Real a\-\_\-time, const int a\-\_\-var, Cell\-To\-Edge\-Averaging\-Method method, bool do\-Interior=false, bool quad\-Interp=false, Real smoothing=0.\-0)}\label{class_a_m_r_level_mushy_layer_a20fcbe7201a07b0e90405b45f806ffc7}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aea3d5cfb654cc0e1e0f14bea830add39}{void {\bfseries smooth\-Scalar\-Field} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, int a\-\_\-var, Real a\-\_\-smoothing)}\label{class_a_m_r_level_mushy_layer_aea3d5cfb654cc0e1e0f14bea830add39}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a64193ef3a3eba669336ec93b6dde857f}{void \hyperlink{class_a_m_r_level_mushy_layer_a64193ef3a3eba669336ec93b6dde857f}{get\-Scalar\-B\-Cs} (B\-C\-Holder \&this\-B\-C, int a\-\_\-var, bool a\-\_\-homogeneous)}\label{class_a_m_r_level_mushy_layer_a64193ef3a3eba669336ec93b6dde857f}
+
+\begin{DoxyCompactList}\small\item\em Get boundary conditions for implicit problems. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac533661ed4f32a562f30e7489bbb384f}{void \hyperlink{class_a_m_r_level_mushy_layer_ac533661ed4f32a562f30e7489bbb384f}{compute\-Inflow\-Outflow\-Adv\-Vel} ()}\label{class_a_m_r_level_mushy_layer_ac533661ed4f32a562f30e7489bbb384f}
+
+\begin{DoxyCompactList}\small\item\em Refactored this to be consistent. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a50b7408c664ba80543611da02f5d6900}{Phys\-I\-B\-C $\ast$ \hyperlink{class_a_m_r_level_mushy_layer_a50b7408c664ba80543611da02f5d6900}{get\-Scalar\-I\-B\-Cs} (int a\-\_\-var)}\label{class_a_m_r_level_mushy_layer_a50b7408c664ba80543611da02f5d6900}
+
+\begin{DoxyCompactList}\small\item\em Get initial and boundary conditions for advection. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af343ac4563d008066f072fee73d8dc0e}{void \hyperlink{class_a_m_r_level_mushy_layer_af343ac4563d008066f072fee73d8dc0e}{convert\-B\-C\-Type} (const int a\-\_\-implicit\-B\-C, const Real a\-\_\-implicit\-Val, int a\-\_\-explicit\-B\-C, Real a\-\_\-explicit\-Val)}\label{class_a_m_r_level_mushy_layer_af343ac4563d008066f072fee73d8dc0e}
+
+\begin{DoxyCompactList}\small\item\em Need to convert implicit dirichlet/neuman/inflow outflow B\-Cs to advection B\-Cs. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aae8bd0481accd53b1662d44ddf27eb33}{int {\bfseries convert\-B\-C\-Type} (const int a\-\_\-implicit\-B\-C)}\label{class_a_m_r_level_mushy_layer_aae8bd0481accd53b1662d44ddf27eb33}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a4cb7430dbeb587992f88b45d9b26ad64}{void \hyperlink{class_a_m_r_level_mushy_layer_a4cb7430dbeb587992f88b45d9b26ad64}{stokes\-Darcy\-Forcing} (Level\-Data$<$ F\-Array\-Box $>$ \&T, Real time)}\label{class_a_m_r_level_mushy_layer_a4cb7430dbeb587992f88b45d9b26ad64}
+
+\begin{DoxyCompactList}\small\item\em Forcing term for darcy-\/brinkman test. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a38a4a2391d1667f06f8f003afb3dba12}{bool \hyperlink{class_a_m_r_level_mushy_layer_a38a4a2391d1667f06f8f003afb3dba12}{crashed} ()}\label{class_a_m_r_level_mushy_layer_a38a4a2391d1667f06f8f003afb3dba12}
+
+\begin{DoxyCompactList}\small\item\em Check the simulation hasn't crashed. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_a508d3f7f8099dbaacfdaefe36d064e57}{do\-Regularisation\-Ops} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-scal, int a\-\_\-var)
+\begin{DoxyCompactList}\small\item\em Operations to keep variables bounded correctly. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af2fd1f6837f1ee9f5eb1bdc50773d029}{void {\bfseries do\-Regularisation\-Ops} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-scal, int a\-\_\-var)}\label{class_a_m_r_level_mushy_layer_af2fd1f6837f1ee9f5eb1bdc50773d029}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0efd6693e4a91d5df4284c4b8570cb24}{void {\bfseries do\-Regularisation\-Ops} (int a\-\_\-var, F\-Array\-Box \&a\-\_\-state)}\label{class_a_m_r_level_mushy_layer_a0efd6693e4a91d5df4284c4b8570cb24}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a914c405e621143eed2da6da1bcae2604}{void \hyperlink{class_a_m_r_level_mushy_layer_a914c405e621143eed2da6da1bcae2604}{level\-Setup} ()}\label{class_a_m_r_level_mushy_layer_a914c405e621143eed2da6da1bcae2604}
+
+\begin{DoxyCompactList}\small\item\em Setup menagerie of data structures. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ae7241de9407e8d6a7ad84166d5cc24fc}{void \hyperlink{class_a_m_r_level_mushy_layer_ae7241de9407e8d6a7ad84166d5cc24fc}{set\-Flux\-Registers\-Zero} ()}\label{class_a_m_r_level_mushy_layer_ae7241de9407e8d6a7ad84166d5cc24fc}
+
+\begin{DoxyCompactList}\small\item\em Reset all flux registers. \end{DoxyCompactList}\item 
+void \hyperlink{class_a_m_r_level_mushy_layer_ad0fbde13c159047cbc2cfd3e3eb83eb0}{copy\-New\-To\-Old\-States} ()
+\begin{DoxyCompactList}\small\item\em copy old data to new data, reset time \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a4223e19add7010f40fa97c297313af35}{void \hyperlink{class_a_m_r_level_mushy_layer_a4223e19add7010f40fa97c297313af35}{copy\-Old\-To\-New\-States} ()}\label{class_a_m_r_level_mushy_layer_a4223e19add7010f40fa97c297313af35}
+
+\begin{DoxyCompactList}\small\item\em Copy old data to new data holders. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6eb2873a405edcb7f9ae01f6ba28fe44}{void \hyperlink{class_a_m_r_level_mushy_layer_a6eb2873a405edcb7f9ae01f6ba28fe44}{compute\-Advection\-Velocities} (Level\-Data$<$ F\-Array\-Box $>$ \&advection\-Src, Real adv\-Vel\-Centering=0.\-5)}\label{class_a_m_r_level_mushy_layer_a6eb2873a405edcb7f9ae01f6ba28fe44}
+
+\begin{DoxyCompactList}\small\item\em Compute advection velocity. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_adbe81ed4dc8e5b76516390d359df16f7}{void \hyperlink{class_a_m_r_level_mushy_layer_adbe81ed4dc8e5b76516390d359df16f7}{correct\-Edge\-Centred\-Velocity} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel, Real a\-\_\-dt)}\label{class_a_m_r_level_mushy_layer_adbe81ed4dc8e5b76516390d359df16f7}
+
+\begin{DoxyCompactList}\small\item\em Correct velocity (projection + volume discrepancy) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac35bf0ea694dbcba6b12ec5cdf5fbd67}{void \hyperlink{class_a_m_r_level_mushy_layer_ac35bf0ea694dbcba6b12ec5cdf5fbd67}{compute\-Volume\-Discrepancy\-Correction} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-adv\-Vel)}\label{class_a_m_r_level_mushy_layer_ac35bf0ea694dbcba6b12ec5cdf5fbd67}
+
+\begin{DoxyCompactList}\small\item\em Compute and apply volume discrepancy correction (edge centred velocity) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa6359d3a5c627812a89197d5ccb0a597}{Real {\bfseries compute\-Dt\-Init} (int finest\-\_\-level)}\label{class_a_m_r_level_mushy_layer_aa6359d3a5c627812a89197d5ccb0a597}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9e20bcf141ad788f0ba357797cdeabea}{\hyperlink{class_a_m_r_level_mushy_layer}{A\-M\-R\-Level\-Mushy\-Layer} $\ast$ \hyperlink{class_a_m_r_level_mushy_layer_a9e20bcf141ad788f0ba357797cdeabea}{get\-Coarser\-Level} () const }\label{class_a_m_r_level_mushy_layer_a9e20bcf141ad788f0ba357797cdeabea}
+
+\begin{DoxyCompactList}\small\item\em Get the next coarser level. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a077bec843072abfd8ed2a23dfee10d56}{\hyperlink{class_a_m_r_level_mushy_layer}{A\-M\-R\-Level\-Mushy\-Layer} $\ast$ \hyperlink{class_a_m_r_level_mushy_layer_a077bec843072abfd8ed2a23dfee10d56}{get\-Coarsest\-Level} ()}\label{class_a_m_r_level_mushy_layer_a077bec843072abfd8ed2a23dfee10d56}
+
+\begin{DoxyCompactList}\small\item\em Get the coarsest level. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ae020365cfbaac92f38f32633dcbbc436}{\hyperlink{class_a_m_r_level_mushy_layer}{A\-M\-R\-Level\-Mushy\-Layer} $\ast$ \hyperlink{class_a_m_r_level_mushy_layer_ae020365cfbaac92f38f32633dcbbc436}{get\-Finer\-Level} () const }\label{class_a_m_r_level_mushy_layer_ae020365cfbaac92f38f32633dcbbc436}
+
+\begin{DoxyCompactList}\small\item\em Get the next finer level. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa8b1365bdf67cc5b82bec6c04a25f6a0}{void \hyperlink{class_a_m_r_level_mushy_layer_aa8b1365bdf67cc5b82bec6c04a25f6a0}{set\-Advection\-B\-Cs} ()}\label{class_a_m_r_level_mushy_layer_aa8b1365bdf67cc5b82bec6c04a25f6a0}
+
+\begin{DoxyCompactList}\small\item\em Set B\-Cs on advection physics classes. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a1ee4e1a2fc0863bca7550be4e3dcc6c4}{Level\-Data$<$ Flux\-Box $>$ \hyperlink{class_a_m_r_level_mushy_layer_a1ee4e1a2fc0863bca7550be4e3dcc6c4}{m\-\_\-adv\-Vel}}\label{class_a_m_r_level_mushy_layer_a1ee4e1a2fc0863bca7550be4e3dcc6c4}
+
+\begin{DoxyCompactList}\small\item\em Advection velocity. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a43265d34b4981f1b0aa4008956e5ed6b}{Level\-Data$<$ Flux\-Box $>$ {\bfseries m\-\_\-adv\-Vel\-Explicit\-Correction}}\label{class_a_m_r_level_mushy_layer_a43265d34b4981f1b0aa4008956e5ed6b}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af8641fd347befbe1d1d1779102d08f74}{Level\-Data$<$ Flux\-Box $>$ \hyperlink{class_a_m_r_level_mushy_layer_af8641fd347befbe1d1d1779102d08f74}{m\-\_\-adv\-Vel\-Old}}\label{class_a_m_r_level_mushy_layer_af8641fd347befbe1d1d1779102d08f74}
+
+\begin{DoxyCompactList}\small\item\em Advection velocity at old time. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a348a74b9d75e95c79ea6a0edd050ab7f}{Level\-Data$<$ Flux\-Box $>$ \hyperlink{class_a_m_r_level_mushy_layer_a348a74b9d75e95c79ea6a0edd050ab7f}{m\-\_\-adv\-Vel\-New}}\label{class_a_m_r_level_mushy_layer_a348a74b9d75e95c79ea6a0edd050ab7f}
+
+\begin{DoxyCompactList}\small\item\em Advection velocity at new time. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6faf8aa52dbd4627dce4a2408bac25e7}{Level\-Data$<$ Flux\-Box $>$ \hyperlink{class_a_m_r_level_mushy_layer_a6faf8aa52dbd4627dce4a2408bac25e7}{m\-\_\-frame\-Adv\-Vel}}\label{class_a_m_r_level_mushy_layer_a6faf8aa52dbd4627dce4a2408bac25e7}
+
+\begin{DoxyCompactList}\small\item\em Frame advection velocity. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6bba1599c6385bfc52087d65d83e2485}{Level\-Data$<$ Flux\-Box $>$ \hyperlink{class_a_m_r_level_mushy_layer_a6bba1599c6385bfc52087d65d83e2485}{m\-\_\-total\-Adv\-Vel}}\label{class_a_m_r_level_mushy_layer_a6bba1599c6385bfc52087d65d83e2485}
+
+\begin{DoxyCompactList}\small\item\em Frame advection velocity + fluid advection velocity. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a40949c8df12b362facb7aa3f1d879cf6}{Real {\bfseries A\-M\-R\-Salt\-Sum\-\_\-new}}\label{class_a_m_r_level_mushy_layer_a40949c8df12b362facb7aa3f1d879cf6}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9e9671d353d9bdf3e9be0bdbb06bc2be}{Real {\bfseries A\-M\-R\-Salt\-Sum\-\_\-old}}\label{class_a_m_r_level_mushy_layer_a9e9671d353d9bdf3e9be0bdbb06bc2be}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a2826cb43a2acbc06d05ea5625aed4263}{Real {\bfseries A\-M\-R\-Enthalpy\-Sum\-\_\-new}}\label{class_a_m_r_level_mushy_layer_a2826cb43a2acbc06d05ea5625aed4263}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_abc6821ef9d09fddf0cd3e55fc0bb349d}{Real {\bfseries A\-M\-R\-Enthalpy\-Sum\-\_\-old}}\label{class_a_m_r_level_mushy_layer_abc6821ef9d09fddf0cd3e55fc0bb349d}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a89f01be36bc140aaac63f16a74aa6e9a}{Level\-Data$<$ F\-Array\-Box $>$ {\bfseries m\-\_\-salt\-Flux\-Top}}\label{class_a_m_r_level_mushy_layer_a89f01be36bc140aaac63f16a74aa6e9a}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3019ebcb233c3bdb4f1646e1f1022221}{Level\-Data$<$ F\-Array\-Box $>$ {\bfseries m\-\_\-salt\-Flux\-Bottom}}\label{class_a_m_r_level_mushy_layer_a3019ebcb233c3bdb4f1646e1f1022221}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a519fbccec0b9fa2dff32d9040c7d579d}{Level\-Data$<$ F\-Array\-Box $>$ \hyperlink{class_a_m_r_level_mushy_layer_a519fbccec0b9fa2dff32d9040c7d579d}{m\-\_\-frame\-Vel}}\label{class_a_m_r_level_mushy_layer_a519fbccec0b9fa2dff32d9040c7d579d}
+
+\begin{DoxyCompactList}\small\item\em Frame velocity (cell centred). Don't think we need this. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ae2ec059dfa56298ffbc8dc412f84da8f}{Real \hyperlink{class_a_m_r_level_mushy_layer_ae2ec059dfa56298ffbc8dc412f84da8f}{m\-\_\-lower\-Porosity\-Limit}}\label{class_a_m_r_level_mushy_layer_ae2ec059dfa56298ffbc8dc412f84da8f}
+
+\begin{DoxyCompactList}\small\item\em Cap on porosity. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3556903e5a8df44f5e8ad9113bb782a0}{Vector$<$ int $>$ \hyperlink{class_a_m_r_level_mushy_layer_a3556903e5a8df44f5e8ad9113bb782a0}{m\-\_\-output\-Scalar\-Vars}}\label{class_a_m_r_level_mushy_layer_a3556903e5a8df44f5e8ad9113bb782a0}
+
+\begin{DoxyCompactList}\small\item\em List of scalar vars to write out to H\-D\-F5 files. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a26eb81fbe2e9bcaf1d72099d4a15cc45}{Vector$<$ int $>$ \hyperlink{class_a_m_r_level_mushy_layer_a26eb81fbe2e9bcaf1d72099d4a15cc45}{m\-\_\-output\-Vector\-Vars}}\label{class_a_m_r_level_mushy_layer_a26eb81fbe2e9bcaf1d72099d4a15cc45}
+
+\begin{DoxyCompactList}\small\item\em List of vector vars to write out to H\-D\-F5 files. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a588ea6850fbe16d53bd496961ba5427b}{Vector$<$ int $>$ \hyperlink{class_a_m_r_level_mushy_layer_a588ea6850fbe16d53bd496961ba5427b}{m\-\_\-chk\-Vector\-Vars}}\label{class_a_m_r_level_mushy_layer_a588ea6850fbe16d53bd496961ba5427b}
+
+\begin{DoxyCompactList}\small\item\em List of vector vars to write to checkpoint files. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a8d09ec620023d399fcff3c8720d846c6}{Vector$<$ int $>$ \hyperlink{class_a_m_r_level_mushy_layer_a8d09ec620023d399fcff3c8720d846c6}{m\-\_\-chk\-Scalar\-Vars}}\label{class_a_m_r_level_mushy_layer_a8d09ec620023d399fcff3c8720d846c6}
+
+\begin{DoxyCompactList}\small\item\em List of scalar vars to write to checkpoint files. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0f6d029ffba9fced9eea9b9abc193302}{int \hyperlink{class_a_m_r_level_mushy_layer_a0f6d029ffba9fced9eea9b9abc193302}{m\-\_\-num\-Output\-Comps}}\label{class_a_m_r_level_mushy_layer_a0f6d029ffba9fced9eea9b9abc193302}
+
+\begin{DoxyCompactList}\small\item\em Number of component we write out to H\-D\-F5 files. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6d75b7140e1d162a99fd9e2253859977}{int \hyperlink{class_a_m_r_level_mushy_layer_a6d75b7140e1d162a99fd9e2253859977}{m\-\_\-\-M\-Gtype}}\label{class_a_m_r_level_mushy_layer_a6d75b7140e1d162a99fd9e2253859977}
+
+\begin{DoxyCompactList}\small\item\em Which type of multigrid to use. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ad040d219e6cc9b943f3d5e0042afb1fc}{bool \hyperlink{class_a_m_r_level_mushy_layer_ad040d219e6cc9b943f3d5e0042afb1fc}{m\-\_\-do\-Automatic\-Restart}}\label{class_a_m_r_level_mushy_layer_ad040d219e6cc9b943f3d5e0042afb1fc}
+
+\begin{DoxyCompactList}\small\item\em Whether or not to restart with a small perturbation after reaching steady state. \end{DoxyCompactList}\item 
+Real \hyperlink{class_a_m_r_level_mushy_layer_a49000dfb8d30dc44b35fc1c802c9fd4c}{m\-\_\-max\-Lambda}
+\begin{DoxyCompactList}\small\item\em Store max value of $ \lambda-1 $ from previous timestep. \end{DoxyCompactList}\item 
+Real \hyperlink{class_a_m_r_level_mushy_layer_ae2655a0f1abc12048154f60bfca18110}{m\-\_\-variable\-\_\-eta\-\_\-factor}
+\begin{DoxyCompactList}\small\item\em Option to automatically increase/decrease $ \eta $. \end{DoxyCompactList}\item 
+int \hyperlink{class_a_m_r_level_mushy_layer_afcdd508c570b393a964397f344bfd4a1}{C\-Finterp\-Order\-\_\-advection}
+\item 
+int \hyperlink{class_a_m_r_level_mushy_layer_ac4fc74a2eaea0389f94d8e36513b8773}{m\-\_\-steady\-State\-Norm\-Type}
+\item 
+Vector$<$ Ref\-Counted\-Ptr\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_a4937b8d2fdcfb86d57b7f197f91f5069}{m\-\_\-scalar\-New}
+\begin{DoxyCompactList}\small\item\em Nusselt number (no longer used) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac46148c3e276d617167713088ffe0599}{Vector$<$ Ref\-Counted\-Ptr\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_ac46148c3e276d617167713088ffe0599}{m\-\_\-scalar\-Old}}\label{class_a_m_r_level_mushy_layer_ac46148c3e276d617167713088ffe0599}
+
+\begin{DoxyCompactList}\small\item\em Scalar fields at old time. \end{DoxyCompactList}\item 
+Vector$<$ Ref\-Counted\-Ptr\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_a05741bcf973b908f3defe7aa3de6dcc8}{m\-\_\-scalar\-Restart}
+\begin{DoxyCompactList}\small\item\em Change in scalar fields. We don't actually seem to use this. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a29bc16b92f683fa1006932cdc417b9f5}{Level\-Data$<$ F\-Array\-Box $>$ {\bfseries m\-\_\-d\-Porosity\-\_\-dt}}\label{class_a_m_r_level_mushy_layer_a29bc16b92f683fa1006932cdc417b9f5}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3532d7906fe5e9bbdb42e6b861bd6f32}{Vector$<$ Ref\-Counted\-Ptr\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_a3532d7906fe5e9bbdb42e6b861bd6f32}{m\-\_\-vector\-New}}\label{class_a_m_r_level_mushy_layer_a3532d7906fe5e9bbdb42e6b861bd6f32}
+
+\begin{DoxyCompactList}\small\item\em Vector fields at new time. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3462ba31ff9fc2ea54892d9f0c9ee88b}{Vector$<$ Ref\-Counted\-Ptr\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_a3462ba31ff9fc2ea54892d9f0c9ee88b}{m\-\_\-vector\-Old}}\label{class_a_m_r_level_mushy_layer_a3462ba31ff9fc2ea54892d9f0c9ee88b}
+
+\begin{DoxyCompactList}\small\item\em Vector fields at old time. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ae0b04f00d4e2178d4c5c4ab41f735a4b}{Vector$<$ Ref\-Counted\-Ptr\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_ae0b04f00d4e2178d4c5c4ab41f735a4b}{m\-\_\-d\-Vector}}\label{class_a_m_r_level_mushy_layer_ae0b04f00d4e2178d4c5c4ab41f735a4b}
+
+\begin{DoxyCompactList}\small\item\em Change in vector fields. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a728c07f2d1ab13e5e30f511f579786d1}{Vector$<$ Ref\-Counted\-Ptr\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_a728c07f2d1ab13e5e30f511f579786d1}{m\-\_\-vector\-Restart}}\label{class_a_m_r_level_mushy_layer_a728c07f2d1ab13e5e30f511f579786d1}
+
+\begin{DoxyCompactList}\small\item\em Backed up vector fields to be used for restarting. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ade5e5c646cf12ebaacd01f0a3ba137d9}{Vector$<$ string $>$ \hyperlink{class_a_m_r_level_mushy_layer_ade5e5c646cf12ebaacd01f0a3ba137d9}{m\-\_\-scalar\-Var\-Names}}\label{class_a_m_r_level_mushy_layer_ade5e5c646cf12ebaacd01f0a3ba137d9}
+
+\begin{DoxyCompactList}\small\item\em Names of scalar variables. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6f408f55473cdc50d4f5fa9c8cc5649b}{Vector$<$ string $>$ \hyperlink{class_a_m_r_level_mushy_layer_a6f408f55473cdc50d4f5fa9c8cc5649b}{m\-\_\-vector\-Var\-Names}}\label{class_a_m_r_level_mushy_layer_a6f408f55473cdc50d4f5fa9c8cc5649b}
+
+\begin{DoxyCompactList}\small\item\em Names of vector variables. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a424ca17c77e48db3c2ceee5c1874ab68}{Ref\-Counted\-Ptr$<$ Level\-T\-G\-A $>$ \hyperlink{class_a_m_r_level_mushy_layer_a424ca17c77e48db3c2ceee5c1874ab68}{s\-\_\-enthalpy\-Salinity\-T\-G\-A}}\label{class_a_m_r_level_mushy_layer_a424ca17c77e48db3c2ceee5c1874ab68}
+
+\begin{DoxyCompactList}\small\item\em T\-G\-A integrators (2nd order in time) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a5ebc9f4dc4853347b581386dae2f17f3}{Ref\-Counted\-Ptr$<$ Level\-Backward\-Euler $>$ \hyperlink{class_a_m_r_level_mushy_layer_a5ebc9f4dc4853347b581386dae2f17f3}{s\-\_\-enthalpy\-Salinity\-B\-E}}\label{class_a_m_r_level_mushy_layer_a5ebc9f4dc4853347b581386dae2f17f3}
+
+\begin{DoxyCompactList}\small\item\em Backward Euler integrators (1st order in time) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9b70c8623be78e3b15f34db75987507a}{Ref\-Counted\-Ptr$<$ A\-M\-R\-Multi\-Grid\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_a9b70c8623be78e3b15f34db75987507a}{s\-\_\-diffuse\-A\-M\-R\-M\-G} \mbox{[}m\-\_\-num\-Scalar\-Vars\mbox{]}}\label{class_a_m_r_level_mushy_layer_a9b70c8623be78e3b15f34db75987507a}
+
+\begin{DoxyCompactList}\small\item\em A\-M\-R\-Multigrid operators for each scalar. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ac9929ee850f10e1ffc3cf31811b4751c}{Ref\-Counted\-Ptr$<$ A\-M\-R\-F\-A\-S\-Multi\-Grid\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_ac9929ee850f10e1ffc3cf31811b4751c}{s\-\_\-diffuse\-A\-M\-R\-F\-A\-S\-M\-G} \mbox{[}m\-\_\-num\-Scalar\-Vars\mbox{]}}\label{class_a_m_r_level_mushy_layer_ac9929ee850f10e1ffc3cf31811b4751c}
+
+\begin{DoxyCompactList}\small\item\em F\-A\-S\-A\-M\-R\-Multigrid operators for each scalar. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa4c450c7dd79bb47d3caa9aafbeda62a}{Ref\-Counted\-Ptr$<$ A\-M\-R\-F\-A\-S\-Multi\-Grid\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ {\bfseries s\-\_\-multi\-Comp\-F\-A\-S\-M\-G}}\label{class_a_m_r_level_mushy_layer_aa4c450c7dd79bb47d3caa9aafbeda62a}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a66838ab2619985c016ecd218b6e2bc20}{Ref\-Counted\-Ptr\\*
+$<$ A\-M\-R\-Level\-Op\-Factory$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_a66838ab2619985c016ecd218b6e2bc20}{H\-C\-Op\-Fact}}\label{class_a_m_r_level_mushy_layer_a66838ab2619985c016ecd218b6e2bc20}
+
+\begin{DoxyCompactList}\small\item\em Operator factories for scalar vars. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_abbb061fba0c367430c23fc97dc453db5}{Ref\-Counted\-Ptr$<$ A\-M\-R\-Multi\-Grid\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_abbb061fba0c367430c23fc97dc453db5}{s\-\_\-u\-Star\-A\-M\-R\-M\-G} \mbox{[}Space\-Dim\mbox{]}}\label{class_a_m_r_level_mushy_layer_abbb061fba0c367430c23fc97dc453db5}
+
+\begin{DoxyCompactList}\small\item\em A\-M\-R\-Multigrid solver for unprojected velocity, $ \mathbf{u}^* $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_abd0f7cb699d55a6f8cff657c24deedb7}{Ref\-Counted\-Ptr\\*
+$<$ A\-M\-R\-Level\-Op\-Factory$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_abd0f7cb699d55a6f8cff657c24deedb7}{s\-\_\-u\-Star\-Op\-Fact} \mbox{[}Space\-Dim\mbox{]}}\label{class_a_m_r_level_mushy_layer_abd0f7cb699d55a6f8cff657c24deedb7}
+
+\begin{DoxyCompactList}\small\item\em Operator factory for unprojected velocity, $ \mathbf{u}^* $. \end{DoxyCompactList}\item 
+Ref\-Counted\-Ptr$<$ A\-M\-R\-Poisson\-Op $>$ \hyperlink{class_a_m_r_level_mushy_layer_a4d91e3fa25799fc66e74808c545892b6}{m\-\_\-viscous\-Op} \mbox{[}Space\-Dim\mbox{]}
+\begin{DoxyCompactList}\small\item\em Operator factory for unprojected velocity, $ \mathbf{u}^* $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6b8c2c0a55b677d826818cf7f26128aa}{bool \hyperlink{class_a_m_r_level_mushy_layer_a6b8c2c0a55b677d826818cf7f26128aa}{m\-\_\-is\-Defined}}\label{class_a_m_r_level_mushy_layer_a6b8c2c0a55b677d826818cf7f26128aa}
+
+\begin{DoxyCompactList}\small\item\em Is object defined. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_abb1c15fe65dcc4dfa75b229f47386f39}{Real \hyperlink{class_a_m_r_level_mushy_layer_abb1c15fe65dcc4dfa75b229f47386f39}{m\-\_\-cfl}}\label{class_a_m_r_level_mushy_layer_abb1c15fe65dcc4dfa75b229f47386f39}
+
+\begin{DoxyCompactList}\small\item\em C\-F\-L number -\/ to control timestep. \end{DoxyCompactList}\item 
+Real \hyperlink{class_a_m_r_level_mushy_layer_aa7a6e8a5cb2cb6f690c047e46d70547f}{m\-\_\-computed\-C\-F\-L}
+\begin{DoxyCompactList}\small\item\em The C\-F\-L number we're currently running at. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a84fc3ef3cdbf715c83ff6d78293e9fee}{Real \hyperlink{class_a_m_r_level_mushy_layer_a84fc3ef3cdbf715c83ff6d78293e9fee}{m\-\_\-domain\-Width}}\label{class_a_m_r_level_mushy_layer_a84fc3ef3cdbf715c83ff6d78293e9fee}
+
+\begin{DoxyCompactList}\small\item\em Domain width. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa662bb49cb6956efb2998484054c2281}{Real \hyperlink{class_a_m_r_level_mushy_layer_aa662bb49cb6956efb2998484054c2281}{m\-\_\-domain\-Height}}\label{class_a_m_r_level_mushy_layer_aa662bb49cb6956efb2998484054c2281}
+
+\begin{DoxyCompactList}\small\item\em Domain height. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3b0c04c2f96d9a9ad8bf7dde59b91264}{Int\-Vect \hyperlink{class_a_m_r_level_mushy_layer_a3b0c04c2f96d9a9ad8bf7dde59b91264}{m\-\_\-num\-Cells}}\label{class_a_m_r_level_mushy_layer_a3b0c04c2f96d9a9ad8bf7dde59b91264}
+
+\begin{DoxyCompactList}\small\item\em Number of cells in each direction of domain. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0687912b630f370dadca349161167b37}{Real \hyperlink{class_a_m_r_level_mushy_layer_a0687912b630f370dadca349161167b37}{m\-\_\-refine\-Thresh}}\label{class_a_m_r_level_mushy_layer_a0687912b630f370dadca349161167b37}
+
+\begin{DoxyCompactList}\small\item\em Refinement threshold. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ab60aa384ccfd15936e9fb822864b7274}{int \hyperlink{class_a_m_r_level_mushy_layer_ab60aa384ccfd15936e9fb822864b7274}{m\-\_\-tag\-Buffer\-Size}}\label{class_a_m_r_level_mushy_layer_ab60aa384ccfd15936e9fb822864b7274}
+
+\begin{DoxyCompactList}\small\item\em Tag buffer size. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a65a0a5abcc272ba9634034ff0fae81d8}{Real \hyperlink{class_a_m_r_level_mushy_layer_a65a0a5abcc272ba9634034ff0fae81d8}{m\-\_\-max\-\_\-dt\-\_\-growth}}\label{class_a_m_r_level_mushy_layer_a65a0a5abcc272ba9634034ff0fae81d8}
+
+\begin{DoxyCompactList}\small\item\em Maxmimum fractional growth in $ \Delta t $ between timesteps. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a5afc0cf82e7f6ccff19bcd39751308f6}{bool \hyperlink{class_a_m_r_level_mushy_layer_a5afc0cf82e7f6ccff19bcd39751308f6}{m\-\_\-use\-Limiting}}\label{class_a_m_r_level_mushy_layer_a5afc0cf82e7f6ccff19bcd39751308f6}
+
+\begin{DoxyCompactList}\small\item\em Should we do slope limiting in advection solves? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6e8ce82a43920d2e8bcca5aab6b4ac5e}{Real \hyperlink{class_a_m_r_level_mushy_layer_a6e8ce82a43920d2e8bcca5aab6b4ac5e}{m\-\_\-dx}}\label{class_a_m_r_level_mushy_layer_a6e8ce82a43920d2e8bcca5aab6b4ac5e}
+
+\begin{DoxyCompactList}\small\item\em Cell spacing. \end{DoxyCompactList}\item 
+Ref\-Counted\-Ptr$<$ Advect\-Physics $>$ \hyperlink{class_a_m_r_level_mushy_layer_acc7b64a985eeb8434eff80c393733c1f}{m\-\_\-adv\-Phys\-Velocity}
+\begin{DoxyCompactList}\small\item\em Object to do advection physics. \end{DoxyCompactList}\item 
+Real \hyperlink{class_a_m_r_level_mushy_layer_afb12e6063552f8629a5d81fbac6ac20b}{m\-\_\-scalar\-Diffusion\-Coeffs} \mbox{[}m\-\_\-num\-Scalar\-Vars\mbox{]}
+\begin{DoxyCompactList}\small\item\em Object to do advection physics for scalars. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_abe297f9aa07e4d85ac2bfdd1efe09781}{bool \hyperlink{class_a_m_r_level_mushy_layer_abe297f9aa07e4d85ac2bfdd1efe09781}{m\-\_\-use\-Subcycling}}\label{class_a_m_r_level_mushy_layer_abe297f9aa07e4d85ac2bfdd1efe09781}
+
+\begin{DoxyCompactList}\small\item\em Whether or not to do subcycling. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ad6dcb2741d855105a79cc6386a921cdc}{int \hyperlink{class_a_m_r_level_mushy_layer_ad6dcb2741d855105a79cc6386a921cdc}{m\-\_\-verbosity\-\_\-multigrid}}\label{class_a_m_r_level_mushy_layer_ad6dcb2741d855105a79cc6386a921cdc}
+
+\begin{DoxyCompactList}\small\item\em So we can set multigrid verbosity off. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_abe361484bd04d3be84f4c3a0c96d896d}{\hyperlink{class_mushy_layer_params}{Mushy\-Layer\-Params} \hyperlink{class_a_m_r_level_mushy_layer_abe361484bd04d3be84f4c3a0c96d896d}{m\-\_\-parameters}}\label{class_a_m_r_level_mushy_layer_abe361484bd04d3be84f4c3a0c96d896d}
+
+\begin{DoxyCompactList}\small\item\em Physical parameters. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa66b84701e0d54917f5953aace828534}{bool \hyperlink{class_a_m_r_level_mushy_layer_aa66b84701e0d54917f5953aace828534}{m\-\_\-do\-Euler\-Part}}\label{class_a_m_r_level_mushy_layer_aa66b84701e0d54917f5953aace828534}
+
+\begin{DoxyCompactList}\small\item\em Whether or not to include the inertial terms $ \mathbf{u} \cdot \nabla \mathbf{u} $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ade6864a328f681146317e98f94ec6144}{bool \hyperlink{class_a_m_r_level_mushy_layer_ade6864a328f681146317e98f94ec6144}{m\-\_\-do\-Projection}}\label{class_a_m_r_level_mushy_layer_ade6864a328f681146317e98f94ec6144}
+
+\begin{DoxyCompactList}\small\item\em Should we projection the velocity? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a0e0e8e66ad58ebcf74775a8e799a26b0}{Real {\bfseries m\-\_\-max\-Div\-U\-Face}}\label{class_a_m_r_level_mushy_layer_a0e0e8e66ad58ebcf74775a8e799a26b0}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a7344a567872638f3663880c52c553ec3}{bool \hyperlink{class_a_m_r_level_mushy_layer_a7344a567872638f3663880c52c553ec3}{m\-\_\-do\-Sync\-Operations}}\label{class_a_m_r_level_mushy_layer_a7344a567872638f3663880c52c553ec3}
+
+\begin{DoxyCompactList}\small\item\em Do synchronisation operations for velocity? \end{DoxyCompactList}\item 
+bool \hyperlink{class_a_m_r_level_mushy_layer_a731a16b4dfaecb9235357b88e251af97}{m\-\_\-enforce\-Grad\-P}
+\begin{DoxyCompactList}\small\item\em Should we enforce some analytic $ \nabla P $. \end{DoxyCompactList}\item 
+bool \hyperlink{class_a_m_r_level_mushy_layer_ae251dc2af22530cbf8a9311a2e83e442}{m\-\_\-add\-Subtract\-Grad\-P}
+\begin{DoxyCompactList}\small\item\em Should we use previous $ \nabla P $ to calculate $ \mathbf{u}^* $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a40e563bb6e1417ca7bf61987e13603c8}{bool {\bfseries m\-\_\-add\-Subtract\-Grad\-P\-Advection}}\label{class_a_m_r_level_mushy_layer_a40e563bb6e1417ca7bf61987e13603c8}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3e84e8df24a1e38639c20b087e57898f}{bool \hyperlink{class_a_m_r_level_mushy_layer_a3e84e8df24a1e38639c20b087e57898f}{m\-\_\-enforce\-Analytic\-Soln}}\label{class_a_m_r_level_mushy_layer_a3e84e8df24a1e38639c20b087e57898f}
+
+\begin{DoxyCompactList}\small\item\em Enforce analytic solution as initial conditions? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a81cc07f84fdb23699edb0cd0947f43e3}{bool \hyperlink{class_a_m_r_level_mushy_layer_a81cc07f84fdb23699edb0cd0947f43e3}{m\-\_\-is\-Viscous}}\label{class_a_m_r_level_mushy_layer_a81cc07f84fdb23699edb0cd0947f43e3}
+
+\begin{DoxyCompactList}\small\item\em Is problem viscous? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af3468fbc83ccd99b67ae99bfce938210}{bool {\bfseries m\-\_\-viscous\-B\-Cs}}\label{class_a_m_r_level_mushy_layer_af3468fbc83ccd99b67ae99bfce938210}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_acda4a7343a5b352ba224e6da9273825b}{bool \hyperlink{class_a_m_r_level_mushy_layer_acda4a7343a5b352ba224e6da9273825b}{explicit\-Darcy\-Term}}\label{class_a_m_r_level_mushy_layer_acda4a7343a5b352ba224e6da9273825b}
+
+\begin{DoxyCompactList}\small\item\em T\-Reat darcy term in mom equation explicitly. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a33b45393c7bac5c1bfec26a3ddc1bedf}{bool \hyperlink{class_a_m_r_level_mushy_layer_a33b45393c7bac5c1bfec26a3ddc1bedf}{m\-\_\-scale\-Pwith\-Porosity}}\label{class_a_m_r_level_mushy_layer_a33b45393c7bac5c1bfec26a3ddc1bedf}
+
+\begin{DoxyCompactList}\small\item\em Should we calculate pressure like $ \chi \nabla P $? \end{DoxyCompactList}\item 
+int \hyperlink{class_a_m_r_level_mushy_layer_a53408b847afbe94238f1f19daf166f2f}{m\-\_\-pressure\-Scale\-Var}
+\begin{DoxyCompactList}\small\item\em Which field scales the pressure. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a5c4b489e6ec6338b9f245f9786d31e46}{bool {\bfseries m\-\_\-split\-Darcy\-Solve}}\label{class_a_m_r_level_mushy_layer_a5c4b489e6ec6338b9f245f9786d31e46}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a117454cc35453023858217acf6771c54}{bool {\bfseries m\-\_\-do\-Advection\-Solve}}\label{class_a_m_r_level_mushy_layer_a117454cc35453023858217acf6771c54}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_afbc664002e09b45bb20f5c652aa53a8d}{bool {\bfseries m\-\_\-scale\-Advection\-Src\-Extra\-Chi}}\label{class_a_m_r_level_mushy_layer_afbc664002e09b45bb20f5c652aa53a8d}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a093fc921a278a2a8bc25040df657a93d}{bool {\bfseries m\-\_\-implicit\-Advection\-Solve}}\label{class_a_m_r_level_mushy_layer_a093fc921a278a2a8bc25040df657a93d}
+
+\item 
+int \hyperlink{class_a_m_r_level_mushy_layer_a5304e0c78e438aea19acb6f3702e5243}{m\-\_\-advection\-Method}
+\begin{DoxyCompactList}\small\item\em Don't use this anymroe. \end{DoxyCompactList}\item 
+Real \hyperlink{class_a_m_r_level_mushy_layer_abe5e093bac71759f0e5b37c64d91b6cc}{m\-\_\-skip\-Tricky\-Source\-Term}
+\begin{DoxyCompactList}\small\item\em Skip some velocity source terms. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a556d09747dccd10f54abbf691c058bb5}{\hyperlink{class_phys_b_c_util}{Phys\-B\-C\-Util} $\ast$ \hyperlink{class_a_m_r_level_mushy_layer_a556d09747dccd10f54abbf691c058bb5}{m\-\_\-phys\-B\-C\-Ptr}}\label{class_a_m_r_level_mushy_layer_a556d09747dccd10f54abbf691c058bb5}
+
+\begin{DoxyCompactList}\small\item\em Pointer to physics boundary condition object. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a44fb7624096c8143df1c09e062d57fbf}{Fine\-Interp \hyperlink{class_a_m_r_level_mushy_layer_a44fb7624096c8143df1c09e062d57fbf}{m\-\_\-fine\-Interp\-Scalar}}\label{class_a_m_r_level_mushy_layer_a44fb7624096c8143df1c09e062d57fbf}
+
+\begin{DoxyCompactList}\small\item\em For interpolating scalars from coarser grids. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9d616c357ecbe1098998feae5ffefa18}{Fine\-Interp \hyperlink{class_a_m_r_level_mushy_layer_a9d616c357ecbe1098998feae5ffefa18}{m\-\_\-fine\-Interp\-Vector}}\label{class_a_m_r_level_mushy_layer_a9d616c357ecbe1098998feae5ffefa18}
+
+\begin{DoxyCompactList}\small\item\em For interpolating vectors from coarser grids. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af0e2d84fa6c2cf813bf25f1bb4c880ab}{Coarse\-Average \hyperlink{class_a_m_r_level_mushy_layer_af0e2d84fa6c2cf813bf25f1bb4c880ab}{m\-\_\-coarse\-Average\-Scalar}}\label{class_a_m_r_level_mushy_layer_af0e2d84fa6c2cf813bf25f1bb4c880ab}
+
+\begin{DoxyCompactList}\small\item\em For averaging scalars to coarse grids. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a22ba6f41aa7c557ac01cf6cb9e5fc8c9}{Coarse\-Average \hyperlink{class_a_m_r_level_mushy_layer_a22ba6f41aa7c557ac01cf6cb9e5fc8c9}{m\-\_\-coarse\-Average\-H\-C}}\label{class_a_m_r_level_mushy_layer_a22ba6f41aa7c557ac01cf6cb9e5fc8c9}
+
+\begin{DoxyCompactList}\small\item\em For 2 component enthalpy-\/salinity fields. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a992715b841cd44d7dbb64cd99acb9306}{Coarse\-Average \hyperlink{class_a_m_r_level_mushy_layer_a992715b841cd44d7dbb64cd99acb9306}{m\-\_\-coarse\-Average\-Vector}}\label{class_a_m_r_level_mushy_layer_a992715b841cd44d7dbb64cd99acb9306}
+
+\begin{DoxyCompactList}\small\item\em For averaging vectors to coarse grids. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aaaff66ec4a08d3d90fdee05a2a67cede}{bool \hyperlink{class_a_m_r_level_mushy_layer_aaaff66ec4a08d3d90fdee05a2a67cede}{m\-\_\-timestep\-Reduced}}\label{class_a_m_r_level_mushy_layer_aaaff66ec4a08d3d90fdee05a2a67cede}
+
+\begin{DoxyCompactList}\small\item\em For reducing the timestep after a failed timestep. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a514c73fd99d14fb7e4ce39b50636f6ce}{int \hyperlink{class_a_m_r_level_mushy_layer_a514c73fd99d14fb7e4ce39b50636f6ce}{m\-\_\-dt\-Reduction}}\label{class_a_m_r_level_mushy_layer_a514c73fd99d14fb7e4ce39b50636f6ce}
+
+\begin{DoxyCompactList}\small\item\em Factor reduce $ \Delta t $ by after a failed timestep. \end{DoxyCompactList}\item 
+Real \hyperlink{class_a_m_r_level_mushy_layer_a3111453ab5dbcb11dbf0a3e22c5ef715}{m\-\_\-fixed\-Dt}
+\begin{DoxyCompactList}\small\item\em Fixed $ Delta t $. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_abf254beee2f05065819e03b76e824d04}{bool \hyperlink{class_a_m_r_level_mushy_layer_abf254beee2f05065819e03b76e824d04}{m\-\_\-timestep\-Failed}}\label{class_a_m_r_level_mushy_layer_abf254beee2f05065819e03b76e824d04}
+
+\begin{DoxyCompactList}\small\item\em Has this timestep failed? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9f70722407eeabafaddd7b045066c6dd}{bool \hyperlink{class_a_m_r_level_mushy_layer_a9f70722407eeabafaddd7b045066c6dd}{m\-\_\-new\-Level}}\label{class_a_m_r_level_mushy_layer_a9f70722407eeabafaddd7b045066c6dd}
+
+\begin{DoxyCompactList}\small\item\em If this level has only just been added due to regridding. \end{DoxyCompactList}\item 
+Real \hyperlink{class_a_m_r_level_mushy_layer_af41eb6058681e1345ce40633dd9fde1f}{m\-\_\-adv\-\_\-vel\-\_\-centering}
+\begin{DoxyCompactList}\small\item\em The advection velocity is calculated at old\-\_\-time + m\-\_\-adv\-\_\-vel\-\_\-centering$\ast$dt. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a532678009eb6a62cb967f6578c88fef6}{Real \hyperlink{class_a_m_r_level_mushy_layer_a532678009eb6a62cb967f6578c88fef6}{m\-\_\-adv\-\_\-vel\-\_\-centering\-\_\-growth}}\label{class_a_m_r_level_mushy_layer_a532678009eb6a62cb967f6578c88fef6}
+
+\begin{DoxyCompactList}\small\item\em Rate at which we grow m\-\_\-adv\-\_\-vel\-\_\-centering each timestep. \end{DoxyCompactList}\item 
+bool \hyperlink{class_a_m_r_level_mushy_layer_a7ddfec87b90ab2887546165b5ca7196b}{m\-\_\-ignore\-Solver\-Fails}
+\begin{DoxyCompactList}\small\item\em Option to ignore solver fails. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a8deec9976a07239f71a6efc88e579d53}{int \hyperlink{class_a_m_r_level_mushy_layer_a8deec9976a07239f71a6efc88e579d53}{m\-\_\-solver\-Fail\-Restart\-Method}}\label{class_a_m_r_level_mushy_layer_a8deec9976a07239f71a6efc88e579d53}
+
+\begin{DoxyCompactList}\small\item\em What to do when restarting after a solver fail. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aef47162bc24ba3eccffb5f7319c4d19d}{Quad\-C\-F\-Interp \hyperlink{class_a_m_r_level_mushy_layer_aef47162bc24ba3eccffb5f7319c4d19d}{m\-\_\-quad\-C\-F\-Interp\-Scalar}}\label{class_a_m_r_level_mushy_layer_aef47162bc24ba3eccffb5f7319c4d19d}
+
+\begin{DoxyCompactList}\small\item\em For doing quadratic interpolation at coarse fine boundaries (for scalars) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a95cbb370eeaed9cd89e03dbf57d69988}{Quad\-C\-F\-Interp \hyperlink{class_a_m_r_level_mushy_layer_a95cbb370eeaed9cd89e03dbf57d69988}{m\-\_\-quad\-C\-F\-Interp\-Vector}}\label{class_a_m_r_level_mushy_layer_a95cbb370eeaed9cd89e03dbf57d69988}
+
+\begin{DoxyCompactList}\small\item\em For doing quadratic interpolation at coarse fine boundaries (for vectors) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aba35ef990a5a51e81af28856f9bfd095}{int \hyperlink{class_a_m_r_level_mushy_layer_aba35ef990a5a51e81af28856f9bfd095}{m\-\_\-num\-Ghost}}\label{class_a_m_r_level_mushy_layer_aba35ef990a5a51e81af28856f9bfd095}
+
+\begin{DoxyCompactList}\small\item\em Number of ghost cells for standard calculations. \end{DoxyCompactList}\item 
+int \hyperlink{class_a_m_r_level_mushy_layer_a5ac61ca83db82c5642e21d7cbe83f37b}{m\-\_\-num\-Ghost\-Advection}
+\begin{DoxyCompactList}\small\item\em Number of ghost cells for advection calculations. \end{DoxyCompactList}\item 
+Patch\-Godunov \hyperlink{class_a_m_r_level_mushy_layer_a90acda5f43d2b66e4bcbd989f9354b1b}{m\-\_\-patch\-God\-Velocity}
+\begin{DoxyCompactList}\small\item\em This is just used for calculating max(\-Dt) \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a75f21997491a30f17dfd30f2dd6b3967}{Patch\-Godunov \hyperlink{class_a_m_r_level_mushy_layer_a75f21997491a30f17dfd30f2dd6b3967}{m\-\_\-patch\-God\-H\-C}}\label{class_a_m_r_level_mushy_layer_a75f21997491a30f17dfd30f2dd6b3967}
+
+\begin{DoxyCompactList}\small\item\em For multi component solve. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a40f638ac59f7b05a5832d28ec2aa9ea6}{Patch\-Godunov {\bfseries m\-\_\-patch\-God\-T\-Sl}}\label{class_a_m_r_level_mushy_layer_a40f638ac59f7b05a5832d28ec2aa9ea6}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a8f211bc8b76a04f3be8ab05725179b8c}{Patch\-Godunov \hyperlink{class_a_m_r_level_mushy_layer_a8f211bc8b76a04f3be8ab05725179b8c}{m\-\_\-patch\-God\-H}}\label{class_a_m_r_level_mushy_layer_a8f211bc8b76a04f3be8ab05725179b8c}
+
+\begin{DoxyCompactList}\small\item\em For single component solves. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af6f10ce77edec7cf1643c7c58cbd9ca5}{Patch\-Godunov {\bfseries m\-\_\-patch\-God\-C}}\label{class_a_m_r_level_mushy_layer_af6f10ce77edec7cf1643c7c58cbd9ca5}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a5d5421485cb631a1031662bc2970b8b2}{Patch\-Godunov {\bfseries m\-\_\-patch\-God\-T}}\label{class_a_m_r_level_mushy_layer_a5d5421485cb631a1031662bc2970b8b2}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aaf69aef4a8257992ca9a178fc9e3789c}{Patch\-Godunov {\bfseries m\-\_\-patch\-God\-Sl}}\label{class_a_m_r_level_mushy_layer_aaf69aef4a8257992ca9a178fc9e3789c}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a233972001b8206d301933423130a7c61}{\hyperlink{class_advection_physics}{Advection\-Physics} \hyperlink{class_a_m_r_level_mushy_layer_a233972001b8206d301933423130a7c61}{m\-\_\-advection\-Physics\-Velocity}}\label{class_a_m_r_level_mushy_layer_a233972001b8206d301933423130a7c61}
+
+\begin{DoxyCompactList}\small\item\em Physics for velocity advection. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a7e25d8921ac7ab01740ed65b021d0e79}{\hyperlink{class_advection_physics}{Advection\-Physics} \hyperlink{class_a_m_r_level_mushy_layer_a7e25d8921ac7ab01740ed65b021d0e79}{m\-\_\-adv\-Phys\-H\-C}}\label{class_a_m_r_level_mushy_layer_a7e25d8921ac7ab01740ed65b021d0e79}
+
+\begin{DoxyCompactList}\small\item\em Physics for H,C and T, Sl advection. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_acc1771419f8ae45a0303d8315e80798b}{\hyperlink{class_advection_physics}{Advection\-Physics} {\bfseries m\-\_\-adv\-Phys\-T\-Sl}}\label{class_a_m_r_level_mushy_layer_acc1771419f8ae45a0303d8315e80798b}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a12e1e6883d371f38d0ad9e1f8094c3a0}{\hyperlink{class_advection_physics}{Advection\-Physics} {\bfseries m\-\_\-adv\-Phys\-H}}\label{class_a_m_r_level_mushy_layer_a12e1e6883d371f38d0ad9e1f8094c3a0}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa34869335db20c8d9e78b2fa7489ad9f}{\hyperlink{class_advection_physics}{Advection\-Physics} {\bfseries m\-\_\-adv\-Phys\-C}}\label{class_a_m_r_level_mushy_layer_aa34869335db20c8d9e78b2fa7489ad9f}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aeed83b5ab64ca1c98478753602ebbd40}{\hyperlink{class_advection_physics}{Advection\-Physics} {\bfseries m\-\_\-adv\-Phys\-T}}\label{class_a_m_r_level_mushy_layer_aeed83b5ab64ca1c98478753602ebbd40}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6f0d3470a6089238d42a6eb3a2222142}{\hyperlink{class_advection_physics}{Advection\-Physics} {\bfseries m\-\_\-adv\-Phys\-Sl}}\label{class_a_m_r_level_mushy_layer_a6f0d3470a6089238d42a6eb3a2222142}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a624292a7c8fa00de496a75a9816d8f29}{Ref\-Counted\-Ptr$<$ Patch\-Godunov $>$ \hyperlink{class_a_m_r_level_mushy_layer_a624292a7c8fa00de496a75a9816d8f29}{m\-\_\-patch\-God\-Scalars} \mbox{[}m\-\_\-num\-Scalar\-Vars\mbox{]}}\label{class_a_m_r_level_mushy_layer_a624292a7c8fa00de496a75a9816d8f29}
+
+\begin{DoxyCompactList}\small\item\em Handles advection of scalar vars. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aff6179584bf6eaa3c6c016f03e23ba48}{Phys\-I\-B\-C $\ast$ \hyperlink{class_a_m_r_level_mushy_layer_aff6179584bf6eaa3c6c016f03e23ba48}{m\-\_\-scalar\-I\-B\-C} \mbox{[}m\-\_\-num\-Scalar\-Vars\mbox{]}}\label{class_a_m_r_level_mushy_layer_aff6179584bf6eaa3c6c016f03e23ba48}
+
+\begin{DoxyCompactList}\small\item\em Initial and Boundary Conditions for scalar vars. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a72b78b19e03f6c997c1cccf97dd20790}{\hyperlink{class_c_c_projector}{C\-C\-Projector} \hyperlink{class_a_m_r_level_mushy_layer_a72b78b19e03f6c997c1cccf97dd20790}{m\-\_\-projection}}\label{class_a_m_r_level_mushy_layer_a72b78b19e03f6c997c1cccf97dd20790}
+
+\begin{DoxyCompactList}\small\item\em Handles pressure projection. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a074c89f375f2e2436f0e9ab4b8846ad1}{\hyperlink{class_c_c_projector}{C\-C\-Projector} \hyperlink{class_a_m_r_level_mushy_layer_a074c89f375f2e2436f0e9ab4b8846ad1}{m\-\_\-projection\-Backup}}\label{class_a_m_r_level_mushy_layer_a074c89f375f2e2436f0e9ab4b8846ad1}
+
+\begin{DoxyCompactList}\small\item\em Contains the old pressure, in case we need to restart. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a415e82d9a6e78b645eef60b573aec79e}{Ref\-Counted\-Ptr$<$ Level\-Flux\-Register $>$ \hyperlink{class_a_m_r_level_mushy_layer_a415e82d9a6e78b645eef60b573aec79e}{m\-\_\-flux\-Registers} \mbox{[}m\-\_\-num\-Scalar\-Vars\mbox{]}}\label{class_a_m_r_level_mushy_layer_a415e82d9a6e78b645eef60b573aec79e}
+
+\begin{DoxyCompactList}\small\item\em Flux registers for scalar variables. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aeaa3fd2d4ab926288073064170e791f3}{Ref\-Counted\-Ptr$<$ Level\-Flux\-Register $>$ {\bfseries m\-\_\-flux\-Reg\-H\-C}}\label{class_a_m_r_level_mushy_layer_aeaa3fd2d4ab926288073064170e791f3}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ab6d6bc6e97ec3b0bdfe4a13de762f48c}{Ref\-Counted\-Ptr$<$ Level\-Flux\-Register $>$ \hyperlink{class_a_m_r_level_mushy_layer_ab6d6bc6e97ec3b0bdfe4a13de762f48c}{m\-\_\-vector\-Flux\-Registers} \mbox{[}m\-\_\-num\-Vector\-Vars\mbox{]}}\label{class_a_m_r_level_mushy_layer_ab6d6bc6e97ec3b0bdfe4a13de762f48c}
+
+\begin{DoxyCompactList}\small\item\em Flux registers for vector variables. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9086ff974a6766f02f3ecf0d25e98a08}{Ref\-Counted\-Ptr$<$ Level\-Flux\-Register $>$ {\bfseries m\-\_\-adv\-Vel\-F\-R}}\label{class_a_m_r_level_mushy_layer_a9086ff974a6766f02f3ecf0d25e98a08}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a7f0dd62b216d0ab459d2f8469297c852}{Level\-Domain\-Flux\-Register {\bfseries m\-\_\-salt\-Domain\-Flux\-Register}}\label{class_a_m_r_level_mushy_layer_a7f0dd62b216d0ab459d2f8469297c852}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a12005aabbc909314eba74afaba3a9188}{Level\-Domain\-Flux\-Register {\bfseries m\-\_\-heat\-Domain\-Flux\-Register}}\label{class_a_m_r_level_mushy_layer_a12005aabbc909314eba74afaba3a9188}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a934fadf749cd979e03db2a084450ae73}{bool \hyperlink{class_a_m_r_level_mushy_layer_a934fadf749cd979e03db2a084450ae73}{m\-\_\-make\-Flux\-Reg\-For\-Scalar\-Var} \mbox{[}m\-\_\-num\-Scalar\-Vars\mbox{]}}\label{class_a_m_r_level_mushy_layer_a934fadf749cd979e03db2a084450ae73}
+
+\begin{DoxyCompactList}\small\item\em Which scalar vars should we bother making flux registers for? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_adc0b73ca3269c4015bcc31850ab50785}{bool \hyperlink{class_a_m_r_level_mushy_layer_adc0b73ca3269c4015bcc31850ab50785}{m\-\_\-make\-Flux\-Reg\-For\-Vector\-Var} \mbox{[}m\-\_\-num\-Vector\-Vars\mbox{]}}\label{class_a_m_r_level_mushy_layer_adc0b73ca3269c4015bcc31850ab50785}
+
+\begin{DoxyCompactList}\small\item\em Which vector vars should we bother making flux registers for? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3b035a45d271c4c771406dc0f181d44e}{bool \hyperlink{class_a_m_r_level_mushy_layer_a3b035a45d271c4c771406dc0f181d44e}{m\-\_\-has\-Coarser}}\label{class_a_m_r_level_mushy_layer_a3b035a45d271c4c771406dc0f181d44e}
+
+\begin{DoxyCompactList}\small\item\em Does a coarser \hyperlink{class_a_m_r_level_mushy_layer}{A\-M\-R\-Level\-Mushy\-Layer} pointer exist? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a4ae86c69a9100a32c7cc278100a534ee}{bool \hyperlink{class_a_m_r_level_mushy_layer_a4ae86c69a9100a32c7cc278100a534ee}{m\-\_\-has\-Finer}}\label{class_a_m_r_level_mushy_layer_a4ae86c69a9100a32c7cc278100a534ee}
+
+\begin{DoxyCompactList}\small\item\em Does a finer \hyperlink{class_a_m_r_level_mushy_layer}{A\-M\-R\-Level\-Mushy\-Layer} pointer exist? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a569c5dbec07fb04ccdd094584b66f7af}{bool \hyperlink{class_a_m_r_level_mushy_layer_a569c5dbec07fb04ccdd094584b66f7af}{s\-\_\-initialize\-\_\-pressures}}\label{class_a_m_r_level_mushy_layer_a569c5dbec07fb04ccdd094584b66f7af}
+
+\begin{DoxyCompactList}\small\item\em Should we initialise the pressure? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ad63ca84ccd8a3ed30ca6f9034cfb325f}{bool {\bfseries s\-\_\-regrid\-\_\-init\-\_\-pressure}}\label{class_a_m_r_level_mushy_layer_ad63ca84ccd8a3ed30ca6f9034cfb325f}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9932c8c2aee096420d2b8dedb77b30e4}{bool \hyperlink{class_a_m_r_level_mushy_layer_a9932c8c2aee096420d2b8dedb77b30e4}{s\-\_\-project\-\_\-initial\-\_\-vel}}\label{class_a_m_r_level_mushy_layer_a9932c8c2aee096420d2b8dedb77b30e4}
+
+\begin{DoxyCompactList}\small\item\em Should we project the initial velocity? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a338b8e8a3fde134807d7e5b2ff47a64f}{bool \hyperlink{class_a_m_r_level_mushy_layer_a338b8e8a3fde134807d7e5b2ff47a64f}{s\-\_\-compute\-\_\-initial\-\_\-\-V\-D\-\_\-corr}}\label{class_a_m_r_level_mushy_layer_a338b8e8a3fde134807d7e5b2ff47a64f}
+
+\begin{DoxyCompactList}\small\item\em Should we calculate the initial volume discrepancy correction? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a1099c89fd5bc80bf46eea1823a0d3ae3}{Disjoint\-Box\-Layout \hyperlink{class_a_m_r_level_mushy_layer_a1099c89fd5bc80bf46eea1823a0d3ae3}{m\-\_\-grids}}\label{class_a_m_r_level_mushy_layer_a1099c89fd5bc80bf46eea1823a0d3ae3}
+
+\begin{DoxyCompactList}\small\item\em Grids on this level. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a8eec8d2d864c28268839fd35d1788cb4}{bool \hyperlink{class_a_m_r_level_mushy_layer_a8eec8d2d864c28268839fd35d1788cb4}{m\-\_\-new\-Grids\-\_\-different}}\label{class_a_m_r_level_mushy_layer_a8eec8d2d864c28268839fd35d1788cb4}
+
+\begin{DoxyCompactList}\small\item\em Are the new grids different from current ones? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a4c79c5e47b397340a7e682026e1a2081}{bool \hyperlink{class_a_m_r_level_mushy_layer_a4c79c5e47b397340a7e682026e1a2081}{m\-\_\-regrid\-\_\-smoothing\-\_\-done}}\label{class_a_m_r_level_mushy_layer_a4c79c5e47b397340a7e682026e1a2081}
+
+\begin{DoxyCompactList}\small\item\em Has post regrid smoothing been done? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a834319f2bb3eceeafa4d3db231ffe5a2}{Real \hyperlink{class_a_m_r_level_mushy_layer_a834319f2bb3eceeafa4d3db231ffe5a2}{s\-\_\-regrid\-\_\-smoothing\-\_\-coeff}}\label{class_a_m_r_level_mushy_layer_a834319f2bb3eceeafa4d3db231ffe5a2}
+
+\begin{DoxyCompactList}\small\item\em Coefficient for post regrid smoothing. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_aa83f8a19f835a592c3484448f08ac33e}{bool \hyperlink{class_a_m_r_level_mushy_layer_aa83f8a19f835a592c3484448f08ac33e}{s\-\_\-do\-\_\-post\-Regrid\-\_\-smoothing}}\label{class_a_m_r_level_mushy_layer_aa83f8a19f835a592c3484448f08ac33e}
+
+\begin{DoxyCompactList}\small\item\em Do smoothing after regridding? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ae045eef1c0046ddff09f2dea5b127522}{bool \hyperlink{class_a_m_r_level_mushy_layer_ae045eef1c0046ddff09f2dea5b127522}{s\-\_\-implicit\-\_\-reflux}}\label{class_a_m_r_level_mushy_layer_ae045eef1c0046ddff09f2dea5b127522}
+
+\begin{DoxyCompactList}\small\item\em Do reflux implicitly? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a3c942f130fc8e0c07d003274a818121a}{bool \hyperlink{class_a_m_r_level_mushy_layer_a3c942f130fc8e0c07d003274a818121a}{s\-\_\-reflux\-\_\-momentum}}\label{class_a_m_r_level_mushy_layer_a3c942f130fc8e0c07d003274a818121a}
+
+\begin{DoxyCompactList}\small\item\em Reflux momentum? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a9bc89a93a661055dc7fdc2d16c8f65b5}{bool \hyperlink{class_a_m_r_level_mushy_layer_a9bc89a93a661055dc7fdc2d16c8f65b5}{s\-\_\-reflux\-\_\-normal\-\_\-momentum}}\label{class_a_m_r_level_mushy_layer_a9bc89a93a661055dc7fdc2d16c8f65b5}
+
+\begin{DoxyCompactList}\small\item\em Reflux normal component of momentum? \end{DoxyCompactList}\item 
+bool \hyperlink{class_a_m_r_level_mushy_layer_a17f58299941c1b1c2bf58a412d8c91a6}{s\-\_\-reflux\-\_\-enthalpy}
+\begin{DoxyCompactList}\small\item\em Reflux scalar fields? \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a8afb3180fbc79a686b45976746e08e69}{bool \hyperlink{class_a_m_r_level_mushy_layer_a8afb3180fbc79a686b45976746e08e69}{s\-\_\-reflux\-\_\-concentration}}\label{class_a_m_r_level_mushy_layer_a8afb3180fbc79a686b45976746e08e69}
+
+\begin{DoxyCompactList}\small\item\em Turn concentration refluxing on. \end{DoxyCompactList}\item 
+bool \hyperlink{class_a_m_r_level_mushy_layer_ad8271cd4dc0e17cc132a28165ccdbbfc}{s\-\_\-reflux\-\_\-lambda}
+\begin{DoxyCompactList}\small\item\em Turn lambda refluxing on. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a57b52432290e5939d6093b0e21088a02}{Real \hyperlink{class_a_m_r_level_mushy_layer_a57b52432290e5939d6093b0e21088a02}{s\-\_\-viscous\-\_\-solver\-\_\-tol}}\label{class_a_m_r_level_mushy_layer_a57b52432290e5939d6093b0e21088a02}
+
+\begin{DoxyCompactList}\small\item\em Viscous solver tolerance. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6f106e6e68635bc0f9d01c8ee9d07990}{int \hyperlink{class_a_m_r_level_mushy_layer_a6f106e6e68635bc0f9d01c8ee9d07990}{s\-\_\-viscous\-\_\-num\-\_\-smooth\-\_\-down}}\label{class_a_m_r_level_mushy_layer_a6f106e6e68635bc0f9d01c8ee9d07990}
+
+\begin{DoxyCompactList}\small\item\em Number of down smooths for viscous solves. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a05982dd38ce4afe6da1ca2545cca7591}{int \hyperlink{class_a_m_r_level_mushy_layer_a05982dd38ce4afe6da1ca2545cca7591}{s\-\_\-viscous\-\_\-num\-\_\-smooth\-\_\-up}}\label{class_a_m_r_level_mushy_layer_a05982dd38ce4afe6da1ca2545cca7591}
+
+\begin{DoxyCompactList}\small\item\em Number of up smooths for viscous solves. \end{DoxyCompactList}\item 
+int \hyperlink{class_a_m_r_level_mushy_layer_a760063c20ec9abb7820afc11cafad1ab}{m\-\_\-time\-Integration\-Order}
+\begin{DoxyCompactList}\small\item\em Time integration accuracy. \end{DoxyCompactList}\item 
+int \hyperlink{class_a_m_r_level_mushy_layer_a1b88cc852494c1537cd7e5fbc01bae53}{m\-\_\-iter\-\_\-plot\-\_\-interval}
+\begin{DoxyCompactList}\small\item\em Plot interval for picard iterations. \end{DoxyCompactList}\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af39200bb363589378b4561cd9054b686}{Real {\bfseries m\-\_\-initial\-Perturbation}}\label{class_a_m_r_level_mushy_layer_af39200bb363589378b4561cd9054b686}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_ad5de6949a3948b1adcb35344a6e34605}{Real {\bfseries m\-\_\-perturbation\-Time}}\label{class_a_m_r_level_mushy_layer_ad5de6949a3948b1adcb35344a6e34605}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a4c04f83744b285463b7e995e981f5106}{Real {\bfseries m\-\_\-delayed\-Perturbation}}\label{class_a_m_r_level_mushy_layer_a4c04f83744b285463b7e995e981f5106}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a842163e81fb5627656b0fef429302a9c}{Real {\bfseries m\-\_\-restart\-Perturbation}}\label{class_a_m_r_level_mushy_layer_a842163e81fb5627656b0fef429302a9c}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a6efe658340f6ed8e298d006c22a70d6e}{Real {\bfseries m\-\_\-perturbation\-Wavenumber}}\label{class_a_m_r_level_mushy_layer_a6efe658340f6ed8e298d006c22a70d6e}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a95dddef4de24d7af747d1ebb06b37936}{bool {\bfseries m\-\_\-perturbation\-Sin}}\label{class_a_m_r_level_mushy_layer_a95dddef4de24d7af747d1ebb06b37936}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_af6c899586a7e51b2f7f88836354e6c58}{Real {\bfseries m\-\_\-fixed\-Porosity}}\label{class_a_m_r_level_mushy_layer_af6c899586a7e51b2f7f88836354e6c58}
+
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a10f499d1859bd0d1a1e910ea35125e32}{int {\bfseries m\-\_\-porosity\-Function}}\label{class_a_m_r_level_mushy_layer_a10f499d1859bd0d1a1e910ea35125e32}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_level_mushy_layer_a8c401f05b4163845cc987f0d6baae9d0}{static Bi\-C\-G\-Stab\-Solver\\*
+$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ \hyperlink{class_a_m_r_level_mushy_layer_a8c401f05b4163845cc987f0d6baae9d0}{s\-\_\-bot\-Solver}}\label{class_a_m_r_level_mushy_layer_a8c401f05b4163845cc987f0d6baae9d0}
+
+\begin{DoxyCompactList}\small\item\em bottom solver \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A\-M\-R\-Level for mushy layer calculations. 
+
+Big class to manage integration of nonlinear mushy layer equations on an A\-M\-R level 
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{class_a_m_r_level_mushy_layer_ac96810ce869ac7ad58404b43a823cba3}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!M\-Gmethod@{M\-Gmethod}}
+\index{M\-Gmethod@{M\-Gmethod}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{M\-Gmethod}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf A\-M\-R\-Level\-Mushy\-Layer\-::\-M\-Gmethod}\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_ac96810ce869ac7ad58404b43a823cba3}
+
+
+Different multigrid methods. 
+
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{m\-\_\-standard@{m\-\_\-standard}!A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}}\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-standard@{m\-\_\-standard}}\item[{\em 
+\hypertarget{class_a_m_r_level_mushy_layer_ac96810ce869ac7ad58404b43a823cba3a7fcd73cadaa66126997b4e1183712951}{m\-\_\-standard}\label{class_a_m_r_level_mushy_layer_ac96810ce869ac7ad58404b43a823cba3a7fcd73cadaa66126997b4e1183712951}
+}]Normal linear multigrid. \index{m\-\_\-\-F\-A\-S@{m\-\_\-\-F\-A\-S}!A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}}\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-\-F\-A\-S@{m\-\_\-\-F\-A\-S}}\item[{\em 
+\hypertarget{class_a_m_r_level_mushy_layer_ac96810ce869ac7ad58404b43a823cba3a2b0b946b439cf26fb2ee3648f4ea7744}{m\-\_\-\-F\-A\-S}\label{class_a_m_r_level_mushy_layer_ac96810ce869ac7ad58404b43a823cba3a2b0b946b439cf26fb2ee3648f4ea7744}
+}]Full Approximation Scheme (for nonlinear problems) \end{description}
+\end{Desc}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_a_m_r_level_mushy_layer_acfd7a12794a564615d7b507717ea0d70}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!advect\-Lambda@{advect\-Lambda}}
+\index{advect\-Lambda@{advect\-Lambda}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{advect\-Lambda}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::advect\-Lambda (
+\begin{DoxyParamCaption}
+\item[{bool}]{do\-F\-Rupdates = {\ttfamily true}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_acfd7a12794a564615d7b507717ea0d70}
+
+
+Advect lambda field (for freestream preservation) 
+
+Let's also write out the correction \hypertarget{class_a_m_r_level_mushy_layer_a367dd316723860bb7bd1c8b97895a3f4}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!advect\-Scalar@{advect\-Scalar}}
+\index{advect\-Scalar@{advect\-Scalar}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{advect\-Scalar}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::advect\-Scalar (
+\begin{DoxyParamCaption}
+\item[{const int}]{a\-\_\-scalar\-Var, }
+\item[{const int}]{a\-\_\-advection\-Var, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-adv\-Vel, }
+\item[{bool}]{do\-F\-Rupdates = {\ttfamily true}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a367dd316723860bb7bd1c8b97895a3f4}
+
+
+Update a scalar field by advection. 
+
+a\-\_\-scalar\-Var is the field which is updated, whilst a\-\_\-advection\-Var is the field that has been advected. These don't need to be the same, i.\-e. could do advect\-Scalar(enthalpy, temperature, ...) in order to compute an update for the equation d(enthalpy)/dt + u.\-grad(temperature) = 0 \hypertarget{class_a_m_r_level_mushy_layer_a0169d83decd5824058e36a4b126f762a}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!calculate\-Time\-Ind\-Advection\-Vel@{calculate\-Time\-Ind\-Advection\-Vel}}
+\index{calculate\-Time\-Ind\-Advection\-Vel@{calculate\-Time\-Ind\-Advection\-Vel}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{calculate\-Time\-Ind\-Advection\-Vel}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::calculate\-Time\-Ind\-Advection\-Vel (
+\begin{DoxyParamCaption}
+\item[{Real}]{a\-\_\-time, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-adv\-Vel}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a0169d83decd5824058e36a4b126f762a}
+
+
+Calculate velocity for momentum equations which are time independent. 
+
+Calculate advection velocity for momentum equations which are time independent \hypertarget{class_a_m_r_level_mushy_layer_a4c5ae9f4b8016a17944e103389ac6c1f}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!compute\-Advection\-Vel\-Source\-Term@{compute\-Advection\-Vel\-Source\-Term}}
+\index{compute\-Advection\-Vel\-Source\-Term@{compute\-Advection\-Vel\-Source\-Term}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{compute\-Advection\-Vel\-Source\-Term}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::compute\-Advection\-Vel\-Source\-Term (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{advection\-Source\-Term}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a4c5ae9f4b8016a17944e103389ac6c1f}
+
+
+Time integration by the T\-G\-A method (2nd order accurate) 
+
+Time integration by the Backward Euler method (1st order accurate) Make source term for the advection velocity solve \hypertarget{class_a_m_r_level_mushy_layer_a77914a8f6be67642c366b4da8e0a2829}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!compute\-Scalar\-Advective\-Flux@{compute\-Scalar\-Advective\-Flux}}
+\index{compute\-Scalar\-Advective\-Flux@{compute\-Scalar\-Advective\-Flux}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{compute\-Scalar\-Advective\-Flux}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::compute\-Scalar\-Advective\-Flux (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-edge\-Scal, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-old\-\_\-scal, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-adv\-\_\-vel, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-inflow\-Outflow\-Vel, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-old\-\_\-vel, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-diffusive\-Src, }
+\item[{Patch\-Godunov \&}]{a\-\_\-patch\-God, }
+\item[{Real}]{a\-\_\-old\-\_\-time, }
+\item[{Real}]{a\-\_\-dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a77914a8f6be67642c366b4da8e0a2829}
+
+
+Compute the advective flux given the scalar field, advection velocity and source term specified. 
+
+Should work for multiple components \hypertarget{class_a_m_r_level_mushy_layer_af3fc0d2c619ba6ad099b1ad6c39b352e}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!compute\-Scalar\-Advective\-Flux@{compute\-Scalar\-Advective\-Flux}}
+\index{compute\-Scalar\-Advective\-Flux@{compute\-Scalar\-Advective\-Flux}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{compute\-Scalar\-Advective\-Flux}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::compute\-Scalar\-Advective\-Flux (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-edge\-Scal, }
+\item[{int}]{a\-\_\-advection\-Var, }
+\item[{int}]{a\-\_\-diffusion\-Var, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-adv\-Vel, }
+\item[{Real}]{a\-\_\-old\-\_\-time, }
+\item[{Real}]{a\-\_\-dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_af3fc0d2c619ba6ad099b1ad6c39b352e}
+
+
+Compute the advective flux. 
+
+advection var is what we advect diffusion var determines the variable used to calculate the diffusive src. Set to -\/1 to use no source. \hypertarget{class_a_m_r_level_mushy_layer_a496393891a2db8a73b2f398f90324af5}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!compute\-Scalar\-Advective\-Flux\-Multi\-Comp@{compute\-Scalar\-Advective\-Flux\-Multi\-Comp}}
+\index{compute\-Scalar\-Advective\-Flux\-Multi\-Comp@{compute\-Scalar\-Advective\-Flux\-Multi\-Comp}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{compute\-Scalar\-Advective\-Flux\-Multi\-Comp}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::compute\-Scalar\-Advective\-Flux\-Multi\-Comp (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-edge\-Scal, }
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-adv\-Vel, }
+\item[{Patch\-Godunov \&}]{a\-\_\-patch\-God, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-scal\-Old, }
+\item[{Real}]{a\-\_\-old\-\_\-time, }
+\item[{Real}]{a\-\_\-dt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a496393891a2db8a73b2f398f90324af5}
+
+
+Compute the advective flux for the enthalpy and salinity equations,. 
+
+Compute temperature and salinity advective flux.
+
+edge\-Scal contains two components\-: $ (\mathbf{U} T, \mathbf{U} S_l) $ or $ (V H, V S) $ depending on the parameters given \hypertarget{class_a_m_r_level_mushy_layer_a8f04027bc844bd17a8bed1e073978436}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!compute\-Total\-Advective\-Fluxes@{compute\-Total\-Advective\-Fluxes}}
+\index{compute\-Total\-Advective\-Fluxes@{compute\-Total\-Advective\-Fluxes}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{compute\-Total\-Advective\-Fluxes}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::compute\-Total\-Advective\-Fluxes (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{edge\-Scal\-Total}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a8f04027bc844bd17a8bed1e073978436}
+
+
+Compute total fluxes that provide the source term for implicit enthalpy-\/salinity updates. 
+
+$ (\mathbf{U} T + V H \mathbf{k}, \mathbf{U} S_l + V S \mathbf{k})$ \hypertarget{class_a_m_r_level_mushy_layer_ad0fbde13c159047cbc2cfd3e3eb83eb0}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!copy\-New\-To\-Old\-States@{copy\-New\-To\-Old\-States}}
+\index{copy\-New\-To\-Old\-States@{copy\-New\-To\-Old\-States}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{copy\-New\-To\-Old\-States}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::copy\-New\-To\-Old\-States (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_ad0fbde13c159047cbc2cfd3e3eb83eb0}
+
+
+copy old data to new data, reset time 
+
+Copy new data to old data holders \hypertarget{class_a_m_r_level_mushy_layer_a1510d27c94955086af90d133d3932610}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!define@{define}}
+\index{define@{define}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{define}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::define (
+\begin{DoxyParamCaption}
+\item[{const Real \&}]{a\-\_\-cfl, }
+\item[{const Real \&}]{a\-\_\-domain\-Width, }
+\item[{const Real \&}]{a\-\_\-refine\-Thresh, }
+\item[{const int \&}]{a\-\_\-tag\-Buffer\-Size, }
+\item[{const bool \&}]{a\-\_\-use\-Limiting}
+\end{DoxyParamCaption}
+)}}\label{class_a_m_r_level_mushy_layer_a1510d27c94955086af90d133d3932610}
+
+
+Defines this \hyperlink{class_a_m_r_level_mushy_layer}{A\-M\-R\-Level\-Mushy\-Layer}. 
+
+m\-\_\-parameters.\-prandtl;
+
+todo 
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-cfl} & C\-F\-L number \\
+\hline
+{\em a\-\_\-domain\-Width} & physical width of domain \\
+\hline
+{\em a\-\_\-refine\-Thresh} & undivided gradient size over which a cell will be tagged for refinement \\
+\hline
+{\em a\-\_\-tag\-Buffer\-Size} & number of buffer cells around each tagged cell that will also be tagged \\
+\hline
+{\em a\-\_\-use\-Limiting} & whether to use van Leer limiting \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_a_m_r_level_mushy_layer_a508d3f7f8099dbaacfdaefe36d064e57}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!do\-Regularisation\-Ops@{do\-Regularisation\-Ops}}
+\index{do\-Regularisation\-Ops@{do\-Regularisation\-Ops}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{do\-Regularisation\-Ops}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::do\-Regularisation\-Ops (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-scal, }
+\item[{int}]{a\-\_\-var}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a508d3f7f8099dbaacfdaefe36d064e57}
+
+
+Operations to keep variables bounded correctly. 
+
+Porosity $ \chi > 0 $ Liquid concentration $ -1 <= \Theta_l <= 0 $ \hypertarget{class_a_m_r_level_mushy_layer_adc086e9a094b35435de36aadb3891ab7}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!multi\-Comp\-Advect\-Diffuse@{multi\-Comp\-Advect\-Diffuse}}
+\index{multi\-Comp\-Advect\-Diffuse@{multi\-Comp\-Advect\-Diffuse}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{multi\-Comp\-Advect\-Diffuse}]{\setlength{\rightskip}{0pt plus 5cm}int A\-M\-R\-Level\-Mushy\-Layer\-::multi\-Comp\-Advect\-Diffuse (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-phi\-\_\-old, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-phi\-\_\-new, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-src, }
+\item[{bool}]{do\-F\-Rupdates = {\ttfamily false}, }
+\item[{bool}]{compute\-Advective\-Src = {\ttfamily true}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_adc086e9a094b35435de36aadb3891ab7}
+
+
+Advect and diffuse a scalar field. Returns multigrid status. 
+
+Advection diffusion for multiple components \hypertarget{class_a_m_r_level_mushy_layer_a5064704173348a8efa158f400983a101}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!set\-Eta@{set\-Eta}}
+\index{set\-Eta@{set\-Eta}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{set\-Eta}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::set\-Eta (
+\begin{DoxyParamCaption}
+\item[{Real}]{a\-\_\-eta}
+\end{DoxyParamCaption}
+)}}\label{class_a_m_r_level_mushy_layer_a5064704173348a8efa158f400983a101}
+
+
+Set eta on all projection operators. 
+
+Only call from level 0 \hypertarget{class_a_m_r_level_mushy_layer_abedf24a1dd03d1de3c42222da1fcac3d}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!write\-A\-M\-R\-Hierarchy@{write\-A\-M\-R\-Hierarchy}}
+\index{write\-A\-M\-R\-Hierarchy@{write\-A\-M\-R\-Hierarchy}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{write\-A\-M\-R\-Hierarchy}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Level\-Mushy\-Layer\-::write\-A\-M\-R\-Hierarchy (
+\begin{DoxyParamCaption}
+\item[{string}]{filename}
+\end{DoxyParamCaption}
+)}}\label{class_a_m_r_level_mushy_layer_abedf24a1dd03d1de3c42222da1fcac3d}
+file to send output to
+
+grids at each level
+
+data indexed by level
+
+names of variables in {\itshape a\-\_\-vect\-Data}
+
+domain at base level given by {\itshape a\-\_\-levels}.begin()
+
+grid spacing at base level
+
+time step at base level
+
+time
+
+refinement ratios between adjacent levels, starting with {\itshape a\-\_\-ref\-Ratio}\mbox{[}0\mbox{]}, the refinement ratio between levels 0 and 1; Vector length at least {\itshape a\-\_\-num\-Levels}-\/1
+
+indices of levels to write out 
+
+\subsection{Member Data Documentation}
+\hypertarget{class_a_m_r_level_mushy_layer_afcdd508c570b393a964397f344bfd4a1}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!C\-Finterp\-Order\-\_\-advection@{C\-Finterp\-Order\-\_\-advection}}
+\index{C\-Finterp\-Order\-\_\-advection@{C\-Finterp\-Order\-\_\-advection}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{C\-Finterp\-Order\-\_\-advection}]{\setlength{\rightskip}{0pt plus 5cm}int A\-M\-R\-Level\-Mushy\-Layer\-::\-C\-Finterp\-Order\-\_\-advection\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_afcdd508c570b393a964397f344bfd4a1}
+either first or second order interpolation at C\-F boundaries for advection problems \hypertarget{class_a_m_r_level_mushy_layer_ae251dc2af22530cbf8a9311a2e83e442}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-add\-Subtract\-Grad\-P@{m\-\_\-add\-Subtract\-Grad\-P}}
+\index{m\-\_\-add\-Subtract\-Grad\-P@{m\-\_\-add\-Subtract\-Grad\-P}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-add\-Subtract\-Grad\-P}]{\setlength{\rightskip}{0pt plus 5cm}bool A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-add\-Subtract\-Grad\-P\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_ae251dc2af22530cbf8a9311a2e83e442}
+
+
+Should we use previous $ \nabla P $ to calculate $ \mathbf{u}^* $. 
+
+We then subtract off $ \nabla P $ before actually doing the projection \hypertarget{class_a_m_r_level_mushy_layer_af41eb6058681e1345ce40633dd9fde1f}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-adv\-\_\-vel\-\_\-centering@{m\-\_\-adv\-\_\-vel\-\_\-centering}}
+\index{m\-\_\-adv\-\_\-vel\-\_\-centering@{m\-\_\-adv\-\_\-vel\-\_\-centering}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-adv\-\_\-vel\-\_\-centering}]{\setlength{\rightskip}{0pt plus 5cm}Real A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-adv\-\_\-vel\-\_\-centering\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_af41eb6058681e1345ce40633dd9fde1f}
+
+
+The advection velocity is calculated at old\-\_\-time + m\-\_\-adv\-\_\-vel\-\_\-centering$\ast$dt. 
+
+Usually 0.\-5, but set to something smaller after regridding for stability \hypertarget{class_a_m_r_level_mushy_layer_a5304e0c78e438aea19acb6f3702e5243}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-advection\-Method@{m\-\_\-advection\-Method}}
+\index{m\-\_\-advection\-Method@{m\-\_\-advection\-Method}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-advection\-Method}]{\setlength{\rightskip}{0pt plus 5cm}int A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-advection\-Method\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a5304e0c78e438aea19acb6f3702e5243}
+
+
+Don't use this anymroe. 
+
+How to handle velocity advection \hypertarget{class_a_m_r_level_mushy_layer_acc7b64a985eeb8434eff80c393733c1f}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-adv\-Phys\-Velocity@{m\-\_\-adv\-Phys\-Velocity}}
+\index{m\-\_\-adv\-Phys\-Velocity@{m\-\_\-adv\-Phys\-Velocity}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-adv\-Phys\-Velocity}]{\setlength{\rightskip}{0pt plus 5cm}Ref\-Counted\-Ptr$<$Advect\-Physics$>$ A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-adv\-Phys\-Velocity\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_acc7b64a985eeb8434eff80c393733c1f}
+
+
+Object to do advection physics. 
+
+Object to do advection physics for velocity \hypertarget{class_a_m_r_level_mushy_layer_aa7a6e8a5cb2cb6f690c047e46d70547f}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-computed\-C\-F\-L@{m\-\_\-computed\-C\-F\-L}}
+\index{m\-\_\-computed\-C\-F\-L@{m\-\_\-computed\-C\-F\-L}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-computed\-C\-F\-L}]{\setlength{\rightskip}{0pt plus 5cm}Real A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-computed\-C\-F\-L\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_aa7a6e8a5cb2cb6f690c047e46d70547f}
+
+
+The C\-F\-L number we're currently running at. 
+
+computed from the current max velocity and the grid spacing. \hypertarget{class_a_m_r_level_mushy_layer_a731a16b4dfaecb9235357b88e251af97}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-enforce\-Grad\-P@{m\-\_\-enforce\-Grad\-P}}
+\index{m\-\_\-enforce\-Grad\-P@{m\-\_\-enforce\-Grad\-P}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-enforce\-Grad\-P}]{\setlength{\rightskip}{0pt plus 5cm}bool A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-enforce\-Grad\-P\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a731a16b4dfaecb9235357b88e251af97}
+
+
+Should we enforce some analytic $ \nabla P $. 
+
+Usually false, but can be useful to do this for benchmark problems \hypertarget{class_a_m_r_level_mushy_layer_a3111453ab5dbcb11dbf0a3e22c5ef715}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-fixed\-Dt@{m\-\_\-fixed\-Dt}}
+\index{m\-\_\-fixed\-Dt@{m\-\_\-fixed\-Dt}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-fixed\-Dt}]{\setlength{\rightskip}{0pt plus 5cm}Real A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-fixed\-Dt\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a3111453ab5dbcb11dbf0a3e22c5ef715}
+
+
+Fixed $ Delta t $. 
+
+Used if $>$ 0 in place of a variable timestep \hypertarget{class_a_m_r_level_mushy_layer_a7ddfec87b90ab2887546165b5ca7196b}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-ignore\-Solver\-Fails@{m\-\_\-ignore\-Solver\-Fails}}
+\index{m\-\_\-ignore\-Solver\-Fails@{m\-\_\-ignore\-Solver\-Fails}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-ignore\-Solver\-Fails}]{\setlength{\rightskip}{0pt plus 5cm}bool A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-ignore\-Solver\-Fails\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a7ddfec87b90ab2887546165b5ca7196b}
+
+
+Option to ignore solver fails. 
+
+Default is to restart the timestep with a reduced $ \Delta t$ \hypertarget{class_a_m_r_level_mushy_layer_a1b88cc852494c1537cd7e5fbc01bae53}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-iter\-\_\-plot\-\_\-interval@{m\-\_\-iter\-\_\-plot\-\_\-interval}}
+\index{m\-\_\-iter\-\_\-plot\-\_\-interval@{m\-\_\-iter\-\_\-plot\-\_\-interval}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-iter\-\_\-plot\-\_\-interval}]{\setlength{\rightskip}{0pt plus 5cm}int A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-iter\-\_\-plot\-\_\-interval\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a1b88cc852494c1537cd7e5fbc01bae53}
+
+
+Plot interval for picard iterations. 
+
+1 means don't make any plots \hypertarget{class_a_m_r_level_mushy_layer_a49000dfb8d30dc44b35fc1c802c9fd4c}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-max\-Lambda@{m\-\_\-max\-Lambda}}
+\index{m\-\_\-max\-Lambda@{m\-\_\-max\-Lambda}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-max\-Lambda}]{\setlength{\rightskip}{0pt plus 5cm}Real A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-max\-Lambda\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a49000dfb8d30dc44b35fc1c802c9fd4c}
+
+
+Store max value of $ \lambda-1 $ from previous timestep. 
+
+We may decide to increase $ \eta $ if we're not decreasing lambda quickly enough \hypertarget{class_a_m_r_level_mushy_layer_a5ac61ca83db82c5642e21d7cbe83f37b}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-num\-Ghost\-Advection@{m\-\_\-num\-Ghost\-Advection}}
+\index{m\-\_\-num\-Ghost\-Advection@{m\-\_\-num\-Ghost\-Advection}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-num\-Ghost\-Advection}]{\setlength{\rightskip}{0pt plus 5cm}int A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-num\-Ghost\-Advection\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a5ac61ca83db82c5642e21d7cbe83f37b}
+
+
+Number of ghost cells for advection calculations. 
+
+Generally need extra ghost cells when doing advection problems \hypertarget{class_a_m_r_level_mushy_layer_a90acda5f43d2b66e4bcbd989f9354b1b}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-patch\-God\-Velocity@{m\-\_\-patch\-God\-Velocity}}
+\index{m\-\_\-patch\-God\-Velocity@{m\-\_\-patch\-God\-Velocity}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-patch\-God\-Velocity}]{\setlength{\rightskip}{0pt plus 5cm}Patch\-Godunov A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-patch\-God\-Velocity\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a90acda5f43d2b66e4bcbd989f9354b1b}
+
+
+This is just used for calculating max(\-Dt) 
+
+Handles advection of velocity \hypertarget{class_a_m_r_level_mushy_layer_a53408b847afbe94238f1f19daf166f2f}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-pressure\-Scale\-Var@{m\-\_\-pressure\-Scale\-Var}}
+\index{m\-\_\-pressure\-Scale\-Var@{m\-\_\-pressure\-Scale\-Var}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-pressure\-Scale\-Var}]{\setlength{\rightskip}{0pt plus 5cm}int A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-pressure\-Scale\-Var\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a53408b847afbe94238f1f19daf166f2f}
+
+
+Which field scales the pressure. 
+
+We either have $ \chi \nabla P $ or $ \Pi \nabla P $ \hypertarget{class_a_m_r_level_mushy_layer_afb12e6063552f8629a5d81fbac6ac20b}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-scalar\-Diffusion\-Coeffs@{m\-\_\-scalar\-Diffusion\-Coeffs}}
+\index{m\-\_\-scalar\-Diffusion\-Coeffs@{m\-\_\-scalar\-Diffusion\-Coeffs}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-scalar\-Diffusion\-Coeffs}]{\setlength{\rightskip}{0pt plus 5cm}Real A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-scalar\-Diffusion\-Coeffs\mbox{[}m\-\_\-num\-Scalar\-Vars\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_afb12e6063552f8629a5d81fbac6ac20b}
+
+
+Object to do advection physics for scalars. 
+
+Diffusion coefficients for different scalar fields \hypertarget{class_a_m_r_level_mushy_layer_a4937b8d2fdcfb86d57b7f197f91f5069}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-scalar\-New@{m\-\_\-scalar\-New}}
+\index{m\-\_\-scalar\-New@{m\-\_\-scalar\-New}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-scalar\-New}]{\setlength{\rightskip}{0pt plus 5cm}Vector$<$Ref\-Counted\-Ptr$<$Level\-Data$<$F\-Array\-Box$>$ $>$ $>$ A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-scalar\-New\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a4937b8d2fdcfb86d57b7f197f91f5069}
+
+
+Nusselt number (no longer used) 
+
+Scalar fields at new time \hypertarget{class_a_m_r_level_mushy_layer_a05741bcf973b908f3defe7aa3de6dcc8}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-scalar\-Restart@{m\-\_\-scalar\-Restart}}
+\index{m\-\_\-scalar\-Restart@{m\-\_\-scalar\-Restart}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-scalar\-Restart}]{\setlength{\rightskip}{0pt plus 5cm}Vector$<$Ref\-Counted\-Ptr$<$Level\-Data$<$F\-Array\-Box$>$ $>$ $>$ A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-scalar\-Restart\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a05741bcf973b908f3defe7aa3de6dcc8}
+
+
+Change in scalar fields. We don't actually seem to use this. 
+
+Backed up scalar fields to be used for restarting \hypertarget{class_a_m_r_level_mushy_layer_abe5e093bac71759f0e5b37c64d91b6cc}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-skip\-Tricky\-Source\-Term@{m\-\_\-skip\-Tricky\-Source\-Term}}
+\index{m\-\_\-skip\-Tricky\-Source\-Term@{m\-\_\-skip\-Tricky\-Source\-Term}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-skip\-Tricky\-Source\-Term}]{\setlength{\rightskip}{0pt plus 5cm}Real A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-skip\-Tricky\-Source\-Term\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_abe5e093bac71759f0e5b37c64d91b6cc}
+
+
+Skip some velocity source terms. 
+
+When restarting and changing parameters, it can be useful to skip some source terms in the velocity calculation for some period of time to stop simulations blowing up \hypertarget{class_a_m_r_level_mushy_layer_ac4fc74a2eaea0389f94d8e36513b8773}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-steady\-State\-Norm\-Type@{m\-\_\-steady\-State\-Norm\-Type}}
+\index{m\-\_\-steady\-State\-Norm\-Type@{m\-\_\-steady\-State\-Norm\-Type}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-steady\-State\-Norm\-Type}]{\setlength{\rightskip}{0pt plus 5cm}int A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-steady\-State\-Norm\-Type\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_ac4fc74a2eaea0389f94d8e36513b8773}
+norm\-Type\-: 0 = max, 1 = volume averaged switched to 1 because we weren't converging due to single grid cells \hypertarget{class_a_m_r_level_mushy_layer_a760063c20ec9abb7820afc11cafad1ab}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-time\-Integration\-Order@{m\-\_\-time\-Integration\-Order}}
+\index{m\-\_\-time\-Integration\-Order@{m\-\_\-time\-Integration\-Order}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-time\-Integration\-Order}]{\setlength{\rightskip}{0pt plus 5cm}int A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-time\-Integration\-Order\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a760063c20ec9abb7820afc11cafad1ab}
+
+
+Time integration accuracy. 
+
+1 = backward euler 2 = T\-G\-A \hypertarget{class_a_m_r_level_mushy_layer_ae2655a0f1abc12048154f60bfca18110}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-variable\-\_\-eta\-\_\-factor@{m\-\_\-variable\-\_\-eta\-\_\-factor}}
+\index{m\-\_\-variable\-\_\-eta\-\_\-factor@{m\-\_\-variable\-\_\-eta\-\_\-factor}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-variable\-\_\-eta\-\_\-factor}]{\setlength{\rightskip}{0pt plus 5cm}Real A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-variable\-\_\-eta\-\_\-factor\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_ae2655a0f1abc12048154f60bfca18110}
+
+
+Option to automatically increase/decrease $ \eta $. 
+
+Default value is 1.\-0, i.\-e. don't change eta \hypertarget{class_a_m_r_level_mushy_layer_a4d91e3fa25799fc66e74808c545892b6}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!m\-\_\-viscous\-Op@{m\-\_\-viscous\-Op}}
+\index{m\-\_\-viscous\-Op@{m\-\_\-viscous\-Op}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{m\-\_\-viscous\-Op}]{\setlength{\rightskip}{0pt plus 5cm}Ref\-Counted\-Ptr$<$A\-M\-R\-Poisson\-Op$>$ A\-M\-R\-Level\-Mushy\-Layer\-::m\-\_\-viscous\-Op\mbox{[}Space\-Dim\mbox{]}\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a4d91e3fa25799fc66e74808c545892b6}
+
+
+Operator factory for unprojected velocity, $ \mathbf{u}^* $. 
+
+Variable coefficient version, not currently used\-Operator for computing components of $ \nabla^2 \mathbf{u} $ \hypertarget{class_a_m_r_level_mushy_layer_a17f58299941c1b1c2bf58a412d8c91a6}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!s\-\_\-reflux\-\_\-enthalpy@{s\-\_\-reflux\-\_\-enthalpy}}
+\index{s\-\_\-reflux\-\_\-enthalpy@{s\-\_\-reflux\-\_\-enthalpy}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{s\-\_\-reflux\-\_\-enthalpy}]{\setlength{\rightskip}{0pt plus 5cm}bool A\-M\-R\-Level\-Mushy\-Layer\-::s\-\_\-reflux\-\_\-enthalpy\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_a17f58299941c1b1c2bf58a412d8c91a6}
+
+
+Reflux scalar fields? 
+
+Turn enthalpy refluxing on \hypertarget{class_a_m_r_level_mushy_layer_ad8271cd4dc0e17cc132a28165ccdbbfc}{\index{A\-M\-R\-Level\-Mushy\-Layer@{A\-M\-R\-Level\-Mushy\-Layer}!s\-\_\-reflux\-\_\-lambda@{s\-\_\-reflux\-\_\-lambda}}
+\index{s\-\_\-reflux\-\_\-lambda@{s\-\_\-reflux\-\_\-lambda}!AMRLevelMushyLayer@{A\-M\-R\-Level\-Mushy\-Layer}}
+\subsubsection[{s\-\_\-reflux\-\_\-lambda}]{\setlength{\rightskip}{0pt plus 5cm}bool A\-M\-R\-Level\-Mushy\-Layer\-::s\-\_\-reflux\-\_\-lambda\hspace{0.3cm}{\ttfamily [protected]}}}\label{class_a_m_r_level_mushy_layer_ad8271cd4dc0e17cc132a28165ccdbbfc}
+
+
+Turn lambda refluxing on. 
+
+This is necessary for computing the freestream preservation correction 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/src\-Subcycle/A\-M\-R\-Level\-Mushy\-Layer.\-H\item 
+/home/parkinsonjl/mushy-\/layer/src\-Subcycle/A\-M\-R\-Level\-Mushy\-Layer.\-cpp\item 
+/home/parkinsonjl/mushy-\/layer/src\-Subcycle/A\-M\-R\-Level\-Mushy\-Layer\-Init.\-cpp\item 
+/home/parkinsonjl/mushy-\/layer/src\-Subcycle/A\-M\-R\-Level\-Mushy\-Layer\-I\-O.\-cpp\item 
+/home/parkinsonjl/mushy-\/layer/src\-Subcycle/A\-M\-R\-Level\-Mushy\-Layer\-Regrid.\-cpp\item 
+/home/parkinsonjl/mushy-\/layer/src\-Subcycle/A\-M\-R\-Level\-Mushy\-Layer\-Sync.\-cpp\end{DoxyCompactItemize}

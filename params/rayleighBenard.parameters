@@ -1,0 +1,102 @@
+##############################################
+## Parameters the control the problem type
+##############################################
+
+parameters.problem_type = 9
+parameters.fixedTempDirection = 1  # 0 for sidewall heating, 1 for vertical heating
+
+#main.fixed_dt   = 0.001 #0.0024
+
+main.periodic_bc = 1 0 1 
+main.domain_length = 6.0
+main.symmetric_domain = false
+
+
+# Refluxing
+main.reflux_momentum = 1
+main.reflux_normal_momentum = 0
+main.reflux_scalar = 1
+
+#projection
+projection.eta = 0.0 #0.9
+
+# refinement
+main.taggingVar = 0 # 0=enthalpy
+main.taggingVectorVar = -1 # 0=darcy vel
+main.refine_thresh = 0.3 # 0.02
+main.refineMethod = 0 # 0=undivided gradient, 1 = absolute value
+
+main.initialPerturbation = 0.1
+
+main.restart_perturbation = 0.1
+main.restart_wavenumber = 2 # 2 for vertical profiles, 3 for Nu(Ra)
+
+##################################################
+# How to calculate permeability
+# 0: permeability = 1
+# 1: permeability = (1-solid fraction)^3
+# 2: permeability = kozeny-carman
+# 3: permeability = log()
+# 4: permeability = x^2 (or whatever function I want)
+################################################
+parameters.permeabilityFunction = 0
+parameters.heleShaw=false
+
+#############################################
+#Physical parameters
+#############################################
+##Katz & Worster 2008 parameters for NH4Cl
+parameters.viscosity 				= 1.4e-3 	# Pa s
+parameters.heatConductivityLiquid   = 0.54 		# W/(m K)
+parameters.heatConductivitySolid    = 2.2 		# W/(m K)
+parameters.specificHeatLiquid 		= 3.5e3 	# J/(kg K)
+parameters.specificHeatSolid 		= 1.5e3 	# J/(kg K)
+parameters.liquidDensity			= 1050		# kg/(m^3)
+parameters.latentHeatDissolution	= 2.76e5	# J/kg
+parameters.thermalExpansivity		= 2.1e-4	# 1/K
+parameters.solutalExpansivity		= -0.30		# 1/(wt. frac.)
+
+
+parameters.eutecticTemp				= 20.0		# celcius
+parameters.eutecticComposition		= 0.2		# wt. frac.
+parameters.liquidusSlope			= 471.4 	# celcius/(wt. frac.)
+parameters.waterDistributionCoeff	= 1e-5 #1e-5		# dimensionless
+parameters.heleShawCoolingCoeff		= 1600		# J/(m^3 s celcius)
+parameters.liquidSoluteDiffusivity	= 1e-9		# m^2/s   (guess, approx 100x smaller than heat diffusivity)
+parameters.d						= 5e-3		# m
+parameters.height					= 0.5		# m
+parameters.width					= 6e-2		# m
+parameters.referencePermeability 	= 1e-12		# m^2
+parameters.gravitationalAcceleration= 9.8		# m/s
+parameters.nonDimVel				= 0.0
+
+#Initial and boundary conditions
+parameters.initialComposition		= 0		# wt. frac. no salt in this problem
+parameters.topEnthalpy 				= 1.0		# 
+parameters.bottomEnthalpy			= 2.0		    # n
+parameters.topBulkConc				= -1.0		# non dim
+parameters.bottomBulkConc			= -1.0		# non dim
+
+# non dimensional parameters - these will overwrite parameters
+parameters.stefan 			= 0 # no solidification in this problem
+parameters.compositionRatio = 2
+parameters.K				= 1 # 4
+parameters.specificHeatRatio= 1 # 0.5
+parameters.lewis			= 2e300  # (infinite)
+parameters.heatConductivityRatio = 1
+
+parameters.rayleighTemp				= 4000 # 4000
+parameters.rayleighComp				= 0.0 # 
+parameters.darcy 					= 1e300 #  infinite - pure fluid
+parameters.prandtl					= 0.71
+
+# momentum equation
+main.doEuler = 1
+main.doProjection = 1
+main.addSubtractGradP = 1
+main.scalePwithChi = 1
+
+bc.velLo = 0 0 # x-dir, y-dir, z-dir
+bc.velHi = 0 0 # x-dir, y-dir, z-dir
+bc.scalarLo = 1 0
+bc.scalarHi = 1 0

@@ -1,0 +1,43 @@
+\hypertarget{amr_mushy_layer_8cpp}{\section{src\-Non\-Subcycle/amr\-Mushy\-Layer.cpp File Reference}
+\label{amr_mushy_layer_8cpp}\index{src\-Non\-Subcycle/amr\-Mushy\-Layer.\-cpp@{src\-Non\-Subcycle/amr\-Mushy\-Layer.\-cpp}}
+}
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$cstdio$>$}\\*
+{\ttfamily \#include $<$cmath$>$}\\*
+{\ttfamily \#include \char`\"{}Box.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Vector.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Disjoint\-Box\-Layout.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Parm\-Parse.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Layout\-Iterator.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Box\-Iterator.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}parstream.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Coarse\-Average.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Fine\-Interp.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}A\-M\-R\-I\-O.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}B\-R\-Mesh\-Refine.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Load\-Balance.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}May\-Day.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}amr\-Mushy\-Layer.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}compute\-Norm.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Level\-Advect.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}C\-H\-\_\-\-H\-D\-F5.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils\-\_\-\-F.\-H\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Sea\-Ice\-Utils.\-H\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{amr_mushy_layer_8cpp_ab6dabd9b55425ba62f778393b22352a9}{T\-G\-A\-\_\-\-E\-P\-S}~1.\-0e-\/8
+\item 
+\#define \hyperlink{amr_mushy_layer_8cpp_ab2161d79208751e6a58bc0381eca3f02}{T\-I\-M\-E\-\_\-\-E\-P\-S}~1.\-0e-\/12
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{amr_mushy_layer_8cpp_ab6dabd9b55425ba62f778393b22352a9}{\index{amr\-Mushy\-Layer.\-cpp@{amr\-Mushy\-Layer.\-cpp}!T\-G\-A\-\_\-\-E\-P\-S@{T\-G\-A\-\_\-\-E\-P\-S}}
+\index{T\-G\-A\-\_\-\-E\-P\-S@{T\-G\-A\-\_\-\-E\-P\-S}!amrMushyLayer.cpp@{amr\-Mushy\-Layer.\-cpp}}
+\subsubsection[{T\-G\-A\-\_\-\-E\-P\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\-G\-A\-\_\-\-E\-P\-S~1.\-0e-\/8}}\label{amr_mushy_layer_8cpp_ab6dabd9b55425ba62f778393b22352a9}
+\hypertarget{amr_mushy_layer_8cpp_ab2161d79208751e6a58bc0381eca3f02}{\index{amr\-Mushy\-Layer.\-cpp@{amr\-Mushy\-Layer.\-cpp}!T\-I\-M\-E\-\_\-\-E\-P\-S@{T\-I\-M\-E\-\_\-\-E\-P\-S}}
+\index{T\-I\-M\-E\-\_\-\-E\-P\-S@{T\-I\-M\-E\-\_\-\-E\-P\-S}!amrMushyLayer.cpp@{amr\-Mushy\-Layer.\-cpp}}
+\subsubsection[{T\-I\-M\-E\-\_\-\-E\-P\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\-I\-M\-E\-\_\-\-E\-P\-S~1.\-0e-\/12}}\label{amr_mushy_layer_8cpp_ab2161d79208751e6a58bc0381eca3f02}

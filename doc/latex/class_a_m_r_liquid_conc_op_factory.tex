@@ -1,0 +1,82 @@
+\hypertarget{class_a_m_r_liquid_conc_op_factory}{\section{A\-M\-R\-Liquid\-Conc\-Op\-Factory Class Reference}
+\label{class_a_m_r_liquid_conc_op_factory}\index{A\-M\-R\-Liquid\-Conc\-Op\-Factory@{A\-M\-R\-Liquid\-Conc\-Op\-Factory}}
+}
+
+
+{\ttfamily \#include $<$A\-M\-R\-Liquid\-Conc\-Op.\-H$>$}
+
+Inheritance diagram for A\-M\-R\-Liquid\-Conc\-Op\-Factory\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_a_m_r_liquid_conc_op_factory}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bfseries m\-\_\-primary\-Vars} \{ {\bfseries m\-\_\-enthalpy\-Var}, 
+{\bfseries m\-\_\-bulk\-Concentration\-Var}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_a_m_r_liquid_conc_op_factory_a15c6b0b665b015266c8a8c9ef45c0c49}{define} (const Problem\-Domain \&a\-\_\-coarse\-Domain, const Vector$<$ Disjoint\-Box\-Layout $>$ \&a\-\_\-grids, const Vector$<$ int $>$ \&a\-\_\-ref\-Ratios, const Real \&a\-\_\-coarsedx, B\-C\-Holder a\-\_\-bc, const Real \&a\-\_\-alpha, Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&a\-\_\-a\-Coef, const Real \&a\-\_\-beta, Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ Flux\-Box $>$ $>$ $>$ \&a\-\_\-b\-Coef, Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&a\-\_\-secondary\-Var, Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&a\-\_\-enthalpy\-Solidus, Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&a\-\_\-enthalpy\-Liquidus, Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&a\-\_\-enthalpy\-Eutectic, \hyperlink{class_mushy_layer_params}{Mushy\-Layer\-Params} $\ast$a\-\_\-params, Enthalpy\-Variable a\-\_\-calc\-Enthalpy\-Var, int a\-\_\-primary\-Var, B\-C\-Holder a\-\_\-derived\-Var\-B\-C, int a\-\_\-relax\-Mode, \hyperlink{class_edge_vel_b_c_holder}{Edge\-Vel\-B\-C\-Holder} a\-\_\-porosity\-Edge\-B\-C)
+\item 
+\hypertarget{class_a_m_r_liquid_conc_op_factory_aa40368a95f9cb6a48fc5ff9d210d63c9}{virtual M\-G\-Level\-Op$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ $\ast$ {\bfseries M\-Gnew\-Op} (const Problem\-Domain \&a\-\_\-\-Fineindex\-Space, int a\-\_\-depth, bool a\-\_\-homo\-Only=true)}\label{class_a_m_r_liquid_conc_op_factory_aa40368a95f9cb6a48fc5ff9d210d63c9}
+
+\item 
+\hypertarget{class_a_m_r_liquid_conc_op_factory_a140f6325a11c89ebb1775e16fb65ab51}{virtual A\-M\-R\-Level\-Op$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ $\ast$ {\bfseries A\-M\-Rnew\-Op} (const Problem\-Domain \&a\-\_\-index\-Space)}\label{class_a_m_r_liquid_conc_op_factory_a140f6325a11c89ebb1775e16fb65ab51}
+
+\item 
+\hypertarget{class_a_m_r_liquid_conc_op_factory_a5e29bf33525ea7dc4f6f1620ded58669}{virtual int {\bfseries ref\-To\-Finer} (const Problem\-Domain \&a\-\_\-domain) const }\label{class_a_m_r_liquid_conc_op_factory_a5e29bf33525ea7dc4f6f1620ded58669}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_a_m_r_liquid_conc_op_factory_a55f28feb4920e37e186ac18d443e93dc}{int {\bfseries m\-\_\-coefficient\-\_\-average\-\_\-type}}\label{class_a_m_r_liquid_conc_op_factory_a55f28feb4920e37e186ac18d443e93dc}
+
+\item 
+\hypertarget{class_a_m_r_liquid_conc_op_factory_a473654f3e7a954eadb5de1b06a99c817}{int {\bfseries m\-\_\-primary\-Var}}\label{class_a_m_r_liquid_conc_op_factory_a473654f3e7a954eadb5de1b06a99c817}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Factory to create A\-M\-R\-Liquid\-Conc\-Ops 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_a_m_r_liquid_conc_op_factory_a15c6b0b665b015266c8a8c9ef45c0c49}{\index{A\-M\-R\-Liquid\-Conc\-Op\-Factory@{A\-M\-R\-Liquid\-Conc\-Op\-Factory}!define@{define}}
+\index{define@{define}!AMRLiquidConcOpFactory@{A\-M\-R\-Liquid\-Conc\-Op\-Factory}}
+\subsubsection[{define}]{\setlength{\rightskip}{0pt plus 5cm}void A\-M\-R\-Liquid\-Conc\-Op\-Factory\-::define (
+\begin{DoxyParamCaption}
+\item[{const Problem\-Domain \&}]{a\-\_\-coarse\-Domain, }
+\item[{const Vector$<$ Disjoint\-Box\-Layout $>$ \&}]{a\-\_\-grids, }
+\item[{const Vector$<$ int $>$ \&}]{a\-\_\-ref\-Ratios, }
+\item[{const Real \&}]{a\-\_\-coarsedx, }
+\item[{B\-C\-Holder}]{a\-\_\-bc, }
+\item[{const Real \&}]{a\-\_\-alpha, }
+\item[{Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&}]{a\-\_\-a\-Coef, }
+\item[{const Real \&}]{a\-\_\-beta, }
+\item[{Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ Flux\-Box $>$ $>$ $>$ \&}]{a\-\_\-b\-Coef, }
+\item[{Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&}]{a\-\_\-secondary\-Var, }
+\item[{Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&}]{a\-\_\-enthalpy\-Solidus, }
+\item[{Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&}]{a\-\_\-enthalpy\-Liquidus, }
+\item[{Vector$<$ Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&}]{a\-\_\-enthalpy\-Eutectic, }
+\item[{{\bf Mushy\-Layer\-Params} $\ast$}]{a\-\_\-params, }
+\item[{Enthalpy\-Variable}]{a\-\_\-calc\-Enthalpy\-Var, }
+\item[{int}]{a\-\_\-primary\-Var, }
+\item[{B\-C\-Holder}]{a\-\_\-derived\-Var\-B\-C, }
+\item[{int}]{a\-\_\-relax\-Mode, }
+\item[{{\bf Edge\-Vel\-B\-C\-Holder}}]{a\-\_\-porosity\-Edge\-B\-C}
+\end{DoxyParamCaption}
+)}}\label{class_a_m_r_liquid_conc_op_factory_a15c6b0b665b015266c8a8c9ef45c0c49}
+a\-\_\-coarse\-Domain is the domain at the coarsest level. a\-\_\-grids is the A\-M\-R hierarchy. a\-\_\-ref\-Ratios are the refinement ratios between levels. The ratio lives with the coarser level so a\-\_\-ref\-Ratios\mbox{[}ilev\mbox{]} is the ratio between ilev and ilev+1 a\-\_\-coarse\-Dx is the grid spacing at the coarsest level. a\-\_\-bc holds the boundary conditions. a\-\_\-alpha is the identity constant coefficient a\-\_\-beta is the laplacian constant coefficient. a\-\_\-a\-Coef is the identity spatially varying coefficient a\-\_\-b\-Coef is the laplacian spatially varying coefficient. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+src/A\-M\-R\-Liquid\-Conc\-Op.\-H\item 
+src/A\-M\-R\-Liquid\-Conc\-Op.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,51 @@
+\hypertarget{class_advect_diffuse_scalar_b_c}{\section{Advect\-Diffuse\-Scalar\-B\-C Class Reference}
+\label{class_advect_diffuse_scalar_b_c}\index{Advect\-Diffuse\-Scalar\-B\-C@{Advect\-Diffuse\-Scalar\-B\-C}}
+}
+
+
+Scalar B\-C function which holds values at the top, bottom, and in the plume.  
+
+
+Inheritance diagram for Advect\-Diffuse\-Scalar\-B\-C\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{class_advect_diffuse_scalar_b_c}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_advect_diffuse_scalar_b_c_a2227cd96500613d5eb7918cc6fa3a645}{{\bfseries Advect\-Diffuse\-Scalar\-B\-C} (bool a\-\_\-is\-Defined, \hyperlink{class_mushy_layer_params}{Mushy\-Layer\-Params} a\-\_\-params, bool a\-\_\-homogeneous, Level\-Data$<$ Flux\-Box $>$ $\ast$a\-\_\-adv\-Vel, Real a\-\_\-dx, Vector$<$ Real $>$ a\-\_\-plume\-Vals, Interval a\-\_\-interval, Vector$<$ Vector$<$ int $>$ $>$ \&a\-\_\-custom\-Lo\-B\-C, Vector$<$ Vector$<$ int $>$ $>$ \&a\-\_\-custom\-Hi\-B\-C, Vector$<$ Vector$<$ Real $>$ $>$ \&a\-\_\-custom\-Lo\-B\-C\-Val, Vector$<$ Vector$<$ Real $>$ $>$ \&a\-\_\-custom\-Hi\-B\-C\-Val)}\label{class_advect_diffuse_scalar_b_c_a2227cd96500613d5eb7918cc6fa3a645}
+
+\item 
+\hypertarget{class_advect_diffuse_scalar_b_c_ab55b1f2a27a3ff1ecda0d56acdbf0d77}{virtual void \hyperlink{class_advect_diffuse_scalar_b_c_ab55b1f2a27a3ff1ecda0d56acdbf0d77}{operator()} (F\-Array\-Box \&a\-\_\-state, const Box \&a\-\_\-valid, const Problem\-Domain \&a\-\_\-domain, Real a\-\_\-dx, bool a\-\_\-homogeneous)}\label{class_advect_diffuse_scalar_b_c_ab55b1f2a27a3ff1ecda0d56acdbf0d77}
+
+\begin{DoxyCompactList}\small\item\em Apply B\-C. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_advect_diffuse_scalar_b_c_a24079c63607fa7aaada70d393c91038e}{Vector$<$ Real $>$ {\bfseries m\-\_\-plume\-Val}}\label{class_advect_diffuse_scalar_b_c_a24079c63607fa7aaada70d393c91038e}
+
+\item 
+\hypertarget{class_advect_diffuse_scalar_b_c_a88722dbb4d1fde30f3608db8104640c0}{Vector$<$ Vector$<$ int $>$ $>$ \hyperlink{class_advect_diffuse_scalar_b_c_a88722dbb4d1fde30f3608db8104640c0}{m\-\_\-custom\-Lo\-B\-C}}\label{class_advect_diffuse_scalar_b_c_a88722dbb4d1fde30f3608db8104640c0}
+
+\begin{DoxyCompactList}\small\item\em Each element of the vector corresponds to a different interval. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_diffuse_scalar_b_c_a3143ed8cc319ce90e64e936c459f9b12}{Vector$<$ Vector$<$ int $>$ $>$ {\bfseries m\-\_\-custom\-Hi\-B\-C}}\label{class_advect_diffuse_scalar_b_c_a3143ed8cc319ce90e64e936c459f9b12}
+
+\item 
+\hypertarget{class_advect_diffuse_scalar_b_c_ab09adbfb8bbf7bd9ec9d51f2d0b1106a}{Vector$<$ Vector$<$ Real $>$ $>$ {\bfseries m\-\_\-custom\-Lo\-B\-C\-Val}}\label{class_advect_diffuse_scalar_b_c_ab09adbfb8bbf7bd9ec9d51f2d0b1106a}
+
+\item 
+\hypertarget{class_advect_diffuse_scalar_b_c_a5733082dd61f2021d755cfebda84481d}{Vector$<$ Vector$<$ Real $>$ $>$ {\bfseries m\-\_\-custom\-Hi\-B\-C\-Val}}\label{class_advect_diffuse_scalar_b_c_a5733082dd61f2021d755cfebda84481d}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Scalar B\-C function which holds values at the top, bottom, and in the plume. 
+
+All these fields have the same type of conditions at each boundary, but just different values. 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/\-B\-Cutil/Phys\-B\-C\-Util.\-cpp\end{DoxyCompactItemize}

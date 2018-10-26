@@ -1,0 +1,136 @@
+\hypertarget{class_coefficient_interpolator_linear_face}{\section{Coefficient\-Interpolator\-Linear\-Face Class Reference}
+\label{class_coefficient_interpolator_linear_face}\index{Coefficient\-Interpolator\-Linear\-Face@{Coefficient\-Interpolator\-Linear\-Face}}
+}
+
+
+Linear coefficient interpolator (face centred)  
+
+
+
+
+{\ttfamily \#include $<$Coefficient\-Interpolator\-Linear\-Face.\-H$>$}
+
+Inheritance diagram for Coefficient\-Interpolator\-Linear\-Face\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_coefficient_interpolator_linear_face}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_coefficient_interpolator_linear_face_a64b4959fa8d8df6705df5a8baf31f3f5}{\hyperlink{class_coefficient_interpolator_linear_face_a64b4959fa8d8df6705df5a8baf31f3f5}{Coefficient\-Interpolator\-Linear\-Face} (int a\-\_\-num\-Comps=1)}\label{class_coefficient_interpolator_linear_face_a64b4959fa8d8df6705df5a8baf31f3f5}
+
+\begin{DoxyCompactList}\small\item\em default constructor \end{DoxyCompactList}\item 
+\hypertarget{class_coefficient_interpolator_linear_face_a08d5f51d4204deb361b6c8cb054cff69}{virtual void \hyperlink{class_coefficient_interpolator_linear_face_a08d5f51d4204deb361b6c8cb054cff69}{interpolate} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-result, Real a\-\_\-time)}\label{class_coefficient_interpolator_linear_face_a08d5f51d4204deb361b6c8cb054cff69}
+
+\begin{DoxyCompactList}\small\item\em Interpolate coefficient. \end{DoxyCompactList}\item 
+virtual void \hyperlink{class_coefficient_interpolator_linear_face_a825a5def3f5da9e2a8890bd46d2af5b0}{interpolate} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-result, const Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-solution, Real a\-\_\-time)
+\item 
+virtual bool \hyperlink{class_coefficient_interpolator_linear_face_a233d0b610df69e882c5820610dc65f99}{depends\-Upon\-Solution} () const 
+\item 
+virtual void \hyperlink{class_coefficient_interpolator_linear_face_a6a9d41e8aac928cad20649644ce70aeb}{interpolate\-Prime} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-prime, const Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-solution, Real a\-\_\-time)
+\item 
+virtual void \hyperlink{class_coefficient_interpolator_linear_face_aa1d2b29813de7845fda24e5c523ca5b7}{solve} (Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-f, Real a\-\_\-time, const Level\-Data$<$ Flux\-Box $>$ \&a\-\_\-phi0, Real a\-\_\-tolerance)
+\item 
+\hypertarget{class_coefficient_interpolator_linear_face_af27d8bed697ac3ddda5accdd37df3dee}{void \hyperlink{class_coefficient_interpolator_linear_face_af27d8bed697ac3ddda5accdd37df3dee}{define} (Ref\-Counted\-Ptr$<$ Level\-Data$<$ Flux\-Box $>$ $>$ a\-\_\-coef\-Old, Ref\-Counted\-Ptr$<$ Level\-Data$<$ Flux\-Box $>$ $>$ a\-\_\-coef\-New, Real a\-\_\-time\-Old, Real a\-\_\-time\-New)}\label{class_coefficient_interpolator_linear_face_af27d8bed697ac3ddda5accdd37df3dee}
+
+\begin{DoxyCompactList}\small\item\em Define. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_coefficient_interpolator_linear_face_aae51740c3e19c958371b6b1136f8d9c1}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ Flux\-Box $>$ $>$ \hyperlink{class_coefficient_interpolator_linear_face_aae51740c3e19c958371b6b1136f8d9c1}{m\-\_\-coef\-Old}}\label{class_coefficient_interpolator_linear_face_aae51740c3e19c958371b6b1136f8d9c1}
+
+\begin{DoxyCompactList}\small\item\em Coefficient at old time. \end{DoxyCompactList}\item 
+\hypertarget{class_coefficient_interpolator_linear_face_a8211cb341ee6772d07fc4951aab16a00}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ Flux\-Box $>$ $>$ \hyperlink{class_coefficient_interpolator_linear_face_a8211cb341ee6772d07fc4951aab16a00}{m\-\_\-coef\-New}}\label{class_coefficient_interpolator_linear_face_a8211cb341ee6772d07fc4951aab16a00}
+
+\begin{DoxyCompactList}\small\item\em Coefficient at new time. \end{DoxyCompactList}\item 
+\hypertarget{class_coefficient_interpolator_linear_face_aa4b51decdda11a34c0d910cd1be109bd}{Real \hyperlink{class_coefficient_interpolator_linear_face_aa4b51decdda11a34c0d910cd1be109bd}{m\-\_\-time\-Old}}\label{class_coefficient_interpolator_linear_face_aa4b51decdda11a34c0d910cd1be109bd}
+
+\begin{DoxyCompactList}\small\item\em Old time. \end{DoxyCompactList}\item 
+\hypertarget{class_coefficient_interpolator_linear_face_af4baef6ce288a442d798fe1650b9a932}{Real \hyperlink{class_coefficient_interpolator_linear_face_af4baef6ce288a442d798fe1650b9a932}{m\-\_\-time\-New}}\label{class_coefficient_interpolator_linear_face_af4baef6ce288a442d798fe1650b9a932}
+
+\begin{DoxyCompactList}\small\item\em New time. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Linear coefficient interpolator (face centred) 
+
+Class to get time depdendent (face centred) coefficients by interpolating linearly in time. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_coefficient_interpolator_linear_face_a233d0b610df69e882c5820610dc65f99}{\index{Coefficient\-Interpolator\-Linear\-Face@{Coefficient\-Interpolator\-Linear\-Face}!depends\-Upon\-Solution@{depends\-Upon\-Solution}}
+\index{depends\-Upon\-Solution@{depends\-Upon\-Solution}!CoefficientInterpolatorLinearFace@{Coefficient\-Interpolator\-Linear\-Face}}
+\subsubsection[{depends\-Upon\-Solution}]{\setlength{\rightskip}{0pt plus 5cm}bool Coefficient\-Interpolator\-Linear\-Face\-::depends\-Upon\-Solution (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_coefficient_interpolator_linear_face_a233d0b610df69e882c5820610dc65f99}
+Returns true if the coefficient depends on the solution to the partial differential equation (rendering it nonlinear), false otherwise. By default, the coefficient is assumed not to depend upon the solution. \hypertarget{class_coefficient_interpolator_linear_face_a825a5def3f5da9e2a8890bd46d2af5b0}{\index{Coefficient\-Interpolator\-Linear\-Face@{Coefficient\-Interpolator\-Linear\-Face}!interpolate@{interpolate}}
+\index{interpolate@{interpolate}!CoefficientInterpolatorLinearFace@{Coefficient\-Interpolator\-Linear\-Face}}
+\subsubsection[{interpolate}]{\setlength{\rightskip}{0pt plus 5cm}void Coefficient\-Interpolator\-Linear\-Face\-::interpolate (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-result, }
+\item[{const Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-solution, }
+\item[{Real}]{a\-\_\-time}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_coefficient_interpolator_linear_face_a825a5def3f5da9e2a8890bd46d2af5b0}
+Interpolate the coefficient at the given time, placing the result in the given Level\-Data object. This method assumes that the coefficient depends upon the solution to the partial differential equation in question, so the solution is passed into it as an argument. 
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-result} & The Level\-Data object that will store the result. \\
+\hline
+{\em a\-\_\-solution} & The solution to the partial differential equation. \\
+\hline
+{\em a\-\_\-time} & The time at which the coefficient is to be evaluated. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_coefficient_interpolator_linear_face_a6a9d41e8aac928cad20649644ce70aeb}{\index{Coefficient\-Interpolator\-Linear\-Face@{Coefficient\-Interpolator\-Linear\-Face}!interpolate\-Prime@{interpolate\-Prime}}
+\index{interpolate\-Prime@{interpolate\-Prime}!CoefficientInterpolatorLinearFace@{Coefficient\-Interpolator\-Linear\-Face}}
+\subsubsection[{interpolate\-Prime}]{\setlength{\rightskip}{0pt plus 5cm}void Coefficient\-Interpolator\-Linear\-Face\-::interpolate\-Prime (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-prime, }
+\item[{const Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-solution, }
+\item[{Real}]{a\-\_\-time}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_coefficient_interpolator_linear_face_a6a9d41e8aac928cad20649644ce70aeb}
+Computes the derivative of the coefficient with respect to the solution at the desired time. By default, this sets {\itshape a\-\_\-deriv} to 0. 
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-prime} & The coefficient derivative data will be stored here. \\
+\hline
+{\em a\-\_\-solution} & The solution to the partial differential equation. \\
+\hline
+{\em a\-\_\-time} & The time at which to compute the coefficient data. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_coefficient_interpolator_linear_face_aa1d2b29813de7845fda24e5c523ca5b7}{\index{Coefficient\-Interpolator\-Linear\-Face@{Coefficient\-Interpolator\-Linear\-Face}!solve@{solve}}
+\index{solve@{solve}!CoefficientInterpolatorLinearFace@{Coefficient\-Interpolator\-Linear\-Face}}
+\subsubsection[{solve}]{\setlength{\rightskip}{0pt plus 5cm}void Coefficient\-Interpolator\-Linear\-Face\-::solve (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-phi, }
+\item[{const Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-f, }
+\item[{Real}]{a\-\_\-time, }
+\item[{const Level\-Data$<$ Flux\-Box $>$ \&}]{a\-\_\-phi0, }
+\item[{Real}]{a\-\_\-tolerance}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_coefficient_interpolator_linear_face_aa1d2b29813de7845fda24e5c523ca5b7}
+This virtual void method performs the iterative nonlinear solve $A(\phi) \phi - f(\vec{x}) = 0$ for $\phi$. 
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-phi} & The solution to the equation, $\phi$, will be stored here. \\
+\hline
+{\em a\-\_\-f} & The term $f(\vec{x})$ in the equation. \\
+\hline
+{\em a\-\_\-time} & The time at which the equation is solved. \\
+\hline
+{\em a\-\_\-phi0} & The initial estimate for $\phi$. \\
+\hline
+{\em a\-\_\-tolerance} & The threshold for the error in the equation that dictates when iteration should cease. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/src/Coefficient\-Interpolator\-Linear\-Face.\-H\item 
+/home/parkinsonjl/mushy-\/layer/src/Coefficient\-Interpolator\-Linear\-Face.\-cpp\end{DoxyCompactItemize}

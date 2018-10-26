@@ -1,0 +1,321 @@
+
+amrmultigrid.MGtype=1
+amrmultigrid.hang_eps=1.0e-10
+amrmultigrid.max_iter=10
+amrmultigrid.norm_thresh=1.0e-10
+amrmultigrid.num_mg=1
+amrmultigrid.num_smooth=8
+amrmultigrid.relaxMode=1
+amrmultigrid.tolerance=1.0e-10
+amrmultigrid.verbosity=0
+bc.bulkConcentrationHiVal=-1 -1
+bc.bulkConcentrationLoVal=-1 -1
+
+bc.scalarHi=1 0 0
+bc.scalarLo=1 2 2
+bc.velHi=6 0 0
+bc.velLo=6 3 0 #6 3 0 for outflow
+concise_run_name=Uniform64MushyDB
+machineCodeIsRunOn=atmlxmaster
+main.addSubtractGradP=1
+
+
+main.checkpoint_interval=8
+main.chk_prefix=chk
+main.debug=false
+main.doEuler=1
+main.doProjection=1
+main.doVCreflux=0
+main.dt_tolerance_factor=1.01
+main.enforceAnalyticSoln=false
+main.fill_ratio=0.75
+
+main.ignoreSolverFails=true
+main.implicitAdvectionSolve=false
+main.initialPerturbation=0.0
+main.initial_cfl=0.001 # was 0.01
+main.initialize_pressure=true
+main.iter_plot_interval=-1
+main.iteration_plot_interval=-1
+main.maxRestartWavenumber=1
+
+main.max_dt_growth=1.01 # trying to increase this above 1.01
+
+main.max_step=10000 #187
+main.max_time=1.0e10
+main.min_time=10.0
+main.nondimensionalisation=1
+main.output_folder=output
+main.periodic_bc=1 0 0
+main.perturbationSin=true
+main.perturbationWavenumber=1
+
+main.plot_prefix=plt
+main.project_initial_vel=true
+main.ref_ratio=2 2 2
+
+
+main.restart_perturbation=0.0
+main.restart_wavenumber=1
+main.scalePwithChi=1
+main.solverFailRestartMethod=0
+main.steady_state=1e-9
+main.symmetric_domain=false
+
+
+main.usePhiForImplicitAdvectionSolve=false
+main.use_limiting=true
+
+main.verbosity=2
+main.viscous_solver_tol=1e-15
+mercurialRepository=1062+
+parameters.K=1
+parameters.bottomBulkConc=-1.0
+parameters.bottomEnthalpy=6.3
+parameters.compositionRatio=20.0
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.heatConductivityRatio=1
+parameters.heleShaw=true
+parameters.initialComposition=30
+parameters.lewis=500 # 500
+parameters.liquidusSlope=-0.1
+
+parameters.nonDimVel=0.0
+parameters.permeabilityFunction=2
+parameters.prandtl=10.0
+parameters.problem_type=0
+parameters.rayleighTemp=0
+parameters.specificHeatRatio=1
+parameters.stefan=5
+parameters.topBulkConc=-1.0
+parameters.waterDistributionCoeff=1e-5
+picardSolver.max_iter=8
+picardSolver.tol=1e-5
+
+
+projection.numSmoothDown=4
+projection.numSmoothUp=4
+projection.solverTol=1e-15
+
+projector.verbosity=0
+regrid.marginalPorosityLimit=0.99
+run_name=Uniform
+
+
+#AMR
+main.max_level=2
+main.refine_thresh=0.0005 #0.02
+main.taggingVar=3   #3 porosity, 4 liquid conc
+main.regrid_interval=8 16
+
+
+# Good:
+parameters.rayleighComp=500
+parameters.darcy=1e-4
+main.domain_width=1.0
+
+# Also Good:
+
+parameters.rayleighComp=5e3
+parameters.darcy=1e-4
+main.domain_width=1.0
+
+#AMR testing:
+main.domain_width=1.0  #3.0 for multiple channels
+parameters.rayleighComp=350 #100
+parameters.darcy=2e-3
+main.debug=true
+
+main.num_cells=32 64 #64 64
+main.max_dt=4 #0.5 # should be less than prandtl number?
+
+main.nondimensionalisation=1
+
+main.use_subcycling=0
+
+main.plot_interval=16 #32
+
+bc.enthalpyHiVal=0.0 0.2  #-0.2
+bc.enthalpyLoVal=0.0 6.05 #6.5  #6.5
+main.cfl=0.4
+
+parameters.nonDimReluctance=1e-3
+
+main.advPorosityLimit=0.01
+main.ccvel_porosity_cap=0.01
+main.verbosity=2
+
+regrid.plume_vel=0.025 # need to work out what this should be a priori. Probably scales a bit like a^2 * Pr * Da * RaC
+main.grid_buffer_size=4 4 4
+main.tag_buffer_size=4 # this needs to be big enough to keep ahead of the ml-interface
+
+
+# Try just 1 refined region, around channel, and get reflux to work
+main.max_level=1
+main.num_cells=64 128
+
+
+main.time_integration_order=1
+main.reflux_average_down=1
+projection.eta=0.95 #0.95 
+main.reflux_momentum=1
+main.reflux_normal_momentum=1 # default is true
+main.reflux_scalar=1
+main.refluxType=0 # could try reflux type 0, just a simple (non-VC) poisson solve
+
+#main.refluxBetaSign=-1
+#main.refluxCorrSign=0.0 #0.01
+
+#main.restart_file=output/chk000464.2d.hdf5
+
+parameters.darcy=5e-4
+parameters.rayleighComp=800
+
+parameters.darcy=5e-3
+parameters.rayleighComp=75
+main.domain_width = 1.0
+
+# These params develop a single channel:
+main.max_level=1
+main.num_cells=32 128 #64 128
+main.block_factor=16
+main.max_grid_size=16
+parameters.rayleighComp=300
+
+# Need to test these params:
+#main.max_level=2
+#main.num_cells=32 128 #64 128
+#parameters.rayleighComp=300
+
+# Try coarser params:
+main.max_level=1
+main.num_cells=16 64 #64 128
+main.block_factor=8
+main.max_grid_size=32
+parameters.rayleighComp=300
+main.domain_width = 1.0
+main.tag_buffer_size=1
+
+regrid.plume_salinity=-0.5
+regrid.plume_vel=0.011 #0.01 #0.0005
+
+# Good, now try two levels
+main.max_level=2
+# Above works, but issue with refluxing at domain boundaries
+
+parameters.rayleighComp=275 #want just the one channel 
+main.maxDivUFace=1e-10
+
+# Trying to fix bug at step 430
+#main.restart_file=outputAMR/chk000704.2d.hdf5
+projection.eta=0.9
+main.reflux_scalar=1
+main.max_step=74
+main.use_subcycling=1
+
+# try and make larger grids to see if it helps the solvers
+main.tag_buffer_size=16 # - this places refined regions outside mush
+main.tag_buffer_size=8 # - places cf interface in mush which doesn't work
+
+parameters.rayleighComp=300
+# Just one channel?:
+# 300 for max_dt = 10
+parameters.rayleighComp=1000 # 400 for single level
+
+## Sync options:
+main.initLambda=1
+main.regrid_advect_before_freestream=1
+main.regrid_freestream_subcycle=1
+main.num_init_passes=5
+main.regrid_dt_scale=0.5
+
+main.regrid_small_vel_limit=1e-7
+
+main.writePressureInitFields=0
+main.max_level=2
+projection.eta=0.99
+
+# Trying to construct same problem with one level of refinement
+main.max_level=1
+main.max_step=3000
+main.num_cells=32 128
+
+main.tag_buffer_size=4
+
+
+
+main.plot_interval=8
+main.subcycled_plots=0
+
+
+
+#main.project_initial_vel=0
+# Not sure if this makes a difference. Maybe a bit.
+main.vectorHOinterp=1
+main.scalarHOinterp=1
+
+#######################################################
+### With viscous src
+#############################################
+parameters.compositionRatio=1.3
+parameters.darcy=5e-3
+parameters.rayleighComp=500
+main.domain_width=1.0
+main.output_folder=outputViscousSrc
+main.max_step=10000
+
+main.max_dt=100
+main.initial_cfl=1e-7
+main.max_time=1500
+main.max_dt_growth=1.001
+parameters.rayleighComp=600 # make this bigger now we've reduced dt 
+
+########################################################
+# Try without viscous source:
+########################################################
+#main.output_folder=outputNoViscousSrc
+#advSrc.viscous=0
+#parameters.rayleighComp=300 # need to reduce this if no viscosity
+#main.max_step=220
+
+# This will be dodgy because pressure BCs are messed up (pi includes effects of viscosity)
+# Try turning off viscosity altogether
+#main.viscosityCoeff=0
+#parameters.rayleighComp=50
+#main.max_step=1e5
+# This is unstable - try smaller Darcy though
+#parameters.darcy=1e-6
+#parameters.rayleighComp=7e3
+#main.max_dt=1e3
+
+#main.restart_file=outputNoViscousSrc/chk010000.2d.hdf5
+
+########################################################
+## Sync options:
+##################################################
+main.initLambda=1
+main.regrid_advect_before_freestream=0
+main.regrid_freestream_subcycle=0
+main.regrid_eta_scale=1.0
+projection.eta=0.99
+#projection.scaleSyncCorrection=0 # default true, doesn't seem to make a difference
+
+main.num_init_passes=5
+main.regrid_dt_scale=0.5
+
+main.reflux_scalar=1
+
+main.do_postRegrid_smoothing=0
+#main.regrid_smoothing_coeff=0.05
+
+
+
+
+##################################################
+# For debugging:
+#################################################
+#main.plot_interval=1
+#main.subcycled_plots=1
+
+##################### End of Params ########################

@@ -1,0 +1,121 @@
+C      _______              __
+C     / ___/ /  ___  __ _  / /  ___
+C    / /__/ _ \/ _ \/  V \/ _ \/ _ \
+C    \___/_//_/\___/_/_/_/_.__/\___/
+C    Please refer to Copyright.txt, in Chombo's root directory.
+
+#include "CONSTANTS.H"
+
+c ---------------------------------------------------------
+c sets boundary conditions on computed terms
+c at the moment, this is just 0th order extrapolation from
+c the interior, so it's real simple
+c
+c INPUTS/OUTPUTS:
+c phi      <=> field to set BCs on
+c gridBox  => interior of grid
+c loBox    => box of ghost cells to fill at lo end in direction dir
+c hiBox    => box of ghost cells to fill at hi end in direction dir
+c dir      => direction in which we're working
+c nComp    => number of components
+c ----------------------------------------------------------
+      subroutine EXTRAPOLATIONBC(CHF_FRA[phi], CHF_BOX[gridBox],
+     &                     CHF_BOX[loBox], CHF_BOX[hiBox],
+     &                     CHF_INT[dir], CHF_INT[nComp])
+
+c ::: local variables
+      integer CHF_DDECL[i;j;k]
+      integer CHF_DDECL[ii;jj;kk], n
+
+c ::: loop over components
+      do n=0,nComp-1
+
+c ::: do low box
+         CHF_MULTIDO[loBox;i;j;k]
+         CHF_DTERM[
+         ii = i+CHF_ID(0,dir)*(CHF_LBOUND[gridBox;0]-i);
+         jj = j+CHF_ID(1,dir)*(CHF_LBOUND[gridBox;1]-j);
+         kk = k+CHF_ID(2,dir)*(CHF_LBOUND[gridBox;2]-k)]
+
+         phi(CHF_IX[i;j;k],n) = phi(CHF_IX[ii;jj;kk],n)
+
+         CHF_ENDDO
+
+c ::: now do high box
+         CHF_MULTIDO[hiBox;i;j;k]
+         CHF_DTERM[
+         ii = i+CHF_ID(0,dir)*(CHF_UBOUND[gridBox;0]-i);
+         jj = j+CHF_ID(1,dir)*(CHF_UBOUND[gridBox;1]-j);
+         kk = k+CHF_ID(2,dir)*(CHF_UBOUND[gridBox;2]-k)]
+
+         phi(CHF_IX[i;j;k],n) = phi(CHF_IX[ii;jj;kk],n)
+
+         CHF_ENDDO
+
+      enddo
+
+      return
+      end
+
+      
+c ---------------------------------------------------------
+c sets boundary conditions on viscous terms (nu*Laplacian(vel))
+c 1st order extrapolation version
+c
+c INPUTS/OUTPUTS:
+c phi <=> viscous term
+c gridBox  => interior of grid
+c loBox    => box of ghost cells to fill at lo end in direction dir
+c hiBox    => box of ghost cells to fill at hi end in direction dir
+c dir      => direction in which we're working
+c nComp    => number of components
+c ----------------------------------------------------------
+      subroutine EXTRAPOLATIONBC1(CHF_FRA[phi], CHF_BOX[gridBox],
+     &                     CHF_BOX[loBox], CHF_BOX[hiBox],
+     &                     CHF_INT[dir], CHF_INT[nComp])
+
+c ::: local variables
+      integer CHF_DDECL[i;j;k]
+      integer CHF_DDECL[ii;jj;kk], n
+      integer CHF_DDECL[iii;jjj;kkk]
+
+c ::: loop over components
+      do n=0,nComp-1
+
+c ::: do low box
+         CHF_MULTIDO[loBox;i;j;k]
+         CHF_DTERM[
+         ii = i+CHF_ID(0,dir)*(CHF_LBOUND[gridBox;0]-i);
+         jj = j+CHF_ID(1,dir)*(CHF_LBOUND[gridBox;1]-j);
+         kk = k+CHF_ID(2,dir)*(CHF_LBOUND[gridBox;2]-k)]
+         
+         CHF_DTERM[
+         iii = ii+CHF_ID(0,dir)*(CHF_LBOUND[gridBox;0]-i);
+         jjj = jj+CHF_ID(1,dir)*(CHF_LBOUND[gridBox;1]-j);
+         kkk = kk+CHF_ID(2,dir)*(CHF_LBOUND[gridBox;2]-k)]
+                              
+
+         phi(CHF_IX[i;j;k],n) = 2*phi(CHF_IX[ii;jj;kk],n) - phi(CHF_IX[iii;jjj;kkk],n)
+
+         CHF_ENDDO
+
+c ::: now do high box
+         CHF_MULTIDO[hiBox;i;j;k]
+         CHF_DTERM[
+         ii = i+CHF_ID(0,dir)*(CHF_UBOUND[gridBox;0]-i);
+         jj = j+CHF_ID(1,dir)*(CHF_UBOUND[gridBox;1]-j);
+         kk = k+CHF_ID(2,dir)*(CHF_UBOUND[gridBox;2]-k)]
+         
+         CHF_DTERM[
+         iii = ii+CHF_ID(0,dir)*(CHF_UBOUND[gridBox;0]-i);
+         jjj = jj+CHF_ID(1,dir)*(CHF_UBOUND[gridBox;1]-j);
+         kkk = kk+CHF_ID(2,dir)*(CHF_UBOUND[gridBox;2]-k)]
+
+         phi(CHF_IX[i;j;k],n) = 2*phi(CHF_IX[ii;jj;kk],n) - phi(CHF_IX[iii;jjj;kkk],n)
+
+         CHF_ENDDO
+
+      enddo
+
+      return
+      end

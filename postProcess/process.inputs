@@ -1,0 +1,26 @@
+# Where are the files to analyse located?
+in_folder = /home/parkinsonjl/convection-in-sea-ice/MushyLayer/postProcess/test/
+prefix  = chkCR6.0RaC4000Le200KozenyPermeabilitypts88-000100.2d.hdf5
+#run_inputs = inputs
+
+# Where should we write out the diagnostics?
+out_file = /home/parkinsonjl/convection-in-sea-ice/MushyLayer/postProcess/test/cpp_diagnostics.out
+
+##################################
+# To convert Wells to Katz
+##################################
+parameters.referenceTemperature = -3.5
+parameters.referenceSalinity = 35
+	
+# Katz ref:
+parameters.prevReferenceTemperature = -23
+parameters.prevReferenceSalinity = 230
+	
+# Convert boundary conditions:
+parameters.bottomEnthalpy = 5.5
+parameters.topEnthalpy = -1.5
+parameters.topBulkConc = 0.0
+parameters.bottomBulkConc = 0.0
+	
+# Convert non dim vals:
+parameters.compositionRatio = 0.1

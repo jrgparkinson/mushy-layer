@@ -1,0 +1,42 @@
+\hypertarget{class_extrapolation_b_c_function}{\section{Extrapolation\-B\-C\-Function Class Reference}
+\label{class_extrapolation_b_c_function}\index{Extrapolation\-B\-C\-Function@{Extrapolation\-B\-C\-Function}}
+}
+
+
+Boundary condition for source terms.  
+
+
+Inheritance diagram for Extrapolation\-B\-C\-Function\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_extrapolation_b_c_function}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_extrapolation_b_c_function_ab6747f91f0d3ee6d32634cae85f62dd8}{\hyperlink{class_extrapolation_b_c_function_ab6747f91f0d3ee6d32634cae85f62dd8}{Extrapolation\-B\-C\-Function} (bool a\-\_\-is\-Defined, int a\-\_\-order=0)}\label{class_extrapolation_b_c_function_ab6747f91f0d3ee6d32634cae85f62dd8}
+
+\begin{DoxyCompactList}\small\item\em Full constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_extrapolation_b_c_function_a3d8d0ed4cda1a8beb61c5ac5817b36aa}{virtual void \hyperlink{class_extrapolation_b_c_function_a3d8d0ed4cda1a8beb61c5ac5817b36aa}{operator()} (F\-Array\-Box \&a\-\_\-state, const Box \&a\-\_\-valid, const Problem\-Domain \&a\-\_\-domain, Real a\-\_\-dx, bool a\-\_\-homogeneous)}\label{class_extrapolation_b_c_function_a3d8d0ed4cda1a8beb61c5ac5817b36aa}
+
+\begin{DoxyCompactList}\small\item\em Apply B\-C. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_extrapolation_b_c_function_a64590e6d6c7e4182ab3c5c9079620af3}{bool \hyperlink{class_extrapolation_b_c_function_a64590e6d6c7e4182ab3c5c9079620af3}{m\-\_\-is\-Defined}}\label{class_extrapolation_b_c_function_a64590e6d6c7e4182ab3c5c9079620af3}
+
+\begin{DoxyCompactList}\small\item\em Is object defined? \end{DoxyCompactList}\item 
+\hypertarget{class_extrapolation_b_c_function_a9fda57684ad22edeee9fb5c3b98a1469}{int {\bfseries m\-\_\-order}}\label{class_extrapolation_b_c_function_a9fda57684ad22edeee9fb5c3b98a1469}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Boundary condition for source terms. 
+
+sets boundary conditions on source terms. At the moment, this is just 0th order extrapolation from the interior, so it's real simple. Fills interior as well as domain ghost cells. 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/\-B\-Cutil/Phys\-B\-C\-Util.\-cpp\end{DoxyCompactItemize}

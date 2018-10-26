@@ -1,0 +1,192 @@
+\hypertarget{class_advect_i_b_c}{\section{Advect\-I\-B\-C Class Reference}
+\label{class_advect_i_b_c}\index{Advect\-I\-B\-C@{Advect\-I\-B\-C}}
+}
+
+
+I\-B\-C for simple advection.  
+
+
+
+
+{\ttfamily \#include $<$Advect\-I\-B\-C.\-H$>$}
+
+Inheritance diagram for Advect\-I\-B\-C\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_advect_i_b_c}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{class_advect_i_b_c_ad4d8474d7904dab87483522ebe711b8e}{bc\-Type} \{ \\*
+{\bfseries m\-\_\-dirichlet}, 
+{\bfseries m\-\_\-extrap}, 
+{\bfseries m\-\_\-inflow\-Outflow}, 
+{\bfseries m\-\_\-plume\-Inflow}, 
+\\*
+{\bfseries m\-\_\-neumann}, 
+{\bfseries m\-\_\-num\-B\-C\-Types}
+ \}
+\begin{DoxyCompactList}\small\item\em Possible B\-C types. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_advect_i_b_c_af2d3f4fff7f08be3e1e3f140034bc34c}{\hyperlink{class_advect_i_b_c_af2d3f4fff7f08be3e1e3f140034bc34c}{Advect\-I\-B\-C} ()}\label{class_advect_i_b_c_af2d3f4fff7f08be3e1e3f140034bc34c}
+
+\begin{DoxyCompactList}\small\item\em Null constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a8897e6ad80cdff2121c4d4f6ce922ce1}{{\bfseries Advect\-I\-B\-C} (int a\-\_\-num\-Comp)}\label{class_advect_i_b_c_a8897e6ad80cdff2121c4d4f6ce922ce1}
+
+\item 
+\hypertarget{class_advect_i_b_c_a4d1d956949384ad8621ba145de87952e}{\hyperlink{class_advect_i_b_c_a4d1d956949384ad8621ba145de87952e}{$\sim$\-Advect\-I\-B\-C} ()}\label{class_advect_i_b_c_a4d1d956949384ad8621ba145de87952e}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+Phys\-I\-B\-C $\ast$ \hyperlink{class_advect_i_b_c_a4d092d4a393e169a87f7df920d09a2b0}{new\-\_\-phys\-I\-B\-C} ()
+\begin{DoxyCompactList}\small\item\em Factory method -\/ this object is its own factory. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_ae2edb5fa139b1655c3d7d87416da7023}{void \hyperlink{class_advect_i_b_c_ae2edb5fa139b1655c3d7d87416da7023}{set\-Default\-Values} (int a\-\_\-num\-Comp=1)}\label{class_advect_i_b_c_ae2edb5fa139b1655c3d7d87416da7023}
+
+\begin{DoxyCompactList}\small\item\em set default boundary values \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_af222561d9fba9498f4fc647a9e37547a}{void \hyperlink{class_advect_i_b_c_af222561d9fba9498f4fc647a9e37547a}{prim\-B\-C} (F\-Array\-Box \&a\-\_\-\-W\-Gdnv, const F\-Array\-Box \&a\-\_\-\-Wextrap, const F\-Array\-Box \&a\-\_\-\-W, const int \&a\-\_\-dir, const Side\-::\-Lo\-Hi\-Side \&a\-\_\-side, const Real \&a\-\_\-time)}\label{class_advect_i_b_c_af222561d9fba9498f4fc647a9e37547a}
+
+\begin{DoxyCompactList}\small\item\em Set boundary fluxes. \end{DoxyCompactList}\item 
+void \hyperlink{class_advect_i_b_c_a5410c1910c93274665fe324a5c6b3be9}{set\-Bdry\-Slopes} (F\-Array\-Box \&a\-\_\-d\-W, const F\-Array\-Box \&a\-\_\-\-W, const int \&a\-\_\-dir, const Real \&a\-\_\-time)
+\begin{DoxyCompactList}\small\item\em Set boundary slopes. \end{DoxyCompactList}\item 
+void \hyperlink{class_advect_i_b_c_abd44c883d18c238c99456b57d974f9dc}{initialize} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-\-U)
+\begin{DoxyCompactList}\small\item\em Set up initial conditions. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_ab09d9d22d56f103e39e08884fb4b6217}{void \hyperlink{class_advect_i_b_c_ab09d9d22d56f103e39e08884fb4b6217}{advection\-Vel} (const Real\-Vect \&a\-\_\-adv\-Vel)}\label{class_advect_i_b_c_ab09d9d22d56f103e39e08884fb4b6217}
+
+\begin{DoxyCompactList}\small\item\em set velocity \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a249a4f558a5cfa9b51874cc6d51df02a}{const Real\-Vect \& \hyperlink{class_advect_i_b_c_a249a4f558a5cfa9b51874cc6d51df02a}{advection\-Vel} () const }\label{class_advect_i_b_c_a249a4f558a5cfa9b51874cc6d51df02a}
+
+\begin{DoxyCompactList}\small\item\em advection velocity. No idea what this is here for. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_ab835398d8c5f12740518e69d47e8cad2}{void \hyperlink{class_advect_i_b_c_ab835398d8c5f12740518e69d47e8cad2}{prob\-Type} (const int a\-\_\-probtype)}\label{class_advect_i_b_c_ab835398d8c5f12740518e69d47e8cad2}
+
+\begin{DoxyCompactList}\small\item\em set problem type \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a9d9cb1bf0ce09b8f4ce0429b850221a7}{void \hyperlink{class_advect_i_b_c_a9d9cb1bf0ce09b8f4ce0429b850221a7}{set\-Boundary\-Value} (Real a\-\_\-bc\-Val, int a\-\_\-bc\-Type, int a\-\_\-dir, Side\-::\-Lo\-Hi\-Side a\-\_\-hi\-Lo, int a\-\_\-comp=0)}\label{class_advect_i_b_c_a9d9cb1bf0ce09b8f4ce0429b850221a7}
+
+\begin{DoxyCompactList}\small\item\em set boundary value (default is 0) \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_aa03fa005397fe7ba2f40dfd0e4762f66}{void \hyperlink{class_advect_i_b_c_aa03fa005397fe7ba2f40dfd0e4762f66}{set\-Boundary\-Values} (Real\-Vect bc\-Vals, Int\-Vect \hyperlink{class_advect_i_b_c_ad4d8474d7904dab87483522ebe711b8e}{bc\-Type}, Side\-::\-Lo\-Hi\-Side a\-\_\-hi\-Lo, int a\-\_\-comp=0)}\label{class_advect_i_b_c_aa03fa005397fe7ba2f40dfd0e4762f66}
+
+\begin{DoxyCompactList}\small\item\em Set boundary values (N dimensional version) \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a559e2f450c3ccbff23ba713d508117d5}{void \hyperlink{class_advect_i_b_c_a559e2f450c3ccbff23ba713d508117d5}{set\-Plume} (Vector$<$ Real $>$ a\-\_\-plume\-Vals, Vector$<$ Real $>$ plume\-Bounds)}\label{class_advect_i_b_c_a559e2f450c3ccbff23ba713d508117d5}
+
+\begin{DoxyCompactList}\small\item\em Set plume details. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_abeb87fbdca5e7f2711161712734c3f9e}{void \hyperlink{class_advect_i_b_c_abeb87fbdca5e7f2711161712734c3f9e}{set\-B\-C\-Type} (int a\-\_\-bc\-Type, int a\-\_\-dir, Side\-::\-Lo\-Hi\-Side a\-\_\-hi\-Lo)}\label{class_advect_i_b_c_abeb87fbdca5e7f2711161712734c3f9e}
+
+\begin{DoxyCompactList}\small\item\em Set the type of condition on each boundary. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_adabceffc28ca37c3be7a6fc3f674c69b}{Real \hyperlink{class_advect_i_b_c_adabceffc28ca37c3be7a6fc3f674c69b}{get\-Boundary\-Value} (int a\-\_\-dir, Side\-::\-Lo\-Hi\-Side a\-\_\-hi\-Lo, int a\-\_\-comp=0) const }\label{class_advect_i_b_c_adabceffc28ca37c3be7a6fc3f674c69b}
+
+\begin{DoxyCompactList}\small\item\em access boundary value \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a28147c7f8464b4f5ce98813a277799ad}{void \hyperlink{class_advect_i_b_c_a28147c7f8464b4f5ce98813a277799ad}{set\-Adv\-Vel} (Level\-Data$<$ Flux\-Box $>$ $\ast$a\-\_\-adv\-Vel)}\label{class_advect_i_b_c_a28147c7f8464b4f5ce98813a277799ad}
+
+\begin{DoxyCompactList}\small\item\em Set pointer to advection velocity. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_aae3c93645117a85f8ed4efbc758d9cc6}{void \hyperlink{class_advect_i_b_c_aae3c93645117a85f8ed4efbc758d9cc6}{set\-Adv\-Vel} (Flux\-Box $\ast$a\-\_\-adv\-Vel)}\label{class_advect_i_b_c_aae3c93645117a85f8ed4efbc758d9cc6}
+
+\begin{DoxyCompactList}\small\item\em Set pointer to advection velocity for the box we're integrating over. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a142042663359db469a777366ca287855}{void \hyperlink{class_advect_i_b_c_a142042663359db469a777366ca287855}{set\-Slope\-Value} (Real a\-\_\-slope\-Val, int a\-\_\-dir, Side\-::\-Lo\-Hi\-Side a\-\_\-hi\-Lo)}\label{class_advect_i_b_c_a142042663359db469a777366ca287855}
+
+\begin{DoxyCompactList}\small\item\em set slope value (default is 0) \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a8feb7b809940db26555a59073cdb9de7}{Real \hyperlink{class_advect_i_b_c_a8feb7b809940db26555a59073cdb9de7}{get\-Slope\-Value} (int a\-\_\-dir, Side\-::\-Lo\-Hi\-Side a\-\_\-hi\-Lo) const }\label{class_advect_i_b_c_a8feb7b809940db26555a59073cdb9de7}
+
+\begin{DoxyCompactList}\small\item\em access slope value \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a8109239cfc7cc3637da64045e4df1f30}{void \hyperlink{class_advect_i_b_c_a8109239cfc7cc3637da64045e4df1f30}{art\-Visc\-B\-C} (F\-Array\-Box \&a\-\_\-\-F, const F\-Array\-Box \&a\-\_\-\-U, const F\-Array\-Box \&a\-\_\-div\-Vel, const int \&a\-\_\-dir, const Real \&a\-\_\-time)}\label{class_advect_i_b_c_a8109239cfc7cc3637da64045e4df1f30}
+
+\begin{DoxyCompactList}\small\item\em Apply artifical viscosity B\-Cs. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_ae61302d20370083b3d249c994aa368da}{int \hyperlink{class_advect_i_b_c_ae61302d20370083b3d249c994aa368da}{prob\-Type} () const }\label{class_advect_i_b_c_ae61302d20370083b3d249c994aa368da}
+
+\begin{DoxyCompactList}\small\item\em accessor \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_advect_i_b_c_a7d844d0407883309028ab564f3b20261}{Real\-Vect \hyperlink{class_advect_i_b_c_a7d844d0407883309028ab564f3b20261}{m\-\_\-velocity}}\label{class_advect_i_b_c_a7d844d0407883309028ab564f3b20261}
+
+\begin{DoxyCompactList}\small\item\em Don't know what this is for. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a5737cd993143b522c10599caa94e849f}{Real \hyperlink{class_advect_i_b_c_a5737cd993143b522c10599caa94e849f}{m\-\_\-bc\-Val\-Plume}}\label{class_advect_i_b_c_a5737cd993143b522c10599caa94e849f}
+
+\begin{DoxyCompactList}\small\item\em boundary value at the plume \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_aeb567fe955fff5c26c250a77b1bd2762}{Real {\bfseries m\-\_\-inflow\-Val}}\label{class_advect_i_b_c_aeb567fe955fff5c26c250a77b1bd2762}
+
+\item 
+\hypertarget{class_advect_i_b_c_a4149bd47a240acfc4de71ff74e10df1d}{Vector$<$ Real $>$ {\bfseries m\-\_\-plume\-Bounds}}\label{class_advect_i_b_c_a4149bd47a240acfc4de71ff74e10df1d}
+
+\item 
+\hypertarget{class_advect_i_b_c_a2fd99ddeaa84fbadf49657de8491998f}{Level\-Data$<$ Flux\-Box $>$ $\ast$ \hyperlink{class_advect_i_b_c_a2fd99ddeaa84fbadf49657de8491998f}{m\-\_\-adv\-Vel}}\label{class_advect_i_b_c_a2fd99ddeaa84fbadf49657de8491998f}
+
+\begin{DoxyCompactList}\small\item\em advection velocity field for the whole level \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a34ee29705f4f1205a75f0c725a135a1a}{Flux\-Box $\ast$ \hyperlink{class_advect_i_b_c_a34ee29705f4f1205a75f0c725a135a1a}{m\-\_\-adv\-Vel\-Box}}\label{class_advect_i_b_c_a34ee29705f4f1205a75f0c725a135a1a}
+
+\begin{DoxyCompactList}\small\item\em advection velocity for the specific box we're integrating over \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a8d828241433e76c184521c9ae489f078}{Vector$<$ Real $>$ \hyperlink{class_advect_i_b_c_a8d828241433e76c184521c9ae489f078}{m\-\_\-bc\-Val} \mbox{[}Space\-Dim\mbox{]}\mbox{[}2\mbox{]}}\label{class_advect_i_b_c_a8d828241433e76c184521c9ae489f078}
+
+\begin{DoxyCompactList}\small\item\em Boundary value. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a4f7653572eab6fea3ad343517b9f87c6}{Real \hyperlink{class_advect_i_b_c_a4f7653572eab6fea3ad343517b9f87c6}{m\-\_\-slope\-Val} \mbox{[}Space\-Dim\mbox{]}\mbox{[}2\mbox{]}}\label{class_advect_i_b_c_a4f7653572eab6fea3ad343517b9f87c6}
+
+\begin{DoxyCompactList}\small\item\em Boundary slope value. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a690ab64b62ebfc1757ec94dc93706516}{Vector$<$ Real $>$ {\bfseries m\-\_\-plume\-Vals}}\label{class_advect_i_b_c_a690ab64b62ebfc1757ec94dc93706516}
+
+\item 
+\hypertarget{class_advect_i_b_c_aa2a891f499c8d490a7ac7531a33a5d85}{Vector$<$ int $>$ \hyperlink{class_advect_i_b_c_aa2a891f499c8d490a7ac7531a33a5d85}{m\-\_\-bc\-Type} \mbox{[}Space\-Dim\mbox{]}\mbox{[}2\mbox{]}}\label{class_advect_i_b_c_aa2a891f499c8d490a7ac7531a33a5d85}
+
+\begin{DoxyCompactList}\small\item\em Boundary condition type. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_a3efbc8664456083ae4d71de9a7b17312}{bool \hyperlink{class_advect_i_b_c_a3efbc8664456083ae4d71de9a7b17312}{m\-\_\-is\-B\-Cval\-Set}}\label{class_advect_i_b_c_a3efbc8664456083ae4d71de9a7b17312}
+
+\begin{DoxyCompactList}\small\item\em Whether or not B\-Cs have been set. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_afd9c2bb5aa7834ea549538f060857ba9}{bool \hyperlink{class_advect_i_b_c_afd9c2bb5aa7834ea549538f060857ba9}{m\-\_\-is\-Slope\-Val\-Set}}\label{class_advect_i_b_c_afd9c2bb5aa7834ea549538f060857ba9}
+
+\begin{DoxyCompactList}\small\item\em Whether or not boundary slopes have been set. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_acccc5b94b75465b61128a7b8075516ae}{bool \hyperlink{class_advect_i_b_c_acccc5b94b75465b61128a7b8075516ae}{m\-\_\-is\-B\-Ctype\-Set}}\label{class_advect_i_b_c_acccc5b94b75465b61128a7b8075516ae}
+
+\begin{DoxyCompactList}\small\item\em Whether or not B\-C types have been set. \end{DoxyCompactList}\item 
+\hypertarget{class_advect_i_b_c_afcdc8bf740b7e44790927adce875cf59}{int \hyperlink{class_advect_i_b_c_afcdc8bf740b7e44790927adce875cf59}{m\-\_\-num\-Comps}}\label{class_advect_i_b_c_afcdc8bf740b7e44790927adce875cf59}
+
+\begin{DoxyCompactList}\small\item\em number of components \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+I\-B\-C for simple advection. 
+
+Parameters\-: 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_advect_i_b_c_abd44c883d18c238c99456b57d974f9dc}{\index{Advect\-I\-B\-C@{Advect\-I\-B\-C}!initialize@{initialize}}
+\index{initialize@{initialize}!AdvectIBC@{Advect\-I\-B\-C}}
+\subsubsection[{initialize}]{\setlength{\rightskip}{0pt plus 5cm}void Advect\-I\-B\-C\-::initialize (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-\-U}
+\end{DoxyParamCaption}
+)}}\label{class_advect_i_b_c_abd44c883d18c238c99456b57d974f9dc}
+
+
+Set up initial conditions. 
+
+shouldn't be in this function \hypertarget{class_advect_i_b_c_a4d092d4a393e169a87f7df920d09a2b0}{\index{Advect\-I\-B\-C@{Advect\-I\-B\-C}!new\-\_\-phys\-I\-B\-C@{new\-\_\-phys\-I\-B\-C}}
+\index{new\-\_\-phys\-I\-B\-C@{new\-\_\-phys\-I\-B\-C}!AdvectIBC@{Advect\-I\-B\-C}}
+\subsubsection[{new\-\_\-phys\-I\-B\-C}]{\setlength{\rightskip}{0pt plus 5cm}Phys\-I\-B\-C $\ast$ Advect\-I\-B\-C\-::new\-\_\-phys\-I\-B\-C (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{class_advect_i_b_c_a4d092d4a393e169a87f7df920d09a2b0}
+
+
+Factory method -\/ this object is its own factory. 
+
+Return a pointer to a new Phys\-I\-B\-C object with m\-\_\-is\-Defined = false (i.\-e., its define() must be called before it is used) and m\-\_\-is\-Fortran\-Common\-Set set to value of m\-\_\-is\-Fortran\-Commonset in the current (factory) object. \hypertarget{class_advect_i_b_c_a5410c1910c93274665fe324a5c6b3be9}{\index{Advect\-I\-B\-C@{Advect\-I\-B\-C}!set\-Bdry\-Slopes@{set\-Bdry\-Slopes}}
+\index{set\-Bdry\-Slopes@{set\-Bdry\-Slopes}!AdvectIBC@{Advect\-I\-B\-C}}
+\subsubsection[{set\-Bdry\-Slopes}]{\setlength{\rightskip}{0pt plus 5cm}void Advect\-I\-B\-C\-::set\-Bdry\-Slopes (
+\begin{DoxyParamCaption}
+\item[{F\-Array\-Box \&}]{a\-\_\-d\-W, }
+\item[{const F\-Array\-Box \&}]{a\-\_\-\-W, }
+\item[{const int \&}]{a\-\_\-dir, }
+\item[{const Real \&}]{a\-\_\-time}
+\end{DoxyParamCaption}
+)}}\label{class_advect_i_b_c_a5410c1910c93274665fe324a5c6b3be9}
+
+
+Set boundary slopes. 
+
+The boundary slopes in a\-\_\-d\-W are already set to one sided difference approximations. If this function doesn't change them they will be used for the slopes at the boundaries. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/\-B\-Cutil/Advect\-I\-B\-C.\-H\item 
+/home/parkinsonjl/mushy-\/layer/\-B\-Cutil/Advect\-I\-B\-C.\-cpp\end{DoxyCompactItemize}

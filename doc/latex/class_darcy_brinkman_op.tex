@@ -1,0 +1,249 @@
+\hypertarget{class_darcy_brinkman_op}{\section{Darcy\-Brinkman\-Op Class Reference}
+\label{class_darcy_brinkman_op}\index{Darcy\-Brinkman\-Op@{Darcy\-Brinkman\-Op}}
+}
+
+
+Operator for solving the Darcy-\/\-Brinkman equation.  
+
+
+
+
+{\ttfamily \#include $<$Darcy\-Brinkman\-Op.\-H$>$}
+
+Inheritance diagram for Darcy\-Brinkman\-Op\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_darcy_brinkman_op}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_darcy_brinkman_op_ac6da9fd6f61b40c42b3a94b645c21e35}{finer\-Operator\-Changed} (const M\-G\-Level\-Op$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ \&a\-\_\-operator, int a\-\_\-coarsening\-Factor)
+\item 
+\hypertarget{class_darcy_brinkman_op_a27d3f026aea19d8b7f14f6801d4fb479}{Level\-Data$<$ F\-Array\-Box $>$ \& \hyperlink{class_darcy_brinkman_op_a27d3f026aea19d8b7f14f6801d4fb479}{identity\-Coef} ()}\label{class_darcy_brinkman_op_a27d3f026aea19d8b7f14f6801d4fb479}
+
+\begin{DoxyCompactList}\small\item\em Returns identity coefficient data. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a4c661019f1436c2d7f68e6d7ec8a216c}{virtual void \hyperlink{class_darcy_brinkman_op_a4c661019f1436c2d7f68e6d7ec8a216c}{diagonal\-Scale} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs, bool a\-\_\-kappa\-Weighted)}\label{class_darcy_brinkman_op_a4c661019f1436c2d7f68e6d7ec8a216c}
+
+\begin{DoxyCompactList}\small\item\em For tga stuff. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a6b3aa7b8af250978e180b477a9037061}{virtual void \hyperlink{class_darcy_brinkman_op_a6b3aa7b8af250978e180b477a9037061}{divide\-By\-Identity\-Coef} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_darcy_brinkman_op_a6b3aa7b8af250978e180b477a9037061}
+
+\begin{DoxyCompactList}\small\item\em For tga stuff. \end{DoxyCompactList}\item 
+void \hyperlink{class_darcy_brinkman_op_a291dd090a4475bcb95fe2901722660c9}{set\-B\-Coef\-Interpolator} (Ref\-Counted\-Ptr$<$ Coefficient\-Interpolator$<$ Level\-Data$<$ Flux\-Box $>$, Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&a\-\_\-b\-Coef\-Interpolator)
+\item 
+\hypertarget{class_darcy_brinkman_op_a9b2d72f39820a3dfcd502ea60232ddeb}{Level\-Data$<$ Flux\-Box $>$ \& \hyperlink{class_darcy_brinkman_op_a9b2d72f39820a3dfcd502ea60232ddeb}{B\-Coef} ()}\label{class_darcy_brinkman_op_a9b2d72f39820a3dfcd502ea60232ddeb}
+
+\begin{DoxyCompactList}\small\item\em Returns the B coefficient. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a16cce095d955f2514589e45bd6b348df}{Ref\-Counted\-Ptr\\*
+$<$ Coefficient\-Interpolator\\*
+$<$ Level\-Data$<$ Flux\-Box $>$\\*
+, Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_darcy_brinkman_op_a16cce095d955f2514589e45bd6b348df}{B\-Coef\-Interpolator} ()}\label{class_darcy_brinkman_op_a16cce095d955f2514589e45bd6b348df}
+
+\begin{DoxyCompactList}\small\item\em Allows access to the B coefficient interpolator. \end{DoxyCompactList}\item 
+void \hyperlink{class_darcy_brinkman_op_a50dc1353f78c310c788763b122ca939d}{set\-Time} (Real a\-\_\-time)
+\item 
+virtual void \hyperlink{class_darcy_brinkman_op_adfd7590e98c5edd78140265bb05eef17}{get\-Flux} (Flux\-Box \&a\-\_\-flux, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-data, const Box \&a\-\_\-grid, const Data\-Index \&a\-\_\-dit, Real a\-\_\-scale)
+\begin{DoxyCompactList}\small\item\em get\-Flux function which matches interface to A\-M\-R\-Poisson\-Op \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_acf0aa656f124288b7d3cd2a11b1ab0be}{virtual void \hyperlink{class_darcy_brinkman_op_acf0aa656f124288b7d3cd2a11b1ab0be}{get\-Flux} (Flux\-Box \&a\-\_\-flux, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-data, const F\-Array\-Box \&a\-\_\-c\-Coef, const Flux\-Box \&a\-\_\-b\-Coef, const Box \&a\-\_\-grid, const Data\-Index \&a\-\_\-dit, Real a\-\_\-scale)}\label{class_darcy_brinkman_op_acf0aa656f124288b7d3cd2a11b1ab0be}
+
+\begin{DoxyCompactList}\small\item\em get diffusive flux \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{Indent}{\bf Darcy\-Brinkman\-Op functions}\par
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_darcy_brinkman_op_a6cd24f28d1df8726929ae287490b9a3c}{{\bfseries Darcy\-Brinkman\-Op} ()}\label{class_darcy_brinkman_op_a6cd24f28d1df8726929ae287490b9a3c}
+
+\item 
+\hypertarget{class_darcy_brinkman_op_a944fdaaac1b4d62baad0d5ecd148891f}{virtual {\bfseries $\sim$\-Darcy\-Brinkman\-Op} ()}\label{class_darcy_brinkman_op_a944fdaaac1b4d62baad0d5ecd148891f}
+
+\item 
+\hypertarget{class_darcy_brinkman_op_a9bacaab9278b52f297ba8ef6fdd438a4}{virtual void {\bfseries residual\-I} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lhs, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs, bool a\-\_\-homogeneous=false)}\label{class_darcy_brinkman_op_a9bacaab9278b52f297ba8ef6fdd438a4}
+
+\item 
+\hypertarget{class_darcy_brinkman_op_af6eb3662000de656241b272ca947ff53}{virtual void {\bfseries pre\-Cond} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-correction, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-residual)}\label{class_darcy_brinkman_op_af6eb3662000de656241b272ca947ff53}
+
+\item 
+\hypertarget{class_darcy_brinkman_op_ab844b37881daf983c00080b9cb4da099}{virtual void {\bfseries apply\-Op\-I} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lhs, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, bool a\-\_\-homogeneous=false)}\label{class_darcy_brinkman_op_ab844b37881daf983c00080b9cb4da099}
+
+\item 
+\hypertarget{class_darcy_brinkman_op_aa7c0a826f1109c621a7ce43efb915c5e}{virtual void {\bfseries apply\-Op\-No\-Boundary} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-lhs, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi)}\label{class_darcy_brinkman_op_aa7c0a826f1109c621a7ce43efb915c5e}
+
+\item 
+\hypertarget{class_darcy_brinkman_op_ac2879982d9153c9e83b1e86c2a19caa7}{virtual void \hyperlink{class_darcy_brinkman_op_ac2879982d9153c9e83b1e86c2a19caa7}{set\-Alpha\-And\-Beta} (const Real \&a\-\_\-alpha, const Real \&a\-\_\-beta)}\label{class_darcy_brinkman_op_ac2879982d9153c9e83b1e86c2a19caa7}
+
+\begin{DoxyCompactList}\small\item\em For tga stuff. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_afc3972638ccf8fb63e080a533f66efcc}{virtual void \hyperlink{class_darcy_brinkman_op_afc3972638ccf8fb63e080a533f66efcc}{set\-Coefs} (const Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ \&a\-\_\-a\-Coef, const Ref\-Counted\-Ptr$<$ Level\-Data$<$ Flux\-Box $>$ $>$ \&a\-\_\-b\-Coef, const Real \&a\-\_\-alpha, const Real \&a\-\_\-beta, const Ref\-Counted\-Ptr$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ \&a\-\_\-c\-Coef)}\label{class_darcy_brinkman_op_afc3972638ccf8fb63e080a533f66efcc}
+
+\begin{DoxyCompactList}\small\item\em Also calls reset lambda. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a35fa524145af3a0641f10817ce291b0b}{virtual void \hyperlink{class_darcy_brinkman_op_a35fa524145af3a0641f10817ce291b0b}{reset\-Lambda} ()}\label{class_darcy_brinkman_op_a35fa524145af3a0641f10817ce291b0b}
+
+\begin{DoxyCompactList}\small\item\em Should be called before the relaxation parameter is needed. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_aa6b2a052c4d143cd0b946518cd19f313}{virtual void \hyperlink{class_darcy_brinkman_op_aa6b2a052c4d143cd0b946518cd19f313}{compute\-Lambda} ()}\label{class_darcy_brinkman_op_aa6b2a052c4d143cd0b946518cd19f313}
+
+\begin{DoxyCompactList}\small\item\em Compute lambda once alpha, a\-Coef, beta, b\-Coef are defined. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a1e8a4aec2b75bd325cf0d89feb0f0581}{virtual void {\bfseries reflux} (const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-Fine, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-residual, A\-M\-R\-Level\-Op$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ $\ast$a\-\_\-finer\-Op)}\label{class_darcy_brinkman_op_a1e8a4aec2b75bd325cf0d89feb0f0581}
+
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf M\-G\-Level\-Op functions}\par
+{\em \subsection*{$<$$<$$<$$<$$<$$<$$<$ \hyperlink{_darcy_brinkman_op_8_h_source}{Darcy\-Brinkman\-Op.\-H} }}\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{class_darcy_brinkman_op_a22da926f24eef3899c539896dc6cc314}{restrict\-Residual} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-res\-Coarse, Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi\-Fine, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs\-Fine)
+\end{DoxyCompactItemize}
+\end{Indent}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_darcy_brinkman_op_a7e1b9891159ab88e702382380c253758}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ \hyperlink{class_darcy_brinkman_op_a7e1b9891159ab88e702382380c253758}{m\-\_\-a\-Coef}}\label{class_darcy_brinkman_op_a7e1b9891159ab88e702382380c253758}
+
+\begin{DoxyCompactList}\small\item\em Identity operator spatially varying coefficient storage (cell-\/centered) --- if you change this call \hyperlink{class_darcy_brinkman_op_a35fa524145af3a0641f10817ce291b0b}{reset\-Lambda()} \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a6fd695093ab30f1ce1de57c4eb3f0d1e}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ F\-Array\-Box $>$ $>$ \hyperlink{class_darcy_brinkman_op_a6fd695093ab30f1ce1de57c4eb3f0d1e}{m\-\_\-c\-Coef}}\label{class_darcy_brinkman_op_a6fd695093ab30f1ce1de57c4eb3f0d1e}
+
+\begin{DoxyCompactList}\small\item\em Darcy coefficient. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a2363c28bf18a93ddd9096973959fb299}{Ref\-Counted\-Ptr$<$ Level\-Data\\*
+$<$ Flux\-Box $>$ $>$ \hyperlink{class_darcy_brinkman_op_a2363c28bf18a93ddd9096973959fb299}{m\-\_\-b\-Coef}}\label{class_darcy_brinkman_op_a2363c28bf18a93ddd9096973959fb299}
+
+\begin{DoxyCompactList}\small\item\em Laplacian operator spatially varying coefficient storage (face-\/centered) --- if you change this call \hyperlink{class_darcy_brinkman_op_a35fa524145af3a0641f10817ce291b0b}{reset\-Lambda()} \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_ab4521803f9a322aa5a1113f642e3a054}{Level\-Data$<$ F\-Array\-Box $>$ \hyperlink{class_darcy_brinkman_op_ab4521803f9a322aa5a1113f642e3a054}{m\-\_\-lambda}}\label{class_darcy_brinkman_op_ab4521803f9a322aa5a1113f642e3a054}
+
+\begin{DoxyCompactList}\small\item\em Reciprocal of the diagonal entry of the operator matrix. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_darcy_brinkman_op_a0f64c952b5180bb6ab279842b4f0cb50}{virtual void \hyperlink{class_darcy_brinkman_op_a0f64c952b5180bb6ab279842b4f0cb50}{level\-G\-S\-R\-B} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_darcy_brinkman_op_a0f64c952b5180bb6ab279842b4f0cb50}
+
+\begin{DoxyCompactList}\small\item\em Gauss-\/\-Seidel relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a62d977a105970a27de2f50989798c3d8}{virtual void \hyperlink{class_darcy_brinkman_op_a62d977a105970a27de2f50989798c3d8}{level\-Multi\-Color} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_darcy_brinkman_op_a62d977a105970a27de2f50989798c3d8}
+
+\begin{DoxyCompactList}\small\item\em Multicolor relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a2f0ad8188c617c1f0a560dda3aa88ed1}{virtual void \hyperlink{class_darcy_brinkman_op_a2f0ad8188c617c1f0a560dda3aa88ed1}{loose\-G\-S\-R\-B} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_darcy_brinkman_op_a2f0ad8188c617c1f0a560dda3aa88ed1}
+
+\begin{DoxyCompactList}\small\item\em Gauss-\/\-Seidel relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a5c792a6fc34828e86caa1492346abdbf}{virtual void \hyperlink{class_darcy_brinkman_op_a5c792a6fc34828e86caa1492346abdbf}{overlap\-G\-S\-R\-B} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_darcy_brinkman_op_a5c792a6fc34828e86caa1492346abdbf}
+
+\begin{DoxyCompactList}\small\item\em Gauss-\/\-Seidel relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a6743cea1c7637481cc5a40fc7431aece}{virtual void \hyperlink{class_darcy_brinkman_op_a6743cea1c7637481cc5a40fc7431aece}{level\-G\-S\-R\-B\-Lazy} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_darcy_brinkman_op_a6743cea1c7637481cc5a40fc7431aece}
+
+\begin{DoxyCompactList}\small\item\em Gauss-\/\-Seidel relaxation. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a9ad6b182c9779e420fef314ace1438ae}{virtual void \hyperlink{class_darcy_brinkman_op_a9ad6b182c9779e420fef314ace1438ae}{level\-Jacobi} (Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-phi, const Level\-Data$<$ F\-Array\-Box $>$ \&a\-\_\-rhs)}\label{class_darcy_brinkman_op_a9ad6b182c9779e420fef314ace1438ae}
+
+\begin{DoxyCompactList}\small\item\em jacobi relaxation \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a58e6e29ef7c3648c4ff3f159f9a4f660}{virtual void \hyperlink{class_darcy_brinkman_op_a58e6e29ef7c3648c4ff3f159f9a4f660}{get\-Flux} (F\-Array\-Box \&a\-\_\-flux, const F\-Array\-Box \&a\-\_\-data, const F\-Array\-Box \&a\-\_\-c\-Coef, const Flux\-Box \&a\-\_\-b\-Coef, const Box \&a\-\_\-facebox, int a\-\_\-dir, int a\-\_\-ref=1) const }\label{class_darcy_brinkman_op_a58e6e29ef7c3648c4ff3f159f9a4f660}
+
+\begin{DoxyCompactList}\small\item\em computes flux over face-\/centered a\-\_\-facebox. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_darcy_brinkman_op_a22e511a984f56a6ddfdf90dc6ec5ac0a}{Layout\-Data$<$ C\-F\-I\-V\-S $>$ \hyperlink{class_darcy_brinkman_op_a22e511a984f56a6ddfdf90dc6ec5ac0a}{m\-\_\-lo\-C\-F\-I\-V\-S} \mbox{[}Space\-Dim\mbox{]}}\label{class_darcy_brinkman_op_a22e511a984f56a6ddfdf90dc6ec5ac0a}
+
+\begin{DoxyCompactList}\small\item\em Coarse fine intvect sets. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a6177888421b0d13671e8a05a7c25a99a}{Layout\-Data$<$ C\-F\-I\-V\-S $>$ \hyperlink{class_darcy_brinkman_op_a6177888421b0d13671e8a05a7c25a99a}{m\-\_\-hi\-C\-F\-I\-V\-S} \mbox{[}Space\-Dim\mbox{]}}\label{class_darcy_brinkman_op_a6177888421b0d13671e8a05a7c25a99a}
+
+\begin{DoxyCompactList}\small\item\em Coarse fine intvect sets. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_ab867d6f04206f2212c8e458fc460551e}{Ref\-Counted\-Ptr\\*
+$<$ Coefficient\-Interpolator\\*
+$<$ Level\-Data$<$ Flux\-Box $>$\\*
+, Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \hyperlink{class_darcy_brinkman_op_ab867d6f04206f2212c8e458fc460551e}{m\-\_\-b\-Coef\-Interpolator}}\label{class_darcy_brinkman_op_ab867d6f04206f2212c8e458fc460551e}
+
+\begin{DoxyCompactList}\small\item\em Interpolator for b coefficient data. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_ae3bc28a06e580430b51aaf07db866117}{Real \hyperlink{class_darcy_brinkman_op_ae3bc28a06e580430b51aaf07db866117}{m\-\_\-time}}\label{class_darcy_brinkman_op_ae3bc28a06e580430b51aaf07db866117}
+
+\begin{DoxyCompactList}\small\item\em Current time. \end{DoxyCompactList}\item 
+\hypertarget{class_darcy_brinkman_op_a854d500d6bf64372c1249e8b0d919c8e}{bool \hyperlink{class_darcy_brinkman_op_a854d500d6bf64372c1249e8b0d919c8e}{m\-\_\-lambda\-Needs\-Resetting}}\label{class_darcy_brinkman_op_a854d500d6bf64372c1249e8b0d919c8e}
+
+\begin{DoxyCompactList}\small\item\em Does the relaxation coefficient need to be reset? \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Operator for solving the Darcy-\/\-Brinkman equation. 
+
+Operator for solving one component of \[ (alpha * aCoef(x) * I - beta * (cCoef(x) + Lap) ) phi = rho \] over an A\-M\-R hierarchy. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_darcy_brinkman_op_ac6da9fd6f61b40c42b3a94b645c21e35}{\index{Darcy\-Brinkman\-Op@{Darcy\-Brinkman\-Op}!finer\-Operator\-Changed@{finer\-Operator\-Changed}}
+\index{finer\-Operator\-Changed@{finer\-Operator\-Changed}!DarcyBrinkmanOp@{Darcy\-Brinkman\-Op}}
+\subsubsection[{finer\-Operator\-Changed}]{\setlength{\rightskip}{0pt plus 5cm}void Darcy\-Brinkman\-Op\-::finer\-Operator\-Changed (
+\begin{DoxyParamCaption}
+\item[{const M\-G\-Level\-Op$<$ Level\-Data$<$ F\-Array\-Box $>$ $>$ \&}]{a\-\_\-operator, }
+\item[{int}]{a\-\_\-coarsening\-Factor}
+\end{DoxyParamCaption}
+)}}\label{class_darcy_brinkman_op_ac6da9fd6f61b40c42b3a94b645c21e35}
+This is called on multigrid operators when their A\-M\-R operators are altered. \hypertarget{class_darcy_brinkman_op_adfd7590e98c5edd78140265bb05eef17}{\index{Darcy\-Brinkman\-Op@{Darcy\-Brinkman\-Op}!get\-Flux@{get\-Flux}}
+\index{get\-Flux@{get\-Flux}!DarcyBrinkmanOp@{Darcy\-Brinkman\-Op}}
+\subsubsection[{get\-Flux}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Darcy\-Brinkman\-Op\-::get\-Flux (
+\begin{DoxyParamCaption}
+\item[{Flux\-Box \&}]{a\-\_\-flux, }
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-data, }
+\item[{const Box \&}]{a\-\_\-grid, }
+\item[{const Data\-Index \&}]{a\-\_\-dit, }
+\item[{Real}]{a\-\_\-scale}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{class_darcy_brinkman_op_adfd7590e98c5edd78140265bb05eef17}
+
+
+get\-Flux function which matches interface to A\-M\-R\-Poisson\-Op 
+
+assumes we want to use member-\/data b\-Coef, then calls second get\-Flux function \hypertarget{class_darcy_brinkman_op_a22da926f24eef3899c539896dc6cc314}{\index{Darcy\-Brinkman\-Op@{Darcy\-Brinkman\-Op}!restrict\-Residual@{restrict\-Residual}}
+\index{restrict\-Residual@{restrict\-Residual}!DarcyBrinkmanOp@{Darcy\-Brinkman\-Op}}
+\subsubsection[{restrict\-Residual}]{\setlength{\rightskip}{0pt plus 5cm}void Darcy\-Brinkman\-Op\-::restrict\-Residual (
+\begin{DoxyParamCaption}
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-res\-Coarse, }
+\item[{Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-phi\-Fine, }
+\item[{const Level\-Data$<$ F\-Array\-Box $>$ \&}]{a\-\_\-rhs\-Fine}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{class_darcy_brinkman_op_a22da926f24eef3899c539896dc6cc314}
+\begin{quotation}
+\begin{quotation}
+\begin{quotation}
+\begin{quotation}
+\begin{quotation}
+\begin{quotation}
+\begin{quotation}
+1.\-6
+
+\end{quotation}
+
+
+\end{quotation}
+
+
+\end{quotation}
+
+
+\end{quotation}
+
+
+\end{quotation}
+
+
+\end{quotation}
+
+
+\end{quotation}
+calculate restricted residual a\-\_\-res\-Coarse\mbox{[}2h\mbox{]} = I\mbox{[}h-\/$>$2h\mbox{]} (rhs\-Fine\mbox{[}h\mbox{]} -\/ L\mbox{[}h\mbox{]}(phi\-Fine\mbox{[}h\mbox{]}) \hypertarget{class_darcy_brinkman_op_a291dd090a4475bcb95fe2901722660c9}{\index{Darcy\-Brinkman\-Op@{Darcy\-Brinkman\-Op}!set\-B\-Coef\-Interpolator@{set\-B\-Coef\-Interpolator}}
+\index{set\-B\-Coef\-Interpolator@{set\-B\-Coef\-Interpolator}!DarcyBrinkmanOp@{Darcy\-Brinkman\-Op}}
+\subsubsection[{set\-B\-Coef\-Interpolator}]{\setlength{\rightskip}{0pt plus 5cm}void Darcy\-Brinkman\-Op\-::set\-B\-Coef\-Interpolator (
+\begin{DoxyParamCaption}
+\item[{Ref\-Counted\-Ptr$<$ Coefficient\-Interpolator$<$ Level\-Data$<$ Flux\-Box $>$, Level\-Data$<$ F\-Array\-Box $>$ $>$ $>$ \&}]{a\-\_\-b\-Coef\-Interpolator}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{class_darcy_brinkman_op_a291dd090a4475bcb95fe2901722660c9}
+Sets up a model that modifies b coefficient data when the operator's time is set. 
+\begin{DoxyParams}{Parameters}
+{\em a\-\_\-b\-Coef\-Interpolator} & A Coefficient\-Interpolator that will be used to compute the b coefficient at specific times. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_darcy_brinkman_op_a50dc1353f78c310c788763b122ca939d}{\index{Darcy\-Brinkman\-Op@{Darcy\-Brinkman\-Op}!set\-Time@{set\-Time}}
+\index{set\-Time@{set\-Time}!DarcyBrinkmanOp@{Darcy\-Brinkman\-Op}}
+\subsubsection[{set\-Time}]{\setlength{\rightskip}{0pt plus 5cm}void Darcy\-Brinkman\-Op\-::set\-Time (
+\begin{DoxyParamCaption}
+\item[{Real}]{a\-\_\-time}
+\end{DoxyParamCaption}
+)}}\label{class_darcy_brinkman_op_a50dc1353f78c310c788763b122ca939d}
+Sets the time centering of the operator. This interpolates b coefficient data at the given time if an interpolator is set. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/parkinsonjl/mushy-\/layer/src/Darcy\-Brinkman\-Op.\-H\item 
+/home/parkinsonjl/mushy-\/layer/src/Darcy\-Brinkman\-Op.\-cpp\end{DoxyCompactItemize}

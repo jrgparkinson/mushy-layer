@@ -1,0 +1,3 @@
+CXX_SOURCES += computeNorm.cpp MultiHelmOp.cpp Timer.cpp Counter.cpp
+
+FORT_SOURCES += tdglF.ChF MultiHelmOpF.ChF

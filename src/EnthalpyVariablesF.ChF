@@ -1,0 +1,665 @@
+C      _______              __
+C     / ___/ /  ___  __ _  / /  ___
+C    / /__/ _ \/ _ \/  V \/ _ \/ _ \
+C    \___/_//_/\___/_/_/_/_.__/\___/
+C    Please refer to Copyright.txt, in Chombo's root directory.
+
+#include "CONSTANTS.H"
+
+C     -----------------------------------------------------------------
+C     subroutine CALCULATEPOROSITY
+C     calculates porosity from C, H, bounding energies and parameters
+C     -----------------------------------------------------------------
+      subroutine CALCULATEPOROSITY(
+     &     CHF_FRA[porosity],
+     &     CHF_CONST_FRA[H],
+     &     CHF_CONST_FRA[C],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan],
+     &     CHF_CONST_REAL[thetaEutectic])
+     
+      integer comp
+      integer CHF_DDECL[i;j;k]
+      
+      comp = 0
+      
+      
+      CHF_MULTIDO[region; i; j; k]
+        if (H(CHF_IX[i;j;k],comp) .le. H_s(CHF_IX[i;j;k],comp)) then
+          porosity(CHF_IX[i;j;k],comp) = 0
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_s(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .le. H_e(CHF_IX[i;j;k],comp))) then
+          porosity(CHF_IX[i;j;k],comp) = (H(CHF_IX[i;j;k],comp)-thetaEutectic*specificHeatRatio)/(stefan + thetaEutectic*(1-specificHeatRatio))
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_e(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .lt. H_l(CHF_IX[i;j;k],comp))) then
+          call CALCULATEPOROSITYMUSH(porosity(CHF_IX[i;j;k],comp), C(CHF_IX[i;j;k],comp), H(CHF_IX[i;j;k],comp), 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+     
+        else if (H(CHF_IX[i;j;k],comp) .ge. H_l(CHF_IX[i;j;k],comp)) then
+          porosity(CHF_IX[i;j;k],comp) = 1
+        endif
+     
+      CHF_ENDDO
+     
+      return
+      end
+
+
+C     -----------------------------------------------------------------
+C     subroutine CALCULATEPOROSITY_MULTICOMP
+C     calculates porosity from C, H, bounding energies and parameters
+C     -----------------------------------------------------------------
+      subroutine CALCULATEPOROSITY_MULTICOMP(
+     &     CHF_FRA[porosity],
+     &     CHF_CONST_INT[porosComp],
+     &     CHF_CONST_FRA[HC],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan],
+     &     CHF_CONST_REAL[thetaEutectic])
+     
+      integer Hcomp, Ccomp, porosityComp
+      integer CHF_DDECL[i;j;k]
+      
+      Hcomp = 0 
+      Ccomp = 1 
+      porosityComp = 0
+      
+      
+      CHF_MULTIDO[region; i; j; k]
+        if (HC(CHF_IX[i;j;k],Hcomp) .le. H_s(CHF_IX[i;j;k],0)) then
+          porosity(CHF_IX[i;j;k], porosityComp) = 0
+        else if ((HC(CHF_IX[i;j;k],Hcomp) .gt. H_s(CHF_IX[i;j;k],0)) .and. (HC(CHF_IX[i;j;k],Hcomp) .le. H_e(CHF_IX[i;j;k],0))) then
+          porosity(CHF_IX[i;j;k], porosityComp) = (HC(CHF_IX[i;j;k],Hcomp)-thetaEutectic*specificHeatRatio)/(stefan + thetaEutectic*(1-specificHeatRatio))
+        else if ((HC(CHF_IX[i;j;k],Hcomp) .gt. H_e(CHF_IX[i;j;k],0)) .and. (HC(CHF_IX[i;j;k],Hcomp) .lt. H_l(CHF_IX[i;j;k],0))) then
+          call CALCULATEPOROSITYMUSH(porosity(CHF_IX[i;j;k], porosityComp), HC(CHF_IX[i;j;k],Ccomp), HC(CHF_IX[i;j;k],Hcomp), 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+     
+        else if (HC(CHF_IX[i;j;k],Hcomp) .ge. H_l(CHF_IX[i;j;k],0)) then
+          porosity(CHF_IX[i;j;k], porosityComp) = 1
+        endif
+     
+      CHF_ENDDO
+     
+      return
+      end
+
+
+
+C     -----------------------------------------------------------------
+C     subroutine CALCULATEPOROSITYMUSH
+C     calculates porosity from C and H for a mushy region (between 
+C     eutectic and liquidus)
+C     -----------------------------------------------------------------
+      subroutine CALCULATEPOROSITYMUSH(
+     &     CHF_REAL[porosity],
+     &     CHF_CONST_REAL[a_C],
+     &     CHF_CONST_REAL[H],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan])
+      REAL_T a,b,c
+
+      if (stefan .eq. 0) then
+         porosity = 1
+      else
+         a = compositionRatio*(specificHeatRatio -1) + stefan * (waterDistributionCoeff-1)
+         b = compositionRatio * (1-2*specificHeatRatio) + H*(1-waterDistributionCoeff)
+     &				- a_C * (specificHeatRatio-1) - waterDistributionCoeff * stefan
+         c =  (compositionRatio + a_C)*specificHeatRatio +
+     &				waterDistributionCoeff * H
+
+         porosity = (-b -sqrt(b*b - 4*a*c))/(2*a);
+         
+      endif
+
+      return
+      end
+      
+C     -----------------------------------------------------------------
+C     subroutine CALCULATECL
+C     calculates C_l from C, H, bounding energies and parameters
+C     -----------------------------------------------------------------
+      subroutine CALCULATECL(
+     &     CHF_FRA[Cl],
+     &     CHF_CONST_FRA[H],
+     &     CHF_CONST_FRA[C],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan],
+     &     CHF_CONST_REAL[ThetaEutectic])
+     
+      integer comp
+      REAL_T porosity
+      integer CHF_DDECL[i;j;k]
+      
+      comp = 0
+      
+      
+      CHF_MULTIDO[region; i; j; k]
+        if (H(CHF_IX[i;j;k],comp) .le. H_s(CHF_IX[i;j;k],comp)) then
+          Cl(CHF_IX[i;j;k],comp) = ThetaEutectic
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_s(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .le. H_e(CHF_IX[i;j;k],comp))) then
+          Cl(CHF_IX[i;j;k],comp) = ThetaEutectic
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_e(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .lt. H_l(CHF_IX[i;j;k],comp))) then
+          call CALCULATEPOROSITYMUSH(porosity, C(CHF_IX[i;j;k],comp), H(CHF_IX[i;j;k],comp), 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+     
+          Cl(CHF_IX[i;j;k],comp) = (C(CHF_IX[i;j;k],comp) + compositionRatio*(1-porosity)) / (porosity + waterDistributionCoeff*(1-porosity))
+        else if (H(CHF_IX[i;j;k],comp) .ge. H_l(CHF_IX[i;j;k],comp)) then
+          Cl(CHF_IX[i;j;k],comp) = C(CHF_IX[i;j;k],comp)
+        endif
+     
+      CHF_ENDDO
+     
+      return
+      end
+
+
+C     -----------------------------------------------------------------
+C     subroutine CALCULATECS
+C     calculates C_s from C, H, bounding energies and parameters
+C     -----------------------------------------------------------------
+      subroutine CALCULATECS(
+     &     CHF_FRA[Cs],
+     &     CHF_CONST_FRA[H],
+     &     CHF_CONST_FRA[C],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan])
+     
+      integer comp
+      REAL_T porosity
+      integer CHF_DDECL[i;j;k]
+      
+      comp = 0
+      
+      
+      CHF_MULTIDO[region; i; j; k]
+        if (H(CHF_IX[i;j;k],comp) .le. H_s(CHF_IX[i;j;k],comp)) then
+          Cs(CHF_IX[i;j;k],comp) = C(CHF_IX[i;j;k],comp)
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_s(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .le. H_e(CHF_IX[i;j;k],comp))) then
+          call CALCULATEPOROSITYMUSH(porosity, C(CHF_IX[i;j;k],comp), H(CHF_IX[i;j;k],comp), 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+          Cs(CHF_IX[i;j;k],comp) = C(CHF_IX[i;j;k],comp)/(1-porosity)
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_e(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .lt. H_l(CHF_IX[i;j;k],comp))) then
+          call CALCULATEPOROSITYMUSH(porosity, C(CHF_IX[i;j;k],comp), H(CHF_IX[i;j;k],comp), 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+     
+          Cs(CHF_IX[i;j;k],comp) = (C(CHF_IX[i;j;k],comp)*waterDistributionCoeff - compositionRatio*porosity) / (porosity + waterDistributionCoeff*(1-porosity))
+        else if (H(CHF_IX[i;j;k],comp) .ge. H_l(CHF_IX[i;j;k],comp)) then
+          Cs(CHF_IX[i;j;k],comp) = 0
+        endif
+     
+      CHF_ENDDO
+     
+      return
+      end
+
+C     -----------------------------------------------------------------
+C     subroutine CALCULATET
+C     calculates T from C, H, bounding energies and parameters
+C     -----------------------------------------------------------------
+      subroutine CALCULATET(
+     &     CHF_FRA[T],
+     &     CHF_CONST_FRA[H],
+     &     CHF_CONST_FRA[C],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan],
+     &     CHF_CONST_REAL[thetaEutectic])
+     
+      integer comp
+      REAL_T porosity
+      integer CHF_DDECL[i;j;k]
+      
+      comp = 0
+      
+      
+      CHF_MULTIDO[region; i; j; k]
+        if (H(CHF_IX[i;j;k],comp) .le. H_s(CHF_IX[i;j;k],comp)) then
+          T(CHF_IX[i;j;k],comp) = H(CHF_IX[i;j;k],comp)/specificHeatRatio
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_s(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .le. H_e(CHF_IX[i;j;k],comp))) then
+          T(CHF_IX[i;j;k],comp) = thetaEutectic
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_e(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .lt. H_l(CHF_IX[i;j;k],comp))) then
+          call CALCULATEPOROSITYMUSH(porosity, C(CHF_IX[i;j;k],comp), H(CHF_IX[i;j;k],comp), 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+     
+          T(CHF_IX[i;j;k],comp) = - (C(CHF_IX[i;j;k],comp) + compositionRatio*(1-porosity)) / (porosity + waterDistributionCoeff*(1-porosity))
+        else if (H(CHF_IX[i;j;k],comp) .ge. H_l(CHF_IX[i;j;k],comp)) then
+          T(CHF_IX[i;j;k],comp) = H(CHF_IX[i;j;k],comp) - stefan
+        endif
+     
+      CHF_ENDDO
+     
+      return
+      end
+
+
+
+C     -----------------------------------------------------------------
+C     subroutine CALCULATECLPERTURBATION_C
+C     calculates small changes in C_l due to small changes in C, deltaC,
+C     near (C, H)
+C     
+C     -----------------------------------------------------------------
+      subroutine CALCULATECLPERTURBATION_C(
+     &     CHF_FRA[deltaCl],
+     &     CHF_CONST_FRA[deltaC],
+     &     CHF_CONST_FRA[H],
+     &     CHF_CONST_FRA[C],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan])
+     
+      integer comp
+      REAL_T porosity, dThetaLdTheta, dPorositydTheta, a ,b
+      integer CHF_DDECL[i;j;k]
+      
+      comp = 0
+      
+      
+      CHF_MULTIDO[region; i; j; k]
+        if (H(CHF_IX[i;j;k],comp) .le. H_s(CHF_IX[i;j;k],comp)) then
+          deltaCl(CHF_IX[i;j;k],comp) = 0
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_s(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .le. H_e(CHF_IX[i;j;k],comp))) then
+          deltaCl(CHF_IX[i;j;k],comp) = 0
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_e(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .lt. H_l(CHF_IX[i;j;k],comp))) then
+
+          call CALCULATEPOROSITYMUSH(porosity, C(CHF_IX[i;j;k],comp), H(CHF_IX[i;j;k],comp), 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+          a = -4*(H(CHF_IX[i;j;k],comp)*waterDistributionCoeff + specificHeatRatio*(compositionRatio - C(CHF_IX[i;j;k],comp)) )
+     &            *((specificHeatRatio-1)*compositionRatio + (waterDistributionCoeff-1)*stefan)
+     &         + ((2*specificHeatRatio-1)*compositionRatio + H(CHF_IX[i;j;k],comp)*(waterDistributionCoeff-1) 
+     &            + C(CHF_IX[i;j;k],comp)*(1-specificHeatRatio) + waterDistributionCoeff*stefan)**2 
+          a = SQRT(a)
+          
+          b = 2*(compositionRatio*(specificHeatRatio - 1) + (waterDistributionCoeff - 1)*stefan)
+          dPorositydTheta = (1-specificHeatRatio)/b 
+     &                     + (compositionRatio*(1-specificHeatRatio) + H(CHF_IX[i;j;k],comp)*(specificHeatRatio-1)*(waterDistributionCoeff-1) 
+     &                        + C(CHF_IX[i;j;k],comp)*(2*specificHeatRatio - 1 - specificHeatRatio**2) 
+     &                        + stefan*(2*specificHeatRatio - waterDistributionCoeff*(1 + specificHeatRatio) ) ) / (a*b)
+          dThetaLdTheta = (porosity + (compositionRatio - C(CHF_IX[i;j;k],comp)) * dPorositydTheta)/(porosity*porosity)
+     
+          deltaCl(CHF_IX[i;j;k],comp) = dThetaLdTheta * deltaC(CHF_IX[i;j;k],comp)
+          
+          deltaCl(CHF_IX[i;j;k],comp) = deltaC(CHF_IX[i;j;k],comp)
+        else if (H(CHF_IX[i;j;k],comp) .ge. H_l(CHF_IX[i;j;k],comp)) then
+          deltaCl(CHF_IX[i;j;k],comp) = deltaC(CHF_IX[i;j;k],comp)
+        endif
+     
+      CHF_ENDDO
+     
+      return
+      end
+
+      
+C     -----------------------------------------------------------------
+C     subroutine CALCULATETPERTURBATION_H
+C     calculates small changes to T due to small changes to H, deltaH, 
+C      near the point (C, H)
+C     -----------------------------------------------------------------
+      subroutine CALCULATETPERTURBATION_H(
+     &     CHF_FRA[deltaT],
+     &     CHF_CONST_FRA[deltaH],
+     &     CHF_CONST_FRA[H],
+     &     CHF_CONST_FRA[C],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan])
+     
+      integer comp
+      REAL_T porosity, dTdH, dPorositydH, a, b
+      integer CHF_DDECL[i;j;k]
+      
+      comp = 0
+      
+      CHF_MULTIDO[region; i; j; k]
+        if (H(CHF_IX[i;j;k],comp) .le. H_s(CHF_IX[i;j;k],comp)) then
+          deltaT(CHF_IX[i;j;k],comp) = deltaH(CHF_IX[i;j;k],comp)/specificHeatRatio
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_s(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .le. H_e(CHF_IX[i;j;k],comp))) then
+          deltaT(CHF_IX[i;j;k],comp) = 0
+        else if ((H(CHF_IX[i;j;k],comp) .gt. H_e(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .lt. H_l(CHF_IX[i;j;k],comp))) then
+C	      TODO - this
+          call CALCULATEPOROSITYMUSH(porosity, C(CHF_IX[i;j;k],comp), H(CHF_IX[i;j;k],comp), 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+     
+          a = -4*(H(CHF_IX[i;j;k],comp)*waterDistributionCoeff + specificHeatRatio*(compositionRatio - C(CHF_IX[i;j;k],comp)) )
+     &            *((specificHeatRatio-1)*compositionRatio + (waterDistributionCoeff-1)*stefan)
+     &         + ((2*specificHeatRatio-1)*compositionRatio + H(CHF_IX[i;j;k],comp)*(waterDistributionCoeff-1) 
+     &            + C(CHF_IX[i;j;k],comp)*(1-specificHeatRatio) + waterDistributionCoeff*stefan)**2 
+          a = SQRT(a)
+          
+          b = 2*(compositionRatio*(specificHeatRatio - 1) + (waterDistributionCoeff - 1)*stefan)
+          
+          dPorositydH = (waterDistributionCoeff - 1)/b
+     &                 + ( compositionRatio*(2*specificHeatRatio -1 - waterDistributionCoeff) 
+     &                   + (1-waterDistributionCoeff)*(H(CHF_IX[i;j;k],comp)*(waterDistributionCoeff-1) + C(CHF_IX[i;j;k],comp)*(1-specificHeatRatio))
+     &                   - waterDistributionCoeff * stefan )/(a*b)
+          
+          dTdH = ((compositionRatio - C(CHF_IX[i;j;k],comp))/(porosity*porosity)) * dPorositydH
+     
+          deltaT(CHF_IX[i;j;k],comp) = dTdH * deltaH(CHF_IX[i;j;k],comp)
+          
+          deltaT(CHF_IX[i;j;k],comp) = deltaH(CHF_IX[i;j;k],comp)
+        else if (H(CHF_IX[i;j;k],comp) .ge. H_l(CHF_IX[i;j;k],comp)) then
+          deltaT(CHF_IX[i;j;k],comp) = deltaH(CHF_IX[i;j;k],comp)
+        endif
+     
+      CHF_ENDDO
+     
+      return
+      end
+      
+C           Multi component routines
+C     -----------------------------------------------------------------
+C     subroutine CALCULATE_T_CL
+C     calculates T and Cl from H and C, bounding energies and parameters
+C     TCL should have T in component 0 and Cl in component 1
+C     HC should have H in component 0 and C in component 1
+C     -----------------------------------------------------------------
+      subroutine CALCULATE_T_CL(
+     &     CHF_FRA[TCL],
+     &     CHF_CONST_FRA[HC],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan],
+     &     CHF_CONST_REAL[thetaEutectic],
+     &     CHF_CONST_REAL[Theta_Eutectic])
+     
+      integer THcomp, CCLcomp
+      REAL_T porosity
+      integer CHF_DDECL[i;j;k]
+      
+      THcomp = 0
+      CCLcomp = 1
+      
+      
+      CHF_MULTIDO[region; i; j; k]
+        if (HC(CHF_IX[i;j;k],THcomp) .le. H_s(CHF_IX[i;j;k],0)) then
+          TCL(CHF_IX[i;j;k],THcomp) = HC(CHF_IX[i;j;k],THcomp)/specificHeatRatio
+          TCL(CHF_IX[i;j;k],CCLcomp) = Theta_Eutectic
+        else if ((HC(CHF_IX[i;j;k],THcomp) .gt. H_s(CHF_IX[i;j;k],0)) .and. (HC(CHF_IX[i;j;k],THcomp) .le. H_e(CHF_IX[i;j;k],0))) then
+          TCL(CHF_IX[i;j;k],THcomp) = thetaEutectic
+          TCL(CHF_IX[i;j;k],CCLcomp) = Theta_Eutectic
+        else if ((HC(CHF_IX[i;j;k],THcomp) .gt. H_e(CHF_IX[i;j;k],0)) .and. (HC(CHF_IX[i;j;k],THcomp) .lt. H_l(CHF_IX[i;j;k],0))) then
+          call CALCULATEPOROSITYMUSH(porosity, HC(CHF_IX[i;j;k],CClcomp), HC(CHF_IX[i;j;k],THcomp), 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+     
+          TCL(CHF_IX[i;j;k],THcomp) = - (HC(CHF_IX[i;j;k],CClcomp) + compositionRatio*(1-porosity)) / (porosity + waterDistributionCoeff*(1-porosity))
+          TCL(CHF_IX[i;j;k],CCLcomp) = (HC(CHF_IX[i;j;k],CClcomp) + compositionRatio*(1-porosity)) / (porosity + waterDistributionCoeff*(1-porosity))
+        else if (HC(CHF_IX[i;j;k],THcomp) .ge. H_l(CHF_IX[i;j;k],0)) then
+          TCL(CHF_IX[i;j;k],THcomp) = HC(CHF_IX[i;j;k],THcomp) - stefan
+          TCL(CHF_IX[i;j;k],CCLcomp) = HC(CHF_IX[i;j;k],CCLcomp)
+        endif
+     
+      CHF_ENDDO
+     
+      return
+      end
+      
+C           Multi component routines
+C     -----------------------------------------------------------------
+C     subroutine CALCULATE_T_CL_PERT
+C     calculates T and Cl from H and C, bounding energies and parameters
+C     TCL should have T in component 0 and Cl in component 1
+C     HC should have H in component 0 and C in component 1
+C     -----------------------------------------------------------------
+      subroutine CALCULATE_T_CL_PERT(
+     &     CHF_FRA[TCL],
+     &     CHF_CONST_FRA[HC],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_CONST_FRA[HC_ref],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan],
+     &     CHF_CONST_REAL[thetaEutectic],
+     &     CHF_CONST_REAL[Theta_Eutectic])
+     
+      integer THcomp, CCLcomp
+      REAL_T dTdH, dTdS, dSldS, dSldH, dH, dS, H, S
+      REAL_T dChidH, dChidS, A, B, C, chi, sqRoot
+      integer CHF_DDECL[i;j;k]
+      
+      THcomp = 0
+      CCLcomp = 1
+      
+      
+      CHF_MULTIDO[region; i; j; k]
+        H = HC_ref(CHF_IX[i;j;k],THcomp)
+        S = HC_ref(CHF_IX[i;j;k],CClcomp)
+        
+        if (H .le. H_s(CHF_IX[i;j;k],0)) then
+          dTdH = 1/specificHeatRatio
+          dTdS = 0
+          dSldS = 0
+          dSldH = 0
+          
+C         Testing:
+C          dTdH = 1
+C          dTdS = 0 
+C          dSldS = 1
+C          dSldH = 0
+        else if ((H .gt. H_s(CHF_IX[i;j;k],0)) .and. (H .le. H_e(CHF_IX[i;j;k],0))) then
+          dTdH = 0
+          dTdS = 0
+          dSldS = 0
+          dSldH = 0
+          
+C         Testing:
+C          dTdH = 1
+C          dTdS = 0 
+C          dSldS = 1
+C          dSldH = 0
+          
+        else if ((H .gt. H_e(CHF_IX[i;j;k],0)) .and. (H .lt. H_l(CHF_IX[i;j;k],0))) then
+          
+          call CALCULATEPOROSITYMUSH(chi, S, H, 
+     &      compositionRatio, waterDistributionCoeff, specificHeatRatio, stefan)
+          A = compositionRatio*(specificHeatRatio-1) - stefan
+          B = H + compositionRatio*(1-2*specificHeatRatio) + S*(1-specificHeatRatio)
+          C = specificHeatRatio*(compositionRatio + S)
+          
+          sqRoot = SQRT(B*B - 4*A*C)
+          
+          dChidS = -(1/(2*A))*((1-specificHeatRatio) + (B*(1-specificHeatRatio) - 2*A*specificHeatRatio )/sqRoot )
+          dChidH = -(1/(2*A))*(1+B/(sqRoot))
+          
+          dSldS = -(1/(chi*chi))*dChidS*(S+compositionRatio) + 1/chi
+          dSldH = -(1/(chi*chi))*dChidH*(S+compositionRatio)
+          
+          dTdH = - dSldH
+          dTdS = - dSldS
+          
+C         Testing:
+C          dTdH = 1
+C          dTdS = 0 
+C          dSldS = 1
+C          dSldH = 0
+          
+        else if (H .ge. H_l(CHF_IX[i;j;k],0)) then
+          dTdH = 1
+          dTdS = 0 
+          dSldS = 1
+          dSldH = 0
+        endif
+        
+        dH = HC(CHF_IX[i;j;k],THcomp)
+        dS = HC(CHF_IX[i;j;k],CClcomp)
+        
+        TCL(CHF_IX[i;j;k],THcomp)  = dH*dTdH  + dS*dTdS
+        TCL(CHF_IX[i;j;k],CCLcomp) = dH*dSldH + dS*dSldS
+     
+C       Debugging
+C        print *, "dSldS", dSldS
+C        print *, "dSldH", dSldH     
+     
+      CHF_ENDDO
+     
+      return
+      end   
+      
+      
+C     -----------------------------------------------------------------
+C     subroutine MODIFY_DIFFUSION_COEFFS
+C     modify diffusion coeffs to better approximate nonlinear equations
+C     -----------------------------------------------------------------
+#if CH_SPACEDIM == 1
+      subroutine MODIFY_DIFFUSION_COEFFS1D(
+     &     CHF_CONST_FRA[HC],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_FRA[bCoef0],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[specificHeatRatio])
+#elif CH_SPACEDIM == 2
+      subroutine MODIFY_DIFFUSION_COEFFS2D(
+     &     CHF_CONST_FRA[HC],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_FRA[bCoef0],
+     &     CHF_FRA[bCoef1],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[specificHeatRatio])
+#elif CH_SPACEDIM == 3
+      subroutine MODIFY_DIFFUSION_COEFFS3D(
+     &     CHF_CONST_FRA[HC],
+     &     CHF_CONST_FRA[H_s],
+     &     CHF_CONST_FRA[H_e],
+     &     CHF_CONST_FRA[H_l],
+     &     CHF_FRA[bCoef0],
+     &     CHF_FRA[bCoef1],
+     &     CHF_FRA[bCoef2],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[specificHeatRatio])
+#endif
+     
+      integer Hcomp, Ccomp
+      integer CHF_DDECL[i;j;k]
+      REAL_T Hscale, Cscale
+      
+      Hcomp = 0
+      Ccomp = 1
+      
+      CHF_MULTIDO[region; i; j; k]
+        if (HC(CHF_IX[i;j;k],Hcomp) .le. H_s(CHF_IX[i;j;k],0)) then
+          Hscale = 1/specificHeatRatio
+          Cscale = 0
+
+        else if ((HC(CHF_IX[i;j;k],Hcomp) .gt. H_s(CHF_IX[i;j;k],0)) .and. (HC(CHF_IX[i;j;k],Hcomp) .le. H_e(CHF_IX[i;j;k],0))) then
+          Hscale = 0
+          Cscale = 0
+
+        else if ((HC(CHF_IX[i;j;k],Hcomp) .gt. H_e(CHF_IX[i;j;k],0)) .and. (HC(CHF_IX[i;j;k],Hcomp) .lt. H_l(CHF_IX[i;j;k],0))) then
+C         Based on rough estimates (all other scales exact from phase diagram)
+          Hscale = 0.25
+          Cscale = 1
+
+        else if (HC(CHF_IX[i;j;k],Hcomp) .ge. H_l(CHF_IX[i;j;k],0)) then
+          Hscale = 1
+          Cscale = 1
+
+        endif
+        
+        CHF_DTERM[ bCoef0(CHF_IX[i;j  ;k  ],Hcomp) = bCoef0(CHF_IX[i;j  ;k  ],Hcomp)*Hscale;
+        bCoef1(CHF_IX[i;j  ;k  ],Hcomp) = bCoef1(CHF_IX[i;j  ;k  ],Hcomp)*Hscale;
+        bCoef2(CHF_IX[i;j  ;k  ],Hcomp) = bCoef2(CHF_IX[i;j  ;k  ],Hcomp)*Hscale; ]
+          
+          
+        CHF_DTERM[ bCoef0(CHF_IX[i;j  ;k  ],Ccomp) = bCoef0(CHF_IX[i;j  ;k  ],Ccomp)*Cscale;
+        bCoef1(CHF_IX[i;j  ;k  ],Ccomp) = bCoef1(CHF_IX[i;j  ;k  ],Ccomp)*Cscale;
+        bCoef2(CHF_IX[i;j  ;k  ],Ccomp) = bCoef2(CHF_IX[i;j  ;k  ],Ccomp)*Cscale; ] 
+          
+      CHF_ENDDO
+     
+      return
+      end   
+      
+C     -----------------------------------------------------------------
+C     subroutine CALCULATE_BOUNDING_ENERGY
+C     calculates H_s, H_e, H_l from H, C and parameters
+C     HC should have H in component 0 and C in component 1
+C     -----------------------------------------------------------------
+      subroutine CALCULATE_BOUNDING_ENERGY(
+     &     CHF_CONST_FRA[HC],
+     &     CHF_FRA[H_s],
+     &     CHF_FRA[H_e],
+     &     CHF_FRA[H_l],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[compositionRatio],
+     &     CHF_CONST_REAL[waterDistributionCoeff],
+     &     CHF_CONST_REAL[specificHeatRatio],
+     &     CHF_CONST_REAL[stefan],
+     &     CHF_CONST_REAL[thetaEutectic],
+     &     CHF_CONST_REAL[Theta_Eutectic])
+     
+      integer Hcomp, Ccomp
+      integer CHF_DDECL[i;j;k]
+      REAL_T porosityEutectic
+      
+      Hcomp = 0
+      Ccomp = 1
+      
+      CHF_MULTIDO[region; i; j; k]
+        H_s(CHF_IX[i;j;k],0) = specificHeatRatio*((-HC(CHF_IX[i;j;k],Ccomp)-compositionRatio)/waterDistributionCoeff);
+        
+        if (H_s(CHF_IX[i;j;k],0) .lt. 0.0) then
+          H_s(CHF_IX[i;j;k],0) = 0.0
+        endif
+        H_s(CHF_IX[i;j;k],0) = H_s(CHF_IX[i;j;k],0) + thetaEutectic*specificHeatRatio
+        
+        porosityEutectic = (compositionRatio + HC(CHF_IX[i;j;k],Ccomp))/(compositionRatio + Theta_Eutectic);
+        H_e(CHF_IX[i;j;k],0) = porosityEutectic*(stefan + thetaEutectic*(1-specificHeatRatio)) + specificHeatRatio*thetaEutectic;
+        H_l(CHF_IX[i;j;k],0) = stefan - HC(CHF_IX[i;j;k],Ccomp) + thetaEutectic + Theta_Eutectic;
+     
+      CHF_ENDDO
+     
+      return
+      end
+      
