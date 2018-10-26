@@ -654,7 +654,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
         these_job_ids = AMRConvergenceTest(all_params, full_output_dir, physicalProblem, Nzs, num_procs, numRestarts, analysis_command)
 
         # Concatenate lists
-        job_ids = job_ids + these_jobs_ids
+        job_ids = job_ids + these_job_ids
 
 
     # Once all these runs have been submitted, submit the analysis job

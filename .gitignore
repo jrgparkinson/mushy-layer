@@ -28,5 +28,7 @@ visitlog.py
 *diagnosticsLatest.out
 **/oldInputs/*
 **/execSubcycle/*/*
+**/doc/html/*
+**/doc/latex/*
 
 *.cproject
