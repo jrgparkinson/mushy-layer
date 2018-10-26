@@ -596,7 +596,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
                 p2['projection.eta'] = '0.95'
 
                 p2['main.gridfile'] = gridFile
-                p2['run_name'] = 'VariableMesh2SubcycleRefluxFreestream'+str(p1['projection.eta']) 
+                p2['run_name'] = 'VariableMesh2SubcycleRefluxFreestream'+str(p2['projection.eta']) 
                 p2['concise_run_name'] = 'VM'
             
                 param_sets.append(p2)
@@ -609,7 +609,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
                 p3['projection.eta'] = '0.95'
 
                 p3['main.gridfile'] = gridFileThreeLevels
-                p3['run_name'] = 'VM3LevelsSubcycleRefluxFreestream0.45' +str(p3['projection.eta']) 
+                p3['run_name'] = 'VM3LevelsSubcycleRefluxFreestream' +str(p3['projection.eta']) 
                 p3['concise_run_name'] = 'VM'
                 
                 param_sets.append(p3)
