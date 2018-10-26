@@ -40,7 +40,7 @@ analysis_command = 'cd ' + matlabFolder + '; \n \n matlab -nodisplay -nosplash -
 
 # Run
 extra_params = {'main.debug':'true'}
-runTest(dataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command)
+runTest(dataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command, extra_params)
 
 ######################################
 # 2) Convection in a fixed porous medium
