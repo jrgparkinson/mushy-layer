@@ -4,6 +4,9 @@ from runAMRConvergenceTest import runTest
 import os
 
 from colorama import Fore, Style
+#Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+#Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+#Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
 base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
@@ -22,7 +25,7 @@ else:
 ######################################
 # 1) Diffusive solidification problem
 #######################################
-print('Setup tests for solidification without flow')
+print(Fore.GREEN + 'Setup tests for solidification without flow' + Style.RESET_ALL)
 physicalProblem = 'noFlow'
 AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}, 
 {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr']},
@@ -34,7 +37,7 @@ Nzs 	  = [16, 32, 64]
 num_procs = [1] * len(Nzs)
 
 # Setup up the post processing command
-dataFolder = os.path.join(base_output_dir, 'AMRConvergenceTestNoFlow')
+dataFolder = os.path.join(base_output_dir, 'NoFlow')
 figureName = os.path.join(dataFolder, 'noFlow.pdf')
 parDir = os.path.abspath(os.pardir)
 matlabFolder = os.path.join(parDir, 'matlab', 'MethodsPaper')
@@ -56,7 +59,7 @@ Nzs 	  = [128]
 num_procs = [4]
 
 chi  = 0.4
-base_dataFolder = os.path.join(base_output_dir, 'AMRConvergenceTestConvectionDB')
+base_dataFolder = os.path.join(base_output_dir, 'ConvectionDB')
 
 Da_Ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9]},
 {'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5]}]
@@ -73,7 +76,7 @@ for Da_Ra in Da_Ra_vals:
 		extra_params['bc.porosityHiVal']= str(chi) + ' ' + str(chi) # 0.4 0.4
 		extra_params['bc.porosityLoVal']= str(chi) + ' ' + str(chi)
 
-		output_dir = 'chi'+str(chi)+'-Da' + str(Da) + '-Ra' +  params['parameters.rayleighTemp']
+		output_dir = 'chi'+str(chi)+'-Da' + str(Da) + '-Ra' +  str(extra_params['parameters.rayleighTemp'])
 
 		#extra_params = {}
 		runTest(dataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command, extra_params)
