@@ -29,6 +29,11 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
     for setup in AMRSetup:
         max_level = setup['max_level']
         ref_rat = max(setup['ref_rat'], 1)
+
+        if 'run_types' in setup:
+            run_types = setup['run_types']
+        else:
+            run_types = ['uniform']
     
         finestRefinement = pow(ref_rat, max_level)
         maxRefinement = ref_rat**max_level
@@ -48,7 +53,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
            
             
             # Some default options
-            runTypes = ['uniform']
+            
             gridfile = ''
             gridFile = mushyLayerBaseDir + '/grids/leftRight/' + str(Nz_coarse) + 'x' + str(Nz_coarse)
 
@@ -72,6 +77,8 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
                 params['main.max_grid_size'] = '32'
                 #params['main.nondimensionalisation'] = 0
                 #params['main.enforceAnalyticSolution'] = 'false'
+
+#                runTypes = ['uniform', 'variable']
 
 
             elif physicalProblem == 'convectionDB':
