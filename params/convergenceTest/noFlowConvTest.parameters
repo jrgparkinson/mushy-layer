@@ -109,7 +109,7 @@ bc.enthalpyLoVal=0.0 6.1
 
 
 main.nondimensionalisation=1
-parameters.nonDimVel=0.002
+parameters.nonDimVel=1.0 #0.002
 main.analyticSoln=5
 main.debug=true
 main.doEuler=1

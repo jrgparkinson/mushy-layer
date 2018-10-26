@@ -2,7 +2,7 @@ function noFlowSolution(dataFolder, figureName)
 
 if nargin < 2
    %dataFolder = '/home/parkinsonjl/convection-in-sea-ice/MushyLayer/matlab/MethodsPaper/';
-   dataFolder = getDataDir('Test/AMRConvergenceTestNoFlow/');
+   dataFolder = getDataDir('Test/NoFlow/');
    figureName = 'benchmarkNoFlow.pdf';
 end
 
