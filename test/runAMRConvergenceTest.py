@@ -673,6 +673,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
 
     s.writeSlurmFile()
     s.runTask()
+    print('Submitted analysis job \n')
 
 
 def main(argv):

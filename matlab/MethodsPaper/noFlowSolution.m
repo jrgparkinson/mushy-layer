@@ -6,7 +6,6 @@ if nargin < 2
    figureName = 'benchmarkNoFlow.pdf';
 end
 
-clear all;
 close all;
 
 set(0, 'defaultlinelinewidth',2);
