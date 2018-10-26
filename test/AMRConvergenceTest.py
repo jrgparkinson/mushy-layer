@@ -1,13 +1,15 @@
 # Function to run a convergence test
 import os
 import sys
+from colorama import Fore, Style
+import math
+from subprocess import Popen
+
 parDir = os.path.abspath(os.pardir)
 pythonDir = os.path.join(parDir, 'python')
 sys.path.append(pythonDir)
 
 from classes.MushyLayerRun import MushyLayerRun
-import math
-from subprocess import Popen
 from util.mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, getRestartFile
 from classes.SlurmTask import SlurmTask
 # Params is a vector of params dicts
@@ -44,7 +46,7 @@ def AMRConvergenceTest(params, full_output_dir, physicalProblem, Nzs, num_procs 
         print(full_path)
         if os.path.exists(full_path):
         
-            print('    Run already done')
+            print(Fore.YELLOW + '    Run already done' + Fore.RESET)
             
             if numRestarts > 0:
             
@@ -76,10 +78,10 @@ def AMRConvergenceTest(params, full_output_dir, physicalProblem, Nzs, num_procs 
                 continue
                 
         else:
-            print('    No previous runs')
+            print(Fore.YELLOW + '    No previous runs' + Fore.RESET)
     
       
-        print('    **Do run**')
+        print(Fore.GREEN + '    **Do run**' + Fore.RESET)
 
         # Don't know output dir or exec dir here, MushyLayerRun will fill these in
         s = SlurmTask('', p['concise_run_name'], '', num_proc)

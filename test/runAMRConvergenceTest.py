@@ -4,6 +4,7 @@ import sys
 import math
 import getopt
 from subprocess import Popen
+from colorama import Fore, Style
 
 parDir = os.path.abspath(os.pardir)
 pythonDir = os.path.join(parDir, 'python')
@@ -661,7 +662,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
 
     s.writeSlurmFile()
     s.runTask()
-    print('Submitted analysis job \n')
+    print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
 
 def main(argv):

@@ -79,7 +79,8 @@ for Da_Ra in Da_Ra_vals:
 		output_dir = 'chi'+str(chi)+'-Da' + str(Da) + '-Ra' +  str(extra_params['parameters.rayleighTemp'])
 
 		#extra_params = {}
-		runTest(dataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command, extra_params)
+		thisDataFolder = os.path.join(base_dataFolder, output_dir)
+		runTest(thisDataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command, extra_params)
 
 
 # 3) Convection in a fixed porous medium with variable porosity
