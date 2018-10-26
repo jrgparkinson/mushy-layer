@@ -546,13 +546,13 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
             if num_proc > 1:
                 optimalGrid = float(Nx_coarse)/(float(num_proc)/2.0)
 
-                print('Initial optimal grid guess: %d' % optimalGrid)
+                #print('Initial optimal grid guess: %d' % optimalGrid)
                 
                 # increase to next power of 2
                 while not isPowerOfTwo(optimalGrid):
                     optimalGrid = optimalGrid + 1
 
-                print('Final optimal grid guess: %d' % optimalGrid)
+                #print('Final optimal grid guess: %d' % optimalGrid)
                 
                 maxGrid = max(16, optimalGrid)
                 # grid size must be greater than the blocking factor 
