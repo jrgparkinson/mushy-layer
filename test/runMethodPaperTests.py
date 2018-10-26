@@ -29,13 +29,14 @@ Nzs 	  = [16, 32, 64]
 num_procs = [1] * len(Nzs)
 
 dataFolder = os.path.join(base_output_dir, 'AMRConvergenceTestNoFlow')
-figureName = os.path.join(base_output_dir, 'AMRConvergenceTestNoFlow', 'noFlow.pdf')
+
+figureName = os.path.join(dataFolder, 'noFlow.pdf')
 
 parDir = os.path.abspath(os.pardir)
 matlabFolder = os.path.join(parDir, 'matlab', 'MethodsPaper')
 analysis_command = 'cd ' + matlabFolder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r "noFlowSolution(\'' + dataFolder + '\', \'' +figureName+ '\'); exit;"' 
 
-runTest(base_output_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command)
+runTest(dataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command)
 
 # 2) Convection in a fixed porous medium
 physicalProblem = 'convectionDB'

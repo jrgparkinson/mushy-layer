@@ -15,11 +15,16 @@ from AMRConvergenceTest import AMRConvergenceTest
 import getopt
 
 
-def runTest(data_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command = '', numRestarts=0):
+def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command = '', numRestarts=0):
+
+    # base_dir should be e.g. 
+    #'/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/AMRConvergenceTestNoFlow'
 
     mushyLayerBaseDir = os.path.abspath(os.pardir)
 
     all_params = []
+
+    job_ids = []
 
     for setup in AMRSetup:
         max_level = setup['max_level']
@@ -51,10 +56,10 @@ def runTest(data_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
             if os.path.exists(defaultParamsFile):
                 params = readInputs(defaultParamsFile)
 
-            output_dir = 'AMRConvergenceTest/' + physicalProblem + '/'
+            output_dir = '' #AMRConvergenceTest/' + physicalProblem + '/'
             
             if physicalProblem == 'noFlow':
-                output_dir = 'AMRConvergenceTestNoFlow'
+                #output_dir = 'AMRConvergenceTestNoFlow'
                 params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/noFlowConvTest.parameters')
                 
                 
@@ -640,13 +645,28 @@ def runTest(data_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
             
 
         # Actually run the convergence test
-        full_output_dir = os.path.join(data_dir, output_dir)
-        #print('Data dir: ' + data_dir + '\n')
+        full_output_dir = os.path.join(base_dir, output_dir)
+        #print('Data dir: ' + base_dir + '\n')
         #print('Output dir: ' + output_dir + '\n')
         print('Full output dir: ' + full_output_dir + '\n')
         
         
-        AMRConvergenceTest(all_params, full_output_dir, physicalProblem, Nzs, num_procs, numRestarts, analysis_command)
+        these_job_ids = AMRConvergenceTest(all_params, full_output_dir, physicalProblem, Nzs, num_procs, numRestarts, analysis_command)
+
+        # Concatenate lists
+        job_ids = job_ids + these_jobs_ids
+
+
+    # Once all these runs have been submitted, submit the analysis job
+    jobName = physicalProblem + '-analysis'
+
+    s = SlurmTask(base_dir, jobName, '')
+
+    s.setDependency(job_ids)
+    s.setCustomCommand(analysis_command)
+
+    s.writeSlurmFile()
+    s.runTask()
 
 
 def main(argv):
@@ -670,8 +690,8 @@ def main(argv):
     #################################
     os.environ["CH_TIMER"] = "1"
 
-    data_dir = os.getcwd() # for local runs
-    data_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/' # for writing to shared storage
+    base_dir = os.getcwd() # for local runs
+    base_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/' # for writing to shared storage
 
     # Change things below here
     #num_proc = 1
@@ -706,7 +726,9 @@ def main(argv):
     # MushyConvectionAnalyticVel, MushyConvection, MushyConvectionLiquid
     physicalProblem = 'MushyConvectionLiquid2' 
 
-    runTest(data_dir, physicalProblem, AMRSetup, Nzs, num_procs)
+    base_dir = os.path.join(base_dir, 'AMRConvergenceTestMushyConvection')
+
+    runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs)
 
             
 

@@ -95,16 +95,7 @@ def AMRConvergenceTest(params, full_output_dir, physicalProblem, Nzs, num_procs 
         print('==================')
 
         
-    # Once all these runs have been submitted, submit the analysis job
-    jobName = physicalProblem + '-analysis'
-
-    s = SlurmTask(full_output_dir, jobName, '')
-
-    s.setDependency(dependencies)
-    s.setCustomCommand(analysis_command)
-
-    s.writeSlurmFile()
-    s.runTask()
+    return dependencies
 
 
 

@@ -26,5 +26,7 @@ visitlog.py
 *.ex
 *diagnostics.out
 *diagnosticsLatest.out
+**/oldInputs/*
+**/execSubcycle/*/*
 
 *.cproject
