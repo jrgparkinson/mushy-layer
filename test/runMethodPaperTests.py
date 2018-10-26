@@ -31,7 +31,9 @@ num_procs = [1] * len(Nzs)
 dataFolder = os.path.join(output_dir, 'NoFlow')
 figureName = os.path.join(output_dir, 'NoFlow', 'noFlow.pdf')
 
-analysis_command = 'matlab -nodisplay -nosplash -nodesktop -r "noFlowSolution(\'' + dataFolder + '\', \'' +figureName+ '\'); exit;"' 
+parDir = os.path.abspath(os.pardir)
+matlabFolder = os.path.join(parDir, 'matlab', 'MethodsPaper')
+analysis_command = 'cd ' + parDir + '; \n \n matlab -nodisplay -nosplash -nodesktop -r "noFlowSolution(\'' + dataFolder + '\', \'' +figureName+ '\'); exit;"' 
 
 runTest(output_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command)
 
