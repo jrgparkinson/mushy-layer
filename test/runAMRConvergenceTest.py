@@ -23,7 +23,7 @@ def runTest(data_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
 
     for setup in AMRSetup:
         max_level = setup['max_level']
-        ref_rat = setup['ref_rat']
+        ref_rat = max(setup['ref_rat'], 1)
     
         finestRefinement = pow(ref_rat, max_level)
         maxRefinement = ref_rat**max_level

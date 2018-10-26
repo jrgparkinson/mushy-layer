@@ -98,8 +98,9 @@ def AMRConvergenceTest(params, full_output_dir, physicalProblem, Nzs, num_procs 
     # Once all these runs have been submitted, submit the analysis job
     jobName = physicalProblem + '-analysis'
 
-    parDir = os.path.abspath(os.pardir)
-    matlabFolder = os.path.join(parDir, 'matlab', 'MethodsPaper') # where we will execute the command from
+    #parDir = os.path.abspath(os.pardir)
+    
+    matlabFolder = os.path.join(full_output_dir, 'matlab', 'MethodsPaper') # where we will execute the command from
 
     s = SlurmTask(matlabFolder, jobName, '')
 
