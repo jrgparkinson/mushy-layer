@@ -217,24 +217,33 @@ void analyticSolnSolidificationNoFlow(LevelData<FArrayBox>& enthalpyAnalytic,
         }
         else if (z >= zEutectic)
         {
+          // Liquid phase
           solidFraction = 1;
           Real linearTgradient = (thetaTop - a_parameters.thetaEutectic )/(a_domainLength-zEutectic);
           theta = a_parameters.thetaEutectic + linearTgradient*(z-zEutectic);
         }
         else if (abs(vel) > 0)
         {
-          //Spline interpolation
+          //Spline interpolation to get mush
 
-          spline spl;
-          spl.set_points(zCalc, thetaDefined);
-          theta = spl(z);
+           if (zCalc.size() > 2)
+           {
+             spline spl;
+             spl.set_points(zCalc, thetaDefined);
+             theta = spl(z);
+           }
+           else
+           {
+             theta = thetaDefined[0];
+           }
 
-          solidFraction = (1-theta)/(concRatio - theta);
+           solidFraction = (1-theta)/(concRatio - theta);
 
         }
 
         else
         {
+          // At the liquidus
           theta = 1;
           solidFraction = 0;
         }

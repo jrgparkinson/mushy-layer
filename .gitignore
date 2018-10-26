@@ -20,5 +20,9 @@ visitlog.py
 *.project
 *.pydevproject
 *~
+*pout.*
+*time.table.*
+**/.settings/*
+*.ex
 
-
+*.cproject

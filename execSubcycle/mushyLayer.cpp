@@ -37,7 +37,7 @@ void mushyLayer(const Real& a_stopTime,
 {
   CH_TIME("mushyLayer");
 
-  printRepoVersion();
+//  printRepoVersion();
 
   ProblemDomain prob_domain;
   getProblemDomain(prob_domain);

@@ -65,6 +65,10 @@ def runTest(data_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
                 params['main.tag_buffer_size'] = str(int(float(Nz_coarse)/8))
                 params['main.steady_state'] = '1e-8' #str(1e-4 * pow(32.0/float(Nz_coarse),2))
                 params['main.max_grid_size'] = '32'
+                #params['main.nondimensionalisation'] = 0
+                #params['main.enforceAnalyticSolution'] = 'false'
+
+
             elif physicalProblem == 'convectionDB':
                 #output_dir = 'AMRConvergenceTestConvectionDB'
                 Nx_coarse = Nz_coarse

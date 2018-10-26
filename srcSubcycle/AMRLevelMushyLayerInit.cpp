@@ -775,7 +775,15 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
 
   if (m_parameters.m_nondimensionalisation == m_parameters.m_darcyTime_advectiveVel)
   {
-    m_parameters.m_heatDiffusionCoeff = m_parameters.darcy/m_parameters.prandtl;
+    // To avoid dividing by 0 when Da = Pr = 0
+    if (m_parameters.darcy == m_parameters.prandtl)
+    {
+      m_parameters.m_heatDiffusionCoeff = 1;
+    }
+    else
+    {
+      m_parameters.m_heatDiffusionCoeff = m_parameters.darcy/m_parameters.prandtl;
+    }
     //    m_parameters.m_saltDiffusionCoeff = m_parameters.darcy/(m_parameters.prandtl*m_parameters.lewis);
     m_parameters.m_saltDiffusionCoeff = m_parameters.m_heatDiffusionCoeff/m_parameters.lewis;
     m_parameters.m_viscosityCoeff = m_parameters.darcy;
@@ -1051,6 +1059,22 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
     pout() << "AMRLevelMushyLayer::define - finished (level " << m_level << ")" << endl;
   }
 
+
+}
+
+void AMRLevelMushyLayer::initialDataDefault()
+{
+
+  Real H =  m_parameters.bcValEnthalpyLo[SpaceDim-1];
+  Real C =  m_parameters.bcValBulkConcentrationLo[SpaceDim-1];
+
+  DataIterator dit = m_grids.dataIterator();
+  for (dit.reset(); dit.ok(); ++dit)
+  {
+    (*m_scalarNew[m_enthalpy])[dit].setVal(H);
+    (*m_scalarNew[m_bulkConcentration])[dit].setVal(C);
+
+  }
 
 }
 
@@ -2066,6 +2090,9 @@ void AMRLevelMushyLayer::initialData()
       initialDataVortexPair();
       break;
 
+
+    default:
+      initialDataDefault();
       //          case MushyLayerParams::m_:
       //            initialData(x, y, valNew, scalarVar, -1);
       //            break;
