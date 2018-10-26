@@ -11,9 +11,10 @@ base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
 
 if os.path.exists(base_output_dir):
 	# check empty
-	if os.listdir(base_output_dir) :
-		print(Fore.RED + 'Warning - output directory not empty \n')
-		print(Style.RESET_ALL)
+	#if os.listdir(base_output_dir) :
+	#	print(Fore.RED + 'Warning - output directory not empty \n')
+	#	print(Style.RESET_ALL)
+	pass
 				
 else:
     os.makedirs(base_output_dir)

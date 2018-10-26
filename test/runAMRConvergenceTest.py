@@ -520,7 +520,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
 
             # Any extra params we may have
             for k,v in extra_params.iteritems():
-                p[k] = v
+                params[k] = v
 
                
             numCellsAMR = str(Nx_coarse) + ' ' + str(Nz_coarse) + '  8'    
