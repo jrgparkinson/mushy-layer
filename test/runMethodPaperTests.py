@@ -3,7 +3,7 @@
 from runAMRConvergenceTest import runTest
 import os
 
-from colorama import Fore
+from colorama import Fore, Style
 
 base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
@@ -12,7 +12,7 @@ base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
 if os.path.exists(base_output_dir):
 	# check empty
 	if os.listdir(base_output_dir) :
-		print(Fore.RED + 'Warning - output directory not empty')
+		print(Fore.RED + 'Warning - output directory not empty \n')
 		print(Style.RESET_ALL)
 				
 else:
