@@ -22,6 +22,7 @@ else:
 ######################################
 # 1) Diffusive solidification problem
 #######################################
+print('Setup tests for solidification without flow')
 physicalProblem = 'noFlow'
 AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}, 
 {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr']},
@@ -46,6 +47,7 @@ runTest(dataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command,
 ######################################
 # 2) Convection in a fixed porous medium
 ######################################
+print('Setup tests for convection in a fixed porous medium')
 physicalProblem = 'convectionDB'
 AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform']}, 
 {'max_level': 1, 'ref_rat': 2, 'run_types': ['variable']}]
@@ -62,7 +64,7 @@ Da_Ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9]},
 for Da_Ra in Da_Ra_vals:
 	Da = Da_Ra['Da']
 
-	for Ra in Ra_Ra['RaT']:
+	for Ra in Da_Ra['RaT']:
 
 		extra_params['parameters.rayleighTemp'] = Ra
 	 
