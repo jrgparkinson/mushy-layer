@@ -12,7 +12,7 @@ output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
 
 if os.path.exists(output_dir):
 	# check empty
-	if os.listdir('/home/varun/temp') :
+	if os.listdir(output_dir) :
 		colored('Warning - output directory not empty', 'green', 'on_red')
 else:
     os.makedirs(output_dir)
