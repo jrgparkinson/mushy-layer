@@ -24,5 +24,7 @@ visitlog.py
 *time.table.*
 **/.settings/*
 *.ex
+*diagnostics.out
+*diagnosticsLatest.out
 
 *.cproject
