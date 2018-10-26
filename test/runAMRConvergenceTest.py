@@ -1,18 +1,18 @@
 # Script to test convergence of uniform and AMR solutions
 import os
 import sys
+import math
+import getopt
+from subprocess import Popen
 
 parDir = os.path.abspath(os.pardir)
 pythonDir = os.path.join(parDir, 'python')
 sys.path.append(pythonDir)
-
-from classes.MushyLayerRun import MushyLayerRun
-import math
-from subprocess import Popen
 from util.mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, isPowerOfTwo
-from AMRConvergenceTest import AMRConvergenceTest
+from classes.MushyLayerRun import MushyLayerRun
+from classes.SlurmTask import SlurmTask
 
-import getopt
+from AMRConvergenceTest import AMRConvergenceTest
 
 
 def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command = '', numRestarts=0):
