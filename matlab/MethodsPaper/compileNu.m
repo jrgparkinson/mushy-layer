@@ -1,37 +1,30 @@
-function compileNu
+function compileNu(base_dir, chi, Da, Ra, res, NuLeBars)
 
-chi=0.4;
-Da = '0.01';
-cfl = -1;
-Ra = {'1e3','1e4','1e5','5e5'};
-NuLeBars = [1.01, 1.41, 3.17, 5.24];
+% chi=0.4;
+% Da = '0.01';
+% cfl = -1;
+% Ra = {'1e3','1e4','1e5','5e5'};
+%NuLeBars = [1.01, 1.41, 3.17, 5.24];
 
 UniformPrefix = 'Uniform-convectionDB-';
 
-%UniformPrefix = 'Uniform-convectionDarcyBrinkman-';
-%AMRPrefix = 'VariableMesh2SubcycleRefluxFreestream0.45-convectionDB-';
+% chi='0.4';
+% Da = '1e-06';
+% cfl = '0.001';
+% Ra = {'1e7','1e8','1e9'};
+%NuLeBars = [1.08, 3.07, 12.9];
+AMRPrefix = 'VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-';
 
-%prefix = 'AMRConvergenceTestConvectionDB-chi0.4-Da1e-06-Ra';
-%Ra = {'1e7','1e8','1e9'};
-
-chi='0.4';
-Da = '1e-06';
-cfl = '0.001';
-Ra = {'1e7','1e8','1e9'};
-NuLeBars = [1.08, 3.07, 12.9];
-AMRPrefix = 'VariableMesh2SubcycleRefluxFreestream0.9-ref2-convectionDB-';
-
-
-for r = 5:7
-    
-res = 2^r;
+%base_dir = getDataDir(['AMRConvergenceTest/ConvectionDB/']);
 
 fprintf('Nx = %d \n', res);
 for i=1:length(Ra)
-    outputFolder = getOutputFolder(Ra{i}, chi, Da, cfl);
+    outputFolder = getOutputFolder(Ra{i}, chi, Da);
     
 %folder= getDataDir(['AMRConvergenceTest/ConvectionDB/', params,    Ra{i}]);
-folder= getDataDir(['AMRConvergenceTest/ConvectionDB/', outputFolder]);
+%folder= getDataDir(['AMRConvergenceTest/ConvectionDB/', outputFolder]);
+
+folder = fullfile(base_dir, outputFolder);
 
 % Get latest sub folder
 j = 0;
@@ -70,8 +63,6 @@ end
 fprintf('Ra=%s, Nu=%1.2f %s (Uniform) / %1.2f%s (AMR)  / %1.2f (Le Bars & Worster) \n', ...
     Ra{i}, NuUniform, UniformStr, NuAMR, AMRStr, NuLeBars(i));
  
-end
-
 end
 
 
@@ -130,6 +121,10 @@ end
 end
 
 function folder = getOutputFolder(Ra, chi, Da, cfl)
+if nargin < 4
+    cfl = -1;
+end
+
 if cfl < 0
     folder = ['chi',chi,'-Da',Da,'-Ra',Ra];
 else

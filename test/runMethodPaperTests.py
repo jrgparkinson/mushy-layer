@@ -22,6 +22,10 @@ if os.path.exists(base_output_dir):
 else:
     os.makedirs(base_output_dir)
 
+parDir = os.path.abspath(os.pardir)
+matlabFolder = os.path.join(parDir, 'matlab', 'MethodsPaper')
+matlab_command = 'cd ' + matlabFolder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
+
 ######################################
 # 1) Diffusive solidification problem
 #######################################
@@ -39,9 +43,7 @@ num_procs = [1] * len(Nzs)
 # Setup up the post processing command
 dataFolder = os.path.join(base_output_dir, 'NoFlow')
 figureName = os.path.join(dataFolder, 'noFlow.pdf')
-parDir = os.path.abspath(os.pardir)
-matlabFolder = os.path.join(parDir, 'matlab', 'MethodsPaper')
-analysis_command = 'cd ' + matlabFolder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r "noFlowSolution(\'' + dataFolder + '\', \'' +figureName+ '\'); exit;"' 
+analysis_command = matlab_command + ' "noFlowSolution(\'' + dataFolder + '\', \'' +figureName+ '\'); exit;"' 
 
 # Run
 extra_params = {'main.debug':'true'}
@@ -61,11 +63,19 @@ num_procs = [4]
 chi  = 0.4
 base_dataFolder = os.path.join(base_output_dir, 'ConvectionDB')
 
-Da_Ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9]},
-{'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5]}]
+Da_Ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9], 'lebars': [1.08, 3.07, 12.9]},
+{'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5],  'lebars': [1.01, 1.41, 3.17, 5.24]}]
+
+#[1.01, 1.41, 3.17, 5.24];
+# [1.08, 3.07, 12.9];
+all_job_ids = []
+
+analysis_command = matlab_command 
+
 
 for Da_Ra in Da_Ra_vals:
 	Da = Da_Ra['Da']
+	NuLebars = [str(a) for a in Da_Ra['lebars']]
 
 	for Ra in Da_Ra['RaT']:
 
@@ -80,8 +90,28 @@ for Da_Ra in Da_Ra_vals:
 
 		#extra_params = {}
 		thisDataFolder = os.path.join(base_dataFolder, output_dir)
-		runTest(thisDataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command, extra_params)
+		analysis_command = ''
+		job_ids = runTest(thisDataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command, extra_params)
+		all_job_ids = all_job_ids + job_ids
 
+
+	Ra_str_vals = [str(a) for a in Ra]
+	Ra_str = '{\' ' + '\',\''.join(Ra_str_vals) + '\'}'
+
+	analysis_command = analysis_command + ' "compileNu(\'' + base_dataFolder + '\', \'' +str(chi)+ '\', \'' +str(Da)+ '\', \'' +Ra_str+ '\', \'' +str(Nzs[-1])+ '\', , \'[' + ','.join(NuLebars)+ ']\');' 
+
+# Now do analysis
+analysis_command = analysis_command + ' exit; " '
+#analysis_command = '(base_dir, chi, Da, Ra, res)'
+
+jobName = physicalProblem + '-analysis'
+s = SlurmTask(base_dataFolder, jobName, '')
+
+s.setDependency(all_job_ids)
+s.setCustomCommand(analysis_command)
+s.writeSlurmFile()
+s.runTask()
+print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
 # 3) Convection in a fixed porous medium with variable porosity
 
