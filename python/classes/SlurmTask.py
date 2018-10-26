@@ -83,7 +83,7 @@ class SlurmTask:
             mpiStr = 'mpirun -np ' + str(self.num_proc)
 
         if len(self.dependency) > 0:
-            dependencies = ','.join(self.dependency)
+            dependencies = ':'.join(self.dependency)
             depStr = '#SBATCH --dependency=afterok:' + dependencies + ' \n'
         else:
             depStr = ''
