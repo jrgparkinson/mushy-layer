@@ -24,8 +24,8 @@ AMRSetup = [{'max_level': 0, 'ref_rat': 0},
     {'max_level': 1, 'ref_rat': 4},
     {'max_level': 2, 'ref_rat': 2}]
 
-Nzs = [16, 32, 64, 128]
-num_procs = [1]
+Nzs 	  = [16, 32, 64, 128]
+num_procs = [1] * len(Nzs)
 
 dataFolder = os.path.join(output_dir, 'NoFlow')
 figureName = os.path.join(output_dir, 'NoFlow', 'noFlow.pdf')
