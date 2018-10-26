@@ -30,10 +30,9 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
         max_level = setup['max_level']
         ref_rat = max(setup['ref_rat'], 1)
 
+        runTypes = ['uniform']
         if 'run_types' in setup:
-            run_types = setup['run_types']
-        else:
-            run_types = ['uniform']
+            runTypes = setup['run_types']
     
         finestRefinement = pow(ref_rat, max_level)
         maxRefinement = ref_rat**max_level
