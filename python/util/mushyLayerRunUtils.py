@@ -1,6 +1,7 @@
 import re
 import os
 import time
+import math
 
 def constructRunName(params):
     # run_name = 'CR' + str(params['parameters.compositionRatio']) + 'RaC' + str(params['parameters.rayleighComp'])
