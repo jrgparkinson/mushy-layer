@@ -3,7 +3,7 @@
 from runAMRConvergenceTest import runTest
 import os
 
-from colorama import init
+from colorama import Fore
 
 output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
