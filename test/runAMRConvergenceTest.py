@@ -560,42 +560,55 @@ def runTest(data_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
             param_sets = []
             
             # Run 1: uniform mesh
-            p0 = dict(params)
-            p0['main.max_level'] = '0'
-            p0['main.num_cells'] = numCellsUniform
-            p0['run_name'] = 'Uniform'
-            p0['concise_run_name'] = 'Uniform'
             if 'uniform' in runTypes:
+                p0 = dict(params)
+                p0['main.max_level'] = '0'
+                p0['main.num_cells'] = numCellsUniform
+                p0['run_name'] = 'Uniform'
+                p0['concise_run_name'] = 'Uniform'
+            
                 param_sets.append(p0)
             
             # This should do the job for AMR simulations
-            p1 = dict(params)
-            p1['main.reflux_scalar'] = '1'
-            p1['main.use_subcycling'] = '1'
-            p1['main.refluxType'] = '2'
-            #p1['projection.eta'] = '0.48'
-            #p1['main.max_grid_size'] = '256' # no idea why this was here - it was making AMR sims super slow
-            #p1['main.plot_interval'] = '1'
-            p1['run_name'] = 'AMR-Subcycle-Reflux-Freestream'+str(p1['projection.eta'])+'-MaxLevel' + str(max_level) 
-            p1['concise_run_name'] = 'AMR'
-            #p13['main.initialize_VD_corr'] = 'true' # true by default
             if 'amr' in runTypes:
+                p1 = dict(params)
+                p1['main.reflux_scalar'] = '1'
+                p1['main.use_subcycling'] = '1'
+                p1['main.refluxType'] = '2'
+                p1['projection.eta'] = '0.95'
+                
+                p1['run_name'] = 'AMR-Subcycle-Reflux-Freestream'+str(p1['projection.eta'])+'-MaxLevel' + str(max_level) 
+                p1['concise_run_name'] = 'AMR'
+                #p13['main.initialize_VD_corr'] = 'true' # true by default
+            
                 param_sets.append(p1)
             
             
             # Variable mesh
-            p2 = dict(p1)
-            p2['main.gridfile'] = gridFile
-            p2['run_name'] = 'VariableMesh2SubcycleRefluxFreestream'+str(p1['projection.eta']) 
-            p2['concise_run_name'] = 'VM'
             if 'variable' in runTypes and max_level==1:    
+                p2 = dict(params)
+                p2['main.reflux_scalar'] = '1'
+                p2['main.use_subcycling'] = '1'
+                p2['main.refluxType'] = '2'
+                p2['projection.eta'] = '0.95'
+
+                p2['main.gridfile'] = gridFile
+                p2['run_name'] = 'VariableMesh2SubcycleRefluxFreestream'+str(p1['projection.eta']) 
+                p2['concise_run_name'] = 'VM'
+            
                 param_sets.append(p2)
             
-            p3 = dict(p1)
-            p3['main.gridfile'] = gridFileThreeLevels
-            p3['run_name'] = 'VM3LevelsSubcycleRefluxFreestream0.45' +str(p3['projection.eta']) 
-            p3['concise_run_name'] = 'VM'
             if 'variable' in runTypes and max_level==2: 
+                p3 = dict(params)
+                p3['main.reflux_scalar'] = '1'
+                p3['main.use_subcycling'] = '1'
+                p3['main.refluxType'] = '2'
+                p3['projection.eta'] = '0.95'
+
+                p3['main.gridfile'] = gridFileThreeLevels
+                p3['run_name'] = 'VM3LevelsSubcycleRefluxFreestream0.45' +str(p3['projection.eta']) 
+                p3['concise_run_name'] = 'VM'
+                
                 param_sets.append(p3)
             
             
