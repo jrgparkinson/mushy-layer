@@ -643,7 +643,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
         full_output_dir = os.path.join(base_dir, output_dir)
         #print('Data dir: ' + base_dir + '\n')
         #print('Output dir: ' + output_dir + '\n')
-        print('Full output dir: ' + full_output_dir + '\n')
+        #print('Full output dir: ' + full_output_dir + '\n')
         
         
         these_job_ids = AMRConvergenceTest(all_params, full_output_dir, physicalProblem, Nzs, num_procs, numRestarts, analysis_command)
