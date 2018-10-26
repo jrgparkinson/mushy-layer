@@ -2,7 +2,7 @@ function noFlowSolution(dataFolder, figureName)
 
 if nargin < 2
    %dataFolder = '/home/parkinsonjl/convection-in-sea-ice/MushyLayer/matlab/MethodsPaper/';
-   dataFolder = getDataDir('AMRConvergenceTest/NoFlow/');
+   dataFolder = getDataDir('Test/AMRConvergenceTestNoFlow/');
    figureName = 'benchmarkNoFlow.pdf';
 end
 
@@ -23,8 +23,8 @@ dz = 4./gridRes;
 errUniform = NaN*ones(length(gridRes), 1);
 errAMR = NaN*ones(length(gridRes), 1);
 
-amrPrefix2lev = 'AMR-Subcycle-Reflux-Freestream0.45-MaxLevel2-noFlow-';
-amrPrefix1lev = 'AMR-Subcycle-Reflux-Freestream0.45-MaxLevel1-noFlow-';
+amrPrefix2lev = 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel2-ref2-noFlow-';
+amrPrefix1lev = 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-noFlow-';
 
 
 textFontSize = 16;
@@ -37,27 +37,19 @@ plotWidth = 0.18;
 plotBottom = 0.18;
 horizSpacing = 0.03;
 
-%dataFolder = '/home/parkinsonjl/mnt/sharedStorage/optimalStates-highRes-new/';
-
 doColorbar = true;
 
-
-%plot_prefix = 'CR1.1RaC200Le200ChiCubedPermeabilitypts96-0';
-%plot_prefix = 'CR1.1RaC150Le200ChiCubedPermeabilitypts64-0';
-%plot_prefix = 'CR1.15RaC150Le200ChiCubedPermeabilitypts64-0';
-%plot_prefix = 'CR1.15RaC200Le200ChiCubedPermeabilitypts60-0';
-
-output = getFinalPlotFile([dataFolder, amrPrefix2lev, '16--0']);
-outputFine = getFinalPlotFile([dataFolder, uniformPrefix, '64--0']);
+output2lev        = getFinalPlotFile(fullfile(dataFolder, [amrPrefix2lev, '16--0']));
+outputUniformFine = getFinalPlotFile(fullfile(dataFolder, [uniformPrefix, '64--0']));
 %output = MushyLayerOutput(2, 224, dataFolder, AMRplot_prefix, true);
 
-perm = output.dataForComp(output.components.Porosity);
-T = output.dataForComp(output.components.Temperature);
-Terr = output.dataForComp(output.components.Terr);
-streamfunction = output.getStreamfunction(3000, 1);
+perm = output2lev.dataForComp(output2lev.components.Porosity);
+T = output2lev.dataForComp(output2lev.components.Temperature);
+Terr = output2lev.dataForComp(output2lev.components.Terr);
+streamfunction = output2lev.getStreamfunction(3000, 1);
 
-Tuniform  = outputFine.dataForComp(output.components.Temperature);
-chiUniform = outputFine.dataForComp(output.components.Porosity);
+Tuniform  = outputUniformFine.dataForComp(output2lev.components.Temperature);
+chiUniform = outputUniformFine.dataForComp(output2lev.components.Porosity);
 
 axPos(1,:) = [0.05 plotBottom 0.13 plotHeight];
 axPos(2,:) = [axPos(1,1)+axPos(1,3)+horizSpacing plotBottom 0.17 plotHeight];
@@ -68,9 +60,9 @@ axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*4 plotBottom plotWidth plotHei
 %perm = perm(:, 40:(end-5));
 %perm = log10(perm);
 
-probDomain = output.problemDomain;
+probDomain = output2lev.problemDomain;
 dx = probDomain.dxCoarse;
-numLevels = length(output.levelArray);
+numLevels = length(output2lev.levelArray);
 dxFine = dx/2^(numLevels-1);
 
 numx = 2^(numLevels-1)*((probDomain.domainExtent.hi_i - probDomain.domainExtent.lo_i) + 1);
@@ -153,8 +145,8 @@ edgeColor(2, :) = [1 0 1];
 edgeColor(3, :) = [0 1 1];
 
 % Draw on the different meshes
-for l = 2:length(output.levelArray)
-    lev = output.levelArray(l);
+for l = 2:length(output2lev.levelArray)
+    lev = output2lev.levelArray(l);
     levDx = 0.5*lev.dx;
     lev_width = lev.xhi-lev.xlow+2*levDx;
     lev_height = lev.yhi-lev.ylow+2*levDx;
@@ -277,15 +269,15 @@ for f =1:length(gridResPlot)
     
     plot_prefix = [uniformPrefix, num2str(thisRes),'--0'];
     
-    output = getFinalPlotFile([dataFolder, plot_prefix]);
+    output2lev = getFinalPlotFile([dataFolder, plot_prefix]);
     %output = MushyLayerOutput(2, uniformframes(f), dataFolder, plot_prefix, true);
-    if length(output.levelArray) > 0
+    if length(output2lev.levelArray) > 0
         
-        Terr = output.dataForComp(output.components.Terr);
+        Terr = output2lev.dataForComp(output2lev.components.Terr);
         
-        probDomain = output.problemDomain;
+        probDomain = output2lev.problemDomain;
         dx = probDomain.dxCoarse;
-        numLevels = length(output.levelArray);
+        numLevels = length(output2lev.levelArray);
         dxFine = dx/2^(numLevels-1);
         
         numx = 2^(numLevels-1)*((probDomain.domainExtent.hi_i - probDomain.domainExtent.lo_i) + 1);
@@ -453,3 +445,4 @@ thisRes = gridRes(f);
 end
 
 end
+

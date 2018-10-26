@@ -74,10 +74,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
                 params['main.tag_buffer_size'] = str(int(float(Nz_coarse)/8))
                 params['main.steady_state'] = '1e-8' #str(1e-4 * pow(32.0/float(Nz_coarse),2))
                 params['main.max_grid_size'] = '32'
-                #params['main.nondimensionalisation'] = 0
-                #params['main.enforceAnalyticSolution'] = 'false'
-
-#                runTypes = ['uniform', 'variable']
+                params['main.debug'] = 'true' # make sure we output things like Temperature error
 
 
             elif physicalProblem == 'convectionDB':
