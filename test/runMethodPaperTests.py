@@ -4,8 +4,6 @@ from runAMRConvergenceTest import runTest
 import os
 
 from colorama import init
-from termcolor import colored
-init() # for colorama
 
 output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
@@ -14,7 +12,7 @@ output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
 if os.path.exists(output_dir):
 	# check empty
 	if os.listdir(output_dir) :
-		print(colored('Warning - output directory not empty', 'green', 'on_red'))
+		print(Fore.RED + 'Warning - output directory not empty')
 else:
     os.makedirs(output_dir)
 
