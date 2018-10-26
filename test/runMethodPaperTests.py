@@ -22,12 +22,12 @@ else:
 # 1) Diffusive solidification problem
 #######################################
 physicalProblem = 'noFlow'
-#AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}, 
-#{'max_level': 1, 'ref_rat': 2, 'run_types': ['amr']},
-#{'max_level': 2, 'ref_rat': 2, 'run_types': ['amr']}]
+AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}, 
+{'max_level': 1, 'ref_rat': 2, 'run_types': ['amr']},
+{'max_level': 2, 'ref_rat': 2, 'run_types': ['amr']}]
 # While testing:
-AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}];
- 
+#AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}];
+
 Nzs 	  = [16, 32, 64]
 num_procs = [1] * len(Nzs)
 
