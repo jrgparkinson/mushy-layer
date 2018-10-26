@@ -13,6 +13,8 @@ if os.path.exists(output_dir):
 	# check empty
 	if os.listdir(output_dir) :
 		print(Fore.RED + 'Warning - output directory not empty')
+		print(Style.RESET_ALL)
+				
 else:
     os.makedirs(output_dir)
 

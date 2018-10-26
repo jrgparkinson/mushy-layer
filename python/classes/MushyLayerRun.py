@@ -71,11 +71,11 @@ class MushyLayerRun:
         self.base_output_dir = base_output_dir
         if subcycled:
             self.exec_dir = self.get_home_dir() + \
-                '/convection-in-sea-ice/MushyLayer/execSubcycle/'
+                '/mushy-layer/execSubcycle/'
             #self.parameters['main.use_subcycling'] = '1'
         else:
             self.exec_dir = self.get_home_dir() + \
-                '/convection-in-sea-ice/MushyLayer/execNonSubcycle/'
+                '/mushy-layer/execNonSubcycle/'
             #self.parameters['main.use_subcycling'] = '0'
 
         self.base_command = "mpirun --mca mpi_warn_on_fork 0  -np " + \
