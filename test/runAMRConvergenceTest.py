@@ -15,7 +15,7 @@ from classes.SlurmTask import SlurmTask
 from AMRConvergenceTest import AMRConvergenceTest
 
 
-def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command = '', numRestarts=0):
+def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command = '', extra_params=[], numRestarts=0):
 
     # base_dir should be e.g. 
     #'/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/AMRConvergenceTestNoFlow'
@@ -84,25 +84,17 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
                 gridFile = mushyLayerBaseDir + '/grids/leftRight/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
                 params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/convectionDarcyBrinkmanConvTest.parameters')
                 
-                runTypes = ['uniform', 'variable']
+                #runTypes = ['uniform', 'variable']
                 #runTypes = ['uniform']
-                theseNzs = [32,64,128]
+                #theseNzs = [32,64,128]
 
-                if Nz_coarse not in theseNzs:
-                    continue
+                #if Nz_coarse not in theseNzs:
+                #    continue
                 
                 params['main.refine_thresh'] = str(3.0/float(Nz_coarse))
                 params['main.tag_buffer_size']=str(max(2,int(float(Nz_coarse)/8)))
                 
-                params['parameters.rayleighTemp'] = '1e9'
-                Da = 1e-6
-               
-                chi = 0.4
                 
-                params['parameters.darcy'] = Da*pow(1-chi,2)/pow(chi,3.0)
-                
-                params['bc.porosityHiVal']= str(chi) + ' ' + str(chi) # 0.4 0.4
-                params['bc.porosityLoVal']= str(chi) + ' ' + str(chi)
                 
                 params['main.steady_state'] = '1e-8'
                 params['main.max_time'] = '50000000.0'
@@ -111,13 +103,8 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
                 params['main.cfl'] = cfl
                 params['main.initial_cfl'] = cfl
                 params['main.max_dt'] = '1e-1'
-                
-                #params['main.max_step'] = '2'
-                
-                            
-                #params['main.darcyTimescale'] = 'true'
-                
-                output_dir = 'AMRConvergenceTest/ConvectionDB/chi'+str(chi)+'-Da' + str(Da) + '-Ra' +  params['parameters.rayleighTemp']  + '-cfl0.001' 
+
+                #output_dir = 'chi'+str(chi)+'-Da' + str(Da) + '-Ra' +  params['parameters.rayleighTemp']  + '-cfl0.001' 
                 
                 params['main.plot_interval'] = '1000' #str(int(100.0*float(Nz_coarse)/16.0))
                 params['main.checkpoint_interval'] = params['main.plot_interval']
@@ -530,6 +517,10 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
             # Always turn off slope limiting for convergence tests
             params['main.use_limiting'] = 'false'
             params['main.debug'] = 'false' # also turn off debug to save disk space
+
+            # Any extra params we may have
+            for k,v in extra_params.iteritems():
+                p[k] = v
 
                
             numCellsAMR = str(Nx_coarse) + ' ' + str(Nz_coarse) + '  8'    
