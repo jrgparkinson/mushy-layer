@@ -1,10 +1,21 @@
 # Run all convergence tests for the methods paper
 
 from runAMRConvergenceTest import runTest
+import os
+from colorama import init
 
+init() # for colorama
 
 output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
+
+
+if os.path.exists(output_dir):
+	# check empty
+	if os.listdir('/home/varun/temp') :
+		colored('Warning - output directory not empty', 'green', 'on_red')
+else:
+    os.makedirs(output_dir)
 
 # 1) Diffusive solidification problem
 physicalProblem = 'noFlow'

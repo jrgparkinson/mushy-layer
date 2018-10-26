@@ -1,15 +1,20 @@
-from os import listdir, rename
+import sys
 import os
+pythonDir = os.path.abspath(os.pardir)
+sys.path.append(pythonDir)
+
+from os import listdir, rename
+
 from os.path import isfile, join, exists
 from shutil import copyfile
 import subprocess
 from subprocess import Popen
 from MachineSpecific import MachineSpecific
 import re
-from timeout import timeout
+from util.timeout import timeout
 #import numpy
 import math
-from mushyLayerRunUtils import readInputs, writeParamsFile
+from util.mushyLayerRunUtils import readInputs, writeParamsFile
 from SlurmTask import SlurmTask
 
 # For running processes in parallel
