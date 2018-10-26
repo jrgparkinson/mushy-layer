@@ -4,7 +4,7 @@ from runAMRConvergenceTest import runTest
 
 
 output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
-
+output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
 
 # 1) Diffusive solidification problem
 physicalProblem = 'noFlow'
