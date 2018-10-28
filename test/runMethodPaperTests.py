@@ -98,15 +98,14 @@ for Da_Ra in Da_Ra_vals:
 
 		#extra_params = {}
 		thisDataFolder = os.path.join(base_dataFolder, output_dir)
-		analysis_command = ''
-		job_ids = runTest(thisDataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
+		job_ids = runTest(thisDataFolder, physicalProblem, AMRSetup, num_procs, '', extra_params)
 		all_job_ids = all_job_ids + job_ids
 
 
 	Ra_str_vals = [str(a) for a in Da_Ra['RaT']]
-	Ra_str = '{\' ' + '\',\''.join(Ra_str_vals) + '\'}'
+	Ra_str = '[\'' + '\',\''.join(Ra_str_vals) + '\']'
 
-	analysis_command = analysis_command + ' "compileNu(\'' + base_dataFolder + '\', \'' +str(chi)+ '\', \'' +str(Da)+ '\', \'' +Ra_str+ '\', \'' +str(Nz)+ '\', , \'[' + ','.join(NuLebars)+ ']\');' 
+	analysis_command = analysis_command + ' "compileNu(\'' + base_dataFolder + '\', \'' +str(chi)+ '\', \'' +str(Da)+ '\', \'' +Ra_str+ '\', ' +str(Nz)+ ', [' + ','.join(NuLebars)+ ']);' 
 
 # Now do analysis
 analysis_command = analysis_command + ' exit; " '
