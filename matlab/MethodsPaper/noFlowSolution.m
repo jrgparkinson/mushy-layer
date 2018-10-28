@@ -18,7 +18,7 @@ savePlots = true;
 
 
 uniformPrefix = 'Uniform-noFlow-';
-gridRes = [8,16,32,64,128,256,512];
+gridRes = [16,32,64];
 dz = 4./gridRes;
 errUniform = NaN*ones(length(gridRes), 1);
 errAMR = NaN*ones(length(gridRes), 1);
@@ -403,11 +403,15 @@ err = NaN*ones(length(gridRes), 1);
 
 for f =1:length(gridRes)
     
+    
+    
     thisRes = gridRes(f);
     
     folder_name = [prefix, num2str(gridRes(f)),'--0'];
     thisFolder = fullfile(dataFolder, folder_name);
     errFile = [thisFolder, '/err.mat'];
+    
+    try
     
     if exist(errFile, 'file') == 2 && ~forceRecalculate
         load(errFile)
@@ -429,6 +433,10 @@ for f =1:length(gridRes)
     end
     
     err(f) = e.meanTerr;
+    
+    catch e
+        fprintf('Error processing %s \n', thisFolder);
+    end
     
 end
 
