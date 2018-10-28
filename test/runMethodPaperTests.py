@@ -103,7 +103,7 @@ for Da_Ra in Da_Ra_vals:
 
 
 	Ra_str_vals = [str(a) for a in Da_Ra['RaT']]
-	Ra_str = '[\'' + '\',\''.join(Ra_str_vals) + '\']'
+	Ra_str = '{\'' + '\',\''.join(Ra_str_vals) + '\'}'
 
 	analysis_command = analysis_command + ' compileNu(\'' + base_dataFolder + '\', \'' +str(chi)+ '\', \'' +str(Da)+ '\', ' +Ra_str+ ', ' +str(Nz)+ ', [' + ','.join(NuLebars)+ ']);' 
 
