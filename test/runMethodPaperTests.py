@@ -1,10 +1,13 @@
 # Run all convergence tests for the methods paper
-import os
+import os, sys
 from colorama import Fore, Style
 #Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 #Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 #Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
+parDir = os.path.abspath(os.pardir)
+pythonDir = os.path.join(parDir, 'python')
+sys.path.append(pythonDir)
 from classes.SlurmTask import SlurmTask
 from runAMRConvergenceTest import runTest
 
