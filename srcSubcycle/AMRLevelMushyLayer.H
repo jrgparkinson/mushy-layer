@@ -1109,7 +1109,7 @@ protected:
   /// Backed up scalar fields to be used for restarting
   m_scalarRestart;
 
-  /// Lagged \f$ d \chi / \dt \f$
+  /// Lagged \f$ \partial \chi / \partial t \f$
   LevelData<FArrayBox> m_dPorosity_dt;
 
   /// Vector fields at new time

@@ -32,3 +32,4 @@ visitlog.py
 **/doc/latex/*
 
 *.cproject
+*.tmp
