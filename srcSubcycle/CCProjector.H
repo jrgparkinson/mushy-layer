@@ -144,12 +144,19 @@ public:
 						const RefCountedPtr<LevelData<FluxBox> > a_porosityEdgePtr,
 						const RefCountedPtr<LevelData<FluxBox> > a_crsePorosityEdgePtr);
 
+  /// Scale for \f$ \phi \f$
+  /**
+   * Important to get this right for coarse-fine interface matching
+   */
   Real getPhiScale(Real a_dt);
 
-//  Real getScale(const char* param, Real a_dt);
+  /// Return the scale for \f$ \phi \f$
   Real getScale(Real a_scale, Real a_dt);
 
+  /// Set up for nonsubcycled solves
   void setNonSubcycledMACBCs();
+
+  /// Set up for subcycled solves
   void setSubcycledMACBCs();
 
   /// Projection function that let's user specify pressure coarse fine boundary condition
@@ -270,6 +277,8 @@ public:
 
   /// returns MAC correction
   LevelData<FArrayBox>& phi();
+
+  /// Get \f$ \phi \f$
   void getPhi(LevelData<FArrayBox>& a_phi);
 
   /// const version of accessor
@@ -284,10 +293,16 @@ public:
   /// returns level-projection pressure
   LevelData<FArrayBox>& Pi();
 
+  /// RHS for projection, i.e. \f$ \nabla \cdot \mathbf{U}^* \f$ (cell centred)
   LevelData<FArrayBox>& CCrhs();
+
+  /// RHS for projection solve, i.e. \f$ \nabla \cdot \mathbf{U}^* \f$ (face centred)
   LevelData<FArrayBox>& MACrhs();
 
+  /// Correction to make velocity incompressible (cell centred)
   LevelData<FArrayBox>& CCcorrection();
+
+  /// Correction to make velocity incompressible (face centred)
   LevelData<FluxBox>& MACcorrection();
 
   /// Pressure, not scaled by the timestep
@@ -325,6 +340,8 @@ public:
 
   /// correct face centred velocities with the already calculated grad(e_lambda)
     void applyFreestreamCorrection(LevelData<FluxBox>& a_advVel, Real scale=1.0);
+
+    /// Remove freestream correction from face centred velocities
     void removeFreestreamCorrection(LevelData<FluxBox>& a_advVel);
 
   /// returns edge-centered grad(eLambda) in all directions
@@ -369,9 +386,6 @@ public:
 
   /// sets physBCs
   void setPhysBC(PhysBCUtil& a_bc);
-
-  /// compute the volume discrepancy correction
-//  void computeVDcorrection(Vector<LevelData<FArrayBox>*> a_lambda, Real a_dt);
 
   /// pointer to the boundary condition object
   PhysBCUtil* getPhysBCPtr() const;

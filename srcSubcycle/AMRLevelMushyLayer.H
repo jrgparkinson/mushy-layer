@@ -144,7 +144,7 @@ public:
     s_implicit_reflux = true;
     s_initialize_pressures = true;
     s_regrid_init_pressure = true;
-//    s_reflux_scal = true;
+    //    s_reflux_scal = true;
     s_reflux_enthalpy = true;
     s_reflux_lambda = true;
     s_reflux_concentration = true;
@@ -160,7 +160,7 @@ public:
     m_lowerPorosityLimit = 1e-15;
     m_implicitAdvectionSolve = false;
     m_doAdvectionSolve = true;
-//    m_porosityInAdvectionOperator = true;
+    //    m_porosityInAdvectionOperator = true;
     m_advectionMethod = m_porosityInAdvection;
     m_splitDarcySolve = false;
     m_scaleAdvectionSrcExtraChi = false;
@@ -241,8 +241,13 @@ public:
   /// Things to do after a timestep
   virtual void postTimeStep();
 
+  /// Explicitly reflux scalar field
   void doExplicitReflux(int a_var);
+
+  /// Reflux enthalpy and bulk concentration
   Real doHCreflux();
+
+  /// Do reflux on momentum field
   void doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel);
 
   /// Create tags for regridding
@@ -275,7 +280,7 @@ public:
   Real maxAllowedEta();
 
   /// Set adv_vel_centering on all levels
-    void setAdvVelCentering(Real a_fraction);
+  void setAdvVelCentering(Real a_fraction);
 
   /// Create tags at initialization
   virtual void tagCellsInit(IntVectSet& a_tags) ;
@@ -298,44 +303,59 @@ public:
   /// Initialize data structures - resize arrays etc.
   void initDataStructures();
 
+  /// Compute cell-centred and face-centred velocities
   void computeAllVelocities(bool doFRupdates);
 
   /// Initialize data
   virtual void initialData();
 
+  /// Initial data for corner flow problem
   void initialDataCornerFlow();
 
+  /// Initial data for  Horton-Rogers-Lapwood problem
   void initialDataHRL();
 
+  /// Initial data for convection in a hetrogeneous porous medium
   void initialDataConvectionMixedPorous();
 
+  /// Initial data for poiseuille flow
   void initialDataPoiseuille();
 
- void initialDataIceBlock();
+  /// Initial data for a solid ice block
+  void initialDataIceBlock();
 
+  /// Initial data for mushy layer simulations
   void initialDataMushyLayer();
 
+  /// Initial data for a test case with regions of zero porosity
   void initialDataZeroPorosityTest();
 
+  /// Initial data for diffusion problem
   void initialDataDiffusion();
 
+  /// Initial data for vortex pair problem
   void initialDataVortexPair();
+
+  /// Add vortex to domain
   void addVortex(RealVect center, Real strength, Real radius);
 
+  /// Initial data for Rayleigh-Benard problem
   void initialDataRayleighBenard();
 
+  /// Initial data for solute flux test problem
   void initialDataSoluteFlux();
 
+  /// Initial data for sidewall heating problem
   void initialDataSidewallHeating();
 
+  /// Default initial data
   void initialDataDefault();
 
+  /// Initial data for burgers problem
   void initialDataBurgers();
 
+  /// Initial data for problem to test refluxing
   void initialDataRefluxTest();
-  //  void initialData(Real x, Real y,
-  //                              Real valNew, Real valOld, Real valD,
-  //                              int scalarVar, int vectorVar);
 
   /// Have we converged to steady state?
   virtual bool convergedToSteadyState();
@@ -366,14 +386,16 @@ public:
 #endif
 
   /// Calculate vorticity and streamfunction so we can plot them
-    void computeVorticityStreamfunction();
+  void computeVorticityStreamfunction();
 
-    void computeVorticity();
+  /// Compute vorticity
+  void computeVorticity();
 
-    // Get pi and phi from projection so we can plot it
-    void getExtraPlotFields();
+  // Get pi and phi from projection so we can plot it
+  void getExtraPlotFields();
 
-    void writeAMRHierarchy(string filename);
+  /// Write AMR hierarchy to file
+  void writeAMRHierarchy(string filename);
 
   /// Returns the dt computed earlier for this level
   virtual Real computeDt();
@@ -387,41 +409,50 @@ public:
   /// Define solvers
   void defineSolvers(Real a_time, bool a_homogeneous = false, Real alpha = 1.0, Real beta = 1.0);
 
+  /// Compute chimney diagnostics
   void computeChimneyDiagnostics();
 
   /// Diagnostics e.g. Nusselt number, solute flux
   Diagnostics m_diagnostics;
+
+  /// Whether or not to compute diagnostics
   bool m_computeDiagnostics;
 
-
+  /// Get the grids on this level
   DisjointBoxLayout grids();
 
+  /// Shift data in domain
   void shiftData(int dir, int distance);
 
+  /// Set \f$ \Delta x \f$ on this level
   void dx(Real newDx);
 
+  /// Transfer data to new disjoint box layout
   void reshapeData(DisjointBoxLayout newGrids,  ProblemDomain newDomain);
 
+  /// Refine data
   void refine(Real ref_ratio, DisjointBoxLayout a_grids, ProblemDomain a_domain);
 
   /// Do smoothing after regridding
-    void doPostRegridSmoothing(bool a_smoothVel=true, bool a_smoothScalar=true);
+  void doPostRegridSmoothing(bool a_smoothVel=true, bool a_smoothScalar=true);
 
-    void setSmoothingCoeff(Real a_coeff);
+  /// Set coefficient for smoothing operations
+  void setSmoothingCoeff(Real a_coeff);
 
-    /// Make sure zero porosity regions have no velocity (cell centred velocity)
-     void setVelZero(LevelData<FArrayBox>& a_vel, Real a_limit=-1, int a_radius=0);
+  /// Make sure zero porosity regions have no velocity (cell centred velocity)
+  void setVelZero(LevelData<FArrayBox>& a_vel, Real a_limit=-1, int a_radius=0);
 
-     /// Make sure zero porosity regions have no velocity (face centred velocity)
-     void setVelZero(LevelData<FluxBox>& a_vel, Real a_limit=-1);
+  /// Make sure zero porosity regions have no velocity (face centred velocity)
+  void setVelZero(LevelData<FluxBox>& a_vel, Real a_limit=-1);
 
-     void setCCVelZero(Real a_limit);
+  /// Set velocity to zero when porosity is below specified limit (cell centred)
+  void setCCVelZero(Real a_limit);
 
-     /// Update thermodynamic variables based on phase diagram
-       void updateEnthalpyVariables();
+  /// Update thermodynamic variables based on phase diagram
+  void updateEnthalpyVariables();
 
-       /// Compute lambda/porosity
-       void computeLambdaPorosity();
+  /// Compute lambda/porosity
+  void computeLambdaPorosity();
 
 protected:
 
@@ -432,8 +463,6 @@ protected:
 
   /// Determine if we're solving the full time dependent equation, or just darcy's law
   bool solvingFullDarcyBrinkman();
-
-
 
   /// Update thermodynamic variables based on phase diagram (old time)
   void updateEnthalpyVariablesOld();
@@ -452,11 +481,8 @@ protected:
   /// Returns \f$ \Delta t \f$
   Real computeDt(bool growdt);
 
-
-
   /// Compute salt equation residual
   void computeSaltResidual(LevelData<FluxBox>& totalSoluteFlux);
-
 
   /// Replace with data from before the last backup
   void restartTimestepFromBackup(bool ignorePressure = false);
@@ -476,9 +502,6 @@ protected:
 
   /// Fills coarse-fine boundaries on variable by quadratic interpolation
   void calculateCoarseFineBoundaries(int a_var, bool vector=false);
-
-  /// Advect and diffuse a scalar field. Returns multigrid status.
-//  int  advectDiffuseScalar(const int a_var, const LevelData<FArrayBox>& a_src,  const bool converged, const bool calculateAdvectiveSrc = true);
 
   /// Advection diffusion for multiple components
   int multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, LevelData<FArrayBox>& a_phi_new,
@@ -522,18 +545,18 @@ protected:
   void advectLambda(bool doFRupdates = true);
 
   /// Time integration by the TGA method (2nd order accurate)
-//  int TGAUpdateScalar(const int a_scalarVar, LevelData<FArrayBox>&  a_src, const bool converged);
+  //  int TGAUpdateScalar(const int a_scalarVar, LevelData<FArrayBox>&  a_src, const bool converged);
 
   /// Time integration by the Backward Euler method (1st order accurate)
-//  int BEUpdateScalar(const int a_scalarVar, LevelData<FArrayBox>&  a_src,
-//                     const bool converged);
+  //  int BEUpdateScalar(const int a_scalarVar, LevelData<FArrayBox>&  a_src,
+  //                     const bool converged);
 
   /// Make source term for the advection velocity solve
   void computeAdvectionVelSourceTerm(LevelData<FArrayBox>& advectionSourceTerm);
 
   /// Average vertical fluxes in the horizontal direction
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FluxBox>& a_phi);
-    void horizontallyAverage(Vector<Real>& averageVector, LevelData<FluxBox>& a_phi);
+  void horizontallyAverage(Vector<Real>& averageVector, LevelData<FluxBox>& a_phi);
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FluxBox>& a_phi, Vector<Real>& averageVector);
 
   /// Average vertical fluxes in the horizontal direction
@@ -556,15 +579,15 @@ protected:
   /// Compute \f$ \nabla^2 \phi \f$
   void computeScalDiffusion(const int a_var,
                             LevelData<FArrayBox>& a_lapScal,
-//                            LevelData<FArrayBox>& a_scal,
-//                            const LevelData<FArrayBox>* a_crseScalPtr
+                            //                            LevelData<FArrayBox>& a_scal,
+                            //                            const LevelData<FArrayBox>* a_crseScalPtr
                             Real a_time);
 
 
 
   /// Compute \f$ \nabla^2 (H, S) \f$
   void computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
-                                           Real a_time);
+                            Real a_time);
 
   void computeScalDiffusion(LevelData<FArrayBox>& a_src, int a_var);
 
@@ -579,7 +602,7 @@ protected:
 
   /// Compute the source term for the \f$\mathbf{U}^* \f$ solve
   void computeUstarSrc(LevelData<FArrayBox>& src,  LevelData<FArrayBox>& a_uDelu, Real src_time,
-                        bool a_MACprojection = false);
+                       bool a_MACprojection = false);
 
 
 
@@ -650,10 +673,10 @@ protected:
    * or \f$ (V H, V S) \f$ depending on the parameters given
    */
   void computeScalarAdvectiveFluxMultiComp(LevelData<FluxBox>& a_edgeScal,
-                                    LevelData<FluxBox>& a_advVel,
-                                    PatchGodunov& a_patchGod,
-                                    LevelData<FArrayBox>& a_scalOld,
-                                    Real a_old_time, Real a_dt);
+                                           LevelData<FluxBox>& a_advVel,
+                                           PatchGodunov& a_patchGod,
+                                           LevelData<FArrayBox>& a_scalOld,
+                                           Real a_old_time, Real a_dt);
 
   /// Calculate  \f$ \mathbf{u} \cdot \nabla \left( \mathbf{u}/\chi \right) \f$
   void predictVelocities(LevelData<FArrayBox>& a_uDelU,
@@ -664,7 +687,7 @@ protected:
                          bool doFRupdates);
 
   /// Calculate velocity for momentum equations which are time independent
-//  void calculateTimeIndependentVelocity(Real calc_time);
+  //  void calculateTimeIndependentVelocity(Real calc_time);
 
 
   /// Calculate advection velocity for momentum equations which are time independent
@@ -680,13 +703,13 @@ protected:
   void fillBuoyancy(LevelData<FArrayBox>& a_buoyancy, Real a_time);
 
   void fillBuoyancy(LevelData<FArrayBox>& a_buoyancy,
-                                        LevelData<FArrayBox>& a_temperature,
-                                        LevelData<FArrayBox>& a_liquidConc,
-                                        LevelData<FArrayBox>& a_porosity);
+                    LevelData<FArrayBox>& a_temperature,
+                    LevelData<FArrayBox>& a_liquidConc,
+                    LevelData<FArrayBox>& a_porosity);
 
   void fillBuoyancy(FArrayBox& buoyancy,FArrayBox& temperature, FArrayBox& liquidConc,
-                                        FArrayBox& porosity,
-                                        FArrayBox& bodyForce);
+                    FArrayBox& porosity,
+                    FArrayBox& bodyForce);
 
 
 
@@ -851,8 +874,10 @@ protected:
   void doRegularisationOps(LevelData<FArrayBox>& a_scal,
                            int a_var);
 
+  /// Operations to keep variables bounded correctly.
   void doRegularisationOps(LevelData<FluxBox>& a_scal, int a_var);
 
+  /// Operations to keep variables bounded correctly.
   void doRegularisationOps(int a_var, FArrayBox& a_state);
 
   /// Setup menagerie of data structures
@@ -861,9 +886,6 @@ protected:
   /// Reset all flux registers
   void setFluxRegistersZero();
 
-  /// copy old data to new data, reset time
-  //	void resetStates(const Real a_time);
-  //	void swapOldAndNewStates();
 
 
   /// Copy new data to old data holders
@@ -998,7 +1020,7 @@ protected:
     m_advectionSrc,
     m_fluidVelAnalytic,
     m_fluidVelErr,
-//    m_fluidRefluxCorr,
+    //    m_fluidRefluxCorr,
     m_dUdt,
     m_FsDiffusion,
     m_FsFluid,
@@ -1008,8 +1030,8 @@ protected:
     m_advectionImplicitSrc,
     m_MACcorrection,
     m_CCcorrection,
-//    m_lapUinit,
-//    m_lapUfinal,
+    //    m_lapUinit,
+    //    m_lapUfinal,
     m_advSrcLapU,
     m_advUpreProjection,
     m_bodyForce,
@@ -1077,7 +1099,7 @@ protected:
   m_scalarOld,
 
   /// Change in scalar fields. We don't actually seem to use this.
-//  m_dScalar,
+  //  m_dScalar,
 
   /// Backed up scalar fields to be used for restarting
   m_scalarRestart;
@@ -1096,10 +1118,6 @@ protected:
   /// Backed up vector fields to be used for restarting
   m_vectorRestart;
 
-
-  // Don't think we're currently using this
-  //  Vector<RefCountedPtr<LevelData<FluxBox> > > m_scalarFluxNew, m_scalarFluxOld;
-
   /// Names of scalar variables
   Vector<string> m_scalarVarNames,
 
@@ -1107,12 +1125,9 @@ protected:
   m_vectorVarNames;
 
   /// TGA integrators (2nd order in time)
-//  RefCountedPtr<LevelTGA>      s_diffuseLevTGA[m_numScalarVars];
   RefCountedPtr<LevelTGA> s_enthalpySalinityTGA;
 
-
   /// Backward Euler integrators (1st order in time)
-//  Vector<RefCountedPtr<LevelBackwardEuler> >                  s_diffuseLevBE;
   RefCountedPtr<LevelBackwardEuler> s_enthalpySalinityBE;
 
   /// AMRMultigrid operators for each scalar
@@ -1120,33 +1135,24 @@ protected:
 
   /// FASAMRMultigrid operators for each scalar
   RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >      s_diffuseAMRFASMG[m_numScalarVars];
+
+  /// Multicomponent FAS Multigrid solver (for enthalpy-bulk concentration solves)
   RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >   s_multiCompFASMG;
 
   /// Operator factories for scalar vars
-//  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > s_diffuseOpFact[m_numScalarVars];
+  //  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > s_diffuseOpFact[m_numScalarVars];
   RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > HCOpFact;
 
-//  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > m_scalarDiffusionOpFact;
+  //  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > m_scalarDiffusionOpFact;
 
   /// bottom solver
   static BiCGStabSolver<LevelData<FArrayBox> >                    s_botSolver;
-  //	static RelaxSolver<LevelData<FArrayBox> >                       s_botSolver;
-  //	static RelaxSolver<LevelData<FArrayBox> >                       s_botSolver;
 
   /// AMRMultigrid solver for unprojected velocity, \f$ \mathbf{u}^* \f$
   RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >      s_uStarAMRMG[SpaceDim];
 
   /// Operator factory for unprojected velocity, \f$ \mathbf{u}^* \f$
   RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > s_uStarOpFact[SpaceDim];
-
-  /// Operator factory for unprojected velocity, \f$ \mathbf{u}^* \f$
-  /**
-   * Variable coefficient version, not currently used
-   */
-  //  Vector<VCAMRPoissonOp2Factory*> m_UstarVCAMRPOp;
-
-  // Don't think we actually use this anymore
-  //	VelocityAMRPoissonOp m_velocityAMRPoissonOp;
 
   /// Operator for computing components of \f$ \nabla^2 \mathbf{u} \f$
   RefCountedPtr<AMRPoissonOp> m_viscousOp[SpaceDim];
@@ -1170,7 +1176,7 @@ protected:
   Real                 m_domainHeight;
 
   /// Number of cells in each direction of domain
-//  int                  m_numCells[SpaceDim];
+  //  int                  m_numCells[SpaceDim];
   IntVect               m_numCells;
 
   /// Refinement threshold
@@ -1188,15 +1194,8 @@ protected:
   /// Cell spacing
   Real                 m_dx;
 
-  // Don't think we need this anymore
-  /// Object to do advection physics
-//  RefCountedPtr<AdvectPhysics> m_advPhys,
-
   /// Object to do advection physics for velocity
   RefCountedPtr<AdvectPhysics> m_advPhysVelocity;
-
-  /// Object to do advection physics for scalars
-//  m_advPhysScalar[m_numScalarVars];
 
   /// Diffusion coefficients for different scalar fields
   Real m_scalarDiffusionCoeffs[m_numScalarVars];
@@ -1267,22 +1266,22 @@ protected:
   bool m_implicitAdvectionSolve;
 
   /// Don't use this anymroe
-//  bool m_porosityInAdvectionOperator;
+  //  bool m_porosityInAdvectionOperator;
 
   /// How to handle velocity advection
-
-  /*
-           * Options:
-           * m_porosityInAdvection:
-           *    solve d(u/porosity)/dt + (u/porosity).grad(u/porosity) = S/porosity (-(u/porosity^2)dporosity/dt)
-           *    (assume d(porosity)/dt = 0)
-           * m_porosityOutsideAdvection (DEFAULT):
-           *    solve du/dt + (u/porosity).grad(u) = S + (u.grad(porosity)/porosity^2)u
-           * m_noPorosity:
-           *    solve du/dt + u.grad(u) = S
-           */
+  /**
+   * Options:
+   * m_porosityInAdvection:
+   *    solve d(u/porosity)/dt + (u/porosity).grad(u/porosity) = S/porosity (-(u/porosity^2)dporosity/dt)
+   *    (assume d(porosity)/dt = 0)
+   * m_porosityOutsideAdvection (DEFAULT):
+   *    solve du/dt + (u/porosity).grad(u) = S + (u.grad(porosity)/porosity^2)u
+   * m_noPorosity:
+   *    solve du/dt + u.grad(u) = S
+   */
   int m_advectionMethod;
 
+  /// Options for handling advection velocities
   enum velocityAdvectionTypes
   {
     m_porosityInAdvection,
@@ -1369,8 +1368,7 @@ protected:
    */
   m_numGhostAdvection;
 
-  /// This is just used for calculating max(Dt)
-//  LevelAdvect m_levGodHC;
+
 
   /// Handles advection of velocity
   PatchGodunov m_patchGodVelocity,
@@ -1439,81 +1437,81 @@ protected:
   /// Grids on this level
   DisjointBoxLayout m_grids;
 
-    /// Are the new grids different from current ones?
-    bool m_newGrids_different;
+  /// Are the new grids different from current ones?
+  bool m_newGrids_different;
 
-    /// Has post regrid smoothing been done?
-    bool m_regrid_smoothing_done;
+  /// Has post regrid smoothing been done?
+  bool m_regrid_smoothing_done;
 
-    /// Coefficient for post regrid smoothing
-    Real s_regrid_smoothing_coeff;
+  /// Coefficient for post regrid smoothing
+  Real s_regrid_smoothing_coeff;
 
-    /// Do smoothing after regridding?
-    bool s_do_postRegrid_smoothing;
+  /// Do smoothing after regridding?
+  bool s_do_postRegrid_smoothing;
 
-    /// Do reflux implicitly?
-    bool s_implicit_reflux;
+  /// Do reflux implicitly?
+  bool s_implicit_reflux;
 
-    /// Reflux momentum?
-    bool s_reflux_momentum;
+  /// Reflux momentum?
+  bool s_reflux_momentum;
 
-    /// Reflux normal component of momentum?
-    bool s_reflux_normal_momentum;
+  /// Reflux normal component of momentum?
+  bool s_reflux_normal_momentum;
 
-    /// Reflux scalar fields?
+  /// Reflux scalar fields?
   //  bool s_reflux_scal;
-    /// Turn enthalpy refluxing on
-    bool s_reflux_enthalpy;
+  /// Turn enthalpy refluxing on
+  bool s_reflux_enthalpy;
 
-    /// Turn concentration refluxing on
-    bool s_reflux_concentration;
+  /// Turn concentration refluxing on
+  bool s_reflux_concentration;
 
-    /// Turn lambda refluxing on
-    /**
-     * This is necessary for computing the freestream preservation correction
-     */
-    bool s_reflux_lambda;
+  /// Turn lambda refluxing on
+  /**
+   * This is necessary for computing the freestream preservation correction
+   */
+  bool s_reflux_lambda;
 
-    /// Viscous solver tolerance
-    Real s_viscous_solver_tol;
+  /// Viscous solver tolerance
+  Real s_viscous_solver_tol;
 
-    /// Number of down smooths for viscous solves
-    int s_viscous_num_smooth_down;
+  /// Number of down smooths for viscous solves
+  int s_viscous_num_smooth_down;
 
-    /// Number of up smooths for viscous solves
-    int s_viscous_num_smooth_up;
+  /// Number of up smooths for viscous solves
+  int s_viscous_num_smooth_up;
 
-    /// Time integration accuracy
-    /**
-     * 1 = backward euler
-     * 2 = TGA
-     */
-    int m_timeIntegrationOrder;
+  /// Time integration accuracy
+  /**
+   * 1 = backward euler
+   * 2 = TGA
+   */
+  int m_timeIntegrationOrder;
 
-    /// Plot interval for picard iterations
-    /**
-     * 1 means don't make any plots
-     */
-    int m_iter_plot_interval;
+  /// Plot interval for picard iterations
+  /**
+   * 1 means don't make any plots
+   */
+  int m_iter_plot_interval;
 
-    Real m_initialPerturbation;
-    Real m_perturbationTime;
-    Real m_delayedPerturbation;
-    Real m_restartPerturbation;
-    Real m_perturbationWavenumber;
-    bool m_perturbationSin;
-    Real m_fixedPorosity;
-    int m_porosityFunction;
+  Real m_initialPerturbation;
+  Real m_perturbationTime;
+  Real m_delayedPerturbation;
+  Real m_restartPerturbation;
+  Real m_perturbationWavenumber;
+  bool m_perturbationSin;
+  Real m_fixedPorosity;
+  int m_porosityFunction;
 
 
 
-  private:
+private:
 
-    // Disallowed for all the usual reasons
-    void operator=(const AMRLevelMushyLayer&);
-    AMRLevelMushyLayer(const AMRLevelMushyLayer&);
-  };
+  // Disallowed for all the usual reasons
+  void operator=(const AMRLevelMushyLayer&);
+  AMRLevelMushyLayer(const AMRLevelMushyLayer&);
+};
 
-  #include "NamespaceFooter.H"
+#include "NamespaceFooter.H"
 
-  #endif
+#endif

@@ -20,8 +20,10 @@ class Channel : public IntVectSet
 public:
   //  Channel ();
 
+  /// Standard creator
   Channel ();
 
+  /// Create with intvectset
   Channel(const IntVect& iv) : IntVectSet(iv)
   {
     m_finished = false;
@@ -33,8 +35,10 @@ public:
   /// Get the width at the vertical position specified
   Real width(Side::LoHiSide a_side, int a_offset, Real a_dx);
 
+  /// Channel height
   Real height(Real a_dx);
 
+  /// Chanel width, averaged over height
   Real averageWidth(Real a_dx);
 
   /// Horizontal position in grid
@@ -47,21 +51,17 @@ public:
   /// Remove bottom row of cells
   void removeBottomCells();
 
+  /// Have we finished defining a channel
   bool isFinished();
-  void setFinished();
-  // explicit
-  // Channel(const IntVect& iv)
-  //{
-  ////    define(iv);
-  //    // There must be a cleverer way of doing this,
-  //    //e.g. Channel(IntVect iv): IntVectSet(iv),
-  //    // but I can't get it to work
-  //}
 
+  /// Set isFinished to true
+  void setFinished();
+
+  /// Destructor
   virtual
   ~Channel ();
 
-
+  /// Compute channel spacing
   static void channelSpacing(Vector<Real>& a_spacing, Vector<Channel*>& a_channels, Real a_dx, ProblemDomain a_probDomain)
   {
     int numChannels = a_channels.size();
@@ -107,6 +107,7 @@ public:
 
 private:
 
+  /// Set if we've finished defining a channel
   bool m_finished;
 };
 

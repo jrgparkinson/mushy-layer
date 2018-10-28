@@ -183,30 +183,53 @@ public:
 	 */
 	timescale;
 
-	// For defining the equations:
-//	  bool m_darcyTimescale;
+	/// How to nondimensionalise the governing equations
 	  int m_nondimensionalisation;
 
+	  /// Different options for nondimensionalisation
 	  enum nondimensionalisations
 	  {
+	    /// Diffusive timescale, advective velocity scale
 	    m_diffusiveTime_advectiveVel,
+
+	    /// Darcy timescales, advective velocity scale
 	    m_darcyTime_advectiveVel,
+
+	    /// Darcy timescale, darcy velocity scale
 	    m_darcyTime_darcyVel,
+
+	    /// Advective timescale, darcy velocity scale
 	    m_advectiveTime_darcyVel,
+
+	    /// Buoyancy timescale, advective velocity scale
 	    m_buoyancyTime_advectiveVel,
 
+	    /// Number of nondimensional schemes
 	    m_num_nondimensionalisations
 	  };
 
+	  /// Heat diffusion coefficient
 	  Real m_heatDiffusionCoeff,
+
+	  /// Salt diffusion coefficient
 	  m_saltDiffusionCoeff,
+
+	  /// Viscosity
 	  m_viscosityCoeff,
+
+	  /// Buoyancy due to temperature
 	  m_buoyancyTCoeff,
+
+	  /// Buoyancy due to liquid concentration
 	  m_buoyancySCoeff,
+
+	  /// Darcy coefficient
 	  m_darcyCoeff,
+
+	  /// Coefficient for advection terms
 	  m_advectionCoeff;
 
-	//Nondimensional parameters and boundary conditions
+
 
 	/// Dimensionless frame advection velocity
 	Real nonDimVel,
@@ -232,11 +255,6 @@ public:
 	 */
 	thetaInterface,
 
-	/// Dimensionless temperature at the bottom of the domain \f$ \theta_b \f$
-//	thetaBottom,
-
-	/// Dimensionless temperature at the top of the domain \f$ \theta_t \f$
-//	thetaTop,
 
 	/// Dimensionless bulk concentration at the eutectic \f$ \Theta_e \f$
 	ThetaEutectic,
@@ -247,83 +265,60 @@ public:
 	/// Dimensionless far field bulk concentration \f$ \Theta_\infty \f$
 	ThetaInf,
 
-	/// Dimensionless bulk concentration at the top of the domain \f$ \Theta_t \f$
-//	ThetaTop,
 
-	/// Dimensionless bulk concentration at the bottom of the domain \f$ \Theta_b \f$
-//	ThetaBottom,
-
-	/// Dimensionless liquid concentration at the bottom of the domain \f$ \Theta_l \f$
-//	ThetaLBottom,
 
 	/// Dimensionless initial liquid concentration \f$ \Theta_{l,i} \f$
 	ThetaLInitial,
 
-	/// Dimensionless liquid concentration at the top of the domain \f$ \Theta_{l,t} \f$
-//	ThetaLTop,
 
-	/// Dimensionless solid concentration at the top of the domain \f$ \Theta_{s,t} \f$
-//	ThetaSTop,
-
-	/// Dimensionless solid concentration at the bottom of the domain \f$ \Theta_{s,b} \f$
-//	ThetaSBottom,
 
 	/// Dimensionless initial solid concentration \f$ \Theta_{s,i} \f$
 	ThetaSInitial,
 
-	/// Porosity at the top of the domain
-//	porosityTop,
 
-	/// Porosity at the bottom of the domain
-//	porosityBottom,
-
-	/// Permeability at the top of the domain
-//	permeabilityTop,
-
-	/// Permeability at the bottom of the domain
-//	permeabilityBottom,
-
-	/// Dimensionless enthalpy at the bottom of the domain
-//	HBottom,
-
-	/// Dimensionless enthalpy at the top of the domain
-//	HTop,
 
 	/// Dimensionless initial enthalpy
 	Hinitial,
 
-	/// Dimensionless enthalpy solidus at the bottom of the domain
-//	HSolidusBottom,
-
-	/// Dimensionless enthalpy solidus at the top of the domain
-//	HSolidusTop,
-
-	/// Dimensionless eutectic enthalpy at the bottom of the domain
-//	HEutecticBottom,
-
-	/// Dimensionless eutectic enthalpy at the top of the domain
-//	HEutecticTop,
-
-	/// Dimensionless enthalpy liquidus at the bottom of the domain
-//	HLiquidusBottom,
-
-	/// Dimensionless enthalpy liquidus at the top of the domain
-//	HLiquidusTop,
 
         /// For plumes
+
+
+	/// Temperature inflow value in plume
         thetaPlumeInflow,
+
+        /// Enthalpy inflow value in plume
         HPlumeInflow,
+
+        /// Bulk concentration inflow value in plume
         ThetaPlumeInflow,
+
+        /// Liquid concentration inflow value in plume
         ThetaLPlumeInflow,
+
+        /// Solid concentration inflow value in plume
         ThetaSPlumeInflow,
+
+        /// Porosity inflow value in plume
         porosityPlume,
+
+        /// Permeability inflow value in plume
         permeabilityPlume,
+
+        /// Liquidus inflow value in plume
         HLiquidusPlume,
+
+        /// Eutectic inflow value in plume
         HEutecticPlume,
+
+        /// Solidus inflow value in plume
         HSolidusPlume;
 
-	// To determine how we do nondimensionalisation
-	Real referenceTemperature, referenceSalinity;
+	/// Reference temperature for nondimensionalisation
+	Real referenceTemperature,
+
+	/// Reference salinity for nondimensionalisation
+	referenceSalinity;
 
 	/// Inflow velocity, when required
 	Real inflowVelocity;
@@ -349,10 +344,29 @@ public:
 	/// Bulk concentration boundary conditions (hi side, for each spatial direction)
 	bcTypeBulkConcentrationHi,
 
-	bcTypeTemperatureLo, bcTypeTemperatureHi,
-	bcTypeLiquidConcentrationLo, bcTypeLiquidConcentrationHi,
-	bcTypePorosityLo, bcTypePorosityHi,
-	bcTypePermeabilityLo, bcTypePermeabilityHi;
+	///Temperature boundary conditions (low side, for each spatial direction)
+	bcTypeTemperatureLo,
+
+	/// Temperature boundary conditions (hi side, for each spatial direction)
+	bcTypeTemperatureHi,
+
+	/// Liquid concentration boundary conditions (low side, for each spatial direction)
+	bcTypeLiquidConcentrationLo,
+
+	/// Liquid concentration boundary conditions (hi side, for each spatial direction)
+	bcTypeLiquidConcentrationHi,
+
+	/// Porosity boundary conditions (low side, for each spatial direction)
+	bcTypePorosityLo,
+
+	/// Porosity boundary conditions (hi side, for each spatial direction)
+	bcTypePorosityHi,
+
+	/// Permeability boundary conditions (low side, for each spatial direction)
+	bcTypePermeabilityLo,
+
+	/// Permeability boundary conditions (hi side, for each spatial direction)
+	bcTypePermeabilityHi;
 
 	/// Unified BCs for all scalars (lo side, for each spatial direction)
 	Vector<int> bcTypeScalarLo,
@@ -361,22 +375,72 @@ public:
 	bcTypeScalarHi;
 
 	/// Vector containing boundary values
+
+	/// Enthalpy BCs on hi-side boundaries
 	RealVect bcValEnthalpyHi,
+
+	/// Enthalpy BCs on lo-side boundaries
 	bcValEnthalpyLo,
+
+	/// Bulk Concentration BCs on hi-side boundaries
 	bcValBulkConcentrationHi,
+
+	/// Bulk Concentration BCs on lo-side boundaries
 	bcValBulkConcentrationLo,
+
+	/// Temperature BCs on hi-side boundaries
 	bcValTemperatureHi,
+
+	/// Temperature BCs on lo-side boundaries
 	bcValTemperatureLo,
+
+	/// Liquid concentration BCs on lo-side boundaries
 	bcValLiquidConcentrationLo,
+
+	/// Liquid concentration BCs on hi-side boundaries
 	bcValLiquidConcentrationHi,
-	bcValPorosityLo, bcValPorosityHi,
-	bcValPermeabilityLo, bcValPermeabilityHi,
+
+	/// Porosity BCs on lo-side boundaries
+	bcValPorosityLo,
+
+	/// Porosity BCs on hi-side boundaries
+	bcValPorosityHi,
+
+	/// Permeability BCs on lo-side boundaries
+	bcValPermeabilityLo,
+
+	/// Permeability BCs on hi-side boundaries
+	bcValPermeabilityHi,
+
+	/// Velocity BCs on hi-side boundaries
 	bcValVelHi,
+
+	/// Velocity BCs on lo-side boundaries
 	bcValVelLo,
-	bcValSolidusHi, bcValSolidusLo,
-	bcValLiquidusHi, bcValLiquidusLo,
-	bcValEutecticHi, bcValEutecticLo,
-	bcValSolidConcentrationLo, bcValSolidConcentrationHi;
+
+	/// Solidus BCs on hi-side boundaries
+	bcValSolidusHi,
+
+	/// Solidus BCs on lo-side boundaries
+	bcValSolidusLo,
+
+	/// Liquidus BCs on hi-side boundaries
+	bcValLiquidusHi,
+
+	/// Liquidus BCs on lo-side boundaries
+	bcValLiquidusLo,
+
+	/// Eutectic BCs on hi-side boundaries
+	bcValEutecticHi,
+
+	/// Eutectic BCs on lo-side boundaries
+	bcValEutecticLo,
+
+	/// Solid concentration BCs on lo-side boundaries
+	bcValSolidConcentrationLo,
+
+	/// Solid concentration BCs on hi-side boundaries
+	bcValSolidConcentrationHi;
 
 	/// Time, in case BCs are time-dependent
 	Real m_time;
@@ -391,7 +455,11 @@ public:
 	  m_custom
 	};
 
+
+	/// Amplitude of time periodic boundary conditions
 	Real m_BCamplitude;
+
+	/// Time scale (period) for time periodic boundary conditions
 	Real m_BCtimescale;
 
 
@@ -418,6 +486,8 @@ public:
 
 	/// For cases where want to impose a porosity, e.g. for benchmarking
 	int m_porosityFunction;
+
+	/// Different options for enforced porosity
 	enum porosityFunctions {
 	  m_porosityConstant,
 	  m_porosityLinear,

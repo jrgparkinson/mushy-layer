@@ -98,6 +98,9 @@ public:
 };
 
 /// Return one value for inflow, and another if not
+/*
+ * Assumes plume along top boundary
+ */
 class InflowValueFunction: public BCValueFunction
 {
 public:
@@ -107,8 +110,13 @@ public:
   /// The component to apply this BC to
   int m_nComp;
 
+  /// Value during inflow
   Real m_inflowValue;
+
+  /// Position where plume starts
   Real m_plumeStart;
+
+  /// Position where plume ends
   Real m_plumeEnd;
 
 
@@ -165,9 +173,17 @@ public:
   Real m_value;
   /// The component to apply this BC to
   int m_nComp;
+
+  /// Boundary value for inflow
   Real m_inflowValue;
+
+  /// Position along domain edge where plume starts
   Real m_plumeStart;
+
+  /// Position along domain edge where plume ends
   Real m_plumeEnd;
+
+  /// Params object
   MushyLayerParams* m_params;
 
   /// Default constructor
@@ -532,9 +548,19 @@ class AdvectDiffuseScalarBC: public AbstractScalarBCFunction
 {
 public:
 
-  Vector<Real> m_plumeVal; /// Each element of the vector corresponds to a different interval
-  Vector<Vector<int> > m_customLoBC, m_customHiBC; // First index refers to direction, second to component
-  Vector<Vector<Real> > m_customLoBCVal, m_customHiBCVal; // first index refers to direction, second to component
+  /// Each element of the vector corresponds to a different interval
+  Vector<Real> m_plumeVal;
+
+  /// BC type on the lo side. First index refers to direction, second to component
+  Vector<Vector<int> > m_customLoBC,
+  /// BC type on the hi side. First index refers to direction, second to component
+  m_customHiBC;
+
+  /// BC value on the lo side. First index refers to direction, second to component
+  Vector<Vector<Real> > m_customLoBCVal,
+
+  /// BC value on the hi side. First index refers to direction, second to component
+  m_customHiBCVal;
 
   AdvectDiffuseScalarBC(bool a_isDefined,
                         MushyLayerParams a_params,
@@ -1045,6 +1071,8 @@ public:
 
   /// Is object defined?
   bool m_isDefined;
+
+  /// Order of accuracy (1st, 2nd etc.)
   int m_order;
 
   // Default constructor
@@ -1669,6 +1697,7 @@ public:
 class StreamFunctionBC: public AbstractScalarBCFunction
 {
 public:
+  /// Apply BCs for streamfunction
   StreamFunctionBC(bool a_isDefined,
                    MushyLayerParams a_params,
                    bool a_homogeneous,
@@ -1695,14 +1724,7 @@ public:
       RefCountedPtr<ConstValueFunction>
       zeroFunc(new ConstValueFunction(0.0, a_state.nComp()));
 
-      //      RefCountedPtr<InflowValueFunction> inflowFunc(new InflowValueFunction(0.0, a_state.nComp(),
-      //                                                                            -m_params.inflowVelocity,
-      //                                                                            m_params.plumeBounds[0],
-      //                                                                            m_params.plumeBounds[1]));
-      //      RefCountedPtr<PressureInflowValueFunction> inflowFuncNeum(new PressureInflowValueFunction(0.0, a_state.nComp(),
-      //                                                                                                -m_params.inflowVelocity,
-      //                                                                                                m_params.plumeBounds[0],
-      //                                                                                                m_params.plumeBounds[1], &m_params));
+
 
       for (int idir = 0; idir < SpaceDim; idir++)
       {
@@ -1770,6 +1792,7 @@ public:
 class BasicPressureBCFunctionSubcycled: public AbstractScalarBCFunction
 {
 public:
+  /// Creator
   BasicPressureBCFunctionSubcycled(bool a_isDefined,
                                    MushyLayerParams a_params,
                                    bool a_homogeneous,
@@ -1920,9 +1943,20 @@ class BasicPorosityPermeabilityFaceBCFunction: public AbstractFaceBCFunction
 {
 public:
 
+  /// Value in plume
   Real m_plumeVal;
-  Vector<Vector <int> > m_bcTypeLo, m_bcTypeHi;
-  Vector<Vector <Real> > m_bcValLo, m_bcValHi;
+
+  /// BC type on the lo side.
+  Vector<Vector <int> > m_bcTypeLo,
+
+  /// BC type on the hi side.
+  m_bcTypeHi;
+
+  /// BC type on the lo side.
+  Vector<Vector <Real> > m_bcValLo,
+
+  /// BC type on the hi side.
+  m_bcValHi;
 
   /// Full constructor
   BasicPorosityPermeabilityFaceBCFunction(bool a_isHomogeneous,

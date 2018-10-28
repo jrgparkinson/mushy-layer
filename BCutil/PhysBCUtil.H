@@ -107,6 +107,8 @@ public:
 
 	/// BC holder for porosity \f$ \chi \f$, (edge centred)
 	virtual Tuple<BCHolder, SpaceDim> porosityFaceBC() const;
+
+	/// BCs for permeability \f$ \Pi \f$ (edge centred)
 	virtual Tuple<BCHolder, SpaceDim> permeabilityFaceBC() const;
 
 	/// BC holder for velocity \f$ \mathbf{u} \f$ - extrapolation
@@ -127,11 +129,11 @@ public:
 	/// sets cell spacing
 	void Dx(const Real a_dx);
 
-	// Convert to AdvectIBC BCs
+	/// Convert to AdvectIBC BCs
 	void convertBCType(const int a_implicitBC,  const Real a_implicitVal,
                            int& a_explicitBC, Real& a_explicitVal) const;
 
-	// Handy to have a function of this form, too
+	/// Handy to have a function of this form, too
 	int convertBCType(const int a_implicitBC) const;
 
 	/// returns cell spacing
@@ -229,6 +231,7 @@ public:
 	 */
 	virtual BCHolder BasicGradPressureFuncBC() const;
 
+	/// BCs for streamfunction
 	virtual BCHolder streamFunctionBC() const;
 
 	/// BC holder for pressure
@@ -262,12 +265,15 @@ public:
 	virtual BCHolder BasicEnthalpyFuncBC(bool a_homogeneous = false,
 	                                     LevelData<FluxBox>* a_advVel = NULL) const;
 
+	/// Boundary conditions for calculating the liquidus
 	virtual BCHolder BasicLiquidusBC(bool a_homogeneous = false,
 	                                             LevelData<FluxBox>* a_advVel = NULL) const;
 
+	/// Boundary conditions for calculating the eutectic
 	virtual BCHolder BasicEutecticBC(bool a_homogeneous = false,
 	                                             LevelData<FluxBox>* a_advVel = NULL) const;
 
+	/// Boundary conditions for calculating the solidus
 	virtual BCHolder BasicSolidusBC(bool a_homogeneous = false,
 	                                             LevelData<FluxBox>* a_advVel = NULL) const;
 
@@ -282,6 +288,7 @@ public:
 	/// BC holder for \f$ \lambda \f$ (for finding freestream preservation errors)
 	virtual BCHolder basicLambdaFuncBC(bool a_homogeneous = false, bool a_scaleWithPorosity=false)const;
 
+	/// BCs for no flux boundaries
 	virtual BCHolder noFluxBC() const;
 
 	/// Initial and Boundary Conditions for advecting scalars
@@ -292,30 +299,32 @@ public:
 	/// For multi component enthalpy-salinity solve
 	virtual PhysIBC* scalarTraceHC_IBC() const;
 
+	/// Boundary conditions for Enthalpy during advection solves
 	virtual PhysIBC* scalarTraceH_IBC() const;
+
+	/// Boundary conditions for Bulk Concentration during advection solves
 	virtual PhysIBC* scalarTraceC_IBC() const;
 
+	/// Generic boundary conditions for Bulk Concentration during advection solves
 	virtual PhysIBC*  scalarTrace_IBC(Vector<int> a_bcTypeHi, Vector<int> a_bcTypeLo,
 	                                  RealVect a_bcValHi, RealVect a_bcValLo,
 	                                  Real a_plumeInflow) const;
 
+	/// Apply frame advection BCs if appropriate
 	void applyFrameAdvectionBC(IntVect& bcTypeHi, IntVect& bcTypeLo) const;
 
 	/// For multi component enthalpy-salinity solve
 	virtual PhysIBC* scalarTraceTSl_IBC() const;
 
 
-	/// BC for object with two components, temperature and liquid salinity
-
+	/// BC for object with two components: temperature and liquid salinity
 	virtual BCHolder temperatureLiquidSalinityBC(bool a_homogeneous = false) const;
 
-	/// BC for object with two components, enthalpy and bulk salinity
+	/// BC for object with two components: enthalpy and bulk salinity
 	virtual BCHolder enthalpySalinityBC(bool a_homogeneous = false) const;
 
 protected:
 
-
-//	virtual BCHolder basicFluxExtrapBCFunc(int  a_comp) const;
 
 	/// BCHolder for edge centred velocity
 	virtual BCHolder basicECVelFuncBC(bool a_isHomogeneous,
@@ -348,21 +357,6 @@ protected:
 			int  a_comp,
 			const Interval& a_interval,
 			int n_ghost) const;
-
-
-
-
-
-
-	/// returns a BCHolder for edge-centered velocity
-	//  virtual BCHolder basicECVelFuncBC(bool a_isHomogeneous,
-	//                                    bool a_isViscous,
-	//                                    int a_comp,
-	//                                    const Interval& a_interval) const;
-	//
-	//  ///
-	//  virtual BCHolder basicScalarFuncBC(bool a_isHomogeneous,
-	//                                     int  a_scalarType) const;
 
 	///  interact with ParmParse to set physical BC types
 	virtual void setBCs();

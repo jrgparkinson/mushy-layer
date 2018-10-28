@@ -31,8 +31,8 @@ public:
   /// Define object
   void define (Real a_movingAverageTimescale, int a_verbosity, Real a_convCrit);
 
-  virtual
-  ~Diagnostics ();
+  /// Destructor
+  virtual  ~Diagnostics ();
 
   /// Add a diagnostic
   void addDiagnostic(int a_diagnostic, Real a_time, Real value);
@@ -52,10 +52,16 @@ public:
   /// Determine if the moving average has reached steady state
   bool movingAverageHasConverged(int a_diagnostic, Real m_time, Real a_dt);
 
+  /// Print header of all diagnostic names
   void printHeader();
+
+  /// Print header to specified file
   void printHeader(std::ofstream& a_file);
 
+  /// Print diagnostics at specified time
   void printDiagnostics(Real a_time);
+
+  /// Print diagnostics at given time to a certain file
   void printDiagnostics(Real a_time, std::ofstream& a_file);
 
   /// Different diagnostics we consider
@@ -106,19 +112,32 @@ public:
 
 private:
 
+  /// Times at which diagnostics have been calculated
   Vector<Real> m_times;
+
+  /// Diagnostics at each time
   Vector<Vector<Real>* > m_diagnostics;
 
+  /// Names of diagnostics
   Vector<string> m_diagnosticNames;
 
+  /// Timescale for computing moving averages
   Real movingAverageTimescale;
 
+  /// Criteria for determining convergence
   Real m_convergenceCriteria;
 
+  /// Verbosity
   int m_verbosity;
+
+  /// Is object defined properly
   bool m_defined;
 
-  std::ofstream m_diagnosticsFile, m_diagnosticsFileLatest;
+  /// File to which all diagnostics are written
+  std::ofstream m_diagnosticsFile,
+
+  /// File to which the latest the diagnostics are written
+  m_diagnosticsFileLatest;
 
   int getIndex(Real a_time);
 

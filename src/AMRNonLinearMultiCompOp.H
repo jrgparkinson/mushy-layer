@@ -299,7 +299,7 @@ public:
 
 
 
-
+/// Boundary conditions for the diffused field
   BCHolder m_diffusedVarBC;
 
 
@@ -312,14 +312,6 @@ public:
 
   /// Physical parameters for problems
   MushyLayerParams* m_params;
-
-  /// Object to compute enthalpy method variables
-//  ComputeEnthalpyVars m_computeEnthalpyVars;
-
-  /// Boundary conditions for porosity
-//  EdgeVelBCHolder m_porosityEdgeBC;
-
-
 
   /// true if we're running in FAS mode (much quicker for nonlinear problems)
   bool m_FAS;
@@ -440,21 +432,21 @@ public:
   /// refinement ratio to finer level
   virtual int refToFiner(const ProblemDomain& a_domain) const;
 
+  /// Set primary field
   void setPrimaryVarPtr(Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_primaryVarPtr);
+
+  /// Whether we should use the primary variable for solves
   void setUsePrimaryVar(bool a_usePrimaryVar);
 
+  /// Set the boundary conditions m_bc
   void setBC(BCHolder& a_bc);
-
-
 
   /// Type of coefficient averaging
   int m_coefficient_average_type;
 
-
-
-
-
 private:
+
+  /// Set default values
   void setDefaultValues();
 
   /// Problem domains across AMR hierarchy

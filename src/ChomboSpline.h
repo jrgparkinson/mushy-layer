@@ -32,52 +32,69 @@
 
 #include "IntVect.H"
 #include "RealVect.H"
-//#include "MushyLayerParams.h"
-//#include "LevelData.H"
-//#include "FArrayBox.H"
-//#include "BoxIterator.H"
 #include <cstdio>
 #include <cassert>
 #include <vector>
 #include <algorithm>
 
-//#include "NamespaceHeader.H"
-
-
-
-//void analyticSolnSolidificationNoFlow(LevelData<FArrayBox>& enthalpyAnalytic,
-//                LevelData<FArrayBox>& bulkConcentrationAnalytic,
-//                Real a_domainLength, Real a_dx,
-//                MushyLayerParams a_params);
 
 class band_matrix
 {
 private:
-    std::vector< std::vector<Real> > m_upper;  // upper band
-    std::vector< std::vector<Real> > m_lower;  // lower band
+  /// upper band
+    std::vector< std::vector<Real> > m_upper;
+
+    /// lower band
+    std::vector< std::vector<Real> > m_lower;
 public:
-    band_matrix() {};                             // constructor
-    band_matrix(int dim, int n_u, int n_l);       // constructor
-    ~band_matrix() {};                            // destructor
-    void resize(int dim, int n_u, int n_l);      // init with dim,n_u,n_l
-    int dim() const;                             // matrix dimension
+    ///constructor
+    band_matrix() {};
+
+    ///destructor
+    band_matrix(int dim, int n_u, int n_l);
+
+    /// destructor
+    ~band_matrix() {};
+
+    // init with dim,n_u,n_l
+    void resize(int dim, int n_u, int n_l);
+
+    /// matrix dimension
+    int dim() const;
+
+    /// num upper
     int num_upper() const
     {
         return m_upper.size()-1;
     }
+
+    /// num lower
     int num_lower() const
     {
         return m_lower.size()-1;
     }
-    // access operator
-    Real & operator () (int i, int j);            // write
-    Real   operator () (int i, int j) const;      // read
-    // we can store an additional diagonal (in m_lower)
+    /// write access operator
+    Real & operator () (int i, int j);
+
+    /// read access operator
+    Real   operator () (int i, int j) const;
+
+    /// we can store an additional diagonal (in m_lower)
     Real& saved_diag(int i);
+
+    /// we can store an additional diagonal (in m_lower)
     Real  saved_diag(int i) const;
+
+    /// lu decomposition
     void lu_decompose();
+
+    /// r solve
     std::vector<Real> r_solve(const std::vector<Real>& b) const;
+
+    /// l solve
     std::vector<Real> l_solve(const std::vector<Real>& b) const;
+
+    /// lu solve
     std::vector<Real> lu_solve(const std::vector<Real>& b,
                                  bool is_lu_decomposed=false);
 
@@ -87,21 +104,33 @@ public:
 class spline
 {
 public:
+  /// boundary types
     enum bd_type {
         first_deriv = 1,
         second_deriv = 2
     };
 
 private:
-    std::vector<Real> m_x,m_y;            // x,y coordinates of points
-    // interpolation parameters
-    // f(x) = a*(x-x_i)^3 + b*(x-x_i)^2 + c*(x-x_i) + y_i
-    std::vector<Real> m_a,m_b,m_c;        // spline coefficients
+    /// x,y coordinates of points
+    std::vector<Real> m_x,m_y;
 
+    /// interpolation parameters
+    /**
+     * f(x) = a*(x-x_i)^3 + b*(x-x_i)^2 + c*(x-x_i) + y_i
+     */
+    std::vector<Real> m_a,m_b,m_c;
+
+    /// left and right types
     bd_type m_left, m_right;
+
+    /// left and right values
     Real  m_left_value, m_right_value;
+
+    /// force linear extrapolation
     bool    m_force_linear_extrapolation;
-    Real  m_b0, m_c0;                     // for left extrapol
+
+    /// for left extrapolation
+    Real  m_b0, m_c0;
 
 public:
     // set default boundary condition to be zero curvature at both ends
@@ -112,12 +141,16 @@ public:
         ;
     }
 
-    // optional, but if called it has to come be before set_points()
+    /// optional, but if called it has to come be before set_points()
     void set_boundary(bd_type left, Real left_value,
                       bd_type right, Real right_value,
                       bool force_linear_extrapolation=false);
+
+    /// set the points to interpolate on
     void set_points(const std::vector<Real>& x,
                     const std::vector<Real>& y, bool cubic_spline=true);
+
+    /// Perform operation
     Real operator() (Real x) const;
 };
 
