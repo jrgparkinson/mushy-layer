@@ -972,8 +972,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
   if (m_doEulerPart)
   {
 
-    if (m_doAdvectionSolve)
-    {
+
 
       if (m_implicitAdvectionSolve)
       {
@@ -1125,7 +1124,6 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
       setVelZero(m_advVel, advPorosityLimit);
 
-    } // end if do advection solve
 
     //m_advVel contains predicted face centred velocity at half time step
     //Now need to project it and do lambda corrections etc
@@ -1256,36 +1254,6 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
       crsePressureScalePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(getCoarserLevel()->m_grids, 1, IntVect::Unit));
       getCoarserLevel()->fillScalars(*crsePressureScalePtr, half_time, m_pressureScaleVar, true);
-    }
-  }
-
-  // Need to remove pressure before projecting
-  if (m_addSubtractGradPAdvection)
-  {
-
-    IntVect ghostVect = IntVect::Unit;
-
-    LevelData<FluxBox> pressureSrcFace(m_grids, 1, ghostVect);
-    LevelData<FluxBox> porosityFace(m_grids, 1, ghostVect);
-    fillScalarFace(porosityFace, m_time, m_porosity, true, true);
-
-//    LevelData<FArrayBox>
-//    m_projection.Pi().copyTo(*m_scalarNew[m_pi]);
-
-    Gradient::levelGradientMAC(pressureSrcFace, m_projection.Pi(), m_dx);
-
-    for (DataIterator dit = a_advVel.dataIterator(); dit.ok(); ++dit)
-    {
-      Box b = pressureSrcFace[dit].box();
-      b &= a_advVel[dit].box();
-
-      pressureSrcFace[dit].mult(porosityFace[dit], b, 0, 0);
-      pressureSrcFace[dit] *= m_dt;
-
-      for (int dir=0; dir<SpaceDim; dir++)
-      {
-        a_advVel[dit][dir].plus(pressureSrcFace[dit][dir]);
-      }
     }
   }
 
@@ -2220,7 +2188,6 @@ void AMRLevelMushyLayer::advectLambda(bool doFRupdates)
   // Want to get the lambda flux back so we can remove it later
   LevelData<FluxBox> lambdaFlux(m_grids, 1);
   advectScalar(m_lambda, m_lambda, m_advVel, true, lambdaFlux); // advect without a diffusive source term
-
 
   setValLevel(*m_vectorNew[m_advVelCorr], 0.0);
 
@@ -4526,7 +4493,7 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
 
 
   ParmParse ppAdvsrc("advSrc");
-  bool pressureSrc = m_addSubtractGradPAdvection;
+  bool pressureSrc = false;
   bool darcySrc = true;
   bool viscousSrc = true;
   bool buoyancySrc = true;
@@ -4647,25 +4614,12 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
     a_src[dit] += buoyancy[dit];
     }
 
-    if (!m_splitDarcySolve && darcySrc)
+    if (darcySrc)
     {
       a_src[dit] -= darcy[dit];
     }
 
-    if (m_scaleAdvectionSrcExtraChi)
-    {
-      for (int dir = 0; dir < SpaceDim; dir++)
-      {
-        //            darcy[dit].divide(permeability[dit],
-        //                              darcy[dit].box(), 0, dir);
 
-        a_src[dit].divide(porosity[dit],
-                        a_src[dit].box(), 0, dir);
-
-      }
-    }
-
-    //    a_src[dit] -= pressure[dit];
 
   } // end dataiterator
 

@@ -85,7 +85,7 @@ public:
     m_isDefined = false;
 
     m_addSubtractGradP = true;
-    m_addSubtractGradPAdvection = false;
+
     m_doEulerPart =true;
     m_domainWidth = -1.0;
     m_domainHeight = -1.0;
@@ -159,14 +159,11 @@ public:
     m_doAutomaticRestart = false;
     m_lowerPorosityLimit = 1e-15;
     m_implicitAdvectionSolve = false;
-    m_doAdvectionSolve = true;
-    //    m_porosityInAdvectionOperator = true;
+
     m_advectionMethod = m_porosityInAdvection;
-    m_splitDarcySolve = false;
-    m_scaleAdvectionSrcExtraChi = false;
+
     m_maxDivUFace=5e-14;
     m_skipTrickySourceTerm=-1;
-
 
     explicitDarcyTerm = false;
     m_viscousBCs = true;
@@ -934,8 +931,23 @@ protected:
   /// Frame advection velocity + fluid advection velocity
   m_totalAdvVel;
 
-  Real AMRSaltSum_new, AMRSaltSum_old, AMREnthalpySum_new, AMREnthalpySum_old;
-  LevelData<FArrayBox> m_saltFluxTop, m_saltFluxBottom;
+  /// Total salt content in domain at new time
+  Real AMRSaltSum_new,
+
+  /// Total salt content in domain at old time
+  AMRSaltSum_old,
+
+  /// Total heat content in domain at new time
+  AMREnthalpySum_new,
+
+  /// Total heat content in domain at new time
+  AMREnthalpySum_old;
+
+  /// Salt flux at the top of the domain
+  LevelData<FArrayBox> m_saltFluxTop,
+
+  /// Salt flux at the bottom of the domain
+  m_saltFluxBottom;
 
   /// Frame velocity (cell centred). Don't think we need this.
   LevelData<FArrayBox> m_frameVel;
@@ -1085,12 +1097,6 @@ protected:
   /// switched to 1 because we weren't converging due to single grid cells
   int m_steadyStateNormType;
 
-  /// Nusselt  number (no longer used)
-  // For some problems we want to keep track of the nusselt number
-  // This contains current and 2 older time nusselt numbers, calculated on level 0
-  //  Vector<Real> m_nusselt;
-
-  //	int m_physicalProblem;
 
   /// Scalar fields at new time
   Vector<RefCountedPtr<LevelData<FArrayBox> > > m_scalarNew,
@@ -1098,12 +1104,12 @@ protected:
   /// Scalar fields at old time
   m_scalarOld,
 
-  /// Change in scalar fields. We don't actually seem to use this.
-  //  m_dScalar,
+
 
   /// Backed up scalar fields to be used for restarting
   m_scalarRestart;
 
+  /// Lagged \f$ d \chi / \dt \f$
   LevelData<FArrayBox> m_dPorosity_dt;
 
   /// Vector fields at new time
@@ -1215,6 +1221,7 @@ protected:
   /// Should we projection the velocity?
   bool m_doProjection;
 
+  /// Max allowed \f$ \nabla \cdot \mathbf{U} \f$ on cell faces
   Real m_maxDivUFace;
 
   /// Do synchronisation operations for velocity?
@@ -1232,10 +1239,7 @@ protected:
    */
   bool m_addSubtractGradP;
 
-  // We really shouldn't be doing this.
-  // Remember that U_cc is projected after pressure has been subtracted,
-  // so U_ad shouldn't know about the pressure before being projected
-  bool m_addSubtractGradPAdvection;
+
 
   /// Enforce analytic solution as initial conditions?
   bool m_enforceAnalyticSoln;
@@ -1243,10 +1247,14 @@ protected:
   /// Is problem viscous?
   bool m_isViscous;
 
+  /// Whether or not to use viscous BCs
+  /**
+   * May want these even if there isn't a viscous term in the governing equations.
+   */
   bool m_viscousBCs;
 
 
-  /// TReat darcy term in mom equation explicitly
+  /// Treat darcy term in mom equation explicitly
   bool explicitDarcyTerm;
 
   /// Should we calculate pressure like \f$ \chi \nabla P \f$?
@@ -1258,10 +1266,8 @@ protected:
    */
   int m_pressureScaleVar;
 
-  bool m_splitDarcySolve;
-  bool m_doAdvectionSolve;
 
-  bool m_scaleAdvectionSrcExtraChi;
+
 
   bool m_implicitAdvectionSolve;
 
@@ -1368,23 +1374,47 @@ protected:
    */
   m_numGhostAdvection;
 
-
-
   /// Handles advection of velocity
   PatchGodunov m_patchGodVelocity,
 
-  /// For multi component solve
-  m_patchGodHC, m_patchGodTSl,
+  /// Operator For multi component H-C advection solve
+  m_patchGodHC,
 
-  /// For single component solves
-  m_patchGodH, m_patchGodC,
-  m_patchGodT, m_patchGodSl  ;
+  /// Operator For multi component T-Sl advection solve
+  m_patchGodTSl,
+
+  /// Operator For single component H advection solve
+  m_patchGodH,
+
+  /// Operator For single component C advection solve
+  m_patchGodC,
+
+  /// Operator For single component T advection solve
+  m_patchGodT,
+
+  /// Operator For single component Sl advection solve
+  m_patchGodSl;
 
   /// Physics for velocity advection
   AdvectionPhysics m_advectionPhysicsVelocity;
 
-  /// Physics for H,C and T, Sl advection
-  AdvectionPhysics m_advPhysHC, m_advPhysTSl, m_advPhysH, m_advPhysC, m_advPhysT, m_advPhysSl;
+  /// Physics for coupled H-C advection solve
+  AdvectionPhysics m_advPhysHC,
+
+  /// Physics for coupled T-Sl advection solve
+  m_advPhysTSl,
+
+  /// Physics for H advection solve
+  m_advPhysH,
+
+  /// Physics for C advection solve
+  m_advPhysC,
+
+  /// Physics for T advection solve
+  m_advPhysT,
+
+  /// Physics for Sl advection solve
+  m_advPhysSl;
 
   /// Handles advection of scalar vars
   RefCountedPtr<PatchGodunov> m_patchGodScalars[m_numScalarVars];
@@ -1401,11 +1431,12 @@ protected:
   /// Flux registers for scalar variables
   RefCountedPtr<LevelFluxRegister> m_fluxRegisters[m_numScalarVars],
 
-  // Flux Register for multi component HC solves
+  /// Flux Register for multi component HC solves
   m_fluxRegHC,
 
   /// Flux registers for vector variables
   m_vectorFluxRegisters[m_numVectorVars];
+
 
   RefCountedPtr<LevelFluxRegister> m_advVelFR;
 

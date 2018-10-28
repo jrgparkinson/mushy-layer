@@ -753,15 +753,6 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_parameters.m_nondimensionalisation = 0;
   ppMain.query("nondimensionalisation", m_parameters.m_nondimensionalisation);
 
-  m_splitDarcySolve = false;
-  ppMain.query("splitDarcySolve", m_splitDarcySolve);
-
-  m_scaleAdvectionSrcExtraChi = false;
-  ppMain.query("scaleAdvectionSrcExtraChi", m_scaleAdvectionSrcExtraChi);
-
-  m_doAdvectionSolve = true;
-  ppMain.query("doAdvectionSolve", m_doAdvectionSolve);
-
   m_implicitAdvectionSolve = false;
   ppMain.query("implicitAdvectionSolve", m_implicitAdvectionSolve);
 
@@ -954,18 +945,14 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_doProjection = true;
   m_doSyncOperations = true;
   m_addSubtractGradP = true;
-  m_addSubtractGradPAdvection = false;
   m_enforceAnalyticSoln = false;
-
   m_maxDivUFace = 1e-10;
 
   ppMain.query("doEuler", m_doEulerPart);
   ppMain.query("doProjection", m_doProjection);
   ppMain.query("doSyncOperations", m_doSyncOperations);
   ppMain.query("addSubtractGradP", m_addSubtractGradP);
-  ppMain.query("addSubtractGradPAdvection", m_addSubtractGradPAdvection);
   ppMain.query("enforceAnalyticSoln", m_enforceAnalyticSoln);
-
   ppMain.query("maxDivUFace", m_maxDivUFace);
 
   Real analyticSoln=-1;

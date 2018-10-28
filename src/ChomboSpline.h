@@ -38,6 +38,7 @@
 #include <algorithm>
 
 
+/// Class for describing the matrix
 class band_matrix
 {
 private:
@@ -56,7 +57,7 @@ public:
     /// destructor
     ~band_matrix() {};
 
-    // init with dim,n_u,n_l
+    /// init with dim,n_u,n_l
     void resize(int dim, int n_u, int n_l);
 
     /// matrix dimension
@@ -100,7 +101,7 @@ public:
 
 };
 
-// spline interpolation
+/// Class for handling spline interpolation
 class spline
 {
 public:

@@ -36,6 +36,7 @@ public:
    */
   AdvectIBC();
 
+  /// Constructor
   AdvectIBC(int a_numComp);
 
   /// Destructor
@@ -152,7 +153,11 @@ protected:
 
   /// boundary value at the plume
   Real m_bcValPlume;
+
+  /// Boundary value for inflow in a plume
   Real m_inflowVal;
+
+  /// Extend of plume along domain boundary
   Vector<Real> m_plumeBounds;
 
   /// advection velocity field for the whole level
@@ -167,6 +172,7 @@ protected:
   /// Boundary slope value
   Real m_slopeVal[SpaceDim][2];
 
+  /// Multi component plume values
   Vector<Real> m_plumeVals;
 
   /// Boundary condition type

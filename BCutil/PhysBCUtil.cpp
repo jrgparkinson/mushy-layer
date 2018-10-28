@@ -562,6 +562,7 @@ public:
   /// BC value on the hi side. First index refers to direction, second to component
   m_customHiBCVal;
 
+  /// Constructor
   AdvectDiffuseScalarBC(bool a_isDefined,
                         MushyLayerParams a_params,
                         bool a_homogeneous,
@@ -2059,54 +2060,7 @@ public:
                 }
               }
 
-              // normal BCs in z direction
-              //              if (idir == 1)
-              //              {
-              //                if (idir == m_comp)
-              //                {
-              //                  if (side == Side::Hi)
-              //                  {
-              //                    DiriEdgeBC(a_state, a_valid, a_dx,
-              //                               a_homogeneous,
-              //                               BCValueHolder(topBC),
-              //                               idir, side);
-              //                  }
-              //                  else
-              //                  {
-              //                    DiriEdgeBC(a_state, a_valid, a_dx,
-              //                               a_homogeneous,
-              //                               BCValueHolder(bottomBC),
-              //                               idir, side);
-              //                  }
-              //                }
-              //                else
-              //                {
-              //                  // Don't think these BCs matter?
-              //                }
-              //
-              //              }
-              //              else
-              //              {
-              //                if (idir == m_comp)
-              //                {
-              //                  Box validFace(a_valid);
-              //                  validFace.surroundingNodes(m_comp);
-              //                  //                NeumBC(a_state, validFace, a_dx,
-              //                  //                       a_homogeneous,
-              //                  //                       BCValueHolder(zeroFunc),
-              //                  //                       idir, side);
-              //                  ////
-              //                  NeumEdgeBC(a_state, validFace, a_dx,
-              //                             a_homogeneous,
-              //                             BCValueHolder(zeroFunc),
-              //                             idir, side, Interval(0,0));
-              //                }
-              //                else
-              //                {
-              //
-              //                  // Don't think these BCs matter?
-              //                }
-              //              }
+
 
             } // if ends match
           } // end iteration over sides
@@ -2128,6 +2082,7 @@ class BasicPorosityPermeabilityBCFunction: public AdvectDiffuseScalarBC
 
 
 public:
+  /// Constructor
   BasicPorosityPermeabilityBCFunction(bool a_isDefined,
                                       MushyLayerParams a_params,
                                       bool a_homogeneous,
