@@ -1,12 +1,12 @@
 # Run all convergence tests for the methods paper
-
-from runAMRConvergenceTest import runTest
 import os
-
 from colorama import Fore, Style
 #Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 #Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 #Style: DIM, NORMAL, BRIGHT, RESET_ALL
+
+from classes.SlurmTask import SlurmTask
+from runAMRConvergenceTest import runTest
 
 base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
