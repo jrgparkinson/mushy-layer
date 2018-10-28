@@ -114,18 +114,18 @@ analysis_command = analysis_command + ' exit; " '
 runAnalysisName = 'runAnalysis.sh'
 
 # Don't redo analysis if job already exists
-if os.path.exists(os.path.join(base_dataFolder, runAnalysisName)):
+#if os.path.exists(os.path.join(base_dataFolder, runAnalysisName)):
+#
+#	print(Fore.YELLOW + 'Analysis job already submitted \n' + Fore.RESET)
+#else:
+jobName = physicalProblem + '-analysis'
+s = SlurmTask(base_dataFolder, jobName, '')
 
-	print(Fore.YELLOW + 'Analysis job already submitted \n' + Fore.RESET)
-else:
-	jobName = physicalProblem + '-analysis'
-	s = SlurmTask(base_dataFolder, jobName, '')
-
-	s.setDependency(all_job_ids)
-	s.setCustomCommand(analysis_command)
-	s.writeSlurmFile()
-	s.runTask()
-	print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
+s.setDependency(all_job_ids)
+s.setCustomCommand(analysis_command)
+s.writeSlurmFile()
+s.runTask()
+print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
 # 3) Convection in a fixed porous medium with variable porosity
 
