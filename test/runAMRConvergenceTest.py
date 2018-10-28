@@ -101,10 +101,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 
                 params['main.steady_state'] = '1e-8'
                 params['main.max_time'] = '50000000.0'
-                cfl = '0.0001'
-                cfl = '0.005'            
-                params['main.cfl'] = cfl
-                params['main.initial_cfl'] = cfl
+                
                 params['main.max_dt'] = '1e-1'
 
                 #output_dir = 'chi'+str(chi)+'-Da' + str(Da) + '-Ra' +  params['parameters.rayleighTemp']  + '-cfl0.001' 

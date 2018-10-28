@@ -66,7 +66,13 @@ AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz]
 num_procs = [4]
 
 chi  = 0.4
-base_dataFolder = os.path.join(base_output_dir, 'ConvectionDB')
+
+# Try and speed things up for now, should eventually make this criteria smaller
+extra_params = {'main.steady_state': 1e-4}
+cfl = 0.1            
+extra_params['main.cfl'] = cfl
+extra_params['main.initial_cfl'] = cfl/10
+base_dataFolder = os.path.join(base_output_dir, 'ConvectionDB-cfl' + str(cfl))
 
 Da_Ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9], 'lebars': [1.08, 3.07, 12.9]},
 {'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5],  'lebars': [1.01, 1.41, 3.17, 5.24]}]
@@ -77,8 +83,7 @@ all_job_ids = []
 
 analysis_command = matlab_command + ' " '
 
-# Try and speed things up for now, should eventually make this criteria smaller
-extra_params['main.steady_state'] = 1e-4
+
 
 
 for Da_Ra in Da_Ra_vals:

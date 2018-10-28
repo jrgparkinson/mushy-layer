@@ -60,7 +60,7 @@ if AMRRunning
 end
 
 
-fprintf('Ra=%e, Nu=%1.2f %s (Uniform) / %1.2f%s (AMR)  / %1.2f (Le Bars & Worster) \n', ...
+fprintf('Ra=%.1e, Nu=%1.2f %s (Uniform) / %1.2f%s (AMR)  / %1.2f (Le Bars & Worster) \n', ...
     str2num(Ra{i}), NuUniform, UniformStr, NuAMR, AMRStr, NuLeBars(i));
  
 end
