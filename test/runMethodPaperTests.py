@@ -107,14 +107,18 @@ for Da_Ra in Da_Ra_vals:
 analysis_command = analysis_command + ' exit; " '
 #analysis_command = '(base_dir, chi, Da, Ra, res)'
 
-jobName = physicalProblem + '-analysis'
-s = SlurmTask(base_dataFolder, jobName, '')
+runAnalysisName = 'runAnalysis.sh'
 
-s.setDependency(all_job_ids)
-s.setCustomCommand(analysis_command)
-s.writeSlurmFile()
-s.runTask()
-print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
+# Don't redo analysis if job already exists
+if not os.path.exists(os.path.join(base_dataFolder, runAnalysisName)):
+	jobName = physicalProblem + '-analysis'
+	s = SlurmTask(base_dataFolder, jobName, '')
+
+	s.setDependency(all_job_ids)
+	s.setCustomCommand(analysis_command)
+	s.writeSlurmFile()
+	s.runTask()
+	print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
 # 3) Convection in a fixed porous medium with variable porosity
 

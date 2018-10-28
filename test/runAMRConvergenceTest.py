@@ -656,16 +656,20 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
     # Once all these runs have been submitted, submit the analysis job
     if analysis_command:
-        jobName = physicalProblem + '-analysis'
+        runAnalysisName = 'runAnalysis.sh'
 
-        s = SlurmTask(base_dir, jobName, '')
+        # Don't redo analysis - we may be waiting on runs to finish
+        if not os.path.exists(os.path.join(base_dir, runAnalysisName)):
+            jobName = physicalProblem + '-analysis'
 
-        s.setDependency(job_ids)
-        s.setCustomCommand(analysis_command)
+            s = SlurmTask(base_dir, jobName, '')
 
-        s.writeSlurmFile()
-        s.runTask()
-        print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
+            s.setDependency(job_ids)
+            s.setCustomCommand(analysis_command)
+
+            s.writeSlurmFile(runAnalysisName)
+            s.runTask()
+            print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
 
     return job_ids
