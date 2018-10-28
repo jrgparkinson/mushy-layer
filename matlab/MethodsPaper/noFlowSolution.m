@@ -39,7 +39,10 @@ horizSpacing = 0.03;
 
 doColorbar = true;
 
+fprintf('Loading 2 level solution \n');
 output2lev        = getFinalPlotFile(fullfile(dataFolder, [amrPrefix2lev, '16--0']));
+
+fprintf('Loading uniform fine solution \n');
 outputUniformFine = getFinalPlotFile(fullfile(dataFolder, [uniformPrefix, '64--0']));
 %output = MushyLayerOutput(2, 224, dataFolder, AMRplot_prefix, true);
 
@@ -267,9 +270,11 @@ gridResPlot = [16 32 64];
 for f =1:length(gridResPlot)
     thisRes = gridResPlot(f);
     
-    plot_prefix = [uniformPrefix, num2str(thisRes),'--0'];
+    folder = [uniformPrefix, num2str(thisRes),'--0'];
     
-    output2lev = getFinalPlotFile([dataFolder, plot_prefix]);
+    fprintf(['Loading 2 level solution with resolution ', num2str(thisRes), ' \n']);
+    output2lev = getFinalPlotFile(fullfile(dataFolder, folder));
+    
     %output = MushyLayerOutput(2, uniformframes(f), dataFolder, plot_prefix, true);
     if length(output2lev.levelArray) > 0
         
@@ -400,8 +405,8 @@ for f =1:length(gridRes)
     
     thisRes = gridRes(f);
     
-    plot_prefix = [prefix, num2str(gridRes(f)),'--0'];
-    thisFolder = [dataFolder, plot_prefix];
+    folder_name = [prefix, num2str(gridRes(f)),'--0'];
+    thisFolder = fullfile(dataFolder, folder_name);
     errFile = [thisFolder, '/err.mat'];
     
     if exist(errFile, 'file') == 2 && ~forceRecalculate
@@ -438,8 +443,8 @@ for f =1:length(gridRes)
     
 thisRes = gridRes(f);
     
-    plot_prefix = [prefix, num2str(thisRes),'--0'];
-    thisFolder = [dataFolder, plot_prefix];
+    folder_name = [prefix, num2str(thisRes),'--0'];
+    thisFolder = fullfile(dataFolder, folder_name);
     
     times(f)  = getRuntime( thisFolder );
 end
