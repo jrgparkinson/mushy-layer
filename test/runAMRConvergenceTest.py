@@ -16,7 +16,7 @@ from classes.SlurmTask import SlurmTask
 from AMRConvergenceTest import AMRConvergenceTest
 
 
-def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command = '', extra_params={}, numRestarts=0):
+def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '', extra_params={}, numRestarts=0):
 
     # base_dir should be e.g. 
     #'/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/AMRConvergenceTestNoFlow'
@@ -30,6 +30,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs, analysis_comman
     for setup in AMRSetup:
         max_level = setup['max_level']
         ref_rat = max(setup['ref_rat'], 1)
+        Nzs = setup['Nzs']
 
         runTypes = ['uniform']
         if 'run_types' in setup:

@@ -18,7 +18,7 @@ savePlots = true;
 
 
 uniformPrefix = 'Uniform-noFlow-';
-gridRes = [16,32,64];
+gridRes = [8,16,32,64,128,256];
 dz = 4./gridRes;
 errUniform = NaN*ones(length(gridRes), 1);
 errAMR = NaN*ones(length(gridRes), 1);

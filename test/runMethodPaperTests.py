@@ -31,14 +31,14 @@ matlab_command = 'cd ' + matlabFolder + '; \n \n matlab -nodisplay -nosplash -no
 #######################################
 print(Fore.GREEN + 'Setup tests for solidification without flow' + Style.RESET_ALL)
 physicalProblem = 'noFlow'
-AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}, 
-{'max_level': 1, 'ref_rat': 2, 'run_types': ['amr']},
-{'max_level': 2, 'ref_rat': 2, 'run_types': ['amr']}]
+AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': [8,16,32,64,128,256]}, 
+{'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8,16,32,64,128]},
+{'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8,16,32,64]}]
 # While testing:
 #AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}];
 
-Nzs 	  = [16, 32, 64]
-num_procs = [1] * len(Nzs)
+#Nzs 	  = [16, 32, 64]
+num_procs = [1] * 6 # Needs to be as long as the longest Nzs
 
 # Setup up the post processing command
 dataFolder = os.path.join(base_output_dir, 'NoFlow')
@@ -47,17 +47,17 @@ analysis_command = matlab_command + ' "noFlowSolution(\'' + dataFolder + '\', \'
 
 # Run
 extra_params = {'main.debug':'true'}
-runTest(dataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command, extra_params)
+runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 
 ######################################
 # 2) Convection in a fixed porous medium
 ######################################
 print('Setup tests for convection in a fixed porous medium')
 physicalProblem = 'convectionDB'
-AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform']}, 
-{'max_level': 1, 'ref_rat': 2, 'run_types': ['variable']}]
+AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [128]}, 
+{'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [128]}]
 
-Nzs 	  = [128]
+#Nzs 	  = [128]
 num_procs = [4]
 
 chi  = 0.4
@@ -94,7 +94,7 @@ for Da_Ra in Da_Ra_vals:
 		#extra_params = {}
 		thisDataFolder = os.path.join(base_dataFolder, output_dir)
 		analysis_command = ''
-		job_ids = runTest(thisDataFolder, physicalProblem, AMRSetup, Nzs, num_procs, analysis_command, extra_params)
+		job_ids = runTest(thisDataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 		all_job_ids = all_job_ids + job_ids
 
 
