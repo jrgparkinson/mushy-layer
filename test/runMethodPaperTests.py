@@ -51,11 +51,13 @@ runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extr
 
 ######################################
 # 2) Convection in a fixed porous medium
+# Just run for a single grid resolution and compare to previously published values
 ######################################
 print('Setup tests for convection in a fixed porous medium')
 physicalProblem = 'convectionDB'
-AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [128]}, 
-{'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [128]}]
+Nz = 128
+AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz]}, 
+{'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz]}]
 
 #Nzs 	  = [128]
 num_procs = [4]
@@ -101,7 +103,7 @@ for Da_Ra in Da_Ra_vals:
 	Ra_str_vals = [str(a) for a in Da_Ra['RaT']]
 	Ra_str = '{\' ' + '\',\''.join(Ra_str_vals) + '\'}'
 
-	analysis_command = analysis_command + ' "compileNu(\'' + base_dataFolder + '\', \'' +str(chi)+ '\', \'' +str(Da)+ '\', \'' +Ra_str+ '\', \'' +str(Nzs[-1])+ '\', , \'[' + ','.join(NuLebars)+ ']\');' 
+	analysis_command = analysis_command + ' "compileNu(\'' + base_dataFolder + '\', \'' +str(chi)+ '\', \'' +str(Da)+ '\', \'' +Ra_str+ '\', \'' +str(Nz)+ '\', , \'[' + ','.join(NuLebars)+ ']\');' 
 
 # Now do analysis
 analysis_command = analysis_command + ' exit; " '
@@ -110,7 +112,10 @@ analysis_command = analysis_command + ' exit; " '
 runAnalysisName = 'runAnalysis.sh'
 
 # Don't redo analysis if job already exists
-if not os.path.exists(os.path.join(base_dataFolder, runAnalysisName)):
+if os.path.exists(os.path.join(base_dataFolder, runAnalysisName)):
+
+	print(Fore.YELLOW + 'Analysis job already submitted \n' + Fore.RESET)
+else:
 	jobName = physicalProblem + '-analysis'
 	s = SlurmTask(base_dataFolder, jobName, '')
 

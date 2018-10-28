@@ -659,7 +659,9 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
         runAnalysisName = 'runAnalysis.sh'
 
         # Don't redo analysis - we may be waiting on runs to finish
-        if not os.path.exists(os.path.join(base_dir, runAnalysisName)):
+        if os.path.exists(os.path.join(base_dir, runAnalysisName)):
+            print(Fore.YELLOW + 'Analysis job already submitted \n' + Fore.RESET)
+        else:
             jobName = physicalProblem + '-analysis'
 
             s = SlurmTask(base_dir, jobName, '')
