@@ -6762,8 +6762,6 @@ void AMRLevelMushyLayer::setFluxRegistersZero()
   m_heatDomainFluxRegister.setToZero();
   m_saltDomainFluxRegister.setToZero();
 
-  m_advVelFR->setToZero();
-
 }
 /*******/
 
