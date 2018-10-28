@@ -400,13 +400,6 @@ void AMRLevelMushyLayer::levelSetup()
       }
     }
 
-    amrMLCoarserPtr->m_advVelFR = RefCountedPtr<LevelFluxRegister>(
-        new LevelFluxRegister(m_grids,amrMLCoarserPtr->m_grids,
-                              m_problem_domain,
-                              amrMLCoarserPtr->m_ref_ratio,
-                              SpaceDim));
-    amrMLCoarserPtr->m_advVelFR->setToZero();
-
 
 
     // Some of our level structures can't be setup until we've created grids on this level

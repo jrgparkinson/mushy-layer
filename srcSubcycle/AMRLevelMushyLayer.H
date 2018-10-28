@@ -1437,9 +1437,6 @@ protected:
   /// Flux registers for vector variables
   m_vectorFluxRegisters[m_numVectorVars];
 
-
-  RefCountedPtr<LevelFluxRegister> m_advVelFR;
-
   LevelDomainFluxRegister m_saltDomainFluxRegister, m_heatDomainFluxRegister;
 
   /// Which scalar vars should we bother making flux registers for?
