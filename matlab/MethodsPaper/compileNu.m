@@ -17,7 +17,7 @@ AMRPrefix = 'VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-';
 
 %base_dir = getDataDir(['AMRConvergenceTest/ConvectionDB/']);
 
-fprintf('Nx = %d \n', res);
+fprintf('Nx = %d, Da = %s \n', res, Da);
 for i=1:length(Ra)
     outputFolder = getOutputFolder(Ra{i}, chi, Da);
     
@@ -60,8 +60,8 @@ if AMRRunning
 end
 
 
-fprintf('Ra=%s, Nu=%1.2f %s (Uniform) / %1.2f%s (AMR)  / %1.2f (Le Bars & Worster) \n', ...
-    Ra{i}, NuUniform, UniformStr, NuAMR, AMRStr, NuLeBars(i));
+fprintf('Ra=%e, Nu=%1.2f %s (Uniform) / %1.2f%s (AMR)  / %1.2f (Le Bars & Worster) \n', ...
+    str2num(Ra{i}), NuUniform, UniformStr, NuAMR, AMRStr, NuLeBars(i));
  
 end
 
@@ -117,6 +117,11 @@ if diagFileExists
     end
         
 
+end
+
+% Some error checking
+if Nu < 0 || Nu > 100
+    Nu = NaN;    
 end
 end
 
