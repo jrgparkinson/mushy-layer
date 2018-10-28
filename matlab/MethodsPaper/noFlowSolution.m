@@ -413,6 +413,7 @@ for f =1:length(gridRes)
         load(errFile)
     else
    
+        fprintf('Loading final plot file from %s \n', thisFolder);
         output = getFinalPlotFile(thisFolder);
 
         if length(output.levelArray) > 0
