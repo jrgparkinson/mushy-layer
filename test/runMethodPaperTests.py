@@ -72,6 +72,9 @@ all_job_ids = []
 
 analysis_command = matlab_command 
 
+# Try and speed things up for now, should eventually make this criteria smaller
+extra_params['main.steady_state'] = 1e-4
+
 
 for Da_Ra in Da_Ra_vals:
 	Da = Da_Ra['Da']
@@ -95,7 +98,7 @@ for Da_Ra in Da_Ra_vals:
 		all_job_ids = all_job_ids + job_ids
 
 
-	Ra_str_vals = [str(a) for a in Ra]
+	Ra_str_vals = [str(a) for a in Da_Ra['RaT']]
 	Ra_str = '{\' ' + '\',\''.join(Ra_str_vals) + '\'}'
 
 	analysis_command = analysis_command + ' "compileNu(\'' + base_dataFolder + '\', \'' +str(chi)+ '\', \'' +str(Da)+ '\', \'' +Ra_str+ '\', \'' +str(Nzs[-1])+ '\', , \'[' + ','.join(NuLebars)+ ']\');' 
