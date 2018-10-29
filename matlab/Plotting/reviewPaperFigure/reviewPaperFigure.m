@@ -1,5 +1,5 @@
 %clear all;
-function viewWideDomainTimeSeriesEGU
+function reviewPaperFigure
 
 % Boring setup stuff
 close all;
@@ -12,8 +12,8 @@ SlMax = 0.085; %55g/kg
 
 
 % Where the data files are stored
-dataFolder = '/home/parkinsonjl/convection-in-sea-ice/MushyLayer/matlab/EGUPoster/';
-output_dir = [dataFolder, 'T-15/'];
+dataFolder = '/home/parkinsonjl/mushy-layer/matlab/EGUPoster/';
+data_dir = [dataFolder, 'T-15/'];
 
 % Main options to change
 
@@ -30,8 +30,10 @@ depth = 1.2;
 duplicate = false;
 
 resStr = 'hiRes';
-output_dir = '/home/parkinsonjl/convection-in-sea-ice/MushyLayer/matlab/Plotting/reviewPaperFigure/';
-frameLeft = 9000;     frameRight = 48400; % Ideally make this 100000, once processed
+data_dir = '/home/parkinsonjl/mushy-layer/matlab/Plotting/reviewPaperFigure/';
+frameLeft = 9000;     
+frameRight = 48400; % Ideally make this 100000, once processed
+frameRight = 76100; 
 depth = 4.8;
 duplicate = true;
 
@@ -71,7 +73,7 @@ m = 1; n=2;
 
 subplot(m, n, 1);
 axPosLeft = [0.03 ax_bottom width height];
-dataFile = [output_dir, 'toPlot', num2str(frameLeft),'.mat'];
+dataFile = [data_dir, 'toPlot', num2str(frameLeft),'.mat'];
 [axesLeft, cbarPorosity] = makePlot(dataFile, depth, doLabel, axPosLeft, SlMax, styleLeft, 'Porosity', duplicate);
 %title('(a)');
 cbarPorosity.Position = [0.03 cbar_bottom width cbar_height];
@@ -82,7 +84,7 @@ cbarPorosity.Label.Position = [0.5 0];
 
 subplot(m, n, 2);
 axPosRight = [0.52 ax_bottom width height];
-dataFile = [output_dir, 'toPlot', num2str(frameRight),'.mat'];
+dataFile = [data_dir, 'toPlot', num2str(frameRight),'.mat'];
 [axesRight, cbarSl] = makePlot(dataFile, depth, doLabel, axPosRight, SlMax, styleRight, 'Sl', duplicate);
 %title('(b)');
 cbarSl.Position = [0.52 cbar_bottom width cbar_height];
