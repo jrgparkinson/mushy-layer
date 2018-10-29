@@ -4800,7 +4800,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   // Haven't sorted multi component flux registers yet
   if (doFRupdates)
   {
-    incrementFluxRegisters(totalAdvectiveFlux, m_dt);
+    incrementHCFluxRegisters(totalAdvectiveFlux, m_dt);
   }
   else
   {
@@ -4878,7 +4878,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   return exitStatus;
 }
 
-void AMRLevelMushyLayer::incrementFluxRegisters(LevelData<FluxBox>& flux, Real fluxMult)
+void AMRLevelMushyLayer::incrementHCFluxRegisters(LevelData<FluxBox>& flux, Real fluxMult)
 {
   if (s_verbosity > 5)
   {
@@ -4925,207 +4925,7 @@ void AMRLevelMushyLayer::incrementFluxRegisters(LevelData<FluxBox>& flux, Real f
   } // end loop over grids for flux register updates
 }
 
-//void AMRLevelMushyLayer::computeScalarAdvectiveSrc(LevelData<FArrayBox>& a_src,
-//                                                   int a_var, bool converged,
-//                                                   int a_comp)
-//{
-//
-//  int fluidAdvectionVar = -1;
-//  int diffusionVar = -1;
-//  int opVar = -1;
-//  if (a_var == m_enthalpy)
-//  {
-//    fluidAdvectionVar = m_temperature;
-//    diffusionVar = m_enthalpy; // note that we give the operator enthalpy and it calculates lap(temperature)
-//    opVar = m_enthalpyOp;
-//  }
-//  else if (a_var == m_bulkConcentration)
-//  {
-//    fluidAdvectionVar = m_liquidConcentration;
-//    diffusionVar = m_bulkConcentration;
-//    opVar = m_saltEqnOp;
-//  }
-//  else
-//  {
-//    MayDay::Error("AMRLevelMushyLayer::AdvectDiffuseScalar - don't know what to be advecting.");
-//  }
-//
-//  DataIterator dit = a_src.dataIterator();
-//  Interval scalComps(0, 0);
-//  IntVect advect_grow = m_numGhostAdvection*IntVect::Unit;
-//
-//  Real old_time = m_time - m_dt;
-//
-//  // define temporary storage
-//  LevelData<FArrayBox> diffusiveSrc(m_grids,1, IntVect::Unit);
-//
-//  LevelData<FArrayBox> zeroSrc(m_grids,1, IntVect::Unit);
-//  LevelData<FArrayBox> tempStorage(m_grids,1, IntVect::Unit);
-//  //  LevelData<FArrayBox>* crseScalarDiffusion = NULL;
-//  LevelFluxRegister* a_crseFluxRegPtr = NULL;
-//
-//  setValLevel(zeroSrc, 0.0);
-//
-//  if (m_level > 0)
-//  {
-//    // allocate crseBC info
-//    AMRLevelMushyLayer* mlCrse = getCoarserLevel();
-//
-//    //    const DisjointBoxLayout& crseGrids = mlCrse->m_grids;
-//    //    crseScalarDiffusion = new LevelData<FArrayBox>(crseGrids,1);
-//    //
-//    //    mlCrse->fillScalars(*crseScalarDiffusion, old_time, diffusionVar, true);
-//
-//    if (a_var == m_enthalpy || a_var == m_bulkConcentration)
-//    {
-//      a_crseFluxRegPtr = &(*mlCrse->m_fluxRegHC);
-//    }
-//    else
-//    {
-//      a_crseFluxRegPtr = &(*mlCrse->m_fluxRegisters[a_var]);
-//    }
-//  }
-//
-//  // exchange for diffusiveSrc not necessary because it's done
-//  // in computeScalDiffusion
-//
-//  // this is pretty much identical to advectScalar()
-//  /// need to build grown grids to get be able to do all of
-//  /// tracing properly -- this is necessary to sync with old
-//  /// code
-//
-//  LevelData<FArrayBox> local_old_vel(m_grids, SpaceDim, advect_grow);
-//  // m_time contains the time at which the new state is centered
-//  fillVectorField(local_old_vel, old_time, m_fluidVel, true);
-//
-//  IntVect ghostVect = IntVect::Unit;
-//  IntVect fluxGhostVect = IntVect::Unit;
-//  LevelData<FluxBox> edgeScalFluidAdv(m_grids, 1, fluxGhostVect);
-//  LevelData<FluxBox> edgeScalTotal(m_grids, 1, fluxGhostVect);
-//  LevelData<FluxBox> edgeScalFrameAdvection(m_grids, 1, fluxGhostVect);
-//
-//
-//  // Need grown version of this
-//  LevelData<FArrayBox> scalar_advection_old(m_grids, 1, advect_grow);
-//  LevelData<FArrayBox> scalar_old(m_grids, 1, advect_grow);
-//
-//  fillScalars(scalar_advection_old, old_time, fluidAdvectionVar, true);
-//  fillScalars(scalar_old, old_time, a_var, true);
-//
-//  // Compute fluid advective flux
-//  computeScalarAdvectiveFlux(edgeScalFluidAdv, fluidAdvectionVar, a_var, m_advVel, old_time, m_dt);
-//  computeScalarAdvectiveFlux(edgeScalFrameAdvection, a_var, a_var, m_frameAdvVel, old_time, m_dt);
-//
-//  // Need to exchange here.
-//  edgeScalFluidAdv.exchange();
-//  edgeScalFrameAdvection.exchange();
-//
-//  LevelData<FArrayBox> fluidAdvSrc(m_grids, 1, m_scalarNew[a_var]->ghostVect()); // want this for debugging
-//  Divergence::levelDivergenceMAC(fluidAdvSrc, edgeScalFluidAdv, m_dx);
-//
-//  // Combine the two fluxes
-//  for (DataIterator dit = edgeScalFluidAdv.dataIterator(); dit.ok(); ++dit)
-//  {
-//    edgeScalTotal[dit].setVal(0.0);
-//
-//    edgeScalTotal[dit].plus(edgeScalFrameAdvection[dit], edgeScalFrameAdvection[dit].box(), 0,0,1);
-//    edgeScalTotal[dit].plus(edgeScalFluidAdv[dit], edgeScalFluidAdv[dit].box(), 0,0,1);
-//  }
-//
-//  LevelData<FArrayBox> advectiveSrc(m_grids, 1, m_scalarNew[a_var]->ghostVect());
-//  LevelData<FArrayBox> frameAdvSrc(m_grids, 1, m_scalarNew[a_var]->ghostVect()); // want this for debugging
-//
-//  // compute div(us)
-//  Divergence::levelDivergenceMAC(advectiveSrc, edgeScalTotal, m_dx);
-//  Divergence::levelDivergenceMAC(frameAdvSrc, edgeScalFrameAdvection, m_dx);
-//
-//
-//  for (dit.reset(); dit.ok(); ++dit)
-//  {
-//    //    advectiveSrc[dit] *= -1.0;
-//
-//    a_src[dit].plus(advectiveSrc[dit],
-//                    -1.0,  // scale
-//                    0, // src comp
-//                    a_comp, // dest comp
-//                    1); // num comps
-//  }
-//
-//  //  if (m_level > 0)
-//  //  {
-//  //    if (crseScalarDiffusion != NULL)
-//  //    {
-//  //      delete crseScalarDiffusion;
-//  //    }
-//  //  }
-//
-//
-//  // Do FR updates if we've converged
-//
-//  // now add advective flux to diffusive flux
-//  // (edgeScal already contains fluxes)
-//  // advective flux has opposite sign of diffusive flux
-//  // now actually increment flux registers with entire flux
-//
-//  if (converged)
-//  {
-//    Interval refluxComps(a_comp, a_comp);
-//
-//    Real fluxMult = m_dt; // petermc made negative, 7 Dec 07; then positive again because using edgeScalFluidAdv = -diffusiveFlux
-//    for (dit.reset(); dit.ok(); ++dit)
-//    {
-//      // Try only refluxing fluid advection (not frame advection)
-//      // When we don't reflux any advection we get sensible results in regions with small fluid velocities
-//      // so suspect frame advection is fine
-//      // just need to deal with the regions with fluid advection
-//      FluxBox& localFlux = edgeScalTotal[dit]; //edgeScalFluidAdv[dit];
-//
-//      if (m_level > 0)
-//      {
-//        LevelFluxRegister& crseFR = *a_crseFluxRegPtr;
-//        CH_assert (crseFR.isDefined());
-//        // use same multipliers and sign convention as in computeUStar
-//        for (int dir=0; dir<SpaceDim; dir++)
-//        {
-//          crseFR.incrementFine(localFlux[dir],
-//                               fluxMult, dit(), scalComps,
-//                               refluxComps, dir);
-//
-//          //                                            crseFR.incrementFine(localFlux[dir],
-//          //                                                            fluxMult, dit(), scalComps,
-//          //                                                            scalComps, dir, Side::Hi);
-//        } // end loop over directions
-//      } // end if coarser level exists
-//
-//      if (!finestLevel())
-//      {
-//        CH_assert(m_fluxRegisters[a_var]->isDefined());
-//        for (int dir=0; dir<SpaceDim; ++dir)
-//        {
-//          if (a_var == m_enthalpy || a_var == m_bulkConcentration)
-//          {
-//            CH_assert(m_fluxRegHC->isDefined());
-//            m_fluxRegHC->incrementCoarse(localFlux[dir],
-//                                         fluxMult, dit(),
-//                                         scalComps, refluxComps,
-//                                         dir);
-//          }
-//          else
-//          {
-//
-//
-//            m_fluxRegisters[a_var]->incrementCoarse(localFlux[dir],
-//                                                    fluxMult, dit(),
-//                                                    scalComps, scalComps,
-//                                                    dir);
-//          }
-//        } // end loop over directions
-//      } // end if finer level exists
-//    } // end loop over grids for flux register updates
-//  }
-//
-//
-//}
+
 
 void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeScalTotal)
 {
@@ -5161,7 +4961,7 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
                                        m_patchGodHC, HC_old,
                                        old_time, m_dt);
 
-  // todo stop forcing the use of single comp solvers
+  // todo - stop forcing the use of single component solvers
   bool allowMulticompAdvection = false;
   ppMain.query("allowMulticompAdvection", allowMulticompAdvection);
 
@@ -5197,7 +4997,7 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
       advVel_noReflux[dit].copy(m_advVel[dit]);
       advVel_reflux[dit].copy(m_advVel[dit]);
 
-      advVel_noReflux[dit].plus(m_advVelExplicitCorrection[dit], m_advVelExplicitCorrection[dit].box(), 0, 0, 1);
+
     }
 
     m_projection.removeFreestreamCorrection(advVel_noReflux);
@@ -6321,7 +6121,7 @@ void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
 
 }
 
-Real AMRLevelMushyLayer::averageOverLiquidRegion(int a_val)
+Real AMRLevelMushyLayer::averageOverLiquidRegion(int a_var)
 {
   Real average = 0;
   Real vol = 0;
@@ -6342,7 +6142,7 @@ Real AMRLevelMushyLayer::averageOverLiquidRegion(int a_val)
       IntVect iv = bit();
       if ((*m_scalarNew[m_porosity])[dit](iv) > 0.999)
       {
-        average += (*m_scalarNew[a_val])[dit](iv);
+        average += (*m_scalarNew[a_var])[dit](iv);
         vol += 1;
       }
     }
@@ -6997,22 +6797,7 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
 }
 
 
-//void AMRLevelMushyLayer::velocity(LevelData<FArrayBox>& a_vel,
-//                                  Real a_time) const {
-//  Interval velComps(0, SpaceDim - 1);
-//
-//  if (abs(a_time - m_time) < TIME_EPS)
-//  {
-//    m_vectorNew[m_fluidVel]->copyTo(velComps, a_vel, velComps);
-//  } else if (abs(a_time - (m_time - m_dt)) < TIME_EPS)
-//  {
-//    m_vectorOld[m_fluidVel]->copyTo(velComps, a_vel, velComps);
-//  } else {
-//    Real old_time = m_time - m_dt;
-//    timeInterp(a_vel, a_time, *m_vectorOld[m_fluidVel], old_time,
-//               *m_vectorNew[m_fluidVel], m_time, velComps);
-//  }
-//}
+
 
 void AMRLevelMushyLayer::smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing)
 {

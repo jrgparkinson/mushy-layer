@@ -89,7 +89,7 @@ public:
     m_doEulerPart =true;
     m_domainWidth = -1.0;
     m_domainHeight = -1.0;
-    //    m_dtNew = -1;
+
     m_dx = -1.0;
     m_fixedDt = -1.0;
     m_hasFiner = false;
@@ -210,7 +210,7 @@ public:
       /// whether to use van Leer limiting
       const bool&                 a_useLimiting);
 
-  ///
+  /// Destructor
   virtual ~AMRLevelMushyLayer();
 
   /// Never called: historical
@@ -388,7 +388,7 @@ public:
   /// Compute vorticity
   void computeVorticity();
 
-  // Get pi and phi from projection so we can plot it
+  /// Get \f$ \pi \f$ and \f$  \phi \f$ from projection so we can plot them
   void getExtraPlotFields();
 
   /// Write AMR hierarchy to file
@@ -431,7 +431,8 @@ public:
   void refine(Real ref_ratio, DisjointBoxLayout a_grids, ProblemDomain a_domain);
 
   /// Do smoothing after regridding
-  void doPostRegridSmoothing(bool a_smoothVel=true, bool a_smoothScalar=true);
+  void doPostRegridSmoothing(bool a_smoothVel=true,
+                             bool a_smoothScalar=true);
 
   /// Set coefficient for smoothing operations
   void setSmoothingCoeff(Real a_coeff);
@@ -456,6 +457,7 @@ protected:
   /// Has a particular variable converged to steady state?
   Real convergedToSteadyState(const int a_var, bool vector=false);
 
+  /// Compute \f$ \partial / \partial t \f$ of some field
   void compute_d_dt(const int a_var, LevelData<FArrayBox>& diff, bool vector = false);
 
   /// Determine if we're solving the full time dependent equation, or just darcy's law
@@ -473,6 +475,7 @@ protected:
   /// Returns \f$ \Delta t \f$
   Real computeDt(Real cfl);
 
+  /// Get largest velocity in domain
   Real getMaxVelocity();
 
   /// Returns \f$ \Delta t \f$
@@ -513,8 +516,8 @@ protected:
                                    LevelData<FluxBox>& edgeScalTotal,
                                    bool converged);
 
-  // Increment flux registers with flux
-  void incrementFluxRegisters(LevelData<FluxBox>& flux, Real fluxMult);
+  /// Increment Enthalpy-Bulk concentration flux registers with flux
+  void incrementHCFluxRegisters(LevelData<FluxBox>& flux, Real fluxMult);
 
   /// Compute total fluxes that provide the source term for implicit enthalpy-salinity updates
   /**
@@ -532,40 +535,44 @@ protected:
   void advectScalar(const int a_scalarVar, const int a_advectionVar,
                     LevelData<FluxBox>& a_advVel, bool doFRupdates = true);
 
+  /// Update a scalar field with advective terms
   void advectScalar(const int a_scalarVar, const int a_advectionVar,
                     LevelData<FluxBox>& a_advVel, bool doFRupdates,
                     LevelData<FluxBox>& flux);
 
+  /// Update flux register for scalar field
   void updateScalarFluxRegister(int a_scalarVar, LevelData<FluxBox>& flux, Real scale);
 
   /// Advect lambda field (for freestream preservation)
   void advectLambda(bool doFRupdates = true);
 
-  /// Time integration by the TGA method (2nd order accurate)
-  //  int TGAUpdateScalar(const int a_scalarVar, LevelData<FArrayBox>&  a_src, const bool converged);
-
-  /// Time integration by the Backward Euler method (1st order accurate)
-  //  int BEUpdateScalar(const int a_scalarVar, LevelData<FArrayBox>&  a_src,
-  //                     const bool converged);
 
   /// Make source term for the advection velocity solve
   void computeAdvectionVelSourceTerm(LevelData<FArrayBox>& advectionSourceTerm);
 
   /// Average vertical fluxes in the horizontal direction
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FluxBox>& a_phi);
+
+  /// Average vertical fluxes in the horizontal direction
   void horizontallyAverage(Vector<Real>& averageVector, LevelData<FluxBox>& a_phi);
+
+  /// Average vertical fluxes in the horizontal direction
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FluxBox>& a_phi, Vector<Real>& averageVector);
 
   /// Average vertical fluxes in the horizontal direction
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FArrayBox>& a_phi);
+
+  /// Average vertical fluxes in the horizontal direction
   void horizontallyAverage(Vector<Real>& averageVector, LevelData<FArrayBox>& a_phi);
 
+  /// Average vertical fluxes in the horizontal direction
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FArrayBox>& a_phi,
                            Vector<Real>& globalAveraged);
 
-  Real averageOverLiquidRegion(int a_val);
+  /// Compute average value of some scalar field over the liquid region of the domain
+  Real averageOverLiquidRegion(int a_var);
 
-  // Calculate advective + diffusive flux
+  /// Calculate advective + diffusive flux
   void getTotalFlux(LevelData<FluxBox>& totalFlux);
 
   /// Compute \f$ \nabla^2 \mathbf{U} \f$
@@ -576,8 +583,6 @@ protected:
   /// Compute \f$ \nabla^2 \phi \f$
   void computeScalDiffusion(const int a_var,
                             LevelData<FArrayBox>& a_lapScal,
-                            //                            LevelData<FArrayBox>& a_scal,
-                            //                            const LevelData<FArrayBox>* a_crseScalPtr
                             Real a_time);
 
 
@@ -586,8 +591,14 @@ protected:
   void computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
                             Real a_time);
 
+  /// Compute \f$ \nabla^2 \psi \f$ for some scalar field \f$ \psi \f$
   void computeScalDiffusion(LevelData<FArrayBox>& a_src, int a_var);
 
+  /// Compute new cell centred velocity
+  /**
+   * Generally done via an implicit update due to the viscous and darcy terms.
+   * Not required if just considering the Darcy equation.
+   */
   void computeCCvelocity(LevelData<FArrayBox>& advectionSourceTerm, Real a_oldTime, Real a_dt,
                          bool doFRupdates = false,
                          bool a_doProjection = true,
@@ -603,7 +614,7 @@ protected:
 
 
 
-  /// FAB version
+  /// Set velocity to zero where porosity is sufficiently small (FArrayBox version)
   void setVelZero(FArrayBox& a_vel, const FArrayBox& a_porosity, const Real a_limit, const int a_radius=0);
 
   /// Returns \f$ \nabla P \f$ at the specified time
@@ -655,6 +666,7 @@ protected:
               LevelData<FArrayBox>& a_diffusiveSrc,
               PatchGodunov& a_patchGod,
               Real a_old_time, Real a_dt);
+
   /// Compute the advective flux
   /**
    * advection var is what we advect
@@ -683,9 +695,6 @@ protected:
                          Real a_dt,
                          bool doFRupdates);
 
-  /// Calculate velocity for momentum equations which are time independent
-  //  void calculateTimeIndependentVelocity(Real calc_time);
-
 
   /// Calculate advection velocity for momentum equations which are time independent
   void calculateTimeIndAdvectionVel(Real a_time, LevelData<FluxBox>& a_advVel);
@@ -693,28 +702,40 @@ protected:
   /// Fill advection velocity ghost cells
   void fillAdvVel(Real time, LevelData<FluxBox>& a_advVel);
 
+  /// Fill the velocity with some analytically determined function
   void fillAnalyticVel(LevelData<FluxBox>& a_advVel);
+
+  /// Fill the velocity with some analytically determined function
   void fillAnalyticVel(FArrayBox& velDir, int dir, int comp, bool project);
+
+  /// Fill the velocity with some analytically determined function
   void fillAnalyticVel(LevelData<FArrayBox>& velDir);
 
+  /// Compute the buoyancy force
   void fillBuoyancy(LevelData<FArrayBox>& a_buoyancy, Real a_time);
 
+  /// Compute the buoyancy force
   void fillBuoyancy(LevelData<FArrayBox>& a_buoyancy,
                     LevelData<FArrayBox>& a_temperature,
                     LevelData<FArrayBox>& a_liquidConc,
                     LevelData<FArrayBox>& a_porosity);
 
+  /// Compute the buoyancy force
+  /**
+   * \f$ \mathbf{B} = \chi ( Ra_T \theta  - Ra_C \Theta_l + \mathbf{F} \cdot \mathbf{k} ) \mathbf{k} \f$
+   */
   void fillBuoyancy(FArrayBox& buoyancy,FArrayBox& temperature, FArrayBox& liquidConc,
                     FArrayBox& porosity,
                     FArrayBox& bodyForce);
 
 
-
+  /// Compute \f$ \nabla P \f$ at time \f$ t \f$
   void fillPressureSrcTerm(LevelData<FArrayBox>& gradP,
                            LevelData<FArrayBox>& porosityCentred,
                            Real a_time,
                            bool a_MACprojection);
 
+  /// Compile velocity and porosity across an AMR hierarchy
   void fillAMRVelPorosity(Vector<LevelData<FArrayBox>*> & amrVel,
                           Vector<RefCountedPtr< LevelData<FluxBox> > > &  amrPorosityFace,
                           Vector<RefCountedPtr< LevelData<FArrayBox> > >& amrPorosity);
@@ -723,6 +744,7 @@ protected:
   void fillHC(LevelData<FArrayBox>& a_phi, Real a_time,
               bool doInterior = true, bool quadInterp = true);
 
+  /// Fill porosity with some fixed value if appropriate
   void fillFixedPorosity(LevelData<FArrayBox>& a_porosity);
 
   /// Should include correct exchange calls
@@ -733,6 +755,7 @@ protected:
   void fillMultiComp(LevelData<FArrayBox>& a_phi, Real a_time, int scal1, int scal2,
                      bool doInterior = true, bool quadInterp = true);
 
+  /// Compile \f$ \lambda \f$ across the entire AMR hierarchy
   void fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda);
 
   /// Calculate analytic solution to this problem (if possible)
@@ -763,11 +786,19 @@ protected:
   /// Initialize pressure across all levels
   void initializeGlobalPressure(Real dtInit=-1, bool init=true);
 
+  /// Compute initial advection velocities
   void computeInitAdvectionVel();
 
+  /// Flag if a new level has been added
   bool newLevelAdded();
 
+  /// Reset \f$ \lambda = 1\f$
   void resetLambda();
+
+  /// Reflux \f$ \lambda \f$ across AMR hierarchy
+  /**
+   * Only call from base level
+   */
   void AMRRefluxLambda();
 
 
@@ -778,6 +809,7 @@ protected:
                          const Vector<Real>& a_amrDx,
                          const Vector<int>& a_refRatios,
                          const int& a_lBase);
+
   /// Smooth the velocity field
   void smoothVelocityField(int a_lbase);
 
@@ -800,10 +832,9 @@ protected:
                                    Real& a_tCoarserNew);
 
   /// Doesn't do any time interpolation - just fills ghost cells if necessary
-  void fillVectorField(LevelData<FArrayBox>& a_vector, Real a_time, int a_var, bool doInterior=false, bool quadInterp=false);
+  void fillVectorField(LevelData<FArrayBox>& a_vector, Real a_time, int a_var,
+                       bool doInterior=false, bool quadInterp=false);
 
-  //	void fillFluxLevel(LevelData<FluxBox>& a_fluxLevel, Real a_time,
-  //			const int a_var);
 
   /// Fill ghost cells of scalar field
   void fillScalars(LevelData<FArrayBox>& a_scal,
@@ -820,14 +851,18 @@ protected:
   void fillScalarFace(LevelData<FluxBox>& a_scal,
                       Real a_time, const int a_var, bool doInterior = false, bool quadInterp = false);
 
+  /// Fill ghost cells of scalar field (edge-centred)
   void fillScalarFace(LevelData<FluxBox>& a_scal,
                       Real a_time, const int a_var, CellToEdgeAveragingMethod method,
                       bool doInterior = false,
                       bool quadInterp = false,
                       Real smoothing = 0.0);
 
+  /// Smooth some scalar field
+  /**
+   * smoothing done implicitly via an elliptic solve
+   */
   void smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing);
-
 
   /// Get boundary conditions for implicit problems
   void getScalarBCs(BCHolder& thisBC, int a_var, bool a_homogeneous);
@@ -851,17 +886,14 @@ protected:
   void convertBCType(const int a_implicitBC,  const Real a_implicitVal,
                      int a_explicitBC, Real a_explicitVal);
 
+  /// Convert implicit BCs
   int convertBCType(const int a_implicitBC);
 
   /// Forcing term for darcy-brinkman test
   void stokesDarcyForcing(LevelData<FArrayBox>& T, Real time);
 
-
   /// Check the simulation hasn't crashed
   bool crashed();
-
-
-  //	void lambda(LevelData<FArrayBox>& a_lambda, Real a_time) const;
 
   /// Operations to keep variables bounded correctly.
   /**
@@ -883,8 +915,6 @@ protected:
   /// Reset all flux registers
   void setFluxRegistersZero();
 
-
-
   /// Copy new data to old data holders
   void copyNewToOldStates();
 
@@ -900,6 +930,7 @@ protected:
   /// Compute and apply volume discrepancy correction (edge centred velocity)
   void computeVolumeDiscrepancyCorrection(LevelData<FluxBox>& a_advVel);
 
+  /// Compute initial \f$ \Delta t \f$
   Real computeDtInit(int finest_level);
 
   /// Get the next coarser level
@@ -916,8 +947,6 @@ protected:
 
   /// Advection velocity
   LevelData<FluxBox>   m_advVel,
-
-  m_advVelExplicitCorrection,
 
   /// Advection velocity at old time
   m_advVelOld,
@@ -1097,38 +1126,35 @@ protected:
   /// switched to 1 because we weren't converging due to single grid cells
   int m_steadyStateNormType;
 
-
   /// Scalar fields at new time
-  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_scalarNew,
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_scalarNew;
 
   /// Scalar fields at old time
-  m_scalarOld,
-
-
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_scalarOld;
 
   /// Backed up scalar fields to be used for restarting
-  m_scalarRestart;
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_scalarRestart;
 
   /// Lagged \f$ \partial \chi / \partial t \f$
   LevelData<FArrayBox> m_dPorosity_dt;
 
   /// Vector fields at new time
-  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_vectorNew,
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_vectorNew;
 
   /// Vector fields at old time
-  m_vectorOld,
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_vectorOld;
 
   /// Change in vector fields
-  m_dVector,
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_dVector;
 
   /// Backed up vector fields to be used for restarting
-  m_vectorRestart;
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_vectorRestart;
 
   /// Names of scalar variables
-  Vector<string> m_scalarVarNames,
+  Vector<string> m_scalarVarNames;
 
   /// Names of vector variables
-  m_vectorVarNames;
+  Vector<string> m_vectorVarNames;
 
   /// TGA integrators (2nd order in time)
   RefCountedPtr<LevelTGA> s_enthalpySalinityTGA;
@@ -1146,10 +1172,7 @@ protected:
   RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >   s_multiCompFASMG;
 
   /// Operator factories for scalar vars
-  //  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > s_diffuseOpFact[m_numScalarVars];
   RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > HCOpFact;
-
-  //  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > m_scalarDiffusionOpFact;
 
   /// bottom solver
   static BiCGStabSolver<LevelData<FArrayBox> >                    s_botSolver;
@@ -1266,13 +1289,11 @@ protected:
    */
   int m_pressureScaleVar;
 
-
-
-
+  /// Solve implicitly for advection velocities
+  /**
+   * Default option is to instead solve explicitly.
+   */
   bool m_implicitAdvectionSolve;
-
-  /// Don't use this anymroe
-  //  bool m_porosityInAdvectionOperator;
 
   /// How to handle velocity advection
   /**
@@ -1314,14 +1335,14 @@ protected:
   m_fineInterpVector;
 
   /// For averaging scalars to coarse grids
-  CoarseAverage m_coarseAverageScalar,
+  CoarseAverage m_coarseAverageScalar;
 
   /// For 2 component enthalpy-salinity fields
-  m_coarseAverageHC,
+  CoarseAverage m_coarseAverageHC;
 
   /// For averaging vectors to coarse grids
-  m_coarseAverageVector;
-  //  Real m_dtNew;
+  CoarseAverage m_coarseAverageVector;
+
 
   /// For reducing the timestep after a failed timestep
   bool m_timestepReduced;
@@ -1399,22 +1420,22 @@ protected:
   AdvectionPhysics m_advectionPhysicsVelocity;
 
   /// Physics for coupled H-C advection solve
-  AdvectionPhysics m_advPhysHC,
+  AdvectionPhysics m_advPhysHC;
 
   /// Physics for coupled T-Sl advection solve
-  m_advPhysTSl,
+  AdvectionPhysics m_advPhysTSl;
 
   /// Physics for H advection solve
-  m_advPhysH,
+  AdvectionPhysics m_advPhysH;
 
   /// Physics for C advection solve
-  m_advPhysC,
+  AdvectionPhysics m_advPhysC;
 
   /// Physics for T advection solve
-  m_advPhysT,
+  AdvectionPhysics m_advPhysT;
 
   /// Physics for Sl advection solve
-  m_advPhysSl;
+  AdvectionPhysics m_advPhysSl;
 
   /// Handles advection of scalar vars
   RefCountedPtr<PatchGodunov> m_patchGodScalars[m_numScalarVars];
@@ -1437,7 +1458,11 @@ protected:
   /// Flux registers for vector variables
   m_vectorFluxRegisters[m_numVectorVars];
 
-  LevelDomainFluxRegister m_saltDomainFluxRegister, m_heatDomainFluxRegister;
+  /// Flux register for salt along the domain edge
+  LevelDomainFluxRegister m_saltDomainFluxRegister,
+
+  /// Flux register for heat (enthalpy) along the domain edge
+  m_heatDomainFluxRegister;
 
   /// Which scalar vars should we bother making flux registers for?
   bool m_makeFluxRegForScalarVar[m_numScalarVars];
@@ -1454,6 +1479,7 @@ protected:
   /// Should we initialise the pressure?
   bool s_initialize_pressures;
 
+  /// Initialize pressure after regridding?
   bool s_regrid_init_pressure;
 
   /// Should we project the initial velocity?
@@ -1522,16 +1548,29 @@ protected:
    */
   int m_iter_plot_interval;
 
+  /// Size of initial perturbation
   Real m_initialPerturbation;
+
+  /// Time to introduce additional perturbation (if relevant)
   Real m_perturbationTime;
+
+  /// Size of additional perturbation
   Real m_delayedPerturbation;
+
+  /// Size of perturbation to add on restart
   Real m_restartPerturbation;
+
+  /// Wavenumber of perturbation
   Real m_perturbationWavenumber;
+
+  /// Whether perturbation should be a sin function (true) or cosine func
   bool m_perturbationSin;
+
+  /// Value determines the fixed porosity for various test problems
   Real m_fixedPorosity;
+
+  /// Porosity function to use for various test problems where we enforce the porosity
   int m_porosityFunction;
-
-
 
 private:
 

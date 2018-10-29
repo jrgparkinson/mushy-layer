@@ -1,8 +1,5 @@
 # -*- Mode: Makefile -*- 
 
-# trace the chain of included makefiles
-#makefiles += releasedExamples_AMRGodunov_execAdvectDiffuse
-
 ## Define the variables needed by Make.example
 
 # the base name(s) of the application(s) in this directory
@@ -21,8 +18,6 @@ LibNames = AMRElliptic AMRTimeDependent AMRTools BoxTools
 EXEC_DIR = .
 base_dir = .
 src_dirs = ../srcSubcycle ../util ../src  ../BCutil 
-# ../muparser-2.2.5/include
-
 
 # input file for 'run' target
 INPUT = inputs

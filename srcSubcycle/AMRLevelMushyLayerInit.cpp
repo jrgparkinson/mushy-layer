@@ -2023,7 +2023,7 @@ void AMRLevelMushyLayer::initialData()
 
 
     m_advVel[dit].setVal(0.0);
-    m_advVelExplicitCorrection[dit].setVal(0.0);
+
 
   }
 
@@ -3202,10 +3202,10 @@ void AMRLevelMushyLayer::createDataStructures()
   m_advVel.define(m_grids, 1, advectionGhost);
   m_advVelOld.define(m_grids, 1, advectionGhost);
   m_advVelNew.define(m_grids, 1, advectionGhost);
-  m_advVelExplicitCorrection.define(m_grids, 1, advectionGhost);
+
   m_frameAdvVel.define(m_grids, 1, advectionGhost);
   m_totalAdvVel.define(m_grids, 1, advectionGhost);
-  //  m_frameVel.define(m_grids, SpaceDim, advectionGhost);
+
   m_saltFluxTop.define(m_grids, SpaceDim);
   m_saltFluxBottom.define(m_grids, SpaceDim);
   m_dPorosity_dt.define(m_grids, 1, advectionGhost);
@@ -3253,7 +3253,7 @@ void AMRLevelMushyLayer::createDataStructures()
     m_advVel[dit].setVal(0.0);
     m_advVelOld[dit].setVal(0.0);
     m_advVelNew[dit].setVal(0.0);
-    m_advVelExplicitCorrection[dit].setVal(0.0);
+
 
     (*m_vectorNew[m_bodyForce])[dit].setVal(0.0);
   }
