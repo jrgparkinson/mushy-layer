@@ -213,3 +213,14 @@ def isPowerOfTwo(n):
         return True
     else:
         return False
+
+def str2arr(string):
+    #print(string)
+    parts = string.split(' ')
+    array = [int(i) for i in parts]
+    return array
+
+def arr2str(array):
+    str_array = [str(a) for a in array]
+    string = ' '.join(str_array)
+    return string
