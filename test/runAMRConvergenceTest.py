@@ -664,7 +664,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
             s.setCustomCommand(analysis_command)
 
             s.writeSlurmFile(runAnalysisName)
-            s.runTask()
+            s.runTask(runAnalysisName)
             print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
 
