@@ -145,7 +145,7 @@ def main(argv):
         params['main.num_cells']='256 512'
 
 		# Physics
-        params['parameters.rayleighComp']     = 350 #100
+        params['parameters.rayleighComp']     = 320 #100
         params['parameters.nonDimReluctance'] = 0.5 #1e-5?
         params['parameters.compositionRatio'] = 1.4
 
