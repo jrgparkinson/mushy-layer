@@ -60,7 +60,7 @@ print('Setup tests for convection in a fixed porous medium')
 physicalProblem = 'convectionDB'
 Nz = 128
 AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz]}, 
-{'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz]}]
+{'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(float(Nz)/2)]}]
 
 #Nzs 	  = [128]
 num_procs = [4]
@@ -69,7 +69,7 @@ chi  = 0.4
 
 # Try and speed things up for now, should eventually make this criteria smaller
 extra_params = {'main.steady_state': 1e-4}
-cfl = 0.1            
+cfl = 0.4            
 extra_params['main.cfl'] = cfl
 extra_params['main.initial_cfl'] = cfl/10
 base_dataFolder = os.path.join(base_output_dir, 'ConvectionDB-cfl' + str(cfl))
@@ -84,11 +84,11 @@ all_job_ids = []
 analysis_command = matlab_command + ' " '
 
 
-
-
 for Da_Ra in Da_Ra_vals:
 	Da = Da_Ra['Da']
 	NuLebars = [str(a) for a in Da_Ra['lebars']]
+
+	extra_params['main.max_time'] = 0.1/float(Da)
 
 	for Ra in Da_Ra['RaT']:
 

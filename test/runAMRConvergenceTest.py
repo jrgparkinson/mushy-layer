@@ -524,10 +524,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
                
             numCellsAMR = str(Nx_coarse) + ' ' + str(Nz_coarse) + '  8'    
-            #gridFile = mushyLayerBaseDir + '/grids/topQuarter/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
-            #gridFile = mushyLayerBaseDir + '/grids/rightHalf/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
-            #
-            #
+            
             
             gridFileQuarter = mushyLayerBaseDir + '/grids/rightQuarter/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
             gridFileThreeLevels = mushyLayerBaseDir + '/grids/rightHalfThreeLevel/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
