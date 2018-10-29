@@ -127,7 +127,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                     
                 params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/DBVariablePorosityConvTest.parameters')
                 
-                runTypes = ['uniform', 'amr', 'variable']
+                #runTypes = ['uniform', 'amr', 'variable']
                 #runTypes = ['uniform', 'amr']
                 #runTypes = ['uniform']
                 #runTypes = ['amr']
@@ -215,14 +215,14 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 params['parameters.porosityFunction'] = '2'
                 params['main.time_integration_order'] = '2'
                 
-                if params['parameters.porosityFunction'] == '1':
-                    output_dir = 'AMRConvergenceTest/DBVariablePorosityLinear'
-                elif params['parameters.porosityFunction'] == '2':
-                    output_dir = 'AMRConvergenceTest/DBVariablePorosityGaussian'
-                else:
-                    output_dir = 'AMRConvergenceTest/DBVariablePorosity'
+                #if params['parameters.porosityFunction'] == '1':
+                #    output_dir = 'AMRConvergenceTest/DBVariablePorosityLinear'
+                #elif params['parameters.porosityFunction'] == '2':
+                #    output_dir = 'AMRConvergenceTest/DBVariablePorosityGaussian'
+                #else:
+                #    output_dir = 'AMRConvergenceTest/DBVariablePorosity'
                     
-                output_dir = output_dir + str(num_proc) + 'proc' + '-t' + integrationTime + '-v2/'
+                #output_dir = output_dir + str(num_proc) + 'proc' + '-t' + integrationTime + '-v2/'
                     
                 
             
