@@ -9,8 +9,8 @@ import getopt
 pythonDir = os.path.abspath(os.pardir)
 sys.path.append(pythonDir)
 from util.mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, str2arr
-from classesMushyLayerRun import MushyLayerRun
-from classe.sSlurmTask import SlurmTask
+from classes.MushyLayerRun import MushyLayerRun
+from classes.SlurmTask import SlurmTask
 
 def main(argv):
     num_proc = 12
