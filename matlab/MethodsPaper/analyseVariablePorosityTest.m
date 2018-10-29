@@ -19,7 +19,8 @@ if nargin < 1
   %  folder = '/AMRConvergenceTest/DBVariablePorosityGaussian1proc-t1.6-v2/';
   %   folder = '/AMRConvergenceTest/MushyDB/';
   %   folder = '/AMRConvergenceTest/MushQuick/';
-     folder = ['/AMRConvergenceTest/',defaultFolder,'/'];
+    % folder = ['/AMRConvergenceTest/',defaultFolder,'/'];
+     base_dir = 'VariablePorosityTest';
 end
 
 if nargin < 2
@@ -40,7 +41,7 @@ if nargin < 5
     fine_res_dir = ['Uniform-',defaultFolder,'-',num2str(fineNumCells),'--0'];
 end
 
-base_dir = getDataDir(folder);
+
 folders = dir(base_dir);
 
 % Restructure data for table
