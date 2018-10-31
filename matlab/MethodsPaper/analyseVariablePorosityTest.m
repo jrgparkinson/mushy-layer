@@ -1,4 +1,4 @@
-function analyseVariablePorosityTest(folder, fineNumCells, redoAnalysis, runAnalysis, fine_res_dir)
+function analyseVariablePorosityTest(base_dir, fineNumCells, redoAnalysis, runAnalysis, fine_res_dir)
 close all;
 
 compName = 'Temperature';
