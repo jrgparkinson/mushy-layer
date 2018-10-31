@@ -110,6 +110,9 @@ public:
     m_numDiagnostics
   };
 
+  /// Specify which diagnostics we should print out
+  void setPrintDiags(Vector<int> a_diagsToPrint);
+
 private:
 
   /// Times at which diagnostics have been calculated
@@ -120,6 +123,9 @@ private:
 
   /// Names of diagnostics
   Vector<string> m_diagnosticNames;
+
+  /// Diagnostics to print out
+  Vector<int> m_diagsToPrint;
 
   /// Timescale for computing moving averages
   Real movingAverageTimescale;
@@ -139,7 +145,10 @@ private:
   /// File to which the latest the diagnostics are written
   m_diagnosticsFileLatest;
 
+  /// Get the index for a certain timestep
   int getIndex(Real a_time);
+
+
 
 };
 

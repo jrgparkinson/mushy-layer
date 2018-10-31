@@ -1189,6 +1189,14 @@ void AMRLevelMushyLayer::initialDataHRL()
 
 void AMRLevelMushyLayer::initialDataConvectionMixedPorous()
 {
+  // First setup diagnostics
+  Vector<int> diagsToPrint;
+
+  diagsToPrint.push_back(m_diagnostics.m_time);
+  diagsToPrint.push_back(m_diagnostics.m_dt);
+  diagsToPrint.push_back(m_diagnostics.m_Nu);
+  m_diagnostics.setPrintDiags(diagsToPrint);
+  // Now do data
   Real initVel = 0;
   ParmParse pp("init");
   pp.query("initVel", initVel);
