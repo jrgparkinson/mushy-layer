@@ -12,7 +12,7 @@ from colorama import Fore, Style
 from util.mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, isPowerOfTwo
 from classes.SlurmTask import SlurmTask
 
-from .AMRConvergenceTest import AMRConvergenceTest
+from AMRConvergenceTest import AMRConvergenceTest
 
 
 def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '', extra_params={}, numRestarts=0):
