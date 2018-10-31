@@ -30,6 +30,7 @@ visitlog.py
 **/execSubcycle/*/*
 **/doc/html/*
 **/doc/latex/*
+**/.idea/
 
 *.cproject
 *.tmp
