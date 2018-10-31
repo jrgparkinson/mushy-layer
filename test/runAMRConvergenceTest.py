@@ -6,9 +6,9 @@ import getopt
 from subprocess import Popen
 from colorama import Fore, Style
 
-parDir = os.path.abspath(os.pardir)
-pythonDir = os.path.join(parDir, 'python')
-sys.path.append(pythonDir)
+#parDir = os.path.abspath(os.pardir)
+#pythonDir = os.path.join(parDir, 'python')
+#sys.path.append(pythonDir)
 from util.mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, isPowerOfTwo
 from classes.SlurmTask import SlurmTask
 
