@@ -18,6 +18,7 @@
 #include "Gradient.H"
 #include "SetValLevel.H"
 #include "CellToEdge.H"
+#include "CellToEdge2.H"
 
 #include <cstdio>
 #include <iostream>
@@ -64,7 +65,7 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
   // Do cell to face averaging
   CellToEdge(shiftedS, fluxFrameAdv);
   CellToEdge(S, fluxFluidAdv);
-  CellToEdge(porosity, porosityEdge, geometricAveraging);
+  CellToEdge2(porosity, porosityEdge, geometricAveraging);
 
   // Compute fluxes
   for (dit.reset(); dit.ok(); ++dit)

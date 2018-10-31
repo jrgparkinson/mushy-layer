@@ -2716,7 +2716,7 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU, Real a_oldT
                                   old_time,  old_crseTime, new_crseTime,
                                   a_dt, m_level, false, comp); // False - don't zero phi
 
-        //        int exitStatus = UstarBE[comp]->exitStatus();
+
       }
       else
       {
@@ -2727,11 +2727,6 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU, Real a_oldT
                                    a_dt, m_level, false, comp);  // False - don't zero phi
       }
 
-//      int temp = 0;
-
-      // OR solve steady darcy brinkman
-
-      //			s_uStarAMRMG[comp]->solve(UstarVectComp, rhsVectComp, m_level, m_level, false, false);
 
 
     } // end loop over components
@@ -3187,8 +3182,8 @@ void AMRLevelMushyLayer::fillAdvVel(Real time, LevelData<FluxBox>& a_advVel)
     bool secondOrderCorners = (CFinterpOrder_advection == 2);
     PiecewiseLinearFillPatchFace patcher(m_grids, crseGrids, 1,
                                          crseDomain, crseRefRatio,
-                                         interpRadius,
-                                         secondOrderCorners);
+                                         interpRadius);
+//                                         secondOrderCorners);
 
     Real timeInterpCoeff = 0;
 
@@ -3617,8 +3612,8 @@ void AMRLevelMushyLayer::computeGradP(LevelData<FArrayBox>& gradP,
     PiecewiseLinearFillPatch filpatcher(m_grids, crseGrids, SpaceDim,
                                         crseDomain, nRefCrse,
                                         velGrow,
-                                        false, // not constant interp
-                                        secondOrderCorners);
+                                        false); // not constant interp
+//                                        secondOrderCorners);
 
     filpatcher.fillInterp(gradP, crseGradP, crseGradP,
                           crse_time_interp_coeff, 0, 0, SpaceDim);
@@ -4575,7 +4570,7 @@ void AMRLevelMushyLayer::fillBuoyancy(LevelData<FArrayBox>& a_buoyancy, Real a_t
     // Fill ghost cells
     PiecewiseLinearFillPatch filpatcher(m_grids, mlCrse->m_grids,
                                         a_buoyancy.nComp(), mlCrse->m_problem_domain, mlCrse->m_ref_ratio, ghost[0],
-                                        false, false);
+                                        false);
 
     Interval scalComps = a_buoyancy.interval();
 
@@ -4846,10 +4841,9 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     pout() << "multiCompAdvectDiffuse -  updated solution" << endl;
   }
 
-
-
   a_phi_new.exchange();
 
+#ifdef CH_FORK
   if (baseLevBE != NULL)
   {
     exitStatus = baseLevBE->exitStatus();
@@ -4859,7 +4853,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     }
 
   }
-
+#endif
 
   // Clean up
   if (coarserDataNewPtr != NULL)
@@ -5398,80 +5392,6 @@ void AMRLevelMushyLayer::updateScalarFluxRegister(int a_scalarVar, LevelData<Flu
   }
 }
 
-//int AMRLevelMushyLayer::TGAUpdateScalar(const int a_scalarVar,
-//                                        LevelData<FArrayBox>& a_src, const bool converged)
-//{
-//  LevelFluxRegister* coarserFRPtr = NULL;
-//  LevelFluxRegister* finerFRPtr = NULL;
-//  LevelData<FArrayBox>* coarserDataOldPtr = NULL;
-//  LevelData<FArrayBox>* coarserDataNewPtr = NULL;
-//  Real tCoarserOld, tCoarserNew;
-//
-//  getCoarseScalarDataPointers(a_scalarVar, &coarserDataOldPtr,
-//                              &coarserDataNewPtr, &coarserFRPtr, &finerFRPtr, tCoarserOld,
-//                              tCoarserNew);
-//
-//  if (!converged)
-//  {
-//    finerFRPtr = NULL;
-//    coarserFRPtr = NULL;
-//  }
-//
-//  s_diffuseLevTGA[a_scalarVar]->updateSoln(*m_scalarNew[a_scalarVar],
-//                                           *m_scalarOld[a_scalarVar], a_src, finerFRPtr, coarserFRPtr,
-//                                           coarserDataOldPtr, coarserDataNewPtr, m_time, tCoarserOld,
-//                                           tCoarserNew, m_dt, m_level, false);
-//
-//  BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister>* baseLevTGA = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*s_diffuseLevTGA[a_scalarVar]));
-//
-//  return baseLevTGA->exitStatus();
-//
-//}
-
-//int AMRLevelMushyLayer::BEUpdateScalar(const int a_scalarVar,
-//                                       LevelData<FArrayBox>& a_src,
-//                                       const bool converged)
-//{
-//  CH_TIME("AMRLevelMushyLayer::BEUpdateScalar");
-//  if (s_verbosity > 5)
-//  {
-//    pout() << "AMRLevelMushyLayer::BEUpdateScalar for var " << a_scalarVar  << endl;
-//  }
-//
-//  MayDay::Error("AMRLevelMushyLayer::BEUpdateScalar no longer implemented");
-//
-//  //  LevelFluxRegister* coarserFRPtr = NULL;
-//  //  LevelFluxRegister* finerFRPtr = NULL;
-//  //  LevelData<FArrayBox>* coarserDataOldPtr = NULL;
-//  //  LevelData<FArrayBox>* coarserDataNewPtr = NULL;
-//  //  Real tCoarserOld, tCoarserNew;
-//  //
-//  //  getCoarseScalarDataPointers(a_scalarVar, &coarserDataOldPtr,
-//  //                              &coarserDataNewPtr, &coarserFRPtr, &finerFRPtr, tCoarserOld,
-//  //                              tCoarserNew);
-//  //
-//  //  // Only update FRs if we've converged
-//  //  if (!converged)
-//  //  {
-//  //    finerFRPtr = NULL;
-//  //    coarserFRPtr = NULL;
-//  //  }
-//  //
-//  //  Real old_time = m_time-m_dt;
-//  //  s_enthalpySalinityBE->updateSoln(*m_scalarNew[a_scalarVar],
-//  //                                          *m_scalarOld[a_scalarVar], a_src, finerFRPtr, coarserFRPtr,
-//  //                                          coarserDataOldPtr, coarserDataNewPtr, old_time, tCoarserOld,
-//  //                                          tCoarserNew, m_dt, m_level, false); //false - don't zero phi
-//  //
-//  //  BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister>* baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*s_enthalpySalinityBE));
-//  //
-//  //  m_scalarNew[a_scalarVar]->exchange();
-//  //
-//  //  return baseLevBE->exitStatus();
-//
-//  return -1;
-//
-//}
 
 
 
@@ -6730,7 +6650,7 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
 
         PiecewiseLinearFillPatch filpatcher(levelGrids, crseGrids, SpaceDim,
                                             crseDomain, nRefCrse, velGrow,
-                                            false, doSecondOrderCorners);
+                                            false); //doSecondOrderCorners);
 
         filpatcher.fillInterp(a_vector, oldCrseVector, newCrseVector,
                               crse_time_interp_coeff, 0, 0, SpaceDim);
@@ -6974,7 +6894,7 @@ void AMRLevelMushyLayer::fillScalarFace(LevelData<FluxBox>& a_scal, Real a_time,
     smoothScalarField(temp, a_var, smoothing);
   }
 
-  CellToEdge(temp, a_scal, method);
+  CellToEdge2(temp, a_scal, method);
 
   // Redo BCs. For now just use extrap. Should eventually do this properly,
 
@@ -7068,9 +6988,11 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     int scalGrow = scalGrowVect[0];
 
     bool doSecondOrderCorners = (CFinterpOrder_advection==2);
+
     PiecewiseLinearFillPatch filpatcher(levelGrids, crseGrids,
                                         a_scal.nComp(), crseDomain, nRefCrse, scalGrow,
-                                        false, doSecondOrderCorners);
+//                                        false, doSecondOrderCorners);
+                                        false);
 
     filpatcher.fillInterp(a_scal, oldCrseScal, newCrseScal,
                           crse_time_interp_coeff,

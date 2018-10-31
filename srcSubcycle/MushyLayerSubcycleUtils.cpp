@@ -175,6 +175,7 @@ defineAMR(AMR&                                          a_amr,
     a_amr.checkpointPrefix(fullPrefix);
   }
 
+#ifdef CH_FORK
   if (ppMain.contains("subcycled_plots"))
   {
     bool subcycledPlots = false;
@@ -188,6 +189,7 @@ defineAMR(AMR&                                          a_amr,
     ppMain.get("chombo_chk_not_plot", makeCheck);
     a_amr.makeChkNotPlot(makeCheck);
   }
+#endif
 
   int verbosity;
   ppMain.get("verbosity",verbosity);
@@ -361,8 +363,7 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
     ppMain.query("restart_newTime", resetTime);
     if (resetTime >= 0 )
     {
-//      a_amr.initialTime(resetTime); // can't do this after we've set up levels due to an assert
-
+#ifdef CH_FORK
       a_amr.cur_time(resetTime);
       Vector<AMRLevel*> amrLev = a_amr.getAMRLevels();
       for (int i=0; i < amrLev.size(); i++)
@@ -371,7 +372,9 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
 
       }
       pout() << "Set time = " << resetTime << endl;
-
+#else
+      MayDay::Warning("Unable to reset time as you're not using the forked version of Chombo, and therefore your AMR class doesn't have a cur_time() method");
+#endif
     }
 
 
