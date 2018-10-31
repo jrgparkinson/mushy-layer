@@ -8,7 +8,7 @@ from colorama import Fore, Style
 #parDir = os.path.abspath(os.pardir)
 #pythonDir = os.path.join(parDir, 'python')
 #sys.path.append(pythonDir)
-from classes.SlurmTask import SlurmTask
+from SlurmTask import SlurmTask
 from runAMRConvergenceTest import runTest
 
 base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'

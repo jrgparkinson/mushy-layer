@@ -9,9 +9,9 @@ parDir = os.path.abspath(os.pardir)
 pythonDir = os.path.join(parDir, 'python')
 sys.path.append(pythonDir)
 
-from classes.MushyLayerRunSimple import MushyLayerRunSimple
-from util.mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, getRestartFile
-from classes.SlurmTask import SlurmTask
+from MushyLayerRunSimple import MushyLayerRunSimple
+from mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, getRestartFile
+from SlurmTask import SlurmTask
 # Params is a vector of params dicts
 
 

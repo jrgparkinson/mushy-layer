@@ -7,7 +7,7 @@ from os.path import isfile, join, exists
 import subprocess
 import socket
 
-from util.mushyLayerRunUtils import readInputs, writeParamsFile
+from mushyLayerRunUtils import readInputs, writeParamsFile
 
 # This class basically just makes the output directory and dumps an input file into it
 # It also performs various sanity checks
