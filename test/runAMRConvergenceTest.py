@@ -10,10 +10,9 @@ parDir = os.path.abspath(os.pardir)
 pythonDir = os.path.join(parDir, 'python')
 sys.path.append(pythonDir)
 from util.mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, isPowerOfTwo
-from classes.MushyLayerRun import MushyLayerRun
 from classes.SlurmTask import SlurmTask
 
-from AMRConvergenceTest import AMRConvergenceTest
+from .AMRConvergenceTest import AMRConvergenceTest
 
 
 def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '', extra_params={}, numRestarts=0):

@@ -9,7 +9,7 @@ parDir = os.path.abspath(os.pardir)
 pythonDir = os.path.join(parDir, 'python')
 sys.path.append(pythonDir)
 
-from classes.MushyLayerRun import MushyLayerRun
+from classes.MushyLayerRunSimple import MushyLayerRunSimple
 from util.mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, getRestartFile
 from classes.SlurmTask import SlurmTask
 # Params is a vector of params dicts
@@ -86,10 +86,7 @@ def AMRConvergenceTest(params, full_output_dir, physicalProblem, Nzs, num_procs 
         # Don't know output dir or exec dir here, MushyLayerRun will fill these in
         s = SlurmTask('', p['concise_run_name'], '', num_proc)
 
-        ml_run = MushyLayerRun(full_output_dir, num_proc, p, subcycled)
-        ml_run.allowMultipleOutputDirs = allowRestarts
-        ml_run.makeSlurmJob = True
-        ml_run.slurmJob = s 
+        ml_run = MushyLayerRunSimple(full_output_dir, num_proc, p, s, allowRestarts, 'mushyLayer2d.Linux.64.mpiCC.gfortran.DEBUG.MPI.ex')
         ml_run.single_run(run_name)
 
         dependencies.append(s.jobID)
