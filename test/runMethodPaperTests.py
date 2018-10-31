@@ -57,9 +57,10 @@ runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extr
 ######################################
 print('Setup tests for convection in a fixed porous medium')
 physicalProblem = 'convectionDB'
-Nz = 128
-AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz]}, 
-{'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(float(Nz)/2)]}]
+Nz_uniform = 128
+Nz_vm = int(float(Nz_uniform)/2)
+AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]}, 
+{'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz_vm]}]
 
 #Nzs 	  = [128]
 num_procs = [4]
@@ -68,7 +69,7 @@ chi  = 0.4
 
 # Try and speed things up for now, should eventually make this criteria smaller
 extra_params = {'main.steady_state': 1e-4}
-cfl = 0.4            
+cfl = 0.35           
 extra_params['main.cfl'] = cfl
 extra_params['main.initial_cfl'] = cfl/10
 base_dataFolder = os.path.join(base_output_dir, 'ConvectionDB-cfl' + str(cfl))
@@ -109,7 +110,7 @@ for Da_Ra in Da_Ra_vals:
 	Ra_str_vals = [str(a) for a in Da_Ra['RaT']]
 	Ra_str = '{\'' + '\',\''.join(Ra_str_vals) + '\'}'
 
-	analysis_command = analysis_command + ' compileNu(\'' + base_dataFolder + '\', \'' +str(chi)+ '\', \'' +str(Da)+ '\', ' +Ra_str+ ', ' +str(Nz)+ ', [' + ','.join(NuLebars)+ ']);' 
+	analysis_command = analysis_command + ' compileNu(\'' + base_dataFolder + '\', \'' +str(chi)+ '\', \'' +str(Da)+ '\', ' +Ra_str+ ', ' +str(Nz_uniform)+ ', ' +str(Nz_vm)+ ', [' + ','.join(NuLebars)+ ']);' 
 
 # Now do analysis
 analysis_command = analysis_command + ' exit; " '
