@@ -26,6 +26,7 @@
 
 /// Advection integrator on a level
 /**
+ * Not currently used in the subcycled code
  */
 class LevelAdvect
 {

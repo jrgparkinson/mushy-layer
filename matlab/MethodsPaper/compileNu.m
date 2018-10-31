@@ -1,4 +1,4 @@
-function compileNu(base_dir, chi, Da, Ra, res, NuLeBars)
+function compileNu(base_dir, chi, Da, Ra, res_uniform,  res_vm, NuLeBars)
 
 % chi=0.4;
 % Da = '0.01';
@@ -17,7 +17,7 @@ AMRPrefix = 'VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-';
 
 %base_dir = getDataDir(['AMRConvergenceTest/ConvectionDB/']);
 
-fprintf('Nx = %d, Da = %s \n', res, Da);
+fprintf('Nx = %d, Da = %s \n', res_uniform, Da);
 for i=1:length(Ra)
     outputFolder = getOutputFolder(Ra{i}, chi, Da);
     
@@ -28,24 +28,24 @@ folder = fullfile(base_dir, outputFolder);
 
 % Get latest sub folder
 j = 0;
-subFolder = [folder,'/', UniformPrefix,num2str(res),'--', num2str(j)];
+subFolder = [folder,'/', UniformPrefix,num2str(res_uniform),'--', num2str(j)];
 while exist(subFolder, 'dir') == 7
     j = j+1;
-    subFolder = [folder,'/', UniformPrefix,num2str(res),'--', num2str(j)];
+    subFolder = [folder,'/', UniformPrefix,num2str(res_uniform),'--', num2str(j)];
 end
-subFolder = [folder,'/', UniformPrefix,num2str(res),'--', num2str(j-1)];
+subFolder = [folder,'/', UniformPrefix,num2str(res_uniform),'--', num2str(j-1)];
 [NuUniform, UniformRunning]= getNuFolder(subFolder);
 
 
 %subFolder = [folder,'/',AMRPrefix,num2str(res),'-ref2--0'];
 
 j = 0;
-subFolder = [folder,'/',AMRPrefix,num2str(res),'--', num2str(j)];
+subFolder = [folder,'/',AMRPrefix,num2str(res_vm),'--', num2str(j)];
 while exist(subFolder, 'dir') == 7
     j = j+1;
-    subFolder = [folder,'/',AMRPrefix,num2str(res),'--', num2str(j)];
+    subFolder = [folder,'/',AMRPrefix,num2str(res_vm),'--', num2str(j)];
 end
-subFolder = [folder,'/',AMRPrefix,num2str(res),'--', num2str(j-1)];
+subFolder = [folder,'/',AMRPrefix,num2str(res_vm),'--', num2str(j-1)];
 [NuAMR, AMRRunning] = getNuFolder(subFolder);
 
 

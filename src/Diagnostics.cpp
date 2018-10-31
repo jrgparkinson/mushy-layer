@@ -72,6 +72,9 @@ Diagnostics::Diagnostics ()
     {
       MayDay::Error("Diagnostics::Diagnostics() - a diagnostic doesn't have a name specified.");
     }
+
+    // Default: print all diagnostics
+    m_diagsToPrint.push_back(i);
   }
 
   movingAverageTimescale = 0;
@@ -268,12 +271,14 @@ void Diagnostics::printHeader()
 
 void Diagnostics::printHeader(std::ofstream& a_file)
 {
-  for (int i = 0; i < m_numDiagnostics; i++)
+  for (int i = 0; i < m_diagsToPrint.size(); i++)
   {
-    a_file << m_diagnosticNames[i];
+    int diag_i = m_diagsToPrint[i];
+
+    a_file << m_diagnosticNames[diag_i];
 
     // Add a comma to separate entries unless it's the final entry
-    if (i < m_numDiagnostics-1)
+    if (i < m_diagsToPrint.size()-1)
     {
       a_file << ",";
     }
@@ -299,14 +304,16 @@ void Diagnostics::printDiagnostics(Real a_time)
 void Diagnostics::printDiagnostics(Real a_time, std::ofstream& a_file)
 {
 
-  for (int i = 0; i < m_numDiagnostics; i++)
+  for (int i = 0; i < m_diagsToPrint.size(); i++)
   {
-    Real diag = getDiagnostic(i, a_time);
+    int diag_i = m_diagsToPrint[i];
+
+    Real diag = getDiagnostic(diag_i, a_time);
 
     a_file << setprecision(10) << diag;
 
     // Add a comma to separate entries unless it's the final entry
-    if (i < m_numDiagnostics-1)
+    if (i < m_diagsToPrint.size()-1)
     {
       a_file << ",";
     }
@@ -329,6 +336,11 @@ int Diagnostics::getIndex(Real a_time)
   }
 
   return index;
+}
+
+void Diagnostics::setPrintDiags(Vector<int> a_diagsToPrint)
+{
+  m_diagsToPrint = a_diagsToPrint;
 }
 
 #include "NamespaceFooter.H"

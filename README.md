@@ -50,6 +50,8 @@ The analysis is performed by matlab scripts located in `/matlab/*`, which must b
 addpath(genpath('/path/to/matlab/'))
 ```
 
+Note that running all the tests will take some time unless you have lots of processors available (i.e. multiple days) and will take up a reasonable amount of disk space (~50GB).
+
 # Running
 The executable in `/execSubcycle/` requires inputs in order to run. These can either be supplied at the command line or, more sensibly, by specifying the location of a file which contains a list of inputs, e.g.
 
