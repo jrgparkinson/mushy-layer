@@ -7,6 +7,8 @@ ebase = mushyLayer
 
 # the location of the Chombo "lib" directory
 CHOMBO_HOME = ../../chombofork/lib
+# Compile with chombo trunk to check everything will work for other users
+#CHOMBO_HOME = ../../Chombo-trunk/lib 
 
 include $(CHOMBO_HOME)/mk/Make.defs
 include $(CHOMBO_HOME)/mk/Make.defs.config
@@ -24,6 +26,8 @@ INPUT = inputs
 
 # shared code for building example programs
 include $(CHOMBO_HOME)/mk/Make.example
+
+CUSTOM_CHOMBO_LIB=true
 
 # application-specific variables
 

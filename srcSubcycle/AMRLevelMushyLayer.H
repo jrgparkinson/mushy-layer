@@ -43,6 +43,7 @@
 #include "VelBCHolder.H"
 
 #include "CellToEdge.H"
+#include "CellToEdge2.H"
 #include "EdgeToCell.H"
 #include "FourthOrderFineInterp.H"
 #include "Divergence.H"

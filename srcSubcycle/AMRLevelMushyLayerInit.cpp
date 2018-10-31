@@ -759,6 +759,7 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
 
   if (m_parameters.m_nondimensionalisation == m_parameters.m_darcyTime_advectiveVel)
   {
+    pout() << "Darcy timescale, advective velocity scale" << endl;
     // To avoid dividing by 0 when Da = Pr = 0
     if (m_parameters.darcy == m_parameters.prandtl)
     {
@@ -779,6 +780,8 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_diffusiveTime_advectiveVel)
   {
+    pout() << "Diffusive timescale, advective velocity scale" << endl;
+
     m_parameters.m_heatDiffusionCoeff = 1.0;
     m_parameters.m_saltDiffusionCoeff = 1/m_parameters.lewis;
     m_parameters.m_viscosityCoeff = m_parameters.prandtl;
@@ -789,6 +792,8 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_darcyTime_darcyVel)
   {
+    pout() << "Darcy timescale, darcy velocity scale" << endl;
+
     m_parameters.m_heatDiffusionCoeff = m_parameters.darcy/m_parameters.prandtl;
     m_parameters.m_saltDiffusionCoeff = m_parameters.m_heatDiffusionCoeff/m_parameters.lewis;
     m_parameters.m_viscosityCoeff = m_parameters.darcy;
@@ -799,6 +804,7 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_advectiveTime_darcyVel)
   {
+    pout() << "Advective timescale, darcy velocity scale" << endl;
     m_parameters.m_heatDiffusionCoeff = 1/(m_parameters.darcy*m_parameters.rayleighTemp);///m_parameters.prandtl;
     m_parameters.m_saltDiffusionCoeff = m_parameters.m_heatDiffusionCoeff/m_parameters.lewis;
     m_parameters.m_viscosityCoeff = m_parameters.prandtl/(m_parameters.darcy*m_parameters.rayleighTemp);
@@ -809,7 +815,8 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_buoyancyTime_advectiveVel)
   {
-    ///todo
+    pout() << "Buoyancy timescale, advective velocity scale" << endl;
+
     Real R = m_parameters.rayleighComposition;
     if (R == 0)
     {

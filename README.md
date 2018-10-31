@@ -38,6 +38,12 @@ $ make all
 # Testing
 `/test/` contains python scripts for running various test problems, which demonstrate the accuracy and efficiency of the code. You can run all the problems via the script `runMethodsPaperTests.py`. 
 
+You must ensure that the `/python/` directory is in your `PYTHONPATH`, i.e. place the following in your ~/.bashrc or similar
+
+```console
+EXPORT PYTHONPATH=PYTHONPATH:/path/to/mushy-layer/python
+```
+
 The analysis is performed by matlab scripts located in `/matlab/*`, which must be added to your matlab path to be executed:
 
 ```matlab
