@@ -10,7 +10,7 @@ from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
 # 3) Convection in a mushy layer with an initial porous hole
 ##########################################################################
 
-def textFixedChillHeleShaw(max_time=100.0, Ra=1e7, Da=5e-5, C=5.0):
+def textFixedChillHeleShaw(max_time=1e6, Ra=2e6, Da=2e-6, C=1.75):
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
@@ -20,7 +20,7 @@ def textFixedChillHeleShaw(max_time=100.0, Ra=1e7, Da=5e-5, C=5.0):
     folderName = "FixedChill-t%1.1f-Ra%.0e-Da%1.1e-C%1.2f" % (max_time, Ra, Da, C)
     dataFolder = os.path.join(base_output_dir, folderName)
 
-    Nz_uniform = 128
+    Nz_uniform = 256
     Nz_amr_2 = int(float(Nz_uniform) / 2)
     Nz_amr_4 = int(float(Nz_uniform) / 4)
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]},
@@ -29,7 +29,7 @@ def textFixedChillHeleShaw(max_time=100.0, Ra=1e7, Da=5e-5, C=5.0):
                 {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]}]
 
     # While testing:
-    Nz_uniform = [64]
+    Nz_uniform = [128]
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
 
     # Nzs 	  = [16, 32, 64]
@@ -39,12 +39,12 @@ def textFixedChillHeleShaw(max_time=100.0, Ra=1e7, Da=5e-5, C=5.0):
 
     # figureName = os.path.join(dataFolder, 'noFlow.pdf')
     #fine_res_folder = 'Uniform-' + physicalProblem + '-' + str(Nz_uniform[-1]) + '--0'
-    #analysis_command = matlab_command + ' "analyseVariablePorosityTest(\'' + dataFolder + '\', ' + str(
-    #    Nz_uniform[-1]) + ', true, true, \'' + fine_res_folder + '\'); exit;"'
-    analysis_command = '' # No analysis yet. Eventually should collate run times, make some plots, and maybe compute differences between solutions
+    analysis_command = matlab_command + ' "processFixedChill(\'' + dataFolder + '\'); exit;"'
+    #analysis_command = '' # No analysis yet. Eventually should collate run times, make some plots, and maybe compute differences between solutions
 
     # Run
     extra_params = {'main.max_time':max_time, 'parameters.rayleighComp':Ra, 'parameters.darcy': Da, 'parameters.compositionRatio':C }
+
     runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 
 def main(argv):

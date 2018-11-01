@@ -208,7 +208,10 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 
                 Nx_coarse = Nz_coarse
                 gridFile = mushyLayerBaseDir + '/grids/topMiddle/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
-                
+
+
+
+                params['main.max_dt'] = 10.0 / (params['parameters.darcy']*params['parameters.rayleighComp'])
 
                 pltInt = int(200.0*float(Nz_coarse)/64.0)
                 params['main.plot_interval'] = str(pltInt)
