@@ -5,23 +5,13 @@ from colorama import Fore, Style
 #Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 #Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
-#parDir = os.path.abspath(os.pardir)
-#pythonDir = os.path.join(parDir, 'python')
-#sys.path.append(pythonDir)
 from SlurmTask import SlurmTask
 from runAMRConvergenceTest import runTest
 
 base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
 
-if os.path.exists(base_output_dir):
-	# check empty
-	#if os.listdir(base_output_dir) :
-	#	print(Fore.RED + 'Warning - output directory not empty \n')
-	#	print(Style.RESET_ALL)
-	pass
-				
-else:
+if not os.path.exists(base_output_dir):
     os.makedirs(base_output_dir)
 
 parDir = os.path.abspath(os.pardir)
@@ -69,7 +59,7 @@ chi  = 0.4
 
 # Try and speed things up for now, should eventually make this criteria smaller
 extra_params = {'main.steady_state': 1e-4}
-cfl = 0.4           
+cfl = 0.45
 extra_params['main.cfl'] = cfl
 extra_params['main.initial_cfl'] = cfl/10
 base_dataFolder = os.path.join(base_output_dir, 'ConvectionDB-cfl' + str(cfl))
