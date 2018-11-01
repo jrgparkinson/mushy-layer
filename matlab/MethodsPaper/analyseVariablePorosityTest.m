@@ -1,4 +1,4 @@
-function analyseVariablePorosityTest(base_dir, Nzs, redoAnalysis, runAnalysis, fine_res_dir)
+function analyseVariablePorosityTest(base_dir, Nzs, redoAnalysis, runAnalysis, uniform_prefix)
 close all;
 
 compName = 'Temperature';
@@ -28,8 +28,13 @@ if nargin < 4
 end
 
 if nargin < 5
-fine_res_dir = ['Uniform-DBVariablePorosity-',num2str(fineNumCells),'--0'];
+    uniform_prefix = 'Uniform-DBVariablePorosity-';
 end
+
+fine_res_dir = [uniform_prefix,num2str(fineNumCells),'--0'];
+
+% For uniform grids
+computeRichardsonError(base_dir, uniform_prefix)
 
 
 folders = dir(base_dir);
@@ -110,6 +115,8 @@ for i=1:length(runs)
         
         numCells = getNumCells(folders(j).name);
         
+        
+        
         ref = 1;
         maxLev = 0;
        
@@ -131,6 +138,13 @@ for i=1:length(runs)
             continue
         end
         
+        exponent = 1+log(numCells*totalRefinement)/log(2) - log(Nzs(1))/log(2);
+        
+        if exponent < 1
+            fprintf('Skipping Nz < min(Nz specified) - skipping');
+            continue;
+        end
+        
         
         if numCells*totalRefinement == fineNumCells/2 && maxLev<2 ...
                 && (length(strfind(folders(j).name, 'AMR') ) > 0 || length(strfind(folders(j).name, 'Uniform') ) > 0)
@@ -150,10 +164,6 @@ for i=1:length(runs)
            performance(index).folder = folders(j).name;
         end
         
-        %numCells = strrep(folders(j).name, runs{i}, '');
-        %numCells = strrep(numCells, '-ref2--0', '');
-        %numCells = strrep(numCells, '--0', '');
-        %numCells = str2num(numCells);
         
         
         
@@ -163,7 +173,7 @@ for i=1:length(runs)
         end
         thisNumCells(i, j) = numCells;
         
-        exponent = log(numCells)/log(2) - log%(Nz(1))/log(2);
+        
         thisErrStruct = errStruct(exponent);
         
         if strfind(folders(j).name, 'Uniform')
@@ -171,7 +181,7 @@ for i=1:length(runs)
            
            
            % Also get richardson error
-            richardsonErrorFile = fullfile(folder_dir, 'richardsonError.mat');
+            File = fullfile(folder_dir, 'richardsonError.mat');
             if exist(richardsonErrorFile, 'file') ~= 2
                 continue
             end

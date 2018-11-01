@@ -17,7 +17,7 @@ folders = dir([output_folder, prefix, '*']);
 
 parfor i=1:length(folders)
    folderName = folders(i).name;
-   coarseDir = [output_folder, folderName, '/'];
+   coarseDir = fullfile(output_folder, folderName);
    
    numCells = getNumCells(folderName);
    
@@ -26,10 +26,10 @@ parfor i=1:length(folders)
    
    
    
-   if exist([output_folder, finerFolder], 'dir')
+   if exist(fullfile(output_folder, finerFolder), 'dir')
       % Compare the two
       %coarseML = getFinalPlotFile([output_folder, folderName, '/']);
-      fineML = getFinalPlotFile([output_folder, finerFolder, '/']);
+      fineML = getFinalPlotFile(fullfile(output_folder, finerFolder));
       
       computeAMRerror(coarseDir, fineML, true, 'richardsonError.mat', 'richardsonErr')
    end
