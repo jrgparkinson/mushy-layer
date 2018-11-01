@@ -64,15 +64,17 @@ end
 
 if runAnalysis
     tic;
-    HighResFile = getFinalPlotFile([base_dir, fine_res_dir, '/']);
+    HighResFile = getFinalPlotFile(fullfile(base_dir, fine_res_dir));
     fprintf('Loaded high res file (%1.3f seconds) \n', toc);
 
     tic;
     parfor i=1:length(folders)
         folder = folders(i);
         folderName = folder.name;
+        
+        fullFolder = fullfile(base_dir, folderName);
 
-        if exist([base_dir, folderName], 'dir') ~= 7
+        if exist(fullFolder, 'dir') ~= 7
             continue
         end
 
@@ -84,9 +86,8 @@ if runAnalysis
                 continue
             end
 
-
             fprintf('%s \n', folder.name);
-            computeAMRerror([base_dir, folderName, '/'], HighResFile, redoAnalysis);
+            computeAMRerror(fullFolder, HighResFile, redoAnalysis);
         end
     end
 
@@ -94,22 +95,18 @@ if runAnalysis
 
 end
 
-
-
 % Now that all files have been analysed, plot the results
 runs = getRuns(base_dir);
-
-
 
 thisRunTime = NaN*ones(length(runs), 10);
     thisError = thisRunTime;
     thisNumCells = thisRunTime;
 
 for i=1:length(runs)
-    folders = dir([base_dir, runs{i}, '*']);
+    folders = dir([fullfile(base_dir, runs{i}), '*']);
     
     for j=1:length(folders)
-        folder_dir = [base_dir, folders(j).name];
+        folder_dir = fullfile(base_dir, folders(j).name);
         fprintf('%s \n', folders(j).name);
         
         errorFile = [folder_dir, '/errorAnalysis.mat'];
@@ -401,9 +398,6 @@ for j=1:length(performance)
 end
 
 
-
-
-temp=0;
 
 
 end

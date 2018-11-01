@@ -34,8 +34,8 @@ def testFixedPorousHole():
 
     # figureName = os.path.join(dataFolder, 'noFlow.pdf')
     fine_res_folder = 'Uniform-DBVariablePorosity-' + str(Nz_uniform[-1]) + '--0';
-    analysis_command = matlab_command + ' "analyseVariablePorosityTest(\' ' + dataFolder + '\', ' + str(
-        Nz_uniform[-1]) + ', true, true, \' ' + fine_res_folder + '\'); exit;"'
+    analysis_command = matlab_command + ' "analyseVariablePorosityTest(\'' + dataFolder + '\', ' + str(
+        Nz_uniform[-1]) + ', true, true, \'' + fine_res_folder + '\'); exit;"'
 
     # Run
     extra_params = {}

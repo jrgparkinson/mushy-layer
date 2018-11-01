@@ -12,7 +12,7 @@ from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
 # Just run for a single grid resolution and compare to previously published values
 ######################################
 
-def testUniformPorousConvection(cfl=0.4, Nz_uniform=128):
+def testUniformPorousConvection(cfl=0.4, Nz_uniform=128, Nz_vm=-1):
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
@@ -20,11 +20,13 @@ def testUniformPorousConvection(cfl=0.4, Nz_uniform=128):
     print(Fore.GREEN + 'Setup tests for convection in a fixed uniform porous medium' + Style.RESET_ALL)
     physicalProblem = 'convectionDB'
     #Nz_uniform = 128
-    Nz_vm = int(float(Nz_uniform) / 2)
+    if Nz_vm <= 0:
+        Nz_vm = Nz_uniform #int(float(Nz_uniform) / 2)
+
     AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]},
                 {'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz_vm]}]
 
-    # Nzs 	  = [128]
+
     num_procs = [4]
     chi = 0.4
 
@@ -73,22 +75,17 @@ def testUniformPorousConvection(cfl=0.4, Nz_uniform=128):
 
         # Now do analysis
     analysis_command = analysis_command + ' exit; " '
-    # analysis_command = '(base_dir, chi, Da, Ra, res)'
 
     runAnalysisName = 'runAnalysis.sh'
 
-    # Don't redo analysis if job already exists
-    # if os.path.exists(os.path.join(base_dataFolder, runAnalysisName)):
-    #
-    #	print(Fore.YELLOW + 'Analysis job already submitted \n' + Fore.RESET)
-    # else:
+
     jobName = physicalProblem + '-analysis'
     s = SlurmTask(base_dataFolder, jobName, '')
 
     s.setDependency(all_job_ids)
     s.setCustomCommand(analysis_command)
-    s.writeSlurmFile()
-    s.runTask()
+    s.writeSlurmFile(runAnalysisName)
+    s.runTask(runAnalysisName)
     print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
 
@@ -98,12 +95,13 @@ def main(argv):
     # Unknown values:
     Nz = -1
     cfl = -1
+    Nz_vm = -1
 
     try:
-       opts, args = getopt.getopt(argv,"n:c:")
+       opts, args = getopt.getopt(argv,"n:v:c:")
     except getopt.GetoptError as err:
         print(str(err))
-        print('testUniformPorousConvection.py -n<num z gird points> -c<cfl>')
+        print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points> -c<cfl>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -111,6 +109,8 @@ def main(argv):
             Nz = int(arg)
         elif opt in ("-c"):
             cfl = float(arg)
+        elif opt in ("-v"):
+            Nz_vm = int(arg)
 
     # Only pass in the defined arguments
 
@@ -118,8 +118,10 @@ def main(argv):
         testUniformPorousConvection()
     elif Nz < 0:
         testUniformPorousConvection(cfl)
-    else:
+    elif Nz_vm < 0:
         testUniformPorousConvection(cfl, Nz)
+    else:
+        testUniformPorousConvection(cfl, Nz, Nz_vm)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
