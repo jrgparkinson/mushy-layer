@@ -14,7 +14,7 @@ if nargin < 2
     base_dir = '/home/parkinsonjl/mnt/sharedStorage/AMRConvergenceTest/DBVariablePorosityGaussian1proc/';
     AMRDir = [base_dir,  'AMR-Subcycle-Reflux-Freestream0.48-MaxLevel1-DBVariablePorosity-64-ref2--0/'];
     HighResDir = [base_dir, 'Uniform-DBVariablePorosity-256--0/'];
-    HighResFile =   getFinalPlotFile(HighResDir);
+    HighResFile = getFinalPlotFile(HighResDir);
 end
 
 if nargin < 3
@@ -80,7 +80,6 @@ exactSol = ChomboCompare(HighResFile);
 compNames = fieldnames(AMRPlotFile.components);
 
 % Compute error
-
 compsToCompute = [AMRPlotFile.components.xAdvectionvelocity, ...
    AMRPlotFile.components.Temperature, ...
    AMRPlotFile.components.xDarcyvelocity];

@@ -25,7 +25,7 @@ def testFixedPorousHole():
                 {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
 
     # While testing:
-    # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}];
+
 
     # Nzs 	  = [16, 32, 64]
     num_procs = [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
@@ -33,9 +33,8 @@ def testFixedPorousHole():
     # Setup up the post processing command
 
     # figureName = os.path.join(dataFolder, 'noFlow.pdf')
-    fine_res_folder = 'Uniform-DBVariablePorosity-' + str(Nz_uniform[-1]) + '--0';
-    analysis_command = matlab_command + ' "analyseVariablePorosityTest(\'' + dataFolder + '\', ' + str(
-        Nz_uniform[-1]) + ', true, true, \'' + fine_res_folder + '\'); exit;"'
+    fine_res_folder = 'Uniform-DBVariablePorosity-' + str(Nz_uniform[-1]) + '--0'
+    analysis_command = matlab_command + ' "analyseVariablePorosityTest(\'' + dataFolder + '\', ' + ',['.join([str(a) for a in Nz_uniform]) + '], true, true, \'' + fine_res_folder + '\'); exit;"'
 
     # Run
     extra_params = {}

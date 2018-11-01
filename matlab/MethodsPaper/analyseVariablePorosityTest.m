@@ -1,4 +1,4 @@
-function analyseVariablePorosityTest(base_dir, fineNumCells, redoAnalysis, runAnalysis, fine_res_dir)
+function analyseVariablePorosityTest(base_dir, Nzs, redoAnalysis, runAnalysis, fine_res_dir)
 close all;
 
 compName = 'Temperature';
@@ -15,8 +15,9 @@ if nargin < 1
 end
 
 if nargin < 2
-    fineNumCells = 512;
+    Nzs = [16,32,64,128];
 end
+fineNumCells = Nzs(end);
 
 if nargin < 3
     redoAnalysis = false;
@@ -33,14 +34,12 @@ end
 
 folders = dir(base_dir);
 
-% Restructure data for table
-% consider 2^4 to 2^8
-numCellsOffset = 3;
-
-for j=numCellsOffset+1:(log(fineNumCells)/log(2) -1 )
+for j=1:length(Nzs)
+   Nz = Nzs(j);
+    
    thisErrStruct = struct();
    
-   thisErrStruct.numCells = 2^j;
+   thisErrStruct.numCells = Nz;
    thisErrStruct.singleLevel = NaN;
    thisErrStruct.richardson = NaN;
    thisErrStruct.rate = NaN;
@@ -48,7 +47,7 @@ for j=numCellsOffset+1:(log(fineNumCells)/log(2) -1 )
    thisErrStruct.nref4 = NaN;
    thisErrStruct.nref22 = NaN;
       
-   errStruct(j-numCellsOffset) = thisErrStruct;
+   errStruct(j) = thisErrStruct;
 end
 
 if runAnalysis
@@ -58,6 +57,7 @@ if runAnalysis
     fprintf('Loaded high res file (%1.3f seconds) \n', toc);
 
     tic;
+    
     parfor i=1:length(folders)
         folder = folders(i);
         folderName = folder.name;
@@ -68,7 +68,7 @@ if runAnalysis
             continue
         end
 
-        if length(folderName) > 3 && ~strcmp(folderName, fine_res_dir)
+        if length(folderName) > 3 && ~strcmp(folderName, fine_res_dir) && ~strcmp(folderName, 'errPlots')
             fprintf('Considering %s \n', folderName);
             skip = false;
             thisNumCells = getNumCells(folderName);
@@ -163,7 +163,7 @@ for i=1:length(runs)
         end
         thisNumCells(i, j) = numCells;
         
-        exponent = log(numCells)/log(2) - numCellsOffset;
+        exponent = log(numCells)/log(2) - log%(Nz(1))/log(2);
         thisErrStruct = errStruct(exponent);
         
         if strfind(folders(j).name, 'Uniform')
