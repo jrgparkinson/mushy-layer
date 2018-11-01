@@ -325,6 +325,9 @@ public:
   /// Initial data for mushy layer simulations
   void initialDataMushyLayer();
 
+  /// Mushy layer with a porous hole in the middle
+  void initialDataPorousHole();
+
   /// Initial data for a test case with regions of zero porosity
   void initialDataZeroPorosityTest();
 

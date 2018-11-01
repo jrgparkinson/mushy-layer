@@ -1592,6 +1592,54 @@ void AMRLevelMushyLayer::initialDataZeroPorosityTest()
     }
   }
 }
+
+void AMRLevelMushyLayer::initialDataPorousHole()
+{
+  ParmParse pp("main");
+
+  DataIterator dit = m_grids.dataIterator();
+
+    Real HTop = m_parameters.bcValEnthalpyHi[1];
+    Real HBottom = m_parameters.bcValEnthalpyLo[1];
+    Real ThetaTop = m_parameters.bcValBulkConcentrationHi[1];
+    Real ThetaBottom = m_parameters.bcValBulkConcentrationLo[1];
+
+    Real thetaBottom = m_parameters.bcValTemperatureLo[1];
+    Real thetaTop = m_parameters.bcValTemperatureHi[1];
+    Real ThetaLTop = m_parameters.bcValLiquidConcentrationHi[1];
+
+  if (porousHole)
+   {
+     Real cx = m_domainWidth/2;
+     Real cy = m_domainHeight/2;
+
+     Real initVelScale = 1e-3;
+     pp.query("initVelScale", initVelScale);
+
+     for (dit.reset(); dit.ok(); ++dit)
+     {
+       BoxIterator bit((*m_scalarNew[0])[dit].box());
+       for (bit.reset(); bit.ok(); ++bit)
+       {
+         IntVect iv = bit();
+         RealVect loc;
+         getLocation(iv, loc, m_dx);
+
+         (*m_scalarNew[m_enthalpy])[dit](iv) = HTop + (HBottom-HTop)*exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2))/(pow(radius,2)));
+         (*m_scalarNew[m_bulkConcentration])[dit](iv) = ThetaTop + (ThetaBottom-ThetaTop)*exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2))/(pow(radius,2)));
+
+         (*m_vectorNew[m_fluidVel])[dit](iv, 1) = initVelScale*sin(M_PI*loc[0]/m_domainWidth);
+         (*m_vectorNew[m_fluidVel])[dit](iv, 0) = 0;
+
+         (*m_vectorNew[m_bodyForce])[dit](iv, 1) =  m_parameters.m_buoyancySCoeff*ThetaLTop \
+             - m_parameters.m_buoyancyTCoeff*thetaTop ;
+
+       }
+     }
+   }
+
+}
+
 void AMRLevelMushyLayer::initialDataMushyLayer()
 {
 
@@ -1606,8 +1654,8 @@ void AMRLevelMushyLayer::initialDataMushyLayer()
   Real mushHeight = m_domainHeight/2;
   pp.query("summerProfileMushHeight", mushHeight);
 
-  bool porousHole = false;
-  pp.query("porousHole", porousHole);
+//  bool porousHole = false;
+//  pp.query("porousHole", porousHole);
 
   bool linearGradient = false;
   pp.query("initLinear", linearGradient);
@@ -1633,36 +1681,7 @@ void AMRLevelMushyLayer::initialDataMushyLayer()
   Real thetaTop = m_parameters.bcValTemperatureHi[1];
   Real ThetaLTop = m_parameters.bcValLiquidConcentrationHi[1];
 
-  if (porousHole)
-  {
-    Real cx = m_domainWidth/2;
-    Real cy = m_domainHeight/2;
-
-    Real initVelScale = 1e-3;
-    pp.query("initVelScale", initVelScale);
-
-    for (dit.reset(); dit.ok(); ++dit)
-    {
-      BoxIterator bit((*m_scalarNew[0])[dit].box());
-      for (bit.reset(); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-        RealVect loc;
-        getLocation(iv, loc, m_dx);
-
-        (*m_scalarNew[m_enthalpy])[dit](iv) = HTop + (HBottom-HTop)*exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2))/(pow(radius,2)));
-        (*m_scalarNew[m_bulkConcentration])[dit](iv) = ThetaTop + (ThetaBottom-ThetaTop)*exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2))/(pow(radius,2)));
-
-        (*m_vectorNew[m_fluidVel])[dit](iv, 1) = initVelScale*sin(M_PI*loc[0]/m_domainWidth);
-        (*m_vectorNew[m_fluidVel])[dit](iv, 0) = 0;
-
-        (*m_vectorNew[m_bodyForce])[dit](iv, 1) =  m_parameters.m_buoyancySCoeff*ThetaLTop \
-            - m_parameters.m_buoyancyTCoeff*thetaTop ;
-
-      }
-    }
-  }
-  else if (summerProfile > 0)
+ if (summerProfile > 0)
   {
     Real blScale = 0.00001;
 
@@ -2042,57 +2061,79 @@ void AMRLevelMushyLayer::initialData()
 
   }
 
-  // May want to overwrite default options for some problems
-  switch(m_parameters.physicalProblem)
+  ParmParse pp("main");
+
+  // If we've specified some custom initial data, deal with it here
+  if (pp.contains("initData"))
   {
-    case MushyLayerParams::m_sidewallHeating:
-      initialDataSidewallHeating();
-      break;
-    case MushyLayerParams::m_HRL:
-      initialDataHRL();
-      break;
-    case MushyLayerParams::m_convectionMixedPorous:
-      initialDataConvectionMixedPorous();
-      break;
-    case MushyLayerParams::m_rayleighBenard:
-      initialDataRayleighBenard();
-      break;
-    case MushyLayerParams::m_cornerFlow:
-      initialDataCornerFlow();
-      break;
-    case  MushyLayerParams::m_mushyLayer:
-      initialDataMushyLayer();
-      break;
-    case MushyLayerParams::m_poiseuilleFlow:
-      initialDataPoiseuille();
-      break;
-    case MushyLayerParams::m_soluteFluxTest:
-      initialDataSoluteFlux();
-      break;
-    case MushyLayerParams::m_refluxTest:
-      initialDataRefluxTest();
-      break;
-    case MushyLayerParams::m_zeroPorosityTest:
-      initialDataZeroPorosityTest();
-      break;
-    case MushyLayerParams::m_meltingIceBlock:
-      initialDataIceBlock();
-      break;
-    case MushyLayerParams::m_diffusion:
-      initialDataDiffusion();
-      break;
-    case MushyLayerParams::m_vortexPair:
-      initialDataVortexPair();
-      break;
+    int initData = -1;
+    pp.query("initData", initData);
 
+    switch(initData)
+    {
+      case 1:
+        initialDataPorousHole();
+        break;
+      default:
+        initialDataDefault();
+    }
 
-    default:
-      initialDataDefault();
-      //          case MushyLayerParams::m_:
-      //            initialData(x, y, valNew, scalarVar, -1);
-      //            break;
   }
+  else
+  {
 
+    // May want to overwrite default options for some problems
+    switch(m_parameters.physicalProblem)
+    {
+      case MushyLayerParams::m_sidewallHeating:
+        initialDataSidewallHeating();
+        break;
+      case MushyLayerParams::m_HRL:
+        initialDataHRL();
+        break;
+      case MushyLayerParams::m_convectionMixedPorous:
+        initialDataConvectionMixedPorous();
+        break;
+      case MushyLayerParams::m_rayleighBenard:
+        initialDataRayleighBenard();
+        break;
+      case MushyLayerParams::m_cornerFlow:
+        initialDataCornerFlow();
+        break;
+      case  MushyLayerParams::m_mushyLayer:
+        initialDataMushyLayer();
+        break;
+      case MushyLayerParams::m_poiseuilleFlow:
+        initialDataPoiseuille();
+        break;
+      case MushyLayerParams::m_soluteFluxTest:
+        initialDataSoluteFlux();
+        break;
+      case MushyLayerParams::m_refluxTest:
+        initialDataRefluxTest();
+        break;
+      case MushyLayerParams::m_zeroPorosityTest:
+        initialDataZeroPorosityTest();
+        break;
+      case MushyLayerParams::m_meltingIceBlock:
+        initialDataIceBlock();
+        break;
+      case MushyLayerParams::m_diffusion:
+        initialDataDiffusion();
+        break;
+      case MushyLayerParams::m_vortexPair:
+        initialDataVortexPair();
+        break;
+
+
+      default:
+        initialDataDefault();
+        //          case MushyLayerParams::m_:
+        //            initialData(x, y, valNew, scalarVar, -1);
+        //            break;
+    }
+
+  }
   addMeltPond();
 
   if(m_parameters.physicalProblem == MushyLayerParams::m_poiseuilleFlow)

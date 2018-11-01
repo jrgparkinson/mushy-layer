@@ -366,44 +366,21 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 runTypes = ['uniform']
                 params['projection.eta'] = 0.0 # stop some issues which arise from running with the OPT code on a 64x64 grid for some reason
 
-            elif physicalProblem == 'MushyConvectionLiquid' or physicalProblem == 'MushyConvectionLiquid2':
-                
+            elif physicalProblem == 'PorousMushyHole' or physicalProblem == 'MushyConvectionLiquid' or physicalProblem == 'MushyConvectionLiquid2':
 
-                params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/'+physicalProblem+'.parameters')
+                params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/porousMushyHole.parameters')
 
                 # For short sim:
                 dt64 = 0.000125
                 maxTime = 0.001
-                
-               
 
-                # For longer sim:
+                sameDt = 0.0005
+                dt64 = sameDt
+                maxTime = dt64*2*80 #sameDt*100 #93
 
-                sameDt = -1
-                
+                maxTime = 0.5
+                sameDt=-1
 
-                if  physicalProblem == 'MushyConvectionLiquid2':
-                    dt64 = 0.01
-                    dt64 = 0.016
-
-                    maxTime = 0.0001 #0.04
-                    sameDt = 0.0005
-                    dt64 = sameDt
-                    maxTime = dt64*2*80 #sameDt*100 #93
-
-                    maxTime = 0.5
-                    #sameDt = 0.0001
-
-
-                    #params['main.radius']=0.1
-
-                    sameDt=-1
-
-                    params['bc.bulkConcentrationLoVal']='-1 -1'
-
-                else:
-                    maxTime = 0.1
-                    dt64 = 0.0005
 
                 #dt64 = 0.001                
                 #params['main.radius']=0.005
@@ -414,7 +391,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 #params['main.radius']=0.01
                 #params['parameters.rayleighTemp']=1e7
 
-                output_dir = 'AMRConvergenceTest/'+physicalProblem+'-t' + str(maxTime) + '/'
+                output_dir = physicalProblem+'-t' + str(maxTime) + '/'
                 #output_dir = 'AMRConvergenceTest/'+physicalProblem+'-t' + str(maxTime) + '-1proc/'
                 
 
@@ -469,10 +446,10 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
 
                 #runTypes = ['uniform', 'amr', 'variable']
-                if Nx_coarse < Nzs[-1]/finestRefinement:
-                    runTypes = ['uniform', 'amr']
-                else:
-                    runTypes = ['uniform']
+                #if Nx_coarse < Nzs[-1]/finestRefinement:
+                #    runTypes = ['uniform', 'amr']
+                #else:
+                #    runTypes = ['uniform']
 
                 #runTypes = ['uniform']   
                 #params['projection.eta'] = 0.0 # stop some issues which arise from running with the OPT code on a 64x64 grid for some reason
