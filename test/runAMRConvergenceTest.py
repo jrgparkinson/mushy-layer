@@ -3,15 +3,11 @@ import os
 import sys
 import math
 import getopt
-from subprocess import Popen
 from colorama import Fore, Style
 
-#parDir = os.path.abspath(os.pardir)
-#pythonDir = os.path.join(parDir, 'python')
-#sys.path.append(pythonDir)
+
 from mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, isPowerOfTwo
 from SlurmTask import SlurmTask
-
 from AMRConvergenceTest import AMRConvergenceTest
 
 
@@ -115,7 +111,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
             elif physicalProblem == 'DBVariablePorosity':
                 integrationTime = '1.6'
                 
-                Nx_coarse = Nz_coarse;
+                Nx_coarse = Nz_coarse
                 
                 if ref_rat == 2:
                     gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(Nx_coarse) + 'x' + str(Nz_coarse)           
