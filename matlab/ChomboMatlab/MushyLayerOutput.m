@@ -14,11 +14,7 @@ classdef MushyLayerOutput < ChomboOutput
             
             m.subcycled = subcycled;
             
-            % if m.subcycled
-            %     m.components = MushyLayerComponentsSubcycle(m.components);
-            % else
-            %     m.components = MushyLayerComponents(m.components);
-            % end
+            
             
         end
         
