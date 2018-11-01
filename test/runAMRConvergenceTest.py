@@ -391,7 +391,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 #params['main.radius']=0.01
                 #params['parameters.rayleighTemp']=1e7
 
-                output_dir = physicalProblem+'-t' + str(maxTime) + '/'
+                output_dir = '' # physicalProblem+'-t' + str(maxTime) + '/'
                 #output_dir = 'AMRConvergenceTest/'+physicalProblem+'-t' + str(maxTime) + '-1proc/'
                 
 
@@ -411,7 +411,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 else:
                     params['main.fixed_dt'] = dt #dt
 
-                params['main.max_time'] = maxTime
+                #params['main.max_time'] = maxTime
 
                 pltInt = int(math.ceil(4*float(Nz_coarse)/32.0))
                 pltInt = max(pltInt, 1)
