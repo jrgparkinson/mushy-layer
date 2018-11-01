@@ -100,10 +100,11 @@ def main(argv):
     cfl = -1
 
     try:
-       opts, args = getopt.getopt(argv,"n:c")
-    except getopt.GetoptError:
-       print('testUniformPorousConvection.py -n <num z gird points> -c <cfl>')
-       sys.exit(2)
+       opts, args = getopt.getopt(argv,"n:c:")
+    except getopt.GetoptError as err:
+        print(str(err))
+        print('testUniformPorousConvection.py -n<num z gird points> -c<cfl>')
+        sys.exit(2)
 
     for opt, arg in opts:
         if opt in ("-n"):
