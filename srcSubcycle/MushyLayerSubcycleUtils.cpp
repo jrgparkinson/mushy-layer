@@ -66,6 +66,19 @@ defineAMR(AMR&                                          a_amr,
   std::vector<int> regrid_intervals; // (num_read_levels,1);
   ppMain.getarr("regrid_interval",regrid_intervals,0,num_read_levels);
 
+  if (max_level > 0)
+  {
+    std::vector<int> ref_ratios; // (num_read_levels,1);
+    ppMain.getarr("ref_ratio", ref_ratios, 0, num_read_levels);
+    for (int i=0; i<=max_level; i++)
+    {
+      if (ref_ratios[i] == 1)
+      {
+        MayDay::Error("Refinement ratio can't be 1!");
+      }
+    }
+  }
+
   Vector<Vector<Box> > fixedGrids;
   bool predefinedGrids = false;
   predefinedGrids = getFixedGrids(fixedGrids, a_prob_domain);
