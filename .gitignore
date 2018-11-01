@@ -32,6 +32,7 @@ visitlog.py
 **/doc/latex/*
 **/.idea/
 **/.hg/*
+**/execNonSubcycle/*/*
 
 *.cproject
 *.tmp
