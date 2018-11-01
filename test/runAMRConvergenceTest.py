@@ -786,7 +786,7 @@ def getExecName():
 
 
     # Sanity check
-    if not os.path.exists(os.path.join(exec_dir, exec)):
+    if not os.path.exists(os.path.join(exec_dir, exec_file)):
         print('Executable ' + exec_file +' not found in directory ' + exec_dir)
         sys.exit(0)
 
