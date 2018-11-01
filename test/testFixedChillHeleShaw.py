@@ -33,7 +33,7 @@ def textFixedChillHeleShaw(max_time=100.0, Ra=1e7, Da=5e-5, C=5.0):
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
 
     # Nzs 	  = [16, 32, 64]
-    num_procs = [1, 1, 1]  # Needs to be as long as the longest Nzs
+    num_procs = [4, 4, 4]  # Needs to be as long as the longest Nzs
 
     # Setup up the post processing command
 
