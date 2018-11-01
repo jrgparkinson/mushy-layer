@@ -31,7 +31,7 @@ end
 
 fprintf('Analysing error for %s \n', AMRDir);
 
-saveFile = [AMRDir, saveFilename];
+saveFile = fullfile(AMRDir, saveFilename);
 
 if exist(saveFile, 'file') == 2 && ~redoRuns
     fprintf('Folder already analysed \n');
@@ -144,7 +144,7 @@ if ~exist(compFolder, 'dir')
     mkdir(compFolder)
 end
 
-errPltFile = [compFolder, finalFolder, '.png'];
+errPltFile = fullfile(compFolder, [finalFolder, '.png']);
 fprintf('Saving error plot to %s \n', errPltFile);
  print(h,errPltFile,'-dpng','-r150')
  

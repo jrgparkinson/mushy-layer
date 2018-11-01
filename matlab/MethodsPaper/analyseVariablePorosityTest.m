@@ -9,22 +9,13 @@ compName = 'Temperature';
 errType = 'L1';
 %errType = 'Max';
 
-%defaultFolder = 'MushyConvection';
-%defaultFolder = 'MushyConvectionLiquid';
-defaultFolder = 'MushyConvectionLiquidSmoother';
-%defaultFolder = 'MushyConvectionLiquidLimiting';
-%defaultFolder = 'MushyConvectionAnalyticVel';
-
 if nargin < 1
-  %  folder = '/AMRConvergenceTest/DBVariablePorosityGaussian1proc-t1.6-v2/';
-  %   folder = '/AMRConvergenceTest/MushyDB/';
-  %   folder = '/AMRConvergenceTest/MushQuick/';
-    % folder = ['/AMRConvergenceTest/',defaultFolder,'/'];
-     base_dir = 'VariablePorosityTest';
+    fprintf('**Warning - the directory containing the data has not been specified** \n');
+    base_dir = 'FixedPorousHole';
 end
 
 if nargin < 2
-    fineNumCells = 1024;
+    fineNumCells = 512;
 end
 
 if nargin < 3
@@ -36,9 +27,7 @@ if nargin < 4
 end
 
 if nargin < 5
- %   fine_res_dir = ['Uniform-DBVariablePorosity-',num2str(fineNumCells),'--0'];
- %   fine_res_dir = ['Uniform-MushyDB-',num2str(fineNumCells),'--0'];
-    fine_res_dir = ['Uniform-',defaultFolder,'-',num2str(fineNumCells),'--0'];
+fine_res_dir = ['Uniform-DBVariablePorosity-',num2str(fineNumCells),'--0'];
 end
 
 
@@ -64,6 +53,7 @@ end
 
 if runAnalysis
     tic;
+    fprintf('Loading high res file \n');
     HighResFile = getFinalPlotFile(fullfile(base_dir, fine_res_dir));
     fprintf('Loaded high res file (%1.3f seconds) \n', toc);
 
