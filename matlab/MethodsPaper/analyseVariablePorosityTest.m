@@ -99,7 +99,7 @@ for i=1:length(runs)
         folder_dir = fullfile(base_dir, folders(j).name);
         fprintf('%s \n', folders(j).name);
         
-        errorFile = [folder_dir, '/errorAnalysis.mat'];
+        errorFile = fullfile(folder_dir, 'errorAnalysis.mat');
         if exist(errorFile, 'file') ~= 2
             continue
         end
@@ -135,7 +135,7 @@ for i=1:length(runs)
         if numCells*totalRefinement == fineNumCells/2 && maxLev<2 ...
                 && (length(strfind(folders(j).name, 'AMR') ) > 0 || length(strfind(folders(j).name, 'Uniform') ) > 0)
             
-            pout = Pout([folder_dir, '/pout.0']);
+            pout = Pout(fullfile(folder_dir, 'pout.0'));
             
             ncells = pout.pointsUpdated;
             
@@ -171,7 +171,7 @@ for i=1:length(runs)
            
            
            % Also get richardson error
-            richardsonErrorFile = [folder_dir, '/richardsonError.mat'];
+            richardsonErrorFile = fullfile(folder_dir, 'richardsonError.mat');
             if exist(richardsonErrorFile, 'file') ~= 2
                 continue
             end

@@ -134,12 +134,12 @@ c.Label.String = compNames{comp};
 xlabel('x');
 ylabel('y');
 
-errPlotFolder = [runDir, '/',plotDir,'/'];
+errPlotFolder = fullfile(runDir, plotDir);
 if ~exist(errPlotFolder, 'dir')
     mkdir(errPlotFolder)
 end
 
-compFolder = [errPlotFolder, compNames{comp}, '/'];
+compFolder = fullfile(errPlotFolder, compNames{comp});
 if ~exist(compFolder, 'dir')
     mkdir(compFolder)
 end
