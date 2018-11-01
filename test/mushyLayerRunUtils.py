@@ -2,6 +2,66 @@ import re
 import os
 import time
 import math
+import sys
+
+def getBaseOutputDir():
+    #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
+    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
+
+    if not os.path.exists(base_output_dir):
+        os.makedirs(base_output_dir)
+
+    return base_output_dir
+
+
+def getMatlabBaseCommand():
+    parDir = os.path.abspath(os.pardir)
+    matlabFolder = os.path.join(parDir, 'matlab', 'MethodsPaper')
+    matlab_command = 'cd ' + matlabFolder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
+
+    return matlab_command
+
+
+
+
+def getExecName():
+    mushyLayerDir = os.path.dirname(os.path.dirname(__file__))
+    exec_dir = os.path.join(mushyLayerDir, 'execSubcycle')
+
+    # Get files in exec dir starting with mushyLayer2d and ending with ex
+    possible_exec_files = [f for f in os.listdir(exec_dir) if f[:12] == 'mushyLayer2d' and f[-2:] == 'ex']
+
+    if len(possible_exec_files) == 0:
+        print('Cannot find any executable files - have you compiled the code?')
+        sys.exit(0)
+
+    # Choose optimised execs over DEBUG execs as they will be quicker
+    opthigh_exec = ''
+    opt_exec = ''
+
+    for f in possible_exec_files:
+        if 'OPTHIGH' in f:
+            opthigh_exec = f
+        elif 'OPT' in f:
+            opt_exec = f
+
+    if opthigh_exec:
+        exec_file = opthigh_exec
+    elif opt_exec:
+        exec_file = opt_exec
+    else:
+        exec_file = possible_exec_files[1]
+
+    # Can also specify the file manually
+    #exec = 'mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex'
+
+
+    # Sanity check
+    if not os.path.exists(os.path.join(exec_dir, exec_file)):
+        print('Executable ' + exec_file +' not found in directory ' + exec_dir)
+        sys.exit(0)
+
+    return exec_file
 
 def constructRunName(params):
     # run_name = 'CR' + str(params['parameters.compositionRatio']) + 'RaC' + str(params['parameters.rayleighComp'])

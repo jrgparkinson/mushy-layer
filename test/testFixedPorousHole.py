@@ -2,7 +2,8 @@
 import os, sys
 from colorama import Fore, Style
 
-from runAMRConvergenceTest import runTest, getBaseOutputDir, getMatlabBaseCommand
+from runAMRConvergenceTest import runTest
+from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
 
 ##########################################################################
 # 3) Convection in a fixed porous medium with variable porosity
