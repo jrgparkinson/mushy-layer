@@ -244,16 +244,16 @@ axLabels = allAxes(1);
 xlab = xlabel(allAxes(1), '$x$');
 ylab = ylabel(allAxes(1), '$y$');
 
-xlab.Position(2) = xlab.Position(2) + 0.02;
-ylab.Position(1) = ylab.Position(1) + 0.02;
+xlab.Position(2) = xlab.Position(2) + 2*dx;
+ylab.Position(1) = ylab.Position(1) + 2*dx;
 
 axLabels.XTick = xl;
 axLabels.YTick = yl;
 
 
-%format = '%1.1f';
-axLabels.XTickLabels = {sprintf(format, xl(1)-dx/2), sprintf(format, xl(2)+dx/2)};
-axLabels.YTickLabels = {sprintf(format, yl(1)-dx/2), sprintf(format, yl(2)+dx/2)};
+format = '%1.1f';
+axLabels.XTickLabels = {sprintf(format, xl(1)-dx/4), sprintf(format, xl(2)+dx/4)};
+axLabels.YTickLabels = {sprintf(format, yl(1)-dx/4), sprintf(format, yl(2)+dx/4)};
 
 
 % h = gcf;
