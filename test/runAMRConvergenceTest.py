@@ -674,13 +674,13 @@ def main(argv):
     try:
        opts, args = getopt.getopt(argv,"n:f:H:")
     except getopt.GetoptError:
-       print 'runAMRConvergenceTest.py -n <num processors>'
+       print('runAMRConvergenceTest.py -n <num processors>')
        sys.exit(2)
     for opt, arg in opts:
         if opt in ("-n"):
             num_proc = int(arg)
         
-    print 'Num processors: ', str(num_proc)
+    print('Num processors: ' + str(num_proc))
 
     #################################
     # These shouldn't change
@@ -735,3 +735,19 @@ if __name__ == "__main__":
                  
 
 
+def getBaseOutputDir():
+    #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
+    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
+
+    if not os.path.exists(base_output_dir):
+        os.makedirs(base_output_dir)
+
+    return base_output_dir
+
+
+def getMatlabBaseCommand():
+    parDir = os.path.abspath(os.pardir)
+    matlabFolder = os.path.join(parDir, 'matlab', 'MethodsPaper')
+    matlab_command = 'cd ' + matlabFolder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
+
+    return matlab_command
