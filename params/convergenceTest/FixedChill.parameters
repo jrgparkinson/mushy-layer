@@ -116,3 +116,13 @@ main.steady_state=1e-5
 main.max_time=10.0
 
 regrid.marginalPorosityLimit=0.8
+
+#AMR
+main.refine_thresh=0.01
+main.tag_buffer_size=1 1 1
+main.max_level=2
+regrid.marginalPorosityLimit=0.99
+regrid.plume_salinity=-0.95
+regrid.plume_vel=5e-5
+main.ref_ratio=2 2 2
+main.regrid_interval=32 32 32

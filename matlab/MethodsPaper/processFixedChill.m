@@ -167,23 +167,23 @@ if length(ml.levelArray) > 1
     
     domainBox = polyshape([xl(1) xl(1) xl(end) xl(end)], [yl(1) yl(end) yl(end) yl(1)]);
 
-    meshes = amrFile.getMeshes(domainBox);
+    meshes = ml.getMeshes(domainBox);
 
     % Plot meshes 
-    pshape = shiftMesh(meshes(2), dx, xl, k, d);
+    pshape = meshes(2);
     mesh2 = plot(allAxes(1), pshape); % meshes on chombo level 1
 
     %plot(domainBox);
     mesh2.FaceAlpha = 0;
-    mesh2.EdgeColor = [1 0 1];
+    mesh2.EdgeColor = [1 0 1]; % magenta
     mesh2.LineWidth = 2;
 
     if length(meshes) > 2
-        pshape = shiftMesh(meshes(3),dx, xl,  k, d);
-    mesh3 = plot(allAxes(1), pshape); % meshes on chombo level 2
-    mesh3.FaceAlpha = 0;
-    mesh3.EdgeColor = [0 1 1];
-    mesh3.LineWidth = 2;
+        pshape = meshes(3);
+        mesh3 = plot(allAxes(1), pshape); % meshes on chombo level 2
+        mesh3.FaceAlpha = 0;
+        mesh3.EdgeColor = [0 1 1]; %cyan
+        mesh3.LineWidth = 2;
     end
 end
 
