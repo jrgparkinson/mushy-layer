@@ -11,6 +11,7 @@ from runAMRConvergenceTest import runTest
 base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/'
 
+
 if not os.path.exists(base_output_dir):
     os.makedirs(base_output_dir)
 
