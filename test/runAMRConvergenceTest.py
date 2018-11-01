@@ -751,3 +751,43 @@ def getMatlabBaseCommand():
     matlab_command = 'cd ' + matlabFolder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
 
     return matlab_command
+
+
+def getExecName():
+    mushyLayerDir = os.path.dirname(os.path.dirname(__file__))
+    exec_dir = os.path.join(mushyLayerDir, 'execSubcycle')
+
+    # Get files in exec dir starting with mushyLayer2d and ending with ex
+    possible_exec_files = [f for f in os.listdir(exec_dir) if f[:12] == 'mushyLayer2d' and f[-2:] == 'ex']
+
+    if len(possible_exec_files) == 0:
+        print('Cannot find any executable files - have you compiled the code?')
+        sys.exit(0)
+
+    # Choose optimised execs over DEBUG execs as they will be quicker
+    opthigh_exec = ''
+    opt_exec = ''
+
+    for f in possible_exec_files:
+        if 'OPTHIGH' in f:
+            opthigh_exec = f
+        elif 'OPT' in f:
+            opt_exec = f
+
+    if opthigh_exec:
+        exec = opthigh_exec
+    elif opt_exec:
+        exec = opt_exec
+    else:
+        exec = f[1]
+
+    # Can also specify the file manually
+    #exec = 'mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex'
+
+
+    # Sanity check
+    if not os.path.exists(os.path.join(exec_dir, exec)):
+        print('Executable ' + exec +' not found in directory ' + exec_dir)
+        sys.exit(0)
+
+    return exec
