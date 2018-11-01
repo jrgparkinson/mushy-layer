@@ -69,7 +69,7 @@ chi  = 0.4
 
 # Try and speed things up for now, should eventually make this criteria smaller
 extra_params = {'main.steady_state': 1e-4}
-cfl = 0.35           
+cfl = 0.4           
 extra_params['main.cfl'] = cfl
 extra_params['main.initial_cfl'] = cfl/10
 base_dataFolder = os.path.join(base_output_dir, 'ConvectionDB-cfl' + str(cfl))
@@ -136,7 +136,7 @@ print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 # 3) Convection in a fixed porous medium with variable porosity
 ##########################################################################
 
-print(Fore.GREEN + 'Setup tests for solidification without flow' + Style.RESET_ALL)
+print(Fore.GREEN + 'Setup tests for (fixed) porous hole' + Style.RESET_ALL)
 physicalProblem = 'DBVariablePorosity'
 dataFolder = os.path.join(base_output_dir, 'FixedPorousHole')
 
