@@ -775,11 +775,11 @@ def getExecName():
             opt_exec = f
 
     if opthigh_exec:
-        exec = opthigh_exec
+        exec_file = opthigh_exec
     elif opt_exec:
-        exec = opt_exec
+        exec_file = opt_exec
     else:
-        exec = f[1]
+        exec_file = f[1]
 
     # Can also specify the file manually
     #exec = 'mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex'
@@ -787,7 +787,7 @@ def getExecName():
 
     # Sanity check
     if not os.path.exists(os.path.join(exec_dir, exec)):
-        print('Executable ' + exec +' not found in directory ' + exec_dir)
+        print('Executable ' + exec_file +' not found in directory ' + exec_dir)
         sys.exit(0)
 
-    return exec
+    return exec_file
