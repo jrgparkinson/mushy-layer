@@ -44,7 +44,7 @@ def textFixedChillHeleShaw(max_time=1e6, Ra=2e6, Da=2e-6, C=1.75):
 
     # Run
     extra_params = {'main.max_time':max_time, 'parameters.rayleighComp':Ra, 'parameters.darcy': Da, 'parameters.compositionRatio':C }
-
+    extra_params['main.max_dt'] = 10.0 / (Da*Ra)
     runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 
 def main(argv):

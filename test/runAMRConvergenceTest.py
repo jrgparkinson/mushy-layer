@@ -211,7 +211,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
 
 
-                params['main.max_dt'] = 10.0 / (params['parameters.darcy']*params['parameters.rayleighComp'])
+
 
                 pltInt = int(200.0*float(Nz_coarse)/64.0)
                 params['main.plot_interval'] = str(pltInt)
