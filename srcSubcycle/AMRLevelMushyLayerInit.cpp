@@ -1597,6 +1597,9 @@ void AMRLevelMushyLayer::initialDataPorousHole()
 {
   ParmParse pp("main");
 
+  Real radius = 0.1*m_domainWidth;
+    pp.query("radius", radius);
+
   DataIterator dit = m_grids.dataIterator();
 
     Real HTop = m_parameters.bcValEnthalpyHi[1];
@@ -1608,8 +1611,7 @@ void AMRLevelMushyLayer::initialDataPorousHole()
     Real thetaTop = m_parameters.bcValTemperatureHi[1];
     Real ThetaLTop = m_parameters.bcValLiquidConcentrationHi[1];
 
-  if (porousHole)
-   {
+
      Real cx = m_domainWidth/2;
      Real cy = m_domainHeight/2;
 
@@ -1636,7 +1638,7 @@ void AMRLevelMushyLayer::initialDataPorousHole()
 
        }
      }
-   }
+
 
 }
 
@@ -1663,8 +1665,7 @@ void AMRLevelMushyLayer::initialDataMushyLayer()
   bool initVel = false;
   pp.query("initVel", initVel);
 
-  Real radius = 0.1*m_domainWidth;
-  pp.query("radius", radius);
+
 
   Real perturbation;
   //  Real Nwaves = round(m_domainWidth);
