@@ -10,7 +10,20 @@ from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
 # 3) Convection in a mushy layer with an initial porous hole
 ##########################################################################
 
-def testPorousMushyHole(max_time=0.5):
+def testPorousMushyHole(argv):
+
+    # Defaults:
+    max_time = 0.5
+    try:
+        opts, args = getopt.getopt(argv, "t:")
+    except getopt.GetoptError as err:
+        print(str(err))
+        print('testPorousMushyHole.py -t<max time>')
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ("-t"):
+            max_time = float(arg)
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
@@ -43,27 +56,6 @@ def testPorousMushyHole(max_time=0.5):
     extra_params = {'main.max_time':max_time}
     runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 
-def main(argv):
-    # Unknown values:
-    max_time = -1
-
-    try:
-        opts, args = getopt.getopt(argv, "t:")
-    except getopt.GetoptError as err:
-        print(str(err))
-        print('testPorousMushyHole.py -t<max time>')
-        sys.exit(2)
-
-    for opt, arg in opts:
-        if opt in ("-t"):
-            max_time = float(arg)
-
-    # Only pass in the defined arguments
-    if max_time < 0:
-        testPorousMushyHole()
-    else:
-        testPorousMushyHole(max_time)
-
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    testPorousMushyHole(sys.argv[1:])
 

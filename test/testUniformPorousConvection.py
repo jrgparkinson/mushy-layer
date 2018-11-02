@@ -12,7 +12,27 @@ from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
 # Just run for a single grid resolution and compare to previously published values
 ######################################
 
-def testUniformPorousConvection(cfl=0.4, Nz_uniform=128, Nz_vm=-1):
+def testUniformPorousConvection(argv):
+
+    # Default vals:
+    cfl = 0.4
+    Nz_uniform = 128
+    Nz_vm = -1
+
+    try:
+       opts, args = getopt.getopt(argv,"n:v:c:")
+    except getopt.GetoptError as err:
+        print(str(err))
+        print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points> -c<cfl>')
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ("-n"):
+            Nz = int(arg)
+        elif opt in ("-c"):
+            cfl = float(arg)
+        elif opt in ("-v"):
+            Nz_vm = int(arg)
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
@@ -90,38 +110,5 @@ def testUniformPorousConvection(cfl=0.4, Nz_uniform=128, Nz_vm=-1):
 
 
 
-def main(argv):
-
-    # Unknown values:
-    Nz = -1
-    cfl = -1
-    Nz_vm = -1
-
-    try:
-       opts, args = getopt.getopt(argv,"n:v:c:")
-    except getopt.GetoptError as err:
-        print(str(err))
-        print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points> -c<cfl>')
-        sys.exit(2)
-
-    for opt, arg in opts:
-        if opt in ("-n"):
-            Nz = int(arg)
-        elif opt in ("-c"):
-            cfl = float(arg)
-        elif opt in ("-v"):
-            Nz_vm = int(arg)
-
-    # Only pass in the defined arguments
-
-    if cfl < 0:
-        testUniformPorousConvection()
-    elif Nz < 0:
-        testUniformPorousConvection(cfl)
-    elif Nz_vm < 0:
-        testUniformPorousConvection(cfl, Nz)
-    else:
-        testUniformPorousConvection(cfl, Nz, Nz_vm)
-
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    testUniformPorousConvection(sys.argv[1:])
