@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     int maxStep;
     Real maxTime;
     //Real startTime;
-    pp2.get("maxTime", maxTime);
+    pp2.get("max_time", maxTime);
     pp2.get("max_step", maxStep);
     
     amrObject.run(maxTime, maxStep);

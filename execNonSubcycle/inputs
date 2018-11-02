@@ -46,7 +46,7 @@ main.max_time=1.0e10
 main.min_time=10.0
 main.nondimensionalisation=1
 main.output_folder=output
-main.periodic_bc=1 0 0
+main.periodic_bc=0 0 0
 main.perturbationSin=true
 main.perturbationWavenumber=1
 
@@ -127,14 +127,14 @@ parameters.rayleighComp=350 #100
 parameters.darcy=2e-3
 main.debug=true
 
-main.num_cells=32 64 #64 64
+main.num_cells=32 32 #64 64
 main.max_dt=4 #0.5 # should be less than prandtl number?
 
 main.nondimensionalisation=1
 
 main.use_subcycling=0
 
-main.plot_interval=16 #32
+main.plot_interval=1 #32
 
 bc.enthalpyHiVal=0.0 0.2  #-0.2
 bc.enthalpyLoVal=0.0 6.05 #6.5  #6.5
@@ -205,7 +205,7 @@ main.max_level=2
 # Above works, but issue with refluxing at domain boundaries
 
 parameters.rayleighComp=275 #want just the one channel 
-main.output_folder=outputAMR
+
 main.maxDivUFace=1e-10
 
 # Trying to fix bug at step 430
@@ -239,7 +239,7 @@ projection.eta=0.99
 
 # Trying to construct same problem with one level of refinement
 main.max_level=1
-main.max_step=3000
+main.max_step=100
 main.num_cells=32 128
 
 #main.restart_file=outputAMR/chk000032.2d.hdf5

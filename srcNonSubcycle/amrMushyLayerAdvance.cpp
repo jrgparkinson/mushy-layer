@@ -73,8 +73,8 @@ amrMushyLayer::timeStep()
   //This is the data structure that AMRElliptic expects
   Vector<Vector<RefCountedPtr<LevelData<FArrayBox> > > > a_scalarNew, a_scalarOld;
 
-  Vector<DisjointBoxLayout> a_amrGrids;
-  getActiveGridsVars(a_scalarNew, a_scalarOld, a_amrGrids);
+  Vector<DisjointBoxLayout> amrGrids;
+  getActiveGridsVars(a_scalarNew, a_scalarOld, amrGrids);
 
   //We need a different data structure for the BE/TGA solver (this is a bit silly)
   Vector<LevelData<FArrayBox>* >  a_thetaNew, a_thetaOld, a_thetaDiff, a_thetaOldTemp, a_ThetaLNew, a_ThetaLOld;
@@ -133,7 +133,7 @@ amrMushyLayer::timeStep()
   logMessage(8, "    amrMushyLayer::timestep() - setup solvers");
 
 
-  Vector<LevelData<FArrayBox>* > thetaSource(m_finest_level+1,NULL);
+  Vector<LevelData<FArrayBox>* > HC_src(m_finest_level+1,NULL);
   Vector<LevelData<FArrayBox>* > ThetaLSource(m_finest_level+1,NULL);
   Vector<LevelData<FArrayBox>* > zeroSource(m_finest_level+1,NULL);
   Vector<LevelData<FArrayBox>* > ThetaDiffusion(m_finest_level+1,NULL);
@@ -146,17 +146,17 @@ amrMushyLayer::timeStep()
   for (int lev=0; lev<=m_finest_level; lev++)
   {
     const DisjointBoxLayout& grids = m_amrGrids[lev];
-    thetaSource[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
+    HC_src[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
     ThetaLSource[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
     zeroSource[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
     V_gradH_n[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
     V_dThetadz_n[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
     ThetaDiffusion_n[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
 
-    DataIterator dit = thetaSource[lev]->dataIterator();
+    DataIterator dit = HC_src[lev]->dataIterator();
     for (dit.begin(); dit.ok(); ++dit)
     {
-      (*thetaSource[lev])[dit()].setVal(0);
+      (*HC_src[lev])[dit()].setVal(0);
       (*ThetaLSource[lev])[dit()].setVal(0);
       (*zeroSource[lev])[dit()].setVal(0);
       (*V_gradH_n[lev])[dit()].setVal(0);
@@ -171,11 +171,15 @@ amrMushyLayer::timeStep()
 
 
   //Setup solvers for this timestep
-  setupAdvectionSolvers();
+  // Not doing advection for now
+//  setupAdvectionSolvers();
+
+  // This is consumed into multigrid setup
   //  setupPoissonSolvers(a_thetaNew, thetaSource, a_ThetaLNew, zeroSource, a_amrGrids);
 
   //Must be done after setupPoissonSolvers()
-  setupMultigrid(a_thetaNew, thetaSource, a_ThetaLNew, zeroSource, a_amrGrids);
+  updateEnthalpyVariables();
+  setupMultigrid(amrGrids);
 
   //Do fluid advection
   //Get fluid velocities based on our current best estimate of the
@@ -217,7 +221,7 @@ amrMushyLayer::timeStep()
   {
     for (DataIterator dit=m_dScalar[m_theta][lev]->dataIterator(); dit.ok(); ++dit)
     {
-      (*thetaSource[lev])[dit].setVal(0.0);
+      (*HC_src[lev])[dit].setVal(0.0);
     }
   }
 
@@ -229,9 +233,9 @@ amrMushyLayer::timeStep()
 
   if (m_timeIntegrationOrder == 1)
   {
-    m_BEEnthalpySalinity->oneStep(a_thetaNew,
-                              a_thetaOld,
-                              thetaSource,
+    m_BEEnthalpySalinity->oneStep(m_HC,
+                                  m_HC,
+                              HC_src,
                               m_dt,
                               lbase,
                               lmax,
@@ -244,7 +248,7 @@ amrMushyLayer::timeStep()
 
     m_TGAEnthalpySalinity->oneStep(a_thetaNew,
                                a_thetaOld,
-                               thetaSource,
+                               HC_src,
                                m_dt,
                                lbase,
                                lmax,
@@ -295,10 +299,10 @@ amrMushyLayer::timeStep()
       delete a_thetaNewPrev[lev];
       a_thetaNewPrev[lev] = NULL;
     }
-    if (thetaSource[lev] != NULL)
+    if (HC_src[lev] != NULL)
     {
-      delete thetaSource[lev];
-      thetaSource[lev] = NULL;
+      delete HC_src[lev];
+      HC_src[lev] = NULL;
     }
     if (zeroSource[lev] != NULL)
     {
@@ -901,8 +905,9 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
 
   // 2. Ensure velocity is divergence free
 
+  // we should not need a lambda correction here?
   // Set lambda = 1, advect it, subtract 1. We should get zero - anything else is an error.
-  Vector<LevelData<FArrayBox>* > zeroSource = newEmptyPtr();
+ /* Vector<LevelData<FArrayBox>* > zeroSource = newEmptyPtr();
 
   for (int lev=0; lev <= m_finest_level; lev++)
   {
@@ -922,7 +927,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
   Vector<LevelData<FArrayBox>* > a_lambda(m_finest_level+1, NULL);
   refCountedPtrToPtr(m_scalarNew[m_lambda], a_lambda);
 
-  proj.doLambdaCorrection(m_fluidAdv, a_lambda, m_time, m_dt);
+  proj.doLambdaCorrection(m_fluidAdv, a_lambda, m_time, m_dt);*/
 
   //Re apply BCs after correction
   for (int lev=0; lev<=m_finest_level; lev++)
@@ -932,16 +937,16 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
                        false); // inhomogeneous
   }
 
-  advectScalar(m_lambdaPostCorr, zeroSource, m_fluidAdv);
+//  advectScalar(m_lambdaPostCorr, zeroSource, m_fluidAdv);
 
-  for (int lev=0; lev <= m_finest_level; lev++)
-  {
-    for (DataIterator dit = m_scalarNew[m_lambdaPostCorr][lev]->dataIterator(); dit.ok(); ++dit)
-    {
-      (*m_scalarNew[m_lambda][lev])[dit].plus(-1);
-      (*m_scalarNew[m_lambdaPostCorr][lev])[dit].plus(-1);
-    }
-  }
+//  for (int lev=0; lev <= m_finest_level; lev++)
+//  {
+//    for (DataIterator dit = m_scalarNew[m_lambdaPostCorr][lev]->dataIterator(); dit.ok(); ++dit)
+//    {
+//      (*m_scalarNew[m_lambda][lev])[dit].plus(-1);
+//      (*m_scalarNew[m_lambdaPostCorr][lev])[dit].plus(-1);
+//    }
+//  }
 
 
   Vector<LevelData<FluxBox>* > gradPressureEdge;
@@ -967,149 +972,6 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
   }
 
   logMessage(10, "    amrMushyLayerAdvance::updateVelocity - calculate errors");
-
-  //Calculate error in calculated quantities
-  for (int lev=0; lev<=m_finest_level; lev++)
-  {
-    for (DataIterator dit = m_vectorNew[m_fluidVel][lev]->dataIterator(); dit.ok(); ++dit)
-    {
-      //Let's just enforce the analytic velocity and see if that works
-      //			(*m_vectorNew[m_fluidVel][lev])[dit].setVal(0);
-      //			(*m_vectorNew[m_fluidVel][lev])[dit] += (*m_vectorNew[m_fluidVelAnalytic][lev])[dit];
-
-      (*m_scalarNew[m_divUstarErr][lev])[dit] -= (*m_scalarNew[m_divUstar][lev])[dit];
-
-      //			(*m_vectorNew[m_gradPressureErr][lev])[dit] -= (*m_vectorNew[m_gradPressure][lev])[dit];
-
-      //						(*m_vectorNew[m_fluidVelErr][lev])[dit].setVal(0);
-      //						(*m_vectorNew[m_fluidVelErr][lev])[dit] += (*m_vectorNew[m_fluidVelAnalytic][lev])[dit];
-      //						(*m_vectorNew[m_fluidVelErr][lev])[dit] -= (*m_vectorNew[m_fluidVel][lev])[dit];
-
-      (*m_scalarNew[m_pressureError][lev])[dit] -= (*m_scalarNew[m_pressure][lev])[dit];
-
-
-      FArrayBox& gradPerr = (*m_vectorNew[m_gradPressureErr][lev])[dit];
-      FArrayBox gradPerry(gradPerr.box(), 1);
-      gradPerry.copy(gradPerr, 1, 0, 1);
-
-      FArrayBox Uerrx((*m_vectorNew[m_fluidVel][lev])[dit].box(), 1);
-      FArrayBox Uerry((*m_vectorNew[m_fluidVel][lev])[dit].box(), 1);
-
-      Uerrx.copy((*m_vectorNew[m_fluidVel][lev])[dit], 0, 0, 1);
-      Uerry.copy((*m_vectorNew[m_fluidVel][lev])[dit], 1, 0, 1);
-
-      Uerrx -= (*m_vectorNew[m_fluidVelErr][lev])[dit];
-      Uerry.minus((*m_vectorNew[m_fluidVelErr][lev])[dit], 1, 0 , 1);
-
-      // Calculate errors in edge centred quantities
-      for (int idir = 0; idir<SpaceDim; idir++)
-      {
-        for (BoxIterator bit((*gradPressureEdge[lev])[dit][idir].box()); bit.ok(); ++bit)
-        {
-          IntVect ivEdge = bit();
-
-          (*m_vectorNew[m_gradPressureErr][lev])[dit](ivEdge, idir) -= (*gradPressureEdge[lev])[dit][idir](ivEdge, 0);
-          (*m_vectorNew[m_gradPressure][lev])[dit](ivEdge, idir) = (*gradPressureEdge[lev])[dit][idir](ivEdge, 0);
-        }
-      }
-
-      //			int temp=0;
-
-    }
-
-    Real maxPerr = computeMax(*m_scalarNew[m_pressureError][lev],
-                              &(m_scalarNew[m_pressure][lev]->disjointBoxLayout()),
-                              getRefinementRatio(lev));
-    Real minPerr = computeMin(*m_scalarNew[m_pressureError][lev],
-                              &(m_scalarNew[m_pressure][lev]->disjointBoxLayout()),
-                              getRefinementRatio(lev));
-    Real averagePerr = (maxPerr + minPerr)/2;
-
-    for (DataIterator dit = m_scalarNew[m_pressureError][lev]->dataIterator(); dit.ok(); ++dit)
-    {
-      (*m_scalarNew[m_pressureError][lev])[dit].plus(-averagePerr);
-    }
-
-
-    m_vectorNew[m_fluidVel][lev]->exchange();
-  }
-
-
-  //Enforce analytic U edge if we want
-  for (int lev=0; lev <=m_finest_level; lev++)
-  {
-    for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
-    {
-      FluxBox& advVel = (*m_fluidAdv[lev])[dit];
-      FArrayBox& Ux = (*m_vectorNew[m_fluidVel][lev])[dit];
-      FArrayBox Uz(Ux.box(),1);
-      Uz.copy((*m_vectorNew[m_fluidVel][lev])[dit], 1,0,1);
-
-      //Let's try filling our advVel fluxbox with the analytic solution
-      FArrayBox& advVelx = advVel[0];
-      FArrayBox& advVely = advVel[1];
-
-      FArrayBox& advVelErr = (*m_vectorNew[m_fluidVelErr][lev])[dit];
-      FArrayBox advVelErry(advVelErr.box(), 1);
-
-
-
-      Box bx = advVelx.box();
-      Box by = advVely.box();
-
-      bx.grow(-m_num_ghost+1);
-      BoxIterator bitx(bx);
-
-
-      for (bitx.begin(); bitx.ok(); ++bitx)
-      {
-        IntVect iv = bitx();
-        RealVect loc;
-        getLocation(iv, lev, loc, 0, 0.5);
-
-        Real x = loc[0]; Real y = loc[1];
-        Real alpha = 0.1;
-
-
-        //enforce velocity
-        //				advVelx(iv, 0) = m_parameters.rayleighTemp *(-0.5*alpha*sin(M_PI*(x))*cos(M_PI*(y)));
-
-
-        advVelErr(iv, 0) = m_parameters.rayleighTemp *(-0.5*alpha*sin(M_PI*(x))*cos(M_PI*(y)));
-        advVelErr(iv, 0) = advVelErr(iv, 0) - advVelx(iv,0);
-
-      }
-
-      by.grow(-m_num_ghost+1);
-      BoxIterator bity(by);
-
-
-      for (bity.begin(); bity.ok(); ++bity)
-      {
-        IntVect iv = bity();
-        RealVect loc;
-        getLocation(iv, lev, loc, 0.5, 0);
-
-        Real x = loc[0]; Real y = loc[1];
-        Real alpha = 0.1;
-
-        //enforce velocity
-        //				advVely(iv, 0) =  m_parameters.rayleighTemp *(0.5*alpha*cos(M_PI*(x))*sin(M_PI*(y)));
-
-        advVelErr(iv, 1) = m_parameters.rayleighTemp *(0.5*alpha*cos(M_PI*(x))*sin(M_PI*(y)));
-        advVelErr(iv, 1) = advVelErr(iv, 1) - advVely(iv,0);
-
-      }
-
-      advVelErry.copy(advVelErr, 1, 0, 1);
-
-      //			int temp=0;
-
-    } // end loop over grids
-
-
-
-  } // end loop over levels
 
 
 
@@ -1153,11 +1015,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
       delete gradPressureEdge[lev];
       gradPressureEdge[lev]  = NULL;
     }
-    if(zeroSource[lev]!=NULL)
-    {
-      delete zeroSource[lev];
-      zeroSource[lev]  = NULL;
-    }
+
 
   }
 

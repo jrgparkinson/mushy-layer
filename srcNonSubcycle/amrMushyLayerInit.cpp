@@ -44,7 +44,7 @@ amrMushyLayer::setDefaults()
   m_ghostVect = m_num_ghost*IntVect::Unit;
   m_parameters.getParameters();
  // m_parameters.printParameters();
-  m_timeIntegrationOrder = 2;
+  m_timeIntegrationOrder = 1;
   m_enforceAnalyticSoln = true;
   m_printAnalyticSoln = false;
   m_frameAdvectionMethod = m_godunov;
@@ -335,7 +335,7 @@ amrMushyLayer::initialize()
       m_scalarDiffusionCoeffs[m_bulkConcentration] = 1/m_parameters.lewis;
     }
 
-    m_HC.resize(m_max_level+1);
+    m_HC.resize(m_max_level+1, NULL);
 
     for (int a_var=0; a_var<m_numVectorVars; a_var++)
     {
@@ -498,8 +498,8 @@ void amrMushyLayer::initVars(const int lev)
     (new LevelData<FArrayBox>(m_amrGrids[lev], 1,m_ghostVect));
   }
 
-  m_HC[lev] = RefCountedPtr<LevelData<FArrayBox> >
-  (new LevelData<FArrayBox>(m_amrGrids[lev], 1,m_ghostVect));
+  // HC has two components
+  m_HC[lev] = new LevelData<FArrayBox>(m_amrGrids[lev], 2 ,m_ghostVect);
 
   for (int a_var=0; a_var<m_numVectorVars; a_var++)
   {
@@ -1202,12 +1202,7 @@ amrMushyLayer::setupPoissonSolvers(
 }
 
 void
-amrMushyLayer::setupMultigrid(
-    Vector<LevelData<FArrayBox>* >& a_thetaNew,
-    Vector<LevelData<FArrayBox>* >& thetaSource,
-    Vector<LevelData<FArrayBox>* >& a_ThetaLNew,
-    Vector<LevelData<FArrayBox>* >& ThetaLSource,
-    Vector<DisjointBoxLayout>& activeGrids)
+amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
 {
 
   CH_TIME("amrMushyLayer::setupMultigrid()");
@@ -1271,6 +1266,8 @@ amrMushyLayer::setupMultigrid(
 
   EdgeVelBCHolder porosityEdgeBC(m_physBCPtr->porosityFaceBC());
 
+//  updateEnthalpyVariables();
+
   // two components: enthalpy and salinity
   int numComps = 2;
   int Hcomp = 0;
@@ -1287,22 +1284,24 @@ amrMushyLayer::setupMultigrid(
     bCoef[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(activeGrids[lev], numComps, ivGhost));
     aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(activeGrids[lev], numComps, ivGhost));
 
+     CellToEdge(*m_scalarNew[m_porosity][lev], *porosityFace[lev]);
+
     for (DataIterator dit = bCoef[lev]->dataIterator(); dit.ok(); ++dit)
     {
       (*aCoef[lev])[dit].setVal(1.0);
       (*bCoef[lev])[dit].setVal(1.0);
 
       // bCoef for salt solve
-      (*bCoef[lev])[dit].mult((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Ccomp);
+//      (*bCoef[lev])[dit].mult((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Ccomp);
 
       // for heat solve
-      (*bCoef[lev])[dit].minus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
-      for (int dir=0; dir<SpaceDim; dir++)
-      {
-        (*bCoef[lev])[dit][dir].mult(m_parameters.heatConductivityRatio, Hcomp);
-      }
-      (*bCoef[lev])[dit].plus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
-
+//      (*bCoef[lev])[dit].minus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
+//      for (int dir=0; dir<SpaceDim; dir++)
+//      {
+//        (*bCoef[lev])[dit][dir].mult(m_parameters.heatConductivityRatio, Hcomp);
+//      }
+//      (*bCoef[lev])[dit].plus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
+//
 
       for (int dir=0; dir<SpaceDim; dir++)
       {

@@ -172,12 +172,7 @@ protected:
 			Vector<DisjointBoxLayout>& activeGrids);
 
 	/// Setup multigrid solvers and timestepping (backward euler, TGA etc.)
-	void setupMultigrid(
-			Vector<LevelData<FArrayBox>* >& a_thetaNew,
-			Vector<LevelData<FArrayBox>* >& thetaSource,
-			Vector<LevelData<FArrayBox>* >& a_ThetaLNew,
-			Vector<LevelData<FArrayBox>* >& ThetaLSource,
-			Vector<DisjointBoxLayout>& activeGrids);
+	void setupMultigrid(Vector<DisjointBoxLayout>& activeGrids);
 
 	/// Initialise Godunov operators for frame advection calculations (enthalpy and bulk concentration)
 	void setupAdvectionSolvers();
@@ -540,7 +535,7 @@ protected:
 	Vector<Vector<RefCountedPtr<LevelData<FArrayBox> > > > m_scalarNew;
 
 	/// This is a special case
-	Vector<RefCountedPtr<LevelData<FArrayBox> > > m_HC;
+	Vector<LevelData<FArrayBox> * > m_HC;
 
 	/// Scalar fields at old timestep
 	Vector<Vector<RefCountedPtr<LevelData<FArrayBox> > > > m_scalarOld;
