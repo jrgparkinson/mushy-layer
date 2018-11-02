@@ -10,7 +10,31 @@ from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
 # 3) Convection in a mushy layer with an initial porous hole
 ##########################################################################
 
-def testHeleShawFixedChill(max_time=1e6, Ra=4e3, Da=2e-3, C=2.0):
+def testHeleShawFixedChill(argv):
+
+    # Defaults
+    max_time=1e6
+    Ra=4e3
+    Da=2e-3
+    C=2.0
+
+    try:
+        opts, args = getopt.getopt(argv, "t:R:D:C:")
+    except getopt.GetoptError as err:
+        print(str(err))
+        print(
+            'testPorousMushyHole.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio>')
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ("-t"):
+            max_time = float(arg)
+        elif opt in ("-R"):
+            Ra = float(arg)
+        elif opt in ("-D"):
+            Da = float(arg)
+        elif opt in ("-C"):
+            C = float(arg)
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
@@ -48,42 +72,19 @@ def testHeleShawFixedChill(max_time=1e6, Ra=4e3, Da=2e-3, C=2.0):
     extra_params['main.max_dt'] = 10.0 / (Da*Ra)
     runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 
-def main(argv):
-    # Unknown values:
-    max_time = -1
-    Ra = -1
-    Da = -1
-    C = -1
-
-    try:
-        opts, args = getopt.getopt(argv, "t:R:D:C:")
-    except getopt.GetoptError as err:
-        print(str(err))
-        print('testPorousMushyHole.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio>')
-        sys.exit(2)
-
-    for opt, arg in opts:
-        if opt in ("-t"):
-            max_time = float(arg)
-        elif opt in ("-R"):
-            Ra = float(arg)
-        elif opt in ("-D"):
-            Da = float(arg)
-        elif opt in ("-C"):
-            C = float(arg)
-
+# def main(argv):
     # Only pass in the defined arguments
-    if max_time < 0:
-        testHeleShawFixedChill()
-    elif Ra < 0:
-        testHeleShawFixedChill(max_time)
-    elif Da < 0:
-        testHeleShawFixedChill(max_time, Ra)
-    elif C < 0:
-        testHeleShawFixedChill(max_time, Ra, Da)
-    else:
-        testHeleShawFixedChill(max_time, Ra, Da, C)
+    # if max_time < 0:
+    #     testHeleShawFixedChill()
+    # elif Ra < 0:
+    #     testHeleShawFixedChill(max_time)
+    # elif Da < 0:
+    #     testHeleShawFixedChill(max_time, Ra)
+    # elif C < 0:
+    #     testHeleShawFixedChill(max_time, Ra, Da)
+    # else:
+    #     testHeleShawFixedChill(max_time, Ra, Da, C)
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    testHeleShawFixedChill(sys.argv[1:])
 
