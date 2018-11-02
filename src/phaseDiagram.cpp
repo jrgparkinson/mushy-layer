@@ -45,7 +45,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
     HC.copyTo(Interval(0,0), enthalpy, Interval(0,0));
     HC.copyTo(Interval(1,1), composition, Interval(0,0));
 
-    updateEnthalpyVariables(enthalpy, composition, theta, compositionLiquid, compositionSolid,
+    updateEnthalpyVariables(enthalpy, composition, temperature, compositionLiquid, compositionSolid,
                               porosity, enthalpySolid,enthalpyLiquid, enthalpyEutectic, a_params);
 }
 
