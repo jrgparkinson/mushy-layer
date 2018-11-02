@@ -284,6 +284,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
             # Default options
             if Nx_coarse == -1:
+                print('Trying to convert to an array: ' + str(params['main.num_cells']))
                 gridPts = str2arr(params['main.num_cells'])
 
                 aspectRatio = gridPts[0]/gridPts[1]
