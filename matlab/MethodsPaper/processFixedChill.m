@@ -20,8 +20,6 @@ end
 
 function processSpecificFolder(output_dir)
 
-
-
 savePNG = true;
 
 % Load plotfile

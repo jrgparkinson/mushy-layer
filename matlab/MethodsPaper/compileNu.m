@@ -17,7 +17,7 @@ AMRPrefix = 'VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-';
 
 %base_dir = getDataDir(['AMRConvergenceTest/ConvectionDB/']);
 
-fprintf('Nx = %d, Da = %s \n', res_uniform, Da);
+fprintf('Nx = %d, Da = %s, * indicates simulation which is still running\n', res_uniform, Da);
 for i=1:length(Ra)
     outputFolder = getOutputFolder(Ra{i}, chi, Da);
     
@@ -60,7 +60,7 @@ if AMRRunning
 end
 
 
-fprintf('Ra=%.1e, Nu=%1.2f %s (Uniform) / %1.2f%s (AMR)  / %1.2f (Le Bars & Worster) \n', ...
+fprintf('Ra=%.1e, Nu=%1.2f %s (Uniform) / %1.2f%s (Variable mesh)  / %1.2f (Le Bars & Worster) \n', ...
     str2num(Ra{i}), NuUniform, UniformStr, NuAMR, AMRStr, NuLeBars(i));
  
 end

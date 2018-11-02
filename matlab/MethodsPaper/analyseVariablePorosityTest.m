@@ -1,13 +1,6 @@
-function analyseVariablePorosityTest(base_dir, Nzs, redoAnalysis, runAnalysis, uniform_prefix)
+function analyseVariablePorosityTest(base_dir, Nzs, redoAnalysis, runAnalysis, uniform_prefix, compName, errType)
 close all;
 
-compName = 'Temperature';
-%compName = 'xAdvectionvelocity';
-%compName = 'xDarcyvelocity';
-%compName = 'Porosity';
-
-errType = 'L1';
-%errType = 'Max';
 
 if nargin < 1
     fprintf('**Warning - the directory containing the data has not been specified** \n');
@@ -29,6 +22,16 @@ end
 
 if nargin < 5
     uniform_prefix = 'Uniform-DBVariablePorosity-';
+end
+
+if nargin < 6
+   compName = 'Porosity';
+end
+
+if nargin < 7
+    errType = 'L2';
+    % other options: L1, Max
+    
 end
 
 fine_res_dir = [uniform_prefix,num2str(fineNumCells),'--0'];
@@ -328,6 +331,7 @@ end
 % Print tables, first latex then human readable format
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+fprintf('Error computed for the field: %s \n', compName);
 
 % Error
 fprintf('%5s | %15s  | %5s  | %13s | %12s  | %12s  | %12s \n', '1/dz', 'Richardson', 'Rate', '512 diff', 'n_{ref} = 2', 'n_{ref} = 4', 'n_{ref} = (2,2)');
