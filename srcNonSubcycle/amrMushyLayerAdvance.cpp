@@ -104,30 +104,30 @@ amrMushyLayer::timeStep()
 
   IntVect zeroGhost = IntVect::Zero;
 
-  for (int lev=0; lev<=m_finest_level; lev++)
-  {
-    a_thetaNew[lev] = &(*a_scalarNew[m_theta][lev]);
-    a_thetaOld[lev] = &(*a_scalarOld[m_theta][lev]);
-
-    a_thetaNewPrev[lev] = new LevelData<FArrayBox>(m_amrGrids[lev], 1, m_ghostVect);
-    a_thetaNew[lev]->copyTo(*a_thetaNewPrev[lev]);
-
-    a_ThetaLNew[lev] = &(*a_scalarNew[m_compositionLiquid][lev]);
-    a_ThetaLOld[lev] = &(*a_scalarOld[m_compositionLiquid][lev]);
-
-    Theta_prev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
-    m_scalarNew[m_bulkConcentration][lev]->copyTo(*Theta_prev[lev]);
-
-    H_prev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
-    m_scalarNew[m_HC][lev]->copyTo(*H_prev[lev]);
-
-    H_twoPrev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
-    m_scalarNew[m_HC][lev]->copyTo(*H_twoPrev[lev]);
-
-    Theta_twoPrev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
-    m_scalarNew[m_bulkConcentration][lev]->copyTo(*Theta_twoPrev[lev]);
-
-  }
+//  for (int lev=0; lev<=m_finest_level; lev++)
+//  {
+//    a_thetaNew[lev] = &(*a_scalarNew[m_theta][lev]);
+//    a_thetaOld[lev] = &(*a_scalarOld[m_theta][lev]);
+//
+//    a_thetaNewPrev[lev] = new LevelData<FArrayBox>(m_amrGrids[lev], 1, m_ghostVect);
+//    a_thetaNew[lev]->copyTo(*a_thetaNewPrev[lev]);
+//
+//    a_ThetaLNew[lev] = &(*a_scalarNew[m_compositionLiquid][lev]);
+//    a_ThetaLOld[lev] = &(*a_scalarOld[m_compositionLiquid][lev]);
+//
+//    Theta_prev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
+//    m_scalarNew[m_bulkConcentration][lev]->copyTo(*Theta_prev[lev]);
+//
+//    H_prev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
+//    m_scalarNew[m_HC][lev]->copyTo(*H_prev[lev]);
+//
+//    H_twoPrev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
+//    m_scalarNew[m_HC][lev]->copyTo(*H_twoPrev[lev]);
+//
+//    Theta_twoPrev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
+//    m_scalarNew[m_bulkConcentration][lev]->copyTo(*Theta_twoPrev[lev]);
+//
+//  }
 
 
   logMessage(8, "    amrMushyLayer::timestep() - setup solvers");
@@ -462,10 +462,7 @@ calculatePermeability(bool oldTime)
   {
     for (DataIterator dit=m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
     {
-      //			Box box = m_amrGrids[lev][dit]; //This doesn't iterate over ghost cells
-      //			Box box = (*m_scalarNew[m_solidFraction][lev])[dit].box(); //This does iterate over ghost cells
 
-      FArrayBox& solid = (*m_scalarNew[m_solidFraction][lev])[dit];
 
       if (oldTime)
       {
@@ -480,9 +477,8 @@ calculatePermeability(bool oldTime)
                                 m_parameters, m_amrDx[lev]);
       }
 
-      //int temp=0;
 
-    } //data iterator
+    } // end data iterator
   }
 }
 //
@@ -1243,7 +1239,7 @@ calculateDiffAtPoint(Vector<RefCountedPtr<LevelData<FArrayBox> > > a_phiNew,
                      Vector<RefCountedPtr<LevelData<FArrayBox> > > a_phiOld,
                      int z_i)
 {
-  Real diff;
+  Real diff = 0.0;
   for(int lev=0; lev<=m_finest_level; lev++)
   {
     for(DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
@@ -1289,80 +1285,6 @@ calculateMaxDiff(Vector<RefCountedPtr<LevelData<FArrayBox> > > a_phiNew, Vector<
 
 
 
-Real amrMushyLayer::
-calculateResidual2(const Vector<RefCountedPtr<LevelData<FArrayBox> > > a_phiOld,
-                   const Vector<RefCountedPtr<LevelData<FArrayBox> > > a_phiNew)
-{
-  Vector<LevelData<FArrayBox>* > residual;
-  residual.resize(m_finest_level+1, NULL);
-
-  for (int lev=0; lev<=m_finest_level; lev++)
-  {
-    residual[lev] = new LevelData<FArrayBox>(m_amrGrids[lev], 1, IntVect::Zero);
-    a_phiNew[lev]->copyTo(*residual[lev]);
-
-    for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
-    {
-      (*residual[lev])[dit] -= (*a_phiOld[lev])[dit];
-    }
-  }
-
-
-  Real norm = computeNormWithSign(residual, m_refinement_ratios);
-
-  for (int lev=0; lev<=m_finest_level; lev++)
-  {
-    if (residual[lev] != NULL)
-    {
-      delete residual[lev];
-      //			residual[lev] == NULL;
-    }
-  }
-
-  return norm;
-
-}
-
-//Calculate dTheta/dt - ( V*d(Theta)/dz + (1/Le)*div(porosity*grad(Theta_l)) )
-//Real amrMushyLayer::
-//calculateConcEqnResidual()
-//{
-//
-//	Vector<LevelData<FArrayBox>* > residual;
-//	residual.resize(m_finest_level+1, NULL);
-//
-//	for (int lev=0; lev<=m_finest_level; lev++)
-//	{
-//		residual[lev] = new LevelData<FArrayBox>(m_amrGrids[lev], 1, IntVect::Zero);
-//		LevelData<FArrayBox> residualSteady(m_amrGrids[lev], 1, IntVect::Zero);
-//
-//
-//		for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
-//		{
-//			(*residual[lev])[dit].setVal(0);
-//			residualSteady[dit].setVal(0);
-//
-//			//Note that m_dScalar[m_composition] contains (V*d(Theta)/dz + (1/Le)*div(porosity*grad(Theta_l))) * m_dt
-//			(*residual[lev])[dit()] += (*m_dScalar[m_composition][lev])[dit];
-//
-//			//Add [d(Theta)/dt] * m_dt
-//			(*residual[lev])[dit()] += (*m_scalarNew[m_composition][lev])[dit()];
-//			(*residual[lev])[dit()] -= (*m_scalarOld[m_composition][lev])[dit()];
-//
-//
-//			//Divide by dt
-//			(*residual[lev])[dit()].divide(m_dt);
-//
-//		}
-//	}
-//
-//	Interval comps(0,0);
-//
-//	Real norm = computeNorm(residual, m_refinement_ratios, m_amrDx[0], comps, 0);
-//
-//	return norm;
-//
-//}
 
 void amrMushyLayer::
 applyBCs(const int a_var, const int lev)
@@ -1374,10 +1296,10 @@ applyBCs(const int a_var, const int lev)
   BCHolder bcHolder;
 
   //Get the BC function for this variable.
-  if (a_var==m_HC)
-  {
-    bcHolder = m_physBCPtr->enthalpySalinityBC(a_homogeneous);
-  }
+//  if (a_var==m_HC)
+//  {
+//    bcHolder = m_physBCPtr->enthalpySalinityBC(a_homogeneous);
+//  }
 //  else if(a_var == m_composition)
 //  {
 //    bcHolder = m_physBCPtr->ThetaFuncBC();
@@ -1399,12 +1321,12 @@ applyBCs(const int a_var, const int lev)
 //  {
 //    bcHolder = m_physBCPtr->BasicScalarFuncBC();
 //  }
-  else
-  {
+//  else
+//  {
     //let's not throw an error anymore
     MayDay::Error("applyBCs() - Can't calculate apply bcs for a_var specified");
     return;
-  }
+//  }
 
 
 
@@ -1729,129 +1651,6 @@ calculateThetaLSourceTerm(Vector<LevelData<FArrayBox>* > V_dThetadz_n, Vector<Le
   }
 
 
-}
-
-void amrMushyLayer::
-calculatethetaSourceTerm(Vector<LevelData<FArrayBox>* > thetaSource,  Vector<LevelData<FArrayBox>* > V_gradH_n)
-{
-  CH_TIME("amrMushyLayer::calclulatethetaSouceTerm");
-  //Calculate enthalpy advection at n+1
-  Vector<LevelData<FArrayBox>* > V_gradH_nPlusOne(m_finest_level+1,NULL);
-
-  //contains theta*(c_p-1) - S
-  Vector<LevelData<FArrayBox>* > porosityCoeff(m_finest_level+1,NULL);
-
-  Vector<LevelData<FArrayBox>* > fakePorositySource(m_finest_level+1,NULL);
-
-  Vector<LevelData<FArrayBox>* > thetaAverage = timeCenteredScalar(m_theta);
-
-  for (int lev=0; lev<=m_finest_level; lev++)
-  {
-    const DisjointBoxLayout& grids = m_amrGrids[lev];
-    V_gradH_nPlusOne[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
-    porosityCoeff[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
-    fakePorositySource[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
-
-    DataIterator dit = V_gradH_nPlusOne[lev]->dataIterator();
-    for (dit.begin(); dit.ok(); ++dit)
-    {
-      (*V_gradH_nPlusOne[lev])[dit()].setVal(0);
-      (*porosityCoeff[lev])[dit()].setVal(0);
-      (*fakePorositySource[lev])[dit()].setVal(0);
-    }
-  }
-
-  if (m_frameAdvectionMethod == m_finiteDifference)
-  {
-    calculateFrameAdvection(m_HC, V_gradH_nPlusOne, m_parameters.nonDimVel);
-    calculateFrameAdvection(m_porosity, fakePorositySource, 1); // V = 1
-  }
-
-
-  //	Real heleShawCooling = m_parameters.nonDimHeleShawCooling * m_parameters.thetaInf;
-
-  for (int lev=0; lev<=m_finest_level; lev++)
-  {
-    for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
-    {
-      // This is V * S *d (porosity)/dz
-      (*fakePorositySource[lev])[dit()].mult(0);
-
-      // Calculate (theta*(c_p - 1) - S)*d(porosity)/dt
-      (*porosityCoeff[lev])[dit()].setVal(-1);
-      (*porosityCoeff[lev])[dit()].plus(m_parameters.specificHeatRatio);
-      (*porosityCoeff[lev])[dit()].mult((*thetaAverage[lev])[dit]);
-      (*porosityCoeff[lev])[dit()].plus(-m_parameters.stefan);
-
-      (*m_dScalar[m_porosity][lev])[dit()].setVal(0);
-      (*m_dScalar[m_porosity][lev])[dit()] += (*m_scalarNew[m_porosity][lev])[dit()];
-      (*m_dScalar[m_porosity][lev])[dit()] -= (*m_scalarOld[m_porosity][lev])[dit()];
-      (*m_dScalar[m_porosity][lev])[dit()] /= m_dt;
-      //			(*m_dScalar[m_porosity][lev])[dit()] *= m_parameters.stefan;
-      (*m_dScalar[m_porosity][lev])[dit()].mult((*porosityCoeff[lev])[dit()]);
-
-      //Calculate d/dz (H^n + H^(n+1) )/2
-      if (m_frameAdvectionMethod == m_finiteDifference)
-      {
-        (*m_dScalar[m_HC][lev])[dit()].setVal(0);
-        (*m_dScalar[m_HC][lev])[dit()] += (*V_gradH_n[lev])[dit];
-        (*m_dScalar[m_HC][lev])[dit()] += (*V_gradH_nPlusOne[lev])[dit];
-        (*m_dScalar[m_HC][lev])[dit()] /= 2;
-      }
-
-
-      //Build the full forcing term (theta*(c_p-1) -S)*d(porosity)/dt + V*dH/dz
-      (*thetaSource[lev])[dit()].setVal(0);
-      (*thetaSource[lev])[dit()] += (*m_dScalar[m_porosity][lev])[dit()];
-      (*thetaSource[lev])[dit()] += (*m_dScalar[m_HC][lev])[dit()];
-      (*thetaSource[lev])[dit()] += (*m_dScalar[m_theta][lev])[dit()];
-      (*thetaSource[lev])[dit()] += (*fakePorositySource[lev])[dit()];
-
-    }
-    m_dScalar[m_HC][lev]->copyTo(*m_scalarNew[m_enthalpyAdvection][lev]);
-
-    thetaSource[lev]->exchange();
-
-    //Stick the forcing term in here for debugging
-    thetaSource[lev]->copyTo(*m_scalarNew[m_thetaForcing][lev]);
-
-    //Also calculate error in this term
-    for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
-    {
-      (*m_scalarNew[m_thetaForcingError][lev])[dit].setVal(0);
-      (*m_scalarNew[m_thetaForcingError][lev])[dit] += (*m_scalarNew[m_thetaForcingAnalytic][lev])[dit];
-      (*m_scalarNew[m_thetaForcingError][lev])[dit] -= (*m_scalarNew[m_thetaForcing][lev])[dit];
-    }
-  }
-
-  //Clean up memory
-  for (int lev=0; lev <= m_finest_level; lev++)
-  {
-    if (V_gradH_nPlusOne[lev] != NULL)
-    {
-      delete V_gradH_nPlusOne[lev];
-      V_gradH_nPlusOne[lev] = NULL;
-    }
-    if (porosityCoeff[lev] != NULL)
-    {
-      delete porosityCoeff[lev];
-      porosityCoeff[lev] = NULL;
-    }
-    if (thetaAverage[lev] != NULL)
-    {
-      delete thetaAverage[lev];
-      thetaAverage[lev] = NULL;
-    }
-    if (fakePorositySource[lev] != NULL)
-    {
-      delete fakePorositySource[lev];
-      fakePorositySource[lev] = NULL;
-    }
-
-
-
-
-  }
 }
 
 

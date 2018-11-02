@@ -1,242 +1,320 @@
-# Timestepping 
-main.maxTime = 10  # maximum (scaled) time to run to
-main.max_step = 9999   # maximum number of steps to run
-main.minStep = 1 #sometimes we want to make sure we don't stop immediately
-main.cfl = 0.9  # "cfl" number
-main.initial_cfl = 0.05  # "cfl" number 0.1
-main.max_dt_grow_factor = 1.1 #max amount dt can grow from one timestep to another - 1.1
-main.max_dt = 0.05
-main.fixed_dt = -1 # 0.0002 # 
-main.convergence_criteria = 1e-3
 
-# Grid setup
-main.max_level = 0 # finest level allowed in simulation
-main.num_cells = 120 40 80  #number of cells in base grid
-main.num_cells = 160 40 60 
-main.num_cells = 128 32 16
-main.num_cells = 32 32 16
-#main.num_cells = 16 128 16
-main.domain_size = 1 1 0 
-#main.domain_size = 1 8 0
-#main.restart_file = output/bm2-adaptive-Ra100-chk-64pts4676.2d.hdf5 #should be a checkpoint file
-#main.gridsFile=../../test/grids/grids-katz-data-112-40
+amrmultigrid.MGtype=1
+amrmultigrid.hang_eps=1.0e-10
+amrmultigrid.max_iter=10
+amrmultigrid.norm_thresh=1.0e-10
+amrmultigrid.num_mg=1
+amrmultigrid.num_smooth=8
+amrmultigrid.relaxMode=1
+amrmultigrid.tolerance=1.0e-10
+amrmultigrid.verbosity=0
+bc.bulkConcentrationHiVal=-1 -1
+bc.bulkConcentrationLoVal=-1 -1
 
-#Refinement
-main.ref_ratio = 2 2 2 2 2 2  # refinement ratios
-main.regrid_interval = 5  # number of timesteps between regridding
-main.blockFactor = 4           # block factor used in grid generation
-main.fill_ratio = 0.8          # how efficient are the grids
-main.nestingRadius = 1         # proper nesting radius required
-main.tags_grow = 1             # amount to buffer tags
-main.max_box_size = 256       	# largest box length allowed
-main.tagging_val = 0.14  	#condition on which to tag cells. Smaller means more refinement. (0.09)
-# Note - to find the index of each field look in the amrMushyLayer.H. theta = 5, U=0
-#main.tagging_vector_var = 0     # Refine if this vector field is above the refinement threshold. Only use if tagging_scalar_var = -1.
-main.tagging_scalar_var = 8    # Refine if the undivided gradient of this scalar field is above the refinement threshold.
-# 5 = temperature, 8 = porosity, 31 - permeability
+bc.scalarHi=1 0 0
+bc.scalarLo=1 2 2
+bc.velHi=6 0 0
+bc.velLo=6 3 0 #6 3 0 for outflow
+concise_run_name=Uniform64MushyDB
+machineCodeIsRunOn=atmlxmaster
+main.addSubtractGradP=1
 
-# Output
-main.plot_interval = 1
-main.plot_prefix = plot
-main.check_interval = -1
-main.check_prefix = chk
+
+main.checkpoint_interval=2
+main.chk_prefix=chk
+main.debug=false
+main.doEuler=1
+main.doProjection=1
+main.doVCreflux=0
+main.dt_tolerance_factor=1.01
+main.enforceAnalyticSoln=false
+main.fill_ratio=0.75
+
+main.ignoreSolverFails=true
+main.implicitAdvectionSolve=false
+main.initialPerturbation=0.0
+main.initial_cfl=0.001 # was 0.01
+main.initialize_pressure=true
+main.iter_plot_interval=-1
 main.iteration_plot_interval=-1
-main.verbosity = 5 #1 - not much, 5 - a fair bit, 15 - loads
-main.output_folder = output
+main.maxRestartWavenumber=1
 
-main.printAnalyticSoln = false
+main.max_dt_growth=1.01 # trying to increase this above 1.01
 
+main.max_step=10000 #187
+main.max_time=1.0e10
+main.min_time=10.0
+main.nondimensionalisation=1
+main.output_folder=output
+main.periodic_bc=1 0 0
+main.perturbationSin=true
+main.perturbationWavenumber=1
 
-##################################################
-# Init from specified data file
-#main.inputGhost = 0
-#main.thetaFile = theta-128.dat
-#main.U0 	= U0.dat
-#main.V0		= V0.dat
-#
-##################################################
-
-##################################################
-# How to calculate permeability
-# 0: permeability = 1
-# 1: permeability = (1-solid fraction)^3
-# 2: permeability = kozeny-carman
-# 3: permeability = log()
-# 4: permeability = x^2 (or whatever function I want)
-################################################
-parameters.permeabilityFunction = 1
-parameters.heleShaw=false
-
-#################################################
-# frame advection method
-#0 - godunov
-#1 - finite differences
-#################################################
-main.frameAdvectionMethod = 1
-
-################################################
-# Which order to calculate various parts of the 
-# fluid velocity
-# fluidVelDiffOrder - 2/4, for divergence and gradient calculations
-# fluidVelInterpOrder - 0/1/2, for converting cell centred to face centred values
-################################################
-main.fluidVelDiffOrder = 2
-main.fluidVelInterpOrder = 1 # 1st order seems to work better than 2nd order for smooth errors
-main.ownVelCalc = true #false means level, true means composite
-
-########################################################
-# Problem to solve
-# This code is designed to be able to solve both the full 
-# problem and also the benchmarks, with the relevant sections
-# turned on or off as required.
-# 0 - full problem
-# 1 - benchmark 1, directional solidification without flow
-# 2 - benchmark 2, convection in a fixed porous medium (Horton-Rogers-Lapwood problem)
-# 3 - diffusion d(theta)/dt = laplacian(theta)
-# 4 - pure advection
-# 5 - enforced porosity field 
-#######################################################
-parameters.problem_type = 1 #2
-main.enforceAnalyticSoln=false 
-
-############################################
-# How accurate do we want out advancement in time?
-# 1 - backward euler (1st order)
-# 2 - tga (2nd order)
-############################################
-main.timeIntegrationOrder = 2
-
-############################################
-# Multigrid solver
-###########################################
-amrmultigrid.num_smooth  = 80
-amrmultigrid.tolerance   = 1.0e-15
-amrmultigrid.num_mg      = 1
-amrmultigrid.norm_thresh = 1.0e-15
-amrmultigrid.hang_eps    = 1.0e-15
-amrmultigrid.max_iter    = 50
-amrmultigrid.verbosity   = 0
+main.plot_prefix=plt
+main.project_initial_vel=true
+main.ref_ratio=2 2 2
 
 
-godunov.use_limiting = false
-
-############################################
-# Picard iterator for non-linear solve
-###########################################
-picardIterator.absTolerance = 1e-4
-picardIterator.relTolerance = 1e5
-picardIterator.initialIters = 999
-picardIterator.predictorLimit = 0.5
-picardIterator.iterationLimit = 200
-
-#############################################
-# Boundary and initial conditions
-# Warning - CoarseAverageFace doesn't like periodic BCs (see note in Copier::define())
-############################################
-main.is_periodic = 0 0 0    # 1 if domain is periodic 
-# (note that periodic BC's override physical BC types)
-# physical BC types:  0 = homogeneous Dirichlet
-#                     1 = homogeneous Neumann
-main.lo_bc = 0 0 0  
-main.hi_bc = 0 0 0  
-
-parameters.fixedTempDirection = 1  # 0 for sidewall heating, 1 for vertical heating
+main.restart_perturbation=0.0
+main.restart_wavenumber=1
+main.scalePwithChi=1
+main.solverFailRestartMethod=0
+main.steady_state=1e-9
+main.symmetric_domain=false
 
 
-bc.enthalpy_side_val = 0     #d/dx = 0
-bc.composition_side_val = 0  #d/dx = 0
-bc.conc_liquid_side_val = 0  #d/dx = 0
-bc.temp_side_val = 0  		 #d/dx = 0
-bc.porosity_side_val = 0	#d/dx=0
+main.usePhiForImplicitAdvectionSolve=false
+main.use_limiting=true
 
-bc.conc_liquid_hot = 1 #just for testing performance of BC application
-bc.conc_liquid_cold = 0 #just for testing performance of BC application
+main.verbosity=2
+main.viscous_solver_tol=1e-15
+mercurialRepository=1062+
+parameters.K=1
+parameters.bottomBulkConc=-1.0
+parameters.bottomEnthalpy=6.3
+parameters.compositionRatio=20.0
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.heatConductivityRatio=1
+parameters.heleShaw=true
+parameters.initialComposition=30
+parameters.lewis=500 # 500
+parameters.liquidusSlope=-0.1
 
-
-#############################################
-#Physical parameters
-#############################################
-##Katz & Worster 2008 parameters for NH4Cl
-parameters.viscosity 				= 1.4e-3 	# Pa s
-parameters.heatConductivityLiquid   = 0.54 		# W/(m K)
-parameters.heatConductivitySolid    = 2.2 		# W/(m K)
-parameters.specificHeatLiquid 		= 3.5e3 	# J/(kg K)
-parameters.specificHeatSolid 		= 1.5e3 	# J/(kg K)
-parameters.liquidDensity			= 1050		# kg/(m^3)
-parameters.latentHeatDissolution	= 2.76e5	# J/kg
-parameters.thermalExpansivity		= 2.1e-4	# 1/K
-parameters.solutalExpansivity		= -0.30		# 1/(wt. frac.)
-parameters.eutecticTemp				= -16		# celcius
-parameters.eutecticComposition		= 0.2		# wt. frac.
-parameters.liquidusSlope			= 471.4 	# celcius/(wt. frac.)
-parameters.waterDistributionCoeff	= 1e-5 #1e-5		# dimensionless
-parameters.heleShawCoolingCoeff		= 1600		# J/(m^3 s celcius)
-parameters.liquidSoluteDiffusivity	= 1e-9		# m^2/s   (guess, approx 100x smaller than heat diffusivity)
-parameters.d						= 5e-3		# m
-parameters.height					= 0.5		# m
-parameters.width					= 6e-2		# m
-parameters.referencePermeability 	= 1e-12		# m^2
-parameters.gravitationalAcceleration= 9.8		# m/s
-parameters.V						= 1e-6		# m/s
-
-#Initial and boundary conditions
-parameters.initialComposition		= 0.25		# wt. frac. 
-parameters.bottomTemp 				= -28.0		# celcius
-parameters.topTemp					= 20.0		# celcius
-
-##If we wish, we can enforce other parameters like the Stefan number or Lewis number. Else, they are calculated from the data above
-
-##For solidification without fluid flow benchmark (See Katz & Worster 2008 and Worster 1991):
-parameters.stefan 			= 5.7 #5.7
-parameters.compositionRatio = 1.4
-parameters.K				= 1
-parameters.specificHeatRatio= 1
-parameters.lewis			= 10e200  # (infinite)
-parameters.V				= 1e-6 #1e-6
-parameters.deltaTemp		= 25
-parameters.bottomTemp			= -20  
-parameters.topTemp			= 15  #15
-parameters.eutecticTemp		= -20
-parameters.height 			= 0.5
-parameters.initialComposition	= 0.25
-parameters.eutecticComposition	= 0.2 
-parameters.liquidusSlope	= 50
-parameters.heatConductivityLiquid   = 0.5 		# W/(m K)
-parameters.specificHeatLiquid 		= 3.5e3 	# J/(kg K)
-parameters.liquidDensity			= 1000		# kg/(m^3)
-parameters.heatConductivityRatio = 1
-parameters.heleShawCoolingCoeff = 0 #we don't consider a hele-shaw setup yet
-parameters.rayleighTemp 		= 0
-
-#For fixed porous medium flow
-parameters.rayleighTemp 		= 200
-parameters.rayleighComposition 	= 0
-parameters.stefan 				= 0 # 0 means H = theta
-parameters.K					= 1
-parameters.lewis 				= 10e200
-parameters.V					= 0
-parameters.topTemp 			= 0
-parameters.bottomTemp 		= 10
-parameters.eutecticTemp = 0
-parameters.deltaTemp = 10
-parameters.initialComposition	= 0.7
-parameters.eutecticComposition	= 0.9
-parameters.liquidusSlope	= 50
-parameters.specificHeatLiquid 		= 3.5e3 	# J/(kg K)
-parameters.specificHeatSolid		= 3.5e3 	# J/(kg K)
-parameters.porosityTimescale		= 0 #1.5 is a sensible value
-
-# For matching Rich's output
-#parameters.stefan = 3.3
-#parameters.lewis =  276000
-#parameters.initialComposition	= 0.75
-#parameters.eutecticComposition	= 0.8
-#parameters.eutecticTemp = -16
-#parameters.topTemp 			= -18
-#parameters.bottomTemp 		= 20
+parameters.nonDimVel=0.0
+parameters.permeabilityFunction=2
+parameters.prandtl=10.0
+parameters.problem_type=0
+parameters.rayleighTemp=0
+parameters.specificHeatRatio=1
+parameters.stefan=5
+parameters.topBulkConc=-1.0
+parameters.waterDistributionCoeff=1e-5
+picardSolver.max_iter=8
+picardSolver.tol=1e-5
 
 
+projection.numSmoothDown=4
+projection.numSmoothUp=4
+projection.solverTol=1e-15
 
-## Options only used for debugging
-debugging.fixVelocity = false  # setting to true means we just use the initial velocity
-debugging.resetTemperatureField = false  # setting to true means that, when loading from a restart file, we overwrite the temperature field with initial conditions
+projector.verbosity=0
+regrid.marginalPorosityLimit=0.99
+run_name=Uniform
+
+
+#AMR
+main.max_level=2
+main.refine_thresh=0.0005 #0.02
+main.taggingVar=3   #3 porosity, 4 liquid conc
+main.regrid_interval=8 16
+
+
+# Good:
+parameters.rayleighComp=500
+parameters.darcy=1e-4
+main.domain_width=1.0
+
+# Also Good:
+
+parameters.rayleighComp=5e3
+parameters.darcy=1e-4
+main.domain_width=1.0
+
+#AMR testing:
+main.domain_width=1.0  #3.0 for multiple channels
+parameters.rayleighComp=350 #100
+parameters.darcy=2e-3
+main.debug=true
+
+main.num_cells=32 64 #64 64
+main.max_dt=4 #0.5 # should be less than prandtl number?
+
+main.nondimensionalisation=1
+
+main.use_subcycling=0
+
+main.plot_interval=16 #32
+
+bc.enthalpyHiVal=0.0 0.2  #-0.2
+bc.enthalpyLoVal=0.0 6.05 #6.5  #6.5
+main.cfl=0.4
+
+parameters.nonDimReluctance=1e-3
+
+main.advPorosityLimit=0.01
+main.ccvel_porosity_cap=0.01
+main.verbosity=8
+
+regrid.plume_vel=0.025 # need to work out what this should be a priori. Probably scales a bit like a^2 * Pr * Da * RaC
+main.grid_buffer_size=4 4 4
+main.tag_buffer_size=4 # this needs to be big enough to keep ahead of the ml-interface
+
+
+# Try just 1 refined region, around channel, and get reflux to work
+main.max_level=1
+main.num_cells=64 128
+
+
+main.time_integration_order=1
+main.reflux_average_down=1
+projection.eta=0.95 #0.95 
+main.reflux_momentum=1
+main.reflux_normal_momentum=1 # default is true
+main.reflux_scalar=1
+main.refluxType=0 # could try reflux type 0, just a simple (non-VC) poisson solve
+
+#main.refluxBetaSign=-1
+#main.refluxCorrSign=0.0 #0.01
+
+#main.restart_file=output/chk000464.2d.hdf5
+
+parameters.darcy=5e-4
+parameters.rayleighComp=800
+
+parameters.darcy=5e-3
+parameters.rayleighComp=75
+main.domain_width = 1.0
+
+# These params develop a single channel:
+main.max_level=1
+main.num_cells=32 128 #64 128
+main.block_factor=16
+main.max_grid_size=16
+parameters.rayleighComp=300
+
+# Need to test these params:
+#main.max_level=2
+#main.num_cells=32 128 #64 128
+#parameters.rayleighComp=300
+
+# Try coarser params:
+main.max_level=1
+main.num_cells=16 64 #64 128
+main.block_factor=8
+main.max_grid_size=32
+parameters.rayleighComp=300
+main.domain_width = 1.0
+main.tag_buffer_size=1
+
+regrid.plume_salinity=-0.5
+regrid.plume_vel=0.011 #0.01 #0.0005
+
+# Good, now try two levels
+main.max_level=2
+# Above works, but issue with refluxing at domain boundaries
+
+parameters.rayleighComp=275 #want just the one channel 
+main.output_folder=outputAMR
+main.maxDivUFace=1e-10
+
+# Trying to fix bug at step 430
+#main.restart_file=outputAMR/chk000704.2d.hdf5
+projection.eta=0.9
+main.reflux_scalar=1
+main.max_step=74
+main.use_subcycling=1
+
+# try and make larger grids to see if it helps the solvers
+main.tag_buffer_size=16 # - this places refined regions outside mush
+main.tag_buffer_size=8 # - places cf interface in mush which doesn't work
+
+parameters.rayleighComp=300
+# Just one channel?:
+# 300 for max_dt = 10
+parameters.rayleighComp=1000 # 400 for single level
+
+## Sync options:
+main.initLambda=1
+main.regrid_advect_before_freestream=1
+main.regrid_freestream_subcycle=1
+main.num_init_passes=5
+main.regrid_dt_scale=0.5
+
+main.regrid_small_vel_limit=1e-7
+
+main.writePressureInitFields=0
+main.max_level=2
+projection.eta=0.99
+
+# Trying to construct same problem with one level of refinement
+main.max_level=1
+main.max_step=3000
+main.num_cells=32 128
+
+#main.restart_file=outputAMR/chk000032.2d.hdf5
+
+
+
+main.tag_buffer_size=4
+
+# Make this correction larger
+main.regrid_eta_scale=1.0
+
+parameters.compositionRatio=1.3
+parameters.rayleighComp=1000
+main.domain_width=1.0
+
+#main.domain_width=0.5
+#main.max_dt=0.5
+#parameters.rayleighComp=2000
+
+main.plot_interval=8
+main.subcycled_plots=0
+
+# For debugging:
+#main.plot_interval=1
+#main.subcycled_plots=1
+
+# Trying to fix low C sims
+main.regrid_eta_scale=1.0
+projection.eta=0.99
+main.reflux_scalar=1
+parameters.rayleighComp=500
+main.addSubtractGradPAdvection=0
+
+#advSrc.viscous=0
+#main.max_step=150
+#main.project_initial_vel=0
+# Not sure if this makes a difference. Maybe a bit.
+main.vectorHOinterp=1
+main.scalarHOinterp=1
+main.do_postRegrid_smoothing=0
+main.regrid_smoothing_coeff=0.05
+
+#advSrc.allow_lagged_lap_vel=1
+
+#main.restart_file=outputAMR/chk000138.2d.hdf5
+#main.regrid_plots=1
+#main.writePressureInitFields=1
+
+# Really trying to kill off viscosity
+parameters.darcy=5e-3
+parameters.rayleighComp=75
+
+parameters.darcy=2e-3
+parameters.rayleighComp=500
+regrid.plume_vel=0.008
+main.max_dt=4
+
+parameters.darcy=5e-4
+parameters.rayleighComp=1000
+regrid.plume_vel=0.001
+main.max_dt=20
+main.initial_cfl=1e-6
+
+#parameters.darcy=5e-4
+#parameters.rayleighComp=1000
+#main.domain_width = 1.0
+#main.max_dt=10
+
+#main.restart_file=outputAMR/chk000600.2d.hdf5
+
+
+# Try no viscous terms at all
+main.viscosityCoeff=0
+parameters.darcy=1e-2
+parameters.rayleighComp=10
+regrid.plume_vel=0.1
+main.max_level=0
+main.max_dt=5

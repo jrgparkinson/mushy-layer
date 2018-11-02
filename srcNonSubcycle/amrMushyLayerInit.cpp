@@ -43,7 +43,7 @@ amrMushyLayer::setDefaults()
   m_num_ghost = 4; // Warning - think this wants to be 4, or else stuff breaks
   m_ghostVect = m_num_ghost*IntVect::Unit;
   m_parameters.getParameters();
-  m_parameters.printParameters();
+ // m_parameters.printParameters();
   m_timeIntegrationOrder = 2;
   m_enforceAnalyticSoln = true;
   m_printAnalyticSoln = false;
@@ -68,14 +68,14 @@ amrMushyLayer::setDefaults()
   m_total_num_iterations = 1;
 
 
-  m_physBCPtr = new PhysBCUtil(m_parameters, m_amrDx[0]);
+  m_physBCPtr = NULL; //new PhysBCUtil(m_parameters, m_amrDx[0]);
 
   // MAKE SURE YOU UPDATE THIS IF YOU ADD ANOTHER (SCALAR) VARIABLE!
   //  m_numVars = 48;
 
   m_varNames = Vector<string>(m_numVars, string("Placeholder name"));
 
-  m_varNames[m_HC] = string("Enthalpy-Bulk concentration");
+
   m_varNames[m_enthalpy] = string("Enthalpy");
   m_varNames[m_enthalpySolidus] = string("Enthalpy solidus");
   m_varNames[m_enthalpyLiquidus] = string("Enthalpy liquidus");
@@ -147,10 +147,9 @@ amrMushyLayer::initialize()
 {
   CH_TIME("amrMushyLayer::initialize()");
 
-  if (s_verbosity > 3)
-  {
-    pout() << "amrMushyLayer::initialize" << endl;
-  }
+
+  pout() << "amrMushyLayer::initialize" << endl;
+
 
   // first, read in info from parmParse file
   ParmParse pp("main");
@@ -181,7 +180,7 @@ amrMushyLayer::initialize()
   }
 
 
-  pp.getarr("is_periodic", is_periodic_int, 0, SpaceDim);
+  pp.getarr("periodic_bc", is_periodic_int, 0, SpaceDim);
   for (int dir=0; dir<SpaceDim; dir++)
   {
     m_is_periodic[dir] = (is_periodic_int[dir] == 1);
@@ -228,7 +227,7 @@ amrMushyLayer::initialize()
 
   pp.get("regrid_interval", m_regrid_interval);
 
-  pp.get("blockFactor", m_block_factor);
+  pp.get("block_factor", m_block_factor);
 
   pp.get("fill_ratio", m_fill_ratio);
 
@@ -287,6 +286,9 @@ amrMushyLayer::initialize()
 
   } // leaving problem domain setup scope
 
+  // Now we have amr dx we can do this
+  m_physBCPtr = new PhysBCUtil(m_parameters, m_amrDx[0]);
+
   // check to see if we're using predefined grids
   bool usePredefinedGrids = false;
   std::string gridFile;
@@ -333,6 +335,8 @@ amrMushyLayer::initialize()
       m_scalarDiffusionCoeffs[m_bulkConcentration] = 1/m_parameters.lewis;
     }
 
+    m_HC.resize(m_max_level+1);
+
     for (int a_var=0; a_var<m_numVectorVars; a_var++)
     {
       m_vectorOld[a_var].resize(m_max_level+1, NULL);
@@ -340,6 +344,8 @@ amrMushyLayer::initialize()
       m_dVector[a_var].resize(m_max_level+1, NULL);
       m_vectorFluxRegister[a_var].resize(m_max_level+1);
     }
+
+
 
 
 
@@ -491,6 +497,8 @@ void amrMushyLayer::initVars(const int lev)
     m_dScalar[a_var][lev] = RefCountedPtr<LevelData<FArrayBox> >
     (new LevelData<FArrayBox>(m_amrGrids[lev], 1,m_ghostVect));
   }
+  m_HC = RefCountedPtr<LevelData<FArrayBox> >
+  (new LevelData<FArrayBox>(m_amrGrids[lev], 1,m_ghostVect));
 
   for (int a_var=0; a_var<m_numVectorVars; a_var++)
   {
@@ -697,6 +705,11 @@ amrMushyLayer::initData()
 void amrMushyLayer::
 initVectorVars(const int lev)
 {
+  if (s_verbosity > 3)
+    {
+      pout() << "amrMushyLayer::initVectorVars" << endl;
+    }
+
   //Initialise vector variables
   for (int a_var=0; a_var<m_numVectorVars; a_var++)
   {
@@ -736,45 +749,49 @@ void amrMushyLayer::getLocation(const IntVect iv, const int lev, RealVect &loc, 
 void amrMushyLayer::
 initScalarVars(const int lev)
 {
+  if (s_verbosity > 3)
+    {
+      pout() << "amrMushyLayer::initScalarVars" << endl;
+    }
 
   vector<int> ignore;
 
   //Initialise scalar variables
-  for (int a_var=0; a_var<m_numVars; a_var++)
-  {
-    LevelData<FArrayBox>& levelPhiNew = *(m_scalarNew[a_var][lev]);
-    DataIterator levelDit = levelPhiNew.dataIterator();
+
+    LevelData<FArrayBox>& levelHC = *(m_HC[lev]);
+    DataIterator levelDit = levelHC.dataIterator();
     for (levelDit.begin(); levelDit.ok(); ++levelDit)
     {
-      FArrayBox& thisPhiNew = levelPhiNew[levelDit()];
-      Box thisBox = thisPhiNew.box();
-      IntVect box_iv = thisBox.smallEnd();
+      levelHC[levelDit()].setVal(m_parameters.Hinitial, 0);
+      levelHC[levelDit()].setVal(m_parameters.bcValBulkConcentrationLo[SpaceDim-1], 0);
 
-      BoxIterator bit(thisBox);
-      for (bit.begin(); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-        RealVect loc;
-        getLocation(iv, lev, loc);
-        Real x = loc[0];
-        Real z = loc[1];
-
-        if (a_var == m_HC)
-        {
-
-          thisPhiNew(iv,0) = m_parameters.Hinitial;
-          thisPhiNew(iv,1) = m_parameters.bcValBulkConcentrationLo[SpaceDim-1];
-
-        }
-        else
-        {
-          thisPhiNew(iv,0) = 0;
-        }
-      } //end loop over intvects
+//      Box thisBox = thisPhiNew.box();
+//      IntVect box_iv = thisBox.smallEnd();
+//
+//      BoxIterator bit(thisBox);
+//      for (bit.begin(); bit.ok(); ++bit)
+//      {
+//        IntVect iv = bit();
+//        RealVect loc;
+//        getLocation(iv, lev, loc);
+//        Real x = loc[0];
+//        Real z = loc[1];
+//
+//        if (a_var == m_HC)
+//        {
+//
+//          thisPhiNew(iv,0) = ;
+//          thisPhiNew(iv,1) = ;
+//
+//        }
+//        else
+//        {
+//          thisPhiNew(iv,0) = 0;
+//        }
+//      } //end loop over intvects
 
 
     } //end loop over boxes
-  } //end loop over levels
 
   updateEnthalpyVariables();
 
@@ -1633,7 +1650,7 @@ amrMushyLayer::getLevelAdvectionsVars(const int a_var,
   {
     advPhys = m_advPhysConc[lev];
   }
-  else if(a_var == m_HC)
+  else if(a_var == m_enthalpy)
   {
     advPhys = m_advPhysEnthalpy[lev];
   }

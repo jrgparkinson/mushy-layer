@@ -265,57 +265,60 @@ void amrMushyLayer::enforceAnalyticSolution()
     pout() << "amrMushyLayer::enforceAnalyticSolution()" << endl;
   }
 
-  if (m_parameters.physicalProblem == m_bmDiffusiveSolidification)
-  {
-    //Specific to directional solidification benchmark
-    activeLevelCopy(m_scalarNew[m_thetaTrue], m_scalarNew[m_theta]);
-    activeLevelCopy(m_scalarNew[m_solidFractionTrue], m_scalarNew[m_solidFraction]);
-    activeLevelCopy(m_scalarNew[m_ThetaLAnalytic], m_scalarNew[m_compositionLiquid]);
-    activeLevelCopy(m_scalarNew[m_ThetaAnalytic], m_scalarNew[m_bulkConcentration]);
+  MayDay::Error("enforceAnalyticSolution does not work anymore");
 
-    int ilev = 0;
-    for (DataIterator dit = m_amrGrids[ilev].dataIterator(); dit.ok(); ++dit)
-    {
-      (*m_scalarNew[m_porosity][ilev])[dit()].setVal(1);
-      (*m_scalarNew[m_porosity][ilev])[dit()] -= (*m_scalarNew[m_solidFraction][ilev])[dit()];
-    }
-
-    calculateEnthalpy();
-
-    vector<int> ignore;
-    //		ignore.push_back(m_theta);
-    //		ignore.push_back(m_porosity);
-    //		ignore.push_back(m_compositionLiquid);
-    updateEnthalpyVariables();
-  }
-
-  else if (m_parameters.physicalProblem == m_bmDiffusion)
-  {
-    activeLevelCopy(m_scalarNew[m_thetaTrue], m_scalarNew[m_theta]);
-  }
-  else if (m_parameters.physicalProblem == m_bmHRL)
-  {
-    activeLevelCopy(m_scalarNew[m_thetaTrue], m_scalarNew[m_theta]);
-
-    calculateEnthalpy();
-
-    vector<int> ignore;
-    updateEnthalpyVariables();
-
-  }
-
-  else
-  {
-    //Standard
-
-    activeLevelCopy(m_scalarNew[m_ThetaAnalytic], m_scalarNew[m_bulkConcentration]);
-    activeLevelCopy(m_scalarNew[m_enthalpyAnalytic], m_scalarNew[m_HC]);
-
-    // Get porosity, theta, Theta_l, Theta_s
-    vector<int> ignore;
-    updateEnthalpyVariables();
-  }
-
+  //todo - fix method if we need it
+//  if (m_parameters.physicalProblem == m_bmDiffusiveSolidification)
+//  {
+//    //Specific to directional solidification benchmark
+//    activeLevelCopy(m_scalarNew[m_thetaTrue], m_scalarNew[m_theta]);
+//    activeLevelCopy(m_scalarNew[m_solidFractionTrue], m_scalarNew[m_solidFraction]);
+//    activeLevelCopy(m_scalarNew[m_ThetaLAnalytic], m_scalarNew[m_compositionLiquid]);
+//    activeLevelCopy(m_scalarNew[m_ThetaAnalytic], m_scalarNew[m_bulkConcentration]);
+//
+//    int ilev = 0;
+//    for (DataIterator dit = m_amrGrids[ilev].dataIterator(); dit.ok(); ++dit)
+//    {
+//      (*m_scalarNew[m_porosity][ilev])[dit()].setVal(1);
+//      (*m_scalarNew[m_porosity][ilev])[dit()] -= (*m_scalarNew[m_solidFraction][ilev])[dit()];
+//    }
+//
+//    calculateEnthalpy();
+//
+//    vector<int> ignore;
+//    //		ignore.push_back(m_theta);
+//    //		ignore.push_back(m_porosity);
+//    //		ignore.push_back(m_compositionLiquid);
+//    updateEnthalpyVariables();
+//  }
+//
+//  else if (m_parameters.physicalProblem == m_bmDiffusion)
+//  {
+//    activeLevelCopy(m_scalarNew[m_thetaTrue], m_scalarNew[m_theta]);
+//  }
+//  else if (m_parameters.physicalProblem == m_bmHRL)
+//  {
+//    activeLevelCopy(m_scalarNew[m_thetaTrue], m_scalarNew[m_theta]);
+//
+//    calculateEnthalpy();
+//
+//    vector<int> ignore;
+//    updateEnthalpyVariables();
+//
+//  }
+//
+//  else
+//  {
+//    //Standard
+//
+//    activeLevelCopy(m_scalarNew[m_ThetaAnalytic], m_scalarNew[m_bulkConcentration]);
+//    activeLevelCopy(m_scalarNew[m_enthalpyAnalytic], m_scalarNew[m_HC]);
+//
+//    // Get porosity, theta, Theta_l, Theta_s
+//    vector<int> ignore;
+//    updateEnthalpyVariables();
+//  }
+//
 
 
 

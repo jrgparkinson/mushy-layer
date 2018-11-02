@@ -73,29 +73,7 @@ amrMushyLayer::~amrMushyLayer()
   for (int lev=0; lev<m_fluidAdv.size(); lev++)
   {
 
-    // Scalar vars - refcounted pts, don't need to do this?
-    //		for (int a_var = 0; a_var < m_numVars; a_var++)
-    //		{
-    //
-    //			if (m_scalarOld[a_var][lev] != NULL)
-    //			{
-    //				delete m_scalarOld[a_var][lev];
-    //				m_scalarOld[a_var][lev] = NULL;
-    //			}
-    //
-    //			if (m_scalarNew[a_var][lev] != NULL)
-    //			{
-    //				delete m_scalarNew[a_var][lev];
-    //				m_scalarNew[a_var][lev] = NULL;
-    //			}
-    //
-    //			if (m_dScalar[a_var][lev] != NULL)
-    //			{
-    //				delete m_dScalar[a_var][lev];
-    //				m_dScalar[a_var][lev] = NULL;
-    //			}
-    //
-    //		}
+
 
     // Vector vars
     for (int a_var = 0; a_var<m_numVectorVars; a_var++)
@@ -212,8 +190,6 @@ amrMushyLayer::run(Real a_max_time, int a_max_step)
         && m_restart_step != m_cur_step)
     {
       regrid();
-
-      int wait=0;
     }
 
     // compute dt after regridding in case number of levels has changed
@@ -292,85 +268,6 @@ averageCoarseToFineSolutions()
 }
 
 
-
-
-//void amrMushyLayer::
-//initialiseVarToZero(Vector<LevelData<FArrayBox>* > a_phi)
-//{
-//	for (int lev=0; lev<=m_finest_level; lev++)
-//	{
-//		const DisjointBoxLayout& grids = m_amrGrids[lev];
-//		a_phi[lev] = new LevelData<FArrayBox>(grids, 1,m_ghostVect);
-//
-//		DataIterator dit = a_phi[lev]->dataIterator();
-//		for (dit.begin(); dit.ok(); ++dit)
-//		{
-//			(*a_phi[lev])[dit()].setVal(0);
-//		}
-//	}
-//}
-
-//Calculate H = porosity * stefan + (porosity +  (1-porosity)*heat capacity ratio) * temp
-void amrMushyLayer::
-calculateEnthalpy()
-{
-  for (int lev=0; lev<=m_finest_level; lev++)
-  {
-    LevelData<FArrayBox> thetaTerm(m_amrGrids[lev], 1, m_ghostVect);
-
-    for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
-    {
-      //			FArrayBox& enth = (*m_scalarNew[m_enthalpy][lev])[dit()];
-
-      thetaTerm[dit()].setVal(1);
-      thetaTerm[dit()] -= (*m_scalarNew[m_porosity][lev])[dit()];
-      thetaTerm[dit()].mult(m_parameters.specificHeatRatio);
-      thetaTerm[dit()] += (*m_scalarNew[m_porosity][lev])[dit()];
-      thetaTerm[dit()].mult((*m_scalarNew[m_theta][lev])[dit()]);
-
-      (*m_scalarNew[m_HC][lev])[dit()].setVal(0);
-      (*m_scalarNew[m_HC][lev])[dit()] += (*m_scalarNew[m_porosity][lev])[dit()];
-      (*m_scalarNew[m_HC][lev])[dit()].mult(m_parameters.stefan);
-
-      (*m_scalarNew[m_HC][lev])[dit()] += thetaTerm[dit()];
-      //(*m_scalarNew[m_enthalpy])[dit()] += (*m_scalarNew[m_temp])[dit()];
-      //			int temp=1;
-    }
-  }
-}
-
-
-
-//Set Theta^{*+1} = chi^* Theta_l^{*+1} + (1-chi^*) Theta_s^*
-void amrMushyLayer::
-calculateBulkConcentration()
-{
-
-  for (int lev=0; lev<=m_finest_level; lev++)
-  {
-    LevelData<FArrayBox> ThetaSTerm(m_amrGrids[lev], 1, IntVect::Unit);
-
-    for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
-    {
-      ThetaSTerm[dit()].setVal(1);
-      ThetaSTerm[dit()] -= (*m_scalarNew[m_porosity][lev])[dit()];
-      ThetaSTerm[dit()].mult((*m_scalarNew[m_compositionSolid][lev])[dit()]);
-
-      (*m_scalarNew[m_bulkConcentration][lev])[dit()].setVal(0);
-      (*m_scalarNew[m_bulkConcentration][lev])[dit()] += (*m_scalarNew[m_porosity][lev])[dit()];
-      (*m_scalarNew[m_bulkConcentration][lev])[dit()].mult((*m_scalarNew[m_compositionLiquid][lev])[dit()]);
-
-      (*m_scalarNew[m_bulkConcentration][lev])[dit()] += ThetaSTerm[dit()];
-
-    }
-  }
-
-
-
-
-
-}
-
 void amrMushyLayer::
 updateEnthalpyVariables()
 {
@@ -379,7 +276,7 @@ updateEnthalpyVariables()
   for (int lev=0; lev<=m_finest_level; lev++)
   {
     //Get level data's from the vector of all scalar variables to de-clutter the remaining code.
-    LevelData<FArrayBox>& HC = *m_scalarNew[m_HC][lev];
+    LevelData<FArrayBox>& HC = *m_HC[lev];
 
     LevelData<FArrayBox>& theta = *m_scalarNew[m_theta][lev];
     LevelData<FArrayBox>& compositionLiquid = *m_scalarNew[m_compositionLiquid][lev];
@@ -919,7 +816,7 @@ amrMushyLayer::computeDt()
   Real finest_frameAdv_dt = m_amrDx[m_finest_level] /  m_parameters.nonDimVel;
 
   //Just do this on level 0 (base level)
-  Real maxFluidVel = m_godunovEnthalpy[0]->getMaxWaveSpeed(*m_scalarNew[m_HC][0], *m_fluidAdv[0]);
+  Real maxFluidVel = m_godunovEnthalpy[0]->getMaxWaveSpeed(*m_scalarNew[m_enthalpy][0], *m_fluidAdv[0]);
   Real finest_fluidAdv_dt = m_amrDx[m_finest_level] / maxFluidVel;
 
   Real finest_dt = min(finest_frameAdv_dt, finest_fluidAdv_dt);

@@ -245,17 +245,8 @@ protected:
 	void activeLevelCopy(Vector<RefCountedPtr<LevelData<FArrayBox> > > from,
 			Vector<RefCountedPtr<LevelData<FArrayBox> > > to);
 
-	///Calculate the source term for the \f$ \theta \f$ equation, \n
-	/// \f$ B \theta_\infty + V \frac{\partial H^{n+1/2}}{\partial z} +
-	/// \left(\theta^{n+1/2} (c_p - 1) - S \right) \frac{\chi^* - \chi^n}{\Delta t}\f$
-	void calculatethetaSourceTerm(Vector<LevelData<FArrayBox>* > thetaSource,
-			Vector<LevelData<FArrayBox>* > V_gradH);
 
-	///Calculate \f$ H = \chi S + (\chi + (1-\chi) c_p)\theta \f$
-	void calculateEnthalpy();
 
-	///Calculate \f$ \Theta = \chi \Theta_l + (1-\chi) \Theta_s\f$
-	void calculateBulkConcentration();
 
 	///Calculate porosity using the phase diagram
 	void calculatePorosity();
@@ -548,6 +539,9 @@ protected:
 	/// Scalar fields at new timestep
 	Vector<Vector<RefCountedPtr<LevelData<FArrayBox> > > > m_scalarNew;
 
+	/// This is a special case
+	Vector<RefCountedPtr<LevelData<FArrayBox> > > m_HC;
+
 	/// Scalar fields at old timestep
 	Vector<Vector<RefCountedPtr<LevelData<FArrayBox> > > > m_scalarOld;
 
@@ -580,7 +574,6 @@ protected:
 
 	/// List of scalar fields
 	enum vars {
-	        m_HC,
 		m_enthalpy,
 		m_enthalpySolidus,
 		m_enthalpyEutectic,
