@@ -57,7 +57,6 @@ end
 runDir = strrep(AMRDir, finalFolder, '');
 
 
-
 % Try and do the error calculation
 try
    

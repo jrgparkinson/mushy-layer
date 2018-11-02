@@ -63,6 +63,7 @@ if runAnalysis
 
     tic;
     
+   
     parfor i=1:length(folders)
         folder = folders(i);
         folderName = folder.name;
@@ -181,7 +182,7 @@ for i=1:length(runs)
            
            
            % Also get richardson error
-            File = fullfile(folder_dir, 'richardsonError.mat');
+            richardsonErrorFile = fullfile(folder_dir, 'richardsonError.mat');
             if exist(richardsonErrorFile, 'file') ~= 2
                 continue
             end
@@ -218,10 +219,6 @@ for i=1:length(runs)
             end
         
     end
-    
-    %plot(log10(1./thisNumCells), log10(thisError), 'x');
-    %plot(log10(thisRunTime), log10(thisError), 'x');
-    
     
     
     
@@ -291,33 +288,36 @@ legend(runs, 'Location', 'eastoutside');
 
 box on;
 
+extrapolateRunTime = false;
 
-figure();
-hold on;
-for i=1:length(runs)
-    ncell = log10(thisNumCells(i, :));
-    runt = log10(thisRunTime(i, :));
-    validVals = 1-isnan(ncell).*isnan(runt);
-    
-    
-    extrapncell = sort([ncell(validVals==1) max(ncell) max(ncell)*1.5 max(ncell)*2 max(ncell)*3]);
-    
-    P = polyfit(sort(ncell(validVals==1)), sort(runt(validVals==1)), 2);
-    
-    extraprun = P(3) + extrapncell.^2*P(1) +  extrapncell*P(2);
-    
-    %extrapncell = [ncell(validVals==1) max(ncell) max(ncell)*3];
-    
-    %extraprun = interp1(ncell(validVals==1), runt(validVals==1), extrapncell, 'linear', 'extrap');
-    
-    plot(log10(thisNumCells(i, :)), log10(thisRunTime(i, :)), marker{i});
-    plot(extrapncell, extraprun, '-');
+if extrapolateRunTime
+    figure();
+    hold on;
+    for i=1:length(runs)
+        ncell = log10(thisNumCells(i, :));
+        runt = log10(thisRunTime(i, :));
+        validVals = 1-isnan(ncell).*isnan(runt);
+
+
+        extrapncell = sort([ncell(validVals==1) max(ncell) max(ncell)*1.5 max(ncell)*2 max(ncell)*3]);
+
+        P = polyfit(sort(ncell(validVals==1)), sort(runt(validVals==1)), 2);
+
+        extraprun = P(3) + extrapncell.^2*P(1) +  extrapncell*P(2);
+
+        %extrapncell = [ncell(validVals==1) max(ncell) max(ncell)*3];
+
+        %extraprun = interp1(ncell(validVals==1), runt(validVals==1), extrapncell, 'linear', 'extrap');
+
+        plot(log10(thisNumCells(i, :)), log10(thisRunTime(i, :)), marker{i});
+        plot(extrapncell, extraprun, '-');
+
+    end
+    hold off;
+    box on;
+    xlabel('num cells'); ylabel('runtime');
 
 end
-hold off;
-box on;
-xlabel('num cells'); ylabel('runtime');
-
 
 % Compute single level rates
 
