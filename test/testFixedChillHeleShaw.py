@@ -10,7 +10,7 @@ from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
 # 3) Convection in a mushy layer with an initial porous hole
 ##########################################################################
 
-def textFixedChillHeleShaw(max_time=1e6, Ra=2e6, Da=2e-6, C=1.75):
+def testFixedChillHeleShaw(max_time=1e6, Ra=2e6, Da=2e-6, C=1.75):
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
