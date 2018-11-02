@@ -36,8 +36,8 @@ def testPorousMushyHole(max_time=0.5):
 
     # figureName = os.path.join(dataFolder, 'noFlow.pdf')
     uniform_prefix = 'Uniform-' + physicalProblem + '-'
-    analysis_command = matlab_command + ' "analyseVariablePorosityTest(\'' + dataFolder + '\', [' + ','.join([str(a) for a in Nz_uniform]) + ']," \
-     "true, true, \'' + uniform_prefix + '\', \'Porosity\', \'L2\'); exit;"'
+    analysis_command = matlab_command + ' "analyseVariablePorosityTest(\'' + dataFolder + '\', [' + ','.join([str(a) for a in Nz_uniform]) + '],' \
+     'true, true, \'' + uniform_prefix + '\', \'Porosity\', \'L2\'); exit;"'
 
     # Run
     extra_params = {'main.max_time':max_time}
