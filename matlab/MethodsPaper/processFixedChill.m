@@ -20,7 +20,7 @@ end
 
 function processSpecificFolder(output_dir)
 
-close all; 
+
 
 savePNG = true;
 
@@ -32,6 +32,8 @@ if isempty(isprop(ml, 'levelArray'))
     return;
 end
 
+close all; 
+
 % Get data to plot
 [X,Y] = ml.grid();
 porosity = ml.dataForComp(ml.components.Porosity).';
@@ -39,6 +41,7 @@ Sl = ml.dataForComp(ml.components.Liquidconcentration).';
 U = ml.dataForComp(ml.components.xDarcyvelocity).';
 V = ml.dataForComp(ml.components.yDarcyvelocity).';
 Streamfunction = ml.dataForComp(ml.components.streamfunction).';
+
 
 xl = [X(1,1) X(end,end)];
 yl = [Y(1,1) Y(end,end)];
@@ -94,26 +97,14 @@ plotStreamlines = true;
 if plotStreamlines
     axStream = axes;
     
+    % Use level 1 data so the contours are smooth
+    lev1 = ml.levelArray(1);
+    Streamfunction1 = lev1.dataForComp(ml.components.streamfunction);
+    U1 = lev1.dataForComp(ml.components.xDarcyvelocity);
+    V1 = lev1.dataForComp(ml.components.yDarcyvelocity);
+    [X1,Y1] = lev1.grid();
     % Modify data a little to make velocities more similar
 
-    %streamslice(X,Y,U,V)
-    pow = 1.0;
-    Uplot = sign(U).*(abs(U).^pow);
-    Vplot = sign(V).*(abs(V).^pow);
-    
-    vmag = sqrt(Uplot.^2+Vplot.^2);  
-    dx = X(1, 2) - X(1,1);
-    startx = xl(1):3.8*dx:xl(end);
-    %starty = Y(1,1)*startx;
-    
-    [sy,sx] = meshgrid(Y(1,1),startx);
-    
-    %colormap(axStream, spring);
-    %colormap(axStream, autumn);
-    %cmap = colormap(axStream);
-    %Streamcolor(X,Y,Uplot,Vplot,sx,sy, vmag);
-    %colormap(axStream, hot);
-    %minPsi = min(min(Streamfunction));
     maxPsi = max(max(abs(Streamfunction)));
     minPsi = -maxPsi; 
     
@@ -121,13 +112,12 @@ if plotStreamlines
     v = minPsi+0.5*dPsi:dPsi:maxPsi-0.5*dPsi; % Avoid the zero contour
     
     colormap(axStream, autumn);
-    cbar = streamfunctioncolor(X,Y,U,V,Streamfunction,v);
+    cbar = streamfunctioncolor(X1,Y1,U1,V1,Streamfunction1,v);
     cbar.Label.String = 'Scaled fluid velocity';
     cbar.Ticks = [0 1];
 
     axStream.Visible = 'off';
-    
-    
+        
     daspect([ 1 1 1]);
     xlim(xl);
     ylim(yl);

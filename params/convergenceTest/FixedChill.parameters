@@ -17,7 +17,7 @@ main.chk_prefix=chkpAMR-Subcycle-Reflux-Freestream0.45-MaxLevel2-DirectionalDB-3
 main.doEuler=1
 main.doProjection=1
 main.doVCreflux=0
-main.domain_width=0.1
+main.domain_width=0.2
 main.dt_tolerance_factor=1.01
 main.enforceAnalyticSoln=false
 main.fill_ratio=0.75
@@ -111,7 +111,7 @@ bc.scalarLo=1 2 2
 bc.velHi=6 0 0
 bc.velLo=6 3 0
 
-main.steady_state=1e-5
+main.steady_state=1e-10
 
 main.max_time=10.0
 
