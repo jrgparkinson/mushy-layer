@@ -256,7 +256,15 @@ classdef ChomboCompare < handle
                         x = (1+(spacing-1)/2):spacing:(num_points(2)-(spacing-1)/2);
                         y = (1+(spacing-1)/2):spacing:(num_points(1)-(spacing-1)/2);
                         [sample_X, sample_Y] = meshgrid(x, y);
-                        interpolated_exact_comp = interp2(exact_data_comp, sample_X, sample_Y, 'spline');
+                        
+                        try
+                            interpolated_exact_comp = interp2(exact_data_comp, sample_X, sample_Y, 'spline');
+                        catch e
+                            
+                            fprintf(1,'Failed to do interpolation in ChomboCompare.diff() \n%s \n',e.identifier);
+                            fprintf(1,'There was an error! The message was:\n%s \n',e.message);
+                            interpolated_exact_comp = NaN*sample_X;
+                        end
                     end
                     
                     % Calculate the difference between coarsened exact and
