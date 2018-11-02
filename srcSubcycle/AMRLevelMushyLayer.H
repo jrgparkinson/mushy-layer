@@ -160,7 +160,7 @@ public:
     m_doAutomaticRestart = false;
     m_lowerPorosityLimit = 1e-15;
     m_implicitAdvectionSolve = false;
-    m_solidPorosity = 0.05;
+    m_solidPorosity = -1;
 
     m_advectionMethod = m_porosityInAdvection;
 
@@ -990,6 +990,9 @@ protected:
   Real m_lowerPorosityLimit;
 
   /// Below this porosity we artifically enforce U=0
+  /**
+   * Default value is 0.05, based on the 'Law of fives' (Golden et al, Science, 1998)
+   */
   Real m_solidPorosity;
 
   /// List of scalar vars to write out to HDF5 files

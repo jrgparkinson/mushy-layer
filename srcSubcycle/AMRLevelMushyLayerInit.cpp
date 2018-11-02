@@ -749,6 +749,8 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_implicitAdvectionSolve = false;
   ppMain.query("implicitAdvectionSolve", m_implicitAdvectionSolve);
 
+  m_solidPorosity = 0.05;
+
 
   // Default option
   m_advectionMethod =  m_porosityOutsideAdvection; // change to porosity outside advection

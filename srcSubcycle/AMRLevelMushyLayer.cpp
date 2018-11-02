@@ -3293,7 +3293,7 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
     fillVectorField(UtoAdvect_old, old_time, m_fluidVel, true);
   }
 
-  Real advVelChiLimit = m_lowerPorosityLimit; //was 1e-10
+  Real advVelChiLimit = min(pow(10,5)*m_lowerPorosityLimit, pow(10,-10)) ; //was 1e-10
   ParmParse ppMain("main");
   ppMain.query("advPorosityLimit", advVelChiLimit);
   setVelZero(UtoAdvect_old, advVelChiLimit);
@@ -4315,7 +4315,7 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   }
 
 //  Real minChi = ::computeMin(*m_scalarNew[m_porosity], NULL, 1);
-  Real advVelsrcChiLimit = m_lowerPorosityLimit; //1e-10
+  Real advVelsrcChiLimit = m_solidPorosity; //1e-10
   ParmParse ppMain("main");
   ppMain.query("advVelSrcChiLimit", advVelsrcChiLimit);
   setVelZero(velOld, advVelsrcChiLimit);
@@ -4490,10 +4490,6 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
       a_src[dit].minus(extraSrc[dit], 0, 0, SpaceDim);
 
     }
-
-    //todo check this is the correct porosity cap
-    setVelZero(a_src, min(0.05, 5*m_solidPorosity));
-
 
   }
 
