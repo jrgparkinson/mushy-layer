@@ -17,7 +17,7 @@ main.chk_prefix=chkpAMR-Subcycle-Reflux-Freestream0.45-MaxLevel2-DirectionalDB-3
 main.doEuler=1
 main.doProjection=1
 main.doVCreflux=0
-main.domain_width=0.2
+main.domain_width=2.0
 main.dt_tolerance_factor=1.01
 main.enforceAnalyticSoln=false
 main.fill_ratio=0.75
@@ -35,7 +35,7 @@ main.max_grid_size=256
 main.max_level=1
 main.max_step=100000
 main.min_time=0.5
-main.num_cells=16 32  8
+main.num_cells=128 64  8
 main.output_folder=output
 main.periodic_bc=0 0 0
 main.plot_interval=20
@@ -111,7 +111,13 @@ bc.scalarLo=1 2 2
 bc.velHi=6 0 0
 bc.velLo=6 3 0
 
+bc.bulkConcentrationHi = 1 1 # no flux top bc
+bc.enthalpyHiVal=0.0 4.5
+
 main.steady_state=1e-10
+
+
+main.max_dt=1.0
 
 main.max_time=10.0
 
@@ -126,3 +132,5 @@ regrid.plume_salinity=-0.95
 regrid.plume_vel=5e-5
 main.ref_ratio=2 2 2
 main.regrid_interval=32 32 32
+
+

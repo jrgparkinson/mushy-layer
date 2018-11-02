@@ -206,12 +206,8 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
                 output_dir = ''
                 
-                Nx_coarse = Nz_coarse
+                Nx_coarse = Nz_coarse*2
                 gridFile = mushyLayerBaseDir + '/grids/topMiddle/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
-
-
-
-
 
                 pltInt = int(200.0*float(Nz_coarse)/64.0)
                 params['main.plot_interval'] = str(pltInt)
