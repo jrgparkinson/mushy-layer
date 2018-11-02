@@ -36,8 +36,8 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
                              LevelData<FArrayBox>& enthalpyEutectic,
                              MushyLayerParams a_params)
 {
-  DisjointBoxLayout grids = theta.disjointBoxLayout();
-    IntVect ghostVect = theta.ghostVect();
+  DisjointBoxLayout grids = HC.disjointBoxLayout();
+    IntVect ghostVect = HC.ghostVect();
 
     LevelData<FArrayBox> enthalpy(grids, 1, ghostVect);
     LevelData<FArrayBox> composition(grids, 1, ghostVect);
