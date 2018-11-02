@@ -73,15 +73,15 @@ def main(argv):
 
     # Only pass in the defined arguments
     if max_time < 0:
-        textFixedChillHeleShaw()
+        testHeleShawFixedChill()
     elif Ra < 0:
-        textFixedChillHeleShaw(max_time)
+        testHeleShawFixedChill(max_time)
     elif Da < 0:
-        textFixedChillHeleShaw(max_time, Ra)
+        testHeleShawFixedChill(max_time, Ra)
     elif C < 0:
-        textFixedChillHeleShaw(max_time, Ra, Da)
+        testHeleShawFixedChill(max_time, Ra, Da)
     else:
-        textFixedChillHeleShaw(max_time, Ra, Da, C)
+        testHeleShawFixedChill(max_time, Ra, Da, C)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
