@@ -276,7 +276,12 @@ def isPowerOfTwo(n):
 
 def str2arr(string):
     #print(string)
+    if isinstance(string, list):
+        return string
+
+
     parts = string.split(' ')
+
     array = [int(i) for i in parts]
     return array
 

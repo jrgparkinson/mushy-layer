@@ -6,7 +6,7 @@ import getopt
 from colorama import Fore, Style
 
 
-from mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, isPowerOfTwo
+from mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, isPowerOfTwo, str2arr
 from SlurmTask import SlurmTask
 from AMRConvergenceTest import AMRConvergenceTest
 
@@ -46,12 +46,16 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
             #print('Nz coarse = %d, initial num proc = %d \n' % (Nz_coarse, num_proc))
             #num_proc = min(num_proc, 16)
             #print('Final num_proc = %d' % num_proc)
+
+
            
             
             # Some default options
+
+            # Use same aspect ratio as already defined
+            Nx = -1 # if this isn't changed, we'll eventually just use the predetermined aspect ratio
             
             gridfile = ''
-            gridFile = mushyLayerBaseDir + '/grids/leftRight/' + str(Nz_coarse) + 'x' + str(Nz_coarse)
 
             defaultParamsFile = os.path.join(mushyLayerBaseDir, '/params/convergenceTest/'+physicalProblem+'.parameters')
             if os.path.exists(defaultParamsFile):
@@ -205,11 +209,12 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters')
 
                 output_dir = ''
-                
-                Nx_coarse = Nz_coarse*2
+
+
+                #Nx_coarse = Nz_coarse*2
                 gridFile = mushyLayerBaseDir + '/grids/topMiddle/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
 
-                pltInt = int(200.0*float(Nz_coarse)/64.0)
+                pltInt = int(100.0*float(Nz_coarse)/64.0)
                 params['main.plot_interval'] = str(pltInt)
                 params['main.chk_interval'] = params['main.plot_interval']
 
@@ -276,6 +281,16 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 print(Fore.RED  + 'Unknown convergence test option' + Style.RESET_ALL)
                 sys.exit(2)
 
+
+
+            # Default options
+            if Nx_coarse == -1:
+                gridPts = str2arr(params['main.num_cells'])
+
+                aspectRatio = gridPts[0]/gridPts[1]
+                Nx_coarse = aspectRatio*Nz_coarse
+            if not gridFile:
+                gridFile = mushyLayerBaseDir + '/grids/middle/' + str(Nz_coarse) + 'x' + str(Nz_coarse)
 
             # Always turn off slope limiting for convergence tests
             params['main.use_limiting'] = 'false'
