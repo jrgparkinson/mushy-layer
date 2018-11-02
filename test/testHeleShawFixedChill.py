@@ -17,7 +17,7 @@ def testHeleShawFixedChill(max_time=1e6, Ra=4e3, Da=2e-3, C=2.0):
 
     print(Fore.GREEN + 'Setup tests for fixed chill in a Hele-Shaw cell' + Style.RESET_ALL)
     physicalProblem = 'FixedChill'
-    folderName = "FixedChill-t%1.1f-Ra%.0e-Da%1.1e-C%1.2f" % (max_time, Ra, Da, C)
+    folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f" % (max_time, Ra, Da, C)
     dataFolder = os.path.join(base_output_dir, folderName)
 
     Nz_uniform = 256
@@ -30,7 +30,8 @@ def testHeleShawFixedChill(max_time=1e6, Ra=4e3, Da=2e-3, C=2.0):
 
     # While testing:
     Nz_uniform = [128]
-    AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
+    AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
+                {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [64]}]
 
     # Nzs 	  = [16, 32, 64]
     num_procs = [1]  # Needs to be as long as the longest Nzs
