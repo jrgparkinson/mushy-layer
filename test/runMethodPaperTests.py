@@ -3,13 +3,13 @@ from testDiffusiveSolidification import testDiffusiveSolidification
 from testUniformPorousConvection import testUniformPorousConvection
 from testFixedPorousHole import testFixedPorousHole
 from testPorousMushyHole import testPorousMushyHole
-from testFixedChillHeleShaw import testFixedChillHeleShaw
+from testHeleShawFixedChill import testHeleShawFixedChill
 
 testDiffusiveSolidification()
 testUniformPorousConvection()
 testFixedPorousHole()
 testPorousMushyHole()
-testFixedChillHeleShaw()
+testHeleShawFixedChill()
 
 
 # 5) Fixed chill Hele-Shaw cell
