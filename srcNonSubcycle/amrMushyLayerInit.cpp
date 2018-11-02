@@ -497,7 +497,8 @@ void amrMushyLayer::initVars(const int lev)
     m_dScalar[a_var][lev] = RefCountedPtr<LevelData<FArrayBox> >
     (new LevelData<FArrayBox>(m_amrGrids[lev], 1,m_ghostVect));
   }
-  m_HC = RefCountedPtr<LevelData<FArrayBox> >
+
+  m_HC[lev] = RefCountedPtr<LevelData<FArrayBox> >
   (new LevelData<FArrayBox>(m_amrGrids[lev], 1,m_ghostVect));
 
   for (int a_var=0; a_var<m_numVectorVars; a_var++)
