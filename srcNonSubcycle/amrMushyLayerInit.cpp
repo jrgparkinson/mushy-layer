@@ -1209,7 +1209,7 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
 
   //Get general parameters for multigrid solve
   int lbase = 0;
-  int lmax = m_finest_level;
+//  int lmax = m_finest_level;
 
   int numSmooth, numMG, maxIter, mgverb, numLevels;
   Real tolerance, hang, normThresh;
@@ -1225,7 +1225,7 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
   pp.get("max_iter",   maxIter);
   pp.get("verbosity",  mgverb);
 
-  LinearSolver<LevelData<FArrayBox> >* bottomSolverPtrVC = &s_bottomSolverVC;
+//  LinearSolver<LevelData<FArrayBox> >* bottomSolverPtrVC = &s_bottomSolverVC;
   LinearSolver<LevelData<FArrayBox> >* bottomSolver = &s_bottomSolver;
 
   //Multigrid solver for calculating reflux correction
@@ -1280,11 +1280,11 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
   for (int lev=0; lev<numLevels; lev++)
   {
 
-
     bCoef[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(activeGrids[lev], numComps, ivGhost));
     aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(activeGrids[lev], numComps, ivGhost));
+    porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(activeGrids[lev], 1, ivGhost));
 
-     CellToEdge(*m_scalarNew[m_porosity][lev], *porosityFace[lev]);
+    CellToEdge(*m_scalarNew[m_porosity][lev], *porosityFace[lev]);
 
     for (DataIterator dit = bCoef[lev]->dataIterator(); dit.ok(); ++dit)
     {
@@ -1335,7 +1335,7 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
   HCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(
       HCop);
 
-  int maxAMRlevels = numLevels;
+//  int maxAMRlevels = numLevels;
 
   s_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
       new AMRFASMultiGrid<LevelData<FArrayBox> >());
@@ -1348,10 +1348,10 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
 
 
 
-
-  s_enthalpySalinityTGA = RefCountedPtr<LevelTGA>(
-      new LevelTGA(activeGrids, m_refinement_ratios, m_amrDomains[0], HCOpFact,
-                   s_multiCompFASMG));
+// Doesn't currently work. Potential issue is that LevelTGA dosn't like my custom operator.
+//  s_enthalpySalinityTGA = RefCountedPtr<LevelTGA>(
+//      new LevelTGA(activeGrids, m_refinement_ratios, m_amrDomains[0], HCOpFact,
+//                   s_multiCompFASMG));
 
 
   s_enthalpySalinityBE = RefCountedPtr<LevelBackwardEuler>(

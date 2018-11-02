@@ -845,16 +845,14 @@ amrMushyLayer::computeDt()
   // This is so we can fix the same dt for runs on different grids, for
   // comparison of the time dependent solution
   ParmParse pp("main");
-  Real fixed_dt;
+  Real fixed_dt = -1;
   pp.query("fixed_dt", fixed_dt);
   if (fixed_dt > 0)
   {
     m_dt = fixed_dt;
   }
 
-  Real max_dt = 1.0;
-  pp.query("max_dt", max_dt);
-  m_dt = min(m_dt, max_dt);
+
 
 
 }

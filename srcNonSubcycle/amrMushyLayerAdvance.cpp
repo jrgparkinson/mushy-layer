@@ -157,14 +157,14 @@ amrMushyLayer::timeStep()
     for (dit.begin(); dit.ok(); ++dit)
     {
       (*HC_src[lev])[dit()].setVal(0);
-      (*ThetaLSource[lev])[dit()].setVal(0);
-      (*zeroSource[lev])[dit()].setVal(0);
-      (*V_gradH_n[lev])[dit()].setVal(0);
-      (*V_dThetadz_n[lev])[dit()].setVal(0);
-      (*ThetaDiffusion_n[lev])[dit()].setVal(0);
-
-      (*a_thetaNewPrev[lev])[dit].setVal(0);
-      (*a_thetaNewPrev[lev])[dit] += (*a_thetaNew[lev])[dit];
+//      (*ThetaLSource[lev])[dit()].setVal(0);
+//      (*zeroSource[lev])[dit()].setVal(0);
+//      (*V_gradH_n[lev])[dit()].setVal(0);
+//      (*V_dThetadz_n[lev])[dit()].setVal(0);
+//      (*ThetaDiffusion_n[lev])[dit()].setVal(0);
+//
+//      (*a_thetaNewPrev[lev])[dit].setVal(0);
+//      (*a_thetaNewPrev[lev])[dit] += (*a_thetaNew[lev])[dit];
 
     }
   }
