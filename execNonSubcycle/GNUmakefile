@@ -25,8 +25,8 @@ PAPILIBS = #/usr/common/usg/papi/2.1/lib/libpapi.a -L/usr/lpp/pmtoolkit/lib -lpm
 
 #  have a default for machines not defined here.
 # make this a relative path so it will find the Chombo 
-# on same level as TDGL
-CHOMBO_HOME = ../../../Chombo/lib
+# on same level as mushy-layer
+CHOMBO_HOME = ../../chombofork/lib
 
 include $(CHOMBO_HOME)/mk/Make.defs
 include $(CHOMBO_HOME)/mk/Make.defs.config
@@ -37,11 +37,9 @@ XTRALIBFLAGS += $(PAPILIBS)
 ##
 ## names of Chombo libraries needed by this program, in order of search.
 ##
-LibNames :=  AMRElliptic AMRTimeDependent AMRTools BoxTools #OldAMRElliptic  
+LibNames :=  AMRElliptic AMRTimeDependent AMRTools BoxTools 
 
 base_dir = .
-
-TDGL_BASE_DIR = ../
 
 EXEC_DIR = .
 
@@ -56,7 +54,6 @@ src_dirs += $(UTIL_DIR)
 
 BCUTIL_DIR = ../BCutil
 src_dirs += $(BCUTIL_DIR)
-
 
 
 include $(CHOMBO_HOME)/mk/Make.example

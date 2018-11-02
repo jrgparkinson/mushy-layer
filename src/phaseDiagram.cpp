@@ -29,6 +29,24 @@
 
 #include "NamespaceHeader.H"
 
+void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
+                             LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,
+                             LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
+                             MushyLayerParams a_params)
+{
+  DisjointBoxLayout grids = theta.disjointBoxLayout();
+  IntVect ghostVect = theta.ghostVect();
+
+  LevelData<FArrayBox> enthalpy(grids, 1, ghostVect);
+  LevelData<FArrayBox> composition(grids, 1, ghostVect);
+
+  HC.copyTo(Interval(0,0), enthalpy, Interval(0,0));
+  HC.copyTo(Interval(1,1), composition, Interval(0,0));
+
+  updateEnthalpyVariables(enthalpy, composition, theta, compositionLiquid, compositionSolid,
+                            porosity, a_params);
+}
+
 
 void updateEnthalpyVariables(LevelData<FArrayBox>& enthalpy, LevelData<FArrayBox>& composition,
                              LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,

@@ -32,7 +32,7 @@
 #include "FArrayBox.H"
 #include <assert.h>
 
-#include "../src/MushyLayerUtils.H"
+#include "MushyLayerUtils.H"
 #include "RealVect.H"
 #include "BackwardEuler.H"
 #include "AMRPoissonOp.H"
@@ -43,6 +43,9 @@
 #include "CCProjectorComp.H"
 //#include "PhysBCUtil.H"
 #include "LevelFluxRegisterEdge.H"
+#include "AMRNonLinearMultiCompOp.H"
+#include "AMRFASMultiGrid.H"
+#include "phaseDiagram.H"
 
 
 #include "MushyLayerParams.h"
@@ -367,32 +370,6 @@ protected:
 	///Remove nan values and replace them with 0
 	void removeNanValues(FArrayBox &fab);
 
-	/// Do one iteration of the nonlinear solver
-	bool nonlinearSolver(Vector<Vector<RefCountedPtr<LevelData<FArrayBox> > > > a_scalarNew,
-			Vector<Vector<RefCountedPtr<LevelData<FArrayBox> > > >a_scalarOld,
-			Vector<DisjointBoxLayout> a_amrGrids,
-			Vector<LevelData<FArrayBox>* >  a_thetaNew,
-			Vector<LevelData<FArrayBox>* > a_thetaOld,
-			Vector<LevelData<FArrayBox>* > a_thetaDiff,
-			Vector<LevelData<FArrayBox>* > a_thetaOldTemp,
-			Vector<LevelData<FArrayBox>* > a_ThetaLNew,
-			Vector<LevelData<FArrayBox>* > a_ThetaLOld,
-			Vector<LevelData<FArrayBox>* > a_thetaNewPrev,
-			Vector<LevelData<FArrayBox>* > zeroSource,
-			Vector<LevelData<FArrayBox>* > V_gradH_n,
-			Vector<LevelData<FArrayBox>* > V_dThetadz_n,
-			Vector<LevelData<FArrayBox>* > thetaSource,
-			Vector<LevelData<FArrayBox>* > ThetaLSource,
-			Vector<RefCountedPtr<LevelData<FArrayBox> > > a_ThetaPrevIteration,
-			Vector<RefCountedPtr<LevelData<FArrayBox> > > a_HPrevIteration,
-			Vector<RefCountedPtr<LevelData<FArrayBox> > > a_ThetaTwoPrev,
-			Vector<RefCountedPtr<LevelData<FArrayBox> > > a_HTwoPrev,
-			Real residualEnthalpy,
-			Real residualConc,
-			Vector<Real> &heatResiduals, Vector<Real> &concResiduals,
-			int &iteration);
-
-
 
 
 	/// Get the coefficients for the \f$ \Theta_l \f$ elliptic operator, VCAMRPoissonOp2.
@@ -458,6 +435,8 @@ protected:
 
 	/// Define projection operators on current levels
 	void setupProjectionOperators();
+
+	void enforcePorosity();
 
 
 	/// max number of levels
@@ -601,11 +580,12 @@ protected:
 
 	/// List of scalar fields
 	enum vars {
+	        m_HC,
 		m_enthalpy,
-		m_enthalpySolid,
+		m_enthalpySolidus,
 		m_enthalpyEutectic,
-		m_enthalpyLiquid,
-		m_composition,
+		m_enthalpyLiquidus,
+		m_bulkConcentration,
 		m_theta,
 		m_thetaLiquidus,
 		m_thetaSolidus,
@@ -648,12 +628,13 @@ protected:
 		m_divUstarErr,
 		m_lambda,
 		m_lambdaPostCorr,
-		m_buoyancyFilter
+		m_buoyancyFilter,
+
+		m_numVars
 	};
 
 
-	/// Number of scalar fields. Must be set manually.
-	int m_numVars;
+
 
 	/// Frame advection velocity, constant
 	Vector<LevelData<FluxBox>* > m_frameAdv;
@@ -772,47 +753,43 @@ protected:
 //	Vector<RefCountedPtr<LevelFluxRegisterEdge> > m_velFluxReg;
 	//	LevelFluxRegister m_fluxReg;
 
-	/// Operator factory for \f$ \theta \f$ (using a simple poisson solver)
-	RefCountedPtr<AMRPoissonOpFactory> thetaPoissonOpFact;
+	/// Operator factory for the coupled enthalpy-concentration solves
+	RefCountedPtr<AMRNonLinearMultiCompOpFactory> m_HCOpFact;
 
-	/// Operator factory for theta, using a variable coefficient poisson solver
-	RefCountedPtr<VCAMRPoissonOp2Factory> thetaVCOpFact,
+	RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > > s_multiCompFASMG;
 
-	/// Operator factory for Theta_l, using a variable coefficient poisson solver
-	ThetaLVCOpFact;
+	RefCountedPtr<LevelTGA> s_enthalpySalinityTGA;
+	RefCountedPtr<LevelBackwardEuler> s_enthalpySalinityBE;
 
 	/// Op factory for solving for reflux corrections
 	RefCountedPtr<AMRPoissonOpFactory> m_refluxOpFact;
 
 	/// Diffusion/multigrid bottom solver
-	BiCGStabSolver<LevelData<FArrayBox> > s_bottomSolver,
+	BiCGStabSolver<LevelData<FArrayBox> > s_bottomSolver;
 
 	/// Bottom solver for variable coefficient computations
-	s_bottomSolverVC;
+	BiCGStabSolver<LevelData<FArrayBox> > s_bottomSolverVC;
 
-	/// Backward Euler timestepping (temperature)
-	RefCountedPtr<BackwardEuler> m_diffuseBEtheta,
-
-	/// Backward Euler timestepping (liquid salinity)
-	m_diffuseBEThetaL;
 
 	///  TGA timestepping for temperature
-	RefCountedPtr<AMRTGA<LevelData<FArrayBox> > > m_diffuseTGAtheta,
+	RefCountedPtr<AMRTGA<LevelData<FArrayBox> > > m_diffuseTGAtheta;
 
-	///  TGA timestepping for liquid salinity
-	m_diffuseTGAThetaL;
+	RefCountedPtr<AMRTGA<LevelData<FArrayBox> > > m_TGAEnthalpySalinity;
+	RefCountedPtr<BackwardEuler> m_BEEnthalpySalinity;
 
 	///Multigrid solver for \f$ \Theta_l \f$
-	RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > m_amrSolverVCThetaL;
+//	RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > m_amrSolverVCThetaL;
 
 	///Multigrid solver for \f$ \theta \f$
-	RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > m_amrSolverVCtheta;
+//	RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > m_amrSolverVCtheta;
 
 	///Multigrid solver for reflux corrections
 	RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > m_refluxAMRMG;
 
 	/// Pointer to physics boundary condition object
 	PhysBCUtil* m_physBCPtr;
+
+	Vector<Real> m_scalarDiffusionCoeffs;
 
 	/**********************************/
 
@@ -828,6 +805,8 @@ protected:
 
 	/// if starting from a restart, timestep of restart
 	int m_restart_step;
+
+	bool m_do_restart;
 
 	/// initially refine entire domain (rather than generating tags)
 	/** If true, the entire domain is refined to the finest possible
@@ -878,5 +857,6 @@ protected:
 
 
 #endif
+
 
 

@@ -22,6 +22,12 @@
 #include "NamespaceHeader.H"
 
 /// Update thermodynamic variables \f$ \theta, \chi, \Theta_l, \Theta_s\f$ from \f$H, \Theta\f$ and the phase diagram
+void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
+                             LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,
+                             LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
+                             MushyLayerParams a_params);
+
+/// Update thermodynamic variables \f$ \theta, \chi, \Theta_l, \Theta_s\f$ from \f$H, \Theta\f$ and the phase diagram
 void updateEnthalpyVariables(LevelData<FArrayBox>& enthalpy, LevelData<FArrayBox>& composition,
                 LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,
                 LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,

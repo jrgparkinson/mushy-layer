@@ -3148,17 +3148,7 @@ BCHolder PhysBCUtil::velFuncBC(int a_idir, bool a_viscous, Interval interval) co
                           interval);
 }
 
-// Replaced this with velFuncBC(a_idir, a_viscous, interval(dir, dir))
-//BCHolder PhysBCUtil::velFuncMultiCompBC(int a_idir, bool a_viscous) const
-//{
-////  bool isHomogeneous = false;
-////  bool isViscous = true;
-////  //        Interval intvl(0, 0);
-//  Interval intvl(a_idir, a_idir); // I think this is actually correct
-////  return basicCCVelFuncBC(isHomogeneous, isViscous, a_idir,
-////                          intvl);
-//  velFuncBC(a_idir, a_viscous, intvl);
-//}
+
 
 // ---------------------------------------------------------------
 /// Be very careful with this function - it fills CF ghost cells

@@ -5,8 +5,7 @@
 #include "CoarseAverage.H"
 #include "ParmParse.H"
 #include "CellToEdge.H"
-#include "AdvectHeatIBC.H"
-#include "AdvectConcIBC.H"
+#include "AdvectIBC.H"
 #include "LevelAdvect.H"
 #include "ExtrapFillPatch.H"
 #include "FineInterp.H"
@@ -48,7 +47,7 @@ amrMushyLayer::setDefaults()
   m_timeIntegrationOrder = 2;
   m_enforceAnalyticSoln = true;
   m_printAnalyticSoln = false;
-  m_frameAdvectionMethod = m_finiteDifference;
+  m_frameAdvectionMethod = m_godunov;
   m_minTimestep = 0;
   m_fluidVelDiffOrder = 2;
   m_fluidVelInterpOrder = 1;
@@ -69,21 +68,22 @@ amrMushyLayer::setDefaults()
   m_total_num_iterations = 1;
 
 
-  m_physBCPtr = new PhysBCUtil(m_parameters);
+  m_physBCPtr = new PhysBCUtil(m_parameters, m_amrDx[0]);
 
   // MAKE SURE YOU UPDATE THIS IF YOU ADD ANOTHER (SCALAR) VARIABLE!
-  m_numVars = 48;
+  //  m_numVars = 48;
 
   m_varNames = Vector<string>(m_numVars, string("Placeholder name"));
 
+  m_varNames[m_HC] = string("Enthalpy-Bulk concentration");
   m_varNames[m_enthalpy] = string("Enthalpy");
-  m_varNames[m_enthalpySolid] = string("Enthalpy solidus");
-  m_varNames[m_enthalpyLiquid] = string("Enthalpy liquidus");
+  m_varNames[m_enthalpySolidus] = string("Enthalpy solidus");
+  m_varNames[m_enthalpyLiquidus] = string("Enthalpy liquidus");
   m_varNames[m_enthalpyEutectic] = string("Enthalpy eutectic");
-  m_varNames[m_composition] = string("Composition");
-  m_varNames[m_theta] = string("theta");
-  m_varNames[m_thetaLiquidus] = string("theta liquidus");
-  m_varNames[m_thetaSolidus] = string("theta solidus");
+  m_varNames[m_bulkConcentration] = string("Composition");
+  m_varNames[m_theta] = string("temperature");
+  m_varNames[m_thetaLiquidus] = string("temperature liquidus");
+  m_varNames[m_thetaSolidus] = string("temperature solidus");
   m_varNames[m_porosity] = string("Porosity");
   m_varNames[m_compositionLiquid] = string("Liquid Composition");
   m_varNames[m_compositionSolid] = string("Solid Composition");
@@ -318,7 +318,9 @@ amrMushyLayer::initialize()
 
     m_fluxRegister.resize(m_numVars);
     m_vectorFluxRegister.resize(m_numVectorVars);
-    m_velFluxReg.resize(m_max_level+1);
+    //    m_velFluxReg.resize(m_max_level+1);
+
+    m_scalarDiffusionCoeffs.resize(m_numVars, 0);
 
     for (int a_var=0; a_var<m_numVars; a_var++)
     {
@@ -326,6 +328,9 @@ amrMushyLayer::initialize()
       m_scalarNew[a_var].resize(m_max_level+1);
       m_dScalar[a_var].resize(m_max_level+1);
       m_fluxRegister[a_var].resize(m_max_level+1);
+
+      m_scalarDiffusionCoeffs[m_enthalpy] = 1.0;
+      m_scalarDiffusionCoeffs[m_bulkConcentration] = 1/m_parameters.lewis;
     }
 
     for (int a_var=0; a_var<m_numVectorVars; a_var++)
@@ -724,7 +729,8 @@ initVectorVars(const int lev)
 
 void amrMushyLayer::getLocation(const IntVect iv, const int lev, RealVect &loc, Real ccOffsetX, Real ccOffsetY)
 {
-  ::getLocation(iv, loc, m_amrDx[lev], ccOffsetX, ccOffsetY);
+  RealVect offset(ccOffsetX, ccOffsetY);
+  ::getLocation(iv, loc, m_amrDx[lev], offset);
 }
 
 void amrMushyLayer::
@@ -753,152 +759,12 @@ initScalarVars(const int lev)
         Real x = loc[0];
         Real z = loc[1];
 
-        //				if (a_var == m_theta)
-        //				{
-        //					Real thetaInitial = m_parameters.thetaInitial;
-        //					thisPhiNew(iv,0) = thetaInitial;
-        //				}
-        //				else
-        if (a_var == m_enthalpy)
-        {
-          Real H;
-          H = m_parameters.Hinitial;
-
-          int perpToTempGradient = 0;
-          if (m_parameters.fixedTempDirection == 0)
-          {
-            perpToTempGradient = 1;
-          }
-
-          // Initial perturbation
-          if (m_parameters.physicalProblem == m_bmHRL)
-          {
-
-            Real perturbation;
-            Real alpha = 0.001;
-
-            if (m_is_periodic[perpToTempGradient])
-            {
-              // No perturbation if periodic, as this stops our initial condition being periodic!
-              perturbation = alpha*cos((loc[perpToTempGradient])*2*M_PI)*sin(((loc[m_parameters.fixedTempDirection])*M_PI));
-
-            }
-            // For getting the initial conditions to excite the first mode correctly
-            else if (m_parameters.fixedTempDirection == 0)
-            {
-              perturbation = -alpha*cos((loc[perpToTempGradient])*M_PI)*sin(((loc[m_parameters.fixedTempDirection])*M_PI));
-            }
-            else if (m_parameters.fixedTempDirection == 1)
-            {
-              perturbation = alpha*cos((loc[perpToTempGradient])*M_PI)*sin(((loc[m_parameters.fixedTempDirection])*M_PI));
-            }
-            else
-            {
-              perturbation = 0;
-            }
-
-            //						perturbation=0;
-
-            H = m_parameters.HBottom + (m_parameters.HTop - m_parameters.HBottom)
-										    * loc[m_parameters.fixedTempDirection]/m_domainSize[m_parameters.fixedTempDirection]
-										                                                        + perturbation;
-
-            //H = m_parameters.HBottom;
-
-            //						H = m_parameters.HBottom + (m_parameters.HTop - m_parameters.HBottom) * loc[m_parameters.fixedTempDirection]
-            //															+0.1*cos((loc[0])*M_PI)*sin(((loc[1])*M_PI));
-            //						H = m_parameters.HBottom;
-
-
-            //									+ exp(-((x-0.5)*(x-0.5)+(z-0.5)*(z-0.5))*10);
-            if (loc[1] <= 0)
-            {
-              H = m_parameters.HBottom;
-            }
-            else if(loc[1] >= m_domainSize[1])
-            {
-              H = m_parameters.HTop;
-            }
-            //;
-
-
-            //						if (lev == 0)
-            //						{
-            //							H = 2;
-            //						}
-            //						else if (lev == 1)
-            //						{
-            //							H = 1;
-            //						}
-            //						H = loc[0];
-          }
-          else if (m_parameters.physicalProblem == m_bmAdvection)
-          {
-            H = m_parameters.HBottom + (m_parameters.HTop - m_parameters.HBottom) * loc[1] + exp(-x*x-z*z);
-          }
-
-          thisPhiNew(iv,0) = H;
-
-
-        }
-        else if(a_var == m_composition)
-        {
-          thisPhiNew(iv, 0) = m_parameters.ThetaInitial;
-
-          if (m_parameters.physicalProblem == m_bmHRL or m_parameters.physicalProblem == m_bmAdvection)
-          {
-            thisPhiNew(iv, 0)  = 0; //pure fluid here
-          }
-        }
-        else if (a_var == m_porosity)
+        if (a_var == m_HC)
         {
 
-          // Analytic porosity field
+          thisPhiNew(iv,0) = m_parameters.Hinitial;
+          thisPhiNew(iv,1) = m_parameters.bcValBulkConcentrationLo[SpaceDim-1];
 
-          //					Real max_x = m_domainSize[0], max_z = m_domainSize[1];
-          //					Real chimney_width = 0.05;
-          //					Real chimneyOne = 0.25*max_x;
-          //					Real chimneyTwo = 0.75*max_x;
-          //
-          //					Real h0 = 0.25;
-          //					Real chim_height = 2;
-          //
-          //					Real h = h0 - (1/pow(chim_height, 5))*exp(-chim_height*cos(M_PI*x));
-          //
-          ////					Real  vertical = 1-tanh(5* pow((z-h0)/h,3) );
-          ////					Real vertical = 1-( 1-exp(-pow(z, 2)) )*tanh(5* pow((z-h0)/h,3) );
-          //					RthisPhiNew(iv, 0) = 1.0;eal vertical = 1-( log(3*z+4)/3 )*tanh(5* pow((z-h0)/h,3) );
-          //
-          //					Real porosity = vertical;
-          //
-          //
-          //					porosity = porosity + 1.2*exp(-pow( (x-chimneyOne)/chimney_width,4) );
-          //					porosity = porosity + 1.2*exp(-pow( (x-chimneyTwo)/chimney_width,4) );
-          //
-          //
-          //					porosity = min(porosity, 0.99);
-          //					porosity = max(porosity, 1e-4);
-          //
-          //					//porosity = pow(porosity, 0.5);
-          //					porosity = pow(porosity, 0.thisPhiNew(iv, 0) = porosity;5);
-          //
-          //					//porosity = 0.2;
-
-          if (m_parameters.physicalProblem == m_enforcedPorosity)
-          {
-
-            Real porosity = timeDepPorosity(x,z,0);
-
-            thisPhiNew(iv, 0) = porosity;
-
-            ignore.push_back(m_porosity);
-          }
-          else
-          {
-            thisPhiNew(iv, 0) = 1.0;
-          }
-
-          //					thisPhiNew(iv, 0) = 1.0;
         }
         else
         {
@@ -910,64 +776,7 @@ initScalarVars(const int lev)
     } //end loop over boxes
   } //end loop over levels
 
-  updateEnthalpyVariables(ignore);
-
-  ParmParse pp("main");
-
-  int inputGhost = 0;
-  pp.query("inputGhost", inputGhost);
-  string filename;
-
-  pp.query("thetaFile", filename);
-  if (!filename.empty())
-  {
-    loadFromFile(m_theta, filename, inputGhost);
-  }
-
-  // We don't really need this - we get U from theta anyway
-  //		pp.query("U0", filename);
-  //				if (!filename.empty())
-  //				{
-  //					loadFromFile(m_fluidVel, filename, inputGhost, component);
-  //				}
-  //
-  //				pp.query("V0", filename);
-  //								if (!filename.empty())
-  //								{
-  //									loadFromFile(m_fluidVel, filename, inputGhost, component);
-  //								}
-
-  // Read in special porosity field
-  if (m_parameters.physicalProblem == m_enforcedPorosity
-      || m_parameters.physicalProblem == m_bmHRL)
-  {
-
-    if (m_ncells[0]==120)
-    {
-      //		loadFromFile(m_porosity, "porosity.dat", 1);
-      //		loadFromFile(m_theta, "theta.dat", 1);
-      //		loadFromFile(m_porosity, "porosity2.dat", 2);
-      //			loadFromFile(m_theta, "theta2.dat", 2);
-    }
-    else if(m_ncells[0]==240)
-    {
-      //			loadFromFile(m_porosity, "porosity2.dat", 1);
-      //					loadFromFile(m_theta, "theta2.dat", 1);
-    }
-    //		loadFromFile(m_buoyancyFilter, "filter.dat", 1);
-    //		loadFromFile(m_composition, "bulkConcentration.dat", 1);
-    //		loadFromFile(m_enthalpy, "enthalpy.dat", 1);
-
-    vector<int> ignore;
-    //		ignore.push_back(m_porosity);
-    //		calculateEnthalpy();
-    //		calculateBulkConcentration();
-    //		updateEnthalpyVariables(ignore);
-
-
-
-
-  }
+  updateEnthalpyVariables();
 
 
   //Copy new to old vars
@@ -999,9 +808,9 @@ void amrMushyLayer::setupFluxRegisters()
       m_vectorFluxRegister[a_var][lev]->setToZero();
     }
 
-    m_velFluxReg[lev] = RefCountedPtr<LevelFluxRegisterEdge>
-    (new LevelFluxRegisterEdge(m_amrGrids[lev+1], m_amrGrids[lev], m_amrDomains[lev+1], m_refinement_ratios[lev], 1));
-    m_velFluxReg[lev]->setToZero();
+//    m_velFluxReg[lev] = RefCountedPtr<LevelFluxRegisterEdge>
+//    (new LevelFluxRegisterEdge(m_amrGrids[lev+1], m_amrGrids[lev], m_amrDomains[lev+1], m_refinement_ratios[lev], 1));
+//    m_velFluxReg[lev]->setToZero();
   }
 }
 
@@ -1232,6 +1041,7 @@ amrMushyLayer::setupAdvectionSolvers()
 void
 amrMushyLayer::setupIBCS()
 {
+  //todo - fix this to do advection
   if (s_verbosity > 3)
   {
     pout() << "amrMushyLayerInit::setupIBCs" << endl;
@@ -1246,6 +1056,7 @@ amrMushyLayer::setupIBCS()
 
   for (int lev=0; lev<= m_max_level; lev++)
   {
+    /*
     //Create IBC's on this level
     RefCountedPtr<AdvectConcIBC> ibcConcLiquid = RefCountedPtr<AdvectConcIBC>
     (new AdvectConcIBC(m_parameters.ThetaLInitial, m_parameters.ThetaLBottom, m_parameters.ThetaLTop));
@@ -1291,7 +1102,7 @@ amrMushyLayer::setupIBCS()
     m_advPhysConc[lev] = RefCountedPtr<AdvectPhysics>((AdvectPhysics*)gphysPtrConc);
     m_advPhysEnthalpy[lev] = RefCountedPtr<AdvectPhysics>((AdvectPhysics*)gphysPtrEnthalpy);
     m_advPhysLambda[lev] = RefCountedPtr<AdvectPhysics>((AdvectPhysics*)gphysPtrLambda);
-
+*/
   }
 
 }
@@ -1306,62 +1117,69 @@ amrMushyLayer::setupPoissonSolvers(
 {
   CH_TIME("amrMushyLayer::setupPoissonSolvers()");
 
-  s_bottomSolver.m_verbosity = 0;
+  //  s_bottomSolver.m_verbosity = 0;
+  //
+  //  //Poisson solver for theta
+  //  Real alpha = 1.0;
+  //  Real beta  = 1.0;
+  //
+  //  //This object is used for the BE solver
+  //  AMRPoissonOpFactory* opFact = new AMRPoissonOpFactory();
+  //  opFact->define(m_amrDomains[0],
+  //                 activeGrids,
+  //                 m_refinement_ratios,
+  //                 m_amrDx[0],
+  //                 m_physBCPtr->thetaFuncBC(), alpha, beta);
+  //
+  //  //This object is used for calculating residuals
+  //  thetaPoissonOpFact = RefCountedPtr<AMRPoissonOpFactory>(opFact);
+  //  thetaPoissonOpFact->define(m_amrDomains[0],
+  //                             activeGrids,
+  //                             m_refinement_ratios,
+  //                             m_amrDx[0],
+  //                             m_physBCPtr->thetaFuncBC(), alpha, beta);
+  //
+  //
+  //  // Variable coefficient solver for theta
+  //  Real thetaVCAlpha, thetaVCBeta;
+  //  Vector<RefCountedPtr<LevelData<FArrayBox> > > thetaVCa;
+  //  Vector<RefCountedPtr<LevelData<FluxBox> > >  thetaVCb;
+  //  thetaVCOpCoeffs(thetaVCAlpha, thetaVCBeta, thetaVCa, thetaVCb);
+  //  thetaVCOpFact = RefCountedPtr<VCAMRPoissonOp2Factory>(new VCAMRPoissonOp2Factory());
+  //  thetaVCOpFact->define(m_amrDomains[0],
+  //                        activeGrids,
+  //                        m_refinement_ratios,
+  //                        m_amrDx[0],
+  //                        m_physBCPtr->thetaFuncBC(),
+  //                        thetaVCAlpha, thetaVCa,
+  //                        thetaVCBeta, thetaVCb);
+  //
+  //
+  //  // Variable Coefficient solver for Theta_l
+  //  ThetaLVCOpFact = RefCountedPtr<VCAMRPoissonOp2Factory>(new VCAMRPoissonOp2Factory());
+  //
+  //  Real ThetaLAlpha, ThetaLBeta;
+  //  Vector<RefCountedPtr<LevelData<FArrayBox> > > ThetaLa;
+  //  Vector<RefCountedPtr<LevelData<FluxBox> > > ThetaLb;
+  //  getThetaLOpCoeffs(ThetaLAlpha, ThetaLBeta, ThetaLa, ThetaLb);
+  //
+  //  ThetaLVCOpFact->define(m_amrDomains[0],
+  //                         activeGrids,
+  //                         m_refinement_ratios,
+  //                         m_amrDx[0],
+  //                         //ADParseBCConcLiquid,
+  //                         m_physBCPtr->ThetaLFuncBC(),
+  //                         ThetaLAlpha, ThetaLa,
+  //                         ThetaLBeta, ThetaLb);
+  //
+  //
+  //
+  //
+  //
 
-  //Poisson solver for theta
-  Real alpha = 1.0;
-  Real beta  = 1.0;
-
-  //This object is used for the BE solver
-  AMRPoissonOpFactory* opFact = new AMRPoissonOpFactory();
-  opFact->define(m_amrDomains[0],
-                 activeGrids,
-                 m_refinement_ratios,
-                 m_amrDx[0],
-                 //ADParseBCTemp,
-                 m_physBCPtr->thetaFuncBC(), alpha, beta);
-
-  //This object is used for calculating residuals
-  thetaPoissonOpFact = RefCountedPtr<AMRPoissonOpFactory>(opFact);
-  thetaPoissonOpFact->define(m_amrDomains[0],
-                             activeGrids,
-                             m_refinement_ratios,
-                             m_amrDx[0],
-                             //			ADParseBCTemp,
-                             m_physBCPtr->thetaFuncBC(), alpha, beta);
 
 
-  // Variable coefficient solver for theta
-  Real thetaVCAlpha, thetaVCBeta;
-  Vector<RefCountedPtr<LevelData<FArrayBox> > > thetaVCa;
-  Vector<RefCountedPtr<LevelData<FluxBox> > >  thetaVCb;
-  thetaVCOpCoeffs(thetaVCAlpha, thetaVCBeta, thetaVCa, thetaVCb);
-  thetaVCOpFact = RefCountedPtr<VCAMRPoissonOp2Factory>(new VCAMRPoissonOp2Factory());
-  thetaVCOpFact->define(m_amrDomains[0],
-                        activeGrids,
-                        m_refinement_ratios,
-                        m_amrDx[0],
-                        m_physBCPtr->thetaFuncBC(),
-                        thetaVCAlpha, thetaVCa,
-                        thetaVCBeta, thetaVCb);
 
-
-  // Variable Coefficient solver for Theta_l
-  ThetaLVCOpFact = RefCountedPtr<VCAMRPoissonOp2Factory>(new VCAMRPoissonOp2Factory());
-
-  Real ThetaLAlpha, ThetaLBeta;
-  Vector<RefCountedPtr<LevelData<FArrayBox> > > ThetaLa;
-  Vector<RefCountedPtr<LevelData<FluxBox> > > ThetaLb;
-  getThetaLOpCoeffs(ThetaLAlpha, ThetaLBeta, ThetaLa, ThetaLb);
-
-  ThetaLVCOpFact->define(m_amrDomains[0],
-                         activeGrids,
-                         m_refinement_ratios,
-                         m_amrDx[0],
-                         //ADParseBCConcLiquid,
-                         m_physBCPtr->ThetaLFuncBC(),
-                         ThetaLAlpha, ThetaLa,
-                         ThetaLBeta, ThetaLb);
 
 }
 
@@ -1403,7 +1221,7 @@ amrMushyLayer::setupMultigrid(
                          activeGrids,
                          m_refinement_ratios,
                          m_amrDx[0],
-                         m_physBCPtr->refluxCorrFuncBC());
+                         m_physBCPtr->noFluxBC());
 
   m_refluxAMRMG = RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > (new AMRMultiGrid<LevelData<FArrayBox> >);
   m_refluxAMRMG->define(m_amrDomains[0],
@@ -1414,56 +1232,141 @@ amrMushyLayer::setupMultigrid(
                                      maxIter, tolerance, hang, normThresh);
   m_refluxAMRMG->m_verbosity=mgverb;
 
+
+
   //	Multigrid solver for theta variable coefficient operator
-  m_amrSolverVCtheta = RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > (new AMRMultiGrid<LevelData<FArrayBox> >);
-  //	m_amrSolverVCtheta->m_maxDepth = 1; // Trying to deal with periodic BCs and > 2 ghost cells
-  m_amrSolverVCtheta->define(m_amrDomains[0],
-                             *thetaVCOpFact,
-                             bottomSolverPtrVC,
-                             numLevels);
-  m_amrSolverVCtheta->setSolverParameters(numSmooth, numSmooth, numSmooth, numMG,
-                                          maxIter, tolerance, hang, normThresh);
-  m_amrSolverVCtheta->m_verbosity=mgverb;
+  //  m_amrSolverVCtheta = RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > (new AMRMultiGrid<LevelData<FArrayBox> >);
+  //  //	m_amrSolverVCtheta->m_maxDepth = 1; // Trying to deal with periodic BCs and > 2 ghost cells
+  //  m_amrSolverVCtheta->define(m_amrDomains[0],
+  //                             *thetaVCOpFact,
+  //                             bottomSolverPtrVC,
+  //                             numLevels);
+  //  m_amrSolverVCtheta->setSolverParameters(numSmooth, numSmooth, numSmooth, numMG,
+  //                                          maxIter, tolerance, hang, normThresh);
+  //  m_amrSolverVCtheta->m_verbosity=mgverb;
 
-  //	Multigrid solver for Theta_L variable coefficient operator
-  //RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >
-  m_amrSolverVCThetaL =
-      RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > (new AMRMultiGrid<LevelData<FArrayBox> >);
+  // TODO - fill these
+  Vector<RefCountedPtr<LevelData<FluxBox> > > bCoef(numLevels);
+  Vector<RefCountedPtr<LevelData<FluxBox> > > porosityFace(numLevels);
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > aCoef(numLevels);
 
-  m_amrSolverVCThetaL->define(m_amrDomains[0],
-                              *ThetaLVCOpFact,
-                              bottomSolverPtrVC,
-                              numLevels);
 
-  m_amrSolverVCThetaL->setSolverParameters(numSmooth, numSmooth, numSmooth, numMG,
-                                           maxIter, tolerance, hang, normThresh);
-  m_amrSolverVCThetaL->m_verbosity=mgverb;
+  EdgeVelBCHolder porosityEdgeBC(m_physBCPtr->porosityFaceBC());
+
+  // two components: enthalpy and salinity
+  int numComps = 2;
+  int Hcomp = 0;
+  int Ccomp = 1;
+
+  //todo - check if we need this ghost vector
+  IntVect ivGhost = IntVect::Unit;
+
+
+  for (int lev=0; lev<numLevels; lev++)
+  {
+
+
+    bCoef[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(activeGrids[lev], numComps, ivGhost));
+    aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(activeGrids[lev], numComps, ivGhost));
+
+    for (DataIterator dit = bCoef[lev]->dataIterator(); dit.ok(); ++dit)
+    {
+      (*aCoef[lev])[dit].setVal(1.0);
+      (*bCoef[lev])[dit].setVal(1.0);
+
+      // bCoef for salt solve
+      (*bCoef[lev])[dit].mult((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Ccomp);
+
+      // for heat solve
+      (*bCoef[lev])[dit].minus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
+      for (int dir=0; dir<SpaceDim; dir++)
+      {
+        (*bCoef[lev])[dit][dir].mult(m_parameters.heatConductivityRatio, Hcomp);
+      }
+      (*bCoef[lev])[dit].plus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
+
+
+      for (int dir=0; dir<SpaceDim; dir++)
+      {
+        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[m_enthalpy], Hcomp);
+        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[m_bulkConcentration], Ccomp);
+      }
+    }
+
+  } // end loop over levels
+
+  MushyLayerParams* mlParamsPtr = &m_parameters;
+
+  //        EnthalpyVariable calcTemperature = computeTemperatureFunc;
+  BCHolder temperature_Sl_BC; // = m_physBCPtr->BasicthetaFuncBC();
+  temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC();
+  BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC();
+
+  // todo - check these values are correct
+  Real alpha = 1.0; Real beta = 1.0;
+  int relaxMode = 1;
+
+  AMRNonLinearMultiCompOpFactory* HCop = new AMRNonLinearMultiCompOpFactory();
+  HCop->define(m_amrDomains[0], activeGrids, m_refinement_ratios, m_amrDx[0], HC_BC,
+               alpha, aCoef, beta, bCoef,
+               m_scalarNew[m_enthalpySolidus], m_scalarNew[m_enthalpyLiquidus],
+               m_scalarNew[m_enthalpyEutectic],
+               mlParamsPtr, temperature_Sl_BC,
+               relaxMode, porosityEdgeBC);
+
+  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >HCOpFact;
+  HCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(
+      HCop);
+
+  int maxAMRlevels = numLevels;
+
+  s_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
+      new AMRFASMultiGrid<LevelData<FArrayBox> >());
+
+//  s_multiCompFASMG->define(m_amrDomains[0], *HCOpFact, &bottomSolve,
+//                           maxAMRlevels);
+//  s_multiCompFASMG->setSolverParameters(numSmooth, numSmooth, numSmooth, numMG,
+//                                        maxIter, tolerance, hang, normThresh);
+//  s_multiCompFASMG->m_verbosity = mgverb;
+
+
+
+
+  s_enthalpySalinityTGA = RefCountedPtr<LevelTGA>(
+      new LevelTGA(activeGrids, m_refinement_ratios, m_amrDomains[0], HCOpFact,
+                   s_multiCompFASMG));
+
+
+  s_enthalpySalinityBE = RefCountedPtr<LevelBackwardEuler>(
+      new LevelBackwardEuler(activeGrids, m_refinement_ratios, m_amrDomains[0], HCOpFact,
+                             s_multiCompFASMG));
 
 
   //Need to do this for TGA solver
   if (m_timeIntegrationOrder == 2)
   {
+    //todo- init enthalpy salinity solve
     //		amrSolver->init(a_thetaNew,
     //				thetaSource,
     //				lmax,
     //				lbase);
 
-    m_amrSolverVCtheta->init(a_thetaNew,
-                             thetaSource,
-                             lmax,
-                             lbase);
-
-    m_amrSolverVCThetaL->init(a_ThetaLNew,
-                              ThetaLSource,
-                              lmax,
-                              lbase);
+    //    m_amrSolverVCtheta->init(a_thetaNew,
+    //                             thetaSource,
+    //                             lmax,
+    //                             lbase);
+    //
+    //    m_amrSolverVCThetaL->init(a_ThetaLNew,
+    //                              ThetaLSource,
+    //                              lmax,
+    //                              lbase);
   }
 
   //Backward Euler solver for timestepping theta
-  m_diffuseBEtheta = RefCountedPtr<BackwardEuler>
+  m_BEEnthalpySalinity = RefCountedPtr<BackwardEuler>
   (new BackwardEuler(
-      m_amrSolverVCtheta,
-      *thetaVCOpFact,
+      s_enthalpySalinityTGA,
+      *HCop,
       m_amrDomains[0],
       m_refinement_ratios,
       numLevels,
@@ -1471,34 +1374,16 @@ amrMushyLayer::setupMultigrid(
 
 
   //TGA solver for timestepping theta
-  m_diffuseTGAtheta =  RefCountedPtr<AMRTGA<LevelData<FArrayBox> > >
+  m_TGAEnthalpySalinity =  RefCountedPtr<AMRTGA<LevelData<FArrayBox> > >
   (new AMRTGA<LevelData<FArrayBox> >(
-      m_amrSolverVCtheta,
-      *thetaVCOpFact,
+      s_enthalpySalinityTGA,
+      *HCop,
       m_amrDomains[0],
       m_refinement_ratios,
       numLevels,
       s_verbosity-1));
 
-  //Backward Euler for Theta_L
-  m_diffuseBEThetaL = RefCountedPtr<BackwardEuler>
-  (new BackwardEuler(
-      m_amrSolverVCThetaL,
-      *ThetaLVCOpFact,
-      m_amrDomains[0],
-      m_refinement_ratios,
-      numLevels,
-      s_verbosity-1));
 
-  // TGA solver for Theta_L
-  m_diffuseTGAThetaL =  RefCountedPtr<AMRTGA<LevelData<FArrayBox> > >
-  (new AMRTGA<LevelData<FArrayBox> >(
-      m_amrSolverVCThetaL,
-      *ThetaLVCOpFact,
-      m_amrDomains[0],
-      m_refinement_ratios,
-      numLevels,
-      s_verbosity-1));
 
 
 }
@@ -1744,11 +1629,11 @@ amrMushyLayer::getLevelAdvectionsVars(const int a_var,
   {
     advPhys = m_advPhysConcLiquid[lev];
   }
-  else if(a_var == m_composition)
+  else if(a_var == m_bulkConcentration)
   {
     advPhys = m_advPhysConc[lev];
   }
-  else if(a_var == m_enthalpy)
+  else if(a_var == m_HC)
   {
     advPhys = m_advPhysEnthalpy[lev];
   }
@@ -1776,143 +1661,144 @@ amrMushyLayer::getLevelAdvectionsVars(const int a_var,
 // Load data for a field from a file
 void amrMushyLayer::loadFromFile(const int a_var, const string filename, const int num_ghost, const int comp)
 {
-  vector <vector <double> > data;
-  char *fname = const_cast<char*>(filename.c_str());
-  ifstream infile( fname );
 
-  while (infile)
-  {
-    string s;
-    if (!getline( infile, s )) break;
-
-    istringstream ss( s );
-    vector <double> record;
-
-
-    while (ss)
-    {
-      string s;
-      if (!getline( ss, s, ',' )) break;
-
-      record.push_back( atof(s.c_str()) );
-
-    }
-
-    data.push_back( record );
-
-  }
-
-  //If our data doesn't have the same number of ghost cells as our FAB, we need to introduce an offset
-  int ghostx = (*m_scalarNew[a_var][0]).ghostVect()[0];
-  int ghosty = (*m_scalarNew[a_var][0]).ghostVect()[1];
-
-  int offsetx = ghostx - num_ghost;
-  int offsety = ghosty - num_ghost;
-
-  int maxRow = data[0].size() - 1;
-  int maxCol = data.size() - 1;
-
-  DataIterator dit = (*m_scalarNew[a_var][0]).dataIterator();
-  for (dit.reset(); dit.ok(); ++dit)
-  {
-    FArrayBox& fab = (*m_scalarNew[a_var][0])[dit()];
-
-    // Only fill interior cells
-    BoxIterator bit = BoxIterator(m_amrGrids[0][dit]);
-
-    for(bit.reset(); bit.ok(); ++bit)
-    {
-      IntVect iv = bit();
-
-      int row = iv[0] + num_ghost;
-      int col = iv[1] + num_ghost;
-
-      if (row < 0 || col < 0 || row > maxRow || col > maxCol)
-      {
-        continue;
-      }
-
-      fab(iv, comp) = data[col][row];
-
-    }
-  }
-
-  if (!infile.eof())
-  {
-    cerr << "Error reading in file!\n";
-  }
-
-  // Fill finer levels by refinement if necessary
-  for (int lev=1; lev<=m_finest_level; lev++)
-  {
-    FineInterp interpolatorScalar(m_amrGrids[lev], 1,
-                                  m_refinement_ratios[lev-1],
-                                  m_amrDomains[lev]);
-
-    interpolatorScalar.interpToFine(*m_scalarNew[a_var][lev], *m_scalarNew[a_var][lev-1]);
-  }
-
-  // Fill ghost cells
-  for (int lev=0; lev <= m_finest_level; lev++)
-  {
-    for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
-    {
-      FArrayBox& phi = (*m_scalarNew[a_var][lev])[dit];
-      BCHolder BC;
-
-      if (a_var == m_porosity)
-      {
-        BC = m_physBCPtr->BasicPorosityFuncBC();
-        BC(phi, phi.box(), m_amrDomains[lev], m_amrDx[lev], false);
-      }
-      if (a_var == m_theta)
-      {
-        BC = m_physBCPtr->BasicthetaFuncBC();
-        BC(phi, phi.box(), m_amrDomains[lev], m_amrDx[lev], false);
-      }
-      if (a_var == m_enthalpy)
-      {
-        BC = m_physBCPtr->BasicEnthalpyFuncBC();
-        BC(phi, phi.box(), m_amrDomains[lev], m_amrDx[lev], false);
-      }
-      if (a_var == m_composition)
-      {
-        BC = m_physBCPtr->BasicThetaFuncBC();
-        BC(phi, phi.box(), m_amrDomains[lev], m_amrDx[lev], false);
-      }
-
-
-
-
-
-    }
-
-    Box b = m_amrDomains[lev].domainBox();
-
-    // Grow box to include cells we wish to fill
-    b.grow(m_num_ghost);
-
-    ExtrapFillPatch filler(m_scalarNew[a_var][lev]->disjointBoxLayout(), b, Interval(1,m_num_ghost));
-
-
-    for (int dir=0; dir<SpaceDim; dir++)
-    {
-      filler.fillExtrap(*m_scalarNew[a_var][lev], dir, 0, 1);
-    }
-  }
-
-  if (a_var == m_porosity)
-  {
-    for (int lev=0; lev<=m_finest_level; lev++)
-      for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
-      {
-
-        {
-          (*m_scalarNew[m_solidFraction][lev])[dit].setVal(1.0);
-          (*m_scalarNew[m_solidFraction][lev])[dit] -= (*m_scalarNew[m_porosity][lev])[dit];
-        }
-      }
-  }
+//  vector <vector <double> > data;
+//  char *fname = const_cast<char*>(filename.c_str());
+//  ifstream infile( fname );
+//
+//  while (infile)
+//  {
+//    string s;
+//    if (!getline( infile, s )) break;
+//
+//    istringstream ss( s );
+//    vector <double> record;
+//
+//
+//    while (ss)
+//    {
+//      string s;
+//      if (!getline( ss, s, ',' )) break;
+//
+//      record.push_back( atof(s.c_str()) );
+//
+//    }
+//
+//    data.push_back( record );
+//
+//  }
+//
+//  //If our data doesn't have the same number of ghost cells as our FAB, we need to introduce an offset
+//  int ghostx = (*m_scalarNew[a_var][0]).ghostVect()[0];
+//  int ghosty = (*m_scalarNew[a_var][0]).ghostVect()[1];
+//
+//  int offsetx = ghostx - num_ghost;
+//  int offsety = ghosty - num_ghost;
+//
+//  int maxRow = data[0].size() - 1;
+//  int maxCol = data.size() - 1;
+//
+//  DataIterator dit = (*m_scalarNew[a_var][0]).dataIterator();
+//  for (dit.reset(); dit.ok(); ++dit)
+//  {
+//    FArrayBox& fab = (*m_scalarNew[a_var][0])[dit()];
+//
+//    // Only fill interior cells
+//    BoxIterator bit = BoxIterator(m_amrGrids[0][dit]);
+//
+//    for(bit.reset(); bit.ok(); ++bit)
+//    {
+//      IntVect iv = bit();
+//
+//      int row = iv[0] + num_ghost;
+//      int col = iv[1] + num_ghost;
+//
+//      if (row < 0 || col < 0 || row > maxRow || col > maxCol)
+//      {
+//        continue;
+//      }
+//
+//      fab(iv, comp) = data[col][row];
+//
+//    }
+//  }
+//
+//  if (!infile.eof())
+//  {
+//    cerr << "Error reading in file!\n";
+//  }
+//
+//  // Fill finer levels by refinement if necessary
+//  for (int lev=1; lev<=m_finest_level; lev++)
+//  {
+//    FineInterp interpolatorScalar(m_amrGrids[lev], 1,
+//                                  m_refinement_ratios[lev-1],
+//                                  m_amrDomains[lev]);
+//
+//    interpolatorScalar.interpToFine(*m_scalarNew[a_var][lev], *m_scalarNew[a_var][lev-1]);
+//  }
+//
+//  // Fill ghost cells
+//  for (int lev=0; lev <= m_finest_level; lev++)
+//  {
+//    for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
+//    {
+//      FArrayBox& phi = (*m_scalarNew[a_var][lev])[dit];
+//      BCHolder BC;
+//
+//      if (a_var == m_porosity)
+//      {
+//        BC = m_physBCPtr->BasicPorosityFuncBC();
+//        BC(phi, phi.box(), m_amrDomains[lev], m_amrDx[lev], false);
+//      }
+//      if (a_var == m_theta)
+//      {
+//        BC = m_physBCPtr->BasicthetaFuncBC();
+//        BC(phi, phi.box(), m_amrDomains[lev], m_amrDx[lev], false);
+//      }
+//      if (a_var == m_HC)
+//      {
+//        BC = m_physBCPtr->BasicEnthalpyFuncBC();
+//        BC(phi, phi.box(), m_amrDomains[lev], m_amrDx[lev], false);
+//      }
+//      if (a_var == m_bulkConcentration)
+//      {
+//        BC = m_physBCPtr->BasicThetaFuncBC();
+//        BC(phi, phi.box(), m_amrDomains[lev], m_amrDx[lev], false);
+//      }
+//
+//
+//
+//
+//
+//    }
+//
+//    Box b = m_amrDomains[lev].domainBox();
+//
+//    // Grow box to include cells we wish to fill
+//    b.grow(m_num_ghost);
+//
+//    ExtrapFillPatch filler(m_scalarNew[a_var][lev]->disjointBoxLayout(), b, Interval(1,m_num_ghost));
+//
+//
+//    for (int dir=0; dir<SpaceDim; dir++)
+//    {
+//      filler.fillExtrap(*m_scalarNew[a_var][lev], dir, 0, 1);
+//    }
+//  }
+//
+//  if (a_var == m_porosity)
+//  {
+//    for (int lev=0; lev<=m_finest_level; lev++)
+//      for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
+//      {
+//
+//        {
+//          (*m_scalarNew[m_solidFraction][lev])[dit].setVal(1.0);
+//          (*m_scalarNew[m_solidFraction][lev])[dit] -= (*m_scalarNew[m_porosity][lev])[dit];
+//        }
+//      }
+//  }
 
 
 }

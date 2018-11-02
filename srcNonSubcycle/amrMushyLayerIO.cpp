@@ -522,7 +522,7 @@ amrMushyLayer::readCheckpointFile(HDF5Handle& a_handle)
 	{
 		MayDay::Error("checkpoint file does not contain m_numVars");
 	}
-	m_numVars = header.m_int["m_numVars"];
+	int nVars  = header.m_int["m_numVars"];
 
 	// read num vector vars
 	if (header.m_int.find("m_numVectorVars") == header.m_int.end())
