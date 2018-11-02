@@ -886,44 +886,44 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
   return norm;
 }
 
-void AMRLevelMushyLayer::getCoarseVectorDataPointers(const int a_vectorVar,
-                                                     LevelData<FArrayBox>** a_coarserDataOldPtr,
-                                                     LevelData<FArrayBox>** a_coarserDataNewPtr,
-                                                     LevelFluxRegister** a_coarserFRPtr, LevelFluxRegister** a_finerFRPtr,
-                                                     Real& a_tCoarserOld, Real& a_tCoarserNew)
-{
-  *a_coarserDataOldPtr = NULL;
-  *a_coarserDataNewPtr = NULL;
-  *a_coarserFRPtr = NULL;
-  *a_finerFRPtr = NULL;
-
-  a_tCoarserOld = 0.0;
-  a_tCoarserNew = 0.0;
-
-  // A coarser level exists
-  if (m_hasCoarser)
-  {
-    AMRLevelMushyLayer* coarserPtr = getCoarserLevel();
-
-    // Recall that my flux register goes between my level and the next
-    // finer level
-    *a_coarserFRPtr = &(*coarserPtr->m_vectorFluxRegisters[a_vectorVar]);
-
-    *a_coarserDataOldPtr = &(*coarserPtr->m_vectorOld[a_vectorVar]);
-    *a_coarserDataNewPtr = &(*coarserPtr->m_vectorNew[a_vectorVar]);
-
-    a_tCoarserNew = coarserPtr->m_time;
-    a_tCoarserOld = a_tCoarserNew - coarserPtr->m_dt;
-  }
-
-  // A finer level exists
-  if (m_hasFiner)
-  {
-    // Recall that my flux register goes between my level and the next
-    // finer level
-    *a_finerFRPtr = &(*m_vectorFluxRegisters[a_vectorVar]);
-  }
-}
+//void AMRLevelMushyLayer::getCoarseVectorDataPointers(const int a_vectorVar,
+//                                                     LevelData<FArrayBox>** a_coarserDataOldPtr,
+//                                                     LevelData<FArrayBox>** a_coarserDataNewPtr,
+//                                                     LevelFluxRegister** a_coarserFRPtr, LevelFluxRegister** a_finerFRPtr,
+//                                                     Real& a_tCoarserOld, Real& a_tCoarserNew)
+//{
+//  *a_coarserDataOldPtr = NULL;
+//  *a_coarserDataNewPtr = NULL;
+//  *a_coarserFRPtr = NULL;
+//  *a_finerFRPtr = NULL;
+//
+//  a_tCoarserOld = 0.0;
+//  a_tCoarserNew = 0.0;
+//
+//  // A coarser level exists
+//  if (m_hasCoarser)
+//  {
+//    AMRLevelMushyLayer* coarserPtr = getCoarserLevel();
+//
+//    // Recall that my flux register goes between my level and the next
+//    // finer level
+//    *a_coarserFRPtr = &(*coarserPtr->m_vectorFluxRegisters[a_vectorVar]);
+//
+//    *a_coarserDataOldPtr = &(*coarserPtr->m_vectorOld[a_vectorVar]);
+//    *a_coarserDataNewPtr = &(*coarserPtr->m_vectorNew[a_vectorVar]);
+//
+//    a_tCoarserNew = coarserPtr->m_time;
+//    a_tCoarserOld = a_tCoarserNew - coarserPtr->m_dt;
+//  }
+//
+//  // A finer level exists
+//  if (m_hasFiner)
+//  {
+//    // Recall that my flux register goes between my level and the next
+//    // finer level
+//    *a_finerFRPtr = &(*m_vectorFluxRegisters[a_vectorVar]);
+//  }
+//}
 
 void
 AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSourceTerm, Real advVelCentering)
@@ -957,7 +957,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
   // todo - set porosity limit correctly here
 
-  Real advPorosityLimit = 1e-4;
+  Real advPorosityLimit = m_solidPorosity;
   ppMain.query("advPorosityLimit", advPorosityLimit);
 
   // this is useless here
@@ -1097,6 +1097,9 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
           U_to_advect[dit].mult(m_parameters.m_advectionCoeff);
 
         } // end loop over grids
+
+        // Set advection velocity to zero where porosity is low
+//        setVelZero(U_to_advect, 0.05);
 
 
         // m_dt is the full timestep, and this always returns the half time velocity
@@ -1356,25 +1359,25 @@ void AMRLevelMushyLayer::copyNewToOldStates()
 
 }
 
-void AMRLevelMushyLayer::copyOldToNewStates()
-{
-  // Copy the new to the old
-  // Old now contains values at n, new will contain values at n+1 eventually
-  for (int a_scalarVar = 0; a_scalarVar < m_numScalarVars; a_scalarVar++)
-  {
-    m_scalarOld[a_scalarVar]->copyTo(m_scalarOld[a_scalarVar]->interval(),
-                                     *m_scalarNew[a_scalarVar],
-                                     m_scalarNew[a_scalarVar]->interval());
-
-  }
-  for (int vectorVar = 0; vectorVar < m_numVectorVars; vectorVar++)
-  {
-    m_vectorOld[vectorVar]->copyTo(m_vectorOld[vectorVar]->interval(),
-                                   *m_vectorNew[vectorVar],
-                                   m_vectorNew[vectorVar]->interval());
-  }
-
-}
+//void AMRLevelMushyLayer::copyOldToNewStates()
+//{
+//  // Copy the new to the old
+//  // Old now contains values at n, new will contain values at n+1 eventually
+//  for (int a_scalarVar = 0; a_scalarVar < m_numScalarVars; a_scalarVar++)
+//  {
+//    m_scalarOld[a_scalarVar]->copyTo(m_scalarOld[a_scalarVar]->interval(),
+//                                     *m_scalarNew[a_scalarVar],
+//                                     m_scalarNew[a_scalarVar]->interval());
+//
+//  }
+//  for (int vectorVar = 0; vectorVar < m_numVectorVars; vectorVar++)
+//  {
+//    m_vectorOld[vectorVar]->copyTo(m_vectorOld[vectorVar]->interval(),
+//                                   *m_vectorNew[vectorVar],
+//                                   m_vectorNew[vectorVar]->interval());
+//  }
+//
+//}
 
 
 
@@ -1739,7 +1742,7 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
 
   // We seem to need to make this larger as the resolution decreases.
   // I don't know the actual scaling, so this is just a guess.
-  Real ccVelPorosityLimit = 1e-4;
+  Real ccVelPorosityLimit = m_solidPorosity; //1e-4;
 //  m_lowerPorosityLimit = 1e-10;
   ParmParse pp("main");
   pp.query("ccvel_porosity_cap", ccVelPorosityLimit);
@@ -1797,7 +1800,7 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
         {
           pout() << "max(uDelU) = " << maxUdelU << endl;
         }
-        setVelZero(UdelU_porosity, 1e-5);
+        setVelZero(UdelU_porosity, m_solidPorosity);
 
       }
 
@@ -1816,7 +1819,7 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
     pp.query("uDelU_grow", uDelU_grow);
 
     // by default make this tiny (so essentially turned off)
-    Real uDelU_porosityLimit = 1e-15; //min(0.1, m_lowerPorosityLimit*10);
+    Real uDelU_porosityLimit = m_lowerPorosityLimit; //1e-15;
     pp.query("uDelu_porosity", uDelU_porosityLimit);
     setVelZero(UdelU_porosity, uDelU_porosityLimit, uDelU_grow); // grow by 1
 
@@ -2099,7 +2102,7 @@ void AMRLevelMushyLayer::setVelZero(LevelData<FArrayBox>& a_vel, Real a_limit, i
 {
   if (a_limit < 0)
   {
-    a_limit = m_lowerPorosityLimit*100;
+    a_limit = m_solidPorosity;
   }
 
   for (DataIterator dit = a_vel.dataIterator(); dit.ok(); ++dit)
@@ -2112,7 +2115,7 @@ void AMRLevelMushyLayer::setVelZero(LevelData<FluxBox>& a_vel, Real a_limit)
 {
   if (a_limit < 0)
     {
-      a_limit = m_lowerPorosityLimit*100;
+      a_limit = m_solidPorosity;
     }
 
   // Get the porosity
@@ -3290,12 +3293,11 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
     fillVectorField(UtoAdvect_old, old_time, m_fluidVel, true);
   }
 
-  Real advVelChiLimit = 1e-10;
+  Real advVelChiLimit = m_lowerPorosityLimit; //was 1e-10
   ParmParse ppMain("main");
   ppMain.query("advPorosityLimit", advVelChiLimit);
   setVelZero(UtoAdvect_old, advVelChiLimit);
   setVelZero(advectionVelocity, advVelChiLimit);
-
 
   // will need edge-centered storage for all velocity components
   // This is the half time predicted value of whatever we were advecting (u or u/chi)
@@ -4313,7 +4315,7 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   }
 
 //  Real minChi = ::computeMin(*m_scalarNew[m_porosity], NULL, 1);
-  Real advVelsrcChiLimit = 1e-10;
+  Real advVelsrcChiLimit = m_lowerPorosityLimit; //1e-10
   ParmParse ppMain("main");
   ppMain.query("advVelSrcChiLimit", advVelsrcChiLimit);
   setVelZero(velOld, advVelsrcChiLimit);
@@ -4460,40 +4462,40 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
 
   // Add in extra (u.grad(porosity)/porosity^2)u term if needed
   //todo - write this more cleanly
-          if (m_advectionMethod == m_porosityOutsideAdvection)
-          {
-            Real old_time = m_time - m_dt;
-//            LevelData<FArrayBox> ccVel(m_grids, SpaceDim, IntVect::Unit);
-            LevelData<FArrayBox> gradChi_chiSquared(m_grids, SpaceDim, IntVect::Unit);
-            LevelData<FArrayBox> extraSrc(m_grids, SpaceDim, IntVect::Unit);
-//            LevelData<FArrayBox> porosity(m_grids, 1, 2*IntVect::Unit);
+  if (m_advectionMethod == m_porosityOutsideAdvection)
+  {
+    Real old_time = m_time - m_dt;
+    //            LevelData<FArrayBox> ccVel(m_grids, SpaceDim, IntVect::Unit);
+    LevelData<FArrayBox> gradChi_chiSquared(m_grids, SpaceDim, IntVect::Unit);
+    LevelData<FArrayBox> extraSrc(m_grids, SpaceDim, IntVect::Unit);
 
-//            fillScalars(porosity, old_time, m_porosity, true, true);
-//            fillVectorField(ccVel, old_time, m_fluidVel, true, true);
-            Gradient::levelGradientCC(extraSrc, porosity, m_dx, extraSrc.ghostVect()[0]);
+    Gradient::levelGradientCC(extraSrc, porosity, m_dx, extraSrc.ghostVect()[0]);
 
-            for (DataIterator dit = extraSrc.dataIterator(); dit.ok(); ++dit)
-            {
-              for (int dir=0; dir < SpaceDim; dir++)
-              {
-                // Make u.grad(porosity)
-              extraSrc[dit].mult(velOld[dit], dir, dir);
+    for (DataIterator dit = extraSrc.dataIterator(); dit.ok(); ++dit)
+    {
+      for (int dir=0; dir < SpaceDim; dir++)
+      {
+        // Make u.grad(porosity)
+        extraSrc[dit].mult(velOld[dit], dir, dir);
 
-              // Make u.grad(porosity)/porosity^2
-                extraSrc[dit].divide(porosity[dit], 0, dir);
-                extraSrc[dit].divide(porosity[dit], 0, dir);
+        // Make u.grad(porosity)/porosity^2
+        extraSrc[dit].divide(porosity[dit], 0, dir);
+        extraSrc[dit].divide(porosity[dit], 0, dir);
 
-                // Make (u.grad(porosity)/porosity^2)u
-                extraSrc[dit].mult(velOld[dit], dir, dir);
-              }
+        // Make (u.grad(porosity)/porosity^2)u
+        extraSrc[dit].mult(velOld[dit], dir, dir);
+      }
 
-              a_src[dit].minus(extraSrc[dit], 0, 0, SpaceDim);
+      // Add this extra source term to the full source term
+      a_src[dit].minus(extraSrc[dit], 0, 0, SpaceDim);
 
-            }
+    }
+
+    //todo check this is the correct porosity cap
+    setVelZero(a_src, min(0.05, 5*m_solidPorosity));
 
 
-          }
-
+  }
 
 
   Real maxSrcVal = ::computeNorm(a_src, NULL, 1, m_dx);

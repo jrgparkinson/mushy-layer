@@ -160,6 +160,7 @@ public:
     m_doAutomaticRestart = false;
     m_lowerPorosityLimit = 1e-15;
     m_implicitAdvectionSolve = false;
+    m_solidPorosity = 0.05;
 
     m_advectionMethod = m_porosityInAdvection;
 
@@ -794,7 +795,7 @@ protected:
   void computeInitAdvectionVel();
 
   /// Flag if a new level has been added
-  bool newLevelAdded();
+//  bool newLevelAdded();
 
   /// Reset \f$ \lambda = 1\f$
   void resetLambda();
@@ -815,7 +816,7 @@ protected:
                          const int& a_lBase);
 
   /// Smooth the velocity field
-  void smoothVelocityField(int a_lbase);
+//  void smoothVelocityField(int a_lbase);
 
   /// Utility function to get pointers to coarse level objects
   void getCoarseScalarDataPointers(const int a_scalarVar,
@@ -827,13 +828,13 @@ protected:
                                    Real& a_tCoarserNew);
 
   /// Utility function to get pointers to coarse level objects
-  void getCoarseVectorDataPointers(const int a_vectorVar,
-                                   LevelData<FArrayBox>** a_coarserDataOldPtr,
-                                   LevelData<FArrayBox>** a_coarserDataNewPtr,
-                                   LevelFluxRegister**    a_coarserFRPtr,
-                                   LevelFluxRegister**    a_finerFRPtr,
-                                   Real& a_tCoarserOld,
-                                   Real& a_tCoarserNew);
+//  void getCoarseVectorDataPointers(const int a_vectorVar,
+//                                   LevelData<FArrayBox>** a_coarserDataOldPtr,
+//                                   LevelData<FArrayBox>** a_coarserDataNewPtr,
+//                                   LevelFluxRegister**    a_coarserFRPtr,
+//                                   LevelFluxRegister**    a_finerFRPtr,
+//                                   Real& a_tCoarserOld,
+//                                   Real& a_tCoarserNew);
 
   /// Doesn't do any time interpolation - just fills ghost cells if necessary
   void fillVectorField(LevelData<FArrayBox>& a_vector, Real a_time, int a_var,
@@ -849,7 +850,7 @@ protected:
   void fillBuoyancy(LevelData<FArrayBox>& a_buoyancy, Real a_time, bool quadInterp);
 
   /// Helper function
-  void fillBuoyancyFace(LevelData<FluxBox>& a_buoyancy, Real a_time, bool quadInterp);
+//  void fillBuoyancyFace(LevelData<FluxBox>& a_buoyancy, Real a_time, bool quadInterp);
 
   /// Fill ghost cells of scalar field (edge-centred)
   void fillScalarFace(LevelData<FluxBox>& a_scal,
@@ -923,7 +924,7 @@ protected:
   void copyNewToOldStates();
 
   /// Copy old data to new data holders
-  void copyOldToNewStates();
+//  void copyOldToNewStates();
 
   /// Compute advection velocity
   void computeAdvectionVelocities(LevelData<FArrayBox>& advectionSrc,  Real advVelCentering=0.5);
@@ -932,7 +933,7 @@ protected:
   void correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel, Real a_dt);
 
   /// Compute and apply volume discrepancy correction (edge centred velocity)
-  void computeVolumeDiscrepancyCorrection(LevelData<FluxBox>& a_advVel);
+//  void computeVolumeDiscrepancyCorrection(LevelData<FluxBox>& a_advVel);
 
   /// Compute initial \f$ \Delta t \f$
   Real computeDtInit(int finest_level);
@@ -987,6 +988,9 @@ protected:
 
   /// Cap on porosity
   Real m_lowerPorosityLimit;
+
+  /// Below this porosity we artifically enforce U=0
+  Real m_solidPorosity;
 
   /// List of scalar vars to write out to HDF5 files
   Vector<int> m_outputScalarVars,

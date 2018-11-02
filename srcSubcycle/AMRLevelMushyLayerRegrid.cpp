@@ -1647,177 +1647,177 @@ void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
   }
 }
 
-void
-AMRLevelMushyLayer::smoothVelocityField(int a_lbase)
-{
-  // in this function, we take the filpatched fields stored in
-  // the old-time storage (which have been modified to contain
-  // s - mu*lap(s) in the regrid() function and perform an
-  // elliptic solve which should result in a smoothed s
-
-  // first need to loop over levels and put together amr storage
-  // this should be called on the lbase level
-  CH_assert (m_level == a_lbase);
-  CH_assert (m_regrid_smoothing_done);
-
-  AMRLevelMushyLayer* thisMLPtr = this;
-  while (!thisMLPtr->finestLevel())
-  {
-    thisMLPtr = thisMLPtr->getFinerLevel();
-  }
-  CH_assert (thisMLPtr->finestLevel());
-  int finest_level = thisMLPtr->m_level;
-
-  thisMLPtr = this;
-  int startLev = m_level;
-  if (m_level > 0)
-  {
-    startLev = m_level-1;
-    thisMLPtr = thisMLPtr->getCoarserLevel();
-  }
-
-  // now set up multilevel stuff
-  Vector<LevelData<FArrayBox>*> oldS(finest_level+1, NULL);
-  Vector<LevelData<FArrayBox>*> newS(finest_level+1, NULL);
-  Vector<DisjointBoxLayout> amrGrids(finest_level+1);
-  Vector<int> amrRefRatios(finest_level+1,0);
-  Vector<Real> amrDx(finest_level+1,0);
-  Vector<ProblemDomain> amrDomains(finest_level+1);
-  // also will need to avg down new stuff
-  Vector<CoarseAverage*> amrAvgDown(finest_level+1,NULL);
-
-  // loop over levels, allocate temp storage for velocities,
-  // set up for amrsolves
-  for (int lev=startLev; lev<=finest_level; lev++)
-  {
-    const DisjointBoxLayout& levelGrids = thisMLPtr->m_grids;
-    // since AMRSolver can only handle one component at a
-    // time, need to allocate temp space to copy stuff
-    // into, and then back out of to compute Laplacian
-    IntVect ghostVect(D_DECL(1,1,1));
-    newS[lev] = new LevelData<FArrayBox>(levelGrids, 1, ghostVect);
-    oldS[lev] = new LevelData<FArrayBox>(levelGrids,1,ghostVect);
-
-    amrGrids[lev] = levelGrids;
-    amrRefRatios[lev] = thisMLPtr->refRatio();
-    amrDx[lev] = thisMLPtr->m_dx;
-    amrDomains[lev] = thisMLPtr->problemDomain();
-    thisMLPtr = thisMLPtr->getFinerLevel();
-    if (lev>startLev)
-    {
-      amrAvgDown[lev] = new CoarseAverage(levelGrids,1,
-                                          amrRefRatios[lev-1]);
-    }
-  }
-
-  AMRPoissonOpFactory localPoissonOpFactory;
-
-  defineRegridAMROp(localPoissonOpFactory, amrGrids,
-                    amrDomains, amrDx,
-                    amrRefRatios, m_level);
-
-  RelaxSolver<LevelData<FArrayBox> > bottomSolver;
-  bottomSolver.m_verbosity = s_verbosity;
-
-  AMRMultiGrid<LevelData<FArrayBox> > streamSolver;
-  streamSolver.define(amrDomains[0],
-                      localPoissonOpFactory,
-                      &bottomSolver,
-                      finest_level+1);
-  streamSolver.m_verbosity = s_verbosity;
-  streamSolver.m_eps = 1e-10;
-
-  // now loop over velocity components
-  if (m_isViscous)
-  {
-    for (int dir=0; dir<SpaceDim; ++dir)
-    {
-      Interval velComps(dir,dir);
-      Interval tempComps(0,0);
-      thisMLPtr = this;
-      if (startLev<m_level) thisMLPtr = thisMLPtr->getCoarserLevel();
-      for (int lev=startLev; lev<=finest_level; lev++)
-      {
-        thisMLPtr->m_vectorOld[m_fluidVel]->copyTo(velComps, *oldS[lev], tempComps);
-        // do this as initial guess?
-        thisMLPtr->m_vectorOld[m_fluidVel]->copyTo(velComps, *newS[lev], tempComps);
-        thisMLPtr = thisMLPtr->getFinerLevel();
-      }
-
-      // now do elliptic solve
-      // last two args are max level and base level
-      streamSolver.solve(newS, oldS, finest_level, m_level,
-                         true); // initialize newS to zero (converted AMRSolver)
-
-      // average new s down to invalid regions
-      for (int lev=finest_level; lev>startLev; lev--)
-      {
-        amrAvgDown[lev]->averageToCoarse(*newS[lev-1], *newS[lev]);
-      }
-
-      // now copy back to new velocity field
-      thisMLPtr = this;
-      for (int lev=m_level; lev <= finest_level; lev++)
-      {
-        newS[lev]->copyTo(tempComps, *thisMLPtr->m_vectorNew[m_fluidVel], velComps);
-
-        thisMLPtr = thisMLPtr->getFinerLevel();
-      }
-    } // end loop over velocity components
-
-  }// end if viscous
-
-  // since scalars won't need temp storge, clean it up here
-  for (int lev=startLev; lev<= finest_level; lev++)
-  {
-    if (newS[lev] != NULL)
-    {
-      delete newS[lev];
-      newS[lev] = NULL;
-    }
-    if (oldS[lev] != NULL)
-    {
-      delete oldS[lev];
-      oldS[lev] = NULL;
-    }
-  }
-
-  // now do scalars
-  for (int scalComp=0; scalComp < m_numScalarVars; scalComp++)
-  {
-    // only do this if scalar is diffused
-    if (m_scalarDiffusionCoeffs[scalComp] > 0)
-    {
-      thisMLPtr =this;
-      for (int lev=startLev; lev <= finest_level; lev++)
-      {
-        newS[lev] = thisMLPtr->m_scalarNew[scalComp];
-        oldS[lev] = thisMLPtr->m_scalarOld[scalComp];
-        thisMLPtr = thisMLPtr->getFinerLevel();
-      }
-
-      // last two args are max level and base level
-      streamSolver.solve(newS, oldS, finest_level, m_level,
-                         true); // initialize newS to zero (converted AMRSolver)
-
-      // now do averaging down
-      for (int lev=finest_level; lev>m_level; lev--)
-      {
-        amrAvgDown[lev]->averageToCoarse(*newS[lev-1], *newS[lev]);
-      }
-    }  // end if this scalar is diffused
-  }  // end loop over scalars
-
-  // finally, loop over levels, clean up storage, and reset boolean
-  thisMLPtr = this;
-  for (int lev=m_level; lev<= finest_level; lev++)
-  {
-    if (amrAvgDown[lev] != NULL)
-    {
-      delete amrAvgDown[lev];
-      amrAvgDown[lev] = NULL;
-    }
-    thisMLPtr->m_regrid_smoothing_done = false;
-    thisMLPtr = thisMLPtr->getFinerLevel();
-  }
-}
+//void
+//AMRLevelMushyLayer::smoothVelocityField(int a_lbase)
+//{
+//  // in this function, we take the filpatched fields stored in
+//  // the old-time storage (which have been modified to contain
+//  // s - mu*lap(s) in the regrid() function and perform an
+//  // elliptic solve which should result in a smoothed s
+//
+//  // first need to loop over levels and put together amr storage
+//  // this should be called on the lbase level
+//  CH_assert (m_level == a_lbase);
+//  CH_assert (m_regrid_smoothing_done);
+//
+//  AMRLevelMushyLayer* thisMLPtr = this;
+//  while (!thisMLPtr->finestLevel())
+//  {
+//    thisMLPtr = thisMLPtr->getFinerLevel();
+//  }
+//  CH_assert (thisMLPtr->finestLevel());
+//  int finest_level = thisMLPtr->m_level;
+//
+//  thisMLPtr = this;
+//  int startLev = m_level;
+//  if (m_level > 0)
+//  {
+//    startLev = m_level-1;
+//    thisMLPtr = thisMLPtr->getCoarserLevel();
+//  }
+//
+//  // now set up multilevel stuff
+//  Vector<LevelData<FArrayBox>*> oldS(finest_level+1, NULL);
+//  Vector<LevelData<FArrayBox>*> newS(finest_level+1, NULL);
+//  Vector<DisjointBoxLayout> amrGrids(finest_level+1);
+//  Vector<int> amrRefRatios(finest_level+1,0);
+//  Vector<Real> amrDx(finest_level+1,0);
+//  Vector<ProblemDomain> amrDomains(finest_level+1);
+//  // also will need to avg down new stuff
+//  Vector<CoarseAverage*> amrAvgDown(finest_level+1,NULL);
+//
+//  // loop over levels, allocate temp storage for velocities,
+//  // set up for amrsolves
+//  for (int lev=startLev; lev<=finest_level; lev++)
+//  {
+//    const DisjointBoxLayout& levelGrids = thisMLPtr->m_grids;
+//    // since AMRSolver can only handle one component at a
+//    // time, need to allocate temp space to copy stuff
+//    // into, and then back out of to compute Laplacian
+//    IntVect ghostVect(D_DECL(1,1,1));
+//    newS[lev] = new LevelData<FArrayBox>(levelGrids, 1, ghostVect);
+//    oldS[lev] = new LevelData<FArrayBox>(levelGrids,1,ghostVect);
+//
+//    amrGrids[lev] = levelGrids;
+//    amrRefRatios[lev] = thisMLPtr->refRatio();
+//    amrDx[lev] = thisMLPtr->m_dx;
+//    amrDomains[lev] = thisMLPtr->problemDomain();
+//    thisMLPtr = thisMLPtr->getFinerLevel();
+//    if (lev>startLev)
+//    {
+//      amrAvgDown[lev] = new CoarseAverage(levelGrids,1,
+//                                          amrRefRatios[lev-1]);
+//    }
+//  }
+//
+//  AMRPoissonOpFactory localPoissonOpFactory;
+//
+//  defineRegridAMROp(localPoissonOpFactory, amrGrids,
+//                    amrDomains, amrDx,
+//                    amrRefRatios, m_level);
+//
+//  RelaxSolver<LevelData<FArrayBox> > bottomSolver;
+//  bottomSolver.m_verbosity = s_verbosity;
+//
+//  AMRMultiGrid<LevelData<FArrayBox> > streamSolver;
+//  streamSolver.define(amrDomains[0],
+//                      localPoissonOpFactory,
+//                      &bottomSolver,
+//                      finest_level+1);
+//  streamSolver.m_verbosity = s_verbosity;
+//  streamSolver.m_eps = 1e-10;
+//
+//  // now loop over velocity components
+//  if (m_isViscous)
+//  {
+//    for (int dir=0; dir<SpaceDim; ++dir)
+//    {
+//      Interval velComps(dir,dir);
+//      Interval tempComps(0,0);
+//      thisMLPtr = this;
+//      if (startLev<m_level) thisMLPtr = thisMLPtr->getCoarserLevel();
+//      for (int lev=startLev; lev<=finest_level; lev++)
+//      {
+//        thisMLPtr->m_vectorOld[m_fluidVel]->copyTo(velComps, *oldS[lev], tempComps);
+//        // do this as initial guess?
+//        thisMLPtr->m_vectorOld[m_fluidVel]->copyTo(velComps, *newS[lev], tempComps);
+//        thisMLPtr = thisMLPtr->getFinerLevel();
+//      }
+//
+//      // now do elliptic solve
+//      // last two args are max level and base level
+//      streamSolver.solve(newS, oldS, finest_level, m_level,
+//                         true); // initialize newS to zero (converted AMRSolver)
+//
+//      // average new s down to invalid regions
+//      for (int lev=finest_level; lev>startLev; lev--)
+//      {
+//        amrAvgDown[lev]->averageToCoarse(*newS[lev-1], *newS[lev]);
+//      }
+//
+//      // now copy back to new velocity field
+//      thisMLPtr = this;
+//      for (int lev=m_level; lev <= finest_level; lev++)
+//      {
+//        newS[lev]->copyTo(tempComps, *thisMLPtr->m_vectorNew[m_fluidVel], velComps);
+//
+//        thisMLPtr = thisMLPtr->getFinerLevel();
+//      }
+//    } // end loop over velocity components
+//
+//  }// end if viscous
+//
+//  // since scalars won't need temp storge, clean it up here
+//  for (int lev=startLev; lev<= finest_level; lev++)
+//  {
+//    if (newS[lev] != NULL)
+//    {
+//      delete newS[lev];
+//      newS[lev] = NULL;
+//    }
+//    if (oldS[lev] != NULL)
+//    {
+//      delete oldS[lev];
+//      oldS[lev] = NULL;
+//    }
+//  }
+//
+//  // now do scalars
+//  for (int scalComp=0; scalComp < m_numScalarVars; scalComp++)
+//  {
+//    // only do this if scalar is diffused
+//    if (m_scalarDiffusionCoeffs[scalComp] > 0)
+//    {
+//      thisMLPtr =this;
+//      for (int lev=startLev; lev <= finest_level; lev++)
+//      {
+//        newS[lev] = thisMLPtr->m_scalarNew[scalComp];
+//        oldS[lev] = thisMLPtr->m_scalarOld[scalComp];
+//        thisMLPtr = thisMLPtr->getFinerLevel();
+//      }
+//
+//      // last two args are max level and base level
+//      streamSolver.solve(newS, oldS, finest_level, m_level,
+//                         true); // initialize newS to zero (converted AMRSolver)
+//
+//      // now do averaging down
+//      for (int lev=finest_level; lev>m_level; lev--)
+//      {
+//        amrAvgDown[lev]->averageToCoarse(*newS[lev-1], *newS[lev]);
+//      }
+//    }  // end if this scalar is diffused
+//  }  // end loop over scalars
+//
+//  // finally, loop over levels, clean up storage, and reset boolean
+//  thisMLPtr = this;
+//  for (int lev=m_level; lev<= finest_level; lev++)
+//  {
+//    if (amrAvgDown[lev] != NULL)
+//    {
+//      delete amrAvgDown[lev];
+//      amrAvgDown[lev] = NULL;
+//    }
+//    thisMLPtr->m_regrid_smoothing_done = false;
+//    thisMLPtr = thisMLPtr->getFinerLevel();
+//  }
+//}

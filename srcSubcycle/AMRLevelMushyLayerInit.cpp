@@ -2877,20 +2877,20 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
   }
 }
 
-bool AMRLevelMushyLayer::newLevelAdded()
-{
-  AMRLevelMushyLayer* thisMLPtr = this->getCoarsestLevel();
-
-  bool newLevel=false;
-
-  while (thisMLPtr)
-  {
-    newLevel = newLevel || thisMLPtr->m_newLevel;
-    thisMLPtr = thisMLPtr->getFinerLevel();
-  }
-
-  return newLevel;
-}
+//bool AMRLevelMushyLayer::newLevelAdded()
+//{
+//  AMRLevelMushyLayer* thisMLPtr = this->getCoarsestLevel();
+//
+//  bool newLevel=false;
+//
+//  while (thisMLPtr)
+//  {
+//    newLevel = newLevel || thisMLPtr->m_newLevel;
+//    thisMLPtr = thisMLPtr->getFinerLevel();
+//  }
+//
+//  return newLevel;
+//}
 // -------------------------------------------------------------
 // this function manages the pressure initialization after
 // initialization and regridding
