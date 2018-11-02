@@ -26,8 +26,8 @@ def testPorousMushyHole(max_time=0.5):
                 {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
 
     # While testing:
-    Nz_uniform = [16, 32, 64]
-    AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
+   # Nz_uniform = [16, 32, 64]
+   # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
 
     # Nzs 	  = [16, 32, 64]
     num_procs = [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
