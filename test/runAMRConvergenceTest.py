@@ -130,28 +130,15 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 
                 params['main.min_time'] = integrationTime
                 params['main.max_time'] = integrationTime
-                # Velocity refine threshold is highly dependent on the integration time
-                
-                #params['main.vel_refine_thresh'] = '0.0015'
-                #params['main.vel_refine_thresh'] = '0.05'
-                
-                #params['main.refine_thresh'] = str(0.07*float(32.0/float(Nz_coarse)))
-                #params['main.refine_thresh'] = str(0.07*float(32.0/float(Nz_coarse)))
+
                 params['main.vel_refine_thresh'] = '0.0001'
                 params['main.stdev'] = '0.002'
                 
-                regrid_int = 4 #int(4.0*float(Nx_coarse)/16.0)
-            
-                
+                regrid_int = int(4.0*float(Nx_coarse)/16.0)
 
-                print('Determined max refinement: ' + str(maxRefinement))
-
-                #maxGridSize = max(Nx_coarse*maxRefinement/4,4)
 
                 # Make sure we always have one grid
                 maxGridSize = max(Nx_coarse*maxRefinement,4)
-
-                print('Max grid size: ' + str(maxGridSize))
 
                 #bf = max(maxGridSize/2,4)
                 bf = max(Nx_coarse*maxRefinement/8,4)
