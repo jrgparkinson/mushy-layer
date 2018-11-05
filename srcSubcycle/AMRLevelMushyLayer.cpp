@@ -7012,9 +7012,9 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   }
 
   if (s_verbosity >= 5)
-          {
-            pout() << "  AMRLevelMushyLayer::fillScalars - done interior filling" << endl;
-          }
+  {
+    pout() << "  AMRLevelMushyLayer::fillScalars - done interior filling" << endl;
+  }
 
   // Only do CF interp if we have ghost vectors
   if (m_level > 0  && a_scal.ghostVect() >= IntVect::Unit )
@@ -7029,11 +7029,12 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     const ProblemDomain& crseDomain = crseLevel.problemDomain();
     int nRefCrse = crseLevel.refRatio();
 
-
     Real crse_new_time = crseLevel.m_time;
     Real crse_dt = crseLevel.dt();
     Real crse_old_time = crse_new_time - crse_dt;
     Real crse_time_interp_coeff;
+
+
 
     // check for "essentially 0 or 1"
     if (abs(a_time - crse_old_time) < TIME_EPS)
@@ -7046,15 +7047,24 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       crse_time_interp_coeff = (a_time - crse_old_time) / crse_dt;
     }
 
+    if (s_verbosity >= 5)
+    {
+      pout() << "  AMRLevelMushyLayer::fillScalars - crse_time_inter_coeff = " << crse_time_interp_coeff << endl;
+    }
+
     const IntVect& scalGrowVect = a_scal.ghostVect();
     int scalGrow = scalGrowVect[0];
 
 //    bool doSecondOrderCorners = (CFinterpOrder_advection==2);
-
     PiecewiseLinearFillPatch filpatcher(levelGrids, crseGrids,
                                         a_scal.nComp(), crseDomain, nRefCrse, scalGrow,
 //                                        false, doSecondOrderCorners);
                                         false);
+
+    if (s_verbosity >= 5)
+              {
+                pout() << "  AMRLevelMushyLayer::fillScalars - defined fill patch" << endl;
+              }
 
     filpatcher.fillInterp(a_scal, oldCrseScal, newCrseScal,
                           crse_time_interp_coeff,
@@ -7062,6 +7072,10 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
     if (quadInterp && m_quadCFInterpScalar.isDefined())
     {
+      if (s_verbosity >= 5)
+      {
+        pout() << "  AMRLevelMushyLayer::fillScalars - do quad interp" << endl;
+      }
 
       LevelData<FArrayBox> avCrseScal(crseGrids, 1, oldCrseScal.ghostVect());
       ::timeInterp(avCrseScal, a_time, oldCrseScal, crse_old_time, newCrseScal, crse_new_time, scalComps);
