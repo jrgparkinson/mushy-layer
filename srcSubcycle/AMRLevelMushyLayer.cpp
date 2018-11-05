@@ -7007,6 +7007,11 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
+  if (s_verbosity >= 5)
+          {
+            pout() << "  AMRLevelMushyLayer::fillScalars - done interior filling" << endl;
+          }
+
   // Only do CF interp if we have ghost vectors
   if (m_level > 0  && a_scal.ghostVect() >= IntVect::Unit )
   {
@@ -7070,6 +7075,11 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   // Do domain BCs if we have ghost cells
   if (a_scal.ghostVect()[0] > 0)
   {
+    if (s_verbosity >= 5)
+            {
+              pout() << "  AMRLevelMushyLayer::fillScalars - do  BCs" << endl;
+            }
+
     BCHolder thisBC;
     getScalarBCs(thisBC, a_var, false); // inhomogeneous
 
@@ -7082,6 +7092,11 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
+  if (s_verbosity >= 5)
+          {
+            pout() << "  AMRLevelMushyLayer::fillScalars - regularisation ops" << endl;
+          }
+
   doRegularisationOps(a_scal, a_var);
 
 
@@ -7090,6 +7105,11 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   // Try a corner copier?
   if (a_scal.ghostVect()[0] > 0)
   {
+    if (s_verbosity >= 5)
+            {
+              pout() << "  AMRLevelMushyLayer::fillScalars - corner copier" << endl;
+            }
+
     CornerCopier cornerCopy(m_grids, m_grids, m_problem_domain, a_scal.ghostVect(), true);
     a_scal.exchange(a_scal.interval(), cornerCopy);
   }
