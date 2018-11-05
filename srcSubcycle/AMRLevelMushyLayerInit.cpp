@@ -1626,7 +1626,7 @@ void AMRLevelMushyLayer::initialDataPorousHole()
     Real ThetaTop = m_parameters.bcValBulkConcentrationHi[1];
     Real ThetaBottom = m_parameters.bcValBulkConcentrationLo[1];
 
-    Real thetaBottom = m_parameters.bcValTemperatureLo[1];
+//    Real thetaBottom = m_parameters.bcValTemperatureLo[1];
     Real thetaTop = m_parameters.bcValTemperatureHi[1];
     Real ThetaLTop = m_parameters.bcValLiquidConcentrationHi[1];
 
@@ -2677,7 +2677,7 @@ void AMRLevelMushyLayer::postInitialize()
 
       // Do a calculation on the coarsest level to get an estimate of the velocity
       // we need a very rough estimate of dt in order to do this
-      Real initDt;
+      Real initDt, initTime;
       if (this->m_fixedDt > 0)
       {
         initDt = m_fixedDt;
@@ -2694,11 +2694,15 @@ void AMRLevelMushyLayer::postInitialize()
         initDt = 1e-4*initDt; //make it a lot smaller to be safe
       }
 
-      pout() << "Computing initial VD correction with dt = " << initDt << endl;
+      initTime = m_time + initDt;
+
+      pout() << "Computing initial VD correction with dt = " << initDt << ", time = " << m_time << endl;
 
       for (int lev = 0; lev < numLevels; lev++)
       {
         thisML->dt(initDt);
+
+        thisML->time(initTime);
 
         // initialize pressures to first
         // guess (most likely 0)
@@ -2728,7 +2732,7 @@ void AMRLevelMushyLayer::postInitialize()
 
       level0Proj.doInitialSyncOperations(amrVel, amrLambda,
                                          amrPorosityFace, amrPorosity,
-                                         m_time, m_dt); // false - don't add to grad_elambda, simply reset it
+                                         initTime, initDt); // false - don't add to grad_elambda, simply reset it
 
       // Reset original fields incl. lambda
       thisML = this;
@@ -2738,6 +2742,8 @@ void AMRLevelMushyLayer::postInitialize()
 
         // Make sure lambda is definitely 1
         thisML->resetLambda();
+
+        thisML->time(initTime - initDt);
 
         thisML = thisML->getFinerLevel();
       }

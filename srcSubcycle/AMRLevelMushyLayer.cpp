@@ -7034,8 +7034,6 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     Real crse_old_time = crse_new_time - crse_dt;
     Real crse_time_interp_coeff;
 
-
-
     // check for "essentially 0 or 1"
     if (abs(a_time - crse_old_time) < TIME_EPS)
     {
