@@ -54,8 +54,9 @@ def testHeleShawFixedChill(argv):
 
     # While testing:
     Nz_uniform = [128]
-    AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
-                {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [64]}]
+   # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
+    #            {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [64]}]
+    AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
 
     # Nzs 	  = [16, 32, 64]
     num_procs = [1]  # Needs to be as long as the longest Nzs
