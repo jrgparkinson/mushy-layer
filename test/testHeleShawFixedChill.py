@@ -20,6 +20,7 @@ def testHeleShawFixedChill(argv):
     doAMR = False
 
     Pr = 10.0  # fix this for now
+    periodic = True
 
     try:
         opts, args = getopt.getopt(argv, "t:R:D:C:A")
@@ -47,6 +48,8 @@ def testHeleShawFixedChill(argv):
     print(Fore.GREEN + 'Setup tests for fixed chill in a Hele-Shaw cell' + Style.RESET_ALL)
     physicalProblem = 'FixedChill'
     folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f" % (max_time, Ra, Da, C)
+    if periodic:
+        folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
 
     Nz_uniform = 256
@@ -83,6 +86,9 @@ def testHeleShawFixedChill(argv):
 
     extra_params['regrid.plume_salinity']=-1.0
     extra_params['regrid.plume_vel']= 0.1*Da*Ra*Ra*Pr
+    if periodic:
+        extra_params['main.periodic_bc'] = '1 0 0'
+        
     runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 
 # def main(argv):
