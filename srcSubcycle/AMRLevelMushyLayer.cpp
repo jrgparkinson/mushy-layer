@@ -3215,7 +3215,7 @@ void AMRLevelMushyLayer::fillAdvVel(Real time, LevelData<FluxBox>& a_advVel)
     ProblemDomain crseDomain = amrMLcrse->m_problem_domain;
     DisjointBoxLayout crseGrids(amrMLcrse->m_grids);
 
-    bool secondOrderCorners = (CFinterpOrder_advection == 2);
+//    bool secondOrderCorners = (CFinterpOrder_advection == 2);
     PiecewiseLinearFillPatchFace patcher(m_grids, crseGrids, 1,
                                          crseDomain, crseRefRatio,
                                          interpRadius);
@@ -3646,7 +3646,7 @@ void AMRLevelMushyLayer::computeGradP(LevelData<FArrayBox>& gradP,
     Real crse_time_interp_coeff = 1.0;
     int velGrow = gradP.ghostVect()[0];
 
-    bool secondOrderCorners = (CFinterpOrder_advection==2);
+//    bool secondOrderCorners = (CFinterpOrder_advection==2);
 
     PiecewiseLinearFillPatch filpatcher(m_grids, crseGrids, SpaceDim,
                                         crseDomain, nRefCrse,
@@ -4501,7 +4501,7 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   //todo - write this more cleanly
   if (m_advectionMethod == m_porosityOutsideAdvection)
   {
-    Real old_time = m_time - m_dt;
+//    Real old_time = m_time - m_dt;
     //            LevelData<FArrayBox> ccVel(m_grids, SpaceDim, IntVect::Unit);
     LevelData<FArrayBox> gradChi_chiSquared(m_grids, SpaceDim, IntVect::Unit);
     LevelData<FArrayBox> extraSrc(m_grids, SpaceDim, IntVect::Unit);
@@ -6893,6 +6893,10 @@ void AMRLevelMushyLayer::fillScalarFace(LevelData<FluxBox>& a_scal,
                                         Real a_time, const int a_var, bool doInterior , bool quadInterp)
 {
   CH_TIME("AMRLevelMushyLayer::fillScalarFace");
+  if (s_verbosity >= 5)
+     {
+       pout() << "AMRLevelMushyLayer::fillScalarFace - field: " << m_scalarVarNames[a_var] << ", level: " << m_level << endl;
+     }
 
   CellToEdgeAveragingMethod method = arithmeticAveraging; //Arithmetic mean
   // Geometric mean for permeability was making pressure projection impossible
@@ -6965,6 +6969,10 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 {
 
   CH_TIME("AMRLevelMushyLayer::fillScalars");
+  if (s_verbosity >= 5)
+       {
+         pout() << "AMRLevelMushyLayer::fillScalars - field: " << m_scalarVarNames[a_var] << ", level: " << m_level << endl;
+       }
 
   const DisjointBoxLayout& levelGrids = m_grids;
 
