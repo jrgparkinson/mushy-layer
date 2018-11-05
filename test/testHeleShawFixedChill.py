@@ -19,6 +19,8 @@ def testHeleShawFixedChill(argv):
     C=2.0
     doAMR = False
 
+    Pr = 10.0  # fix this for now
+
     try:
         opts, args = getopt.getopt(argv, "t:R:D:C:A")
     except getopt.GetoptError as err:
@@ -74,9 +76,13 @@ def testHeleShawFixedChill(argv):
     analysis_command = matlab_command + ' "processFixedChill(\'' + dataFolder + '\'); exit;"'
     #analysis_command = '' # No analysis yet. Eventually should collate run times, make some plots, and maybe compute differences between solutions
 
+
     # Run
     extra_params = {'main.max_time':max_time, 'parameters.rayleighComp':Ra, 'parameters.darcy': Da, 'parameters.compositionRatio':C }
-    extra_params['main.max_dt'] = 10.0 / (Da*Ra)
+    extra_params['main.max_dt'] = Pr / (Da*Ra)
+
+    extra_params['regrid.plume_salinity']=-1.0
+    extra_params['regrid.plume_vel']= 0.1*Da*Ra*Ra*Pr
     runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 
 # def main(argv):
