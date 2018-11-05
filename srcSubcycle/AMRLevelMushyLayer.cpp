@@ -7062,13 +7062,18 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
                                         false);
 
     if (s_verbosity >= 5)
-              {
-                pout() << "  AMRLevelMushyLayer::fillScalars - defined fill patch" << endl;
-              }
+    {
+      pout() << "  AMRLevelMushyLayer::fillScalars - defined fill patch" << endl;
+    }
 
     filpatcher.fillInterp(a_scal, oldCrseScal, newCrseScal,
                           crse_time_interp_coeff,
                           scalComps.begin(), scalComps.end(), scalComps.size());
+
+    if (s_verbosity >= 5)
+    {
+      pout() << "  AMRLevelMushyLayer::fillScalars - done fill patch" << endl;
+    }
 
     if (quadInterp && m_quadCFInterpScalar.isDefined())
     {
@@ -7080,6 +7085,11 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       LevelData<FArrayBox> avCrseScal(crseGrids, 1, oldCrseScal.ghostVect());
       ::timeInterp(avCrseScal, a_time, oldCrseScal, crse_old_time, newCrseScal, crse_new_time, scalComps);
 
+      if (s_verbosity >= 5)
+      {
+        pout() << "  AMRLevelMushyLayer::fillScalars - made quadInterp CF BC" << endl;
+      }
+
       // Fill BCs on coarse scalar - doesn't seem to make a difference
       //      crseLevel.fillScalars(avCrseScal, a_time, a_var, false, true);
 
@@ -7090,13 +7100,19 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   const ProblemDomain& physDomain = problemDomain();
 
+  int numGhost = a_scal.ghostVect()[0];
+  if (s_verbosity >= 5)
+  {
+    pout() << "  AMRLevelMushyLayer::fillScalars - num ghost: " << numGhost << endl;
+  }
+
   // Do domain BCs if we have ghost cells
-  if (a_scal.ghostVect()[0] > 0)
+  if (numGhost > 0)
   {
     if (s_verbosity >= 5)
-            {
-              pout() << "  AMRLevelMushyLayer::fillScalars - do  BCs" << endl;
-            }
+    {
+      pout() << "  AMRLevelMushyLayer::fillScalars - do  BCs" << endl;
+    }
 
     BCHolder thisBC;
     getScalarBCs(thisBC, a_var, false); // inhomogeneous
