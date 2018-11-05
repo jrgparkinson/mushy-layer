@@ -6994,9 +6994,10 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   if (doInterior)
   {
     if (s_verbosity >= 5)
-             {
-               pout() << "  AMRLevelMushyLayer::fillScalars - start interior filling, a_time:" << a_time << ", old_time: " << old_time << endl;
-             }
+    {
+      pout() << "  AMRLevelMushyLayer::fillScalars - start interior filling, a_time:" << a_time << ", old_time: " << old_time << endl;
+    }
+
     if (abs(a_time - old_time) < TIME_EPS)
     {
       m_scalarOld[a_var]->copyTo(scalComps, a_scal, scalComps);

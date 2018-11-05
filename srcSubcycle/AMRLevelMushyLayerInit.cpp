@@ -2738,12 +2738,14 @@ void AMRLevelMushyLayer::postInitialize()
       thisML = this;
       for (int lev = 0; lev < numLevels; lev++)
       {
+        thisML->time(initTime - initDt);
+
         thisML->copyNewToOldStates();
 
         // Make sure lambda is definitely 1
         thisML->resetLambda();
 
-        thisML->time(initTime - initDt);
+
 
         thisML = thisML->getFinerLevel();
       }
