@@ -1017,6 +1017,11 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
       }
       else
       {
+        if (s_verbosity >= 5)
+             {
+               pout() << "AMRLevelMushyLayer::computeAdvectionVelocities() - explicit tracing scheme" << endl;
+             }
+
         // Explicit advection solve (tracing)
 
         int saveAdvectionMethod = m_advectionMethod;
@@ -1240,6 +1245,11 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel, Real a_dt)
 {
   CH_TIME("AMRLevelMushyLayer::correctEdgeCentredVelocity()");
+  if (s_verbosity >= 5)
+       {
+         pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity()" << endl;
+       }
+
 
   Real old_time = m_time - m_dt;
   Real half_time = old_time + 0.5*m_dt;
@@ -5012,8 +5022,8 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
 
     // Add in the extra source terms due to the fact that we are not advecting the same field
     // that we're evolving (e.g. dH/dt + u.grad(t) = grad^2 T)
-    int H_comp = 0;
-    int C_comp = 1;
+//    int H_comp = 0;
+//    int C_comp = 1;
     LevelData<FArrayBox> porosityOld(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
 
     fillScalars(porosityOld, m_time-m_dt, m_porosity, true, true);
