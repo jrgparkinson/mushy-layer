@@ -1246,9 +1246,9 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 {
   CH_TIME("AMRLevelMushyLayer::correctEdgeCentredVelocity()");
   if (s_verbosity >= 5)
-       {
-         pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity()" << endl;
-       }
+  {
+    pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity()" << endl;
+  }
 
 
   Real old_time = m_time - m_dt;
@@ -1260,6 +1260,10 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
   EdgeVelBCHolder edgeVelBC(m_physBCPtr->advectionVelFuncBC(m_viscousBCs));
   edgeVelBC.applyBCs(a_advVel, m_grids, m_problem_domain, m_dx,
                      false); // inhomogeneous
+  if (s_verbosity >= 5)
+    {
+      pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity() - applied init BCs" << endl;
+    }
 
   if(m_scalePwithPorosity)
   {
@@ -1277,7 +1281,14 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
       crsePressureScalePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(getCoarserLevel()->m_grids, 1, IntVect::Unit));
       getCoarserLevel()->fillScalars(*crsePressureScalePtr, half_time, m_pressureScaleVar, true);
     }
+
+    if (s_verbosity >= 5)
+       {
+         pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity() - got pressure scale vars" << endl;
+       }
   }
+
+
 
   // Try doing this before projection?
 //  bool freestreamBeforeProjection = false;
