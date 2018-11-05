@@ -1245,7 +1245,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel, Real a_dt)
 {
   CH_TIME("AMRLevelMushyLayer::correctEdgeCentredVelocity()");
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 4)
   {
     pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity()" << endl;
   }
@@ -1260,7 +1260,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
   EdgeVelBCHolder edgeVelBC(m_physBCPtr->advectionVelFuncBC(m_viscousBCs));
   edgeVelBC.applyBCs(a_advVel, m_grids, m_problem_domain, m_dx,
                      false); // inhomogeneous
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 6)
     {
       pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - applied init BCs" << endl;
     }
@@ -1275,17 +1275,17 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
     if (m_level > 0)
     {
-      if (s_verbosity >= 5)
-             {
-               pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - get CF boundary conditions" << endl;
-             }
+      if (s_verbosity >= 6)
+      {
+        pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - get CF boundary conditions" << endl;
+      }
 
       AMRLevelMushyLayer* mlCrse = getCoarserLevel();
 
-      if (s_verbosity >= 5)
-                   {
-                     pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - got coarse mushy layer object" << endl;
-                   }
+      if (s_verbosity >= 6)
+      {
+        pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - got coarse mushy layer object" << endl;
+      }
 
       crsePressureScaleEdgePtr = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(mlCrse->m_grids, 1, IntVect::Unit));
       mlCrse->fillScalarFace(*crsePressureScaleEdgePtr, half_time, m_pressureScaleVar, true);
@@ -1294,10 +1294,10 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
       mlCrse->fillScalars(*crsePressureScalePtr, half_time, m_pressureScaleVar, true);
     }
 
-    if (s_verbosity >= 5)
-       {
-         pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - got pressure scale vars" << endl;
-       }
+    if (s_verbosity >= 6)
+    {
+      pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - got pressure scale vars" << endl;
+    }
   }
 
 
@@ -1319,7 +1319,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
   if (m_doProjection)
   {
-    if (s_verbosity >= 5)
+    if (s_verbosity >= 6)
           {
             pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - do projection" << endl;
           }
@@ -1364,7 +1364,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
 void AMRLevelMushyLayer::copyNewToOldStates()
 {
-  if (s_verbosity > 5)
+  if (s_verbosity > 4)
   {
     pout() << "AMRLevelMushyLayer::copyNewToOldStates() " << endl;
   }

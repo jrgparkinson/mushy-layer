@@ -43,7 +43,8 @@ def testPorousMushyHole(argv):
    # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
 
     # Nzs 	  = [16, 32, 64]
-    num_procs = [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
+    #num_procs = [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
+    num_procs = [1] * len(Nz_uniform)
 
     # Setup up the post processing command
 

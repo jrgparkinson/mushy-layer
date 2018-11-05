@@ -2745,8 +2745,6 @@ void AMRLevelMushyLayer::postInitialize()
         // Make sure lambda is definitely 1
         thisML->resetLambda();
 
-
-
         thisML = thisML->getFinerLevel();
       }
     }
@@ -2898,8 +2896,8 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
     LevelData<FArrayBox> advectionSourceTerm(m_grids, SpaceDim, ivGhost);
     computeAdvectionVelSourceTerm(advectionSourceTerm);
 
-    computeAdvectionVelocities(advectionSourceTerm);
 
+    computeAdvectionVelocities(advectionSourceTerm);
     // Just initialising so don't advect/diffuse any scalars here
   }
   else
