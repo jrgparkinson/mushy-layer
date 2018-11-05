@@ -17,13 +17,14 @@ def testHeleShawFixedChill(argv):
     Ra=4e3
     Da=2e-3
     C=2.0
+    doAMR = False
 
     try:
-        opts, args = getopt.getopt(argv, "t:R:D:C:")
+        opts, args = getopt.getopt(argv, "t:R:D:C:A")
     except getopt.GetoptError as err:
         print(str(err))
         print(
-            'testPorousMushyHole.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio>')
+            'testPorousMushyHole.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio> -A<do amr>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -35,6 +36,8 @@ def testHeleShawFixedChill(argv):
             Da = float(arg)
         elif opt in ("-C"):
             C = float(arg)
+        elif opt in ("-A"):
+            doAMR = True
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
@@ -57,6 +60,9 @@ def testHeleShawFixedChill(argv):
    # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
     #            {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [64]}]
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
+
+    if doAMR:
+        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_uniform]})
 
     # Nzs 	  = [16, 32, 64]
     num_procs = [1]  # Needs to be as long as the longest Nzs
