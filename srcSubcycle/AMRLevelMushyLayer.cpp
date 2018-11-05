@@ -7094,6 +7094,11 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     a_scal.exchange(a_scal.interval(), cornerCopy);
   }
 
+  if (s_verbosity >= 5)
+        {
+          pout() << "  AMRLevelMushyLayer::fillScalars - finished" << endl;
+        }
+
 }
 
 void AMRLevelMushyLayer::doRegularisationOps(LevelData<FluxBox>& a_scal, int a_var)
