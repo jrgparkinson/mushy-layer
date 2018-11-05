@@ -1280,15 +1280,15 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
   }
 
   // Try doing this before projection?
-  bool freestreamBeforeProjection = false;
+//  bool freestreamBeforeProjection = false;
   ParmParse ppMain("main");
-  ppMain.query("freestreamBeforeProjection", freestreamBeforeProjection);
-  if (freestreamBeforeProjection)
-  {
-    m_projection.applyFreestreamCorrection(a_advVel);
-    edgeVelBC.applyBCs(a_advVel, m_grids, m_problem_domain, m_dx,
-                         false); // inhomogeneous
-  }
+//  ppMain.query("freestreamBeforeProjection", freestreamBeforeProjection);
+//  if (freestreamBeforeProjection)
+//  {
+//    m_projection.applyFreestreamCorrection(a_advVel);
+//    edgeVelBC.applyBCs(a_advVel, m_grids, m_problem_domain, m_dx,
+//                         false); // inhomogeneous
+//  }
 
   a_advVel.exchange();
 
@@ -1296,10 +1296,15 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
   if (m_doProjection)
   {
+    if (s_verbosity >= 5)
+          {
+            pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity() - do projection" << endl;
+          }
+
     int projNum = 0;
 
-    Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
-    Real maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
+//    Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
+    Real maxDivU = 10*m_maxDivUFace ; //::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
 
     while ( (maxDivU > m_maxDivUFace && projNum < 10) ||
         (ppMain.contains("analyticVel") && projNum < 1) ) // do at least one projection of analytic vel
@@ -1321,14 +1326,14 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
   Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
 
-  // We should really have been doing this before - making sure we fill CF boundaries
+  // Fill CF boundaries
   fillAdvVel(old_time, a_advVel);
 
   //  m_projection.applyFreestreamCorrection(a_advVel, m_dt);
-  if (!freestreamBeforeProjection)
-  {
+//  if (!freestreamBeforeProjection)
+//  {
     m_projection.applyFreestreamCorrection(a_advVel);
-  }
+//  }
 
   a_advVel.exchange();
 
