@@ -35,10 +35,10 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     }
   }
 
-  if (m_level == 0)
-  {
-    m_parameters.printParameters();
-  }
+//  if (m_level == 0)
+//  {
+//    m_parameters.printParameters();
+//  }
 
   // Why wasn't this line here before?
   m_problem_domain = a_problemDomain;
@@ -152,7 +152,7 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     m_outputScalarVars.push_back(m_streamfunction);
     m_outputScalarVars.push_back(m_permeability);
     m_outputScalarVars.push_back(m_lambda);
-    m_outputScalarVars.push_back(m_lambda_porosity);
+//    m_outputScalarVars.push_back(m_lambda_porosity);
 
 
     if (debug)
@@ -208,13 +208,15 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     m_outputVectorVars.push_back(m_fluidVel);
     m_outputVectorVars.push_back(m_advectionVel);
 
-    m_outputVectorVars.push_back(m_FsDiffusion);
-    m_outputVectorVars.push_back(m_FsFluid);
+//    m_outputVectorVars.push_back(m_FsDiffusion);
+//    m_outputVectorVars.push_back(m_FsFluid);
     m_outputVectorVars.push_back(m_Fs);
 
 
     if (debug)
     {
+      m_outputVectorVars.push_back(m_FsDiffusion);
+      m_outputVectorVars.push_back(m_FsFluid);
 
 
       //  m_outputVectorVars.push_back(m_U_porosity);

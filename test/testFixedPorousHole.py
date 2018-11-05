@@ -16,7 +16,7 @@ def testFixedPorousHole():
 
     print(Fore.GREEN + 'Setup tests for (fixed) porous hole' + Style.RESET_ALL)
     physicalProblem = 'DBVariablePorosity'
-    dataFolder = os.path.join(base_output_dir, 'FixedPorousHole')
+    dataFolder = os.path.join(base_output_dir, 'FixedPorousHole-1proc')
 
     Nz_uniform = [16, 32, 64, 128, 256, 512]
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
@@ -33,7 +33,7 @@ def testFixedPorousHole():
 
 
     # Nzs 	  = [16, 32, 64]
-    num_procs = [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
+    num_procs = [1] * len(Nz_uniform) #[1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
 
     # Setup up the post processing command
 
