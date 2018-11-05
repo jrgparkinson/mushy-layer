@@ -763,7 +763,10 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
 
   if (m_parameters.m_nondimensionalisation == m_parameters.m_darcyTime_advectiveVel)
   {
+    if (m_level == 0)
+    {
     pout() << "Darcy timescale, advective velocity scale" << endl;
+    }
     // To avoid dividing by 0 when Da = Pr = 0
     if (m_parameters.darcy == m_parameters.prandtl)
     {
@@ -784,8 +787,10 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_diffusiveTime_advectiveVel)
   {
+    if (m_level == 0)
+        {
     pout() << "Diffusive timescale, advective velocity scale" << endl;
-
+        }
     m_parameters.m_heatDiffusionCoeff = 1.0;
     m_parameters.m_saltDiffusionCoeff = 1/m_parameters.lewis;
     m_parameters.m_viscosityCoeff = m_parameters.prandtl;
@@ -796,7 +801,10 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_darcyTime_darcyVel)
   {
+    if (m_level == 0)
+        {
     pout() << "Darcy timescale, darcy velocity scale" << endl;
+        }
 
     m_parameters.m_heatDiffusionCoeff = m_parameters.darcy/m_parameters.prandtl;
     m_parameters.m_saltDiffusionCoeff = m_parameters.m_heatDiffusionCoeff/m_parameters.lewis;
@@ -808,7 +816,11 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_advectiveTime_darcyVel)
   {
+    if (m_level == 0)
+        {
     pout() << "Advective timescale, darcy velocity scale" << endl;
+        }
+
     m_parameters.m_heatDiffusionCoeff = 1/(m_parameters.darcy*m_parameters.rayleighTemp);///m_parameters.prandtl;
     m_parameters.m_saltDiffusionCoeff = m_parameters.m_heatDiffusionCoeff/m_parameters.lewis;
     m_parameters.m_viscosityCoeff = m_parameters.prandtl/(m_parameters.darcy*m_parameters.rayleighTemp);
@@ -819,7 +831,10 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_buoyancyTime_advectiveVel)
   {
+    if (m_level == 0)
+        {
     pout() << "Buoyancy timescale, advective velocity scale" << endl;
+        }
 
     Real R = m_parameters.rayleighComposition;
     if (R == 0)
@@ -2023,7 +2038,7 @@ void AMRLevelMushyLayer::initialDataCornerFlow()
 /*******/
 void AMRLevelMushyLayer::initialData()
 {
-  pout() << "AMRLevelMushyLayer::initialData" << endl;
+  pout() << "AMRLevelMushyLayer::initialData - setting initial data on " << m_level << endl;
 
   // For some reason AMR calls initialData() on levels
   // which don't have any grids yet. Can't fill empty grids
@@ -2583,10 +2598,9 @@ void AMRLevelMushyLayer::fillAMRVelPorosity(Vector<LevelData<FArrayBox>*> & amrV
 /*******/
 void AMRLevelMushyLayer::postInitialize()
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::postInitialize " << m_level << endl;
-  }
+
+  pout() << "AMRLevelMushyLayer::postInitialize on level " << m_level << endl;
+
 
   // initialize data structures which haven't yet been initialized
   //	levelSetup();

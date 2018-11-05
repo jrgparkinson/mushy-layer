@@ -310,10 +310,9 @@ void AMRLevelMushyLayer::postTimeStep()
 {
   CH_TIME("AMRLevelMushyLayer::postTimeStep");
 
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::postTimeStep " << m_level << endl;
-  }
+
+ pout() << "AMRLevelMushyLayer::postTimeStep - do sync operations on level " << m_level << endl;
+
 
   // Get the advection velocity as a CC variable so we can write it out
   EdgeToCell(m_advVel, *m_vectorNew[m_advectionVel]);
@@ -545,13 +544,16 @@ void AMRLevelMushyLayer::postTimeStep()
         {
           Real refluxRHS = 100.0;
           refluxRHS = doHCreflux();
-          pout() << "sum (reflux RHS) = " << refluxRHS << endl;
+          if (s_verbosity >= 3)
+          {
+            pout() << "  Sum (reflux RHS) = " << refluxRHS << endl;
+          }
         }
         else
         {
           if (s_verbosity >=3 )
           {
-            pout() << "Not doing HC reflux" << endl;
+            pout() << "  Not doing HC reflux" << endl;
           }
         }
 

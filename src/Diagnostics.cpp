@@ -95,7 +95,7 @@ void Diagnostics::define(Real a_movingAverageTimescale, int a_verbosity, Real a_
   m_diagnosticsFile.open("diagnostics.out", std::ios_base::app);
 
 
-  if (m_verbosity > 1)
+  if (m_verbosity > 2)
   {
     pout() << "Diagnostics::define with timescale = " << a_movingAverageTimescale << std::endl;
   }

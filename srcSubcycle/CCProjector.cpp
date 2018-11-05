@@ -1113,7 +1113,10 @@ void CCProjector::levelMacProject(LevelData<FluxBox>& a_uEdge,
                                   const RefCountedPtr<LevelData<FluxBox> > a_crsePorosityEdgePtr)
 {
 
-  pout() << "CCProjector::levelMacProject" << endl;
+  if (s_verbosity > 3)
+  {
+    pout() << "CCProjector::levelMacProject" << endl;
+  }
 
   Divergence::levelDivergenceMAC(MACrhs(), a_uEdge, m_dx);
 
@@ -1693,8 +1696,12 @@ void CCProjector::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocity,
     Interval sumComps(0,0);
     Real sumRHS;
     sumRHS =  computeSum(syncRHS, nRefFineVect, m_dx, sumComps, m_level);
-    pout() << "Sum(RHS) for sync solve = "
+    if (s_verbosity >= 3)
+    {
+    pout() << "  Sum(RHS) for sync solve = "
         << setiosflags(ios::scientific) << sumRHS << endl;
+
+    }
 
     // now solve
     a_solver.solve(syncCorr, syncRHS, vectorSize-1, m_level,
@@ -2023,8 +2030,8 @@ void CCProjector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
     Interval sumComps(0,0);
     m_sumVDrhs =  computeSum(a_lambda, nRefFineVect, m_dx, sumComps, m_level);
     m_sumVDrhs = m_sumVDrhs/m_etaLambda;
-    pout() << "Time = " << a_newTime << " Sum(RHS) for VD solve on level " << m_level << " (divided by eta) = "
-        << setiosflags(ios::scientific) << m_sumVDrhs << endl;
+    pout() << "  Sum(RHS) for VD solve on level " << m_level << " (divided by eta) = "
+        << setiosflags(ios::scientific) << m_sumVDrhs << " (current time " <<a_newTime << ")" <<  endl;
     // now solve
 
     a_solver.solve(VDCorr, newLambda,

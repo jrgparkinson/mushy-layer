@@ -4037,7 +4037,7 @@ PhysBCUtil::PhysBCUtil()
 // ---------------------------------------------------------------
 PhysBCUtil::PhysBCUtil(MushyLayerParams a_params, Real a_dx)
 {
-  pout() << "PhysBCUtil::PhysBCUtil" << endl;
+//  pout() << "PhysBCUtil::PhysBCUtil" << endl;
 
   // initialize to bogus values
   for (int idir=0; idir<SpaceDim; idir++)

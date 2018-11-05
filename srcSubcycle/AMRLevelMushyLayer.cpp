@@ -1281,7 +1281,6 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
     Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
     Real maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
-//    pout() << "MAC Projection (" << projNum << "), max(div u) = " << maxDivU << endl;
 
     while ( (maxDivU > m_maxDivUFace && projNum < 10) ||
         (ppMain.contains("analyticVel") && projNum < 1) ) // do at least one projection of analytic vel
@@ -1294,7 +1293,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
       Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
 
       maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
-      pout() << "MAC Projection (" << projNum << "), max(div u) = " << maxDivU << endl;
+      pout() << "  MAC Projection (#" << projNum << " on level "<< m_level << "), max(div u) = " << maxDivU << endl;
 
 
     }
@@ -1997,7 +1996,6 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
           initSumDivU = sumDivU;
         }
 
-        pout() << "Projection " << i << ", sum of div(U) = " << sumDivU << endl;
 
         i++;
       }

@@ -56,7 +56,7 @@ defineAMR(AMR&                                          a_amr,
           const ProblemDomain&                          a_prob_domain,
           const Vector<int>&                            a_refRat)
 {
-  pout() << "defineAMR" << endl;
+  pout() << "MushyLayerSubscyleUtils - defineAMR(..) - creating AMR object" << endl;
 
   ParmParse ppMain("main");
   int max_level = 0;
@@ -124,7 +124,7 @@ defineAMR(AMR&                                          a_amr,
   a_amr.define(max_level, a_refRat,
                a_prob_domain,&(*a_fact));
 
-  pout() << "MushyLayerSubcycleUtils::defined AMR" <<endl;
+
 
   // set grid generation parameters
   a_amr.maxGridSize(max_grid_size);
@@ -149,7 +149,7 @@ defineAMR(AMR&                                          a_amr,
   std::string output_folder = "";
   ppMain.query("output_folder", output_folder);
 
-  pout() << "MushyLayerSubcycleUtils::check for timestepping" <<endl;
+
 
   if (fixed_dt > 0)
   {
@@ -210,6 +210,8 @@ defineAMR(AMR&                                          a_amr,
 
 
   a_amr.verbosity(verbosity);
+
+  pout() << "MushyLayerSubscyleUtils - defineAMR(..) - finished setting up AMR" << endl;
   //	 pout() << "AMR - set verbosity" << endl;
 
 }
