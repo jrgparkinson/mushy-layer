@@ -55,6 +55,7 @@ bool CCProjector::s_constantLambdaScaling = false;
 Real CCProjector::s_lambda_timestep = 0.0;
 bool CCProjector::pp_init = false;
 int  CCProjector::s_verbosity = 2;
+int CCProjector::s_bottomSolveMaxIter = 10;
 
 /// first define quick-n-easy access functions
 
@@ -1523,13 +1524,14 @@ void CCProjector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
     pout() << "CCProjector::doSyncOperations" << endl;
   }
 
-  RelaxSolver<LevelData<FArrayBox> >* bottomSolver = new RelaxSolver<LevelData<FArrayBox> >;
-  bottomSolver->m_verbosity = s_verbosity;
+//  RelaxSolver<LevelData<FArrayBox> >* bottomSolver = new RelaxSolver<LevelData<FArrayBox> >;
+//  bottomSolver->m_imax = s_bottomSolveMaxIter;
+//  bottomSolver->m_verbosity = s_verbosity;
 
   AMRMultiGrid<LevelData<FArrayBox> >* dspSolver = new
       AMRMultiGrid<LevelData<FArrayBox> >;
 
-  defineMultiGrid(*dspSolver, bottomSolver, a_velocity, a_porosityFace, false);
+  defineMultiGrid(*dspSolver, a_velocity, a_porosityFace, false);
 
   // now call sync projection
   doSyncProjection(a_velocity, a_porosity, a_newTime, a_dtLevel, *dspSolver);
@@ -1543,7 +1545,7 @@ void CCProjector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
 
   AMRMultiGrid<LevelData<FArrayBox> >* cvdcSolver = new
       AMRMultiGrid<LevelData<FArrayBox> >;
-  defineMultiGrid(*cvdcSolver, bottomSolver, a_velocity, a_porosityFace,
+  defineMultiGrid(*cvdcSolver, a_velocity, a_porosityFace,
                   vdBCs); // surely this should be true!??!
 
   // now do freestream preservation solve
@@ -1561,8 +1563,6 @@ void CCProjector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
   // Need to delete cvdcSolver->m_bottomSolver from AMRMultiGrid.
   delete cvdcSolver;
 
-  // Now delete the bottom solver since AMRMultiGrid won't do this
-  delete bottomSolver;
 }
 
 
@@ -1572,12 +1572,12 @@ void CCProjector::doPostRegridOps(Vector<LevelData<FArrayBox>* >& a_lambda,
                                   const Real a_dt, const Real a_time, const Real a_etaScale)
 {
   //
-  RelaxSolver<LevelData<FArrayBox> >* bottomSolver = new RelaxSolver<LevelData<FArrayBox> >;
+
 
   AMRMultiGrid<LevelData<FArrayBox> >* bigSolverPtr = new
       AMRMultiGrid<LevelData<FArrayBox> >;
 
-  defineMultiGrid(*bigSolverPtr, bottomSolver, a_lambda, a_porosity, true); // true - freestream solve
+  defineMultiGrid(*bigSolverPtr, a_lambda, a_porosity, true); // true - freestream solve
 
   // for inviscid flow, only do this
   // now do freestream preservation solve
@@ -1588,8 +1588,7 @@ void CCProjector::doPostRegridOps(Vector<LevelData<FArrayBox>* >& a_lambda,
   // Need to delete bigSolverPtr->m_bottomSolver from AMRMultiGrid.
   delete bigSolverPtr;
 
-  //Now delete the bottom solver since AMRMultiGrid won't do this
-  delete bottomSolver;
+
 }
 
 // ---------------------------------------------------------------
@@ -1844,12 +1843,10 @@ void CCProjector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
                                       Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity,
                                       const Real a_newTime, const Real a_dtSync)
 {
-  RelaxSolver<LevelData<FArrayBox> >* bottomSolver = new RelaxSolver<LevelData<FArrayBox> >;
-   bottomSolver->m_verbosity = s_verbosity;
 
   AMRMultiGrid<LevelData<FArrayBox> >* cvdcSolver = new
         AMRMultiGrid<LevelData<FArrayBox> >;
-    defineMultiGrid(*cvdcSolver, bottomSolver, a_lambda, a_porosity,
+    defineMultiGrid(*cvdcSolver, a_lambda, a_porosity,
                     true);
 
     // now do freestream preservation solve
@@ -1859,8 +1856,6 @@ void CCProjector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
     // Need to delete cvdcSolver->m_bottomSolver from AMRMultiGrid.
     delete cvdcSolver;
 
-    // Now delete the bottom solver since AMRMultiGrid won't do this
-    delete bottomSolver;
 }
 
 // ---------------------------------------------------------------
@@ -2354,15 +2349,13 @@ void CCProjector::doInitialSyncOperations(Vector<LevelData<FArrayBox>* >& a_vel,
                                           Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_porosity,
                                           const Real a_newTime, const Real a_dtSync)
 {
-  //
-  RelaxSolver<LevelData<FArrayBox> >* bottomSolver = new RelaxSolver<LevelData<FArrayBox> >;
-  bottomSolver->m_verbosity = s_verbosity;
+
 
   // now can define multilevel solver
   AMRMultiGrid<LevelData<FArrayBox> >* ispSolverPtr = new
       AMRMultiGrid<LevelData<FArrayBox> >;
 
-  defineMultiGrid(*ispSolverPtr, bottomSolver, a_vel, a_porosityFace, false);
+  defineMultiGrid(*ispSolverPtr, a_vel, a_porosityFace, false);
 
   // now call sync projection
   initialSyncProjection(a_vel, a_porosity, a_newTime, a_dtSync, *ispSolverPtr);
@@ -2371,15 +2364,12 @@ void CCProjector::doInitialSyncOperations(Vector<LevelData<FArrayBox>* >& a_vel,
   delete ispSolverPtr;
   AMRMultiGrid<LevelData<FArrayBox> >* cvdcSolverPtr = new
       AMRMultiGrid<LevelData<FArrayBox> >;
-  defineMultiGrid(*cvdcSolverPtr, bottomSolver, a_lambda, a_porosityFace, true);
+  defineMultiGrid(*cvdcSolverPtr, a_lambda, a_porosityFace, true);
 
   // now do freestream preservation solve
   computeVDCorrection(a_lambda, a_porosityFace, a_newTime, a_dtSync, *cvdcSolverPtr);
 
   delete cvdcSolverPtr; //Kris R.
-
-  //Now delete the bottom solver since AMRMultiGrid won't do this
-  delete bottomSolver;
 
 }
 
@@ -2391,18 +2381,13 @@ void CCProjector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
 {
   CH_assert(m_level==0);
 
-  //
-  RelaxSolver<LevelData<FArrayBox> >* bottomSolver = new RelaxSolver<LevelData<FArrayBox> >;
-  bottomSolver->m_verbosity = s_verbosity;
-
   // first need to define solver
   AMRMultiGrid<LevelData<FArrayBox> > bigSolver;
-  defineMultiGrid(bigSolver, bottomSolver,a_vel, a_porosityFace, false);
+  defineMultiGrid(bigSolver,a_vel, a_porosityFace, false);
 
   initialVelocityProject(a_vel, a_porosity, bigSolver, a_homogeneousCFBC);
 
-  //New delete the bottom solver since AMRMultiGrid won't do this
-  delete bottomSolver;
+
 }
 
 // ---------------------------------------------------------------
@@ -2574,7 +2559,6 @@ void CCProjector::scalePwithPorosity(bool a_scalePwithPorosity)
 
 // ---------------------------------------------------------------
 void CCProjector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
-                                  LinearSolver<LevelData<FArrayBox> >* a_bottomSolver,
                                   const Vector<LevelData<FArrayBox>* >& a_vel,
                                   Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity,
                                   bool a_freestreamSolve)
@@ -2666,8 +2650,7 @@ void CCProjector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
     delete m_bottomSolverLevel;
     m_bottomSolverLevel = NULL;
   }
-  RelaxSolver<LevelData<FArrayBox> >* bottomSolverPtr = new
-      RelaxSolver<LevelData<FArrayBox> >;
+  RelaxSolver<LevelData<FArrayBox> >* bottomSolverPtr = new RelaxSolver<LevelData<FArrayBox> >;
   bottomSolverPtr->m_imax = 10;
   bottomSolverPtr->m_verbosity = s_verbosity;
   m_bottomSolverLevel = bottomSolverPtr;
@@ -2826,6 +2809,9 @@ void CCProjector::defineSolverMGLevelVCOp(
   newRelaxBottomPtr->m_verbosity = s_verbosity;
   newBottomPtr->m_verbosity = s_verbosity;
 
+  newBottomPtr->m_imax = s_bottomSolveMaxIter;
+  newRelaxBottomPtr->m_imax = s_bottomSolveMaxIter;
+
   m_BiCGBottomSolverLevel = newBottomPtr;
   m_bottomSolverLevel = newRelaxBottomPtr;
 
@@ -2952,6 +2938,7 @@ void CCProjector::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
   }
 
   RelaxSolver<LevelData<FArrayBox> >* newBottomPtr = new RelaxSolver<LevelData<FArrayBox> >;
+  newBottomPtr->m_imax = s_bottomSolveMaxIter;
   newBottomPtr->m_verbosity = s_verbosity;
   m_bottomSolverLevel = newBottomPtr;
   if (s_verbosity > 3)

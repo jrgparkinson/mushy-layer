@@ -6655,7 +6655,7 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
           crse_time_interp_coeff = (a_time - crse_old_time) / crse_dt;
         }
 
-        bool doSecondOrderCorners = (CFinterpOrder_advection == 2);
+//        bool doSecondOrderCorners = (CFinterpOrder_advection == 2);
 
         PiecewiseLinearFillPatch filpatcher(levelGrids, crseGrids, SpaceDim,
                                             crseDomain, nRefCrse, velGrow,
@@ -6996,7 +6996,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     const IntVect& scalGrowVect = a_scal.ghostVect();
     int scalGrow = scalGrowVect[0];
 
-    bool doSecondOrderCorners = (CFinterpOrder_advection==2);
+//    bool doSecondOrderCorners = (CFinterpOrder_advection==2);
 
     PiecewiseLinearFillPatch filpatcher(levelGrids, crseGrids,
                                         a_scal.nComp(), crseDomain, nRefCrse, scalGrow,

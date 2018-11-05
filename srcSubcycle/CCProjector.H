@@ -473,7 +473,6 @@ protected:
       a_freestream solver is true if solver will be used for
       freestream preservation solve. */
   void defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
-                       LinearSolver<LevelData<FArrayBox> >* a_bottomSolver, 
                        const Vector<LevelData<FArrayBox>* >& a_vel,
                        Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity,
                        bool a_freestreamSolver);
@@ -649,6 +648,9 @@ private:
 
   /// verbosity of output
   static int s_verbosity;
+
+  /// Max number of relax solves on the bottom level of the multigrid
+  static int s_bottomSolveMaxIter;
 
   /// if false, VD correction is set to zero once it's computed
   static bool s_applyVDCorrection;

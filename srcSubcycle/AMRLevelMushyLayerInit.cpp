@@ -1694,12 +1694,12 @@ void AMRLevelMushyLayer::initialDataMushyLayer()
 
   Real HTop = m_parameters.bcValEnthalpyHi[1];
   Real HBottom = m_parameters.bcValEnthalpyLo[1];
-  Real ThetaTop = m_parameters.bcValBulkConcentrationHi[1];
+//  Real ThetaTop = m_parameters.bcValBulkConcentrationHi[1];
   Real ThetaBottom = m_parameters.bcValBulkConcentrationLo[1];
 
   Real thetaBottom = m_parameters.bcValTemperatureLo[1];
-  Real thetaTop = m_parameters.bcValTemperatureHi[1];
-  Real ThetaLTop = m_parameters.bcValLiquidConcentrationHi[1];
+//  Real thetaTop = m_parameters.bcValTemperatureHi[1];
+//  Real ThetaLTop = m_parameters.bcValLiquidConcentrationHi[1];
 
  if (summerProfile > 0)
   {
