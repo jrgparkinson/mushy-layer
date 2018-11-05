@@ -2878,6 +2878,11 @@ void AMRLevelMushyLayer::AMRRefluxLambda()
 
 void AMRLevelMushyLayer::computeInitAdvectionVel()
 {
+  if (s_verbosity >= 5)
+   {
+     pout() << "AMRLevelMushyLayer::computeInitAdvectionVel (level " << m_level << ")" << endl;
+   }
+
   if (solvingFullDarcyBrinkman())
   {
 

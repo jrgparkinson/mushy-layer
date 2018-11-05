@@ -932,7 +932,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
   if (s_verbosity >= 5)
     {
-      pout() << "AMRLevelMushyLayer::computeAdvectionVelocities" << endl;
+      pout() << "AMRLevelMushyLayer::computeAdvectionVelocities (level " << m_level << ")" << endl;
     }
 
   DataIterator dit(m_grids);
@@ -1262,7 +1262,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
                      false); // inhomogeneous
   if (s_verbosity >= 5)
     {
-      pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity() - applied init BCs" << endl;
+      pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - applied init BCs" << endl;
     }
 
   if(m_scalePwithPorosity)
@@ -1275,16 +1275,28 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
     if (m_level > 0)
     {
-      crsePressureScaleEdgePtr = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(getCoarserLevel()->m_grids, 1, IntVect::Unit));
-      getCoarserLevel()->fillScalarFace(*crsePressureScaleEdgePtr, half_time, m_pressureScaleVar, true);
+      if (s_verbosity >= 5)
+             {
+               pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - get CF boundary conditions" << endl;
+             }
 
-      crsePressureScalePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(getCoarserLevel()->m_grids, 1, IntVect::Unit));
-      getCoarserLevel()->fillScalars(*crsePressureScalePtr, half_time, m_pressureScaleVar, true);
+      AMRLevelMushyLayer* mlCrse = getCoarserLevel();
+
+      if (s_verbosity >= 5)
+                   {
+                     pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - got coarse mushy layer object" << endl;
+                   }
+
+      crsePressureScaleEdgePtr = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(mlCrse->m_grids, 1, IntVect::Unit));
+      mlCrse->fillScalarFace(*crsePressureScaleEdgePtr, half_time, m_pressureScaleVar, true);
+
+      crsePressureScalePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(mlCrse->m_grids, 1, IntVect::Unit));
+      mlCrse->fillScalars(*crsePressureScalePtr, half_time, m_pressureScaleVar, true);
     }
 
     if (s_verbosity >= 5)
        {
-         pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity() - got pressure scale vars" << endl;
+         pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - got pressure scale vars" << endl;
        }
   }
 
@@ -1309,7 +1321,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
   {
     if (s_verbosity >= 5)
           {
-            pout() << "AMRLevelMushyLayer::correctEdgeCentredVelocity() - do projection" << endl;
+            pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - do projection" << endl;
           }
 
     int projNum = 0;
@@ -6542,13 +6554,11 @@ AMRLevelMushyLayer::getCoarserLevel() const {
 
   if (m_coarser_level_ptr != NULL)
   {
-    amrADCoarserPtr =
-        dynamic_cast<AMRLevelMushyLayer*>(m_coarser_level_ptr);
+    amrADCoarserPtr =  dynamic_cast<AMRLevelMushyLayer*>(m_coarser_level_ptr);
 
     if (amrADCoarserPtr == NULL)
     {
-      MayDay::Error(
-          "AMRLevelMushyLayer::getCoarserLevel: dynamic cast failed");
+      MayDay::Error("AMRLevelMushyLayer::getCoarserLevel: dynamic cast failed");
     }
   }
 
