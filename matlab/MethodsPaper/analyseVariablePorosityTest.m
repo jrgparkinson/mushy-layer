@@ -1,4 +1,5 @@
-function analyseVariablePorosityTest(base_dir, Nzs, redoAnalysis, runAnalysis, uniform_prefix, compName, errType)
+function analyseVariablePorosityTest(base_dir, Nzs, redoAnalysis, runAnalysis, uniform_prefix,...
+    compName, errType)
 close all;
 
 
@@ -37,12 +38,14 @@ end
 fine_res_dir = [uniform_prefix,num2str(fineNumCells),'--0'];
 
 % For uniform grids
-computeRichardsonError(base_dir, uniform_prefix)
+if runAnalysis
+    computeRichardsonError(base_dir, uniform_prefix)
+end
 
 
 folders = dir(base_dir);
 
-for j=1:length(Nzs)
+for j=1:length(Nzs)-1
    Nz = Nzs(j);
     
    thisErrStruct = struct();
@@ -66,8 +69,8 @@ if runAnalysis
 
     tic;
     
-   
-    parfor i=1:length(folders)
+   %TODO: return to parfor
+    for i=1:length(folders)
         folder = folders(i);
         folderName = folder.name;
         
@@ -142,7 +145,9 @@ for i=1:length(runs)
             continue
         end
         
-        exponent = 1+log(numCells*totalRefinement)/log(2) - log(Nzs(1))/log(2);
+        %exponent = 1+log(numCells*totalRefinement)/log(2) - log(Nzs(1))/log(2);
+        % Indexing is based on base level
+        exponent = 1+log(numCells)/log(2) - log(Nzs(1))/log(2);
         
         if exponent < 1
             fprintf('Skipping Nz < min(Nz specified) - skipping');
@@ -331,7 +336,7 @@ end
 % Print tables, first latex then human readable format
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-fprintf('Error computed for the field: %s \n', compName);
+fprintf('%s error computed for the field: %s \n', errType, compName);
 
 % Error
 fprintf('%5s | %15s  | %5s  | %13s | %12s  | %12s  | %12s \n', '1/dz', 'Richardson', 'Rate', '512 diff', 'n_{ref} = 2', 'n_{ref} = 4', 'n_{ref} = (2,2)');
