@@ -196,7 +196,6 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
                 output_dir = ''
 
-
                 #Nx_coarse = Nz_coarse*2
                 gridFile = mushyLayerBaseDir + '/grids/topMiddle/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
 
