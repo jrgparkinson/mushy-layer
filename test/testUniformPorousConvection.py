@@ -80,7 +80,8 @@ def testUniformPorousConvection(argv):
             extra_params['bc.porosityHiVal'] = str(chi) + ' ' + str(chi)  # 0.4 0.4
             extra_params['bc.porosityLoVal'] = str(chi) + ' ' + str(chi)
 
-            output_dir = 'chi' + str(chi) + '-Da' + str(Da) + '-Ra' + str(extra_params['parameters.rayleighTemp'])
+            #output_dir = 'chi' + str(chi) + '-Da' + str(Da) + '-Ra' + str(extra_params['parameters.rayleighTemp'])
+            output_dir = "chi%1.1f-Da%1.1e-Ra%1.1e" % (chi, Da, extra_params['parameters.rayleighTemp'])
 
             # extra_params = {}
             thisDataFolder = os.path.join(base_dataFolder, output_dir)

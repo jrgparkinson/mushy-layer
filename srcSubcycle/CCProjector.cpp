@@ -2668,6 +2668,7 @@ void CCProjector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
   }
   RelaxSolver<LevelData<FArrayBox> >* bottomSolverPtr = new
       RelaxSolver<LevelData<FArrayBox> >;
+  bottomSolverPtr->m_imax = 10;
   bottomSolverPtr->m_verbosity = s_verbosity;
   m_bottomSolverLevel = bottomSolverPtr;
 
@@ -2699,6 +2700,7 @@ void CCProjector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
   }
   a_solver.m_pre = s_num_smooth_down; // smoothings before avging
   a_solver.m_post = s_num_smooth_up; // smoothings after avging
+  //a_solver.m_iterMax = 20;
 
 }
 

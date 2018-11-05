@@ -971,6 +971,10 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
   if (m_doEulerPart)
   {
+    if (s_verbosity >= 5)
+       {
+         pout() << "AMRLevelMushyLayer::computeAdvectionVelocities - doing advection of velocities" << endl;
+       }
 
 
 
@@ -1174,6 +1178,11 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
   }
   else
   {
+    if (s_verbosity >= 5)
+       {
+         pout() << "AMRLevelMushyLayer::computeAdvectionVelocities - computing time independent velocities" << endl;
+       }
+
     // if we're not doing advection of velocities, calculate the velocities for scalar advection by averaging our CC velocities to faces at the half time
     // and projecting them to ensure they're divergence free
     LevelData<FArrayBox> vel(m_grids, SpaceDim, ivGhost);
@@ -3487,6 +3496,10 @@ void AMRLevelMushyLayer::traceAdvectionVel(LevelData<FluxBox>& a_advVel,
                                            const LevelData<FArrayBox>& a_viscousSource,
                                            PatchGodunov& a_patchGodVelocity, Real a_old_time, Real a_dt)
 {
+  if (s_verbosity >= 5)
+     {
+       pout() << "AMRLevelMushyLayer::traceAdvectionVel()" << endl;
+     }
 
   CH_TIME("AMRLevelMushyLayer::traceAdvectionVel()");
 
