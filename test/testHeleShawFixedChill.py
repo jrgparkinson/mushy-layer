@@ -62,7 +62,7 @@ def testHeleShawFixedChill(argv):
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
 
     if doAMR:
-        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_uniform]})
+        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
 
     # Nzs 	  = [16, 32, 64]
     num_procs = [1]  # Needs to be as long as the longest Nzs
