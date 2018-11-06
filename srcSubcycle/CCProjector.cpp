@@ -1524,9 +1524,7 @@ void CCProjector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
     pout() << "CCProjector::doSyncOperations" << endl;
   }
 
-//  RelaxSolver<LevelData<FArrayBox> >* bottomSolver = new RelaxSolver<LevelData<FArrayBox> >;
-//  bottomSolver->m_imax = s_bottomSolveMaxIter;
-//  bottomSolver->m_verbosity = s_verbosity;
+
 
   AMRMultiGrid<LevelData<FArrayBox> >* dspSolver = new
       AMRMultiGrid<LevelData<FArrayBox> >;
