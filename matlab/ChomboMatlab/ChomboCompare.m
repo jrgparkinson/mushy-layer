@@ -258,7 +258,12 @@ classdef ChomboCompare < handle
                         [sample_X, sample_Y] = meshgrid(x, y);
                         
                         try
-                            interpolated_exact_comp = interp2(exact_data_comp, sample_X, sample_Y, 'spline');
+                            if sum(isnan(exact_data_comp)) > 0
+                                interpolated_exact_comp = NaN*sample_X;
+                                fprintf(' (NaNs encountered) ');
+                            else
+                                 interpolated_exact_comp = interp2(exact_data_comp, sample_X, sample_Y, 'spline');
+                            end
                         catch e
                             
                             fprintf(1,'Failed to do interpolation in ChomboCompare.diff() \n%s \n',e.identifier);
