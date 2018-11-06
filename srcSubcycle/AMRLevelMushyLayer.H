@@ -617,7 +617,8 @@ protected:
   void computeUstarSrc(LevelData<FArrayBox>& src,  LevelData<FArrayBox>& a_uDelu, Real src_time,
                        bool a_MACprojection = false);
 
-
+  /// Check CFL based on latest velocity is safe to use for explicit updates
+  bool currentCFLIsSafe(bool printWarning=false);
 
   /// Set velocity to zero where porosity is sufficiently small (FArrayBox version)
   void setVelZero(FArrayBox& a_vel, const FArrayBox& a_porosity, const Real a_limit, const int a_radius=0);

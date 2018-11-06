@@ -1145,7 +1145,10 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
       project_dt = m_dt;
     }
 
-    correctEdgeCentredVelocity(m_advVel, project_dt);
+    if (currentCFLIsSafe())
+    {
+      correctEdgeCentredVelocity(m_advVel, project_dt);
+    }
 
     // The projection solve isn't always quite good enough, which can leave U~1e-10 where porosity ~1e-15
     // want to avoid u/chi > 1 for porosity =1e-15, so do it manually
@@ -1640,11 +1643,23 @@ Real AMRLevelMushyLayer::advance()
     calculateTimeIndAdvectionVel(m_time-m_dt, m_advVel);
   }
 
-  // always advect lambda (and update flux registers)
+  // Check we're still satisfying CFL condition
+  // If not, skip scalar advection for this step
+  bool doAdvectiveSrc = true;
+
+  if (!currentCFLIsSafe(true))
+  {
+    doAdvectiveSrc = false;
+  }
+
+  // always* advect lambda (and update flux registers)
   // do this as soon as we have advection velocities, in case we want to
   // correct them prior to HC advection
+  // * skip if we're danger of violating the CFL condition
+  if (doAdvectiveSrc)
+  {
    advectLambda(true);
-
+  }
 
   // Scalar advection diffusion
   bool doScalarAdvectionDiffusion = true;
@@ -1689,7 +1704,9 @@ Real AMRLevelMushyLayer::advance()
 
     setValLevel(srcMultiComp, 0.0);
 
-    exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, true);
+    bool doFRUpdates = true;
+
+    exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, doFRUpdates, doAdvectiveSrc);
 
     // Get back the answer
     HC_new.copyTo(Interval(0,0), *m_scalarNew[m_enthalpy], Interval(0,0));
@@ -1738,8 +1755,18 @@ Real AMRLevelMushyLayer::advance()
 
   if (solvingFullDarcyBrinkman())
   {
+    // If we're skipping advective srcs for this timestep, skip this too
+    if (!doAdvectiveSrc)
+    {
+      DataIterator dit = m_vectorNew[m_UdelU]->dataIterator();
+      for (dit.reset(); dit.ok(); ++dit)
+          {
+            (*m_vectorNew[m_UdelU])[dit].setVal(0.0);
+          }
+    }
+
     bool doFRupdates = true;
-    bool compute_uDelU = !m_implicitAdvectionSolve;
+    bool compute_uDelU = !m_implicitAdvectionSolve && doAdvectiveSrc;
     bool doProjection = true;
     computeCCvelocity(advectionSourceTerm, m_time-m_dt, m_dt, doFRupdates, doProjection, compute_uDelU);
   }
@@ -1852,9 +1879,9 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
 
 
     }
-
-    if (!m_doEulerPart)
+    else
     {
+      // Don't want this term
       for (dit.reset(); dit.ok(); ++dit)
       {
         UdelU_porosity[dit].setVal(0.0);
@@ -7458,6 +7485,26 @@ bool AMRLevelMushyLayer::crashed()
 
 
   return false;
+}
+
+bool AMRLevelMushyLayer::currentCFLIsSafe(bool printWarning)
+{
+
+Real maxAdvU = getMaxVelocity();
+  Real newCFL = maxAdvU * m_dt / m_dx;
+
+  // CFL above 1 definitely unstable. CFL > 2*user limit means the velocity has increased rapidly
+  if (newCFL > 1.0 || newCFL > m_cfl*2)
+  {
+    if (printWarning)
+    {
+      pout() << "WARNING: new max(U) = " << maxAdvU << " means that CFL = " << newCFL << " which may be unstable" << endl;
+          pout() << "Therefore, we will be skipping fluid advection during this timestep" << endl;
+    }
+    return false;
+  }
+
+  return true;
 }
 
 

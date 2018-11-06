@@ -301,7 +301,6 @@ void AMRLevelMushyLayer::levelSetup()
   //  ParmParse ppProj("projector");
   ppProjection.query("verbosity", projectionVerbosity);
 
-
   bool usePiAdvectionBCs = true;
   ppProjection.query("usePiAdvectionBCs", usePiAdvectionBCs);
 
