@@ -751,6 +751,7 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   ppMain.query("implicitAdvectionSolve", m_implicitAdvectionSolve);
 
   m_solidPorosity = 0.05;
+  ppMain.query("solidPorosity", m_solidPorosity);
 
 
   // Default option
@@ -2975,6 +2976,11 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   {
     dtInit = computeDtInit(finest_level);
     dtInit *= 0.5;
+  }
+
+  if (m_time == 0)
+  {
+    dtInit = dtInit/1000;
   }
 
   // Save dt for each level so it can be reset later

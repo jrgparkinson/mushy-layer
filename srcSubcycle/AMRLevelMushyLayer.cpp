@@ -1145,10 +1145,9 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
       project_dt = m_dt;
     }
 
-    if (currentCFLIsSafe())
-    {
-      correctEdgeCentredVelocity(m_advVel, project_dt);
-    }
+
+     correctEdgeCentredVelocity(m_advVel, project_dt);
+
 
     // The projection solve isn't always quite good enough, which can leave U~1e-10 where porosity ~1e-15
     // want to avoid u/chi > 1 for porosity =1e-15, so do it manually
@@ -1358,7 +1357,10 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
   //  m_projection.applyFreestreamCorrection(a_advVel, m_dt);
 //  if (!freestreamBeforeProjection)
 //  {
+  if (currentCFLIsSafe())
+     {
     m_projection.applyFreestreamCorrection(a_advVel);
+     }
 //  }
 
   a_advVel.exchange();
@@ -1651,6 +1653,11 @@ Real AMRLevelMushyLayer::advance()
   {
     doAdvectiveSrc = false;
   }
+
+  // Another sanity check
+  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], m_advVel, m_dx);
+  Real  maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
+  pout() << "  Sanity check: max(div u) = " << maxDivU << endl;
 
   // always* advect lambda (and update flux registers)
   // do this as soon as we have advection velocities, in case we want to
