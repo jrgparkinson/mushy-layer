@@ -70,9 +70,9 @@ parameters.heleShaw=true
 parameters.initialComposition=30
 parameters.lewis=100
 parameters.liquidusSlope=-0.1
-parameters.nonDimReluctance=1e-45
+parameters.nonDimReluctance=1e-3 # hele shaw cell!
 parameters.nonDimVel=0.0
-parameters.darcy=0.001
+parameters.darcy=1e-5
 
 parameters.permeabilityFunction=2
 parameters.prandtl=10.0
