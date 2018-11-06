@@ -86,12 +86,14 @@ compsToCompute = [AMRPlotFile.components.xAdvectionvelocity, ...
 % Compute error for all components
 compsToCompute = 1:1:length(compNames);
 
+fprintf('Differencing component : ');
+
 for comp_i = 1:length(compsToCompute)
     
     
 comp = compsToCompute(comp_i); %AMRPlotFile.components.Temperature; %AMRPlotFile.components.xAdvectionvelocity; %AMRPlotFile.components.Temperature;
 compName = compNames{comp}; 
-fprintf('Differencing component %s \n', compName);
+fprintf('%s, ', compName);
 
 try
 
@@ -143,7 +145,7 @@ if ~exist(compFolder, 'dir')
 end
 
 errPltFile = fullfile(compFolder, [finalFolder, '.png']);
-fprintf('Saving error plot to %s \n', errPltFile);
+%fprintf('Saving error plot to %s \n', errPltFile);
  print(h,errPltFile,'-dpng','-r150')
  
 
@@ -170,7 +172,9 @@ fprintf('Saving error plot to %s \n', errPltFile);
 % Close plot window once we're done
  close(h);
 
-end
+end % end loop over components
+
+fprintf('\n');
     
   % Catch any errors that occured  
 catch e %e is an MException struct

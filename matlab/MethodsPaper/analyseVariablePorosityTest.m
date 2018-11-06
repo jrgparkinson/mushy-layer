@@ -80,7 +80,9 @@ if runAnalysis
             continue
         end
 
-        if length(folderName) > 3 && ~strcmp(folderName, fine_res_dir) && ~strcmp(folderName, 'errPlots')
+        if length(folderName) > 3 && ~strcmp(folderName, fine_res_dir) ...
+                && ~strcmp(folderName, 'errPlots') ...
+                && ~strcmp(folderName, 'richardsonErr')
             fprintf('Considering %s \n', folderName);
             skip = false;
             thisNumCells = getNumCells(folderName);
