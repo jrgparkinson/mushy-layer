@@ -483,6 +483,9 @@ protected:
   /// Get largest velocity in domain
   Real getMaxVelocity();
 
+  /// Get max advection velocity
+  Real getMaxAdvVel();
+
   /// Returns \f$ \Delta t \f$
   Real computeDt(bool growdt);
 

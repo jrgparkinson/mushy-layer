@@ -372,7 +372,7 @@ void AMRLevelMushyLayer::postTimeStep()
       // Check if we're going to make dt too small on the finest level, in
       // which case don't change dt anywhere else
       bool halveDt = true;
-      if (this->m_dt/2 < minDt)
+      if (m_dt/2 < minDt)
       {
         halveDt = false;
         timestepFailed = false; // don't halve the timestep

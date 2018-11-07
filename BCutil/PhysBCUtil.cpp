@@ -1170,6 +1170,9 @@ public:
   /// Physical parameters for the problem
   MushyLayerParams m_params;
 
+  /// order of accuracy
+  int m_order;
+
   /// Default constructor
   BasicCCVelBCFunction()
   :
@@ -1183,13 +1186,15 @@ public:
                        bool a_isViscous,
                        int  a_comp,
                        const Interval& a_interval,
-                       MushyLayerParams a_params)
+                       MushyLayerParams a_params,
+                       int a_order=1)
   : m_comp(a_comp),
     m_bcVal(a_bcVal),
     m_isHomogeneous(a_isHomogeneous),
     m_isViscous(a_isViscous),
     m_interval(a_interval),
-    m_params(a_params)
+    m_params(a_params),
+    m_order(a_order)
   {
   }
   /// Apply BC
@@ -1211,7 +1216,7 @@ public:
       RefCountedPtr<ConstValueFunction>
       bcValueFunc(new ConstValueFunction(m_params.inflowVelocity, aliasStateFab.nComp()));
 
-      int order = 1;
+      int order = m_order;
 
       // loop over directions
       for (int idir = 0; idir < SpaceDim; idir++)
@@ -2930,7 +2935,7 @@ PhysBCUtil::advectionVelIBC() const
 
 // ---------------------------------------------------------------
 Tuple<BCHolder, SpaceDim>
-PhysBCUtil::uStarFuncBC(bool a_isViscous) const
+PhysBCUtil::uStarFuncBC(bool a_isViscous, int a_order) const
 {
   Tuple<BCHolder, SpaceDim> bcVec;
   bool isHomogeneous = false;
@@ -2938,7 +2943,7 @@ PhysBCUtil::uStarFuncBC(bool a_isViscous) const
   {
     Interval intvl(idir, idir);
     bcVec[idir] = basicCCVelFuncBC(isHomogeneous, a_isViscous, idir,
-                                   intvl);
+                                   intvl, a_order);
   }
   return bcVec;
 }
@@ -4000,7 +4005,8 @@ BCHolder PhysBCUtil::extrapVelFuncInterior(bool a_isHomogeneous,
 BCHolder PhysBCUtil::basicCCVelFuncBC(bool a_isHomogeneous,
                                       bool a_isViscous,
                                       int  a_comp,
-                                      const Interval& a_interval) const
+                                      const Interval& a_interval,
+                                      int a_order) const
 {
   Real bcVal = 1.0;
   RefCountedPtr<BasicCCVelBCFunction> basicCCVelBCFunction(new BasicCCVelBCFunction(bcVal,
@@ -4008,7 +4014,8 @@ BCHolder PhysBCUtil::basicCCVelFuncBC(bool a_isHomogeneous,
                                                                                     a_isViscous,
                                                                                     a_comp,
                                                                                     a_interval,
-                                                                                    m_params));
+                                                                                    m_params,
+                                                                                    a_order));
 
   return BCHolder(basicCCVelBCFunction);
 }

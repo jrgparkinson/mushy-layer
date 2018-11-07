@@ -94,7 +94,7 @@ public:
 	virtual Tuple<BCHolder, SpaceDim> fluxExtrapBC() const;
 
 	/// BC holder for \f$ \mathbf{u}^* \f$
-	virtual Tuple<BCHolder, SpaceDim> uStarFuncBC(bool a_isViscous = false) const;
+	virtual Tuple<BCHolder, SpaceDim> uStarFuncBC(bool a_isViscous = false, int a_order=1) const;
 
 
 //	virtual Tuple<BCHolder, SpaceDim> velFuncBC(bool a_isViscous = false) const;
@@ -338,7 +338,8 @@ protected:
 	virtual BCHolder basicCCVelFuncBC(bool a_isHomogeneous,
 			bool a_isViscous,
 			int a_velComponent,
-			const Interval& a_interval) const;
+			const Interval& a_interval,
+			int a_order = 1) const;
 
 //	virtual BCHolder uStarCCVelFuncBC(bool a_isHomogeneous,
 //			bool a_isViscous,

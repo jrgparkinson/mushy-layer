@@ -955,6 +955,12 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
   LevelData<FArrayBox> velOldGrown(m_grids, SpaceDim, ivGhost);
   fillVectorField(velOldGrown, old_time, m_fluidVel, true);
 
+  //todo - Set some zero order BCs on vel
+//  int velOrder = 0;
+//  VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs, velOrder));
+//  velBC.applyBCs(velOldGrown, m_grids, m_problem_domain,
+//                     m_dx, false); // inhomogeneous
+
   // todo - set porosity limit correctly here
 
   Real advPorosityLimit = m_solidPorosity;
@@ -1110,6 +1116,15 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
         // Set advection velocity to zero where porosity is low
 //        setVelZero(U_to_advect, 0.05);
 
+        Real maxAdvectionVel = getMaxAdvVel();
+        Real cfl = maxAdvectionVel*m_dt/m_dx;
+        if (cfl > 1.0)
+        {
+          pout() << "WARNING - about to do trace adv vel with cfl = " << cfl << endl;
+        }
+
+//        pout() << "Do trace advection vel with cfl = " << cfl << endl;
+
 
         // m_dt is the full timestep, and this always returns the half time velocity
         // changed this from m_dt (full timestep) to half_dt*2 incase we want to compute velocities
@@ -1131,6 +1146,51 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
 
         m_advectionMethod = saveAdvectionMethod;
+
+        // DO some post tracing smoothing in the x-direction
+        // this is necessary to remove some \delta x scale instabilities which seem to arise
+
+        m_advVel.exchange();
+
+        int dir = 0;
+        Real alpha = 0.0; // default is no smoothing
+
+        ppMain.query("postTraceSmoothing", alpha);
+
+        // todo - write post trace smoothing in fortran
+        for (dit.reset(); dit.ok(); ++dit)
+        {
+
+          for (int velDir=0; velDir < SpaceDim; velDir++)
+          {
+            FArrayBox& vel = m_advVel[dit][velDir];
+            Box b = vel.box();
+
+            for (BoxIterator bit(b); bit.ok(); ++bit)
+            {
+              IntVect iv = bit();
+              IntVect ivUp = iv+BASISV(dir);
+
+              if (b.contains(ivUp))
+              {
+
+                Real neighbour = vel(ivUp);
+
+                // Make sure we don't change the velocity if the neighboroung value is much larger
+                // this will prevent changing zero velocity cells, or including NaN type values
+                if( abs(neighbour) <= 2*abs(vel(iv)) )
+                {
+                  vel(iv) = (1-alpha)*vel(iv)+alpha*neighbour;
+                }
+
+              }
+            }
+          }
+
+        }
+
+        m_advVel.exchange();
+
 
       } // end if implicit/explicit solve
 
@@ -1470,10 +1530,7 @@ void AMRLevelMushyLayer::fillHC(LevelData<FArrayBox>& a_phi, Real a_time,
 /*******/
 Real AMRLevelMushyLayer::advance()
 {
-//  if (s_verbosity >= 1)
-//  {
-//    pout() << "AMRLevelMushyLayer::advance (level " << m_level << ", time = " << m_time << ", dt = " << m_dt << ")" << endl;
-//  }
+
 
   ParmParse ppParams("parameters");
   ParmParse ppMain("main");
@@ -1715,21 +1772,19 @@ Real AMRLevelMushyLayer::advance()
 
     exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, doFRUpdates, doAdvectiveSrc);
 
-    // Get back the answer
-    HC_new.copyTo(Interval(0,0), *m_scalarNew[m_enthalpy], Interval(0,0));
-    HC_new.copyTo(Interval(1,1), *m_scalarNew[m_bulkConcentration], Interval(0,0));
-
-
-
-    updateEnthalpyVariables();
-
-    // Only do this on the coarsest level
     bool solverFailed = (exitStatus == 2 || exitStatus == 4 || exitStatus == 6);
+    bool solveSuccess = !solverFailed;
 
-    if (solverFailed
-        //          && m_picardIteration == maxNumIter  // Wondering if we should wait until m_picardIteration == maxNumIter before failing and restarting?
-        //          && 1==0
-    )
+//    if (solveSuccess)
+//    {
+      // Get back the answer if solver was a success
+      HC_new.copyTo(Interval(0,0), *m_scalarNew[m_enthalpy], Interval(0,0));
+      HC_new.copyTo(Interval(1,1), *m_scalarNew[m_bulkConcentration], Interval(0,0));
+
+      updateEnthalpyVariables();
+//    }
+
+    if (solverFailed)
     {
       if (m_ignoreSolverFails)
       {
@@ -2052,17 +2107,7 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
                        m_dx, false); // inhomogeneous
         m_vectorNew[uvar]->exchange();
 
-        // Make sure zero porosity regions have no velocity
-        setVelZero(*m_vectorNew[uvar], ccVelPorosityLimit);
 
-        //Testing:
-        LevelData<FArrayBox> U_chi(m_grids, SpaceDim);
-        fillVectorField(U_chi, m_time, m_U_porosity, true, true);
-        Real max = ::computeMax(U_chi, NULL, 1, Interval(0, SpaceDim-1));
-        if (max > 1e5)
-        {
-          pout() << "U_chi > 1e5!!! " << endl;
-        }
 
         QuadCFInterp interp;
         Divergence::levelDivergenceCC(*m_scalarNew[m_divU], *m_vectorNew[uvar], NULL, m_dx, true, interp);
@@ -2080,12 +2125,30 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
 
         i++;
       }
+
+
+
   } // end if doing projection
 
+
+    // Make sure zero porosity regions have no velocity
+            setVelZero(*m_vectorNew[uvar], ccVelPorosityLimit);
+
+            //Testing:
+            LevelData<FArrayBox> U_chi(m_grids, SpaceDim);
+            fillVectorField(U_chi, m_time, m_U_porosity, true, true);
+            Real max = ::computeMax(U_chi, NULL, 1, Interval(0, SpaceDim-1));
+            if (max > 1e5)
+            {
+              pout() << "U_chi > 1e5!!! " << endl;
+            }
 
 
   QuadCFInterp interp;
   Divergence::levelDivergenceCC(*m_scalarNew[m_divU], *m_vectorNew[uvar], NULL, m_dx, true, interp);
+  Real maxDivU = ::computeMax(*m_scalarNew[m_divU], NULL, 1, Interval(0, 0));
+
+  pout() << " CCProjection: max(div(U)) = " << maxDivU << endl;
 
   // Go back to standard porosity limit now we've finished CC solve
 //  m_lowerPorosityLimit = 1e-15;
@@ -3591,6 +3654,9 @@ void AMRLevelMushyLayer::traceAdvectionVel(LevelData<FluxBox>& a_advVel,
   // also need to fill grown advection velocity
   // by cell-to-edge averaging old-time velocity
   //	CellToEdge(a_old_vel, a_advVel);
+  a_advVel.exchange(); // definitely need this
+  U_chi.exchange(); // may need this
+
 
   // loop over grids and predict face-centered velocities at the half
   // time using the patchGodunov infrastructure
@@ -4806,15 +4872,13 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
   if (computeAdvectiveSrc)
   {
-
     // Always do multi comp advection...
     //    bool doMultiCompAdvection = true;
 
     computeScalarAdvectiveSrcHC(full_src, totalAdvectiveFlux, doFRupdates);
-    full_src.copyTo(Interval(0,0), *m_scalarNew[m_enthalpySrc], Interval(0,0));
-    full_src.copyTo(Interval(1,1), *m_scalarNew[m_saltEqnSrcGodunov], Interval(0,0));
-
   } // end if compute advective src
+  full_src.copyTo(Interval(0,0), *m_scalarNew[m_enthalpySrc], Interval(0,0));
+  full_src.copyTo(Interval(1,1), *m_scalarNew[m_saltEqnSrcGodunov], Interval(0,0));
 
   // Option here to not update enthalpy and salinity
   // (useful for debugging)
@@ -6395,6 +6459,36 @@ Real AMRLevelMushyLayer::computeDt(bool growdt)
   return newDt;
 }
 
+Real AMRLevelMushyLayer::getMaxAdvVel()
+{
+  Real maxAdvU = 0.0;
+
+//  LevelData<FArrayBox> U(m_grids, SpaceDim);
+//    EdgeToCell(m_advVel, U);
+//    maxAdvU = ::computeNorm(U, NULL, 1, m_dx, Interval(0,SpaceDim-1), 0);
+
+    // alternate method
+  Box domBox = m_problem_domain.domainBox();
+
+
+    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+    {
+      for (int dir=0; dir < SpaceDim-1; dir++)
+      {
+        Box faceBox = domBox.surroundingNodes(dir);
+
+        FArrayBox& velDir = m_advVel[dit][dir];
+        Box b = velDir.box();
+        b &= faceBox;
+        Real thisMax = velDir.norm(b, 0, 0);
+
+        maxAdvU = max(maxAdvU, thisMax);
+      }
+    }
+
+    return maxAdvU;
+}
+
 Real AMRLevelMushyLayer::getMaxVelocity()
 {
   if (s_verbosity >= 3)
@@ -6402,13 +6496,8 @@ Real AMRLevelMushyLayer::getMaxVelocity()
     pout() << "AMRlevelMushyLayer::getMaxVelocity" << endl;
   }
 
-  LevelData<FArrayBox> U(m_grids, SpaceDim);
+  Real maxAdvU = getMaxAdvVel();
 
-  EdgeToCell(m_advVel, U);
-
-  Real maxAdvU = 0.0;
-
-  maxAdvU = ::computeNorm(U, NULL, 1, m_dx, Interval(0,SpaceDim-1), 0);
   if (s_verbosity >= 3)
     {
       pout() << "AMRlevelMushyLayer::getMaxVelocity - max (face centered U) = " << maxAdvU << endl;

@@ -965,7 +965,7 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_doSyncOperations = true;
   m_addSubtractGradP = true;
   m_enforceAnalyticSoln = false;
-  m_maxDivUFace = 1e-10;
+  m_maxDivUFace = 1e-8;
 
   ppMain.query("doEuler", m_doEulerPart);
   ppMain.query("doProjection", m_doProjection);
@@ -2677,15 +2677,18 @@ void AMRLevelMushyLayer::postInitialize()
 
       // Do a calculation on the coarsest level to get an estimate of the velocity
       // we need a very rough estimate of dt in order to do this
-      Real initDt, initTime;
-      if (this->m_fixedDt > 0)
+      Real initDt = -1;
+      Real initTime = -1;
+
+
+      if (m_fixedDt > 0)
       {
         initDt = m_fixedDt;
       }
       else
       {
         initDt= thisML->computeInitialDt();
-        initDt = 1e-4*initDt;
+//        initDt = 1e-4*initDt;
         thisML->dt(initDt);
         thisML->computeInitAdvectionVel();
 
