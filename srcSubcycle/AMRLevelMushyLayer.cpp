@@ -1935,9 +1935,11 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
         {
           pout() << "max(uDelU) = " << maxUdelU << endl;
         }
-        setVelZero(UdelU_porosity, m_solidPorosity);
+
 
       }
+
+//      setVelZero(UdelU_porosity, m_solidPorosity);
 
 
     }
@@ -1954,7 +1956,7 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
     pp.query("uDelU_grow", uDelU_grow);
 
     // by default make this tiny (so essentially turned off)
-    Real uDelU_porosityLimit = m_lowerPorosityLimit; //1e-15;
+    Real uDelU_porosityLimit = 10*m_lowerPorosityLimit; //1e-15;
     pp.query("uDelu_porosity", uDelU_porosityLimit);
     setVelZero(UdelU_porosity, uDelU_porosityLimit, uDelU_grow); // grow by 1
 
@@ -2194,30 +2196,30 @@ void AMRLevelMushyLayer::setVelZero(FArrayBox& a_vel, const FArrayBox& a_porosit
   {
     //todo - make this work for face centered fields
 
-  IntVectSet porousCells;
+    IntVectSet porousCells;
 
-  for (BoxIterator bit(a_porosity.box()); bit.ok(); ++bit)
-  {
-    IntVect iv = bit();
-
-    if (a_porosity(iv) < a_limit)
+    for (BoxIterator bit(a_porosity.box()); bit.ok(); ++bit)
     {
-      porousCells |= iv;
+      IntVect iv = bit();
+
+      if (a_porosity(iv) <= a_limit)
+      {
+        porousCells |= iv;
+      }
     }
-  }
 
-  porousCells.grow(a_radius);
+    porousCells.grow(a_radius);
 
-  IntVectSet setZeroCells = porousCells;
-  setZeroCells &= a_vel.box();
+    IntVectSet setZeroCells = porousCells;
+    setZeroCells &= a_vel.box();
 
-  for (IVSIterator its(setZeroCells); its.ok(); ++its)
-  {
-    for (int comp=0; comp<a_vel.nComp(); comp++)
+    for (IVSIterator its(setZeroCells); its.ok(); ++its)
     {
-      a_vel(its(), comp) = 0;
+      for (int comp=0; comp<a_vel.nComp(); comp++)
+      {
+        a_vel(its(), comp) = 0;
+      }
     }
-  }
 
 
 
@@ -3453,7 +3455,7 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
 
     // Need to multiply gradPhi by porosity to get correct correction field
     LevelData<FluxBox> porosity(levelGrids, 1);
-    this->fillScalarFace(porosity, old_time, m_pressureScaleVar, true);
+    fillScalarFace(porosity, old_time, m_pressureScaleVar, true);
 
     bool legacyCompute = false;
     ParmParse ppMain("main");
