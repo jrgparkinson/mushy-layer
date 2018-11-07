@@ -936,6 +936,8 @@ protected:
   /// Correct velocity (projection + volume discrepancy)
   void correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel, Real a_dt);
 
+  /// Smoot flux in x-direction
+  void horizontallySmooth(LevelData<FluxBox>& a_flux);
   /// Compute and apply volume discrepancy correction (edge centred velocity)
 //  void computeVolumeDiscrepancyCorrection(LevelData<FluxBox>& a_advVel);
 

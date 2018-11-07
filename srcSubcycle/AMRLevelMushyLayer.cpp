@@ -970,7 +970,16 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 //  setVelZero(velOldGrown, advPorosityLimit);
 
   // Get initial guess at advection velocity from U^n
-  CellToEdge(velOldGrown, m_advVel);
+  bool useOldAdvVel = false;
+  ppMain.query("useOldAdvVelForTracing", useOldAdvVel);
+  if (useOldAdvVel)
+  {
+    // do nothing - we already have m_advVel from previous timestep
+  }
+  else
+  {
+    CellToEdge(velOldGrown, m_advVel);
+  }
 
   edgeVelBC.applyBCs(m_advVel, m_grids, m_problem_domain, m_dx,
                      false); // inhomogeneous
@@ -1152,42 +1161,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
         m_advVel.exchange();
 
-        int dir = 0;
-        Real alpha = 0.0; // default is no smoothing
-
-        ppMain.query("postTraceSmoothing", alpha);
-
-        // todo - write post trace smoothing in fortran
-        for (dit.reset(); dit.ok(); ++dit)
-        {
-
-          for (int velDir=0; velDir < SpaceDim; velDir++)
-          {
-            FArrayBox& vel = m_advVel[dit][velDir];
-            Box b = vel.box();
-
-            for (BoxIterator bit(b); bit.ok(); ++bit)
-            {
-              IntVect iv = bit();
-              IntVect ivUp = iv+BASISV(dir);
-
-              if (b.contains(ivUp))
-              {
-
-                Real neighbour = vel(ivUp);
-
-                // Make sure we don't change the velocity if the neighboroung value is much larger
-                // this will prevent changing zero velocity cells, or including NaN type values
-                if( abs(neighbour) <= 2*abs(vel(iv)) )
-                {
-                  vel(iv) = (1-alpha)*vel(iv)+alpha*neighbour;
-                }
-
-              }
-            }
-          }
-
-        }
+        horizontallySmooth(m_advVel);
 
         m_advVel.exchange();
 
@@ -1211,13 +1185,14 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
     // The projection solve isn't always quite good enough, which can leave U~1e-10 where porosity ~1e-15
     // want to avoid u/chi > 1 for porosity =1e-15, so do it manually
-    setVelZero(m_advVel, advPorosityLimit);
+//    setVelZero(m_advVel, advPorosityLimit);
 
     LevelData<FluxBox> porosityFace(m_advVel.disjointBoxLayout(), 1, m_advVel.ghostVect());
     fillScalarFace(porosityFace, m_time-m_dt, m_porosity, true, true);
     porosityFace.exchange();
 
     // Now check that U(chi=0) = 0
+    int errors = 0;
     for (DataIterator dit = m_advVel.dataIterator(); dit.ok(); ++dit)
     {
       Box b = m_advVel[dit].box();
@@ -1235,11 +1210,17 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
           if (chi < 1e-10 && vel/chi > 1)
           {
-            pout() << "Adv vel not small enough!" << endl;
+            errors= errors + 1;
+//            pout() << "Adv vel not small enough!" << endl;
           }
 
         }
       }
+    }
+
+    if (errors > 0)
+    {
+      pout() << "Num Adv vel not small enough: " << errors << endl;
     }
 
   }
@@ -1303,6 +1284,54 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
 }
 
+void AMRLevelMushyLayer::horizontallySmooth(LevelData<FluxBox>& a_flux)
+{
+  ParmParse ppMain("main");
+  DataIterator dit = a_flux.dataIterator();
+
+  int dir = 0; // horizontally averaging
+
+  Real alpha = 0.0; // default is no smoothing
+
+  ppMain.query("postTraceSmoothing", alpha);
+
+  if (alpha==0.0)
+  {
+    return;
+  }
+
+  // todo - write post trace smoothing in fortran
+  for (dit.reset(); dit.ok(); ++dit)
+  {
+    for (int velDir=0; velDir < SpaceDim; velDir++)
+    {
+      FArrayBox& vel = a_flux[dit][velDir];
+      Box b = vel.box();
+
+      for (BoxIterator bit(b); bit.ok(); ++bit)
+      {
+        IntVect iv = bit();
+        IntVect ivUp = iv+BASISV(dir);
+
+        if (b.contains(ivUp))
+        {
+
+          Real neighbour = vel(ivUp);
+
+          // Make sure we don't change the velocity if the neighboroung value is much larger
+          // this will prevent changing zero velocity cells, or including NaN type values
+          if( abs(neighbour) < 1e100 ) //abs(vel(iv)) > 1e-15 &&
+          {
+            vel(iv) = (1-alpha)*vel(iv)+alpha*neighbour;
+          }
+
+        }
+      }
+    }
+
+  }
+}
+
 
 void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel, Real a_dt)
 {
@@ -1331,6 +1360,8 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
   {
     pressureScaleEdgePtrOneGhost = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(m_grids, 1, IntVect::Unit));
     fillScalarFace(*pressureScaleEdgePtrOneGhost, half_time, m_pressureScaleVar, true);
+
+    horizontallySmooth(*pressureScaleEdgePtrOneGhost);
 
     pressureScalePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(m_grids,1,IntVect::Unit));
     fillScalars(*pressureScalePtr, half_time, m_pressureScaleVar, true);
@@ -1364,16 +1395,9 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
 
 
-  // Try doing this before projection?
-//  bool freestreamBeforeProjection = false;
+
   ParmParse ppMain("main");
-//  ppMain.query("freestreamBeforeProjection", freestreamBeforeProjection);
-//  if (freestreamBeforeProjection)
-//  {
-//    m_projection.applyFreestreamCorrection(a_advVel);
-//    edgeVelBC.applyBCs(a_advVel, m_grids, m_problem_domain, m_dx,
-//                         false); // inhomogeneous
-//  }
+
 
   a_advVel.exchange();
 
@@ -1409,10 +1433,13 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
   }
 
-  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
+//  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
 
   // Fill CF boundaries
-  fillAdvVel(old_time, a_advVel);
+  if (m_level > 0)
+  {
+    fillAdvVel(old_time, a_advVel);
+  }
 
   //  m_projection.applyFreestreamCorrection(a_advVel, m_dt);
 //  if (!freestreamBeforeProjection)
@@ -6591,7 +6618,11 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
     newDT = min(newDT, accelDt);
   }
 
+  if (max_dt > 0)
+  {
   newDT = min(max_dt, newDT);
+  }
+
   return newDT;
 }
 
@@ -6599,9 +6630,9 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 Real AMRLevelMushyLayer::computeInitialDt()
 {
   if (s_verbosity >= 3)
-        {
-          pout() << "AMRlevelMushyLayer::computeInitialDt" << endl;
-        }
+  {
+    pout() << "AMRlevelMushyLayer::computeInitialDt" << endl;
+  }
 
   Real dt = computeDt(m_initial_dt_multiplier);
 
