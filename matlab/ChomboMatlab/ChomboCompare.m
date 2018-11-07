@@ -258,7 +258,8 @@ classdef ChomboCompare < handle
                         [sample_X, sample_Y] = meshgrid(x, y);
                         
                         try
-                            if sum(isnan(exact_data_comp)) > 0
+                            numNans = sum(sum(isnan(exact_data_comp)));
+                            if  numNans > 0
                                 interpolated_exact_comp = NaN*sample_X;
                                 fprintf(' (NaNs encountered) ');
                             else
