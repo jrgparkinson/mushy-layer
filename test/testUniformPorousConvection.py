@@ -71,6 +71,7 @@ def testUniformPorousConvection(argv):
         NuLebars = [str(a) for a in Da_Ra['lebars']]
 
         extra_params['main.max_time'] = 0.1 / float(Da)
+#        extra_params['main.max_dt'] = ?
 
         for Ra in Da_Ra['RaT']:
             extra_params['parameters.rayleighTemp'] = Ra

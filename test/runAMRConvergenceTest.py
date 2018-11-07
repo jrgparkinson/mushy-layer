@@ -136,7 +136,6 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 
                 regrid_int = int(4.0*float(Nx_coarse)/16.0)
 
-
                 # Make sure we always have one grid
                 maxGridSize = max(Nx_coarse*maxRefinement,4)
 
@@ -422,7 +421,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
         else:
             jobName = physicalProblem + '-analysis'
 
-            s = SlurmTask(base_dir, jobName, '')
+            s = SlurmTask(base_dir, jobName, '', 4)
 
             s.setDependency(job_ids)
             s.setCustomCommand(analysis_command)

@@ -88,7 +88,7 @@ def testHeleShawFixedChill(argv):
     extra_params['regrid.plume_vel']= 0.1*Da*Ra*Ra*Pr
     if periodic:
         extra_params['main.periodic_bc'] = '1 0 0'
-        
+
     runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 
 # def main(argv):
