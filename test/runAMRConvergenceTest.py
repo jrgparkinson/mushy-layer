@@ -329,6 +329,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 p0['main.num_cells'] = numCellsUniform
                 p0['run_name'] = 'Uniform'
                 p0['concise_run_name'] = 'Uniform'
+                p0['projection.eta'] = 0.0
             
                 param_sets.append(p0)
             
