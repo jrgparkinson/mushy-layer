@@ -550,6 +550,7 @@ void CCProjector::variableSetUp()
   ppProjection.query("numPrecondSmooth", s_num_precond_smooth);
   ppProjection.query("numMG", s_numMG);
   ppProjection.query("relax_bottom_solver", s_relax_bottom_solver);
+  ppProjection.query("bottomSolveMaxIter", s_bottomSolveMaxIter);
 
   tempBool = (int) s_constantLambdaScaling;
   ppProjection.query("constantLambdaScaling", tempBool);
