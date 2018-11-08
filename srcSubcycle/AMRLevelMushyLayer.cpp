@@ -1924,6 +1924,25 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
         bool doVelFRupdates = true;
         pp.query("doAdvVelFRupdates", doVelFRupdates);
         predictVelocities(UdelU_porosity, m_advVel, advectionSourceTerm, a_oldTime, a_dt, doVelFRupdates);
+
+        // MASSIVE HACK
+//        for (DataIterator dit = UdelU_porosity.dataIterator(); dit.ok(); ++dit)
+//                {
+//          Box b = UdelU_porosity[dit].box();
+//          b &=(*m_scalarNew[m_porosity])[dit].box();
+//
+//          for (BoxIterator bit(b); bit.ok(); ++bit)
+//          {
+//            IntVect iv = bit();
+//            if ((*m_scalarNew[m_porosity])[dit](iv) < 0.9)
+//            {
+//                  UdelU_porosity[dit](iv) = 0.0;
+//            }
+//          }
+//
+//                }
+
+
       }
       else if (uDeluMethod == 1)
       {
@@ -6573,7 +6592,15 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   Real max_dt = -1;
   ppMain.query("max_dt", max_dt);
   Real maxAdvU = getMaxVelocity();
-
+  Real maxUChi = ::computeMax(*m_vectorNew[m_U_porosity], NULL, -1, Interval(0,SpaceDim-1));
+  if (s_verbosity > 4)
+  {
+    pout() << "  Max(U) = " << maxAdvU << ", max(U/chi) = " << maxUChi << endl;
+  }
+  if (maxUChi < 1000*maxAdvU)
+  {
+    maxAdvU = max(maxAdvU, maxUChi);
+  }
 
   Real newDT = cfl * m_dx  / maxAdvU;
 
@@ -6587,21 +6614,32 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 
   Real maxTemp = ::computeMax(*m_scalarNew[m_temperature], NULL, -1, Interval(0,0));
   Real maxPorosity = ::computeMax(*m_scalarNew[m_porosity], NULL, -1, Interval(0,0));
+//  Real maxUChi = ::computeMax(*m_vectorNew[m_U_porosity], NULL, -1, Interval(0,SpaceDim-1));
   //   Real minPerm = ::computeMin(*m_scalarNew[m_permeability], NULL, -1, Interval(0,0));
 
-  Real buoyancy_acceleration = abs(m_parameters.m_buoyancyTCoeff * maxTemp * maxPorosity);
-
-  Real darcy_acceleration = abs(m_parameters.m_darcyCoeff*maxAdvU); //*maxPorosity/minPerm
-
+  Real buoyancy_acceleration = abs(max(m_parameters.m_buoyancyTCoeff, m_parameters.m_buoyancySCoeff) * maxPorosity);
+//  Real buoyancy_acceleration = abs(m_parameters.m_buoyancyTCoeff * maxTemp * maxPorosity);
+  Real darcy_acceleration = abs(m_parameters.m_darcyCoeff*maxUChi); //*maxPorosity/minPerm
+  Real viscous_acceleration = abs(m_parameters.m_viscosityCoeff*maxAdvU/(m_dx*m_dx));
   Real acceleration = max(buoyancy_acceleration, darcy_acceleration);
+//  acceleration = max(acceleration, viscous_acceleration);
+  acceleration = darcy_acceleration;
 
-  Real accelDt = cfl*sqrt(2*finest_dx/acceleration);
+  // Factor of 10 is fairly arbitrary
+  Real accelDt = sqrt(cfl*finest_dx/acceleration);
 
   bool printAccelDt = false;
   ppMain.query("printAccelDt", printAccelDt);
   if (printAccelDt)
   {
-    pout() << "Max dt computed from acceleration = " << accelDt << endl;
+    pout() << "  Max dt computed from acceleration = " << accelDt << endl;
+    pout() << "  Accleration terms: buoyancy = " << buoyancy_acceleration << ", viscous = " << viscous_acceleration << ", darcy = " << darcy_acceleration << endl;
+
+//    Real accelCFL = accelDt*m_dt/m_dx;
+//    if (accelCFL > 1.0)
+//      {
+//     pout() << "  WARNING - CFL computed due to advection terms  = " << accelCFL << endl;
+//      }
   }
 
   // make sure we consider acceleration for determinig dt at time 0.
