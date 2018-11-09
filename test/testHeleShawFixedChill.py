@@ -19,11 +19,11 @@ def testHeleShawFixedChill(argv):
     defaultParams = readInputs(params_file)
     extra_params = {}
 
-    extra_params['main.max_time']=defaultParams['main.max_time']
-    extra_params['parameters.rayleighComp']=defaultParams['parameters.rayleighComp']
-    extra_params['parameters.darcy']=defaultParams['parameters.darcy']
-    extra_params['parameters.compositionRatio']=defaultParams['parameters.compositionRatio']
-    extra_params['parameters.nonDimReluctance'] = defaultParams['parameters.nonDimReluctance']
+    extra_params['main.max_time']=float(defaultParams['main.max_time'])
+    extra_params['parameters.rayleighComp']=float(defaultParams['parameters.rayleighComp'])
+    extra_params['parameters.darcy']=float(defaultParams['parameters.darcy'])
+    extra_params['parameters.compositionRatio']=float(defaultParams['parameters.compositionRatio'])
+    extra_params['parameters.nonDimReluctance'] = float(defaultParams['parameters.nonDimReluctance'])
 
     doAMR = False
 
