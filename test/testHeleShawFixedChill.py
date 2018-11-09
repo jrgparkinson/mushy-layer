@@ -96,7 +96,7 @@ def testHeleShawFixedChill(argv):
 
     # Run
     #extra_params = {'main.max_time':max_time, 'parameters.rayleighComp':Ra, 'parameters.darcy': Da, 'parameters.compositionRatio':C }
-    extra_params['main.max_dt'] = extra_params['parameters.prandtl'] / (extra_params['parameters.darcy']*extra_params['parameters.rayleighComp'])
+    extra_params['main.max_dt'] = 0.01*extra_params['parameters.prandtl'] / (extra_params['parameters.darcy']*extra_params['parameters.rayleighComp'])
 
     extra_params['regrid.plume_salinity']=-1.0
     extra_params['regrid.plume_vel']= 0.1*extra_params['parameters.darcy']*extra_params['parameters.rayleighComp']*extra_params['parameters.rayleighComp']*extra_params['parameters.prandtl']
