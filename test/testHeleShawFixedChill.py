@@ -4,23 +4,31 @@ from colorama import Fore, Style
 import getopt
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
+from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand, readInputs
 
 ##########################################################################
 # 3) Convection in a mushy layer with an initial porous hole
 ##########################################################################
 
 def testHeleShawFixedChill(argv):
+    mushyLayerBaseDir = os.path.abspath(os.pardir)
+    # params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
+    params_file = mushyLayerBaseDir + '/params/convergenceTest/fixedChillNew.parameters'
 
     # Defaults
-    max_time=1e6
-    Ra=4e3
-    Da=2e-3
-    C=2.0
+    defaultParams = readInputs(params_file)
+    extra_params = {}
+
+    extra_params['main.max_time']=defaultParams['main.max_time']
+    extra_params['parameters.rayleighComp']=defaultParams['parameters.rayleighComp']
+    extra_params['parameters.darcy']=defaultParams['parameters.darcy']
+    extra_params['parameters.compositionRatio']=defaultParams['parameters.compositionRatio']
+
     doAMR = False
 
-    Pr = 10.0  # fix this for now
+    #Pr = 10.0  # fix this for now
     periodic = True
+
 
     try:
         opts, args = getopt.getopt(argv, "t:R:D:C:A")
@@ -32,13 +40,13 @@ def testHeleShawFixedChill(argv):
 
     for opt, arg in opts:
         if opt in ("-t"):
-            max_time = float(arg)
+            extra_params['main.max_time'] = float(arg)
         elif opt in ("-R"):
-            Ra = float(arg)
+            extra_params['parameters.rayleighComp'] = float(arg)
         elif opt in ("-D"):
-            Da = float(arg)
+            extra_params['parameters.darcy'] = float(arg)
         elif opt in ("-C"):
-            C = float(arg)
+            extra_params['parameters.compositionRatio'] = float(arg)
         elif opt in ("-A"):
             doAMR = True
 
@@ -47,14 +55,12 @@ def testHeleShawFixedChill(argv):
 
     print(Fore.GREEN + 'Setup tests for fixed chill in a Hele-Shaw cell' + Style.RESET_ALL)
     physicalProblem = 'FixedChill'
-    folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f" % (max_time, Ra, Da, C)
+    folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f" % (extra_params['main.max_time'], extra_params['parameters.rayleighComp'], extra_params['parameters.darcy'], extra_params['parameters.compositionRatio'])
     if periodic:
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
 
-    mushyLayerBaseDir = os.path.abspath(os.pardir)
-    #params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
-    params_file = mushyLayerBaseDir + '/params/convergenceTest/fixedChillNew.parameters'
+
 
     Nz_uniform = 256
     Nz_amr_2 = int(float(Nz_uniform) / 2)
@@ -85,11 +91,11 @@ def testHeleShawFixedChill(argv):
 
 
     # Run
-    extra_params = {'main.max_time':max_time, 'parameters.rayleighComp':Ra, 'parameters.darcy': Da, 'parameters.compositionRatio':C }
-    extra_params['main.max_dt'] = Pr / (Da*Ra)
+    #extra_params = {'main.max_time':max_time, 'parameters.rayleighComp':Ra, 'parameters.darcy': Da, 'parameters.compositionRatio':C }
+    extra_params['main.max_dt'] = extra_params['parameters.prandtl'] / (extra_params['parameters.darcy']*extra_params['parameters.rayleighComp'])
 
     extra_params['regrid.plume_salinity']=-1.0
-    extra_params['regrid.plume_vel']= 0.1*Da*Ra*Ra*Pr
+    extra_params['regrid.plume_vel']= 0.1*extra_params['parameters.darcy']*extra_params['parameters.rayleighComp']*extra_params['parameters.rayleighComp']*extra_params['parameters.prandtl']
     if periodic:
         extra_params['main.periodic_bc'] = '1 0 0'
 
