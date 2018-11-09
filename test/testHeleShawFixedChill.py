@@ -24,6 +24,7 @@ def testHeleShawFixedChill(argv):
     extra_params['parameters.darcy']=float(defaultParams['parameters.darcy'])
     extra_params['parameters.compositionRatio']=float(defaultParams['parameters.compositionRatio'])
     extra_params['parameters.nonDimReluctance'] = float(defaultParams['parameters.nonDimReluctance'])
+    extra_params['parameters.prandtl'] = float(defaultParams['parameters.prandtl'])
 
     doAMR = False
 
