@@ -23,6 +23,7 @@ def testHeleShawFixedChill(argv):
     extra_params['parameters.rayleighComp']=defaultParams['parameters.rayleighComp']
     extra_params['parameters.darcy']=defaultParams['parameters.darcy']
     extra_params['parameters.compositionRatio']=defaultParams['parameters.compositionRatio']
+    extra_params['parameters.nonDimReluctance'] = defaultParams['parameters.nonDimReluctance']
 
     doAMR = False
 
@@ -47,6 +48,8 @@ def testHeleShawFixedChill(argv):
             extra_params['parameters.darcy'] = float(arg)
         elif opt in ("-C"):
             extra_params['parameters.compositionRatio'] = float(arg)
+        elif opt in ("-N"):
+            extra_params['parameters.nonDimReluctance'] = float(arg)
         elif opt in ("-A"):
             doAMR = True
 
@@ -55,7 +58,7 @@ def testHeleShawFixedChill(argv):
 
     print(Fore.GREEN + 'Setup tests for fixed chill in a Hele-Shaw cell' + Style.RESET_ALL)
     physicalProblem = 'FixedChill'
-    folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f" % (extra_params['main.max_time'], extra_params['parameters.rayleighComp'], extra_params['parameters.darcy'], extra_params['parameters.compositionRatio'])
+    folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f-Rel%1.1e" % (extra_params['main.max_time'], extra_params['parameters.rayleighComp'], extra_params['parameters.darcy'], extra_params['parameters.compositionRatio'], extra_params['parameters.nonDimReluctance'])
     if periodic:
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
@@ -80,7 +83,7 @@ def testHeleShawFixedChill(argv):
         AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
 
     # Nzs 	  = [16, 32, 64]
-    num_procs = [1]  # Needs to be as long as the longest Nzs
+    num_procs = [4]  # Needs to be as long as the longest Nzs
 
     # Setup up the post processing command
 
