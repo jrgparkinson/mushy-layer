@@ -631,8 +631,9 @@ private:
 
   static int s_numMG;
 
-  /// True by default
+  /// Whether to use relax solver for bottom solve
   /**
+   * Turned off by default. This works better for non 2^n grids though.
    * Generally want block factor >= max grid size/2 to accurately do MAC projection
    */
   static bool s_relax_bottom_solver;

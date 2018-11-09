@@ -55,7 +55,7 @@ bool CCProjector::s_constantLambdaScaling = false;
 Real CCProjector::s_lambda_timestep = 0.0;
 bool CCProjector::pp_init = false;
 int  CCProjector::s_verbosity = 2;
-int CCProjector::s_bottomSolveMaxIter = 10;
+int CCProjector::s_bottomSolveMaxIter = 20;
 
 /// first define quick-n-easy access functions
 
