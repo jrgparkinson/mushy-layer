@@ -32,7 +32,6 @@ end
 if nargin < 7
     errType = 'L2';
     % other options: L1, Max
-    
 end
 
 fine_res_dir = [uniform_prefix,num2str(fineNumCells),'--0'];

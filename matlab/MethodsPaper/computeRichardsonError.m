@@ -12,6 +12,7 @@ end
 
 folders = dir([fullfile(output_folder, prefix), '*']);
 
+
 parfor i=1:length(folders)
    folderName = folders(i).name;
    coarseDir = fullfile(output_folder, folderName);
