@@ -11,7 +11,7 @@ from SlurmTask import SlurmTask
 from AMRConvergenceTest import AMRConvergenceTest
 
 
-def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '', extra_params={}, numRestarts=0):
+def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '', extra_params={}, numRestarts=0, params_file = ''):
 
     # base_dir should be e.g. 
     #'/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/AMRConvergenceTestNoFlow'
@@ -64,7 +64,11 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
             
             if physicalProblem == 'noFlow':
                 #output_dir = 'AMRConvergenceTestNoFlow'
-                params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/noFlowConvTest.parameters')
+                #params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/.parameters')
+                if not params_file:
+                    params_file = mushyLayerBaseDir + '/params/convergenceTest/noFlowConvTest.parameters'
+
+                params = readInputs(params_file)
                 
                 
                 Nx_coarse = 4
@@ -83,7 +87,11 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 Nx_coarse = Nz_coarse
 
                 gridFile = mushyLayerBaseDir + '/grids/leftRight/' + str(Nx_coarse) + 'x' + str(Nz_coarse)
-                params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/convectionDarcyBrinkmanConvTest.parameters')
+                #params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/.parameters')
+                if not params_file:
+                    params_file = mushyLayerBaseDir + '/params/convergenceTest/convectionDarcyBrinkmanConvTest.parameters'
+
+                params = readInputs(params_file)
                 
 
                 params['main.refine_thresh'] = str(3.0/float(Nz_coarse))
@@ -113,7 +121,11 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                     gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(Nx_coarse*2) + 'x' + str(Nz_coarse*2)   
                             
                     
-                params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/DBVariablePorosityConvTest.parameters')
+                #params = readInputs(mushyLayerBaseDir + )
+                if not params_file:
+                    params_file = mushyLayerBaseDir + '/params/convergenceTest/DBVariablePorosityConvTest.parameters'
+
+                params = readInputs(params_file)
                 
                 #runTypes = ['uniform', 'amr', 'variable']
                 #runTypes = ['uniform', 'amr']
@@ -191,7 +203,11 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 
 
             elif physicalProblem == 'FixedChill':
-                params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters')
+
+                if not params_file:
+                    params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
+
+                params = readInputs(params_file)
 
                 output_dir = ''
 
@@ -205,7 +221,12 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
             elif physicalProblem == 'PorousMushyHole' or physicalProblem == 'MushyConvectionLiquid' or physicalProblem == 'MushyConvectionLiquid2':
 
-                params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/porousMushyHole.parameters')
+                if not params_file:
+                    params_file = mushyLayerBaseDir + '/params/convergenceTest/porousMushyHole.parameters'
+
+                params = readInputs(params_file)
+
+
 
                 sameDt = 0.0005
                 dt64 = sameDt

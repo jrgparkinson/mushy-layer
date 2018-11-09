@@ -52,6 +52,10 @@ def testHeleShawFixedChill(argv):
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
 
+    mushyLayerBaseDir = os.path.abspath(os.pardir)
+    #params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
+    params_file = mushyLayerBaseDir + '/params/convergenceTest/fixedChillNew.parameters'
+
     Nz_uniform = 256
     Nz_amr_2 = int(float(Nz_uniform) / 2)
     Nz_amr_4 = int(float(Nz_uniform) / 4)
@@ -89,7 +93,7 @@ def testHeleShawFixedChill(argv):
     if periodic:
         extra_params['main.periodic_bc'] = '1 0 0'
 
-    runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
+    runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params, 0, params_file)
 
 # def main(argv):
     # Only pass in the defined arguments
