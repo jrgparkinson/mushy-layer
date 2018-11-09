@@ -1065,12 +1065,15 @@ void AMRLevelMushyLayer::computeVorticity()
     {
       for (int dir=0; dir<SpaceDim; dir++)
       {
+        //todo - vorticity needs more components in 3D, can't really store it in m_scalarNew.
+        // will need to make a new data structure which has the write number of componenets for the dimensionality of the problem
+
         // and then compute vorticity
-        FORT_COMPUTEVORT(CHF_FRA1((*m_scalarNew[m_vorticity])[dit],dir),
-                         CHF_CONST_FRA(vel[dit]),
-                         CHF_BOX(grids[dit]),
-                         CHF_CONST_REAL(m_dx),
-                         CHF_CONST_INT(dir));
+//        FORT_COMPUTEVORT(CHF_FRA1((*m_scalarNew[m_vorticity])[dit],dir),
+//                         CHF_CONST_FRA(vel[dit]),
+//                         CHF_BOX(grids[dit]),
+//                         CHF_CONST_REAL(m_dx),
+//                         CHF_CONST_INT(dir));
       }
     }
     else if (SpaceDim == 2)

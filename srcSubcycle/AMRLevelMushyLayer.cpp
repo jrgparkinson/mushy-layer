@@ -6511,9 +6511,14 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
 {
   Real maxAdvU = 0.0;
 
-//  LevelData<FArrayBox> U(m_grids, SpaceDim);
-//    EdgeToCell(m_advVel, U);
-//    maxAdvU = ::computeNorm(U, NULL, 1, m_dx, Interval(0,SpaceDim-1), 0);
+  if (SpaceDim==3)
+  {
+
+  LevelData<FArrayBox> U(m_grids, SpaceDim);
+    EdgeToCell(m_advVel, U);
+    maxAdvU = ::computeNorm(U, NULL, 1, m_dx, Interval(0,SpaceDim-1), 0);
+    return maxAdvU;
+  }
 
     // alternate method
   Box domBox = m_problem_domain.domainBox();
@@ -6524,10 +6529,17 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
       for (int dir=0; dir < SpaceDim-1; dir++)
       {
         Box faceBox = domBox.surroundingNodes(dir);
+//        Box faceBox = domBox.surroundingNodes();
+//        domBox.
+
 
         FArrayBox& velDir = m_advVel[dit][dir];
         Box b = velDir.box();
-        b &= faceBox;
+        if (SpaceDim < 3)
+        {
+          //TODO - work out how to make this work in 3d
+          b &= faceBox;
+        }
         Real thisMax = velDir.norm(b, 0, 0);
 
         maxAdvU = max(maxAdvU, thisMax);
@@ -6593,6 +6605,10 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   ppMain.query("max_dt", max_dt);
   Real maxAdvU = getMaxVelocity();
   Real maxUChi = ::computeMax(*m_vectorNew[m_U_porosity], NULL, -1, Interval(0,SpaceDim-1));
+  if (maxUChi > 1e100)
+  {
+    maxUChi = 1e-100;
+  }
   if (s_verbosity > 4)
   {
     pout() << "  Max(U) = " << maxAdvU << ", max(U/chi) = " << maxUChi << endl;

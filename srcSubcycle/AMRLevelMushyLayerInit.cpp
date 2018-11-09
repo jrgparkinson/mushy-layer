@@ -1633,6 +1633,8 @@ void AMRLevelMushyLayer::initialDataPorousHole()
 
      Real cx = m_domainWidth/2;
      Real cy = m_domainHeight/2;
+     Real cz = m_domainHeight/2;
+     //todo - is there a domainSize vector I can use for this?
 
      Real initVelScale = 1e-3;
      pp.query("initVelScale", initVelScale);
@@ -1646,13 +1648,22 @@ void AMRLevelMushyLayer::initialDataPorousHole()
          RealVect loc;
          getLocation(iv, loc, m_dx);
 
-         (*m_scalarNew[m_enthalpy])[dit](iv) = HTop + (HBottom-HTop)*exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2))/(pow(radius,2)));
-         (*m_scalarNew[m_bulkConcentration])[dit](iv) = ThetaTop + (ThetaBottom-ThetaTop)*exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2))/(pow(radius,2)));
+         Real distanceFactor = 0;
+         if (SpaceDim == 2)
+         {
+           distanceFactor = exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2))/(pow(radius,2)));
+         }
+          else if(SpaceDim == 3)
+           {
+            distanceFactor = exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2) + pow(loc[2]-cz, 2))/(pow(radius,2)));
+           }
+         (*m_scalarNew[m_enthalpy])[dit](iv) = HTop + (HBottom-HTop)*distanceFactor;
+         (*m_scalarNew[m_bulkConcentration])[dit](iv) = ThetaTop + (ThetaBottom-ThetaTop)*distanceFactor;
 
-         (*m_vectorNew[m_fluidVel])[dit](iv, 1) = initVelScale*sin(M_PI*loc[0]/m_domainWidth);
+         (*m_vectorNew[m_fluidVel])[dit](iv, SpaceDim-1) = initVelScale*sin(M_PI*loc[0]/m_domainWidth);
          (*m_vectorNew[m_fluidVel])[dit](iv, 0) = 0;
 
-         (*m_vectorNew[m_bodyForce])[dit](iv, 1) =  m_parameters.m_buoyancySCoeff*ThetaLTop \
+         (*m_vectorNew[m_bodyForce])[dit](iv, SpaceDim-1) =  m_parameters.m_buoyancySCoeff*ThetaLTop \
              - m_parameters.m_buoyancyTCoeff*thetaTop ;
 
        }

@@ -34,6 +34,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("domain_length",domainWidth); // retained for backward compatability
   ppMain.query("domain_width",domainWidth);
 
+  //todo - add option to just specify domain height, then calculate width here using main.num_cells
+
   Real refineThresh = 0.3;
   ppMain.get ("refine_thresh",refineThresh);
 
