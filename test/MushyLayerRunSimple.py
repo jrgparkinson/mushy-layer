@@ -7,7 +7,7 @@ from os.path import isfile, join, exists
 import subprocess
 import socket
 
-from mushyLayerRunUtils import readInputs, writeParamsFile
+from mushyLayerRunUtils import readInputs, writeParamsFile, getCurrentGitRevion
 
 # This class basically just makes the output directory and dumps an input file into it
 # It also performs various sanity checks
@@ -177,14 +177,8 @@ class MushyLayerRunSimple:
             self.parameters['parameters.heleShaw'] = 'true'
             
             
-        # Let's add another item to the parameters: the mercurial repository version. Get this from BASH
-        pipe = subprocess.Popen(
-        ["hg", "identify", "--num"],
-        stdout=subprocess.PIPE
-        )
-        repoVersion = pipe.stdout.read()
-        repoVersion = repoVersion.replace('\n', '') # clean up a bit
-        self.parameters['mercurialRepository'] = repoVersion
+        # Let's add another item to the parameters: the code repository version.
+        self.parameters['gitRevision'] = getCurrentGitRevision()
         
         # Also add the current machine to the parameter list so we now where each run was done from
         self.parameters['machineCodeIsRunOn'] = socket.gethostname()

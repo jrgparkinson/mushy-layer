@@ -3,6 +3,7 @@ import os
 import time
 import math
 import sys
+import subprocess
 
 def getBaseOutputDir():
     #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
@@ -23,6 +24,19 @@ def getMatlabBaseCommand():
 
 
 
+def getCurrentGitRevision():
+    # For mercurial:
+    #pipe = subprocess.Popen(
+    #    ["hg", "identify", "--num"],
+    #    stdout=subprocess.PIPE
+    #)
+    #repoVersion = pipe.stdout.read()
+    #repoVersion = repoVersion.replace('\n', '')  # clean up a bit
+
+    # For git:
+    repoVersion = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
+
+    return repoVersion
 
 def getExecName():
     mushyLayerDir = os.path.dirname(os.path.dirname(__file__))
