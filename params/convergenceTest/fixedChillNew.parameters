@@ -179,7 +179,7 @@ parameters.rayleighComp=4e3 #1e3 # don't change this too much it should really j
 parameters.lewis=100 # maybe mess with this?
 
 
-# This is crucial!!
+# This is crucial!
 main.max_init_dt=1e-2
 
 main.use_limiting=0
@@ -189,13 +189,13 @@ patchGodunov.velUseArtVisc=0
 patchGodunov.velArtVisc=10.0
 
 #main.restart_file=/home/parkinsonjl/mushy-layer/execSubcycle/maxDtTest/chkUniform-FixedChill-128-000050.2d.hdf5
-main.max_step=80000
+main.max_step=100000000
 
 projection.numSmoothDown=16
 projection.numSmoothUp=16
 
 main.postTraceSmoothing=0.0
-main.cfl=0.4
+main.cfl=0.1
 
 main.max_dt = 1000.0
 main.advectionMethod=1
