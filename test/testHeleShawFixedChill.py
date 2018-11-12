@@ -33,11 +33,13 @@ def testHeleShawFixedChill(argv):
 
 
     try:
-        opts, args = getopt.getopt(argv, "t:R:D:C:P:A")
+
+        opts, args = getopt.getopt(argv, "t:R:D:C:P:N:A")
     except getopt.GetoptError as err:
         print(str(err))
         print(
-            'testPorousMushyHole.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio> -A<do amr> -P<true(1)/false(0) do plot files>')
+            'testPorousMushyHole.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio> -A<do amr> -P<true(1)/false(0) do plot files> -N<non dimensional reluctance>')
+
         sys.exit(2)
 
     for opt, arg in opts:
