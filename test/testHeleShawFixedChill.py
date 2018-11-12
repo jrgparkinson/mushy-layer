@@ -33,11 +33,11 @@ def testHeleShawFixedChill(argv):
 
 
     try:
-        opts, args = getopt.getopt(argv, "t:R:D:C:A")
+        opts, args = getopt.getopt(argv, "t:R:D:C:P:A")
     except getopt.GetoptError as err:
         print(str(err))
         print(
-            'testPorousMushyHole.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio> -A<do amr>')
+            'testPorousMushyHole.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio> -A<do amr> -P<true(1)/false(0) do plot files>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -51,6 +51,11 @@ def testHeleShawFixedChill(argv):
             extra_params['parameters.compositionRatio'] = float(arg)
         elif opt in ("-N"):
             extra_params['parameters.nonDimReluctance'] = float(arg)
+        elif opt in ("-P"):
+        	doPlotFiles = bool(int(arg))
+        	print('Do plot files: ' + str(doPlotFiles) +  ', arg = ' + str(arg))
+        	if not doPlotFiles:
+        		extra_params['main.plot_interval'] = -1
         elif opt in ("-A"):
             doAMR = True
 
@@ -75,13 +80,14 @@ def testHeleShawFixedChill(argv):
                 {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]}]
 
     # While testing:
-    Nz_uniform = [128]
+    Nz_uniform = [64]
    # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
     #            {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [64]}]
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
 
     if doAMR:
         AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
+        AMRSetup.append({'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
 
     # Nzs 	  = [16, 32, 64]
     num_procs = [4]  # Needs to be as long as the longest Nzs
@@ -96,7 +102,13 @@ def testHeleShawFixedChill(argv):
 
     # Run
     #extra_params = {'main.max_time':max_time, 'parameters.rayleighComp':Ra, 'parameters.darcy': Da, 'parameters.compositionRatio':C }
-    extra_params['main.max_dt'] = 0.01*extra_params['parameters.prandtl'] / (extra_params['parameters.darcy']*extra_params['parameters.rayleighComp'])
+    extra_params['main.max_dt'] = 0.1*extra_params['parameters.prandtl'] / (extra_params['parameters.darcy']*extra_params['parameters.rayleighComp'])
+
+    if 'main.plot_interval' in extra_params and int(extra_params['main.plot_interval']) > 0: 
+    	extra_params['main.plot_interval'] = int(1e-4 / float(extra_params['parameters.darcy']))
+    	extra_params['main.checkpoint_interval'] = extra_params['main.plot_interval']
+
+    extra_params['main.useAccelDt'] = 0
 
     extra_params['regrid.plume_salinity']=-1.0
     extra_params['regrid.plume_vel']= 0.1*extra_params['parameters.darcy']*extra_params['parameters.rayleighComp']*extra_params['parameters.rayleighComp']*extra_params['parameters.prandtl']
