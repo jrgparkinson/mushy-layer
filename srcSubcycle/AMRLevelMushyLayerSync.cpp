@@ -689,8 +689,6 @@ void AMRLevelMushyLayer::postTimeStep()
       if (m_doSyncOperations)
       {
         m_projection.doSyncOperations(compVel, compLambda, compPorosityFace, compPorosity, m_time, m_dt);
-
-
       }
 
       // re-apply physical boundary conditions
@@ -706,8 +704,6 @@ void AMRLevelMushyLayer::postTimeStep()
       }
 
     } // end if doing synchronisation stuff
-
-
 
 
 

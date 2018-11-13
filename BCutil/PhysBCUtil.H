@@ -112,7 +112,7 @@ public:
 	virtual Tuple<BCHolder, SpaceDim> permeabilityFaceBC() const;
 
 	/// BC holder for velocity \f$ \mathbf{u} \f$ - extrapolation
-	virtual Tuple<BCHolder, SpaceDim> velExtrapBC(bool a_isViscous = false, int num_ghost=1) const;
+	virtual Tuple<BCHolder, SpaceDim> velExtrapBC(Interval ghostInterval=Interval(0,0)) const;
 
 	/// Fills interior ghost cells of vector field by extrapolation
 //	virtual Tuple<BCHolder, SpaceDim> velExtrapInterior(int n_ghost=1) const;
@@ -323,6 +323,10 @@ public:
 	/// BC for object with two components: enthalpy and bulk salinity
 	virtual BCHolder enthalpySalinityBC(bool a_homogeneous = false) const;
 
+	/// Apply extrapolation BCs to velocity
+	        virtual BCHolder extrapVelFuncBC( int  a_comp,
+	                        Interval ghostInterval = Interval(0,0)) const;
+
 protected:
 
 
@@ -346,12 +350,7 @@ protected:
 //			int  a_comp,
 //			const Interval& a_interval) const;
 
-	/// Apply extrapolation BCs to velocity
-	virtual BCHolder extrapVelFuncBC(bool a_isHomogeneous,
-			bool a_isViscous,
-			int  a_comp,
-			const Interval& a_interval,
-			int num_ghost = 1) const;
+
 
 	/// Apply extrapolation BCs to velocity (interior ghost cells)
 	virtual BCHolder extrapVelFuncInterior(bool a_isHomogeneous,

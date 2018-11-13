@@ -1433,6 +1433,9 @@ public:
                 }
               } // end switch
 
+
+              // Fill outer ghost cells?
+
             } // if ends match
           } // end iteration over sides
         } // if not periodic in this direction
@@ -2693,20 +2696,20 @@ public:
   /// Physical parameters for the problem
   MushyLayerParams m_params;
   /// Number of ghost cells to fill
-  int m_ghost;
+  Interval m_ghost;
   /// Component of velocity to apply BCs to
   int m_comp;
 
   /// Default constructor
   BasicExtrapBCFunction()
   :
-    m_isDefined(false), m_ghost(0), m_comp(0)
+    m_isDefined(false), m_comp(0)
   {
   }
   /// Full constructor
   BasicExtrapBCFunction(bool a_isDefined,
                         MushyLayerParams a_params,
-                        int a_ghost = 1,
+                        Interval a_ghost = Interval(0,0), // 0->0: fill first ghost cells
                         int a_comp = 1)
   :
     m_isDefined(a_isDefined),
@@ -2739,26 +2742,38 @@ public:
             if (a_valid.sideEnd(side)[idir] ==
                 domainBox.sideEnd(side)[idir])
             {
-              //Grow the box by one cell in the direction perpendicular to the direction we are extrapolating in,
-              //So that we fill enough ghost cells to be able to correctly calculate face values
+
               Box grownBox(a_valid);
 
-              for (int i=0; i<SpaceDim; i++)
-              {
-                if (i != idir)
+
+              // First expand box in case we're doing outer ghost cells
+              // Expand once for Interval(0,x), twice for interval(1,x) etc.
+                              grownBox.grow(m_ghost.begin());
+
+
+                              //Grow the box by one cell in the direction perpendicular to the direction we are extrapolating in,
+                                            //So that we fill enough ghost cells to be able to correctly calculate face values
+
+                for (int i=0; i<SpaceDim; i++)
                 {
-                  grownBox.grow(i, 1);
+                  if (i != idir)
+                  {
+                    grownBox.grow(i, 1);
+                  }
                 }
-              }
+
 
 
               int order = 1;
 
-              for (int ghost_i = 1; ghost_i <=m_ghost; ghost_i++)
+              for (int ghost_i = m_ghost.begin(); ghost_i <=m_ghost.end(); ghost_i++)
               {
                 //								ExtraBC(a_state, grownBox,
                 //										idir, side, order);
-                ExtrapBC(  a_state, grownBox,  idir,   side, order);
+                for (int comp=0; comp<a_state.nComp(); comp++)
+                {
+                ExtrapBC(  a_state, grownBox,  idir,   side, order, comp);
+                }
 
                 // Grow box in the direction we're extrapolating in so we can fill more ghost cells
                 grownBox.grow(idir, 1);
@@ -2871,16 +2886,14 @@ public:
 
 
 Tuple<BCHolder, SpaceDim>
-PhysBCUtil::velExtrapBC(bool a_isViscous, int num_ghost) const
+PhysBCUtil::velExtrapBC(Interval ghostInterval) const
 {
   Tuple<BCHolder, SpaceDim> bcVec;
-  bool isHomogeneous = false;
   for (int idir=0; idir<SpaceDim; idir++)
   {
-    Interval intvl(idir, idir);
+//    Interval intvl(idir, idir);
 
-    bcVec[idir] = extrapVelFuncBC(isHomogeneous, a_isViscous, idir,
-                                  intvl, num_ghost);
+    bcVec[idir] = extrapVelFuncBC(idir, ghostInterval);
   }
   return bcVec;
 }
@@ -3975,14 +3988,11 @@ BCHolder PhysBCUtil::ThetaFuncBC(bool a_homogeneous, LevelData<FluxBox>* a_advVe
 }
 
 
-BCHolder PhysBCUtil::extrapVelFuncBC(bool a_isHomogeneous,
-                                     bool a_isViscous,
-                                     int  a_comp,
-                                     const Interval& a_interval,
-                                     int num_ghost) const
+BCHolder PhysBCUtil::extrapVelFuncBC( int  a_comp,
+                                     Interval ghostInterval) const
 {
   RefCountedPtr<BasicExtrapBCFunction>
-  extrapVelFuncBC(new BasicExtrapBCFunction(true, m_params, num_ghost, a_comp));
+  extrapVelFuncBC(new BasicExtrapBCFunction(true, m_params, ghostInterval, a_comp));
 
   return BCHolder(extrapVelFuncBC);
 }

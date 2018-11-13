@@ -614,11 +614,18 @@ protected:
                          bool a_MACprojection = false);
 
   /// Compute \f$ \mathbf{U}^* \f$, the velocity before we project it
-  void computeUstar(LevelData<FArrayBox>& a_uDelu, Real a_oldTime, Real a_dt, bool doFRupdates, bool a_MACprojection = false);
+  void computeUstar(LevelData<FArrayBox>& a_uDelu,
+                    const LevelData<FArrayBox>& advectionSourceTerm,
+                    Real a_oldTime, Real a_dt, bool doFRupdates, bool a_MACprojection = false, bool compute_uDelU=true);
 
   /// Compute the source term for the \f$\mathbf{U}^* \f$ solve
-  void computeUstarSrc(LevelData<FArrayBox>& src,  LevelData<FArrayBox>& a_uDelu, Real src_time,
-                       bool a_MACprojection = false);
+  void computeUstarSrc(LevelData<FArrayBox>& src,
+                       const LevelData<FArrayBox>& advectionSourceTerm,
+                       Real src_time,
+                       bool a_MACprojection = false, bool compute_uDelU=true);
+
+  /// Compute \f$ \mathbf{u} \cdot \nabla \left\( \mathbf{U}/\chi \right\)
+  void computeUDelU(LevelData<FArrayBox>& U_adv_src, const LevelData<FArrayBox>& advectionSourceTerm, Real a_oldTime, Real a_dt);
 
   /// Check CFL based on latest velocity is safe to use for explicit updates
   bool currentCFLIsSafe(bool printWarning=false);
@@ -644,7 +651,7 @@ protected:
                                   LevelData<FArrayBox>& a_traceVel,
                                   LevelData<FluxBox>& a_advVel,
                                   LevelData<FArrayBox>& U_chi,
-                                  LevelData<FArrayBox>& a_viscousSource,
+                                  const LevelData<FArrayBox>& a_viscousSource,
                                   PatchGodunov& a_patchGodVelocity,
                                   LevelData<FluxBox>& a_grad_eLambda,
                                   LevelData<FluxBox>& a_gradPhi,
@@ -699,7 +706,7 @@ protected:
   /// Calculate  \f$ \mathbf{u} \cdot \nabla \left( \mathbf{u}/\chi \right) \f$
   void predictVelocities(LevelData<FArrayBox>& a_uDelU,
                          LevelData<FluxBox>& a_advVel,
-                         LevelData<FArrayBox>& viscousSource,
+                         const LevelData<FArrayBox>& viscousSource,
                          Real old_time,
                          Real a_dt,
                          bool doFRupdates);
