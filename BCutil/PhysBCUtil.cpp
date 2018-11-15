@@ -1159,8 +1159,6 @@ public:
 
   /// Component of velocity to apply BCs to
   int m_comp;
-  /// Currently unused
-  Real m_bcVal;
   /// Always enforce homogeneous form of BCs?
   bool m_isHomogeneous;
   /// Is there non-zero viscosity?
@@ -1176,20 +1174,18 @@ public:
   /// Default constructor
   BasicCCVelBCFunction()
   :
-    m_comp(-1), m_bcVal(0), m_isHomogeneous(false), m_isViscous(false)
+    m_comp(-1),  m_isHomogeneous(false), m_isViscous(false), m_order(1)
   {
   }
 
   /// Full constructor
-  BasicCCVelBCFunction(Real a_bcVal,
-                       bool a_isHomogeneous,
+  BasicCCVelBCFunction(bool a_isHomogeneous,
                        bool a_isViscous,
                        int  a_comp,
                        const Interval& a_interval,
                        MushyLayerParams a_params,
                        int a_order=1)
   : m_comp(a_comp),
-    m_bcVal(a_bcVal),
     m_isHomogeneous(a_isHomogeneous),
     m_isViscous(a_isViscous),
     m_interval(a_interval),
@@ -1338,47 +1334,14 @@ public:
                     }
                   } // end if tangential
 
-                  //                  if (!m_isHomogeneous && idir == m_comp)
-                  //                  {
-                  //
-                  //                    //                                    DiriBC(aliasStateFab, a_valid, a_dx,
-                  //                    //                                           a_homogeneous,
-                  //                    //                                           BCValueHolder(bcValueFunc),
-                  //                    //                                           idir, side, order);
-                  //                    OnlyInflowBC(aliasStateFab,
-                  //                                 a_valid,
-                  //                                 a_homogeneous,
-                  //                                 m_params.inflowVelocity, // vertical velocity for plume
-                  //                                 0, // vertical velocity away from plume (no flow)
-                  //                                 m_params.plumeBounds,
-                  //                                 a_dx,
-                  //                                 idir,
-                  //                                 side,
-                  //                                 order);
-                  //                  }
-                  //                  else
-                  //                  {
-                  //                    // tangential velocity = zero
-                  //
-                  //                    DiriBC(aliasStateFab, a_valid, a_dx,
-                  //                           a_homogeneous,
-                  //                           BCValueHolder(zeroFunc),
-                  //                           idir, side, order);
-                  //                  }
+
 
 
                   break;
                 }
                 case PhysBCUtil::Outflow :
                 {
-                  //								NeumBC(aliasStateFab, a_valid, a_dx,
-                  //										a_homogeneous,
-                  //										BCValueHolder(zeroFunc),
-                  //										idir, side);
 
-
-                  //CustomOutflowBC(aliasStateFab, a_valid, idir, side, order, m_comp, a_dx);
-                  //								ExtraBC(aliasStateFab, a_valid, idir, side, order);
                   ExtrapBC(aliasStateFab, a_valid, idir, side, order);
 
                   break;
@@ -1435,6 +1398,20 @@ public:
 
 
               // Fill outer ghost cells?
+              Box grownValid(a_valid);
+              grownValid.grow(1);
+
+              Box shrunkFabBox = aliasStateFab.box();
+              shrunkFabBox.grow(-1);
+
+              // If shrunk fab box contains grownValid, that means we have a set of cells
+              // outside grown valid which we need to fill
+              while(shrunkFabBox.contains(grownValid))
+              {
+                ExtraBC(aliasStateFab, grownValid, idir, side,
+                        0); //0th order
+                grownValid.grow(1);
+              }
 
             } // if ends match
           } // end iteration over sides
@@ -3159,9 +3136,6 @@ BCHolder PhysBCUtil::BasicPressureFuncBC(bool a_isHomogeneous) const
 BCHolder PhysBCUtil::velFuncBC(int a_idir, bool a_viscous, Interval interval) const
 {
   bool isHomogeneous = false;
-//  bool isViscous = true;
-//  Interval intvl(0, 0);
-  //	Interval intvl(a_idir, a_idir); // I think this is actually correct
   return basicCCVelFuncBC(isHomogeneous, a_viscous, a_idir,
                           interval);
 }
@@ -4018,9 +3992,8 @@ BCHolder PhysBCUtil::basicCCVelFuncBC(bool a_isHomogeneous,
                                       const Interval& a_interval,
                                       int a_order) const
 {
-  Real bcVal = 1.0;
-  RefCountedPtr<BasicCCVelBCFunction> basicCCVelBCFunction(new BasicCCVelBCFunction(bcVal,
-                                                                                    a_isHomogeneous,
+
+  RefCountedPtr<BasicCCVelBCFunction> basicCCVelBCFunction(new BasicCCVelBCFunction(a_isHomogeneous,
                                                                                     a_isViscous,
                                                                                     a_comp,
                                                                                     a_interval,
