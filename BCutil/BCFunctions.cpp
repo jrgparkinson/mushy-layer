@@ -192,23 +192,8 @@ void ExtrapBC(FArrayBox&      a_state,
       }
     }
   }
-  //  else if (thisBox.type(perpDir) == IndexType::NODE)
-  //  {
-  //    Box enclosedCells = thisBox.enclosedCells(perpDir);
-  //        toRegion &= enclosedCells;
-  //  }
-  //  else
-  //  {
-  //    toRegion &= thisBox;
-  //  }
 
-
-
-  //  toRegion &= a_state.box(); // have to turn this off as doesn't work with edge centered boxes
-
-  // If user asks for second accuracy but we only have one interior point then
-  //  int boxSize = a_state.box().shortside();
-
+  // If user asks for second order accuracy but we only have one interior point then don't do what they ask for
   int boxSize = a_state.box().size(a_dir);
   a_order = min(a_order, boxSize);
 
