@@ -217,6 +217,46 @@ c ::: local variables
 
       return
       end
+      
+c -----------------------------------------------------------------
+c  This subroutine computes the cell-centered gradient of a
+c  cell-centered phi.  assumes all BC's already set, etc.
+c  Higher order method
+c
+c INPUTS/OUTPUTS:
+c phi     => cell-centered quantity (should have 1 row of ghost cells)
+c gradPhi<=  cell-centered centered-difference gradient
+c dx     <=  cell spacing
+c gridBox => grid interior over which gradient is computed
+c dir     => direction in which to compute gradient
+c ----------------------------------------------------------------
+      subroutine GRADCC_HO(CHF_FRA1[gradPhi],
+     &                  CHF_CONST_FRA1[phi],
+     &                  CHF_BOX[gridBox],
+     &                  CHF_CONST_REAL[dx],
+     &                  CHF_INT[dir])
+
+c ::: local variables
+      integer CHF_DDECL[i;j;k]
+      integer CHF_DDECL[ii;jj;kk]
+      REAL_T factor
+
+      CHF_DTERM[
+      ii = CHF_ID(dir,0);
+      jj = CHF_ID(dir,1);
+      kk = CHF_ID(dir,2)]
+
+      factor = half/dx
+
+      CHF_MULTIDO[gridBox;i;j;k]
+      gradPhi(CHF_IX[i;j;k]) = factor*(phi(CHF_IX[i+ii;j+jj;k+kk])
+     &                                -phi(CHF_IX[i-ii;j-jj;k-kk]))
+
+      CHF_ENDDO
+
+      return
+      end
+      
 
 c -----------------------------------------------------------------
 c  This subroutine computes the cell-centered gradient of a

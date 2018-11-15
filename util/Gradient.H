@@ -93,6 +93,15 @@ public:
                               ///
                               const Real a_dx);
 
+  /// Higher order method
+  static void levelGradientCC_HO(
+                               ///
+                               LevelData<FArrayBox>& a_grad,
+                               ///
+                               const LevelData<FArrayBox>& a_phi,
+                               ///
+                               const Real a_dx);
+
   /// computes cell-centered, level-operator gradient of face-centered phi
    /** in this case, assume that all relevant
        BC's (coarse-fine and physical) have already been set, so

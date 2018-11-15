@@ -434,6 +434,41 @@ Gradient::levelGradientCC(LevelData<FArrayBox>& a_grad,
 }
 
 void
+Gradient::levelGradientCC_HO(LevelData<FArrayBox>& a_grad,
+                const LevelData<FArrayBox>& a_phi,
+                const Real a_dx)
+{
+        // in this case, assume that all BC's have already been set
+        // can just loop over grids and call gradCC subroutine
+        // directly
+        DataIterator dit = a_grad.dataIterator();
+        const DisjointBoxLayout& grids = a_grad.getBoxes();
+
+        for (dit.reset(); dit.ok(); ++dit)
+        {
+                for (int dir=0; dir<SpaceDim; dir++)
+                {
+                  // For outer cells
+                  FORT_GRADCC(CHF_FRA1(a_grad[dit],dir),
+                                                          CHF_CONST_FRA1(a_phi[dit],0),
+                                                          CHF_BOX(grids[dit]),
+                                                          CHF_CONST_REAL(a_dx),
+                                                          CHF_INT(dir));
+
+                  // For inner cells
+                  Box innerBox = grids[dit];
+                  innerBox.grow(-1);
+                        FORT_GRADCC_HO(CHF_FRA1(a_grad[dit],dir),
+                                        CHF_CONST_FRA1(a_phi[dit],0),
+                                        CHF_BOX(innerBox),
+                                        CHF_CONST_REAL(a_dx),
+                                        CHF_INT(dir));
+                }
+        }
+}
+
+
+void
 Gradient::levelGradientCC(LevelData<FArrayBox>& a_grad,
                 const LevelData<FluxBox>& a_phi,
                 const Real a_dx)
