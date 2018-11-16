@@ -486,6 +486,12 @@ protected:
   void defineSolverMGlevel(const DisjointBoxLayout& a_grids,
                            const DisjointBoxLayout* a_crseGridsPtr);
 
+  /// Set things like tolerance, number of smoothing steps etc.
+  void setSolverParameters();
+
+  /// Setup bototm solvers
+  void makeBottomSolvers();
+
   /// define multigrid solver for this level
   /**
    * variable coefficient version to deal with variable porosity
@@ -494,7 +500,8 @@ protected:
                                const RefCountedPtr<LevelData<FArrayBox> > a_crsePorosityPtr,
 		const RefCountedPtr<LevelData<FluxBox> > a_porosityEdgePtr,
 		const RefCountedPtr<LevelData<FluxBox> > a_crsePorosityEdgePtr,
-		bool cellCentred = false);
+		bool cellCentred = false,
+		Real beta=-1);
 
   /// solve for pressure on this level
   void solveMGlevel(LevelData<FArrayBox>&         a_phi,
@@ -619,6 +626,9 @@ private:
 
   /// multigrid solver tolerance
   static Real s_solver_tolerance;
+
+  /// multigrid hang condition
+  static Real s_solver_hang;
 
   /// multigrid solver parameter
   static int s_num_smooth_up;
