@@ -779,6 +779,12 @@ void AMRLevelMushyLayer::postTimeStep()
       // Backup data from this timestep
       AMRmlptr->backupTimestep();
 
+      Real maxU = ::computeNorm(*(AMRmlptr->m_vectorNew[m_fluidVel]), NULL, 1 , m_dx, Interval(0, SpaceDim-1), 0);
+      if (maxU > 1e10)
+      {
+        pout() << "WARNING - During PostTimestep,  Max U = " << maxU << endl;
+      }
+
 
       AMRmlptr = AMRmlptr->getFinerLevel();
     }
