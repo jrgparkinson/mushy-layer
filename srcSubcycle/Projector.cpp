@@ -1,3 +1,4 @@
+
 #ifdef CH_LANG_CC
 /*
  *      _______              __
@@ -8,13 +9,14 @@
  */
 #endif
 
-#include "CCProjector.H"
+#include "Projector.H"
 #include "Gradient.H"
 #include "GradientF_F.H"
 #include "Divergence.H"
 #include "AMRPoissonOp.H"
 #include "VCAMRPoissonOp2.H"
 //#include "MyVCAMRPoissonOp2CC.H"
+#include "AMRProjectionOp.h"
 #include "RelaxSolver.H"
 #include "CoarseAverageEdge.H"
 #include "CornerCopier.H"
@@ -34,93 +36,93 @@
 #endif
 
 /// define static variables here
-bool CCProjector::m_doSyncProjection = true;
-bool CCProjector::m_applySyncCorrection = true;
-bool CCProjector::s_applyVDCorrection = true;
-bool CCProjector::m_doQuadInterp = true;
-Real CCProjector::m_etaLambda = 0.9;
+bool Projector::m_doSyncProjection = true;
+bool Projector::m_applySyncCorrection = true;
+bool Projector::s_applyVDCorrection = true;
+bool Projector::m_doQuadInterp = true;
+Real Projector::m_etaLambda = 0.9;
 
 #if defined(CH_USE_DOUBLE)
-Real CCProjector::s_solver_tolerance = 1.0e-15; // pmc, 18 oct 2007:  was -10
+Real Projector::s_solver_tolerance = 1.0e-15; // pmc, 18 oct 2007:  was -10
 #elif defined(CH_USE_FLOAT)
-Real CCProjector::s_solver_tolerance = 1.0e-5; // pmc, 18 oct 2007:  was -10
+Real Projector::s_solver_tolerance = 1.0e-5; // pmc, 18 oct 2007:  was -10
 #endif
 
-Real CCProjector::s_solver_hang = 1e-15;
+Real Projector::s_solver_hang = 1e-15;
 
-int  CCProjector::s_num_smooth_up = 4;
-int  CCProjector::s_num_smooth_down = 4;
-int  CCProjector::s_num_precond_smooth = 4;
-int  CCProjector::s_numMG = 1;
-bool  CCProjector::s_relax_bottom_solver = false;
-bool CCProjector::s_constantLambdaScaling = false;
-Real CCProjector::s_lambda_timestep = 0.0;
-bool CCProjector::pp_init = false;
-int  CCProjector::s_verbosity = 2;
-int CCProjector::s_bottomSolveMaxIter = 20;
+int  Projector::s_num_smooth_up = 4;
+int  Projector::s_num_smooth_down = 4;
+int  Projector::s_num_precond_smooth = 4;
+int  Projector::s_numMG = 1;
+bool  Projector::s_relax_bottom_solver = false;
+bool Projector::s_constantLambdaScaling = false;
+Real Projector::s_lambda_timestep = 0.0;
+bool Projector::pp_init = false;
+int  Projector::s_verbosity = 2;
+int Projector::s_bottomSolveMaxIter = 20;
 
 /// first define quick-n-easy access functions
 
 // ------------------------------------------------------
-int CCProjector::getLevel() const
+int Projector::getLevel() const
 {
   return m_level;
 }
 
 // ------------------------------------------------------
-const ProblemDomain& CCProjector::dProblem() const
+const ProblemDomain& Projector::dProblem() const
 {
   return m_domain;
 }
 
 // ------------------------------------------------------
-const DisjointBoxLayout& CCProjector::getBoxes() const
+const DisjointBoxLayout& Projector::getBoxes() const
 {
   return m_Pi.getBoxes();
 }
 
 // ------------------------------------------------------
-int CCProjector::nRefCrse() const
+int Projector::nRefCrse() const
 {
   return m_nRefCrse;
 }
 
 // ------------------------------------------------------
-Real CCProjector::dx() const
+Real Projector::dx() const
 {
   return m_dx;
 }
 
 // ------------------------------------------------------
-Real CCProjector::etaLambda() const
+Real Projector::etaLambda() const
 {
   return m_etaLambda;
 }
 
-void CCProjector::etaLambda(Real a_eta)
+void Projector::etaLambda(Real a_eta)
 {
   m_etaLambda = a_eta;
 }
 
 // ------------------------------------------------------
-CCProjector* CCProjector::fineProjPtr() const
+Projector* Projector::fineProjPtr() const
 {
   return m_fineProjPtr;
 }
 
 // ------------------------------------------------------
-CCProjector* CCProjector::crseProjPtr() const
+Projector* Projector::crseProjPtr() const
 {
   return m_crseProjPtr;
 }
 
 // ------------------------------------------------------
-LevelData<FArrayBox>& CCProjector::phi()
+LevelData<FArrayBox>& Projector::phi()
 {
   return m_phi;
 }
 
-void CCProjector::getPhi(LevelData<FArrayBox>& a_phi)
+void Projector::getPhi(LevelData<FArrayBox>& a_phi)
 {
   for (DataIterator dit = a_phi.dataIterator(); dit.ok(); ++dit)
   {
@@ -128,53 +130,53 @@ void CCProjector::getPhi(LevelData<FArrayBox>& a_phi)
   }
 }
 // ------------------------------------------------------
-const LevelData<FArrayBox>& CCProjector::phi() const
+const LevelData<FArrayBox>& Projector::phi() const
 {
   return m_phi;
 }
 
 // ------------------------------------------------------
-LevelData<FArrayBox>& CCProjector::eSync()
+LevelData<FArrayBox>& Projector::eSync()
 {
   return m_eSync;
 }
 
 // ------------------------------------------------------
-const LevelData<FArrayBox>& CCProjector::eSync() const
+const LevelData<FArrayBox>& Projector::eSync() const
 {
   return m_eSync;
 }
 
 // ------------------------------------------------------
-LevelData<FArrayBox>& CCProjector::MACrhs()
+LevelData<FArrayBox>& Projector::MACrhs()
 {
   return m_MACrhs;
 }
 
 // ------------------------------------------------------
-LevelData<FArrayBox>& CCProjector::CCrhs()
+LevelData<FArrayBox>& Projector::CCrhs()
 {
   return m_CCrhs;
 }
 
-LevelData<FluxBox>& CCProjector::MACcorrection()
+LevelData<FluxBox>& Projector::MACcorrection()
 {
   return m_MACcorrection;
 }
 
-LevelData<FArrayBox>& CCProjector::CCcorrection()
+LevelData<FArrayBox>& Projector::CCcorrection()
 {
   return m_CCcorrection;
 }
 
 
 
-LevelData<FArrayBox>& CCProjector::Pi()
+LevelData<FArrayBox>& Projector::Pi()
 {
   return m_Pi;
 }
 
-void CCProjector::unscaledPi(LevelData<FArrayBox>& unscaledPi, Real a_dt)
+void Projector::unscaledPi(LevelData<FArrayBox>& unscaledPi, Real a_dt)
 {
   m_Pi.copyTo(unscaledPi);
   for (DataIterator dit = m_Pi.dataIterator(); dit.ok(); ++dit)
@@ -185,79 +187,79 @@ void CCProjector::unscaledPi(LevelData<FArrayBox>& unscaledPi, Real a_dt)
 }
 
 // ------------------------------------------------------
-LevelData<FArrayBox>& CCProjector::eLambda()
+LevelData<FArrayBox>& Projector::eLambda()
 {
   return m_eLambda;
 }
 
 // ------------------------------------------------------
-const LevelData<FArrayBox>& CCProjector::eLambda() const
+const LevelData<FArrayBox>& Projector::eLambda() const
 {
   return m_eLambda;
 }
 
 // ------------------------------------------------------
-LevelData<FluxBox>& CCProjector::grad_eLambda()
+LevelData<FluxBox>& Projector::grad_eLambda()
 {
   return m_grad_eLambda;
 }
 
 // ------------------------------------------------------
-const LevelData<FluxBox>& CCProjector::grad_eLambda() const
+const LevelData<FluxBox>& Projector::grad_eLambda() const
 {
   return m_grad_eLambda;
 }
 
 // ------------------------------------------------------
-bool CCProjector::doSyncProjection() const
+bool Projector::doSyncProjection() const
 {
   return m_doSyncProjection;
 }
 
 // ------------------------------------------------------
-bool CCProjector::doMacSync() const
+bool Projector::doMacSync() const
 {
   return (m_etaLambda != 0.0);
 }
 
 // ------------------------------------------------------
-bool CCProjector::isInitialized() const
+bool Projector::isInitialized() const
 {
   return m_isInitialized;
 }
 
 // ------------------------------------------------------
-bool CCProjector::doQuadInterp() const
+bool Projector::doQuadInterp() const
 {
   return m_doQuadInterp;
 }
 
 // ------------------------------------------------------
-QuadCFInterp& CCProjector::quadCFInterpolator()
+QuadCFInterp& Projector::quadCFInterpolator()
 {
   return m_cfInterp;
 }
 
 /// returns predefined intvectset which shows coverage
-const LayoutData<IntVectSet>& CCProjector::getGridIVS()
+const LayoutData<IntVectSet>& Projector::getGridIVS()
 {
   return m_gradIVS;
 }
 
 // ------------------------------------------------------
-bool CCProjector::isFinestLevel() const
+bool Projector::isFinestLevel() const
 {
   return m_finest_level;
 }
 
 // ------------------------------------------------------
-void CCProjector::isFinestLevel(bool a_finest_level)
+void Projector::isFinestLevel(bool a_finest_level)
 {
   m_finest_level = a_finest_level;
 }
 
 // ------------------------------------------------------
-void CCProjector::verbosity(int a_verbosity)
+void Projector::verbosity(int a_verbosity)
 {
   s_verbosity = a_verbosity;
 }
@@ -268,13 +270,13 @@ void CCProjector::verbosity(int a_verbosity)
 //}
 
 // ------------------------------------------------------
-int CCProjector::verbosity() const
+int Projector::verbosity() const
 {
   return s_verbosity;
 }
 
 // ------------------------------------------------------
-void CCProjector::setPhysBC(PhysBCUtil& a_bc)
+void Projector::setPhysBC(PhysBCUtil& a_bc)
 {
   //  if (m_physBCPtr != NULL)
   //    {
@@ -286,14 +288,14 @@ void CCProjector::setPhysBC(PhysBCUtil& a_bc)
 }
 
 // ------------------------------------------------------
-PhysBCUtil* CCProjector::getPhysBCPtr() const
+PhysBCUtil* Projector::getPhysBCPtr() const
 {
   return m_physBCPtr;
 }
 
 // ------------------------------------------------------
 // default constructor
-CCProjector::CCProjector()
+Projector::Projector()
 {
   m_level = -1;
   m_nRefCrse = -1;
@@ -319,7 +321,7 @@ CCProjector::CCProjector()
 
 // ------------------------------------------------------
 // destructor
-CCProjector::~CCProjector()
+Projector::~Projector()
 {
   //We don't own this anymore
   //  if (m_physBCPtr != NULL)
@@ -337,12 +339,12 @@ CCProjector::~CCProjector()
 }
 
 // ------------------------------------------------------
-CCProjector::CCProjector(const DisjointBoxLayout& a_grids,
+Projector::Projector(const DisjointBoxLayout& a_grids,
                          const DisjointBoxLayout* a_crseGridsPtr,
                          const Box& a_domain,
                          const Real a_dx,
-                         CCProjector* a_finerProjPtr,
-                         CCProjector* a_crseProjPtr,
+                         Projector* a_finerProjPtr,
+                         Projector* a_crseProjPtr,
                          int a_nRefCrse,
                          int a_level,
                          PhysBCUtil& a_physBC)
@@ -354,12 +356,12 @@ CCProjector::CCProjector(const DisjointBoxLayout& a_grids,
 }
 
 // ------------------------------------------------------
-CCProjector::CCProjector(const DisjointBoxLayout& a_grids,
+Projector::Projector(const DisjointBoxLayout& a_grids,
                          const DisjointBoxLayout* a_crseGridsPtr,
                          const ProblemDomain& a_domain,
                          const Real a_dx,
-                         CCProjector* a_finerProjPtr,
-                         CCProjector* a_crseProjPtr,
+                         Projector* a_finerProjPtr,
+                         Projector* a_crseProjPtr,
                          int a_nRefCrse,
                          int a_level,
                          PhysBCUtil& a_physBC)
@@ -369,7 +371,7 @@ CCProjector::CCProjector(const DisjointBoxLayout& a_grids,
          a_crseProjPtr, a_nRefCrse, a_level, a_physBC);
 }
 
-void CCProjector::copyPressure(CCProjector& a_proj)
+void Projector::copyPressure(Projector& a_proj)
 {
   // Things to copy:
   // m_Pi
@@ -388,7 +390,7 @@ void CCProjector::copyPressure(CCProjector& a_proj)
 
 }
 
-void CCProjector::rescalePressure(Real a_oldDt, Real a_newDt)
+void Projector::rescalePressure(Real a_oldDt, Real a_newDt)
 {
   //Pressure is scaled by dt, such that a_Pi = pressure/dt
 
@@ -402,12 +404,12 @@ void CCProjector::rescalePressure(Real a_oldDt, Real a_newDt)
 }
 
 // ------------------------------------------------------
-void CCProjector::define(const DisjointBoxLayout& a_grids,
+void Projector::define(const DisjointBoxLayout& a_grids,
                          const DisjointBoxLayout* a_crseGridsPtr,
                          const Box& a_domain,
                          const Real a_dx,
-                         CCProjector* a_finerProjPtr,
-                         CCProjector* a_crseProjPtr,
+                         Projector* a_finerProjPtr,
+                         Projector* a_crseProjPtr,
                          int a_nRefCrse,
                          int a_level,
                          PhysBCUtil& a_physBC,
@@ -419,12 +421,12 @@ void CCProjector::define(const DisjointBoxLayout& a_grids,
 }
 
 // ------------------------------------------------------
-void CCProjector::define(const DisjointBoxLayout& a_grids,
+void Projector::define(const DisjointBoxLayout& a_grids,
                          const DisjointBoxLayout* a_crseGridsPtr,
                          const ProblemDomain& a_domain,
                          const Real a_dx,
-                         CCProjector* a_finerProjPtr,
-                         CCProjector* a_crseProjPtr,
+                         Projector* a_finerProjPtr,
+                         Projector* a_crseProjPtr,
                          int a_nRefCrse,
                          int a_level,
                          PhysBCUtil& a_physBC,
@@ -500,7 +502,7 @@ void CCProjector::define(const DisjointBoxLayout& a_grids,
 }
 
 // -------------------------------------------------------
-void CCProjector::init(const CCProjector& a_oldProj)
+void Projector::init(const Projector& a_oldProj)
 {
   // this function performs a partial initialization
   // of this object using the oldProj...
@@ -510,7 +512,7 @@ void CCProjector::init(const CCProjector& a_oldProj)
   // need to be re-initialized anyway)
 }
 
-void CCProjector::variableSetUp()
+void Projector::variableSetUp()
 {
   // first set up parm parse object
   ParmParse ppProjection("projection");
@@ -585,7 +587,7 @@ void CCProjector::variableSetUp()
 
 }
 
-void CCProjector::setCrseProj(CCProjector* a_crseProjPtr, int a_nRefCrse)
+void Projector::setCrseProj(Projector* a_crseProjPtr, int a_nRefCrse)
 {
   if (m_crseProjPtr != NULL)
   {
@@ -625,7 +627,7 @@ void CCProjector::setCrseProj(CCProjector* a_crseProjPtr, int a_nRefCrse)
 }
 
 // -----------------------------------------------------------
-void CCProjector::setFineProj(CCProjector* a_fineProjPtr)
+void Projector::setFineProj(Projector* a_fineProjPtr)
 {
   // this is much simpler than resetting crseProj, since
   // there is no need to rebuild levelsolvers or anything like
@@ -633,14 +635,14 @@ void CCProjector::setFineProj(CCProjector* a_fineProjPtr)
   m_fineProjPtr = a_fineProjPtr;
 }
 
-void CCProjector::limitSolverCoarsening(bool a_limitSolverCoarsening)
+void Projector::limitSolverCoarsening(bool a_limitSolverCoarsening)
 {
   m_limitSolverCoarsening = a_limitSolverCoarsening;
 }
 
 #ifdef CH_USE_HDF5
 // --------------------------------------------------------------
-void CCProjector::writeCheckpointHeader(HDF5Handle& a_handle) const
+void Projector::writeCheckpointHeader(HDF5Handle& a_handle) const
 {
 
   // nothing needs to be done here -- just
@@ -649,7 +651,7 @@ void CCProjector::writeCheckpointHeader(HDF5Handle& a_handle) const
 }
 
 // --------------------------------------------------------------
-void CCProjector::writeCheckpointLevel(HDF5Handle& a_handle) const
+void Projector::writeCheckpointLevel(HDF5Handle& a_handle) const
 {
 
   char level_str[20];
@@ -688,13 +690,13 @@ void CCProjector::writeCheckpointLevel(HDF5Handle& a_handle) const
 }
 
 // --------------------------------------------------------------
-void CCProjector::readCheckpointHeader(HDF5Handle& a_handle)
+void Projector::readCheckpointHeader(HDF5Handle& a_handle)
 {
   //  this doesn't actually do anything...
 }
 
 // --------------------------------------------------------------
-void CCProjector::readCheckpointLevel(HDF5Handle& a_handle)
+void Projector::readCheckpointLevel(HDF5Handle& a_handle)
 {
   char level_str[20];
   sprintf (level_str, "%d", m_level);
@@ -806,7 +808,7 @@ void CCProjector::readCheckpointLevel(HDF5Handle& a_handle)
 
 // --------------------------------------------------------------
 // note that this function assumes that all BC's on phi have been set
-void CCProjector::gradPhi(LevelData<FArrayBox>& a_gradPhi, int a_dir) const
+void Projector::gradPhi(LevelData<FArrayBox>& a_gradPhi, int a_dir) const
 {
   // first compute edge-centering of gradPhi
   DataIterator dit = a_gradPhi.dataIterator();
@@ -844,14 +846,14 @@ void CCProjector::gradPhi(LevelData<FArrayBox>& a_gradPhi, int a_dir) const
 
 // --------------------------------------------------------------
 // note that this function assumes that all BC's on phi have been set
-void CCProjector::gradPhi(LevelData<FluxBox>& a_gradPhi) const
+void Projector::gradPhi(LevelData<FluxBox>& a_gradPhi) const
 {
   Gradient::levelGradientMAC(a_gradPhi, m_phi, m_dx);
 }
 
 // --------------------------------------------------------------
 // note that this function assumes that all BC's on Pi have been set
-void CCProjector::gradPi(LevelData<FArrayBox>& a_gradPi, int a_dir) const
+void Projector::gradPi(LevelData<FArrayBox>& a_gradPi, int a_dir) const
 {
   DataIterator dit = a_gradPi.dataIterator();
 
@@ -868,13 +870,13 @@ void CCProjector::gradPi(LevelData<FArrayBox>& a_gradPi, int a_dir) const
 
 // --------------------------------------------------------------
 // note that this function assumes that all BC's on Pi have been set
-void CCProjector::gradPi(LevelData<FArrayBox>& a_gradPi) const
+void Projector::gradPi(LevelData<FArrayBox>& a_gradPi) const
 {
   Gradient::levelGradientCC(a_gradPi, m_Pi, m_dx);
 }
 
 
-void CCProjector::gradPiBCs(LevelData<FArrayBox>& a_gradPi, bool extrapBCs, bool a_usePhi)
+void Projector::gradPiBCs(LevelData<FArrayBox>& a_gradPi, bool extrapBCs, bool a_usePhi)
 {
   //  BCHolder gradPbcHolder = m_physBCPtr->gradPiFuncBC();
   BCHolder bcHolder;
@@ -927,7 +929,7 @@ void CCProjector::gradPiBCs(LevelData<FArrayBox>& a_gradPi, bool extrapBCs, bool
 // -------------------------------------------------------------
 // note that this function assumes all BC's on eSync have been set
 // also only returns valid grad(eSync) in valid regions of grids
-void CCProjector::grad_eSync(LevelData<FArrayBox>& a_grad_eSync) const
+void Projector::grad_eSync(LevelData<FArrayBox>& a_grad_eSync) const
 {
   if (m_fineProjPtr != NULL)
   {
@@ -947,21 +949,21 @@ void CCProjector::grad_eSync(LevelData<FArrayBox>& a_grad_eSync) const
 // --------------------------------------------------------------
 // note that this function assumes all BC's on eSync have been set
 // also only returns valid grad(eSync) in valid regions of grids
-void CCProjector::grad_eSync(LevelData<FArrayBox>& a_grad_eSync, int a_dir) const
+void Projector::grad_eSync(LevelData<FArrayBox>& a_grad_eSync, int a_dir) const
 {
   // this is not yet implemented (not sure if i'll really need it!)
   MayDay::Warning("directional grad_eSync not yet implemented!");
 }
 
 
-void CCProjector::setSubcycledMACBCs()
+void Projector::setSubcycledMACBCs()
 {
   m_usePiAdvectionBCs = true;
   m_phiScale=1.0;
   m_MACbcScale=-0.5;
 }
 
-void CCProjector::setNonSubcycledMACBCs()
+void Projector::setNonSubcycledMACBCs()
 {
   m_usePiAdvectionBCs = false;
   m_phiScale=1.0;
@@ -969,7 +971,7 @@ void CCProjector::setNonSubcycledMACBCs()
 }
 
 // This is used for projecting a time independent advection velocity
-void CCProjector::levelMacProject(LevelData<FluxBox>& a_uEdge,
+void Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
                                   Real a_dt,
                                   const RefCountedPtr<LevelData<FArrayBox> > a_crsePressurePtr,
                                   const RefCountedPtr<LevelData<FArrayBox> > a_pressureScalePtr,
@@ -1087,13 +1089,13 @@ void CCProjector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 
 }
 
-Real CCProjector::getPhiScale(Real a_dt)
+Real Projector::getPhiScale(Real a_dt)
 {
   return getScale(m_phiScale, a_dt);
 }
 
 //Real CCProjector::getScale(const char* param, Real a_dt)
-Real CCProjector::getScale(Real a_scale, Real a_dt)
+Real Projector::getScale(Real a_scale, Real a_dt)
 {
   //  Real scale = 1.0;
 
@@ -1112,7 +1114,7 @@ Real CCProjector::getScale(Real a_scale, Real a_dt)
 
 // This is used for projecting a time dependent advection velocity
 // --------------------------------------------------------------
-void CCProjector::levelMacProject(LevelData<FluxBox>& a_uEdge,
+void Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
                                   Real a_oldTime, Real a_dt,
                                   const RefCountedPtr<LevelData<FArrayBox> > a_porosityPtr,
                                   const RefCountedPtr<LevelData<FArrayBox> > a_crsePorosityPtr,
@@ -1284,7 +1286,7 @@ void CCProjector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 }
 
 // --------------------------------------------------------------
-void CCProjector::applyMacCorrection(LevelData<FluxBox>& a_uEdge,
+void Projector::applyMacCorrection(LevelData<FluxBox>& a_uEdge,
                                      LevelData<FArrayBox>* crseBCDataPtr,
                                      Real phiScale)
 {
@@ -1333,7 +1335,7 @@ void CCProjector::applyMacCorrection(LevelData<FluxBox>& a_uEdge,
   //  }
 }
 
-void CCProjector::getCFBC(LevelData<FArrayBox>& velBC, LevelData<FArrayBox>* a_crseVelPtr,
+void Projector::getCFBC(LevelData<FArrayBox>& velBC, LevelData<FArrayBox>* a_crseVelPtr,
                           LevelData<FArrayBox>* a_crsePorosityPtr, Real a_dt)
 {
 
@@ -1399,7 +1401,7 @@ void CCProjector::getCFBC(LevelData<FArrayBox>& velBC, LevelData<FArrayBox>* a_c
 
 }
 
-void CCProjector::scaleRHS(LevelData<FArrayBox>& a_rhs, Real a_scale)
+void Projector::scaleRHS(LevelData<FArrayBox>& a_rhs, Real a_scale)
 {
   DataIterator dit = a_rhs.dataIterator();
   for (dit.reset(); dit.ok(); ++dit)
@@ -1410,7 +1412,7 @@ void CCProjector::scaleRHS(LevelData<FArrayBox>& a_rhs, Real a_scale)
 }
 
 // ---------------------------------------------------------------
-void CCProjector::LevelProject(LevelData<FArrayBox>& a_velocity,
+void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
                                LevelData<FArrayBox>* a_crseVelPtr,
                                const Real a_newTime, const Real a_dt,
                                const RefCountedPtr<LevelData<FArrayBox> > a_porosityPtr,
@@ -1591,7 +1593,7 @@ void CCProjector::LevelProject(LevelData<FArrayBox>& a_velocity,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::applyCCcorrection(LevelData<FArrayBox>& a_velocity,
+void Projector::applyCCcorrection(LevelData<FArrayBox>& a_velocity,
                                     const Real scale) //const
 {
   if (s_verbosity >= 3)
@@ -1604,7 +1606,19 @@ void CCProjector::applyCCcorrection(LevelData<FArrayBox>& a_velocity,
 
   // assumes that all relevant BC's have already been set
   // trying higher order gradient
-  Gradient::levelGradientCC(gradPi, m_Pi, m_dx);
+
+  bool HO_corr = false;
+  ParmParse ppProjection("projection");
+  ppProjection.query("HO_CC_Corr", HO_corr);
+  if (HO_corr)
+  {
+  Gradient::levelGradientCC_HO(gradPi, m_Pi, m_dx);
+  }
+  else
+  {
+    // Default
+      Gradient::levelGradientCC(gradPi, m_Pi, m_dx);
+  }
   //  this->gradPi(gradPi);
 
   // vel = vel - scale*pressureScale*gradPi
@@ -1632,7 +1646,7 @@ void CCProjector::applyCCcorrection(LevelData<FArrayBox>& a_velocity,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
+void Projector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
                                    Vector<LevelData<FArrayBox>* >& a_lambda,
                                    Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosityFace,
                                    Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_porosity,
@@ -1670,7 +1684,7 @@ void CCProjector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
   // now do freestream preservation solve
   computeVDCorrection(a_lambda, a_porosityFace, a_newTime, a_dtLevel, *cvdcSolver);
 
-  CCProjector* proj = this;
+  Projector* proj = this;
 
   while(proj)
   {
@@ -1686,7 +1700,7 @@ void CCProjector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
 
 
 // ---------------------------------------------------------------
-void CCProjector::doPostRegridOps(Vector<LevelData<FArrayBox>* >& a_lambda,
+void Projector::doPostRegridOps(Vector<LevelData<FArrayBox>* >& a_lambda,
                                   Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity,
                                   const Real a_dt, const Real a_time, const Real a_etaScale)
 {
@@ -1711,7 +1725,7 @@ void CCProjector::doPostRegridOps(Vector<LevelData<FArrayBox>* >& a_lambda,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocity,
+void Projector::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocity,
                                    Vector<RefCountedPtr< LevelData<FArrayBox> > >& a_porosity,
                                    const Real a_newTime, const Real a_dtSync,
                                    AMRMultiGrid<LevelData<FArrayBox> >& a_solver
@@ -1726,7 +1740,7 @@ void CCProjector::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocity,
     Vector<LevelData<FArrayBox>* > syncCorr(vectorSize,NULL);
 
     // initially
-    CCProjector* levelProjPtr = this;
+    Projector* levelProjPtr = this;
     //    while (!levelProjPtr->isFinestLevel())
     //    {
     //      levelProjPtr = levelProjPtr->fineProjPtr();
@@ -1889,7 +1903,7 @@ void CCProjector::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocity,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::applySyncCorrection(Vector<LevelData<FArrayBox>* >& a_velocities,
+void Projector::applySyncCorrection(Vector<LevelData<FArrayBox>* >& a_velocities,
                                       Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_porosity,
                                       const Real a_scale,
                                       LevelData<FArrayBox>* crseCorrPtr)
@@ -1958,7 +1972,7 @@ void CCProjector::applySyncCorrection(Vector<LevelData<FArrayBox>* >& a_velociti
 }
 
 
-void CCProjector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
+void Projector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
                                       Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity,
                                       const Real a_newTime, const Real a_dtSync)
 {
@@ -1978,7 +1992,7 @@ void CCProjector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
+void Projector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
                                       Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity,
                                       const Real a_newTime, const Real a_dtSync,
                                       AMRMultiGrid<LevelData<FArrayBox> >& a_solver
@@ -2000,7 +2014,7 @@ void CCProjector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
     if (s_lambda_timestep ==0.0)
     {
       int timestepMult = 1;
-      CCProjector* levelProjPtr = this;
+      Projector* levelProjPtr = this;
       for (int lev=m_level; lev>0; lev--)
       {
         timestepMult *= levelProjPtr->nRefCrse();
@@ -2014,7 +2028,7 @@ void CCProjector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
 
     Vector<LevelData<FArrayBox>* > VDCorr(vectorSize);
 
-    CCProjector* levelProjPtr = this;
+    Projector* levelProjPtr = this;
     while (!levelProjPtr->isFinestLevel())
     {
       levelProjPtr = levelProjPtr->fineProjPtr();
@@ -2228,7 +2242,7 @@ void CCProjector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::computeGrad_eLambda(Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity           )
+void Projector::computeGrad_eLambda(Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity           )
 {
   // do this recursively starting at the finest level
 
@@ -2305,7 +2319,7 @@ void CCProjector::computeGrad_eLambda(Vector<RefCountedPtr<LevelData<FluxBox> > 
   }
 }
 
-void CCProjector::applyFreestreamCorrection(LevelData<FluxBox>& a_advVel, Real scale)
+void Projector::applyFreestreamCorrection(LevelData<FluxBox>& a_advVel, Real scale)
 {
   // Compute u = u + grad(e_lambda),
   // where grad(e_lambda) was calculated at the end of previous
@@ -2325,14 +2339,14 @@ void CCProjector::applyFreestreamCorrection(LevelData<FluxBox>& a_advVel, Real s
   }
 }
 
-void CCProjector::removeFreestreamCorrection(LevelData<FluxBox>& a_advVel)
+void Projector::removeFreestreamCorrection(LevelData<FluxBox>& a_advVel)
 {
   applyFreestreamCorrection(a_advVel, -1);
 }
 
 
 // ---------------------------------------------------------------
-void CCProjector::initialLevelProject(LevelData<FArrayBox>& a_velocity,
+void Projector::initialLevelProject(LevelData<FArrayBox>& a_velocity,
                                       LevelData<FArrayBox>* a_crseVelPtr,
                                       const Real a_newTime, const Real a_dt,
                                       const RefCountedPtr<LevelData<FArrayBox> > a_porosityPtr,
@@ -2454,7 +2468,7 @@ void CCProjector::initialLevelProject(LevelData<FArrayBox>& a_velocity,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::initialSyncProjection(Vector<LevelData<FArrayBox>* >& a_vel,
+void Projector::initialSyncProjection(Vector<LevelData<FArrayBox>* >& a_vel,
                                         Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_porosity,
                                         const Real a_newTime, const Real a_dtSync,
                                         AMRMultiGrid<LevelData<FArrayBox> >& a_solver
@@ -2466,7 +2480,7 @@ void CCProjector::initialSyncProjection(Vector<LevelData<FArrayBox>* >& a_vel,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::doInitialSyncOperations(Vector<LevelData<FArrayBox>* >& a_vel,
+void Projector::doInitialSyncOperations(Vector<LevelData<FArrayBox>* >& a_vel,
                                           Vector<LevelData<FArrayBox>* >& a_lambda,
                                           Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosityFace,
                                           Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_porosity,
@@ -2497,7 +2511,7 @@ void CCProjector::doInitialSyncOperations(Vector<LevelData<FArrayBox>* >& a_vel,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
+void Projector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
                                          Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosityFace,
                                          Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_porosity,
                                          bool a_homogeneousCFBC)
@@ -2514,7 +2528,7 @@ void CCProjector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
 }
 
 // ---------------------------------------------------------------
-void CCProjector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
+void Projector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
                                          Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_porosity,
                                          AMRMultiGrid<LevelData<FArrayBox> >& a_bigSolver,
                                          bool a_homogeneousCFBC)
@@ -2525,7 +2539,7 @@ void CCProjector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
   Vector<LevelData<FArrayBox>* > projRHS(vectorSize,NULL);
   Vector<LevelData<FArrayBox>* > projCorr(vectorSize,NULL);
 
-  CCProjector* levelProjPtr = this;
+  Projector* levelProjPtr = this;
 
   int finestLevel = vectorSize - 1;
 
@@ -2675,13 +2689,13 @@ void CCProjector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
   }
 }
 
-void CCProjector::scalePwithPorosity(bool a_scalePwithPorosity)
+void Projector::scalePwithPorosity(bool a_scalePwithPorosity)
 {
   m_scalePressureWithPorosity = a_scalePwithPorosity;
 }
 
 // ---------------------------------------------------------------
-void CCProjector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
+void Projector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
                                   const Vector<LevelData<FArrayBox>* >& a_vel,
                                   Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity,
                                   bool a_freestreamSolve)
@@ -2690,7 +2704,7 @@ void CCProjector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
   int vectorSize = a_vel.size();
 
   // determine finest existing level
-  CCProjector* levelProj = this;
+  Projector* levelProj = this;
 
   int finestLevel = vectorSize - 1;
 
@@ -2756,7 +2770,8 @@ void CCProjector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
 
   // New version = solves div(porosity grad p) = div(u)
   Real alpha=0.0; Real beta=-1.0;
-  VCAMRPoissonOp2Factory opFact;
+//  VCAMRPoissonOp2Factory opFact;
+  AMRProjectionOpFactory opFact;
   opFact.define(baseDomain,
                 allGrids,
                 allRefRatios,
@@ -2809,7 +2824,7 @@ void CCProjector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
 
 
 // -------------------------------------------------------------
-void CCProjector::postRestart()
+void Projector::postRestart()
 {
   // set C/F BC's -- this depends on the fact that the coarser level
   // has already been read in!
@@ -2841,7 +2856,7 @@ void CCProjector::postRestart()
 }
 
 
-void CCProjector::defineSolverMGLevelVCOp(
+void Projector::defineSolverMGLevelVCOp(
     const RefCountedPtr<LevelData<FArrayBox> > a_porosityPtr,
     const RefCountedPtr<LevelData<FArrayBox> > a_crsePorosityPtr,
     const RefCountedPtr<LevelData<FluxBox> > a_porosityEdgePtr,
@@ -2952,7 +2967,8 @@ void CCProjector::defineSolverMGLevelVCOp(
     pout() << "CCProjector::defineSolverMGlevel - define multigrids" << endl;
   }
 
-  VCAMRPoissonOp2Factory faceOpFact;
+//  VCAMRPoissonOp2Factory faceOpFact;
+    AMRProjectionOpFactory faceOpFact;
 
   faceOpFact.define(baseDomain,
                     m_allGrids,
@@ -2981,7 +2997,7 @@ void CCProjector::defineSolverMGLevelVCOp(
 
   //  m_numMG, m_normThresh;
 }
-void CCProjector::makeBottomSolvers()
+void Projector::makeBottomSolvers()
 {
   if (s_verbosity > 3)
   {
@@ -3013,7 +3029,7 @@ void CCProjector::makeBottomSolvers()
   m_BiCGBottomSolverLevel = newBottomPtr;
   m_bottomSolverLevel = newRelaxBottomPtr;
 }
-void CCProjector::setSolverParameters()
+void Projector::setSolverParameters()
 {
   m_solverMGlevel.m_verbosity = s_verbosity;
   m_solverMGlevel.m_eps = s_solver_tolerance;
@@ -3030,7 +3046,7 @@ void CCProjector::setSolverParameters()
 }
 
 // -------------------------------------------------------------
-void CCProjector::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
+void Projector::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
                                       const DisjointBoxLayout* a_crseGridsPtr)
 {
   if (s_verbosity > 3)
@@ -3064,8 +3080,8 @@ void CCProjector::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
   ProblemDomain baseDomain(m_domain); // on this level
 
   // Note that AMRPoissonOp and VCAMR.. require a different sign for beta
-  Real alpha=0.0;
-  Real beta = 1.0;
+//  Real alpha=0.0;
+//  Real beta = 1.0;
 
   if (a_crseGridsPtr != NULL)
   { // coarser level exists:  define solver on two levels
@@ -3138,7 +3154,7 @@ void CCProjector::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
 
 
 // -------------------------------------------------------------
-void CCProjector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
+void Projector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
                                const LevelData<FArrayBox>*   a_phiCoarsePtr,
                                const LevelData<FArrayBox>&   a_rhs,
                                const RefCountedPtr<LevelData<FArrayBox> > a_pressureScalePtr,

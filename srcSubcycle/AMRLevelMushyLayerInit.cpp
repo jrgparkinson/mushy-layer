@@ -288,10 +288,10 @@ void AMRLevelMushyLayer::levelSetup()
   int nRefCrse = 2;
   DisjointBoxLayout* crseGridsPtr = NULL;
 
-  CCProjector *crsProj = NULL;
-  CCProjector *fineProj = NULL;
-  CCProjector *crsProjBackup = NULL;
-  CCProjector *fineProjBackup = NULL;
+  Projector *crsProj = NULL;
+  Projector *fineProj = NULL;
+  Projector *crsProjBackup = NULL;
+  Projector *fineProjBackup = NULL;
   //    DisjointBoxLayout *crseGrids = NULL;
 
   bool scaleFineFluxes = true;
@@ -2640,7 +2640,7 @@ void AMRLevelMushyLayer::postInitialize()
 
     fillAMRVelPorosity(amrVel, amrPorosityFace, amrPorosity);
 
-    CCProjector& level0Proj = m_projection;
+    Projector& level0Proj = m_projection;
 
     // set physical boundary conditions on velocity
 

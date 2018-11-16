@@ -1422,7 +1422,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
     fillAMRVelPorosity(amrVel, amrPorosityFace, amrPorosity);
     fillAMRLambda(amrLambda);
-    CCProjector& level0Proj = m_projection;
+    Projector& level0Proj = m_projection;
 
     // set physical boundary conditions on velocity
 

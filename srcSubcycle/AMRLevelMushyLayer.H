@@ -1,3 +1,4 @@
+
 #ifdef CH_LANG_CC
 /*
  *      _______              __
@@ -54,7 +55,7 @@
 #include "MushyLayerUtils.H"
 #include "Diagnostics.h"
 #include "PhysBCUtil.H"
-#include "CCProjector.H"
+#include "Projector.H"
 #include "PhysIBC.H"
 #include "phaseDiagram.H"
 
@@ -1476,10 +1477,10 @@ protected:
   PhysIBC* m_scalarIBC[m_numScalarVars];
 
   /// Handles pressure projection
-  CCProjector m_projection;
+  Projector m_projection;
 
   /// Contains the old pressure, in case we need to restart
-  CCProjector m_projectionBackup;
+  Projector m_projectionBackup;
 
   /// Flux registers for scalar variables
   RefCountedPtr<LevelFluxRegister> m_fluxRegisters[m_numScalarVars],

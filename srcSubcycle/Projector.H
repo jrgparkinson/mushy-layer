@@ -8,8 +8,8 @@
  */
 #endif
 
-#ifndef _CCPROJECTOR_H_
-#define _CCPROJECTOR_H_
+#ifndef _Projector_H_
+#define _Projector_H_
 
 #include <cstdlib>
 #include <cmath>
@@ -37,8 +37,8 @@ using std::cerr;
 
 #include "UsingNamespace.H"
 
-/// this class manages the various forms of the CC projection
-class CCProjector
+/// this class manages the various forms of the projection
+class Projector
 /** this class performs the various cell-centered projections required
 by the IAMR algorithm. These include the single-level operators levelMac
 and levelProject, as well as the multilevel sync projection and volume
@@ -46,46 +46,46 @@ discrepancy solves. */
 {
 public:
   /// default constructor
-  CCProjector();
+  Projector();
 
   /// full constructor
-  CCProjector(const DisjointBoxLayout& a_grids,
+  Projector(const DisjointBoxLayout& a_grids,
               const DisjointBoxLayout* a_crseGridsPtr,
               const Box& a_domain,
               const Real  a_dx,
-              CCProjector* a_finerProj,
-              CCProjector* a_crseProj,
+              Projector* a_finerProj,
+              Projector* a_crseProj,
               int a_nRefCrse,
               int a_level,
               PhysBCUtil& a_physBC);
 
   /// full constructor
-  CCProjector(const DisjointBoxLayout& a_grids,
+  Projector(const DisjointBoxLayout& a_grids,
               const DisjointBoxLayout* a_crseGridsPtr,
               const ProblemDomain& a_domain,
               const Real  a_dx,
-              CCProjector* a_finerProj,
-              CCProjector* a_crseProj,
+              Projector* a_finerProj,
+              Projector* a_crseProj,
               int a_nRefCrse,
               int a_level,
               PhysBCUtil& a_physBC);
 
   /// Copy pressure from another projection object
-  void copyPressure(CCProjector& a_proj);
+  void copyPressure(Projector& a_proj);
 
   /// May need to rescale pressures after changing the timestep?
   void rescalePressure(Real a_oldDt, Real a_newDt);
 
   /// destructor
-  ~CCProjector();
+  ~Projector();
 
   /// define function
   void define(const DisjointBoxLayout& a_grids,
               const DisjointBoxLayout* a_crseGridsPtr,
               const Box& a_domain,
               const Real  a_dx,
-              CCProjector* a_finerProj,
-              CCProjector* a_crseProj,
+              Projector* a_finerProj,
+              Projector* a_crseProj,
               int a_nRefCrse,
               int a_level,
               PhysBCUtil& a_physBC,
@@ -96,24 +96,24 @@ public:
               const DisjointBoxLayout* a_crseGridsPtr,
               const ProblemDomain& a_domain,
               const Real  a_dx,
-              CCProjector* a_finerProj,
-              CCProjector* a_crseProj,
+              Projector* a_finerProj,
+              Projector* a_crseProj,
               int a_nRefCrse,
               int a_level,
               PhysBCUtil& a_physBC,
               bool a_usePiAdvectionBCs = true);
 
   /// initialize new projection with data from old projection
-  void init(const CCProjector& a_oldProj);
+  void init(const Projector& a_oldProj);
 
   /// define static parts
   void variableSetUp();
 
   /// set coarse projection operator
-  void setCrseProj(CCProjector* a_crseProj, int nRefCrse);
+  void setCrseProj(Projector* a_crseProj, int nRefCrse);
 
   /// set fine projection operator
-  void setFineProj(CCProjector* a_fineProj);
+  void setFineProj(Projector* a_fineProj);
 
   /// set whether to scale pressure with porosity
   void scalePwithPorosity(bool a_scalePwithPorosity);
@@ -248,7 +248,7 @@ public:
 
   /// access functions
 
-  /// get the level this projector is defined for
+  /// get the level this Projector is defined for
   int getLevel() const;
 
   /// get the problem domain
@@ -270,10 +270,10 @@ public:
   void etaLambda(Real a_eta);
 
   /// pointer to fine projection operator
-  CCProjector* fineProjPtr() const;
+  Projector* fineProjPtr() const;
 
   /// pointer to coarse projection operator
-  CCProjector* crseProjPtr() const;
+  Projector* crseProjPtr() const;
 
   /// returns MAC correction
   LevelData<FArrayBox>& phi();
@@ -379,7 +379,7 @@ public:
   void verbosity(int a_verbosity);
 
   /// Set fine proj ptr
-//  void setFineProjPtr(CCProjector* fineProj);
+//  void setFineProjPtr(Projector* fineProj);
 
   /// returns verbosity
   int verbosity() const;
@@ -548,10 +548,10 @@ private:
   /// cache intvectsets for gradient here (if relevant)
   LayoutData<IntVectSet> m_gradIVS;
 
-  /// ptr to finer-level projector object (if it exists -- o/w == NULL)
-  CCProjector* m_fineProjPtr;
-  /// ptr to coarser-level projector (if level == 0, ptr == NULL)
-  CCProjector* m_crseProjPtr;
+  /// ptr to finer-level Projector object (if it exists -- o/w == NULL)
+  Projector* m_fineProjPtr;
+  /// ptr to coarser-level Projector (if level == 0, ptr == NULL)
+  Projector* m_crseProjPtr;
 
   /// if coarse level exists, refinement ratio down to it
   int m_nRefCrse;
