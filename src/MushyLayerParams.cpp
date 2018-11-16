@@ -13,6 +13,14 @@
 //This is for printing out variable names, because c++ doesn't do reflection
 #define SHOW(a) pout() << #a << ": " << (a) << std::endl
 
+string MushyLayerParams::s_DARCY_TIMESCALE = "Darcy";
+string MushyLayerParams::s_DIFFUSIVE_TIMESCALE = "Diffusive";
+string MushyLayerParams::s_BUOYANCY_TIMESCALE = "Buoyancy";
+string MushyLayerParams::s_ADVECTIVE_TIMESCALE = "Advective";
+
+string MushyLayerParams::s_ADVECTIVE_VELOCITY_SCALE = "Advective";
+string MushyLayerParams::s_DARCY_VELOCITY_SCALE = "Darcy";
+
 MushyLayerParams::MushyLayerParams() {
   //Initialise everything
 
@@ -934,3 +942,81 @@ int MushyLayerParams::getVelBCType(int dir, Side::LoHiSide side)
 }
 
 
+void MushyLayerParams::writeToHDF5(HDF5HeaderData& a_header) const
+{
+  a_header.m_real["C"] = compositionRatio;
+  a_header.m_real["k"] = heatConductivityRatio;
+  a_header.m_real["cp"] = specificHeatRatio;
+  a_header.m_real["pc"] = waterDistributionCoeff;
+  a_header.m_real["S"] = stefan;
+  a_header.m_real["L"] = lewis;
+  a_header.m_real["D"] = darcy;
+  a_header.m_string["timescale"] = getTimescale();
+  a_header.m_string["velocity_scale"] = getVelocityScale();
+}
+
+string MushyLayerParams::getTimescale() const
+{
+  switch (m_nondimensionalisation)
+  {
+    case m_advectiveTime_darcyVel:
+      return s_ADVECTIVE_TIMESCALE;
+      break;
+
+    case m_diffusiveTime_advectiveVel:
+      return s_DIFFUSIVE_TIMESCALE;
+      break;
+
+    case     m_darcyTime_advectiveVel:
+      return s_DARCY_TIMESCALE;
+      break;
+
+    case  m_darcyTime_darcyVel:
+      return s_DARCY_TIMESCALE;
+      break;
+
+    case  m_buoyancyTime_advectiveVel:
+      return s_BUOYANCY_TIMESCALE;
+      break;
+
+    default:
+      MayDay::Error("Unknown nondimensionalisation");
+      return "";
+      break;
+
+  }
+
+}
+
+string MushyLayerParams::getVelocityScale() const
+{
+  switch (m_nondimensionalisation)
+  {
+    case m_advectiveTime_darcyVel:
+      return s_DARCY_VELOCITY_SCALE;
+      break;
+
+    case m_diffusiveTime_advectiveVel:
+      return s_ADVECTIVE_VELOCITY_SCALE;
+      break;
+
+    case     m_darcyTime_advectiveVel:
+      return s_ADVECTIVE_VELOCITY_SCALE;
+      break;
+
+    case  m_darcyTime_darcyVel:
+      return s_DARCY_VELOCITY_SCALE;
+      break;
+
+    case  m_buoyancyTime_advectiveVel:
+      return s_ADVECTIVE_VELOCITY_SCALE;
+      break;
+
+    default:
+      MayDay::Error("Unknown nondimensionalisation");
+      return "";
+      break;
+
+  }
+
+}

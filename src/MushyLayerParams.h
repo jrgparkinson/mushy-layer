@@ -14,6 +14,7 @@
 #include "parstream.H"
 #include "CH_Timer.H"
 #include "RealVect.H"
+#include "CH_HDF5.H"
 
 
 
@@ -207,6 +208,14 @@ public:
 	    /// Number of nondimensional schemes
 	    m_num_nondimensionalisations
 	  };
+
+	  static string s_DARCY_TIMESCALE;
+	  static string s_DIFFUSIVE_TIMESCALE;
+	  static string s_BUOYANCY_TIMESCALE;
+	  static string s_ADVECTIVE_TIMESCALE;
+
+	  static string s_ADVECTIVE_VELOCITY_SCALE;
+	  static string s_DARCY_VELOCITY_SCALE;
 
 	  /// Heat diffusion coefficient
 	  Real m_heatDiffusionCoeff,
@@ -545,6 +554,12 @@ public:
 
 	/// Set the time, might be used for BCs
 	void setTime(Real a_time);
+
+	/// Write out the key parameters to hdf5 file, so that solution can be reconstructed
+	void writeToHDF5(HDF5HeaderData& a_header) const;
+
+	string getVelocityScale() const;
+	string getTimescale() const;
 
 
 };
