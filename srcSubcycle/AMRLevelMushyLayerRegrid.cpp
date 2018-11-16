@@ -127,88 +127,88 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
     if (a_smoothVel)
     {
 
-    // now loop over velocity components
-    for (int dir=0; dir<SpaceDim; ++dir)
-    {
-      Interval velComps(dir,dir);
-      Interval tempComps(0,0);
-      // for each velocity component, copy all levels
-      // of data into temp storage.  then, loop over
-      // all levels and compute laplacian of this comonent.
-      // finally, copy lap(vel) into old_vel storage space.
-      thisMLPtr = this;
-      if (startLev < m_level) thisMLPtr = thisMLPtr->getCoarserLevel();
-
-      for (int lev=startLev; lev<=finest_level; lev++)
+      // now loop over velocity components
+      for (int dir=0; dir<SpaceDim; ++dir)
       {
-        thisMLPtr->m_vectorNew[m_fluidVel]->copyTo(velComps, *amrS[lev],
-                                                   tempComps);
-        thisMLPtr = thisMLPtr->getFinerLevel();
-      }
+        Interval velComps(dir,dir);
+        Interval tempComps(0,0);
+        // for each velocity component, copy all levels
+        // of data into temp storage.  then, loop over
+        // all levels and compute laplacian of this comonent.
+        // finally, copy lap(vel) into old_vel storage space.
+        thisMLPtr = this;
+        if (startLev < m_level) thisMLPtr = thisMLPtr->getCoarserLevel();
 
-      // now loop over levels and apply multilevel operator.
-      // also do averaging down here if necessary
+        for (int lev=startLev; lev<=finest_level; lev++)
+        {
+          thisMLPtr->m_vectorNew[m_fluidVel]->copyTo(velComps, *amrS[lev],
+                                                     tempComps);
+          thisMLPtr = thisMLPtr->getFinerLevel();
+        }
 
-      for (int lev=startLev; lev<=finest_level; lev++)
-      {
-        LevelData<FArrayBox>& levelS = *amrS[lev];
-        LevelData<FArrayBox>& levelLapS = *amrLapS[lev];
-        int indVec = lev - startLev;
-        if (lev == 0)
-        { // no coarser level
-          if (lev == finest_level)
-          { // no finer level:  this is all there is
+        // now loop over levels and apply multilevel operator.
+        // also do averaging down here if necessary
+
+        for (int lev=startLev; lev<=finest_level; lev++)
+        {
+          LevelData<FArrayBox>& levelS = *amrS[lev];
+          LevelData<FArrayBox>& levelLapS = *amrLapS[lev];
+          int indVec = lev - startLev;
+          if (lev == 0)
+          { // no coarser level
+            if (lev == finest_level)
+            { // no finer level:  this is all there is
+              localPoissonOpPtrVec[indVec]->
+              applyOp(levelLapS, levelS);
+            }
+            else
+            { // finer level exists
+              localPoissonOpPtrVec[indVec]->
+              AMROperatorNC(levelLapS,
+                            *amrS[lev + 1],
+                            levelS, false,
+                            localPoissonOpPtrVec[indVec+1]);
+            }
+          }
+          else if (lev < finest_level - 1)
+          { // three-level operator
             localPoissonOpPtrVec[indVec]->
-            applyOp(levelLapS, levelS);
+            AMROperator(levelLapS,
+                        *amrS[lev + 1],
+                        levelS,
+                        *amrS[lev - 1], false,
+                        localPoissonOpPtrVec[indVec+1]);
           }
           else
-          { // finer level exists
+          { // no finer level
             localPoissonOpPtrVec[indVec]->
-            AMROperatorNC(levelLapS,
-                          *amrS[lev + 1],
-                          levelS, false,
-                          localPoissonOpPtrVec[indVec+1]);
+            AMROperatorNF(levelLapS,
+                          levelS,
+                          *amrS[lev - 1], false);
           }
         }
-        else if (lev < finest_level - 1)
-        { // three-level operator
-          localPoissonOpPtrVec[indVec]->
-          AMROperator(levelLapS,
-                      *amrS[lev + 1],
-                      levelS,
-                      *amrS[lev - 1], false,
-                      localPoissonOpPtrVec[indVec+1]);
+
+        // need to do average down from finest level on down
+        // to speed this up eventually, may want to do this
+        // _after_ we copy into multicomponent velocity LDF
+        for (int lev= finest_level; lev>startLev; lev--)
+        {
+          amrAvgDown[lev]->averageToCoarse(*amrLapS[lev-1],
+                                           *amrLapS[lev]);
         }
-        else
-        { // no finer level
-          localPoissonOpPtrVec[indVec]->
-          AMROperatorNF(levelLapS,
-                        levelS,
-                        *amrS[lev - 1], false);
+
+        // finally, loop over levels and copy to old-vel storage
+        thisMLPtr = this;
+        if (m_level > 0) thisMLPtr = thisMLPtr->getCoarserLevel();
+
+        for (int lev=startLev; lev<=finest_level; lev++)
+        {
+          amrLapS[lev]->copyTo(tempComps,*(thisMLPtr->m_vectorNew[m_fluidVel]),
+                               velComps);
+          thisMLPtr = thisMLPtr->getFinerLevel();
         }
-      }
 
-      // need to do average down from finest level on down
-      // to speed this up eventually, may want to do this
-      // _after_ we copy into multicomponent velocity LDF
-      for (int lev= finest_level; lev>startLev; lev--)
-      {
-        amrAvgDown[lev]->averageToCoarse(*amrLapS[lev-1],
-                                         *amrLapS[lev]);
-      }
-
-      // finally, loop over levels and copy to old-vel storage
-      thisMLPtr = this;
-      if (m_level > 0) thisMLPtr = thisMLPtr->getCoarserLevel();
-
-      for (int lev=startLev; lev<=finest_level; lev++)
-      {
-        amrLapS[lev]->copyTo(tempComps,*(thisMLPtr->m_vectorNew[m_fluidVel]),
-                             velComps);
-        thisMLPtr = thisMLPtr->getFinerLevel();
-      }
-
-    } // end loop over velocity components
+      } // end loop over velocity components
 
     } // end if smoothing velocity
 
@@ -235,106 +235,106 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
     {
 
 
-    for (int scalComp=0; scalComp < m_numScalarVars; scalComp++)
-    {
-      // only do all this if scalar is diffused
-      if (m_scalarDiffusionCoeffs[scalComp] > 0)
+      for (int scalComp=0; scalComp < m_numScalarVars; scalComp++)
       {
-        thisMLPtr = this;
-        if (startLev < m_level)
+        // only do all this if scalar is diffused
+        if (m_scalarDiffusionCoeffs[scalComp] > 0)
         {
-          thisMLPtr = thisMLPtr->getCoarserLevel();
-          // may need even coarser level for C/F BCs
-          if (startLev > 0)
+          thisMLPtr = this;
+          if (startLev < m_level)
           {
-            startLev = startLev -1;
             thisMLPtr = thisMLPtr->getCoarserLevel();
+            // may need even coarser level for C/F BCs
+            if (startLev > 0)
+            {
+              startLev = startLev -1;
+              thisMLPtr = thisMLPtr->getCoarserLevel();
+            }
           }
-        }
 
-        for (int lev=startLev; lev<=finest_level; lev++)
-        {
-          amrS[lev] = thisMLPtr->m_scalarNew[scalComp];
-          //                                 amrLapS[lev] = thisMLPtr->m_scalarOld[scalComp];
-          amrLapS[lev] = new LevelData<FArrayBox> (thisMLPtr->m_grids, 1, IntVect::Unit);
-          thisMLPtr = thisMLPtr->getFinerLevel();
-        }
+          for (int lev=startLev; lev<=finest_level; lev++)
+          {
+            amrS[lev] = thisMLPtr->m_scalarNew[scalComp];
+            //                                 amrLapS[lev] = thisMLPtr->m_scalarOld[scalComp];
+            amrLapS[lev] = new LevelData<FArrayBox> (thisMLPtr->m_grids, 1, IntVect::Unit);
+            thisMLPtr = thisMLPtr->getFinerLevel();
+          }
 
-        if (m_level > 0) startLev = m_level-1;
+          if (m_level > 0) startLev = m_level-1;
 
-        // now compute laplacian and average down if necessary
-        for (int lev=startLev; lev<=finest_level; lev++)
-        {
-          LevelData<FArrayBox>& levelS = *amrS[lev];
-          LevelData<FArrayBox>& levelLapS = *amrLapS[lev];
-          int indVec = lev - startLev;
-          if (lev == 0)
-          { // no coarser level
-            if (lev == finest_level)
-            { // no finer level:  this is all there is
+          // now compute laplacian and average down if necessary
+          for (int lev=startLev; lev<=finest_level; lev++)
+          {
+            LevelData<FArrayBox>& levelS = *amrS[lev];
+            LevelData<FArrayBox>& levelLapS = *amrLapS[lev];
+            int indVec = lev - startLev;
+            if (lev == 0)
+            { // no coarser level
+              if (lev == finest_level)
+              { // no finer level:  this is all there is
+                localPoissonOpPtrVec[indVec]->
+                applyOp(levelLapS, levelS);
+              }
+              else
+              { // finer level exists
+                localPoissonOpPtrVec[indVec]->
+                AMROperatorNC(levelLapS,
+                              *amrS[lev + 1],
+                              levelS, false,
+                              localPoissonOpPtrVec[indVec+1]);
+              }
+
+
+            }
+            else if (lev < finest_level - 1)
+            { // three-level operator
               localPoissonOpPtrVec[indVec]->
-              applyOp(levelLapS, levelS);
+              AMROperator(levelLapS,
+                          *amrS[lev + 1],
+                          levelS,
+                          *amrS[lev - 1], false,
+                          localPoissonOpPtrVec[indVec+1]);
             }
             else
-            { // finer level exists
+            { // no finer level
               localPoissonOpPtrVec[indVec]->
-              AMROperatorNC(levelLapS,
-                            *amrS[lev + 1],
-                            levelS, false,
-                            localPoissonOpPtrVec[indVec+1]);
+              AMROperatorNF(levelLapS,
+                            levelS,
+                            *amrS[lev - 1], false);
+            }
+            if (lev > m_level)
+            {
+              amrAvgDown[lev]->averageToCoarse(*amrLapS[lev-1],
+                                               *amrLapS[lev]);
+            }
+          } // end loop over levels
+
+
+          for (int lev=startLev; lev <= finest_level; ++lev)
+          {
+            LevelData<FArrayBox>& levelS = *amrS[lev]; //NB: amrS points to scalarNew
+            LevelData<FArrayBox>& levelLapS = *amrLapS[lev]; // NB: amrLapS points to scalarOld
+            DataIterator levelDit = levelS.dataIterator();
+            for (levelDit.reset(); levelDit.ok(); ++levelDit)
+            {
+              // levelLapS contains (1 - delta t * smooth factor * Lap) S^{n+1}
+              // subtract off solution
+              levelLapS[levelDit] -= levelS[levelDit] ;
+
+              // Scale by diffusion/viscosity (was previously scaled by viscosity coefficient)
+              levelLapS[levelDit] *= m_scalarDiffusionCoeffs[scalComp]/m_parameters.m_viscosityCoeff;
+
+              // Add to solution
+              levelS[levelDit] += levelLapS[levelDit];
+
             }
 
-
-          }
-          else if (lev < finest_level - 1)
-          { // three-level operator
-            localPoissonOpPtrVec[indVec]->
-            AMROperator(levelLapS,
-                        *amrS[lev + 1],
-                        levelS,
-                        *amrS[lev - 1], false,
-                        localPoissonOpPtrVec[indVec+1]);
-          }
-          else
-          { // no finer level
-            localPoissonOpPtrVec[indVec]->
-            AMROperatorNF(levelLapS,
-                          levelS,
-                          *amrS[lev - 1], false);
-          }
-          if (lev > m_level)
-          {
-            amrAvgDown[lev]->averageToCoarse(*amrLapS[lev-1],
-                                             *amrLapS[lev]);
-          }
-        } // end loop over levels
+            //          int temp=0;
 
 
-        for (int lev=startLev; lev <= finest_level; ++lev)
-        {
-          LevelData<FArrayBox>& levelS = *amrS[lev]; //NB: amrS points to scalarNew
-          LevelData<FArrayBox>& levelLapS = *amrLapS[lev]; // NB: amrLapS points to scalarOld
-          DataIterator levelDit = levelS.dataIterator();
-          for (levelDit.reset(); levelDit.ok(); ++levelDit)
-          {
-            // levelLapS contains (1 - delta t * smooth factor * Lap) S^{n+1}
-            // subtract off solution
-            levelLapS[levelDit] -= levelS[levelDit] ;
-
-            // Scale by diffusion/viscosity (was previously scaled by viscosity coefficient)
-            levelLapS[levelDit] *= m_scalarDiffusionCoeffs[scalComp]/m_parameters.m_viscosityCoeff;
-
-            // Add to solution
-            levelS[levelDit] += levelLapS[levelDit];
-
-          }
-
-//          int temp=0;
-
-
-        } // end loop over levels
-      } // end if scalar is diffused
-    } // end loop over scalar components
+          } // end loop over levels
+        } // end if scalar is diffused
+      } // end loop over scalar components
 
     } // end if smoothing scalars
 
@@ -365,7 +365,7 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
 
   CH_assert(m_level==0);
 
-//  this->smoothVelocityField(0);
+  //  this->smoothVelocityField(0);
 }
 
 void
@@ -464,14 +464,42 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
   int finestLevel = ml->m_level;
 
+
+  // Compute liquid, mushy and inbetween cells - these will be useful
+  IntVectSet liquidCells;
+  IntVectSet mushyCells;
+  IntVectSet marginalCells;
+  Real marginalPorosityLimit = 1.0;
+  ppRegrid.query("marginalPorosityLimit", marginalPorosityLimit);
+
+  for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+  {
+    for (BoxIterator bit(m_grids[dit]); bit.ok(); ++bit)
+    {
+      if ((*m_scalarNew[m_porosity])[dit](bit()) == 1.0)
+      {
+        liquidCells |= bit();
+      }
+      else if ((*m_scalarNew[m_porosity])[dit](bit()) > marginalPorosityLimit)
+      {
+        marginalCells |= bit();
+      }
+      else
+      {
+        mushyCells |= bit();
+      }
+    }
+  }
+
+
   if (ppMain.contains("vel_refine_thresh"))
   {
 
     ppMain.get("vel_refine_thresh", vel_thresh);
     if (s_verbosity >= 2)
-           {
-             pout() << "AMRLevelMushyLayer::tagCells - tag velocity >  " << vel_thresh << endl;
-           }
+    {
+      pout() << "AMRLevelMushyLayer::tagCells - tag velocity >  " << vel_thresh << endl;
+    }
 
 
     tagCellsVar(localTags, vel_thresh, 1, -1, m_fluidVel);
@@ -485,20 +513,27 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       pout() << "AMRLevelMushyLayer::tagCells - refine plume mush - " << m_level << endl;
     }
 
+
+    // Always make sure we tag mushy regions on level 0
+    if (m_level == 0)
+    {
+      localTags |= mushyCells;
+    }
+
+
+    // Place finest reoslution around channels
     if (m_level == finestLevel - 1)
     {
 
       // Refine cells that are already refined + have large salinity gradients
 
       IntVectSet downflowCells;
-  //    Real refineThresh = m_refineThresh;
-      Real salinityThreshold = 0.0;
-      Real velThreshold = m_parameters.darcy; //*m_parameters.rayleighComposition;
+      //    Real refineThresh = m_refineThresh;
+      Real salinityThreshold = -1.0 + log10(m_parameters.compositionRatio); // rough guess of salinity in channels
+      Real velThreshold = m_parameters.m_buoyancySCoeff/m_parameters.m_darcyCoeff; // rough guess of the velocity in the channels
       ppRegrid.query("plume_vel", velThreshold); // think  this scales like da^3*ra
       ppRegrid.query("plume_salinity", salinityThreshold);
 
-      // Tag regions of high liquid salinity
-  //    tagCellsVar(allCells, refineThresh, taggingMethod, m_liquidConcentration, -1);
 
       IntVectSet porosityGradientCells;
       tagCellsVar(porosityGradientCells, m_refineThresh, taggingMethod, m_porosity, -1);
@@ -535,15 +570,15 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       }
 
       // Add to the local tag set
-      localTags = downflowCells;
+      localTags |= downflowCells;
 
     }
     else
     {
       if (s_verbosity >= 5)
-            {
-              pout() << "Refining on level " << m_level << " where porosity gradients > refine thresh (" << m_refineThresh << ")" << endl;
-            }
+      {
+        pout() << "Refining on level " << m_level << " where porosity gradients > refine thresh (" << m_refineThresh << ")" << endl;
+      }
 
       // Refine mushy regions which may be about generate channels
       IntVectSet mushyCells;
@@ -552,24 +587,24 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
                   0, // refine around undivided gradient
                   m_porosity, -1);
 
-//      Real velLimit = 1e-10;
-//      ppMain.query("regrid_small_vel_limit", velLimit);
-//
-//      IntVectSet velocityCells;
-//      tagCellsVar(velocityCells,
-//                        velLimit, // require vel this magnitude
-//                        1, // refine around magnitude
-//                        -1, //
-//                        m_advectionVel, 1);
+      //      Real velLimit = 1e-10;
+      //      ppMain.query("regrid_small_vel_limit", velLimit);
+      //
+      //      IntVectSet velocityCells;
+      //      tagCellsVar(velocityCells,
+      //                        velLimit, // require vel this magnitude
+      //                        1, // refine around magnitude
+      //                        -1, //
+      //                        m_advectionVel, 1);
 
       localTags = mushyCells;
-//      localTags &= velocityCells;
+      //      localTags &= velocityCells;
 
-//      if (s_verbosity >= 5)
-//      {
-//        pout() << "Sufficient velocity cells: " << velocityCells << endl;
-//        pout() << "Porous and sufficient velocity cells: " << localTags << endl;
-//      }
+      //      if (s_verbosity >= 5)
+      //      {
+      //        pout() << "Sufficient velocity cells: " << velocityCells << endl;
+      //        pout() << "Porous and sufficient velocity cells: " << localTags << endl;
+      //      }
 
     }
 
@@ -577,16 +612,16 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   else if (taggingVar > -1 || taggingVectorVar > -1)
   {
     if (s_verbosity >= 2)
-        {
+    {
       if (taggingVar > -1)
       {
-          pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[taggingVar] << endl;
+        pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[taggingVar] << endl;
       }
       else
       {
         pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_vectorVarNames[taggingVectorVar] << endl;
       }
-        }
+    }
 
     tagCellsVar(localTags, m_refineThresh, taggingMethod, taggingVar, taggingVectorVar );
   }
@@ -613,33 +648,9 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     //    Real gradientCondition = lev0Dx * 1.0; // was 3.2
     //    tagCellsVar(localTags, gradientCondition, 0, m_porosity, -1);
 
-    IntVectSet liquidCells;
-    IntVectSet mushyCells;
-    IntVectSet marginalCells;
-    Real marginalPorosityLimit = 0.9;
-    ppRegrid.query("marginalPorosityLimit", marginalPorosityLimit);
 
-    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
-    {
-      for (BoxIterator bit(m_grids[dit]); bit.ok(); ++bit)
-      {
-        if ((*m_scalarNew[m_porosity])[dit](bit()) > 0.99999)
-        {
-          liquidCells |= bit();
-        }
-        else if ((*m_scalarNew[m_porosity])[dit](bit()) > marginalPorosityLimit)
-        {
-          marginalCells |= bit();
-        }
-        else
-        {
-          mushyCells |= bit();
-        }
-      }
-    }
-
-//    localTags &= liquidCells;
-//    localTags |= mushyCells;
+    //    localTags &= liquidCells;
+    //    localTags |= mushyCells;
     localTags |= mushyCells;
 
     // Also tag all cells where U > Ra_C/4 (i.e. high velocity)
@@ -647,12 +658,12 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
 
 
- if (tagMLboundary)
+  if (tagMLboundary)
   {
     if (s_verbosity >= 2)
-        {
-          pout() << "AMRLevelMushyLayer::tagCells - also tag Mush-Liquid boundary " << endl;
-        }
+    {
+      pout() << "AMRLevelMushyLayer::tagCells - also tag Mush-Liquid boundary " << endl;
+    }
 
 
 
@@ -660,15 +671,15 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     tagMushLiquidBoundary(localTags);
 
     // Tags cells with porosity < 1
-//    tagMushyCells(localTags);
+    //    tagMushyCells(localTags);
   }
 
   if (tagDomainBoundary)
   {
     if (s_verbosity >= 2)
-        {
-          pout() << "AMRLevelMushyLayer::tagCells - also tag domain boundary " << endl;
-        }
+    {
+      pout() << "AMRLevelMushyLayer::tagCells - also tag domain boundary " << endl;
+    }
 
     tagBoundaryLayerCells(localTags);
   }
@@ -678,9 +689,9 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   if (tagCenterOnly > 0)
   {
     if (s_verbosity >= 2)
-        {
-          pout() << "AMRLevelMushyLayer::tagCells - only tag the middle of the domain " << endl;
-        }
+    {
+      pout() << "AMRLevelMushyLayer::tagCells - only tag the middle of the domain " << endl;
+    }
 
     localTags = IntVectSet();
 
@@ -704,9 +715,9 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     if (m_time > fixed_grid_time)
     {
       if (s_verbosity >= 2)
-          {
-            pout() << "AMRLevelMushyLayer::tagCells - tag all cells covered by specified grid file " <<  endl;
-          }
+      {
+        pout() << "AMRLevelMushyLayer::tagCells - tag all cells covered by specified grid file " <<  endl;
+      }
 
       // Get whole hierarchy of grids
       Vector<Vector<Box> > amrGrids;
@@ -752,9 +763,9 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   if (testRegridCoarsening)
   {
     if (s_verbosity >= 2)
-        {
-          pout() << "AMRLevelMushyLayer::tagCells - testing regrid coarsening" << endl;
-        }
+    {
+      pout() << "AMRLevelMushyLayer::tagCells - testing regrid coarsening" << endl;
+    }
 
     bool hasValidFinerLevel = false;
     if (m_hasFiner)
@@ -779,9 +790,9 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
 
   if (s_verbosity >= 5)
-    {
-      pout() << "Final local tags: " << localTags << endl;
-    }
+  {
+    pout() << "Final local tags: " << localTags << endl;
+  }
 
   a_tags = localTags;
 }
@@ -970,9 +981,9 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
     {
       if (comp == -1)
       {
-      // Get scalar magnitude of vector field
-      FORT_MAGNITUDEF(CHF_FRA1(UFab, 0), CHF_CONST_FRA((*m_vectorNew[taggingVectorVar])[dit()]),
-                      CHF_BOX(UFab.box()));
+        // Get scalar magnitude of vector field
+        FORT_MAGNITUDEF(CHF_FRA1(UFab, 0), CHF_CONST_FRA((*m_vectorNew[taggingVectorVar])[dit()]),
+                        CHF_BOX(UFab.box()));
       }
       else
       {
@@ -1006,9 +1017,9 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
     {
       // Calculate magnitude
       FORT_MAGNITUDESIGN(CHF_FRA1(taggingMetricFab, 0), CHF_CONST_FRA(UFab),
-                      CHF_BOX(b));
+                         CHF_BOX(b));
       // Scale it?
-            // Let's stop doing this - so regions of with high values will also be at max refinement
+      // Let's stop doing this - so regions of with high values will also be at max refinement
       //      taggingMetricFab.divide(m_level + 1);
 
     }
@@ -1174,7 +1185,7 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
     // Crucial to use 4th order scheme here
     // Lower order doesn't produce a sufficiently smooth fine level solution
 
-        FourthOrderFineInterp scalarInterp4, vectorInterp4;
+    FourthOrderFineInterp scalarInterp4, vectorInterp4;
     FineInterp scalarInterp, vectorInterp;
 
     int crseRefRat = amrMushyLayerCoarserPtr->m_ref_ratio;
@@ -1203,9 +1214,9 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
       else
       {
         scalarInterp.interpToFine(*m_scalarNew[scalarVar],
-                                        *(amrMushyLayerCoarserPtr->m_scalarNew[scalarVar]));
+                                  *(amrMushyLayerCoarserPtr->m_scalarNew[scalarVar]));
         scalarInterp.interpToFine(*m_scalarOld[scalarVar],
-                                        *(amrMushyLayerCoarserPtr->m_scalarOld[scalarVar]));
+                                  *(amrMushyLayerCoarserPtr->m_scalarOld[scalarVar]));
       }
 
     }
@@ -1224,9 +1235,9 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
       else
       {
         vectorInterp.interpToFine(*m_vectorNew[vectorVar],
-                                        *(amrMushyLayerCoarserPtr->m_vectorNew[vectorVar]));
+                                  *(amrMushyLayerCoarserPtr->m_vectorNew[vectorVar]));
         vectorInterp.interpToFine(*m_vectorOld[vectorVar],
-                                        *(amrMushyLayerCoarserPtr->m_vectorOld[vectorVar]));
+                                  *(amrMushyLayerCoarserPtr->m_vectorOld[vectorVar]));
       }
 
     }
@@ -1431,7 +1442,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       // This deals with periodic BCs
       thisAmrVel.exchange();
 
-//      amrLambda[lev] = &(*thisLevelData->m_scalarNew[m_lambda]);
+      //      amrLambda[lev] = &(*thisLevelData->m_scalarNew[m_lambda]);
 
       if (thisLevelData->m_finer_level_ptr != NULL)
       {
@@ -1451,14 +1462,14 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
       level0Proj.initialVelocityProject(amrVel, amrPorosityFace, amrPorosity, homoBC);
       if (makePlots)
-            {
+      {
         writeAMRHierarchy("regrid2.hdf5");
-            }
+      }
     }
 
     // Compute initial VD correction
     // D this later now
-//    level0Proj.doPostRegridOps(amrLambda,amrPorosityFace,m_dt,m_time);
+    //    level0Proj.doPostRegridOps(amrLambda,amrPorosityFace,m_dt,m_time);
 
     thisLevelData = this;
 
@@ -1511,115 +1522,115 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     {
 
 
-    thisLevelData = this;
-
-    for (int lev = 0; lev < numLevels; lev++)
-    {
-      thisLevelData->setFluxRegistersZero();
-      thisLevelData = thisLevelData->getFinerLevel();
-    }
-
-
-    // Finally, let's try and compute the freestream preservation carefully (i.e. use subcycling)
-    bool useSubcycling = true;
-
-    ppMain.query("regrid_freestream_subcycle", useSubcycling);
-
-    bool advectAgain=false;
-    ppMain.query("regrid_advect_before_freestream", advectAgain);
-
-    // Save dt for each level so it can be reset later
-    Vector<Real> dtSave(numLevels, 1.0e8);
-    thisLevelData = this;
-    for (int lev = m_level; lev < numLevels; lev++)
-    {
-      dtSave[lev] = thisLevelData->m_dt;
-      thisLevelData->backupTimestep();
-
-      thisLevelData = thisLevelData->getFinerLevel();
-    }
-
-
-    if (advectAgain)
-    {
-      if (s_verbosity > 2)
-      {
-        pout() << "AMRLevelMushyLayer::postRegrid - advecting lambda on all levels to compute correction" << endl;
-      }
-
-      // This is a fake subcycled advance
-      // Only currently works for 2 levels?
       thisLevelData = this;
 
-      Real dtLev = dtInit;
       for (int lev = 0; lev < numLevels; lev++)
       {
-        Real tlev = 0;
-        while(tlev < dtInit)
-        {
-
-          thisLevelData->dt(dtLev);
-          thisLevelData->computeAllVelocities(true);
-          thisLevelData->advectLambda(true);
-
-
-          tlev = tlev + dtLev;
-
-        }
-
-        if (useSubcycling)
-        {
-          dtLev = dtLev/thisLevelData->m_ref_ratio;
-        }
-
+        thisLevelData->setFluxRegistersZero();
         thisLevelData = thisLevelData->getFinerLevel();
-
       }
 
-    } // end if doing advection of lambda
 
-    if (makePlots)
-    {
-      writeAMRHierarchy("regrid5.hdf5");
-    }
+      // Finally, let's try and compute the freestream preservation carefully (i.e. use subcycling)
+      bool useSubcycling = true;
 
-    // Reflux Lambda to compute VD correction
-    AMRRefluxLambda();
+      ppMain.query("regrid_freestream_subcycle", useSubcycling);
 
-    if (makePlots)
-    {
-      writeAMRHierarchy("regrid6.hdf5");
-    }
+      bool advectAgain=false;
+      ppMain.query("regrid_advect_before_freestream", advectAgain);
 
-    fillAMRVelPorosity(amrVel, amrPorosityFace, amrPorosity);
-    fillAMRLambda(amrLambda);
+      // Save dt for each level so it can be reset later
+      Vector<Real> dtSave(numLevels, 1.0e8);
+      thisLevelData = this;
+      for (int lev = m_level; lev < numLevels; lev++)
+      {
+        dtSave[lev] = thisLevelData->m_dt;
+        thisLevelData->backupTimestep();
 
-    Real etaScale=1.0;
-    ppMain.query("regrid_eta_scale", etaScale);
+        thisLevelData = thisLevelData->getFinerLevel();
+      }
 
-    level0Proj.doPostRegridOps(amrLambda,amrPorosityFace,dtInit,m_time,
-                               etaScale);
 
-    if (makePlots)
-    {
-      writeAMRHierarchy("regrid7.hdf5");
-    }
+      if (advectAgain)
+      {
+        if (s_verbosity > 2)
+        {
+          pout() << "AMRLevelMushyLayer::postRegrid - advecting lambda on all levels to compute correction" << endl;
+        }
 
-    // Reset dt
-    // todo: Should also reset fields?
-    thisLevelData = this;
-    for (int lev = m_level;  lev < numLevels; lev++)
-    {
-      thisLevelData->dt(dtSave[lev]);
-      thisLevelData->restartTimestepFromBackup(true); // true - don't replace pressure
+        // This is a fake subcycled advance
+        // Only currently works for 2 levels?
+        thisLevelData = this;
 
-      thisLevelData = thisLevelData->getFinerLevel();
-    }
+        Real dtLev = dtInit;
+        for (int lev = 0; lev < numLevels; lev++)
+        {
+          Real tlev = 0;
+          while(tlev < dtInit)
+          {
 
-    if (makePlots)
-       {
-         writeAMRHierarchy("regrid8.hdf5");
-       }
+            thisLevelData->dt(dtLev);
+            thisLevelData->computeAllVelocities(true);
+            thisLevelData->advectLambda(true);
+
+
+            tlev = tlev + dtLev;
+
+          }
+
+          if (useSubcycling)
+          {
+            dtLev = dtLev/thisLevelData->m_ref_ratio;
+          }
+
+          thisLevelData = thisLevelData->getFinerLevel();
+
+        }
+
+      } // end if doing advection of lambda
+
+      if (makePlots)
+      {
+        writeAMRHierarchy("regrid5.hdf5");
+      }
+
+      // Reflux Lambda to compute VD correction
+      AMRRefluxLambda();
+
+      if (makePlots)
+      {
+        writeAMRHierarchy("regrid6.hdf5");
+      }
+
+      fillAMRVelPorosity(amrVel, amrPorosityFace, amrPorosity);
+      fillAMRLambda(amrLambda);
+
+      Real etaScale=1.0;
+      ppMain.query("regrid_eta_scale", etaScale);
+
+      level0Proj.doPostRegridOps(amrLambda,amrPorosityFace,dtInit,m_time,
+                                 etaScale);
+
+      if (makePlots)
+      {
+        writeAMRHierarchy("regrid7.hdf5");
+      }
+
+      // Reset dt
+      // todo: Should also reset fields?
+      thisLevelData = this;
+      for (int lev = m_level;  lev < numLevels; lev++)
+      {
+        thisLevelData->dt(dtSave[lev]);
+        thisLevelData->restartTimestepFromBackup(true); // true - don't replace pressure
+
+        thisLevelData = thisLevelData->getFinerLevel();
+      }
+
+      if (makePlots)
+      {
+        writeAMRHierarchy("regrid8.hdf5");
+      }
 
 
     } // end if initialising lambda correction
@@ -1632,7 +1643,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
 void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
 {
-//  CH_assert(m_level==0);
+  //  CH_assert(m_level==0);
   AMRLevelMushyLayer* thisLevelData = getCoarsestLevel();
 
   int numLevels = amrLambda.size();
