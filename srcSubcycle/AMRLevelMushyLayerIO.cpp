@@ -672,6 +672,10 @@ writePlotHeader(HDF5Handle& a_handle) const
     header.m_string[compStr] = varNames[comp];
   }
 
+  // Write out the key parameters
+  m_parameters.writeToHDF5(header);
+
+
 
   // Write the header
   header.writeToFile(a_handle);
