@@ -520,11 +520,13 @@ void AMRNonLinearMultiCompOp::prolongIncrement(LevelData<FArrayBox>&       a_phi
       const IntVect& iv = region.smallEnd();
       IntVect civ=coarsen(iv, 2);
 
+
       FORT_PROLONG_2(CHF_FRA_SHIFT(phi, iv),
                      CHF_CONST_FRA_SHIFT(coarse, civ),
                      CHF_BOX_SHIFT(region, iv),
                      CHF_CONST_INT(mgref));
-    }
+
+          }
   }//end pragma
 }
 
@@ -618,6 +620,9 @@ void AMRNonLinearMultiCompOp::resetLambda()
 
       // Take its reciprocal
       lambdaFab.invert(1.0);
+
+      //todo - remove?
+//      lambdaFab.mult(0.5);
     }
 
     // Lambda is reset.
@@ -862,6 +867,11 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
 
 #endif
 
+
+/*
+ * Computes a_phi = a_phi - lambda*(op(a_phi) - rhs)
+ * where op(phi) = alpha*a*phi - beta*div(b*grad(phi))
+ */
 void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
                                         const LevelData<FArrayBox>& a_rhs)
 {
@@ -894,7 +904,18 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
   bool homogeneous = false;
 
 
+  Vector<int> compsList;
+//  compsList.push_back(0);
+//  compsList.push_back(1);
+//  compsList.push_back(1);
+//  compsList.push_back(0);
+  compsList.push_back(-1); // do both comps in one fortran routine
+
   // do first red, then black passes
+  for (int comps_i = 0; comps_i < compsList.size(); comps_i++)
+  {
+    int whichComponent = compsList[comps_i];
+
   for (int whichPass = 0; whichPass <= 1; whichPass++)
   {
 
@@ -979,13 +1000,16 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
          This_will_not_compile!
 #endif
          CHF_CONST_FRA(m_lambda[dit]),
-         CHF_CONST_INT(whichPass));
+         CHF_CONST_INT(whichPass),
+         CHF_CONST_INT(whichComponent));
 
 
       } // end loop through grids
 
     }
   } // end loop through red-black
+
+  }
 }
 
 void AMRNonLinearMultiCompOp::levelMultiColor(LevelData<FArrayBox>&       a_phi,
@@ -1127,10 +1151,7 @@ void AMRNonLinearMultiCompOp::levelJacobi(LevelData<FArrayBox>&       a_phi,
 {
   CH_TIME("AMRNonLinearMultiCompOp::levelJacobi");
 
-
-
   resetLambda();
-
 
   LevelData<FArrayBox> resid;
   create(resid, a_rhs);

@@ -8,12 +8,11 @@ C    Please refer to Copyright.txt, in Chombo's root directory.
 
 
 
-
 C     -----------------------------------------------------------------
 C     subroutine NONLINEARSMOOTHING{1D,2D,3D}
 C     computes alpha * aCoef(i) * I - (beta * Div (bCoef(i) * Grad))
 C     computes alpha * aCoef(i) * phi - (beta * Div (bCoef(i) * Grad)) phi_l
-C     applied to phi and then does GSRB relaxation
+C     applied to phi and then does jacobi relaxation
 C
 C     INPUTS/OUTPUTS:
 C     phi       <=> phi
@@ -45,7 +44,8 @@ C     ------------------------------------------------------------------
      &     CHF_CONST_REAL[beta],
      &     CHF_CONST_FRA[bCoef0],
      &     CHF_CONST_FRA[lambda],
-     &     CHF_CONST_INT[redBlack])
+     &     CHF_CONST_INT[redBlack],
+     &     CHF_CONST_INT[whichComponent])
 #elif CH_SPACEDIM == 2
       subroutine NONLINEARSMOOTHING2D(
      &     CHF_FRA[phi],
@@ -59,7 +59,8 @@ C     ------------------------------------------------------------------
      &     CHF_CONST_FRA[bCoef0],
      &     CHF_CONST_FRA[bCoef1],
      &     CHF_CONST_FRA[lambda],
-     &     CHF_CONST_INT[redBlack])
+     &     CHF_CONST_INT[redBlack],
+     &     CHF_CONST_INT[whichComponent])
 #elif CH_SPACEDIM == 3
       subroutine NONLINEARSMOOTHING3D(
      &     CHF_FRA[phi],
@@ -74,14 +75,15 @@ C     ------------------------------------------------------------------
      &     CHF_CONST_FRA[bCoef1],
      &     CHF_CONST_FRA[bCoef2],
      &     CHF_CONST_FRA[lambda],
-     &     CHF_CONST_INT[redBlack])
+     &     CHF_CONST_INT[redBlack],
+     &     CHF_CONST_INT[whichComponent])
 #else
       Somthing_that_will_not_compile
 #endif
 
       REAL_T dxinv,lofphi,phi_alternate,H_s,H_e,H_l,new_var,
      &       phi_l0, phi_l1, phi_l2, phi_l3, phi_l4, phi_l5, phi_l6
-      integer n,ncomp,indtot,imin,imax
+      integer n,ncomp,indtot,imin,imax,nstart,nfinish
       integer CHF_DDECL[i;j;k]
 
       ncomp = CHF_NCOMP[phi]
@@ -108,8 +110,19 @@ C     ------------------------------------------------------------------
       endif                                  ]
 
       dxinv = one/(dx*dx)
+      
+      if (whichComponent > -1) then
+C        just do this component
+         nstart = whichComponent
+         nfinish = nstart
+      else
+C        do all components
+         nstart = 0
+         nfinish = ncomp-1
+      endif
 
-      do n = 0, ncomp - 1
+C      do n = 0, ncomp - 1
+      do n = nstart, nfinish
 #if CH_SPACEDIM==3
         do k=CHF_LBOUND[region; 2], CHF_UBOUND[region; 2]
 #endif
@@ -126,6 +139,8 @@ C          Jamie Parkinson - just do jacobi for now
             imin = imin + abs(mod(indtot + redBlack, 2))
             imax = CHF_UBOUND[region; 0]
             do i = imin, imax, 2
+            
+C            do i = imin, imax, 1
 
 
             phi_l0 = phi_l(CHF_IX[i;j;k],n)
@@ -163,6 +178,10 @@ C          Jamie Parkinson - just do jacobi for now
 
               phi(CHF_IX[i;j;k],n) = phi(CHF_IX[i;j;k],n)
      &          - lambda(CHF_IX[i;j;k],n) * (lofphi - rhs(CHF_IX[i;j;k],n))
+     
+     
+C            Can also update phi_l here for use in future calculations. Will need liquidus and solidus for this though.
+C             phi_l(CHF_IX[i;j;k],n) = COMPUTEDIFFUSEDVAR(phi(CHF_IX[i;j;k],0), phi(CHF_IX[i;j;k],1),  n)
 
              
               
