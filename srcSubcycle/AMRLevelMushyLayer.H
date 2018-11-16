@@ -39,6 +39,7 @@
 #include "SetValLevel.H"
 
 #include "VCAMRPoissonOp2.H"
+//#include "NewPoissonOp4.H"
 #include "AdvectionPhysics.H"
 #include "VelBCHolder.H"
 
@@ -109,7 +110,8 @@ public:
     m_timeIntegrationOrder = 1;
     m_tagBufferSize = 1;
     m_refineThresh = 1;
-    m_scalePwithPorosity = false;
+    m_scaleP_MAC = true;
+    m_scaleP_CC = true;
     m_physBCPtr = NULL; //new PhysBCUtil();
     m_isViscous = false;
 
@@ -607,7 +609,7 @@ protected:
    * Generally done via an implicit update due to the viscous and darcy terms.
    * Not required if just considering the Darcy equation.
    */
-  void computeCCvelocity(LevelData<FArrayBox>& advectionSourceTerm, Real a_oldTime, Real a_dt,
+  void computeCCvelocity(const LevelData<FArrayBox>& advectionSourceTerm, Real a_oldTime, Real a_dt,
                          bool doFRupdates = false,
                          bool a_doProjection = true,
                          bool compute_uDelU = true,
@@ -706,7 +708,7 @@ protected:
   /// Calculate  \f$ \mathbf{u} \cdot \nabla \left( \mathbf{u}/\chi \right) \f$
   void predictVelocities(LevelData<FArrayBox>& a_uDelU,
                          LevelData<FluxBox>& a_advVel,
-                         const LevelData<FArrayBox>& viscousSource,
+                         const LevelData<FArrayBox>& a_src,
                          Real old_time,
                          Real a_dt,
                          bool doFRupdates);
@@ -714,6 +716,7 @@ protected:
 
   /// Calculate advection velocity for momentum equations which are time independent
   void calculateTimeIndAdvectionVel(Real a_time, LevelData<FluxBox>& a_advVel);
+  void fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advVel, Real time);
 
   /// Fill advection velocity ghost cells
   void fillAdvVel(Real time, LevelData<FluxBox>& a_advVel);
@@ -747,7 +750,7 @@ protected:
 
   /// Compute \f$ \nabla P \f$ at time \f$ t \f$
   void fillPressureSrcTerm(LevelData<FArrayBox>& gradP,
-                           LevelData<FArrayBox>& porosityCentred,
+                           LevelData<FArrayBox>& pressureScale,
                            Real a_time,
                            bool a_MACprojection);
 
@@ -1200,6 +1203,7 @@ protected:
 
   /// bottom solver
   static BiCGStabSolver<LevelData<FArrayBox> >                    s_botSolver;
+//  static RelaxSolver<LevelData<FArrayBox> >                    s_botSolver;
 
   /// AMRMultigrid solver for unprojected velocity, \f$ \mathbf{u}^* \f$
   RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >      s_uStarAMRMG[SpaceDim];
@@ -1209,6 +1213,7 @@ protected:
 
   /// Operator for computing components of \f$ \nabla^2 \mathbf{u} \f$
   RefCountedPtr<AMRPoissonOp> m_viscousOp[SpaceDim];
+//  RefCountedPtr<NewPoissonOp4> m_viscousOpHO[SpaceDim];
 
   /// Is object defined
   bool m_isDefined;
@@ -1248,7 +1253,7 @@ protected:
   Real                 m_dx;
 
   /// Object to do advection physics for velocity
-  RefCountedPtr<AdvectPhysics> m_advPhysVelocity;
+//  RefCountedPtr<AdvectPhysics> m_advPhysVelocity;
 
   /// Diffusion coefficients for different scalar fields
   Real m_scalarDiffusionCoeffs[m_numScalarVars];
@@ -1305,7 +1310,10 @@ protected:
   bool explicitDarcyTerm;
 
   /// Should we calculate pressure like \f$ \chi \nabla P \f$?
-  bool m_scalePwithPorosity;
+  bool m_scaleP_MAC;
+
+  /// Whether to scale pressure during CC projection
+  bool m_scaleP_CC;
 
   /// Which field scales the pressure
   /**

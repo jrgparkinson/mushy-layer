@@ -98,17 +98,19 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
 
   IntVect ivGhost = m_numGhost * IntVect::Unit;
 
-  int numSmooth, numMG, maxIter, mgverb;
+  int numSmoothUp, numSmoothDown, numMG, maxIter, mgverb;
   Real tolerance, hang, normThresh;
 
+  numSmoothDown = 2;
   ParmParse ppAmrmultigrid("amrmultigrid");
-  ppAmrmultigrid.get("num_smooth", numSmooth);
+  ppAmrmultigrid.get("num_smooth", numSmoothUp);
   ppAmrmultigrid.get("num_mg", numMG);
   ppAmrmultigrid.get("hang_eps", hang);
   ppAmrmultigrid.get("norm_thresh", normThresh);
   ppAmrmultigrid.get("tolerance", tolerance);
   ppAmrmultigrid.get("max_iter", maxIter);
   ppAmrmultigrid.get("verbosity", mgverb);
+  ppAmrmultigrid.query("numSmoothDown", numSmoothDown);
 
   int relaxMode = 1; // 1=GSRB, 4=jacobi
   ppAmrmultigrid.query("relaxMode", relaxMode);
@@ -142,6 +144,17 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
     m_viscousOp[dir] = RefCountedPtr<AMRPoissonOp>(new AMRPoissonOp());
     m_viscousOp[dir]->define(m_grids, crseGridsPtr, m_dx, nRefCrse,
                              m_problem_domain, viscousBCcomp);
+
+
+
+
+//    RealVect dxVect;
+//    for (int i=0; i < SpaceDim; i++) { dxVect[i]=m_dx; }
+//    NewPoissonOp4Factory opFact(dxVect, viscousBCcomp);
+//
+////    m_viscousOpHO[dir] = RefCountedPtr<NewPoissonOp4>(new NewPoissonOp4());
+////    m_viscousOpHO[dir]->define(dxVect, m_problem_domain, viscousBCcomp);
+//    m_viscousOpHO[dir] = RefCountedPtr<NewPoissonOp4>(opFact.MGnewOp(m_problem_domain, 0, False));
   }
 
   for (int idir = 0; idir < SpaceDim; idir++)
@@ -149,7 +162,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
     s_uStarAMRMG[idir] =
         RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >(
             new AMRMultiGrid<LevelData<FArrayBox> >());
-    s_uStarAMRMG[idir]->setSolverParameters(numSmooth, numSmooth, numSmooth,
+    s_uStarAMRMG[idir]->setSolverParameters(numSmoothUp, numSmoothUp, numSmoothUp,
                                             numMG, maxIter, tolerance, hang, normThresh);
     s_uStarAMRMG[idir]->m_verbosity = mgverb;
   }
@@ -308,14 +321,10 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
     s_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
         new AMRFASMultiGrid<LevelData<FArrayBox> >());
 
-
-
-
     s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolver,
                              maxAMRlevels);
 
-
-    s_multiCompFASMG->setSolverParameters(numSmooth, numSmooth, numSmooth, numMG,
+    s_multiCompFASMG->setSolverParameters(numSmoothDown, numSmoothUp, numSmoothUp, numMG,
                                           maxIter, tolerance, hang, normThresh);
     s_multiCompFASMG->m_verbosity = mgverb;
 
@@ -1004,6 +1013,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
       ppMain.query("usePhiForImplicitAdvectionSolve", MACProjection);
 
       // do full timestep - this should now give the same velocity as the later solve?
+      advectionSourceTerm.exchange();
       computeCCvelocity(advectionSourceTerm, old_time, m_dt, doFRupdates, doProjection,
                         compute_uDelU, MACProjection);
 
@@ -1106,8 +1116,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
             ccAdvVel[dit].divide(porosityAv[dit], ccAdvVel[dit].box(), 0, dir);
           }
           //            }
-          edgeVelBC.applyBCs(m_advVel, m_grids, m_problem_domain, m_dx,
-                             false); // inhomogeneous
+
 
           // this does BCs (doesn't fill interior)
           fillVectorField(ccAdvVel, old_time, m_fluidVel, false);
@@ -1134,6 +1143,8 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
       //        pout() << "Do trace advection vel with cfl = " << cfl << endl;
 
+      edgeVelBC.applyBCs(m_advVel, m_grids, m_problem_domain, m_dx,
+                                   false); // inhomogeneous
 
       // m_dt is the full timestep, and this always returns the half time velocity
       // changed this from m_dt (full timestep) to half_dt*2 incase we want to compute velocities
@@ -1171,6 +1182,9 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
     setVelZero(m_advVel, advPorosityLimit);
 
 
+
+
+
     //m_advVel contains predicted face centred velocity at half time step
     //Now need to project it and do lambda corrections etc
     Real project_dt = 2*half_dt; // this usually just works out at m_dt, for time centred advection velocities
@@ -1182,6 +1196,49 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
     correctEdgeCentredVelocity(m_advVel, project_dt);
 
+    // Maybe replace m_advVel with time independent version in low porosity regions?
+    Real chiLimit = 0.0;
+           ppMain.query("porousAdvVelLimit", chiLimit);
+           if (chiLimit > 0.0)
+           {
+        LevelData<FluxBox> mushyAdvVel(m_advVel.disjointBoxLayout(), 1, m_advVel.ghostVect());
+//        fillUnprojectedDarcyVelocity(mushyAdvVel, m_time-m_dt);
+        calculateTimeIndAdvectionVel(m_time-m_dt, mushyAdvVel);
+
+          int count = 0;
+          for (DataIterator dit = m_advVel.dataIterator(); dit.ok(); ++dit)
+          {
+            FArrayBox& chi = (*m_scalarNew[m_porosity])[dit];
+            for (int dir=0; dir < SpaceDim; dir++)
+            {
+              Box b = m_advVel[dit][dir].box();
+              FArrayBox& velDir = m_advVel[dit][dir];
+              FArrayBox& newVelDir = mushyAdvVel[dit][dir];
+
+              b = b.enclosedCells();
+
+              b &= chi.box();
+
+              for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
+              {
+                IntVect iv = bit();
+                if (chi(iv) < chiLimit)
+                {
+                  velDir(iv) = newVelDir(iv);
+                  count++;
+                }
+              }
+            }
+          }
+
+          pout() << "  ComputeAdvectionVelocities - replaced " << count << " cells with darcy flow" << endl;
+
+          // Project again
+                 correctEdgeCentredVelocity(m_advVel, project_dt);
+        }
+
+
+
 
     // The projection solve isn't always quite good enough, which can leave U~1e-10 where porosity ~1e-15
     // want to avoid u/chi > 1 for porosity =1e-15, so do it manually
@@ -1192,36 +1249,36 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
     porosityFace.exchange();
 
     // Now check that U(chi=0) = 0
-    int errors = 0;
-    for (DataIterator dit = m_advVel.dataIterator(); dit.ok(); ++dit)
-    {
-      Box b = m_advVel[dit].box();
-      b &= m_problem_domain.domainBox();
-
-      for (BoxIterator bit=BoxIterator(b); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-
-        for (int dir=0; dir<SpaceDim; dir++)
-        {
-
-          Real vel = m_advVel[dit][dir](iv);
-          Real chi = porosityFace[dit][dir](iv);
-
-          if (chi < 1e-10 && vel/chi > 1)
-          {
-            errors= errors + 1;
-            //            pout() << "Adv vel not small enough!" << endl;
-          }
-
-        }
-      }
-    }
-
-    if (errors > 0)
-    {
-      pout() << "Num Adv vel not small enough: " << errors << endl;
-    }
+//    int errors = 0;
+//    for (DataIterator dit = m_advVel.dataIterator(); dit.ok(); ++dit)
+//    {
+//      Box b = m_advVel[dit].box();
+//      b &= m_problem_domain.domainBox();
+//
+//      for (BoxIterator bit=BoxIterator(b); bit.ok(); ++bit)
+//      {
+//        IntVect iv = bit();
+//
+//        for (int dir=0; dir<SpaceDim; dir++)
+//        {
+//
+//          Real vel = m_advVel[dit][dir](iv);
+//          Real chi = porosityFace[dit][dir](iv);
+//
+//          if (chi < 1e-10 && vel/chi > 1)
+//          {
+//            errors= errors + 1;
+//            //            pout() << "Adv vel not small enough!" << endl;
+//          }
+//
+//        }
+//      }
+//    }
+//
+//    if (errors > 0)
+//    {
+//      pout() << "Num Adv vel not small enough: " << errors << endl;
+//    }
 
   }
   else
@@ -1356,7 +1413,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
     pout() << "  AMRLevelMushyLayer::correctEdgeCentredVelocity() - applied init BCs" << endl;
   }
 
-  if(m_scalePwithPorosity)
+  if(m_scaleP_MAC)
   {
     pressureScaleEdgePtrOneGhost = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(m_grids, 1, IntVect::Unit));
     fillScalarFace(*pressureScaleEdgePtrOneGhost, half_time, m_pressureScaleVar, true);
@@ -1411,11 +1468,13 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
     }
 
     int projNum = 0;
+    int maxNumProj = 1;
+    ppMain.query("max_num_MAC_proj", maxNumProj);
 
     //    Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
     Real maxDivU = 10*m_maxDivUFace ; //::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
 
-    while ( (maxDivU > m_maxDivUFace && projNum < 10) ||
+    while ( (maxDivU > m_maxDivUFace && projNum < maxNumProj) ||
         (ppMain.contains("analyticVel") && projNum < 1) ) // do at least one projection of analytic vel
     {
       projNum++;
@@ -1739,9 +1798,9 @@ Real AMRLevelMushyLayer::advance()
   }
 
   // Another sanity check
-  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], m_advVel, m_dx);
-  Real  maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
-  pout() << "  Sanity check: max(div u) = " << maxDivU << endl;
+//  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], m_advVel, m_dx);
+//  Real  maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
+//  pout() << "  Sanity check: max(div u) = " << maxDivU << endl;
 
   // always* advect lambda (and update flux registers)
   // do this as soon as we have advection velocities, in case we want to
@@ -1798,6 +1857,8 @@ Real AMRLevelMushyLayer::advance()
     bool doFRUpdates = true;
 
     exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, doFRUpdates, doAdvectiveSrc);
+
+    pout() << "  HC solve finished with exit status " << exitStatus << endl;
 
     bool solverFailed = (exitStatus == 2 || exitStatus == 4 || exitStatus == 6);
 //    bool solveSuccess = !solverFailed;
@@ -1869,7 +1930,7 @@ Real AMRLevelMushyLayer::advance()
 }
 
 
-void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSourceTerm,
+void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advectionSourceTerm,
                                            Real a_oldTime,
                                            Real a_dt,
                                            bool doFRupdates,
@@ -1891,8 +1952,8 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
   }
 
   VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
-  RefCountedPtr<LevelData<FluxBox> > crsePorosityEdgePtr, porosityEdgePtr;
-  RefCountedPtr<LevelData<FArrayBox> > crsePorosityPtr, porosityPtr;
+  RefCountedPtr<LevelData<FluxBox> > crsePressureScaleEdgePtr, pressureScaleEdgePtr;
+  RefCountedPtr<LevelData<FArrayBox> > crsePressureScalePtr, pressureScalePtr;
   LevelData<FArrayBox> *crseVelPtr = NULL;
 
   AMRLevelMushyLayer* amrMLcrse = getCoarserLevel();
@@ -1924,16 +1985,16 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
   Real porositySmoothing = 0.001;
   porositySmoothing = 0.0;
 
-  if (m_scalePwithPorosity)
+  if (m_scaleP_CC)
   {
     // Usually geometric averaging, but try arithmetic
-    porosityEdgePtr= RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(m_grids, 1));
+    pressureScaleEdgePtr= RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(m_grids, 1));
 
     // Need a ghost cell here for 5 point stencil
-    porosityPtr= RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(m_grids, 1, IntVect::Unit));
+    pressureScalePtr= RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(m_grids, 1, IntVect::Unit));
 
-    fillScalarFace(*porosityEdgePtr, half_time, m_pressureScaleVar, arithmeticAveraging, true, false, porositySmoothing);
-    fillScalars(*porosityPtr, half_time, m_pressureScaleVar, true);
+    fillScalarFace(*pressureScaleEdgePtr, half_time, m_pressureScaleVar, arithmeticAveraging, true, false, porositySmoothing);
+    fillScalars(*pressureScalePtr, half_time, m_pressureScaleVar, true);
 
   }
 
@@ -1959,14 +2020,14 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
       amrMLcrse->fillVectorField(*crseVelPtr, new_time, ustarVar, true);
     }
 
-    if (m_scalePwithPorosity)
+    if (m_scaleP_CC)
     {
-      crsePorosityEdgePtr = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(amrMLcrse->m_grids, 1));
-      amrMLcrse->fillScalarFace(*crsePorosityEdgePtr, half_time, m_pressureScaleVar, true, porositySmoothing);
+      crsePressureScaleEdgePtr = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(amrMLcrse->m_grids, 1));
+      amrMLcrse->fillScalarFace(*crsePressureScaleEdgePtr, half_time, m_pressureScaleVar, true, porositySmoothing);
 
       // Need a ghost cell for 5 point stencil
-      crsePorosityPtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(amrMLcrse->m_grids, 1, IntVect::Unit));
-      amrMLcrse->fillScalars(*crsePorosityPtr, half_time, m_pressureScaleVar, true);
+      crsePressureScalePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(amrMLcrse->m_grids, 1, IntVect::Unit));
+      amrMLcrse->fillScalars(*crsePressureScalePtr, half_time, m_pressureScaleVar, true);
     }
   }
 
@@ -1983,24 +2044,27 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
                  m_dx, false); // inhomogeneous
   m_vectorNew[uvar]->exchange();
 
+//  if (m_doProjection && a_doProjection)
+//    {
+
   // Before we project, remove grad(P)]
-  if (m_addSubtractGradP)
-  {
-    LevelData<FArrayBox> gradP(m_grids, SpaceDim);
-    LevelData<FArrayBox> porosityCentred(m_grids, 1);
-    fillScalars(porosityCentred, half_time, m_porosity, true);
-    Real old_time = a_oldTime;
-
-    // first get gradPi
-    fillPressureSrcTerm(gradP, porosityCentred, old_time-a_dt/2, a_MACprojection);
-
-
-    for (dit.reset(); dit.ok(); ++dit)
+    if (m_addSubtractGradP)
     {
-      gradP[dit] *= a_dt ;
-      (*m_vectorNew[uvar])[dit] += gradP[dit];
+      LevelData<FArrayBox> gradP(m_grids, SpaceDim);
+      LevelData<FArrayBox> pressureScale(m_grids, 1);
+      fillScalars(pressureScale, half_time, m_pressureScaleVar, true);
+      Real old_time = a_oldTime;
+
+      // first get gradPi
+      fillPressureSrcTerm(gradP, pressureScale, old_time-a_dt/2, a_MACprojection);
+
+
+      for (dit.reset(); dit.ok(); ++dit)
+      {
+        gradP[dit] *= a_dt ;
+        (*m_vectorNew[uvar])[dit] += gradP[dit];
+      }
     }
-  }
 
   // need to do physical boundary conditions and exchanges
   velBC.applyBCs(*m_vectorNew[uvar], m_grids, m_problem_domain,
@@ -2012,15 +2076,18 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
     (*m_vectorNew[uPreprojectionVar])[dit].copy((*m_vectorNew[uvar])[dit]);
   }
 
+
   if (m_doProjection && a_doProjection)
-  {
+    {
+
+
     CH_TIME("AMRLevelMushyLayer::levelProject");
 
     // Repeatedly apply projection - check divergence goes to 0
     //    int numProj = 2;
 
     Real initSumDivU = 1e300;
-    Real sumDivU = initSumDivU;
+    Real maxDivU = initSumDivU;
 
     Real relTol = 1e-5;
 
@@ -2031,15 +2098,17 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
     pp.query("maxProjections", maxNumProj);
 
 
-
     //    for (int i = 0; i < numProj; i++)
-    while(! (sumDivU < initSumDivU*relTol || sumDivU < relTol || i >= maxNumProj))
+    while(! (maxDivU < initSumDivU*relTol || maxDivU < relTol || i >= maxNumProj))
     {
 
       setVelZero(*m_vectorNew[uvar], ccVelPorosityLimit);
 
+      velBC.applyBCs(*m_vectorNew[uvar], m_grids, m_problem_domain,
+                           m_dx, false); // inhomogeneous
+
       m_projection.LevelProject(*m_vectorNew[uvar], crseVelPtr,
-                                new_time, a_dt, porosityPtr, crsePorosityPtr, porosityEdgePtr, crsePorosityEdgePtr,
+                                new_time, a_dt, pressureScalePtr, crsePressureScalePtr, pressureScaleEdgePtr, crsePressureScaleEdgePtr,
                                 m_isViscous);
       // as things stand now, physical BC's are re-set in LevelProjection
 
@@ -2054,20 +2123,21 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
       m_vectorNew[uvar]->exchange();
 
 
-
       QuadCFInterp interp;
       Divergence::levelDivergenceCC(*m_scalarNew[m_divU], *m_vectorNew[uvar], NULL, m_dx, true, interp);
 
       //      sumDivU = ::computeSum(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), true);
 
       // Actually want norm (sum of absolute values)
-      sumDivU = computeNorm(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), 0);
+      maxDivU = computeNorm(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), 0);
+
+      pout() << " CCProjection: max(div(U)) = " << maxDivU << endl;
+
 
       if (i == 0)
       {
-        initSumDivU = sumDivU;
+        initSumDivU = maxDivU;
       }
-
 
       i++;
     }
@@ -2081,20 +2151,20 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
   setVelZero(*m_vectorNew[uvar], ccVelPorosityLimit);
 
   //Testing:
-  LevelData<FArrayBox> U_chi(m_grids, SpaceDim);
-  fillVectorField(U_chi, m_time, m_U_porosity, true, true);
-  Real max = ::computeMax(U_chi, NULL, 1, Interval(0, SpaceDim-1));
-  if (max > 1e5)
-  {
-    pout() << "U_chi > 1e5!!! " << endl;
-  }
+//  LevelData<FArrayBox> U_chi(m_grids, SpaceDim);
+//  fillVectorField(U_chi, m_time, m_U_porosity, true, true);
+//  Real max = ::computeMax(U_chi, NULL, 1, Interval(0, SpaceDim-1));
+//  if (max > 1e5)
+//  {
+//    pout() << "U_chi > 1e5!!! " << endl;
+//  }
 
 
-  QuadCFInterp interp;
-  Divergence::levelDivergenceCC(*m_scalarNew[m_divU], *m_vectorNew[uvar], NULL, m_dx, true, interp);
-  Real maxDivU = ::computeMax(*m_scalarNew[m_divU], NULL, 1, Interval(0, 0));
+//  QuadCFInterp interp;
+//  Divergence::levelDivergenceCC(*m_scalarNew[m_divU], *m_vectorNew[uvar], NULL, m_dx, true, interp);
+//  Real maxDivU = computeNorm(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), 0);
 
-  pout() << " CCProjection: max(div(U)) = " << maxDivU << endl;
+//  pout() << " CCProjection: max(div(U)) = " << maxDivU << endl;
 
   // Go back to standard porosity limit now we've finished CC solve
   //  m_lowerPorosityLimit = 1e-15;
@@ -2109,7 +2179,7 @@ void AMRLevelMushyLayer::computeCCvelocity(LevelData<FArrayBox>& advectionSource
 }
 
 void AMRLevelMushyLayer::fillPressureSrcTerm(LevelData<FArrayBox>& gradP,
-                                             LevelData<FArrayBox>& porosityCentred,
+                                             LevelData<FArrayBox>& pressureScale,
                                              Real a_time,
                                              bool a_MACprojection)
 {
@@ -2120,11 +2190,11 @@ void AMRLevelMushyLayer::fillPressureSrcTerm(LevelData<FArrayBox>& gradP,
 
   for (dit.reset(); dit.ok(); ++dit)
   {
-    if (m_scalePwithPorosity)
+    if ((a_MACprojection && m_scaleP_MAC) || (!a_MACprojection && m_scaleP_CC))
     {
       for (int dir=0;dir<SpaceDim;dir++)
       {
-        gradP[dit].mult(porosityCentred[dit], 0, dir);
+        gradP[dit].mult(pressureScale[dit], 0, dir);
       }
     }
   }
@@ -2652,6 +2722,7 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
   LevelData<FArrayBox> permeability_centred(m_grids, 1, ivGhost);
   LevelData<FArrayBox> temperature_centred(m_grids, 1, ivGhost);
   LevelData<FArrayBox> liquidConcentration_centred(m_grids, 1, ivGhost);
+  LevelData<FArrayBox> pressureScale(m_grids, 1, ivGhost);
 
   LevelData<FArrayBox> U_half(m_grids, SpaceDim, ivGhost);
   fillVectorField(U_half, src_time, m_fluidVel, true);
@@ -2673,9 +2744,10 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
   fillScalars(porosity_centred,            src_time, m_porosity, true);
   fillScalars(permeability_centred,        src_time, m_permeability, true);
   fillScalars(liquidConcentration_centred, src_time, m_liquidConcentration, true);
+  fillScalars(pressureScale, src_time, m_pressureScaleVar, true);
 
   // Now the Pressure bit
-  fillPressureSrcTerm(P_src, porosity_centred, oldTime-m_dt/2, a_MACprojection);
+  fillPressureSrcTerm(P_src, pressureScale, oldTime-m_dt/2, a_MACprojection);
 
   // Buoyancy
   fillBuoyancy(buoyancy_src, temperature_centred, liquidConcentration_centred,porosity_centred);
@@ -3012,7 +3084,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
     amrMLcrse->fillScalars(*crsePressurePtr, time, m_pressure, true);
 
-    if (m_scalePwithPorosity)
+    if (m_scaleP_MAC)
     {
       crsePressureScaleEdgePtr = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(amrMLcrse->m_grids, 1, IntVect::Unit));
       amrMLcrse->fillScalarFace(*crsePressureScaleEdgePtr, time, m_pressureScaleVar, true);
@@ -3028,7 +3100,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
   }
 
-  if(m_scalePwithPorosity)
+  if(m_scaleP_MAC)
   {
     pressureScaleEdgePtr = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(m_grids, 1, IntVect::Unit));
     fillScalarFace(*pressureScaleEdgePtr, time, m_pressureScaleVar, true);
@@ -3041,19 +3113,14 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
 
   IntVect ghost = IntVect::Unit;
-  LevelData<FluxBox> permeability_face(m_grids, 1, ghost);
-  LevelData<FluxBox> T_face(m_grids, 1, ghost);
-  LevelData<FluxBox> C_face(m_grids, 1, ghost);
+
   LevelData<FluxBox> gradPhi(m_grids, 1);
 
   LevelData<FArrayBox> T(m_grids, 1, IntVect::Unit);
   LevelData<FArrayBox> C(m_grids, 1, IntVect::Unit);
   LevelData<FArrayBox> porosity(m_grids, 1, IntVect::Unit);
 
-  //      LevelData<FArrayBox> pressure(m_grids, 1, IntVect::Unit);
-  fillScalarFace(permeability_face, time, m_permeability,        true, false);
-  fillScalarFace(T_face,            time, m_temperature,         true, false); // second true - do quadinterp.
-  fillScalarFace(C_face,            time, m_liquidConcentration, true, false);
+
 
   fillScalars(porosity, time, m_porosity,            true);
   fillScalars(T,        time, m_temperature,         true);
@@ -3082,31 +3149,8 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
     // Darcy velocity
     // Just doing Darcy. U^* = permeability * (RaT * theta - RaC*Theta)
-    for (dit.reset(); dit.ok(); ++dit)
-    {
-      a_advVel[dit].setVal(0.0);
 
-      FArrayBox& fabVelz = a_advVel[dit][SpaceDim-1]; // for debugging
-
-      fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.rayleighTemp);
-      fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.rayleighComposition);
-
-      for (int idir=0; idir<SpaceDim; idir++)
-      {
-
-        // Try use previous pressure to get this right?
-        //        a_advVel[dit][idir].minus(gradPhi[dit][idir]);
-        //        alreadyHasPressure = true;
-
-        // was this the issue
-        a_advVel[dit][idir].mult(permeability_face[dit][idir]);
-
-        //          (*permeabilityPtr)[dit].mult(-1.0);
-        //          (*permeabilityEdgePtr)[dit][0].mult(-1.0);
-        //          (*permeabilityEdgePtr)[dit][1].mult(-1.0);
-      }
-
-    }
+    fillUnprojectedDarcyVelocity(a_advVel, time);
 
   }
 
@@ -3115,10 +3159,6 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
                      m_problem_domain, m_dx,
                      false); // inhomogeneous
 
-  //  EdgeToCell(a_advVel, *m_vectorNew[m_Ustar]);
-
-  // For debugging
-  //  Divergence::levelDivergenceMAC(*m_scalarNew[m_divU], a_advVel, m_dx);
 
   if (s_verbosity >= 5)
   {
@@ -3131,26 +3171,14 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   m_projection.levelMacProject(a_advVel, m_dt, crsePressurePtr, pressureScalePtr,
                                crsePressureScalePtr, pressureScaleEdgePtr, crsePressureScaleEdgePtr, alreadyHasPressure);
 
-  // For debugging
-  //  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
 
   fillAdvVel(time, a_advVel);
   a_advVel.exchange();
 
-  // Don't need to do this! Should be correct after MAC projection
-  //  edgeVelBC.applyBCs(a_advVel, m_grids,
-  //                     m_problem_domain, m_dx,
-  //                     false); // inhomogeneous
-
   m_projection.getPhi(*m_scalarNew[m_pressure]);
 
-  // Volume discrepancy
-  //  doVolumeDiscrepancyCorrection(a_advVel);
-
   // Test - overwrite with analytic advection velocity
-  bool enforceAnalyticVel = (m_parameters.physicalProblem == MushyLayerParams::m_soluteFluxTest
-      //      || m_parameters.physicalProblem == MushyLayerParams::m_HRL
-  );
+  bool enforceAnalyticVel = (m_parameters.physicalProblem == MushyLayerParams::m_soluteFluxTest  );
 
   enforceAnalyticVel = false;
 
@@ -3194,6 +3222,38 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     pout() << "AMRLevelMushyLayer::calculateTimeIndAdvectionVel - finished (level " << m_level << ")"    << endl;
   }
 
+}
+
+void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advVel, Real time)
+{
+  IntVect ghost = a_advVel.ghostVect();
+  DataIterator dit = a_advVel.dataIterator();
+
+  LevelData<FluxBox> permeability_face(m_grids, 1, ghost);
+        LevelData<FluxBox> T_face(m_grids, 1, ghost);
+        LevelData<FluxBox> C_face(m_grids, 1, ghost);
+       fillScalarFace(permeability_face, time, m_permeability,        true, false);
+       fillScalarFace(T_face,            time, m_temperature,         true, false);
+       fillScalarFace(C_face,            time, m_liquidConcentration, true, false);
+
+      for (dit.reset(); dit.ok(); ++dit)
+      {
+        a_advVel[dit].setVal(0.0);
+
+        FArrayBox& fabVelz = a_advVel[dit][SpaceDim-1]; // for debugging
+
+  //      fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.rayleighTemp);
+  //      fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.rayleighComposition);
+        fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.m_buoyancyTCoeff);
+        fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.m_buoyancySCoeff);
+
+        for (int idir=0; idir<SpaceDim; idir++)
+        {
+          a_advVel[dit][idir].mult(permeability_face[dit][idir]);
+          a_advVel[dit][idir].divide(m_parameters.m_darcyCoeff);
+        }
+
+      }
 }
 
 void AMRLevelMushyLayer::fillAnalyticVel(FArrayBox& velDir, int dir, int comp, bool project)
@@ -3430,7 +3490,7 @@ void AMRLevelMushyLayer::fillAdvVel(Real time, LevelData<FluxBox>& a_advVel)
 
 void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
                                            LevelData<FluxBox>& a_advVel,
-                                           const LevelData<FArrayBox>& viscousSource,
+                                           const LevelData<FArrayBox>& a_src,
                                            Real old_time,
                                            Real a_dt,
                                            bool doFRupdates)
@@ -3519,40 +3579,39 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
     m_projection.gradPhi(gradPhi);
 
     // Need to multiply gradPhi by porosity to get correct correction field
-    LevelData<FluxBox> porosity(levelGrids, 1);
-    fillScalarFace(porosity, old_time, m_pressureScaleVar, true);
+    LevelData<FluxBox> pressureScale(levelGrids, 1);
+    fillScalarFace(pressureScale, old_time, m_pressureScaleVar, true);
 
     bool legacyCompute = false;
     ParmParse ppMain("main");
     ppMain.query("legacy_predict_vel", legacyCompute);
 
 
-    // Get the true porosity correction (scaled with chi if appropriate)
-    if (m_scalePwithPorosity)
+    // Get the true pressure correction (scaled with chi if appropriate)
+    if (m_scaleP_MAC)
     {
       for (DataIterator dit=gradPhi.dataIterator(); dit.ok(); ++dit)
       {
         for (int dir=0; dir<SpaceDim; dir++)
         {
-          gradPhi[dit].mult(porosity[dit], porosity[dit].box(), 0, dir);
+          gradPhi[dit].mult(pressureScale[dit], pressureScale[dit].box(), 0, dir);
         }
       }
     }
-
 
     traceVel.exchange();
     advectionVelocity.exchange();
     UtoAdvect_old.exchange();
     grad_eLambda.exchange();
     gradPhi.exchange();
+    pressureScale.exchange();
 
     computePredictedVelocities(advectedField, traceVel, advectionVelocity,
-                               UtoAdvect_old, viscousSource, m_patchGodVelocity,
-                               grad_eLambda, gradPhi, porosity, old_time, a_dt,
+                               UtoAdvect_old, a_src, m_patchGodVelocity,
+                               grad_eLambda, gradPhi, pressureScale, old_time, a_dt,
                                legacyCompute);
 
-    //attempt to fix things
-      advectedField.exchange();
+    advectedField.exchange();
 
 
   } // FluxBox goes out of scope, memory reclaimed.
@@ -3741,7 +3800,7 @@ void AMRLevelMushyLayer::traceAdvectionVel(LevelData<FluxBox>& a_advVel,
   if (advectionPhysics == NULL)
   {
     MayDay::Error(
-        "AMRLevelMushyLayer::computeAdvectionVelocities - unable to upcast GodunovPhysics to AdvectionPhysics");
+        "AMRLevelMushyLayer::traceAdvectionVel - unable to upcast GodunovPhysics to AdvectionPhysics");
   }
 
   a_patchGodVelocity.setCurrentTime(a_old_time);
@@ -4281,24 +4340,28 @@ void AMRLevelMushyLayer::computeLapVel(LevelData<FArrayBox>& a_lapVel,
 
   ParmParse pp("computeLapVel");
 
-  bool HOLapVel = true;
+  bool HOLapVel = false;
   pp.query("HO", HOLapVel);
+  //todo - make HO with AMR
 
 
   for (int dir = 0; dir < SpaceDim; dir++)
   {
     // Fill outer ghost cells
-    VelBCHolder extrapBC = m_physBCPtr->velExtrapBC(Interval(1,1));
-    extrapBC.applyBCs(a_vel_copy, a_vel_copy.disjointBoxLayout(), m_problem_domain, m_dx, false);
+    // Shouldn't need to do this any more - velBC should fill all ghost cells
+//    VelBCHolder extrapBC = m_physBCPtr->velExtrapBC(Interval(1,1));
+//    extrapBC.applyBCs(a_vel_copy, a_vel_copy.disjointBoxLayout(), m_problem_domain, m_dx, false);
 
     // todo: Try and replace this with the Darcy Brinkman op?
     if (HOLapVel)
     {
+
       m_viscousOp[dir]->applyOpI4(a_lapVel, a_vel_copy, false);
+
     }
     else
     {
-          m_viscousOp[dir]->applyOpI(a_lapVel, a_vel_copy, false);
+      m_viscousOp[dir]->applyOpI(a_lapVel, a_vel_copy, false);
     }
     a_lapVel.exchange(a_lapVel.interval());
 
@@ -4589,6 +4652,8 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
     pout() << "AMRLevelMushyLayer::computeAdvectionVelSourceTerm"            << endl;
   }
 
+  ParmParse ppMain("main");
+
   IntVect ivGhost = a_src.ghostVect();
   LevelData<FArrayBox> darcy(m_grids, SpaceDim, ivGhost);
   LevelData<FArrayBox> viscous(m_grids, SpaceDim, ivGhost);
@@ -4597,6 +4662,7 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   LevelData<FArrayBox> temperature(m_grids, 1, ivGhost);
   LevelData<FArrayBox> liquidConc(m_grids, 1, ivGhost);
   LevelData<FArrayBox> porosity(m_grids, 1, ivGhost);
+  LevelData<FArrayBox> pressureScale(m_grids, 1, ivGhost);
 
   //  Real old_time = m_time - m_dt;
   //  Real src_time = m_time - m_dt; //old_time;
@@ -4614,11 +4680,13 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   fillScalars(temperature, src_time, m_temperature, true);
   fillScalars(liquidConc, src_time, m_liquidConcentration, true);
   fillScalars(porosity, src_time, m_porosity, true);
+  fillScalars(pressureScale, src_time, m_pressureScaleVar, true);
 
   LevelData<FArrayBox> *crseVelPtr = NULL;
   AMRLevelMushyLayer* amrMushyLayerCoarserPtr;
 
   fillVectorField(velOld, src_time, m_fluidVel, true, true);
+
   if (m_level > 0)
   {
     amrMushyLayerCoarserPtr = getCoarserLevel();
@@ -4628,7 +4696,7 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
 
   //  Real minChi = ::computeMin(*m_scalarNew[m_porosity], NULL, 1);
   Real advVelsrcChiLimit = m_solidPorosity; //1e-10
-  ParmParse ppMain("main");
+
   ppMain.query("advVelSrcChiLimit", advVelsrcChiLimit);
   setVelZero(velOld, advVelsrcChiLimit);
 
@@ -4637,7 +4705,7 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   BCHolder bcExtrap = m_physBCPtr->extrapFuncBC();
 
   //  m_projection.gradPiBCs(pressure, true);
-  fillPressureSrcTerm(pressure, porosity, src_time-m_dt/2,
+  fillPressureSrcTerm(pressure, pressureScale, src_time-m_dt/2,
                       false); // false - make sure we use Pi (true means use phi)
 
 
@@ -4810,7 +4878,7 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
 
   if (maxSrcVal > 1e10)
   {
-    pout() << "Warning - norm of advection velocity src term = " << maxSrcVal << endl;
+    pout() << "WARNING - norm of advection velocity src term = " << maxSrcVal << endl;
   }
 
   //Get CF BCs
@@ -5020,7 +5088,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   }
 
   int exitStatus = 0;
-
+  ParmParse ppMain("main");
   int numComp = a_src.nComp();
 
   LevelData<FArrayBox> full_src(m_grids, numComp, IntVect::Zero);
@@ -5039,6 +5107,20 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     //    bool doMultiCompAdvection = true;
 
     computeScalarAdvectiveSrcHC(full_src, totalAdvectiveFlux, doFRupdates);
+
+
+    bool skipSalt = false;
+    ppMain.query("skipSaltUpdate", skipSalt);
+    if (skipSalt)
+    {
+      for (dit.reset(); dit.ok(); ++dit)
+      {
+        full_src[dit].setVal(0.0, 1);
+      }
+      // this needs to be done before operators are defined - just set lewis=1e300 in inputs file
+//      m_parameters.m_saltDiffusionCoeff = 0;
+    }
+
   } // end if compute advective src
   full_src.copyTo(Interval(0,0), *m_scalarNew[m_enthalpySrc], Interval(0,0));
   full_src.copyTo(Interval(1,1), *m_scalarNew[m_saltEqnSrcGodunov], Interval(0,0));
@@ -5046,7 +5128,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   // Option here to not update enthalpy and salinity
   // (useful for debugging)
   bool skipUpdate = false;
-  ParmParse ppMain("main");
+
   ppMain.query("skipHCUpdate", skipUpdate);
   if (skipUpdate)
   {
@@ -5136,12 +5218,74 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   else
   {
 
+    if (ppMain.contains("noMultigrid"))
+    {
+
+
+      int num_iter=100;
+      ppMain.query("noMultigridIter", num_iter);
+      a_phi_old.copyTo(a_phi_new);
+
+
+      LevelData<FArrayBox> thisSrc(m_grids, 2, IntVect::Unit);
+      full_src.copyTo(thisSrc);
+      for (DataIterator dit = thisSrc.dataIterator(); dit.ok(); ++dit)
+      {
+        thisSrc[dit].mult(m_dt);
+        thisSrc[dit].plus(a_phi_old[dit]);
+      }
+
+      for (int i=0; i < num_iter; i++)
+            {
+
+        // Need to define solvers first and foremost
+//        defineSolvers(m_time);
+
+      // Try replacing with single level relax solver
+      RefCountedPtr<AMRNonLinearMultiCompOp> amrpop = RefCountedPtr<AMRNonLinearMultiCompOp>(
+            (AMRNonLinearMultiCompOp*) HCOpFact->AMRnewOp(m_problem_domain));
+
+      // Solving (1-dt Op) HC^{n+1} = HC^{n}
+      amrpop->setAlphaAndBeta(1.0, -m_dt);
+
+      LevelData<FArrayBox> a_res(m_grids, 2, IntVect::Unit);
+
+      amrpop->relax(a_phi_new, thisSrc, 1000);
+
+      amrpop->residual(a_res, a_phi_new, thisSrc, false);
+      Real maxRes = ::computeNorm(a_res, NULL, 1, m_dx, Interval(0, 1), 0);
+      pout() << "  Max residual = " << maxRes << endl;
+
+      if (maxRes < 1e-10)
+      {
+        pout() << "   Converged " << endl;
+        break;
+
+      }
+
+      // Update other variables ready to go again
+//      a_phi_new.copyTo(Interval(0,0), *m_scalarNew[m_enthalpy], Interval(0,0));
+//      a_phi_new.copyTo(Interval(1,1), *m_scalarNew[m_bulkConcentration], Interval(0,0));
+//
+//      updateEnthalpyVariables();
+
+
+      }
+    }
+    else
+    {
+
     s_enthalpySalinityBE->updateSoln(a_phi_new,
                                      a_phi_old, full_src, finerFRPtr, coarserFRPtr,
                                      coarserDataOldPtr, coarserDataNewPtr, old_time, tCoarserOld,
                                      tCoarserNew, m_dt, m_level, false); //false - don't zero phi
 
     baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*s_enthalpySalinityBE));
+    }
+
+
+
+
   }
 
   if (s_verbosity > 5)
@@ -6720,7 +6864,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   ppMain.query("max_dt", max_dt);
   Real maxAdvU = getMaxVelocity();
   Real maxUChi = ::computeMax(*m_vectorNew[m_U_porosity], NULL, -1, Interval(0,SpaceDim-1));
-  if (maxUChi > 1e100)
+  if (maxUChi > 1e10)
   {
     maxUChi = 1e-100;
   }
@@ -6749,12 +6893,22 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   //   Real minPerm = ::computeMin(*m_scalarNew[m_permeability], NULL, -1, Interval(0,0));
 
   Real buoyancy_acceleration = abs(max(m_parameters.m_buoyancyTCoeff, m_parameters.m_buoyancySCoeff) * maxPorosity);
-  //  Real buoyancy_acceleration = abs(m_parameters.m_buoyancyTCoeff * maxTemp * maxPorosity);
   Real darcy_acceleration = abs(m_parameters.m_darcyCoeff*maxUChi); //*maxPorosity/minPerm
-  Real viscous_acceleration = abs(m_parameters.m_viscosityCoeff*maxAdvU/(m_dx*m_dx));
-  Real acceleration = max(buoyancy_acceleration, darcy_acceleration);
-  //  acceleration = max(acceleration, viscous_acceleration);
-  acceleration = darcy_acceleration;
+  Real viscous_acceleration = abs(m_parameters.m_viscosityCoeff*maxAdvU/(m_domainHeight));
+//  Real acceleration = max(buoyancy_acceleration, darcy_acceleration);
+//    acceleration = max(acceleration, viscous_acceleration);
+
+   Real acceleration = computeNorm(*m_vectorNew[m_advectionSrc], NULL, 1, m_dx, Interval(0, SpaceDim-1), 0);
+
+   // Ignore bogus values
+   if (abs(acceleration) > 1e100)
+   {
+     acceleration = 0.0;
+   }
+
+    // Could just compute norm of advection velocity solve source term?
+
+//  acceleration = max(acceleration);
 
   // Factor of 10 is fairly arbitrary
   Real accelDt = sqrt(cfl*finest_dx/acceleration);
@@ -7797,9 +7951,11 @@ bool AMRLevelMushyLayer::currentCFLIsSafe(bool printWarning)
     if (printWarning)
     {
       pout() << "WARNING: new max(U) = " << maxAdvU << " means that CFL = " << newCFL << " which may be unstable" << endl;
-      pout() << "Therefore, we will be skipping fluid advection during this timestep" << endl;
+//      pout() << "Therefore, we will be skipping fluid advection during this timestep" << endl;
     }
-    return false;
+//    return false;
+    //always return true for now
+    return true;
   }
 
   return true;

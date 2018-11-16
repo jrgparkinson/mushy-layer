@@ -729,18 +729,23 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
     pout() << "AMRLevelMushyLayer::define - made diagnostics object" << endl;
   }
 
-  m_scalePwithPorosity = true;
-  ppMain.query("scalePwithChi", m_scalePwithPorosity);
+  m_scaleP_MAC = true;
+  ppMain.query("scalePwithChi", m_scaleP_MAC);
 
   // Makes more sense to store this parameter under projection
   ParmParse ppProjection("projection");
-  ppProjection.query("scalePressureWithPorosity", m_scalePwithPorosity);
+  ppProjection.query("scalePressureWithPorosity", m_scaleP_MAC);
+
+  m_scaleP_CC = m_scaleP_MAC;
+  ppProjection.query("scaleCCPressure", m_scaleP_CC);
 
   explicitDarcyTerm = false;
   ppMain.query("explicitDarcyTerm", explicitDarcyTerm);
 
+  /// Porosity for Darcy-Brinkman, permeability for Darcy
+  m_pressureScaleVar = solvingFullDarcyBrinkman() ? m_porosity : m_permeability ;
 
-  m_pressureScaleVar = (m_parameters.prandtl > 0) ? m_porosity : m_permeability;
+  ppMain.query("pressureScaleVar", m_pressureScaleVar);
 
   s_implicit_reflux = (m_parameters.prandtl > 0);
 
