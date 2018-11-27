@@ -964,19 +964,8 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
   LevelData<FArrayBox> velOldGrown(m_grids, SpaceDim, ivGhost);
   fillVectorField(velOldGrown, old_time, m_fluidVel, true);
 
-  //todo - Set some zero order BCs on vel
-  //  int velOrder = 0;
-  //  VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs, velOrder));
-  //  velBC.applyBCs(velOldGrown, m_grids, m_problem_domain,
-  //                     m_dx, false); // inhomogeneous
-
-  // todo - set porosity limit correctly here
-
   Real advPorosityLimit = m_solidPorosity;
   ppMain.query("advPorosityLimit", advPorosityLimit);
-
-  // this is useless here
-  //  setVelZero(velOldGrown, advPorosityLimit);
 
   // Get initial guess at advection velocity from U^n
   bool useOldAdvVel = false;
@@ -2086,8 +2075,14 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
     // Repeatedly apply projection - check divergence goes to 0
     //    int numProj = 2;
 
-    Real initSumDivU = 1e300;
-    Real maxDivU = initSumDivU;
+//    Real initMaxDivU = 1e300;
+    QuadCFInterp interp;
+    Divergence::levelDivergenceCC(*m_scalarNew[m_divU], *m_vectorNew[uvar], NULL, m_dx, true, interp);
+
+    Real initMaxDivU = computeNorm(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), 0);
+    pout() << " CCProjection: init max(div(U)) = " << initMaxDivU << endl;
+
+    Real maxDivU = initMaxDivU;
 
     Real relTol = 1e-5;
 
@@ -2099,7 +2094,7 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
 
 
     //    for (int i = 0; i < numProj; i++)
-    while(! (maxDivU < initSumDivU*relTol || maxDivU < relTol || i >= maxNumProj))
+    while(! (maxDivU < initMaxDivU*relTol || maxDivU < relTol || i >= maxNumProj))
     {
 
       setVelZero(*m_vectorNew[uvar], ccVelPorosityLimit);
@@ -2107,36 +2102,44 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
       velBC.applyBCs(*m_vectorNew[uvar], m_grids, m_problem_domain,
                            m_dx, false); // inhomogeneous
 
+      if (i > 0)
+      {
+        // todo - WARNING - THIS WILL BREAK AMR AS IT SETS THE BC WRONG FOR MAC SOLVE
+
+        // this only works on level 0 - we don't have any CF boundaries
+        if (m_level==0)
+        {
+        m_projection.AdditionalLevelProject(*m_vectorNew[uvar], crseVelPtr,
+                                       new_time, a_dt,  m_isViscous);
+        }
+      }
+      else
+      {
       m_projection.LevelProject(*m_vectorNew[uvar], crseVelPtr,
                                 new_time, a_dt, pressureScalePtr, crsePressureScalePtr, pressureScaleEdgePtr, crsePressureScaleEdgePtr,
                                 m_isViscous);
+      }
       // as things stand now, physical BC's are re-set in LevelProjection
 
       //Get a copy of the pressure so we can write it out
       m_projection.unscaledPi(*m_scalarNew[m_pressure], a_dt);
-      //      m_projection.unscaledPi(*m_scalarNew[m_pressure], m_dt);
-      //      m_projection.Pi().copyTo(*m_scalarNew[m_pressure]);
 
       // need to do physical boundary conditions and exchanges
       velBC.applyBCs(*m_vectorNew[uvar], m_grids, m_problem_domain,
                      m_dx, false); // inhomogeneous
       m_vectorNew[uvar]->exchange();
 
-
       QuadCFInterp interp;
       Divergence::levelDivergenceCC(*m_scalarNew[m_divU], *m_vectorNew[uvar], NULL, m_dx, true, interp);
-
-      //      sumDivU = ::computeSum(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), true);
 
       // Actually want norm (sum of absolute values)
       maxDivU = computeNorm(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), 0);
 
       pout() << " CCProjection: max(div(U)) = " << maxDivU << endl;
 
-
       if (i == 0)
       {
-        initSumDivU = maxDivU;
+        initMaxDivU = maxDivU;
       }
 
       i++;
@@ -2201,14 +2204,12 @@ void AMRLevelMushyLayer::fillPressureSrcTerm(LevelData<FArrayBox>& gradP,
 
 }
 
-//bool AMRLevelMushyLayer::checkVelZero(LevelData<Flux>)
 
 void AMRLevelMushyLayer::setVelZero(FArrayBox& a_vel, const FArrayBox& a_porosity, const Real a_limit, const int a_radius)
 {
 
   if (a_radius > 0)
   {
-    //todo - make this work for face centered fields
 
     IntVectSet porousCells;
 
@@ -2607,10 +2608,6 @@ void AMRLevelMushyLayer::computeUDelU(LevelData<FArrayBox>& U_adv_src, const Lev
       EdgeToCell(m_advVel, ccVel);
       ccVel.exchange();
 
-      //todo - set this chi limit properly
-      //        setVelZero(vel_chi, 1e-5);
-      //        setVelZero(ccVel, 1e-5);
-
       Gradient::levelGradientCC(UdelU_porosity, vel_chi, m_dx);
       for (DataIterator dit = UdelU_porosity.dataIterator(); dit.ok(); ++dit)
       {
@@ -2948,6 +2945,7 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
 
 
     // Solve each component (x, y, z) separately.
+    //todo - surely can solve both components at the same time? Wouldn't this be quicker with multigrid?
     for (int comp = 0; comp < SpaceDim; comp++)
     {
       Interval intvl(comp, comp);
@@ -4342,7 +4340,7 @@ void AMRLevelMushyLayer::computeLapVel(LevelData<FArrayBox>& a_lapVel,
 
   bool HOLapVel = false;
   pp.query("HO", HOLapVel);
-  //todo - make HO with AMR
+  //todo - make HO work with AMR?
 
 
   for (int dir = 0; dir < SpaceDim; dir++)
@@ -5448,41 +5446,9 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
 
     m_projection.removeFreestreamCorrection(advVel_noReflux);
 
-
     LevelData<FluxBox> *enthalpy_advVel, *conc_advVel;
 
     computeScalDiffusion(diffusiveSrcMultiComp, old_time);
-
-    // Add in the extra source terms due to the fact that we are not advecting the same field
-    // that we're evolving (e.g. dH/dt + u.grad(t) = grad^2 T)
-    //    int H_comp = 0;
-    //    int C_comp = 1;
-    LevelData<FArrayBox> porosityOld(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
-
-    fillScalars(porosityOld, m_time-m_dt, m_porosity, true, true);
-
-    // todo - should probably add something like this back in
-    //    for (DataIterator dit = diffusiveSrcMultiComp.dataIterator(); dit.ok(); ++dit)
-    //    {
-    //      FArrayBox& multiCompSrc = diffusiveSrcMultiComp[dit];
-    //      FArrayBox extraSrc(multiCompSrc.box(), 1);
-    //
-    //      // First subtract Stefan*d(porosity/dt) from temperature src term
-    //      extraSrc.copy(m_dPorosity_dt[dit]);
-    //      extraSrc.mult(m_parameters.stefan);
-    //
-    //      multiCompSrc.minus(extraSrc, extraSrc.box(), 0, H_comp, 1);
-    //
-    //      // Now subtract (1/Porosity)(Sl+CR)*d(porosity/dt) from salinity src term
-    //      FArrayBox& T_Cl = TCl_old[dit];
-    //      extraSrc.copy(T_Cl, C_comp, 0, 1); // set src = Sl
-    //      extraSrc.plus(m_parameters.compositionRatio); // src = Sl + CR
-    //      extraSrc.mult(m_dPorosity_dt[dit]); // src = (Sl+CR)*d(porosity/dt
-    //      extraSrc.divide(porosityOld[dit]); // src = (1/Porosity)(Sl+CR)*d(porosity/dt)
-    //
-    //      multiCompSrc.minus(extraSrc, extraSrc.box(), 0, C_comp, 1);
-    //    }
-
 
     if (s_reflux_enthalpy)
     {
