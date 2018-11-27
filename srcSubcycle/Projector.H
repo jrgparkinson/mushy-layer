@@ -190,6 +190,12 @@ public:
 					const RefCountedPtr<LevelData<FluxBox> > a_crsePorosityEdgePtr,
 					const bool a_isViscous);
 
+  /// For doing a further (constant coefficient) projection
+  void AdditionalLevelProject(LevelData<FArrayBox>& a_velocity,
+                              LevelData<FArrayBox>* a_crseVelPtr,
+                              const Real a_newTime, const Real a_dt,
+                              const bool a_isViscous);
+
   /// do synchronisation operations
   /** defines AMRSolver and calls sync projection
       and freestream preservation solve. assumes all physical
@@ -414,6 +420,8 @@ protected:
    * where \f$ \alpha \f$ is the scale
    */
   void applyCCcorrection(LevelData<FArrayBox>& a_velocity,
+                         LevelData<FArrayBox>* a_pressure,
+                         LevelData<FArrayBox>* a_pressureScalePtr,
                            const Real scale); //const;
 
   /// do sync projection with this level as lBase; corrects velocity in place
@@ -512,6 +520,12 @@ protected:
 					const RefCountedPtr<LevelData<FluxBox> > a_porosityEdgePtr,
 					const RefCountedPtr<LevelData<FluxBox> > a_crsePorosityEdgePtr,
 					bool cellCentred = false);
+
+  /// For when we don't have any pressure scale
+  void solveMGlevel(LevelData<FArrayBox>&   a_phi,
+                    const LevelData<FArrayBox>*   a_phiCoarsePtr,
+                    const LevelData<FArrayBox>&   a_rhs,
+                    bool cellCentred);
 
   /// takes care of setting ghost cell values after restarting
   void postRestart();
@@ -662,6 +676,9 @@ private:
 
   /// Max number of relax solves on the bottom level of the multigrid
   static int s_bottomSolveMaxIter;
+
+  /// multigrid relaxation scheme
+  static int s_multigrid_relaxation;
 
   /// if false, VD correction is set to zero once it's computed
   static bool s_applyVDCorrection;

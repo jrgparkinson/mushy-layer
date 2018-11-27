@@ -60,6 +60,7 @@ Real Projector::s_lambda_timestep = 0.0;
 bool Projector::pp_init = false;
 int  Projector::s_verbosity = 2;
 int Projector::s_bottomSolveMaxIter = 20;
+int Projector::s_multigrid_relaxation = 1; // 1 for gsrb, 4 for jacobi
 
 /// first define quick-n-easy access functions
 
@@ -556,6 +557,7 @@ void Projector::variableSetUp()
   ppProjection.query("relax_bottom_solver", s_relax_bottom_solver);
   ppProjection.query("bottomSolveMaxIter", s_bottomSolveMaxIter);
   ppProjection.query("solverHang", s_solver_hang);
+  ppProjection.query("mg_relaxation", s_multigrid_relaxation);
 
 
   tempBool = (int) s_constantLambdaScaling;
@@ -1539,7 +1541,7 @@ void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
 
   // dt scale was 1/dt, so correct scale is dt
   Real correctScale = 1/dtScale; //1/dtScale;
-  applyCCcorrection(a_velocity, correctScale);
+  applyCCcorrection(a_velocity, &m_Pi, a_porosityPtr, correctScale);
 
   // check resulting velocity field
   // to do this, need to reset physical BC's
@@ -1592,8 +1594,141 @@ void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
 
 }
 
+void Projector::AdditionalLevelProject(LevelData<FArrayBox>& a_velocity,
+                               LevelData<FArrayBox>* a_crseVelPtr,
+                               const Real a_newTime, const Real a_dt,
+                               const bool a_isViscous)
+{
+  if (s_verbosity >= 5)
+  {
+    pout() << "CCProjector::LevelProject "            << endl;
+  }
+
+  CH_TIME("CCProjector::levelProject");
+
+  LevelData<FArrayBox>* velBCPtr=NULL;
+  LevelData<FArrayBox> velBC;
+  ParmParse pp("projection");
+
+  // just to be safe.  proper place for this may be outside this function
+  Interval velComps(0,SpaceDim-1);
+  a_velocity.exchange(velComps);
+
+  LevelData<FArrayBox> rhs(a_velocity.disjointBoxLayout(), 1);
+  LevelData<FArrayBox> pressure(a_velocity.disjointBoxLayout(), 1, IntVect::Unit);
+
+  // Get CF BC if we need it
+  QuadCFInterp velCFInterp;
+
+  if (m_level > 0)
+  {
+//    getCFBC(velBC, a_crseVelPtr, a_crsePorosityPtr, a_dt);
+//
+//    velBCPtr = &velBC;
+//
+//    if (doQuadInterp() && m_crseProjPtr != NULL)
+//    {
+//      // define two-component CF-interp object for velocities
+//      velCFInterp.define(a_velocity.getBoxes(),
+//                         &(velBCPtr->getBoxes()),
+//                         m_dx, m_nRefCrse, SpaceDim, m_domain);
+//    }
+  }
+
+  if (s_verbosity >= 5)
+  {
+    pout() << "CCProjector::LevelProject - calculateDivergence "            << endl;
+  }
+
+  // now compute RHS for projection
+  // BCs should already be set
+  Divergence::levelDivergenceCC(rhs, a_velocity, velBCPtr,
+                                m_dx, doQuadInterp(), velCFInterp);
+
+  // for proper scaling of pi, divide this by dt
+  // so solving lap(pi) = div(u)/dt
+  Real dtScale = 1.0/a_dt; //1.0/a_dt;
+  bool applyScaling = true;
+  pp.query("scaleCCRHS", applyScaling);
+  if (!applyScaling)
+  {
+    dtScale = 1.0;
+  }
+  scaleRHS(rhs, dtScale);
+
+  // this won't work with AMR yet
+  CH_assert(m_level==0);
+
+  // set up coarse BC's for solve, then solve
+  const LevelData<FArrayBox>* crsePiPtr = NULL;
+  if (m_crseProjPtr != NULL) crsePiPtr = &(m_crseProjPtr->Pi());
+
+  // report sum(rhs)
+  if (s_verbosity >= 2)
+  {
+    DisjointBoxLayout* finerGridsPtr = NULL;
+    int nRefFine = -1;
+    Real sumRHS = computeSum(CCrhs(), finerGridsPtr,
+                             nRefFine, m_dx, CCrhs().interval());
+    pout() << "    Level projection -- sum(RHS) = " << sumRHS << endl;
+  }
+
+  if (s_verbosity >= 5)
+  {
+    pout() << "CCProjector::LevelProject - solve for pressure correction "            << endl;
+  }
+
+
+  // now solve for pi
+  solveMGlevel(pressure, crsePiPtr, rhs, true); // cell centred
+
+  // apply appropriate physical BC's
+  BCHolder bcHolder = m_physBCPtr->gradPiFuncBC(); // this is what CC project used to use
+  //  BCHolder bcHolder = m_physBCPtr->BasicPressureFuncBC(false); // this is what MAC project uses
+
+  const DisjointBoxLayout& levelGrids = getBoxes();
+
+  if (s_verbosity >= 5)
+  {
+    pout() << "CCProjector::LevelProject - apply BCs "            << endl;
+  }
+
+  // loop over grids...
+  DataIterator dit = CCrhs().dataIterator();
+  for (dit.reset(); dit.ok(); ++dit)
+  {
+    bcHolder.operator()(pressure[dit],
+                        levelGrids[dit],
+                        m_domain,
+                        m_dx,
+                        false); // not homogeneous
+  }
+
+  pressure.exchange();
+
+  if (m_crseProjPtr != NULL)
+  {
+    // reapply coarse-fine BC's here if necessary
+    m_cfInterp.coarseFineInterp(pressure, *crsePiPtr);
+    // also clean up after ourselves!
+
+    // Don't need to do this anymore
+    //    delete velBCPtr;
+    //    velBCPtr = NULL;
+  }
+
+  // dt scale was 1/dt, so correct scale is dt
+  Real correctScale = 1/dtScale; //1/dtScale;
+  applyCCcorrection(a_velocity, &pressure, NULL, correctScale);
+
+
+
+}
+
 // ---------------------------------------------------------------
 void Projector::applyCCcorrection(LevelData<FArrayBox>& a_velocity,
+                                  LevelData<FArrayBox>* a_pressure,
+                                  LevelData<FArrayBox>* a_pressureScalePtr,
                                     const Real scale) //const
 {
   if (s_verbosity >= 3)
@@ -1612,12 +1747,12 @@ void Projector::applyCCcorrection(LevelData<FArrayBox>& a_velocity,
   ppProjection.query("HO_CC_Corr", HO_corr);
   if (HO_corr)
   {
-  Gradient::levelGradientCC_HO(gradPi, m_Pi, m_dx);
+  Gradient::levelGradientCC_HO(gradPi, *a_pressure, m_dx);
   }
   else
   {
     // Default
-      Gradient::levelGradientCC(gradPi, m_Pi, m_dx);
+      Gradient::levelGradientCC(gradPi, *a_pressure, m_dx);
   }
   //  this->gradPi(gradPi);
 
@@ -1629,11 +1764,11 @@ void Projector::applyCCcorrection(LevelData<FArrayBox>& a_velocity,
     FArrayBox& thisGradPi = gradPi[dit];
     FArrayBox& thisVel = a_velocity[dit];
 
-    if (m_porosityPtr!=NULL)
+    if (a_pressureScalePtr!=NULL)
     {
       for (int dir=0; dir<SpaceDim; dir++)
       {
-        thisGradPi.mult((*m_porosityPtr)[dit],0,dir);
+        thisGradPi.mult((*a_pressureScalePtr)[dit],0,dir);
       }
     }
 
@@ -2457,7 +2592,7 @@ void Projector::initialLevelProject(LevelData<FArrayBox>& a_velocity,
   m_Pi.exchange(piComps);
 
   dtScale = a_dt;
-  applyCCcorrection(a_velocity,dtScale);
+  applyCCcorrection(a_velocity, &m_Pi, a_porosityPtr ,dtScale);
 
   // clean up storage
   if (crseDataPtr!=NULL)
@@ -2781,17 +2916,10 @@ void Projector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
                     m_physBCPtr->SyncProjFuncBC() ),
                     alpha, aCoef, beta, a_porosity);
 
-  // You really need to delete this when you're done with a_solver.
-  // But m_bottomSolver is a protected field of AMRMultiGrid.
-//  if(m_bottomSolverLevel != NULL)
-//  {
-//    delete m_bottomSolverLevel;
-//    m_bottomSolverLevel = NULL;
-//  }
-//  RelaxSolver<LevelData<FArrayBox> >* bottomSolverPtr = new RelaxSolver<LevelData<FArrayBox> >;
-//  bottomSolverPtr->m_imax = 10;
-//  bottomSolverPtr->m_verbosity = s_verbosity;
-//  m_bottomSolverLevel = bottomSolverPtr;
+
+  opFact.m_relaxMode = s_multigrid_relaxation;
+
+
   makeBottomSolvers();
 
   if (m_scaleSyncCorrection)
@@ -2958,8 +3086,6 @@ void Projector::defineSolverMGLevelVCOp(
 
   Vector<int> refRatios(1, m_nRefCrse);
 
-
-
   makeBottomSolvers();
 
   if (s_verbosity > 3)
@@ -2968,14 +3094,19 @@ void Projector::defineSolverMGLevelVCOp(
   }
 
 //  VCAMRPoissonOp2Factory faceOpFact;
-    AMRProjectionOpFactory faceOpFact;
+  int average_type = CoarseAverage::arithmetic;
+  ParmParse pp("projection");
+  pp.query("average_type", average_type);
+  AMRProjectionOpFactory faceOpFact;
 
   faceOpFact.define(baseDomain,
                     m_allGrids,
                     refRatios,
                     dxCrse,
                     m_physBCPtr->LevelPressureFuncBC(),
-                    alpha, m_aCoef, beta, m_bCoef);
+                    alpha, m_aCoef, beta, m_bCoef,
+                    average_type);
+  faceOpFact.m_relaxMode = s_multigrid_relaxation;
 
   if (s_relax_bottom_solver)
   {
@@ -3152,6 +3283,17 @@ void Projector::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
 
 }
 
+void Projector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
+                               const LevelData<FArrayBox>*   a_phiCoarsePtr,
+                               const LevelData<FArrayBox>&   a_rhs,
+                               bool cellCentred)
+{
+RefCountedPtr<LevelData<FArrayBox> > a_pressureScalePtr,  a_crsePressureScalePtr;
+RefCountedPtr<LevelData<FluxBox> > a_pressureScaleEdgePtr,  a_crsePressureScaleEdgePtr;
+
+solveMGlevel(a_phi, a_phiCoarsePtr, a_rhs, a_pressureScalePtr,  a_crsePressureScalePtr, a_pressureScaleEdgePtr,  a_crsePressureScaleEdgePtr,
+             cellCentred);
+}
 
 // -------------------------------------------------------------
 void Projector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
