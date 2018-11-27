@@ -1,0 +1,78 @@
+#include "CONSTANTS.H"
+
+C     -----------------------------------------------------------------
+C     subroutine PROLONG_JP
+C     computes prolongation of correction to finer level with linear (sort of) interp.
+C       phi[h] += I[mh->h](coarse[mh])
+C     INPUTS/OUTPUTS:
+C     m         =>  refinement ratio -- this has to be 2!!!
+C     rhs       <=  rhs[h]
+C     coarse    =>  coarse[2h]
+C     region    =>  Box over which phi is valid (in h index space)
+C
+C     James Parkinson 2018
+C     ------------------------------------------------------------------
+      subroutine PROLONG_JP(
+     &     CHF_FRA[phi],
+     &     CHF_CONST_FRA[coarse],
+     &     CHF_BOX[region],
+     &     CHF_CONST_INT[m] )
+
+      INTEGER ncomp, n
+      integer CHF_DDECL[i;j;k]
+!     integer CHF_DDECL[ioff;joff;koff]
+      integer offs(CH_SPACEDIM)
+!     integer CHF_DDECL[ii;jj;kk]
+      integer CHF_DDECL[ic;jc;kc]
+      real_t f0, den, fx(CH_SPACEDIM)
+      
+
+      den = one/(4**CH_SPACEDIM)
+      CHF_DTERM[
+      fx(1) = three*den;
+      fx(2) = three**2*den;
+      fx(3) = three**3*den]
+      f0 = one*den
+      
+      ncomp = CHF_NCOMP[phi]
+
+      CHF_MULTIDO[region; i; j; k]
+        CHF_DTERM[
+        ic = i/m;
+        jc = j/m;
+        kc = k/m]
+
+!       get sign of side of box
+        CHF_DTERM[
+        offs(1) = 2*mod(i,2) - 1;
+        offs(2) = 2*mod(j,2) - 1;
+        offs(3) = 2*mod(k,2) - 1]
+
+!     center and corner stencil point
+        do n = 0, ncomp-1
+          phi(CHF_IX[i;j;k],n) = phi(CHF_IX[i;j;k],n)
+     $      + fx(CH_SPACEDIM)*coarse(CHF_IX[ic;jc;kc],n)
+     $      + f0*coarse(CHF_IX[ic+offs(1);jc+offs(2);kc+offs(3)],n) 
+#if CH_SPACEDIM > 1
+!       edge stencil
+          phi(CHF_IX[i;j;k],n) = phi(CHF_IX[i;j;k],n) 
+     $      + fx(CH_SPACEDIM-1)*
+     $        (CHF_DTERM[
+     $         coarse(CHF_IX[ic+offs(1);jc;kc],n) ; 
+     $       + coarse(CHF_IX[ic;jc+offs(2);kc],n) ; 
+     $       + coarse(CHF_IX[ic;jc;kc+offs(3)],n) ] )
+#if CH_SPACEDIM > 2
+          phi(CHF_IX[i;j;k],n) = phi(CHF_IX[i;j;k],n) 
+     $      + fx(CH_SPACEDIM-2)*
+     $        (CHF_DTERM[
+     $         coarse(CHF_IX[ic+offs(1);jc+offs(2);kc],n) ; 
+     $       + coarse(CHF_IX[ic;jc+offs(2);kc+offs(3)],n) ; 
+     $       + coarse(CHF_IX[ic+offs(1);jc;kc+offs(3)],n) ] )
+#endif
+#endif
+        enddo
+      CHF_ENDDO
+
+      return
+      
+      end
