@@ -933,7 +933,8 @@ void AMRLevelMushyLayer::getExtraPlotFields()
     {
       (*m_scalarNew[m_MACBC])[dit].mult(0.5*m_dt);
 
-      (*m_scalarNew[m_CCrhs])[dit].mult(m_dt);
+//      (*m_scalarNew[m_CCrhs])[dit].mult(m_dt);
+
       (*m_scalarNew[m_MACrhs])[dit].mult(phiScale);
 
 
