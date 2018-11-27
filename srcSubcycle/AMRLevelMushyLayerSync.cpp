@@ -711,7 +711,13 @@ void AMRLevelMushyLayer::postTimeStep()
   else
   {
     // in case this is the only level
-    if (m_level == 0)
+    // Let's still compute freestream correction
+          // If we've coarsened a previous  mesh, we may have some lambda error left over
+          // which we need to sort out
+    int max_possible_level = 0;
+    pp.query("max_level", max_possible_level);
+
+    if (m_level == 0 && max_possible_level > 0)
     {
       // create boundary condition object and set physical BC's
       VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
@@ -724,9 +730,6 @@ void AMRLevelMushyLayer::postTimeStep()
       m_vectorNew[m_fluidVel]->exchange(velComps);
 
 
-      // Let's still compute freestream correction
-      // If we've coarsened a previous  mesh, we may have some lambda error left over
-      // which we need to sort out
       bool computeFreestream = true;
       ParmParse ppMain("main");
       ppMain.query("single_level_lambda_corr", computeFreestream);
