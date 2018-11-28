@@ -4353,7 +4353,8 @@ void AMRLevelMushyLayer::computeLapVel(LevelData<FArrayBox>& a_lapVel,
     if (HOLapVel)
     {
 
-      m_viscousOp[dir]->applyOpI4(a_lapVel, a_vel_copy, false);
+      MayDay::Error("Higher Order laplacian of velocity not implemented.");
+//      m_viscousOp[dir]->applyOpI4(a_lapVel, a_vel_copy, false);
 
     }
     else
