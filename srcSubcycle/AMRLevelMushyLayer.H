@@ -194,10 +194,23 @@ public:
       const Real&                 a_domainWidth,
       const Real&                 a_refineThresh,
       const int&                  a_tagBufferSize,
-      const bool&                 a_useLimiting)
+      const bool&                 a_useLimiting,
+      const int a_CFInterpOrder,
+      const int a_steadyStateNormType,
+      const Real a_fixedDt,
+      const Real a_max_dt_growth,
+      const int  a_verbosity,
+      const bool a_useSubcycling,
+      const bool a_ignoreSolverFails,
+      const Real a_initial_dt_multiplier,
+      const Real a_adv_vel_centering_growth,
+      const int a_restartMethod)
   {
     define(a_cfl, a_domainWidth, a_refineThresh,
-           a_tagBufferSize,  a_useLimiting);
+           a_tagBufferSize,  a_useLimiting,
+           a_CFInterpOrder, a_steadyStateNormType, a_fixedDt,
+           a_max_dt_growth, a_verbosity, a_useSubcycling,
+           a_ignoreSolverFails, a_initial_dt_multiplier,  a_adv_vel_centering_growth, a_restartMethod);
   }
 
 
@@ -213,7 +226,11 @@ public:
       /// number of buffer cells around each tagged cell that will also be tagged
       const int&                  a_tagBufferSize,
       /// whether to use van Leer limiting
-      const bool&                 a_useLimiting);
+      const bool&                 a_useLimiting,
+      const int a_CFInterpOrder, const int a_steadyStateNormType, const Real a_fixedDt, const Real a_max_dt_growth,
+      const int  a_verbosity, const bool a_useSubcycling,
+      const bool a_ignoreSolverFails,  const Real a_initial_dt_multiplier,
+      const Real a_adv_vel_centering_growth,  const int a_restartMethod);
 
   /// Destructor
   virtual ~AMRLevelMushyLayer();

@@ -2080,18 +2080,17 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
     Divergence::levelDivergenceCC(*m_scalarNew[m_divU], *m_vectorNew[uvar], NULL, m_dx, true, interp);
 
     Real initMaxDivU = computeNorm(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), 0);
-    pout() << " CCProjection: init max(div(U)) = " << initMaxDivU << endl;
+    if (s_verbosity >= 3)
+    {
+      pout() << " CCProjection: init max(div(U)) = " << initMaxDivU << endl;
+    }
 
     Real maxDivU = initMaxDivU;
-
     Real relTol = 1e-5;
-
     int i = 0;
 
     int maxNumProj = 1;
-
     pp.query("maxProjections", maxNumProj);
-
 
     //    for (int i = 0; i < numProj; i++)
     while(! (maxDivU < initMaxDivU*relTol || maxDivU < relTol || i >= maxNumProj))

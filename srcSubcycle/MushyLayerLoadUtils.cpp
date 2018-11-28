@@ -1,4 +1,6 @@
 #include "MushyLayerLoadUtils.H"
+#include "AMRLevelMushyLayerFactory.H"
+#include "MushyLayerSubcycleUtils.H"
 
 void getAMRHierarchy(string inFile, Vector<AMRLevelMushyLayer*>& amrlevels, int& finest_level, HDF5HeaderData& header)
 {
@@ -101,10 +103,16 @@ void getAMRHierarchy(string inFile, Vector<AMRLevelMushyLayer*>& amrlevels, int&
 //  Vector<AMRLevelMushyLayer*> amrlevels;
   amrlevels.resize(num_levels);
 
+  RefCountedPtr<AMRLevelMushyLayerFactory> mlFact;
+  getAMRFactory(mlFact);
+
   for (int level = 0; level <= finest_level; ++level)
   {
-    amrlevels[level] = new AMRLevelMushyLayer(cfl, domainWidth, refineThresh,
-                                              tagBufferSize,  useLimiting);
+
+//    amrlevels[level] = new AMRLevelMushyLayer(cfl, domainWidth, refineThresh,
+//                                              tagBufferSize,  useLimiting);
+    amrlevels[level] = (static_cast <AMRLevelMushyLayer*> (mlFact->new_amrlevel()) );
+
     AMRLevelMushyLayer* crsePtr = NULL;
     if (level > 0)
     {

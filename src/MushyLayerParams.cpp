@@ -469,23 +469,20 @@ void MushyLayerParams::getParameters()
   parseBCs("bulkConcentrationLo", &bcTypeBulkConcentrationLo);
   parseBCs("bulkConcentrationHi", &bcTypeBulkConcentrationHi);
 
+  parseBCs("liquidConcentrationLo", &bcTypeLiquidConcentrationLo);
+  parseBCs("liquidConcentrationHi", &bcTypeLiquidConcentrationHi);
 
-    parseBCs("liquidConcentrationLo", &bcTypeLiquidConcentrationLo);
-    parseBCs("liquidConcentrationHi", &bcTypeLiquidConcentrationHi);
+  parseBCs("temperatureLo", &bcTypeTemperatureLo);
+  parseBCs("temperatureHi", &bcTypeTemperatureHi);
 
-    parseBCs("temperatureLo", &bcTypeTemperatureLo);
-    parseBCs("temperatureHi", &bcTypeTemperatureHi);
+  parseBCs("porosityLo", &bcTypePorosityLo);
+  parseBCs("porosityHi", &bcTypePorosityHi);
 
-    parseBCs("porosityLo", &bcTypePorosityLo);
-    parseBCs("porosityHi", &bcTypePorosityHi);
-
-    parseBCs("permeabilityLo", &bcTypePermeabilityLo);
-    parseBCs("permeabilityHi", &bcTypePermeabilityHi);
-
+  parseBCs("permeabilityLo", &bcTypePermeabilityLo);
+  parseBCs("permeabilityHi", &bcTypePermeabilityHi);
 
   parseBCVals("velLoVal", bcValVelLo);
   parseBCVals("velHiVal", bcValVelHi);
-
 
   parseBCVals("enthalpyLoVal", bcValEnthalpyLo, required);
   parseBCVals("enthalpyHiVal", bcValEnthalpyHi, required);

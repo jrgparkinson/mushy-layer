@@ -40,7 +40,17 @@ public:
                                /// number of buffer cells around each tagged cell that will also be tagged
                                const int&                  a_tagBufferSize,
                                /// whether to use van Leer limiting
-                               const bool&                 a_useLimiting);
+                               const bool&                 a_useLimiting,
+                               const int a_CFInterpOrder,
+                                                            const int a_steadyStateNormType,
+                                                            const Real a_fixedDt,
+                                                            const Real a_max_dt_growth,
+                                                            const int  a_verbosity,
+                                                            const bool a_useSubcycling,
+                                                            const bool ignoreSolveFails,
+                                                            const int solverFailRestartMethod,
+                                                            const Real adv_vel_centering_growth,
+                                                            const Real initial_dt_multiplier);
 
 
   /// Destructor
@@ -68,6 +78,20 @@ protected:
 
   /// Use slope limiting in advection calculations?
   bool                  m_useLimiting;
+
+  int m_CFInterpOrder;
+  int m_steadyStateNormType;
+  Real m_fixedDt;
+  Real m_max_dt_growth;
+  int  m_verbosity;
+  bool m_useSubcycling;
+
+   bool m_ignoreSolverFails;
+   int m_solverFailRestartMethod;
+   Real m_adv_vel_centering_growth;
+   Real m_initial_dt_multiplier;
+
+
 
 private:
 

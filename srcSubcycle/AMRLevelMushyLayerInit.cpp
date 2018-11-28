@@ -3,10 +3,6 @@
 #include "analyticSolns.H"
 #include "SetValLevel.H"
 
-// For custom math expressions
-//#include <iostream>
-//#include "muParser.h"
-
 
 void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
                                 const ProblemDomain& a_problemDomain, int a_level, int a_refRatio)
@@ -28,17 +24,19 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     if (amrMLcrse != NULL)
     {
       define(   amrMLcrse->m_cfl, amrMLcrse->m_domainWidth,
-                amrMLcrse->m_refineThresh, amrMLcrse->m_tagBufferSize, amrMLcrse->m_useLimiting);
-    } else {
+                amrMLcrse->m_refineThresh, amrMLcrse->m_tagBufferSize, amrMLcrse->m_useLimiting,
+                amrMLcrse->CFinterpOrder_advection, amrMLcrse->m_steadyStateNormType,
+                amrMLcrse->m_fixedDt, amrMLcrse->m_max_dt_growth,
+                amrMLcrse->s_verbosity, amrMLcrse->m_useSubcycling,
+                amrMLcrse->m_ignoreSolverFails,  amrMLcrse->m_initial_dt_multiplier,
+                amrMLcrse->m_adv_vel_centering_growth,  amrMLcrse->m_solverFailRestartMethod);
+    }
+    else
+    {
       MayDay::Error(
           "AMRLevelMushyLayer::define: a_coarserLevelPtr is not castable to AMRLevelMushyLayer*");
     }
   }
-
-//  if (m_level == 0)
-//  {
-//    m_parameters.printParameters();
-//  }
 
   // Why wasn't this line here before?
   m_problem_domain = a_problemDomain;
@@ -636,22 +634,30 @@ void AMRLevelMushyLayer::setAdvectionBCs()
 }
 
 
+
+
 void AMRLevelMushyLayer::define(const Real& a_cfl,
                                 const Real& a_domainWidth, const Real& a_refineThresh,
                                 const int& a_tagBufferSize,
-                                const bool& a_useLimiting)
+                                const bool& a_useLimiting,
+                                const int a_CFInterpOrder,
+                                const int a_steadyStateNormType,
+                                const Real a_fixedDt,
+                                const Real a_max_dt_growth,
+                                const int  a_verbosity,
+                                const bool a_useSubcycling,
+                                const bool a_ignoreSolverFails,
+                                const Real a_initial_dt_multiplier,
+                                const Real a_adv_vel_centering_growth,
+                                const int a_restartMethod)
 {
 
   ParmParse ppMain("main");
   ParmParse ppParams("parameters");
   ParmParse ppMG("amrmultigrid");
 
-  ppMain.query("verbosity", s_verbosity);
-
-  //  m_nusselt.resize(3);
-
-  //  m_useSubcycling = true;
-  ppMain.query("use_subcycling", m_useSubcycling);
+  s_verbosity = a_verbosity;
+  m_useSubcycling = a_useSubcycling;
 
   m_isDefined = true;
   m_cfl = a_cfl;
@@ -660,45 +666,52 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_tagBufferSize = a_tagBufferSize;
   m_useLimiting = a_useLimiting;
 
-  // 1st/2nd order interpolation for advection
-  CFinterpOrder_advection = 1;
-  ppMain.query("advectionInterpOrder", CFinterpOrder_advection);
-
-  // 1 for volume averaged, 0 for max
-  m_steadyStateNormType = 1;
-  ppMain.query("steadyStateNormType", m_steadyStateNormType);
-
-  //  m_fixedDt = -1;
-  ppMain.query("fixed_dt", m_fixedDt);
-
-  //Initialise to something large
-  //  m_max_dt_growth = 1.1;
-  ppMain.query("max_dt_growth", m_max_dt_growth);
+//  // 1st/2nd order interpolation for advection
+//  CFinterpOrder_advection = 1;
+//  ppMain.query("advectionInterpOrder", CFinterpOrder_advection);
+//
+//  // 1 for volume averaged, 0 for max
+//  m_steadyStateNormType = 1;
+//  ppMain.query("steadyStateNormType", m_steadyStateNormType);
+//
+//  //  m_fixedDt = -1;
+//  ppMain.query("fixed_dt", m_fixedDt);
+//
+//  //Initialise to something large
+//  //  m_max_dt_growth = 1.1;
+//  ppMain.query("max_dt_growth", m_max_dt_growth);
+  CFinterpOrder_advection = a_CFInterpOrder;
+  m_steadyStateNormType = a_steadyStateNormType;
+  m_fixedDt = a_fixedDt;
+  m_max_dt_growth = a_max_dt_growth;
 
   m_timestepReduced = false;
   m_timestepFailed = false;
-  //  m_ignoreSolverFails = true; // already defaults to true
-  ppMain.query("ignoreSolverFails", m_ignoreSolverFails);
-  m_solverFailRestartMethod = m_restartHalveDt;
-  ppMain.query("solverFailRestartMethod", m_solverFailRestartMethod);
+
+
+//  ppMain.query("ignoreSolverFails", m_ignoreSolverFails);
+//  m_solverFailRestartMethod = m_restartHalveDt;
+//  ppMain.query("solverFailRestartMethod", m_solverFailRestartMethod);
+//
+//  m_adv_vel_centering = 0.5;
+//  m_adv_vel_centering_growth = 1.01;
+//  ppMain.query("adv_vel_centering_growth", m_adv_vel_centering_growth);
+//
+//  m_dtReduction = -1;
+//
+//  ppMain.query("initial_cfl", m_initial_dt_multiplier);
+  m_ignoreSolverFails = a_ignoreSolverFails;
+  m_initial_dt_multiplier = a_initial_dt_multiplier;
+  m_adv_vel_centering_growth = a_adv_vel_centering_growth;
+  m_solverFailRestartMethod = a_restartMethod;
 
   m_adv_vel_centering = 0.5;
-  m_adv_vel_centering_growth = 1.01;
-  ppMain.query("adv_vel_centering_growth", m_adv_vel_centering_growth);
-
   m_dtReduction = -1;
 
-  ppMain.query("initial_cfl", m_initial_dt_multiplier);
 
   m_parameters.getParameters();
 
-  // Delete old m_physBCPtr to prevent memory issues
-  // this doesn't seem to work though
-  //    if (m_physBCPtr != NULL)
-  //    {
-  //      delete m_physBCPtr;
-  //      m_physBCPtr = NULL;
-  //    }
+
   m_physBCPtr = new PhysBCUtil(m_parameters, m_dx);
   m_physBCPtr->setAdvVel(&m_advVel);
 
@@ -770,7 +783,9 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   {
     if (m_level == 0)
     {
-    pout() << "Darcy timescale, advective velocity scale" << endl;
+
+      pout() << "Darcy timescale, advective velocity scale" << endl;
+
     }
     // To avoid dividing by 0 when Da = Pr = 0
     if (m_parameters.darcy == m_parameters.prandtl)
@@ -3048,7 +3063,10 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
       thisMLPtr->dt(dtInit);
     }
 
-    pout() << "Initial pressure calculation ("<< iter<< "/" <<  s_num_init_passes <<") with dt = " << dtInit << endl;
+    if (s_verbosity >= 3)
+    {
+      pout() << "Initial pressure calculation ("<< iter<< "/" <<  s_num_init_passes <<") with dt = " << dtInit << endl;
+    }
 
 
     thisMLPtr = this;

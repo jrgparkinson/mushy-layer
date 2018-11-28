@@ -24,17 +24,36 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   CH_TIME("getAMRFactory");
 
   ParmParse ppMain("main");
+
+  ParmParse ppParams("parameters");
+  ParmParse ppMG("amrmultigrid");
+
   Real cfl = 0.8;
   ppMain.get("cfl",cfl);
 
   // This is really the domain width, not length,
   // but changing it in the inputs files would be a right pain
   // at this point
-  Real domainWidth;
+  Real domainWidth = -1;
   ppMain.query("domain_length",domainWidth); // retained for backward compatability
   ppMain.query("domain_width",domainWidth);
 
-  //todo - add option to just specify domain height, then calculate width here using main.num_cells
+  if (ppMain.contains("domain_height"))
+  {
+    Real domainHeight;
+    ppMain.query("domain_height", domainHeight);
+
+    std::vector<int> num_cells; // (num_read_levels,1);
+    ppMain.getarr("num_cells",num_cells,0,SpaceDim);
+
+    domainWidth = domainHeight*num_cells[0]/num_cells[SpaceDim-1];
+
+  }
+
+  if (domainWidth <= 0)
+  {
+    MayDay::Error("No domain width specified, or domain width is invalid");
+  }
 
   Real refineThresh = 0.3;
   ppMain.get ("refine_thresh",refineThresh);
@@ -46,10 +65,49 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.get("use_limiting", useLimiting);
 
 
+  // New added params
+  Real verbosity = 1;
+  ppMain.query("verbosity", verbosity);
+
+  bool useSubcycling = true;
+  ppMain.query("use_subcycling", useSubcycling);
+
+  // 1st/2nd order interpolation for advection
+  Real CFinterpOrder_advection = 1;
+  ppMain.query("advectionInterpOrder", CFinterpOrder_advection);
+
+  // 1 for volume averaged, 0 for max
+  int steadyStateNormType = 1;
+  ppMain.query("steadyStateNormType", steadyStateNormType);
+
+  Real fixedDt = -1;
+  ppMain.query("fixed_dt", fixedDt);
+
+  Real max_dt_growth = 1.1;
+  ppMain.query("max_dt_growth", max_dt_growth);
+
+  // more new params
+  bool ignoreSolveFails = true;
+  ppMain.query("ignoreSolverFails", ignoreSolveFails);
+
+  int solverFailRestartMethod = 0;
+  ppMain.query("solverFailRestartMethod", solverFailRestartMethod);
+
+  Real adv_vel_centering_growth = 1.01;
+  ppMain.query("adv_vel_centering_growth", adv_vel_centering_growth);
+
+  Real initial_dt_multiplier = 0.1;
+  ppMain.query("initial_cfl", initial_dt_multiplier);
+
+
+
   a_fact = RefCountedPtr<AMRLevelMushyLayerFactory>
   (new AMRLevelMushyLayerFactory(cfl, domainWidth,
                                  refineThresh, tagBufferSize,
-                                 useLimiting));
+                                 useLimiting,
+                                 verbosity, useSubcycling, CFinterpOrder_advection,
+                                 steadyStateNormType, fixedDt, max_dt_growth,
+                                 ignoreSolveFails, solverFailRestartMethod, adv_vel_centering_growth, initial_dt_multiplier));
 
 }
 void
