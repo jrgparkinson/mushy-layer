@@ -317,11 +317,13 @@ MGLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::MGnewOp(const ProblemD
           averager.averageToCoarseHarmonic(*aCoef, *(m_aCoef[ref]));
           faceAverager.averageToCoarseHarmonic(*bCoef, *(m_bCoef[ref]));
         }
+#ifdef CH_FORK
       else if (m_coefficient_average_type == CoarseAverage::geometric)
              {
                averager.averageToCoarseGeometric(*aCoef, *(m_aCoef[ref]));
                faceAverager.averageToCoarseGeometric(*bCoef, *(m_bCoef[ref]));
              }
+#endif
       else
         {
           MayDay::Abort("AMRProjectionOpFactory::MGNewOp -- bad averagetype");

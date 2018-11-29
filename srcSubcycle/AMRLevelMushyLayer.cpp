@@ -6877,11 +6877,13 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 //  acceleration = max(acceleration);
 
   // Factor of 10 is fairly arbitrary
-  Real accelDt = sqrt(cfl*finest_dx/acceleration);
+   Real accelCFL = cfl;
+   ppMain.query("accelCFL", accelCFL);
+  Real accelDt = sqrt(accelCFL*finest_dx/acceleration);
 
   bool printAccelDt = false;
   ppMain.query("printAccelDt", printAccelDt);
-  if (printAccelDt)
+  if (printAccelDt && s_verbosity >= 2)
   {
     pout() << "  Max dt computed from acceleration = " << accelDt << endl;
     pout() << "  Accleration terms: buoyancy = " << buoyancy_acceleration << ", viscous = " << viscous_acceleration << ", darcy = " << darcy_acceleration << endl;
