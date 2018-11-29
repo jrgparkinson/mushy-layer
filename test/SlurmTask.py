@@ -8,7 +8,7 @@ class SlurmTask:
 
     MAX_TASKS_PER_NODE = 8
     
-    def __init__(self, folder, jobname, execFile, num_proc=1, timeLimit = 7.0, memoryLimit=20000, numNodes=0, mpirun=True):
+    def __init__(self, folder, jobname, execFile, num_proc=1, timeLimit = 7.0, memoryLimit=4000, numNodes=0, mpirun=True):
 
         self.jobname = jobname
         self.folder = folder
