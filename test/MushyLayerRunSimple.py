@@ -76,9 +76,13 @@ class MushyLayerRunSimple:
                 # want to choose max_grid_size to do parallel stuff most effectively
                 # Want to choose a box size to make the parallel computations most
                 # efficiently
-                ncells = parameters['main.num_cells'].split(' ')
-                grid_res_x = int(ncells[0])
-                grid_res_y = int(ncells[0])
+                if isinstance(parameters['main.num_cells'], basestring):
+                    ncells = parameters['main.num_cells'].split(' ')
+                    grid_res_x = int(ncells[0])
+                    #grid_res_y = int(ncells[0])
+                else:
+                    grid_res_x = parameters['main.num_cells'][0]
+
                 if math.log(grid_res_x, 2.0) == math.floor(math.log(grid_res_x, 2.0)):
                         min_box_size = math.sqrt(grid_res_x * grid_res_x / num_proc)
 
