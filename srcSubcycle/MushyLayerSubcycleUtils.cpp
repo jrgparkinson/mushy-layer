@@ -99,15 +99,11 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   Real initial_dt_multiplier = 0.1;
   ppMain.query("initial_cfl", initial_dt_multiplier);
 
-
-
   a_fact = RefCountedPtr<AMRLevelMushyLayerFactory>
-  (new AMRLevelMushyLayerFactory(cfl, domainWidth,
-                                 refineThresh, tagBufferSize,
-                                 useLimiting,
-                                 verbosity, useSubcycling, CFinterpOrder_advection,
-                                 steadyStateNormType, fixedDt, max_dt_growth,
-                                 ignoreSolveFails, solverFailRestartMethod, adv_vel_centering_growth, initial_dt_multiplier));
+  (new AMRLevelMushyLayerFactory(cfl, domainWidth, refineThresh, tagBufferSize,  useLimiting,
+                                 CFinterpOrder_advection, steadyStateNormType, fixedDt, max_dt_growth,
+                                 verbosity, useSubcycling, ignoreSolveFails,solverFailRestartMethod,
+                                  adv_vel_centering_growth, initial_dt_multiplier));
 
 }
 void
