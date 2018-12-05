@@ -123,6 +123,7 @@ projection.phiScale=1.0
 projection.MACbcScale=-0.5 #0.4
 main.usePhiForImplicitAdvectionSolve=false
 
-main.nondimensionalisation=1
-
 regrid.tagDomainBoundary=false
+
+main.nondimensionalisation=0
+main.useAccelDt=1

@@ -133,4 +133,5 @@ regrid.plume_vel=5e-5
 main.ref_ratio=2 2 2
 main.regrid_interval=32 32 32
 
-
+main.nondimensionalisation=0
+main.useAccelDt=1

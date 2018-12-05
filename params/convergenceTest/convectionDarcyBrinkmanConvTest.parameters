@@ -56,7 +56,7 @@ main.max_level=1
 main.max_step=100000000
 main.max_time=1.0
 main.min_time=10000.0
-main.nondimensionalisation=1
+
 main.num_cells= 16 16 8 #128 32  8
 main.num_init_passes=0
 #main.gridfile=grids
@@ -124,5 +124,6 @@ projection.phiScale=1.0
 projection.MACbcScale=-0.5 #0.4
 main.usePhiForImplicitAdvectionSolve=false
 
-main.nondimensionalisation=1
+main.nondimensionalisation=0
+main.useAccelDt=1
 

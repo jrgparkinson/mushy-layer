@@ -108,8 +108,10 @@ bc.enthalpyHiVal=0.0 0.0
 bc.enthalpyLoVal=0.0 6.1
 
 
-main.nondimensionalisation=1
 parameters.nonDimVel=1.0 #0.002
 main.analyticSoln=5
 main.debug=true
 main.doEuler=1
+
+main.nondimensionalisation=0
+main.useAccelDt=1

@@ -119,3 +119,6 @@ projection.verbosity=0
 regrid.marginalPorosityLimit=0.99
 run_name=Uniform
 main.initData=1
+
+main.nondimensionalisation=0
+main.useAccelDt=1
