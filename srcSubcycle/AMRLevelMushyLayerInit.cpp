@@ -779,13 +779,16 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_skipTrickySourceTerm = -1;
   ppMain.query("skipTrickySourceTime", m_skipTrickySourceTerm);
 
+  if (!solvingFullDarcyBrinkman() && m_parameters.m_nondimensionalisation != m_parameters.m_diffusiveTime_advectiveVel)
+  {
+    MayDay::Error("Need to choose diffusive timescale/advection velocity scale for solving Darcy flow.");
+  }
+
   if (m_parameters.m_nondimensionalisation == m_parameters.m_darcyTime_advectiveVel)
   {
     if (m_level == 0)
     {
-
       pout() << "Darcy timescale, advective velocity scale" << endl;
-
     }
     // To avoid dividing by 0 when Da = Pr = 0
     if (m_parameters.darcy == m_parameters.prandtl)
@@ -804,6 +807,8 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
     m_parameters.m_buoyancySCoeff = m_parameters.rayleighComposition*m_parameters.darcy*m_parameters.darcy*m_parameters.prandtl;
     m_parameters.m_darcyCoeff = 1.0;
     m_parameters.m_advectionCoeff = 1.0;
+
+
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_diffusiveTime_advectiveVel)
   {
@@ -818,6 +823,12 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
     m_parameters.m_buoyancySCoeff = m_parameters.prandtl*m_parameters.rayleighComposition;
     m_parameters.m_darcyCoeff = m_parameters.prandtl/m_parameters.darcy;
     m_parameters.m_advectionCoeff = 1.0;
+
+    if (!solvingFullDarcyBrinkman())
+       {
+         m_parameters.m_buoyancyTCoeff = m_parameters.rayleighTemp;
+         m_parameters.m_buoyancySCoeff = m_parameters.rayleighComposition;
+       }
   }
   else if (m_parameters.m_nondimensionalisation == m_parameters.m_darcyTime_darcyVel)
   {
