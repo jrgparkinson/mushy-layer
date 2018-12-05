@@ -973,7 +973,7 @@ void Projector::setNonSubcycledMACBCs()
 }
 
 // This is used for projecting a time independent advection velocity
-void Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
+int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
                                   Real a_dt,
                                   const RefCountedPtr<LevelData<FArrayBox> > a_crsePressurePtr,
                                   const RefCountedPtr<LevelData<FArrayBox> > a_pressureScalePtr,
@@ -1014,7 +1014,7 @@ void Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     oldPhi[dit].copy(m_phi[dit]);
   }
 
-  solveMGlevel(m_phi, a_crsePressurePtr, MACrhs(), a_pressureScalePtr, a_crsePressureScalePtr,
+  int exitStatus = solveMGlevel(m_phi, a_crsePressurePtr, MACrhs(), a_pressureScalePtr, a_crsePressureScalePtr,
                a_pressureScaleEdgePtr, a_crsePressureScaleEdgePtr);
 
   // now correct
@@ -1089,6 +1089,8 @@ void Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     }
   }
 
+  return exitStatus;
+
 }
 
 Real Projector::getPhiScale(Real a_dt)
@@ -1116,7 +1118,7 @@ Real Projector::getScale(Real a_scale, Real a_dt)
 
 // This is used for projecting a time dependent advection velocity
 // --------------------------------------------------------------
-void Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
+int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
                                   Real a_oldTime, Real a_dt,
                                   const RefCountedPtr<LevelData<FArrayBox> > a_porosityPtr,
                                   const RefCountedPtr<LevelData<FArrayBox> > a_crsePorosityPtr,
@@ -1186,7 +1188,7 @@ void Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 
 
   // now solve for phi
-  solveMGlevel(m_phi, pressureBCPtr, MACrhs(),
+  int exitStatus = solveMGlevel(m_phi, pressureBCPtr, MACrhs(),
                a_porosityPtr, a_crsePorosityPtr,
                a_porosityEdgePtr, a_crsePorosityEdgePtr);
 
@@ -1285,6 +1287,7 @@ void Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     }
   }
 
+  return exitStatus;
 }
 
 // --------------------------------------------------------------
@@ -3296,7 +3299,7 @@ solveMGlevel(a_phi, a_phiCoarsePtr, a_rhs, a_pressureScalePtr,  a_crsePressureSc
 }
 
 // -------------------------------------------------------------
-void Projector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
+int Projector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
                                const LevelData<FArrayBox>*   a_phiCoarsePtr,
                                const LevelData<FArrayBox>&   a_rhs,
                                const RefCountedPtr<LevelData<FArrayBox> > a_pressureScalePtr,
@@ -3369,31 +3372,20 @@ void Projector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
 
 
 
-  if (s_verbosity >= 2
-      || m_solverMGlevel.m_exitStatus != 0)
-  {
-    if (cellCentred)
-    {
-      pout() << "  CC Projection - solveMGlevel - solved, exitStatus =  " <<  m_solverMGlevel.m_exitStatus           << endl;
-    }
-    else
-    {
-      pout() << "  MAC Projection - solveMGlevel - solved, exitStatus =  " <<  m_solverMGlevel.m_exitStatus           << endl;
-    }
-
-
-    // Try and solve again
-    //    while(m_solverMGlevel.m_exitStatus == 2)
-    //    {
-    //    m_solverMGlevel.m_verbosity = 5;
-    //    m_solverMGlevel.m_pre = m_solverMGlevel.m_pre*4;
-    //    m_solverMGlevel.m_post = m_solverMGlevel.m_post*4;
-    //    m_solverMGlevel.m_bottom = m_solverMGlevel.m_bottom*4;
-    //    m_solverMGlevel.solve(phiVect, rhsVect, maxLevel, maxLevel,
-    //                            true); // do initialize to zero this time
-    //    pout() << "CCProjector::solveMGlevel - solved, exitStatus =  " <<  m_solverMGlevel.m_exitStatus           << endl;
-    //    }
-  }
+//  if (s_verbosity >= 2
+//      || m_solverMGlevel.m_exitStatus != 0)
+//  {
+//    if (cellCentred)
+//    {
+//      pout() << "  CC Projection - solveMGlevel - solved, exitStatus =  " <<  m_solverMGlevel.m_exitStatus           << endl;
+//    }
+//    else
+//    {
+//      pout() << "  MAC Projection - solveMGlevel - solved, exitStatus =  " <<  m_solverMGlevel.m_exitStatus           << endl;
+//    }
+//  }
 
   //	int exitStatus = m_solverMGlevel.m_exitStatus;
+
+  return m_solverMGlevel.m_exitStatus;
 }

@@ -98,21 +98,19 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
 
   IntVect ivGhost = m_numGhost * IntVect::Unit;
 
-  int numSmoothUp, numSmoothDown, numMG, maxIter, mgverb;
-  Real tolerance, hang, normThresh;
-
-  numSmoothDown = 2;
-  ParmParse ppAmrmultigrid("amrmultigrid");
-  ppAmrmultigrid.get("num_smooth", numSmoothUp);
-  ppAmrmultigrid.get("num_mg", numMG);
-  ppAmrmultigrid.get("hang_eps", hang);
-  ppAmrmultigrid.get("norm_thresh", normThresh);
-  ppAmrmultigrid.get("tolerance", tolerance);
-  ppAmrmultigrid.get("max_iter", maxIter);
-  ppAmrmultigrid.get("verbosity", mgverb);
-  ppAmrmultigrid.query("numSmoothDown", numSmoothDown);
-
+  int numSmoothUp=2, numSmoothDown=1, numMG=1, maxIter=10, mgverb=0;
+  Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
   int relaxMode = 1; // 1=GSRB, 4=jacobi
+
+  ParmParse ppAmrmultigrid("HCMultigrid");
+  ppAmrmultigrid.query("num_smooth", numSmoothUp);
+  ppAmrmultigrid.query("num_mg", numMG);
+  ppAmrmultigrid.query("hang_eps", hang);
+  ppAmrmultigrid.query("norm_thresh", normThresh);
+  ppAmrmultigrid.query("tolerance", tolerance);
+  ppAmrmultigrid.query("max_iter", maxIter);
+  ppAmrmultigrid.query("verbosity", mgverb);
+  ppAmrmultigrid.query("numSmoothDown", numSmoothDown);
   ppAmrmultigrid.query("relaxMode", relaxMode);
 
   Vector<AMRLevelMushyLayer*> hierarchy;
@@ -134,7 +132,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
     nRefCrse = coarserAMRLevel->m_ref_ratio;
   }
 
-  s_botSolver.m_verbosity = mgverb - 2;
+  s_botSolver.m_verbosity = max(mgverb - 2, 0);
 
 
   for (int dir = 0; dir < SpaceDim; dir++)
@@ -366,17 +364,17 @@ void AMRLevelMushyLayer::defineUstarSolver()
   IntVect ivGhost = IntVect::Unit;
   getHierarchyAndGrids(hierarchy, allGrids, refRat, lev0Dom, lev0Dx);
 
-  int numSmooth, numMG, maxIter, mgverb;
-  Real tolerance, hang, normThresh;
+  int numSmooth=2, numMG=1, maxIter=10, mgverb=0;
+  Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
 
-  ParmParse ppAmrmultigrid("amrmultigrid");
-  ppAmrmultigrid.get("num_smooth", numSmooth);
-  ppAmrmultigrid.get("num_mg", numMG);
-  ppAmrmultigrid.get("hang_eps", hang);
-  ppAmrmultigrid.get("norm_thresh", normThresh);
-  ppAmrmultigrid.get("tolerance", tolerance);
-  ppAmrmultigrid.get("max_iter", maxIter);
-  ppAmrmultigrid.get("verbosity", mgverb);
+  ParmParse ppAmrmultigrid("VelocityMultigrid");
+  ppAmrmultigrid.query("num_smooth", numSmooth);
+  ppAmrmultigrid.query("num_mg", numMG);
+  ppAmrmultigrid.query("hang_eps", hang);
+  ppAmrmultigrid.query("norm_thresh", normThresh);
+  ppAmrmultigrid.query("tolerance", tolerance);
+  ppAmrmultigrid.query("max_iter", maxIter);
+  ppAmrmultigrid.query("verbosity", mgverb);
 
 
   //  Real half_time = m_time - m_dt / 2;
@@ -852,8 +850,6 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
     }
   }
 
-
-
   int largestDim = 0;
   if (vector)
   {
@@ -879,44 +875,7 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
   return norm;
 }
 
-//void AMRLevelMushyLayer::getCoarseVectorDataPointers(const int a_vectorVar,
-//                                                     LevelData<FArrayBox>** a_coarserDataOldPtr,
-//                                                     LevelData<FArrayBox>** a_coarserDataNewPtr,
-//                                                     LevelFluxRegister** a_coarserFRPtr, LevelFluxRegister** a_finerFRPtr,
-//                                                     Real& a_tCoarserOld, Real& a_tCoarserNew)
-//{
-//  *a_coarserDataOldPtr = NULL;
-//  *a_coarserDataNewPtr = NULL;
-//  *a_coarserFRPtr = NULL;
-//  *a_finerFRPtr = NULL;
-//
-//  a_tCoarserOld = 0.0;
-//  a_tCoarserNew = 0.0;
-//
-//  // A coarser level exists
-//  if (m_hasCoarser)
-//  {
-//    AMRLevelMushyLayer* coarserPtr = getCoarserLevel();
-//
-//    // Recall that my flux register goes between my level and the next
-//    // finer level
-//    *a_coarserFRPtr = &(*coarserPtr->m_vectorFluxRegisters[a_vectorVar]);
-//
-//    *a_coarserDataOldPtr = &(*coarserPtr->m_vectorOld[a_vectorVar]);
-//    *a_coarserDataNewPtr = &(*coarserPtr->m_vectorNew[a_vectorVar]);
-//
-//    a_tCoarserNew = coarserPtr->m_time;
-//    a_tCoarserOld = a_tCoarserNew - coarserPtr->m_dt;
-//  }
-//
-//  // A finer level exists
-//  if (m_hasFiner)
-//  {
-//    // Recall that my flux register goes between my level and the next
-//    // finer level
-//    *a_finerFRPtr = &(*m_vectorFluxRegisters[a_vectorVar]);
-//  }
-//}
+
 
 void
 AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSourceTerm, Real advVelCentering)
@@ -1423,14 +1382,9 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
     }
   }
 
-
-
-
   ParmParse ppMain("main");
 
-
   a_advVel.exchange();
-
   EdgeToCell(a_advVel, *m_vectorNew[m_advUstar]);
 
   if (m_doProjection)
@@ -1452,13 +1406,14 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
     {
       projNum++;
 
-      m_projection.levelMacProject(a_advVel, old_time, a_dt, pressureScalePtr, crsePressureScalePtr,
+      int exitStatus = m_projection.levelMacProject(a_advVel, old_time, a_dt, pressureScalePtr, crsePressureScalePtr,
                                    pressureScaleEdgePtrOneGhost, crsePressureScaleEdgePtr);
+
 
       Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
 
       maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
-      pout() << "  MAC Projection (#" << projNum << " on level "<< m_level << "), max(div u) = " << maxDivU << endl;
+      pout() << "  MAC Projection (#" << projNum << " on level "<< m_level << "), exit status = " << exitStatus << ", max(div u) = " << maxDivU << endl;
 
 
     }
@@ -1662,7 +1617,7 @@ Real AMRLevelMushyLayer::advance()
     Real maxAdvU = getMaxVelocity();
     m_computedCFL = m_dt*maxAdvU/m_dx;
 
-    pout() << "AMRLevelMushyLayer::advance (level = "<< m_level << ", time=" << m_time << ", dt = " << m_dt << ", CFL=" << m_computedCFL << ")" << endl;
+    pout() << "  AMRLevelMushyLayer::advance (level = "<< m_level << ", time=" << m_time << ", dt = " << m_dt << ", CFL=" << m_computedCFL << ")" << endl;
   }
 
   // Reset BCs if they change with time
@@ -1831,7 +1786,7 @@ Real AMRLevelMushyLayer::advance()
 
     exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, doFRUpdates, doAdvectiveSrc);
 
-    pout() << "  HC solve finished with exit status " << exitStatus << endl;
+
 
     bool solverFailed = (exitStatus == 2 || exitStatus == 4 || exitStatus == 6);
 //    bool solveSuccess = !solverFailed;
@@ -3149,9 +3104,12 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   // Copy to U^* before projection
   EdgeToCell(a_advVel, *m_vectorNew[m_advUstar]);
 
-  m_projection.levelMacProject(a_advVel, m_dt, crsePressurePtr, pressureScalePtr,
+  int exitStatus = m_projection.levelMacProject(a_advVel, m_dt, crsePressurePtr, pressureScalePtr,
                                crsePressureScalePtr, pressureScaleEdgePtr, crsePressureScaleEdgePtr, alreadyHasPressure);
 
+  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
+  Real maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
+  pout() << "  MAC Projection (level "<< m_level << "), exit status = " << exitStatus << ", max(div u) = " << maxDivU << endl;
 
   fillAdvVel(time, a_advVel);
   a_advVel.exchange();
@@ -3169,16 +3127,6 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   if (enforceAnalyticVel)
   {
     fillAnalyticVel(a_advVel);
-    //}
-    // }
-
-    // If we want to project the advection velocity to make it divergence free to machine precision
-    //    m_projection.levelMacProject(a_advVel, m_dt, crsePressurePtr, pressureScalePtr,
-    //                                 crsePressureScalePtr, pressureScaleEdgePtr, crsePressureScaleEdgePtr, alreadyHasPressure);
-    //
-    //    doVolumeDiscrepancyCorrection(a_advVel);
-
-
 
   } // end if enforce analytic vel
 
@@ -5245,13 +5193,6 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
       }
 
-      // Update other variables ready to go again
-//      a_phi_new.copyTo(Interval(0,0), *m_scalarNew[m_enthalpy], Interval(0,0));
-//      a_phi_new.copyTo(Interval(1,1), *m_scalarNew[m_bulkConcentration], Interval(0,0));
-//
-//      updateEnthalpyVariables();
-
-
       }
     }
     else
@@ -5265,9 +5206,6 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*s_enthalpySalinityBE));
     }
 
-
-
-
   }
 
   if (s_verbosity > 5)
@@ -5277,14 +5215,19 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
   a_phi_new.exchange();
 
+  Real residual = 0;
+
 #ifdef CH_FORK
   if (baseLevBE != NULL)
   {
     exitStatus = baseLevBE->exitStatus();
+    residual = baseLevBE->finalResidual();
     if (s_verbosity > 5)
     {
       pout() << "multiCompAdvectDiffuse -  backward euler exit status = " << exitStatus << endl;
     }
+
+    pout() << "  HC solve finished with exit status " << exitStatus << ", solver residual = " << residual << ", num MG iterations = " << baseLevBE->numMGiterations() << endl;
 
   }
 #endif

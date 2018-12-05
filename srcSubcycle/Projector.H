@@ -137,7 +137,7 @@ public:
   /*** a_oldTime is
        old-time on AMRLevel which is calling the projection.
        assumes BC's already set on uEdge values */
-  void levelMacProject(LevelData<FluxBox>& uEdge,
+  int levelMacProject(LevelData<FluxBox>& uEdge,
                        Real a_oldTime, Real a_dt,
 						const RefCountedPtr<LevelData<FArrayBox> > a_porosityPtr,
 						const RefCountedPtr<LevelData<FArrayBox> > a_crsePorosityPtr,
@@ -160,7 +160,7 @@ public:
   void setSubcycledMACBCs();
 
   /// Projection function that let's user specify pressure coarse fine boundary condition
-  void levelMacProject(LevelData<FluxBox>& a_uEdge,
+  int levelMacProject(LevelData<FluxBox>& a_uEdge,
                        Real a_dt,
                        const RefCountedPtr<LevelData<FArrayBox> > a_crsePressurePtr,
                        const RefCountedPtr<LevelData<FArrayBox> > a_porosityPtr,
@@ -512,7 +512,7 @@ protected:
 		Real beta=-1);
 
   /// solve for pressure on this level
-  void solveMGlevel(LevelData<FArrayBox>&         a_phi,
+  int solveMGlevel(LevelData<FArrayBox>&         a_phi,
                     const LevelData<FArrayBox>*   a_phiCoarsePtr,
                     const LevelData<FArrayBox>&   a_rhs,
 					const RefCountedPtr<LevelData<FArrayBox> > a_porosityPtr,
