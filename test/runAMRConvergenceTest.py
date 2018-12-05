@@ -54,7 +54,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
             # Use same aspect ratio as already defined
             Nx_coarse = -1 # if this isn't changed, we'll eventually just use the predetermined aspect ratio
-            gridfile = ''
+            gridFile = ''
 
             defaultParamsFile = os.path.join(mushyLayerBaseDir, '/params/convergenceTest/'+physicalProblem+'.parameters')
             if os.path.exists(defaultParamsFile):
