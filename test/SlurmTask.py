@@ -7,6 +7,7 @@ import re
 class SlurmTask:
 
     MAX_TASKS_PER_NODE = 8
+    MAX_MEMORY = 128000.0 # MB
     
     def __init__(self, folder, jobname, execFile, num_proc=1, timeLimit = 7.0, memoryLimit=4000, numNodes=0, mpirun=True):
 
@@ -50,6 +51,11 @@ class SlurmTask:
 
         # Each node usually has two sockets
         self.tasks_per_socket = math.ceil(self.tasks_per_node/2) #self.tasks_per_node #
+
+        # Make sure tasks per node * memory < MAX_MEMORY
+        if self.tasks_per_node*self.memoryLimit > self.MAX_MEMORY:
+            self.memoryLimit = 0.9*self.MAX_MEMORY/float(self.tasks_per_node)
+            print('Reducing memory limit to %1.0f GB per node to avoid exceeding node memory limit. \n' % (self.memoryLimit/1000))
 
     def setPreprocess(self, cmd):
         self.preprocessCommand = cmd
