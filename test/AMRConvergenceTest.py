@@ -83,7 +83,7 @@ def AMRConvergenceTest(params, full_output_dir, physicalProblem, Nzs, num_procs 
       
         print(Fore.GREEN + '    **Do run**' + Fore.RESET)
 
-        # Don't know output dir or exec dir here, MushyLayerRun will fill these in
+        # Don't need output dir or exec dir here, MushyLayerRun will fill these in
         s = SlurmTask('', p['concise_run_name'], '', num_proc)
 
         ml_run = MushyLayerRunSimple(full_output_dir, num_proc, p, s, allowRestarts, getExecName())
