@@ -870,26 +870,10 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
   string varName = vector ? m_vectorVarNames[a_var] : m_scalarVarNames[a_var] ;
   sprintf(outString, "d/dt (%-20s) = %e ", varName.c_str(), norm);
 
-  pout() << outString << endl;
-  //  if (vector)
-  //  {
-  //    pout() << "d/dt (" << m_vectorVarNames[a_var] << ") = " << norm << endl;
-  //  }
-  //  else
-  //  {
-  //    pout() << "d/dt (" << m_scalarVarNames[a_var] << ") = " << norm << endl;
-  //  }
-
-
-
-  //  if (norm < steadyStateCondition)
-  //  {
-  //    return true;
-  //  }
-  //
-  //  return false;
-
-
+  if (s_verbosity > 3)
+  {
+    pout() << outString << endl;
+  }
 
 
   return norm;
