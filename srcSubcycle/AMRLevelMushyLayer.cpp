@@ -2082,7 +2082,7 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
     Real initMaxDivU = computeNorm(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), 0);
     if (s_verbosity >= 3)
     {
-      pout() << " CCProjection: init max(div(U)) = " << initMaxDivU << endl;
+      pout() << "  CCProjection: init max(div(U)) = " << initMaxDivU << endl;
     }
 
     Real maxDivU = initMaxDivU;
@@ -2134,7 +2134,7 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
       // Actually want norm (sum of absolute values)
       maxDivU = computeNorm(*m_scalarNew[m_divU], NULL, -1, m_dx, Interval(0,0), 0);
 
-      pout() << " CCProjection: max(div(U)) = " << maxDivU << endl;
+      pout() << "  CCProjection: max(div(U)) = " << maxDivU << endl;
 
       if (i == 0)
       {
@@ -3227,30 +3227,30 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
   DataIterator dit = a_advVel.dataIterator();
 
   LevelData<FluxBox> permeability_face(m_grids, 1, ghost);
-        LevelData<FluxBox> T_face(m_grids, 1, ghost);
-        LevelData<FluxBox> C_face(m_grids, 1, ghost);
-       fillScalarFace(permeability_face, time, m_permeability,        true, false);
-       fillScalarFace(T_face,            time, m_temperature,         true, false);
-       fillScalarFace(C_face,            time, m_liquidConcentration, true, false);
+  LevelData<FluxBox> T_face(m_grids, 1, ghost);
+  LevelData<FluxBox> C_face(m_grids, 1, ghost);
+  fillScalarFace(permeability_face, time, m_permeability,        true, false);
+  fillScalarFace(T_face,            time, m_temperature,         true, false);
+  fillScalarFace(C_face,            time, m_liquidConcentration, true, false);
 
-      for (dit.reset(); dit.ok(); ++dit)
-      {
-        a_advVel[dit].setVal(0.0);
+  for (dit.reset(); dit.ok(); ++dit)
+  {
+    a_advVel[dit].setVal(0.0);
 
-        FArrayBox& fabVelz = a_advVel[dit][SpaceDim-1]; // for debugging
+    FArrayBox& fabVelz = a_advVel[dit][SpaceDim-1]; // for debugging
 
-  //      fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.rayleighTemp);
-  //      fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.rayleighComposition);
-        fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.m_buoyancyTCoeff);
-        fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.m_buoyancySCoeff);
+    //      fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.rayleighTemp);
+    //      fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.rayleighComposition);
+    fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.m_buoyancyTCoeff);
+    fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.m_buoyancySCoeff);
 
-        for (int idir=0; idir<SpaceDim; idir++)
-        {
-          a_advVel[dit][idir].mult(permeability_face[dit][idir]);
-          a_advVel[dit][idir].divide(m_parameters.m_darcyCoeff);
-        }
+    for (int idir=0; idir<SpaceDim; idir++)
+    {
+      a_advVel[dit][idir].mult(permeability_face[dit][idir]);
+//      a_advVel[dit][idir].divide(m_parameters.m_darcyCoeff);
+    }
 
-      }
+  }
 }
 
 void AMRLevelMushyLayer::fillAnalyticVel(FArrayBox& velDir, int dir, int comp, bool project)
@@ -6754,12 +6754,16 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
     for (int dir=0; dir < SpaceDim-1; dir++)
     {
       Box faceBox = domBox.surroundingNodes(dir);
+//      Box faceBox = domBox.enclosedCells(dir);
+//      faceBox.shiftHalf(BASISV(dir));
       //        Box faceBox = domBox.surroundingNodes();
       //        domBox.
 
 
+
       FArrayBox& velDir = m_advVel[dit][dir];
       Box b = velDir.box();
+      b.grow(-m_advVel.ghostVect());
       if (SpaceDim < 3)
       {
         //TODO - work out how to make this work in 3d
@@ -6769,6 +6773,11 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
 
       maxAdvU = max(maxAdvU, thisMax);
     }
+  }
+
+  if (maxAdvU > 1e100)
+  {
+    pout() << "  WARNING: max advection velocity (level " << m_level << ") = " << maxAdvU << endl;
   }
 
   return maxAdvU;
