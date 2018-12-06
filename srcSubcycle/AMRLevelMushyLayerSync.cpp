@@ -1347,13 +1347,12 @@ Real AMRLevelMushyLayer::doHCreflux()
       }
     }
 
-    int mgverb;
-    Real tolerance, hang, normThresh;
-
-    ppMultigrid.get("hang_eps", hang);
-    ppMultigrid.get("norm_thresh", normThresh);
-    ppMultigrid.get("tolerance", tolerance);
-    ppMultigrid.get("verbosity", mgverb);
+    int mgverb=0;
+    Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
+    ppMultigrid.query("hang_eps", hang);
+    ppMultigrid.query("norm_thresh", normThresh);
+    ppMultigrid.query("tolerance", tolerance);
+    ppMultigrid.query("verbosity", mgverb);
 
     diffusionSolver->m_verbosity = mgverb; // m_verbosity_multigrid;
     diffusionSolver->m_eps = tolerance;

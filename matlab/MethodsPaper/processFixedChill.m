@@ -11,7 +11,7 @@ end
 
 if nargin < 2
     frames = [-1]; % just process the last frame by default
-    frames = [2000, 4800, 17000]; % Testing
+    frames = [3000, 4800, 17000]; % Testing
 end
 
 % folders = dir(output_dir);
@@ -43,7 +43,7 @@ plotHeight = 0.5; % plot top 0.5 of domain
 
 plotAspectRatio = domWidth/plotHeight;
 
-plotScreenWidth = 800;
+plotScreenWidth = 350;
 plotScreenHeight = plotScreenWidth/plotAspectRatio;
 
 % Start plotting stuff
@@ -52,8 +52,8 @@ h.Position = [200 200 plotScreenWidth+100 plotScreenHeight*length(frames)+100];
 
 % Common for all plots
 topFraction = plotHeight;
-fluidVelScale = 80;
-maxPsi = 6;
+fluidVelScale = 200;
+maxPsi = 20;
 minPsi = -maxPsi; 
 dPsi = (maxPsi-minPsi)/40; % need even number of divisions
 v = linspace(minPsi, maxPsi, 40);%minPsi+0.5*dPsi:dPsi:maxPsi-0.5*dPsi; % Avoid the zero contour
@@ -63,12 +63,14 @@ SlLims = [-1.0, -0.0];
 axPositions = {};
 allAxes = {};
 
+pcolorField = 'S'; %porosity, Sl
+
 numFrames = length(frames);
 pltWidth = 0.65;
 pltHeight = 0.8/numFrames;
 
 for i=1:length(frames)
-   axPositions{end+1} = [0.1, 0.1 + (numFrames-i)*(pltHeight+0.01), pltWidth, pltHeight];
+   axPositions{end+1} = [0.15, 0.1 + (numFrames-i)*(pltHeight+0.03), pltWidth, pltHeight];
 end
 
 % Get all frames in folder
@@ -84,7 +86,11 @@ for frame_i=1:length(frames)
         ml = getFinalPlotFile(output_dir);
     else
         ml =  MushyLayerOutput(2, thisFrame, output_dir, actual_plot_prefix, true);
+        
     end
+    
+    
+    mlSmooth =  MushyLayerOutput(2, thisFrame, output_dir, actual_plot_prefix, true, 'bicubic');
 
     if isempty(isprop(ml, 'levelArray'))
         fprintf('Folder does not contain any plot files \n');
@@ -96,6 +102,7 @@ for frame_i=1:length(frames)
     [X,Y] = ml.grid();
     porosity = ml.dataForComp(ml.components.Porosity).';
     Sl = ml.dataForComp(ml.components.Liquidconcentration).';
+    S = ml.dataForComp(ml.components.Bulkconcentration).';
     U = ml.dataForComp(ml.components.xDarcyvelocity).';
     V = ml.dataForComp(ml.components.yDarcyvelocity).';
     Streamfunction = ml.dataForComp(ml.components.streamfunction).';
@@ -103,9 +110,13 @@ for frame_i=1:length(frames)
     % Use level 1 data so the contours are smooth
     lev1 = ml.levelArray(1);
     Streamfunction1 = lev1.dataForComp(ml.components.streamfunction);
+    
     U1 = lev1.dataForComp(ml.components.xDarcyvelocity);
     V1 = lev1.dataForComp(ml.components.yDarcyvelocity);
     [X1,Y1] = lev1.grid();
+    
+    porositySmooth = mlSmooth.dataForComp(ml.components.Porosity).';
+    [Xsmooth,Ysmooth] = mlSmooth.grid();
     
     
     
@@ -114,6 +125,7 @@ for frame_i=1:length(frames)
     ypts = round((1-topFraction)*numypts):1:numypts;
     porosity = porosity(ypts, :);
     Sl = Sl(ypts, :);
+    S = S(ypts, :);
     U = U(ypts, :); V= V(ypts, :);
     Streamfunction = Streamfunction(ypts, :);
     X=X(ypts, :);
@@ -122,10 +134,15 @@ for frame_i=1:length(frames)
     numypts_lev1 = size(Y1, 1);
     yptslev1 = round((1-topFraction)*numypts_lev1):1:numypts_lev1;
     Streamfunction1 = Streamfunction1(yptslev1, :);
+   % porosity1 =porosity1(yptslev1, :);
     U1 =U1(yptslev1, :); V1=V1(yptslev1, :); X1=X1(yptslev1, :); Y1=Y1(yptslev1, :);
     
-  
- 
+    numypts_smooth = size(Ysmooth, 1);
+    ypts_smooth = round((1-topFraction)*numypts_smooth):1:numypts_smooth;
+    porositySmooth = porositySmooth(ypts_smooth, :);
+    Xsmooth = Xsmooth(ypts_smooth, :);
+    Ysmooth = Ysmooth(ypts_smooth, :);
+   
     % Get limits
     xl = [X(1,1) X(end,end)];
     yl = [Y(1,1) Y(end,end)];
@@ -143,13 +160,56 @@ for frame_i=1:length(frames)
   
 
     % Porosity first
-    pcolor(X,Y,Sl);
-    %colormap(axPorosity{frame_i}, blues);
-    %caxis([0 1]);
-    caxis(SlLims);
-    if frame_i == 1
-        cPorosity = colorbar('Location', 'eastoutside');
+    if strcmp(pcolorField, 'Sl')
+        pcolor(X,Y,Sl);
+        colormapLims = [-1, 0];
+        colormapLabel = 'S_l';
+        
+        colormap(axPorosity{frame_i}, bluewhitered);
+        
+        cmapTickLabels = {'-1.0', '0.0'};
+        cmapTicks = [-1, 0];
+        
+    elseif strcmp(pcolorField, 'porosity')
+        pcolor(X,Y,porosity);
+        
+        colormap(axPorosity{frame_i}, blues);
+        
+        colormapLims = [0, 1];
+        colormapLabel = '\chi';
+        cmapTickLabels = {'0 (solid)', '1 (liquid)'};
+        cmapTicks = [0 1];
+        
+    elseif strcmp(pcolorField, 'S')
+         %colormapLims = [-1.5 -0.5];
+        colormapLims = [-1.0, 1.0];
+        colormapLabel = 'Bulk Concentration, \Theta';
+        
+        cmapTickLabels = {sprintf('%1.1f', colormapLims(1)-1), sprintf('%1.1f',colormapLims(2)-1)};
+        cmapTicks = colormapLims;
+        
+        %minS = -2.0;
+        %deltaS = -2*(minS+1.0);
+        %deltaS = max(max(S)) - minS;
+        pcolor(X,Y,S+1);
+        
+        caxis(colormapLims);
+        
+        % or coolwarmcmap ?
+        colormap(axPorosity{frame_i}, bluewhitered(257));
+        
     end
+    
+    shading interp;
+    
+  %  caxis(colormapLims);
+    
+    
+    if frame_i == 2
+        cbar = colorbar('Location', 'eastoutside');
+    end
+    
+    %caxis(colormapLims);
     
 
     daspect([ 1 1 1]);
@@ -180,7 +240,28 @@ for frame_i=1:length(frames)
 
         allAxes{frame_i}(end+1) = axQuiver;
     end
-
+    
+    hold off;
+    
+    plotPorosityContours = true;
+    if plotPorosityContours
+        axPorosityContours{frame_i} = axes;
+        %colormap(axPorosityContours{frame_i}, autumn);
+       
+        v = 0:0.2:0.99;
+        
+       [M, c] = contour(Xsmooth,Ysmooth,porositySmooth, v);
+       c.LineWidth = 1;
+       c.LineColor = 'k';
+       axPorosityContours{frame_i}.Visible = 'off';
+         
+        daspect([1 1 1]);
+        xlim(xl);
+        ylim(yl);
+        
+        allAxes{frame_i}(end+1) = axPorosityContours{frame_i};
+    end
+    
     plotStreamlines = false;
     if plotStreamlines
         axStream{frame_i} = axes;
@@ -235,6 +316,7 @@ for frame_i=1:length(frames)
     end
 
 
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Level outlines
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -242,7 +324,7 @@ for frame_i=1:length(frames)
    
     if length(ml.levelArray) > 1
         
-        axPolyshapes = axes;
+        axPolyshapes = allAxes{frame_i}(end);
         
         hold on;
 
@@ -254,6 +336,8 @@ for frame_i=1:length(frames)
 
         % Plot meshes 
         pshape = meshes(2);
+        pshape = trimShape(pshape);
+        
         mesh2 = plot(axPolyshapes, pshape); % meshes on chombo level 1
 
         %plot(domainBox);
@@ -263,6 +347,8 @@ for frame_i=1:length(frames)
 
         if length(meshes) > 2
             pshape = meshes(3);
+            pshape = trimShape(pshape);
+            
             mesh3 = plot(axPolyshapes, pshape); % meshes on chombo level 2
             mesh3.FaceAlpha = 0;
             mesh3.EdgeColor = [0 1 1]; %cyan
@@ -273,42 +359,43 @@ for frame_i=1:length(frames)
         fprintf('Not plotting level outlines as polyshape cannot be found \n');
          end
     
-         axPolyshapes.Visible='off';
-        daspect([1 1 1]);
-
-        %cSl = colorbar();
-        allAxes{frame_i}(end+1) = axPolyshapes;
+        %axPolyshapes.Visible='off';
+        %daspect([1 1 1]);
+        %allAxes{frame_i}(end+1) = axPolyshapes;
+        
+        hold off;
         
     end
-    
-    
-
-    % Stop plotting stuff now
-    hold off;
-
+   
 
     %axSl.Position = axPos;
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Colorbars
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if frame_i == 1
-        cPorosity.Label.String = 'Porosity';
+    if frame_i == 2
+        cbar.Label.String = colormapLabel;
+        cbar.Label.Position(1) = cbar.Label.Position(1) -1.0;
+        
+        cbar.Position(2) = cbar.Position(2)-0.1;
+        cbar.Position(4) = cbar.Position(4)+0.2;
         %cPorosity.Label.Position = [0.5 1.2];
         %cPorosity.Label.Rotation = 0;
-        cPorosity.Ticks = [0 1];
-        cPorosity.Limits = [0 1];
-        cPorosity.TickLabels = {'0 (solid)', '1 (liquid)'};
-
-    elseif frame_i == 2
-    
-        cVel.Label.String = 'Fluid velocity';
-        cVel.Ticks = [0 1.0];
-       % maxU = sqrt(max(max(abs(U.^2 + V.^2))));
-        cVel.TickLabels = {'0', sprintf('%.1e', fluidVelScale)};
-        cVel.Label.Position = [1.0 0.5];
-    
+        cbar.Ticks = cmapTicks;
+        cbar.Limits = colormapLims;
+        
+        cbar.TickLabels = cmapTickLabels;
     end
+%     elseif frame_i == 2
+%     
+%         cVel.Label.String = 'Fluid velocity';
+%         cVel.Ticks = [0 1.0];
+%        % maxU = sqrt(max(max(abs(U.^2 + V.^2))));
+%         cVel.TickLabels = {'0', sprintf('%.1e', fluidVelScale)};
+%         cVel.Label.Position = [1.0 0.5];
+%     
+%     end
+
     %cPorosity.Label.Rotation = 0;
         %cSl.Label.String = 'S_l';
     %cSl.Position = [0.85 cSl.Position(2) cSl.Position(3) cSl.Position(4)];
@@ -317,14 +404,14 @@ for frame_i=1:length(frames)
     % Link axes
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     for i = 2:length(allAxes{frame_i})
-    linkaxes([allAxes{frame_i}(1), allAxes{frame_i}(i)]);
+        linkaxes([allAxes{frame_i}(1), allAxes{frame_i}(i)]);
     end
 
     set(allAxes{frame_i}(1), 'Layer', 'top');
 
 
     for i = 1:length(allAxes{frame_i})
-    allAxes{frame_i}(i).Position = axPos;
+        allAxes{frame_i}(i).Position = axPos;
     end
 
 
@@ -332,7 +419,7 @@ for frame_i=1:length(frames)
     % Axis labels
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    box on;
+  %  box on;
 
     allAxes{frame_i}(1).Visible = 'on';
     axLabels{frame_i} = allAxes{frame_i}(1);
@@ -373,11 +460,11 @@ end
     filename = fullfile(output_dir, 'finalState.png');
 
     %%if savePDF
-    %   print(h,[filename, '.pdf'],'-dpdf','-r0')
+       print(h,[filename, '.pdf'],'-dpdf','-r0')
     % end
 
     if savePNG
-        print(h,filename,'-dpng','-r400')
+        print(h,filename,'-dpng','-r800')
     end
 
     
@@ -385,4 +472,18 @@ end
     
 end
 
+% Trim polyshapes to stay within domain
+function pshape_trimmed = trimShape(pshape)
 
+dx = 1/128;
+dz = 1/128;
+domainPolyshape = polyshape([dx dx 1-dx 1-dx], [dz  1-dz 1-dz dz]);
+
+%pshape_trimmed = intersect(pshape, domainPolyshape);
+
+for i = 1:length(pshape)
+     pshape_trimmed(i) = intersect(pshape(i), domainPolyshape);
+end
+stop =0;
+
+end

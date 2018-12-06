@@ -514,11 +514,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
 
 
-    // Always make sure we tag mushy regions on level 0
-    if (m_level == 0)
-    {
-      localTags |= mushyCells;
-    }
 
 
     // Place finest reoslution around channels
@@ -575,36 +570,39 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
     else
     {
-      if (s_verbosity >= 5)
+      // Make sure we tag mushy regions on level 0
+      if (m_level == 0)
       {
-        pout() << "Refining on level " << m_level << " where porosity gradients > refine thresh (" << m_refineThresh << ")" << endl;
+        if (s_verbosity >= 5)
+        {
+          pout() << "Refining on level " << m_level << " where porosity < 1 (all mushy cells)" << endl;
+        }
+
+        localTags |= mushyCells;
+      }
+      else
+      {
+
+
+        if (s_verbosity >= 5)
+        {
+          pout() << "Refining on level " << m_level << " where porosity gradients > refine thresh (" << m_refineThresh << ")" << endl;
+        }
+
+        // Refine mushy regions which may be about generate channels
+        IntVectSet mushyCells;
+        tagCellsVar(mushyCells,
+                    m_refineThresh, // refine thresh for gradients
+                    0, // refine around undivided gradient
+                    m_porosity, -1);
+
+
+
+        localTags = mushyCells;
+
+
       }
 
-      // Refine mushy regions which may be about generate channels
-      IntVectSet mushyCells;
-      tagCellsVar(mushyCells,
-                  m_refineThresh, // refine thresh for gradients
-                  0, // refine around undivided gradient
-                  m_porosity, -1);
-
-      //      Real velLimit = 1e-10;
-      //      ppMain.query("regrid_small_vel_limit", velLimit);
-      //
-      //      IntVectSet velocityCells;
-      //      tagCellsVar(velocityCells,
-      //                        velLimit, // require vel this magnitude
-      //                        1, // refine around magnitude
-      //                        -1, //
-      //                        m_advectionVel, 1);
-
-      localTags = mushyCells;
-      //      localTags &= velocityCells;
-
-      //      if (s_verbosity >= 5)
-      //      {
-      //        pout() << "Sufficient velocity cells: " << velocityCells << endl;
-      //        pout() << "Porous and sufficient velocity cells: " << localTags << endl;
-      //      }
 
     }
 

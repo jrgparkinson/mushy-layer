@@ -223,9 +223,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
                 params = readInputs(params_file)
 
-
-
-                sameDt = 0.00002
+                sameDt = 5e-7
                 dt64 = sameDt
 
                 # Scale dt with grid spacing
