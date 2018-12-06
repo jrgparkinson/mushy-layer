@@ -47,7 +47,7 @@ def testUniformPorousConvection(argv):
                 {'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz_vm]}]
 
 
-    num_procs = [4]
+    num_procs = [1]
     chi = 0.4
 
     # Try and speed things up for now, should eventually make this criteria smaller
