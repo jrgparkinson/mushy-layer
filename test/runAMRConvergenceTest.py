@@ -47,9 +47,6 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
             #num_proc = min(num_proc, 16)
             #print('Final num_proc = %d' % num_proc)
 
-
-           
-            
             # Some default options
 
             # Use same aspect ratio as already defined
@@ -110,7 +107,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                     
      
             elif physicalProblem == 'DBVariablePorosity':
-                integrationTime = '1.6'
+                integrationTime = 1e-3
                 
                 Nx_coarse = Nz_coarse
                 
@@ -133,7 +130,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 #runTypes = ['amr']
                 
                 # For a fixed dt:
-                dt = 0.01*float(128.0/float(Nz_coarse))
+                dt = (1e-5)*float(128.0/float(Nz_coarse))
                 numSteps = float(integrationTime)/dt
                 
                 params['main.plot_interval'] = str(int(numSteps/10.0))
@@ -143,7 +140,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 params['main.min_time'] = integrationTime
                 params['main.max_time'] = integrationTime
 
-                params['main.vel_refine_thresh'] = '0.0001'
+                params['main.vel_refine_thresh'] = 1.0
                 params['main.stdev'] = '0.002'
                 
                 regrid_int = int(4.0*float(Nx_coarse)/16.0)
@@ -228,7 +225,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
 
 
-                sameDt = 0.0005
+                sameDt = 0.00002
                 dt64 = sameDt
 
                 # Scale dt with grid spacing
@@ -244,8 +241,6 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                     Nx_grid = 2*Nx_coarse
 
                 gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(Nx_grid) + 'x' + str(Nx_grid)
-                 
-                
 
                 dt = dt64*64.0/float(Nx_coarse)
                 if sameDt > 0:

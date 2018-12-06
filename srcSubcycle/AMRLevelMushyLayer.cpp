@@ -98,12 +98,12 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
 
   IntVect ivGhost = m_numGhost * IntVect::Unit;
 
-  int numSmoothUp=2, numSmoothDown=1, numMG=1, maxIter=10, mgverb=0;
+  int numSmoothUp=4, numSmoothDown=1, numMG=1, maxIter=10, mgverb=0;
   Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
   int relaxMode = 1; // 1=GSRB, 4=jacobi
 
   ParmParse ppAmrmultigrid("HCMultigrid");
-  ppAmrmultigrid.query("num_smooth", numSmoothUp);
+  ppAmrmultigrid.query("num_smooth_up", numSmoothUp);
   ppAmrmultigrid.query("num_mg", numMG);
   ppAmrmultigrid.query("hang_eps", hang);
   ppAmrmultigrid.query("norm_thresh", normThresh);
@@ -2884,6 +2884,8 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
 
     // Solve each component (x, y, z) separately.
     //todo - surely can solve both components at the same time? Wouldn't this be quicker with multigrid?
+    pout() << "  U* solve ";
+
     for (int comp = 0; comp < SpaceDim; comp++)
     {
       Interval intvl(comp, comp);
@@ -2897,11 +2899,11 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
       LevelData<FArrayBox> compSrc;
       aliasLevelData(compSrc, &src, intvl);
 
-      if (s_verbosity > 2)
-      {
-        pout() << "Viscous solve (level " << m_level << ") on component "
-            << comp << endl;
-      }
+//      if (s_verbosity > 2)
+//      {
+//        pout() << "Viscous solve (level " << m_level << ") on component "
+//            << comp << endl;
+//      }
 
       Vector<LevelData<FArrayBox>*> UstarVectComp;
       Vector<LevelData<FArrayBox>*> rhsVectComp;
@@ -2928,6 +2930,9 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
         fineFluxRegPtr = NULL;
       }
 
+      int exitStatus = -1;
+      Real resid = 0;
+
       if (m_timeIntegrationOrder == 1)
       {
         UstarBE[comp]->updateSoln(UstarComp, UoldComp, compSrc,
@@ -2937,6 +2942,9 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
                                   a_dt, m_level, false, comp); // False - don't zero phi
 
 
+        exitStatus = UstarBE[comp]->exitStatus();
+        resid = UstarBE[comp]->finalResidual();
+
       }
       else
       {
@@ -2945,11 +2953,18 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
                                    UoldCrseComp, UstarCrseComp,
                                    old_time, old_crseTime, new_crseTime,
                                    a_dt, m_level, false, comp);  // False - don't zero phi
+
+        exitStatus = UstarTGA[comp]->exitStatus();
+        resid = UstarTGA[comp]->finalResidual();
       }
+
+      pout() << " Component " << comp << ": residual = " << resid;
 
 
 
     } // end loop over components
+
+    pout () << endl;
 
     //Clean up
     if (UstarCrseComp != NULL)
@@ -5222,12 +5237,9 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   {
     exitStatus = baseLevBE->exitStatus();
     residual = baseLevBE->finalResidual();
-    if (s_verbosity > 5)
-    {
-      pout() << "multiCompAdvectDiffuse -  backward euler exit status = " << exitStatus << endl;
-    }
+    int num_iter =  baseLevBE->numMGiterations();
 
-    pout() << "  HC solve finished with exit status " << exitStatus << ", solver residual = " << residual << ", num MG iterations = " << baseLevBE->numMGiterations() << endl;
+    pout() << "  HC solve finished with exit status " << exitStatus << ", solver residual = " << residual << ", num MG iterations = " << num_iter << endl;
 
   }
 #endif

@@ -15,7 +15,7 @@ from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
 def testUniformPorousConvection(argv):
 
     # Default vals:
-    cfl = 0.4
+    cfl = 0.1
     Nz_uniform = 128
     Nz_vm = -1
 

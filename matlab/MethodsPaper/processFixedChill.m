@@ -6,28 +6,29 @@ function processFixedChill(output_dir, frames)
 if nargin < 1
     output_dir = '/home/parkinsonjl/mnt/sharedStorage/Test/FixedChill-t100.0-Ra1e+07-Da5.0e-05-C5.00/Uniform-FixedChill-64--0/';
     output_dir = '/home/parkinsonjl/mushy-layer/execSubcycle/amr/';
+    output_dir = '/home/parkinsonjl/mnt/sharedStorage/fixedChillAMR/TBottom1.3AMR4-2-0/';
 end
 
 if nargin < 2
     frames = [-1]; % just process the last frame by default
-    frames = [1500 2000]; % Testing
+    frames = [2000, 4800, 17000]; % Testing
 end
 
-folders = dir(output_dir);
+% folders = dir(output_dir);
+% 
+% 
+% for i=1:length(folders)
+%     if strcmp(folders(i).name, '.') || strcmp(folders(i).name, '..')
+%         continue
+%     end
+%     fprintf('Processing %s \n', folders(i).name);
+%    
+%     processSpecificFolder(fullfile(output_dir, folders(i).name), frames);
+%     
+% end
 
-
-for i=1:length(folders)
-    if strcmp(folders(i).name, '.') || strcmp(folders(i).name, '..')
-        continue
-    end
-    fprintf('Processing %s \n', folders(i).name);
-    %try
-    processSpecificFolder(fullfile(output_dir, folders(i).name), frames);
-    %catch e
-   % fprintf('Error \n');
-    %end
-end
-
+ processSpecificFolder(output_dir, frames);
+ 
 end
 
 
@@ -36,28 +37,38 @@ function processSpecificFolder(output_dir, frames)
 savePNG = true;
 close all; 
 
+domWidth = 1.0;
+domHeight = 1.0;
+plotHeight = 0.5; % plot top 0.5 of domain
+
+plotAspectRatio = domWidth/plotHeight;
+
+plotScreenWidth = 800;
+plotScreenHeight = plotScreenWidth/plotAspectRatio;
+
 % Start plotting stuff
 h = figure();
-h.Position = [200 200 900 700];
+h.Position = [200 200 plotScreenWidth+100 plotScreenHeight*length(frames)+100];
 
 % Common for all plots
-topFraction = 0.4;
-fluidVelScale = 5e-4;
-maxPsi = 5e-6;
+topFraction = plotHeight;
+fluidVelScale = 80;
+maxPsi = 6;
 minPsi = -maxPsi; 
 dPsi = (maxPsi-minPsi)/40; % need even number of divisions
 v = linspace(minPsi, maxPsi, 40);%minPsi+0.5*dPsi:dPsi:maxPsi-0.5*dPsi; % Avoid the zero contour
-
+SlLims = [-1.0, -0.0];
 
 % Setup axes based on number of plotfiles
 axPositions = {};
 allAxes = {};
 
 numFrames = length(frames);
-pltHeight = 0.8/numFrames;
 pltWidth = 0.65;
+pltHeight = 0.8/numFrames;
+
 for i=1:length(frames)
-   axPositions{end+1} = [0.1, 0.1 + (numFrames-i)*(pltHeight+0.1), pltWidth, pltHeight];
+   axPositions{end+1} = [0.1, 0.1 + (numFrames-i)*(pltHeight+0.01), pltWidth, pltHeight];
 end
 
 % Get all frames in folder
@@ -84,7 +95,7 @@ for frame_i=1:length(frames)
     % Get data to plot
     [X,Y] = ml.grid();
     porosity = ml.dataForComp(ml.components.Porosity).';
-   % Sl = ml.dataForComp(ml.components.Liquidconcentration).';
+    Sl = ml.dataForComp(ml.components.Liquidconcentration).';
     U = ml.dataForComp(ml.components.xDarcyvelocity).';
     V = ml.dataForComp(ml.components.yDarcyvelocity).';
     Streamfunction = ml.dataForComp(ml.components.streamfunction).';
@@ -102,6 +113,7 @@ for frame_i=1:length(frames)
     numypts = size(Y, 1);
     ypts = round((1-topFraction)*numypts):1:numypts;
     porosity = porosity(ypts, :);
+    Sl = Sl(ypts, :);
     U = U(ypts, :); V= V(ypts, :);
     Streamfunction = Streamfunction(ypts, :);
     X=X(ypts, :);
@@ -131,9 +143,10 @@ for frame_i=1:length(frames)
   
 
     % Porosity first
-    pcolor(X,Y,porosity);
-    colormap(axPorosity{frame_i}, blues);
-    caxis([0 1]);
+    pcolor(X,Y,Sl);
+    %colormap(axPorosity{frame_i}, blues);
+    %caxis([0 1]);
+    caxis(SlLims);
     if frame_i == 1
         cPorosity = colorbar('Location', 'eastoutside');
     end
@@ -168,7 +181,7 @@ for frame_i=1:length(frames)
         allAxes{frame_i}(end+1) = axQuiver;
     end
 
-    plotStreamlines = true;
+    plotStreamlines = false;
     if plotStreamlines
         axStream{frame_i} = axes;
 
@@ -228,6 +241,10 @@ for frame_i=1:length(frames)
     
    
     if length(ml.levelArray) > 1
+        
+        axPolyshapes = axes;
+        
+        hold on;
 
          if exist('polyshape')
 
@@ -237,7 +254,7 @@ for frame_i=1:length(frames)
 
         % Plot meshes 
         pshape = meshes(2);
-        mesh2 = plot(allAxes{frame_i}(1), pshape); % meshes on chombo level 1
+        mesh2 = plot(axPolyshapes, pshape); % meshes on chombo level 1
 
         %plot(domainBox);
         mesh2.FaceAlpha = 0;
@@ -246,7 +263,7 @@ for frame_i=1:length(frames)
 
         if length(meshes) > 2
             pshape = meshes(3);
-            mesh3 = plot(allAxes{frame_i}(1), pshape); % meshes on chombo level 2
+            mesh3 = plot(axPolyshapes, pshape); % meshes on chombo level 2
             mesh3.FaceAlpha = 0;
             mesh3.EdgeColor = [0 1 1]; %cyan
             mesh3.LineWidth = 2;
@@ -254,7 +271,14 @@ for frame_i=1:length(frames)
         
         else
         fprintf('Not plotting level outlines as polyshape cannot be found \n');
-    end
+         end
+    
+         axPolyshapes.Visible='off';
+        daspect([1 1 1]);
+
+        %cSl = colorbar();
+        allAxes{frame_i}(end+1) = axPolyshapes;
+        
     end
     
     
@@ -269,12 +293,12 @@ for frame_i=1:length(frames)
     % Colorbars
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if frame_i == 1
-    cPorosity.Label.String = 'Porosity';
-    %cPorosity.Label.Position = [0.5 1.2];
-    %cPorosity.Label.Rotation = 0;
-    cPorosity.Ticks = [0 1];
-    cPorosity.Limits = [0 1];
-    cPorosity.TickLabels = {'0 (solid)', '1 (liquid)'};
+        cPorosity.Label.String = 'Porosity';
+        %cPorosity.Label.Position = [0.5 1.2];
+        %cPorosity.Label.Rotation = 0;
+        cPorosity.Ticks = [0 1];
+        cPorosity.Limits = [0 1];
+        cPorosity.TickLabels = {'0 (solid)', '1 (liquid)'};
 
     elseif frame_i == 2
     
