@@ -350,14 +350,15 @@ if exist('polyshape')
     meshes = AMRsol.getMeshes(domainBox);
     
     % Plot meshes
-    pshape = meshes(2);
-        
-    mesh2 = plot(axPolyshapes, pshape); % meshes on chombo level 1
-    
-    %plot(domainBox);
-    mesh2.FaceAlpha = 0;
-    mesh2.EdgeColor = [1 0 1]; % magenta
-    mesh2.LineWidth = 2;
+    if length(meshes) > 1
+        pshape = meshes(2);
+        mesh2 = plot(axPolyshapes, pshape); % meshes on chombo level 1
+
+        %plot(domainBox);
+        mesh2.FaceAlpha = 0;
+        mesh2.EdgeColor = [1 0 1]; % magenta
+        mesh2.LineWidth = 2;
+    end
     
     if length(meshes) > 2
         pshape = meshes(3);
