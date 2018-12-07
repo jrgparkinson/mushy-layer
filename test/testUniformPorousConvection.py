@@ -66,12 +66,15 @@ def testUniformPorousConvection(argv):
 
     analysis_command = matlab_command + ' " '
 
-    RaFormat ='%1.1e'
-    DaFormat = '%1.1e'
-    chiFormat = '%1.1f'
+    RaFormat ="%1.1e"
+    DaFormat = "%1.1e"
+    chiFormat = "%1.1f"
+
+    chi_str = chiFormat % chi
 
     for Da_Ra in Da_Ra_vals:
         Da = Da_Ra['Da']
+        Da_str = DaFormat % Da
         NuLebars = [str(a) for a in Da_Ra['lebars']]
 
         extra_params['main.max_time'] = 0.1 / float(Da)
@@ -86,7 +89,8 @@ def testUniformPorousConvection(argv):
             extra_params['bc.porosityLoVal'] = str(chi) + ' ' + str(chi)
 
             #output_dir = 'chi' + str(chi) + '-Da' + str(Da) + '-Ra' + str(extra_params['parameters.rayleighTemp'])
-            output_dir = "chi" + chiFormat + "-Da" + DaFormat + "-Ra" + RaFormat % (chi, Da, extra_params['parameters.rayleighTemp'])
+            Ra_str = RaFormat % Ra
+            output_dir = "chi" + chi_str + "-Da" + Da_str + "-Ra" + Ra_str
 
             # extra_params = {}
             thisDataFolder = os.path.join(base_dataFolder, output_dir)
@@ -96,8 +100,6 @@ def testUniformPorousConvection(argv):
 
         Ra_str_vals = [RaFormat % a for a in Da_Ra['RaT']]
         Ra_str = '{\'' + '\',\''.join(Ra_str_vals) + '\'}'
-        Da_str = DaFormat % Da
-        chi_str = chiFormat % chi
 
         analysis_command = analysis_command + ' compileNu(\'' + base_dataFolder + '\', \'' + chi_str + '\', \'' + Da_str + '\', ' + Ra_str + ', ' + str(Nz_uniform) + ', ' + str(Nz_vm) + ', [' + ','.join(NuLebars) + ']);'
 
