@@ -128,9 +128,9 @@ regrid.tagDomainBoundary=false
 main.nondimensionalisation=0
 main.useAccelDt=1
 
-main.max_time=1e-3
-main.min_time=1e-3
-main.fixed_dt=1e-5
+main.max_time=2e-4
+main.min_time=2e-4
+main.fixed_dt=5e-6
 parameters.rayleighTemp=1e4
 parameters.prandtl=1.0
 parameters.darcy=1e-5
