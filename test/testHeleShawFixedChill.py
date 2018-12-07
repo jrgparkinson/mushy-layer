@@ -4,7 +4,9 @@ from colorama import Fore, Style
 import getopt
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand, readInputs
+from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand, readInputs, getExecName
+from MushyLayerRunSimple import MushyLayerRunSimple
+from SlurmTask import  SlurmTask
 
 ##########################################################################
 # 3) Convection in a mushy layer with an initial porous hole
@@ -26,11 +28,10 @@ def testHeleShawFixedChill(argv):
     extra_params['parameters.nonDimReluctance'] = float(defaultParams['parameters.nonDimReluctance'])
     extra_params['parameters.prandtl'] = float(defaultParams['parameters.prandtl'])
 
-    doAMR = False
+    doAMR = True
 
     #Pr = 10.0  # fix this for now
-    periodic = True
-
+    periodic = False
 
     try:
 
@@ -71,66 +72,53 @@ def testHeleShawFixedChill(argv):
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
 
+    analysis_command = matlab_command + ' "processFixedChill(\'' + dataFolder + '\', [3000, 4800, 17000]); exit;"'
 
 
-    Nz_uniform = 256
-    Nz_amr_2 = int(float(Nz_uniform) / 2)
-    Nz_amr_4 = int(float(Nz_uniform) / 4)
-    AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]},
-                {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_amr_2]},
-                {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]},
-                {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]}]
+    singleRun = True
 
-    # While testing:
-    Nz_uniform = [64]
-   # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
-    #            {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [64]}]
-    AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
+    if singleRun:
 
-    if doAMR:
-        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
-        AMRSetup.append({'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
+        num_proc = 1
+        defaultParams['concise_run_name'] = folderName
 
-    # Nzs 	  = [16, 32, 64]
-    num_procs = [4]  # Needs to be as long as the longest Nzs
-
-    # Setup up the post processing command
-
-    # figureName = os.path.join(dataFolder, 'noFlow.pdf')
-    #fine_res_folder = 'Uniform-' + physicalProblem + '-' + str(Nz_uniform[-1]) + '--0'
-    analysis_command = matlab_command + ' "processFixedChill(\'' + dataFolder + '\'); exit;"'
-    #analysis_command = '' # No analysis yet. Eventually should collate run times, make some plots, and maybe compute differences between solutions
+        allowRestarts = False
+        s = SlurmTask('', defaultParams['concise_run_name'], '', num_proc)
+        ml_run = MushyLayerRunSimple(base_output_dir, num_proc, defaultParams, s, allowRestarts, getExecName())
+        ml_run.single_run(folderName)
 
 
-    # Run
-    #extra_params = {'main.max_time':max_time, 'parameters.rayleighComp':Ra, 'parameters.darcy': Da, 'parameters.compositionRatio':C }
-    extra_params['main.max_dt'] = 0.1*extra_params['parameters.prandtl'] / (extra_params['parameters.darcy']*extra_params['parameters.rayleighComp'])
+    else:
 
-    if 'main.plot_interval' in extra_params and int(extra_params['main.plot_interval']) > 0: 
-    	extra_params['main.plot_interval'] = int(1e-4 / float(extra_params['parameters.darcy']))
-    	extra_params['main.checkpoint_interval'] = extra_params['main.plot_interval']
+        Nz_uniform = 256
+        Nz_amr_2 = int(float(Nz_uniform) / 2)
+        Nz_amr_4 = int(float(Nz_uniform) / 4)
+        AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]},
+                    {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_amr_2]},
+                    {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]},
+                    {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]}]
 
-    extra_params['main.useAccelDt'] = 0
+        # While testing:
+        Nz_uniform = [64]
+       # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
+        #            {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [64]}]
+        AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
 
-    extra_params['regrid.plume_salinity']=-1.0
-    extra_params['regrid.plume_vel']= 0.1*extra_params['parameters.darcy']*extra_params['parameters.rayleighComp']*extra_params['parameters.rayleighComp']*extra_params['parameters.prandtl']
-    if periodic:
-        extra_params['main.periodic_bc'] = '1 0 0'
+        if doAMR:
+            AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
+            AMRSetup.append({'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
 
-    runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params, 0, params_file)
+        # Nzs 	  = [16, 32, 64]
+        num_procs = [1]  # Needs to be as long as the longest Nzs
 
-# def main(argv):
-    # Only pass in the defined arguments
-    # if max_time < 0:
-    #     testHeleShawFixedChill()
-    # elif Ra < 0:
-    #     testHeleShawFixedChill(max_time)
-    # elif Da < 0:
-    #     testHeleShawFixedChill(max_time, Ra)
-    # elif C < 0:
-    #     testHeleShawFixedChill(max_time, Ra, Da)
-    # else:
-    #     testHeleShawFixedChill(max_time, Ra, Da, C)
+        # Setup up the post processing command
+
+        # figureName = os.path.join(dataFolder, 'noFlow.pdf')
+        #fine_res_folder = 'Uniform-' + physicalProblem + '-' + str(Nz_uniform[-1]) + '--0'
+
+        #analysis_command = '' # No analysis yet. Eventually should collate run times, make some plots, and maybe compute differences between solutions
+
+        runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params, 0, params_file)
 
 if __name__ == "__main__":
     testHeleShawFixedChill(sys.argv[1:])
