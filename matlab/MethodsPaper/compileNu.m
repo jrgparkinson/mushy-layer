@@ -4,15 +4,15 @@ if nargin == 0
     base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.15/';
     chi = '0.4';
     
-    Da = '1e-06'; % '0.01'
+    Da = '1e-06'; % '1.0e-02'
     res_uniform = 128;
     res_vm = 128;
     
     if strcmp(Da, '1e-06')
-        Ra = {'10000000.0','100000000.0','1000000000.0'};
+        Ra = {'1.0e+07','1.0e+08','1.0e+09'};
         NuLeBars = [1.08,3.07,12.9];
     else
-        Ra = {'1000.0','10000.0','100000.0','500000.0'};
+        Ra = {'1.0e+03','1.0e+04','1.0e+05','5.0e+05'};
         NuLeBars =  [1.01,1.41,3.17,5.24];
     end
     
