@@ -1,11 +1,16 @@
 % Plot  typical AMR solutions for darcy brinkman problems 
-function darcyBrinkmanConvectionPlot
+function Fig6PorousHole(dataFolder)
 
-clear all; close all;
+if nargin < 1
+   % dataFolder = getDataDir('AMRConvergenceTest/MushyConvectionLiquid2-t0.5/');
+    dataFolder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.0001/';
+end
+
+close all;
 
 %gridRes = [8 16 32 64];
 %dataFolderNu = getDataDir('AMRConvergenceTest/ConvectionDB/chi0.4-Da0.01-Ra1e5/');
-dataFolder = getDataDir('AMRConvergenceTest/MushyConvectionLiquid2-t0.5/');
+
 
 thisFilename = mfilename('fullpath');
 %thisFolder = strrep(thisFilename, 'porousHoleFigure', '');
@@ -132,11 +137,11 @@ end
 end
 
 function f = plotPrefixAMR(N)
-f =  ['AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref2-MushyConvectionLiquid2-',num2str(N),'--0'];
+f =  ['AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-PorousMushyHole-',num2str(N),'--0'];
 end
 
 function f = plotPrefixUniform(N)
-f =  ['Uniform-MushyConvectionLiquid2-',num2str(N),'--0'];
+f =  ['Uniform-PorousMushyHole-',num2str(N),'--0'];
 end
 
 

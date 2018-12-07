@@ -1,19 +1,27 @@
 % Plot  typical AMR solutions for darcy brinkman problems 
-function darcyBrinkmanConvectionPlot
+function Fig5FixedPorosityConvectionPlots(dataFolderNu, dataFolderVariablePorosity, figureDirectory)
 
-clear all; close all;
+if nargin < 3
+   % dataFolderNu = getDataDir('AMRConvergenceTest/ConvectionDB/chi0.4-Da0.01-Ra1e5/');
+   % dataFolderVariablePorosity = getDataDir('AMRConvergenceTest/DBVariablePorosityGaussian1proc-t1.6-v2/');
+    
+    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
+    dataFolderNu = fullfile(base_dir, '/ConvectionDB-cfl0.15/chi0.4-Da1.0e-02-Ra1.0e+05/');
+    dataFolderVariablePorosity = fullfile(base_dir, '/FixedPorousHole-1proc/');
+    
+    thisFilename = mfilename('fullpath');
+    figureDirectory = strrep(thisFilename, 'Fig5FixedPorosityConvectionPlots', '');
+end
 
-%gridRes = [8 16 32 64];
-dataFolderNu = getDataDir('AMRConvergenceTest/ConvectionDB/chi0.4-Da0.01-Ra1e5/');
-dataFolderVariablePorosity = getDataDir('AMRConvergenceTest/DBVariablePorosityGaussian1proc-t1.6-v2/');
+close all;
 
-thisFilename = mfilename('fullpath');
-thisFolder = strrep(thisFilename, 'darcyBrinkmanConvectionPlot', '');
-figureName =  [thisFolder, 'fixedPorousFigure']; %[dataFolderNu, 'benchmark2Convergence'];
+figureName =  [figureDirectory, 'fixedPorousFigure']; %[dataFolderNu, 'benchmark2Convergence'];
 saveFigure = true;
 
-%highRes = getFinalPlotFile([dataFolderNu, plotPrefixUniform(gridRes(end)*2)]);
+NuUniformRes = 128;
+NuAMRRes = 128;
 
+%highRes = getFinalPlotFile([dataFolderNu, plotPrefixUniform(gridRes(end)*2)]);
 
 h = figure();
 h.Position = [200 200 1200 500];
@@ -62,15 +70,13 @@ annotation('arrow',[0.03 0.03], [0.06 0.16]);
 text(-0.05, -0.4, '$x$', 'FontSize', 16);
 text(-0.23 , -0.2   , '$z$', 'FontSize', 16);
 
-
 text(0.04, 0.93, '(a)', 'FontSize', 16);
-
 
 subplot(m, n, 2)
 
 %AMRsol = getFinalPlotFile([dataFolder, plotPrefixUniform(32)]);
-AMRsol = getFinalPlotFile([dataFolderNu, plotPrefixAMR(32)]);
-UniformFineSol = getFinalPlotFile([dataFolderNu, plotPrefixUniform(64)]);
+AMRsol = getFinalPlotFile([dataFolderNu, plotPrefixAMR(NuAMRRes)]);
+UniformFineSol = getFinalPlotFile([dataFolderNu, plotPrefixUniform(NuUniformRes)]);
 makeSubplot(AMRsol, UniformFineSol, [0.35 axBottom 0.3 axHeight])
 
 
@@ -79,7 +85,7 @@ text(0.04, 0.92, '(b)', 'FontSize', 16, 'Color', [0 0 0]);
 
 subplot(m, n, 3);
 
-AMRsol = getFinalPlotFile([dataFolderVariablePorosity, 'AMR-Subcycle-Reflux-Freestream0.96-MaxLevel1-ref2-DBVariablePorosity-32--0']);
+AMRsol = getFinalPlotFile([dataFolderVariablePorosity, 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-DBVariablePorosity-32--0']);
 UniformFineSol = getFinalPlotFile([dataFolderVariablePorosity, 'Uniform-DBVariablePorosity-64--0']);
 
 makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
@@ -156,7 +162,7 @@ end
 end
 
 function f = plotPrefixAMR(N)
-f =  ['VariableMesh2SubcycleRefluxFreestream0.45-convectionDB-',num2str(N),'-ref2--0'];
+f =  ['VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-',num2str(N),'--0'];
 end
 
 function f = plotPrefixUniform(N)
@@ -304,7 +310,7 @@ cPsi.Ticks = [newTicks(1) newTicks(end)];
 box on;
 
 
-if maxPsi < 1e-3
+if maxPsi < 1e-3 || maxPsi > 1e2
     formatMax = '%1.1e';
 else
     formatMax = '%1.1f';
