@@ -9,8 +9,9 @@ if nargin < 3
     dataFolderNu = fullfile(base_dir, '/ConvectionDB-cfl0.15/chi0.4-Da1.0e-02-Ra1.0e+05/');
     dataFolderVariablePorosity = fullfile(base_dir, '/FixedPorousHole-1proc/');
     
-    thisFilename = mfilename('fullpath');
-    figureDirectory = strrep(thisFilename, 'Fig5FixedPorosityConvectionPlots', '');
+    %thisFilename = mfilename('fullpath');
+    %figureDirectory = strrep(thisFilename, 'Fig5FixedPorosityConvectionPlots', '');
+    figureDirectory = base_dir;
 end
 
 close all;

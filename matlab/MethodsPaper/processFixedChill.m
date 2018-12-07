@@ -43,12 +43,12 @@ plotHeight = 0.5; % plot top 0.5 of domain
 
 plotAspectRatio = domWidth/plotHeight;
 
-plotScreenWidth = 350;
+plotScreenWidth = 500;
 plotScreenHeight = plotScreenWidth/plotAspectRatio;
 
 % Start plotting stuff
 h = figure();
-h.Position = [200 200 plotScreenWidth+100 plotScreenHeight*length(frames)+100];
+h.Position = [200 200 plotScreenWidth+70 plotScreenHeight*length(frames)];
 
 % Common for all plots
 topFraction = plotHeight;
@@ -66,11 +66,11 @@ allAxes = {};
 pcolorField = 'S'; %porosity, Sl
 
 numFrames = length(frames);
-pltWidth = 0.65;
+pltWidth = 0.75;
 pltHeight = 0.8/numFrames;
 
 for i=1:length(frames)
-   axPositions{end+1} = [0.15, 0.1 + (numFrames-i)*(pltHeight+0.03), pltWidth, pltHeight];
+   axPositions{end+1} = [0.07, 0.06 + (numFrames-i)*(pltHeight+0.06), pltWidth, pltHeight];
 end
 
 % Get all frames in folder
@@ -435,7 +435,7 @@ for frame_i=1:length(frames)
     if frame_i == numFrames
 
      xlab = xlabel(allAxes{frame_i}(1), '$x$');
-     xlab.Position(2) = xlab.Position(2) + 2*dx;
+     xlab.Position(2) = xlab.Position(2) + 0.05;
      axLabels{frame_i}.XTick = xl;
      axLabels{frame_i}.XTickLabels = {sprintf(format, xl(1)-dx/4), sprintf(format, xl(2)+dx/4)};
     
@@ -444,11 +444,19 @@ for frame_i=1:length(frames)
     end
     
     ylab{frame_i} = ylabel(allAxes{frame_i}(1), '$y$');
-    ylab{frame_i}.Position(1) = ylab{frame_i}.Position(1) + 2*dx;
+    ylab{frame_i}.Position(1) = ylab{frame_i}.Position(1) + 0.05;
     axLabels{frame_i}.YTick = yl;
 
     axLabels{frame_i}.YTickLabels = {sprintf(format, yl(1)-dx/4), sprintf(format, yl(2)+dx/4)};
-
+    
+    
+    
+    % Add a/b/c and time labels
+    
+    textLabels = {'(a)', '(b)', '(c)'};
+    thisLabel = [textLabels{frame_i}, ' $t = ',sprintf('%1.4f', ml.t) , '$'];
+    text(0.02, 0.55, thisLabel, 'FontSize', 16);
+    
 end    
 
     % h = gcf;
@@ -457,10 +465,10 @@ end
     set(h,'Units','Inches');
     pos = get(h,'Position');
     set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-    filename = fullfile(output_dir, 'finalState.png');
+    filename = fullfile(output_dir, 'fixedChillSimulation.png');
 
     %%if savePDF
-       print(h,[filename, '.pdf'],'-dpdf','-r0')
+      % print(h,[filename, '.pdf'],'-dpdf','-r0')
     % end
 
     if savePNG

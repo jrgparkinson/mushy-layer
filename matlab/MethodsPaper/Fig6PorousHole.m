@@ -1,20 +1,19 @@
 % Plot  typical AMR solutions for darcy brinkman problems 
-function Fig6PorousHole(dataFolder)
+function Fig6PorousHole(dataFolder, figureDirectory)
 
 if nargin < 1
    % dataFolder = getDataDir('AMRConvergenceTest/MushyConvectionLiquid2-t0.5/');
-    dataFolder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.0001/';
+   base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
+   dataFolder = fullfile(base_dir, '/PorousMushyHole-t0.0001/');
+end
+
+if nargin < 2
+    figureDirectory = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
 end
 
 close all;
 
-%gridRes = [8 16 32 64];
-%dataFolderNu = getDataDir('AMRConvergenceTest/ConvectionDB/chi0.4-Da0.01-Ra1e5/');
-
-
-thisFilename = mfilename('fullpath');
-%thisFolder = strrep(thisFilename, 'porousHoleFigure', '');
-figureName =  thisFilename; %[dataFolderNu, 'benchmark2Convergence'];
+figureName =  fullfile(figureDirectory, 'porousHoleFigure'); % thisFilename; %[dataFolderNu, 'benchmark2Convergence'];
 saveFigure = true;
 
 %highRes = getFinalPlotFile([dataFolderNu, plotPrefixUniform(gridRes(end)*2)]);
