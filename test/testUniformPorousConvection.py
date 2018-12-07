@@ -66,6 +66,10 @@ def testUniformPorousConvection(argv):
 
     analysis_command = matlab_command + ' " '
 
+    RaFormat ='%1.1e'
+    DaFormat = '%1.1e'
+    chiFormat = '%1.1f'
+
     for Da_Ra in Da_Ra_vals:
         Da = Da_Ra['Da']
         NuLebars = [str(a) for a in Da_Ra['lebars']]
@@ -82,18 +86,20 @@ def testUniformPorousConvection(argv):
             extra_params['bc.porosityLoVal'] = str(chi) + ' ' + str(chi)
 
             #output_dir = 'chi' + str(chi) + '-Da' + str(Da) + '-Ra' + str(extra_params['parameters.rayleighTemp'])
-            output_dir = "chi%1.1f-Da%1.1e-Ra%1.1e" % (chi, Da, extra_params['parameters.rayleighTemp'])
+            output_dir = "chi" + chiFormat + "-Da" + DaFormat + "-Ra" + RaFormat % (chi, Da, extra_params['parameters.rayleighTemp'])
 
             # extra_params = {}
             thisDataFolder = os.path.join(base_dataFolder, output_dir)
             job_ids = runTest(thisDataFolder, physicalProblem, AMRSetup, num_procs, '', extra_params)
             all_job_ids = all_job_ids + job_ids
 
-        Ra_str_vals = [str(a) for a in Da_Ra['RaT']]
-        Ra_str = '{\'' + '\',\''.join(Ra_str_vals) + '\'}'
 
-        analysis_command = analysis_command + ' compileNu(\'' + base_dataFolder + '\', \'' + str(chi) + '\', \'' + str(
-            Da) + '\', ' + Ra_str + ', ' + str(Nz_uniform) + ', ' + str(Nz_vm) + ', [' + ','.join(NuLebars) + ']);'
+        Ra_str_vals = [RaFormat % a for a in Da_Ra['RaT']]
+        Ra_str = '{\'' + '\',\''.join(Ra_str_vals) + '\'}'
+        Da_str = DaFormat % Da
+        chi_str = chiFormat % chi
+
+        analysis_command = analysis_command + ' compileNu(\'' + base_dataFolder + '\', \'' + chi_str + '\', \'' + Da_str + '\', ' + Ra_str + ', ' + str(Nz_uniform) + ', ' + str(Nz_vm) + ', [' + ','.join(NuLebars) + ']);'
 
         # Now do analysis
     analysis_command = analysis_command + ' exit; " '
