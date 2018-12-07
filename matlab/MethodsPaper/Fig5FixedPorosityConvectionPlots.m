@@ -76,8 +76,8 @@ text(0.04, 0.93, '(a)', 'FontSize', 16);
 subplot(m, n, 2)
 
 %AMRsol = getFinalPlotFile([dataFolder, plotPrefixUniform(32)]);
-AMRsol = getFinalPlotFile([dataFolderNu, plotPrefixAMR(NuAMRRes)]);
-UniformFineSol = getFinalPlotFile([dataFolderNu, plotPrefixUniform(NuUniformRes)]);
+AMRsol = getFinalPlotFile(fullfile(dataFolderNu, plotPrefixAMR(NuAMRRes)));
+UniformFineSol = getFinalPlotFile(fullfile(dataFolderNu, plotPrefixUniform(NuUniformRes)));
 makeSubplot(AMRsol, UniformFineSol, [0.35 axBottom 0.3 axHeight])
 
 
@@ -86,8 +86,8 @@ text(0.04, 0.92, '(b)', 'FontSize', 16, 'Color', [0 0 0]);
 
 subplot(m, n, 3);
 
-AMRsol = getFinalPlotFile([dataFolderVariablePorosity, 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-DBVariablePorosity-32--0']);
-UniformFineSol = getFinalPlotFile([dataFolderVariablePorosity, 'Uniform-DBVariablePorosity-64--0']);
+AMRsol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-DBVariablePorosity-32--0'));
+UniformFineSol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, 'Uniform-DBVariablePorosity-64--0'));
 
 makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
 

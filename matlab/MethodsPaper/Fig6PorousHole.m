@@ -53,7 +53,7 @@ subplot(m, n, 2)
 
 %AMRsol = getFinalPlotFile([dataFolder, plotPrefixUniform(32)]);
 %AMRsol = getFinalPlotFile([dataFolderNu, plotPrefixAMR(32)]);
-UniformFineSol = getInitialPlotFile([dataFolder, plotPrefixUniform(64)]);
+UniformFineSol = getInitialPlotFile(fullfile(dataFolder, plotPrefixUniform(64)));
 %makeSubplot(AMRsol, UniformFineSol, [0.35 axBottom 0.3 axHeight])
 makeSubplot(UniformFineSol, UniformFineSol, [0.35 axBottom 0.3 axHeight])
 
@@ -63,8 +63,8 @@ text(0.16, 0.85, '(b)', 'FontSize', 16);
 
 subplot(m, n, 3);
 
-AMRsol = getFinalPlotFile([dataFolder, plotPrefixAMR(64)]);
-UniformFineSol = getFinalPlotFile([dataFolder,  plotPrefixUniform(64)]);
+AMRsol = getFinalPlotFile(fullfile(dataFolder, plotPrefixAMR(64)));
+UniformFineSol = getFinalPlotFile(fullfile(dataFolder,  plotPrefixUniform(64)));
 
 makeSubplot(AMRsol, UniformFineSol, [0.7 axBottom 0.3 axHeight])
 
