@@ -352,7 +352,7 @@ if exist('polyshape')
     % Plot meshes
     if length(meshes) > 1
         pshape = meshes(2);
-        mesh2 = plot(axPolyshapes, pshape); % meshes on chombo level 1
+        mesh2 = plot(pshape); % meshes on chombo level 1
 
         %plot(domainBox);
         mesh2.FaceAlpha = 0;
@@ -363,7 +363,7 @@ if exist('polyshape')
     if length(meshes) > 2
         pshape = meshes(3);
                 
-        mesh3 = plot(axPolyshapes, pshape); % meshes on chombo level 2
+        mesh3 = plot(pshape); % meshes on chombo level 2
         mesh3.FaceAlpha = 0;
         mesh3.EdgeColor = [0 1 1]; %cyan
         mesh3.LineWidth = 2;
