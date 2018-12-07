@@ -130,7 +130,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 #runTypes = ['amr']
                 
                 # For a fixed dt:
-                dt = (1e-5)*float(128.0/float(Nz_coarse))
+                dt = (5e-6)*float(128.0/float(Nz_coarse))
                 numSteps = float(integrationTime)/dt
                 
                 params['main.plot_interval'] = str(int(numSteps/10.0))
@@ -140,7 +140,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 params['main.min_time'] = integrationTime
                 params['main.max_time'] = integrationTime
 
-                params['main.vel_refine_thresh'] = 1.0
+                params['main.vel_refine_thresh'] = 15.0
                 params['main.stdev'] = '0.002'
                 
                 regrid_int = int(4.0*float(Nx_coarse)/16.0)
