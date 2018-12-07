@@ -246,7 +246,6 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 params['main.taggingVar'] = 3 # porosity
                 params['main.refine_thresh'] = float(params['main.radius'])*1.0/float(Nz_coarse) #0.05*64.0/float(Nz_coarse)
 
-
                 bf = max(int(Nx_coarse/4), 4)
                 
                 maxGridSize = bf*2
@@ -336,7 +335,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 p1['main.reflux_scalar'] = '1'
                 p1['main.use_subcycling'] = '1'
                 p1['main.refluxType'] = '2'
-                p1['projection.eta'] = '0.95'
+                p1['projection.eta'] = '0.99'
                 
                 p1['run_name'] = 'AMR-Subcycle-Reflux-Freestream'+str(p1['projection.eta'])+'-MaxLevel' + str(max_level) 
                 p1['concise_run_name'] = 'AMR'
