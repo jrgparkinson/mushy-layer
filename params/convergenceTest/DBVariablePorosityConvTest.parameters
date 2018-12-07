@@ -110,7 +110,7 @@ parameters.stefan=0
 parameters.waterDistributionCoeff=1e-3
 picardSolver.max_iter=8
 picardSolver.tol=1e-5
-projection.eta= 0.9 # 0.5 works for constant porosity = 0.6
+projection.eta= 0.99 # 0.5 works for constant porosity = 0.6
 projection.numSmoothDown=8
 projection.numSmoothUp=8
 projection.solverTol=1e-15
