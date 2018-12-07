@@ -1,5 +1,23 @@
 function compileNu(base_dir, chi, Da, Ra, res_uniform,  res_vm, NuLeBars)
 
+if nargin == 0
+    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.15/';
+    chi = '0.4';
+    
+    Da = '1e-06'; % '0.01'
+    res_uniform = 128;
+    res_vm = 128;
+    
+    if strcmp(Da, '1e-06')
+        Ra = {'10000000.0','100000000.0','1000000000.0'};
+        NuLeBars = [1.08,3.07,12.9];
+    else
+        Ra = {'1000.0','10000.0','100000.0','500000.0'};
+        NuLeBars =  [1.01,1.41,3.17,5.24];
+    end
+    
+    
+end
 % chi=0.4;
 % Da = '0.01';
 % cfl = -1;
