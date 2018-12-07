@@ -15,7 +15,7 @@ from SlurmTask import  SlurmTask
 def testHeleShawFixedChill(argv):
     mushyLayerBaseDir = os.path.abspath(os.pardir)
     # params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
-    params_file = mushyLayerBaseDir + '/params/convergenceTest/fixedChillNew.parameters'
+    params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
 
     # Defaults
     defaultParams = readInputs(params_file)
