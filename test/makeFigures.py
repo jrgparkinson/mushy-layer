@@ -25,10 +25,22 @@ def makeFigures():
 
     figureDirectory = base_output_dir
 
-    makeFig5 = 'Fig5FixedPorosityConvectionPlots(\'' + dataFolderNu + '\', \'' + dataFolderVariablePorosity + '\', \'' + figureDirectory + '\')'
-    makeFig6 = 'Fig6PorousHole(\'' + porousMushyHoleFolder + '\', \'' + figureDirectory + '\')'
+    noFlowData = os.path.join(base_output_dir, 'NoFlow')
+    fixedChillData = os.path.join(base_output_dir, 'FixedChill-t1.0e-01-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
 
-    full_matlab_command = matlab_command + ' "' + makeFig5 + '; ' + makeFig6 + '; exit ;"'
+    figCommands = []
+    figCommands.append('noFlowSolution(\'' + noFlowData + '\', \'' + figureDirectory + ' \')')
+    figCommands.append('Fig5FixedPorosityConvectionPlots(\'' + dataFolderNu + '\', \'' + dataFolderVariablePorosity + '\', \'' + figureDirectory + '\')')
+    figCommands.append('Fig6PorousHole(\'' + porousMushyHoleFolder + '\', \'' + figureDirectory + '\')')
+    figCommands.append('processFixedChill(\'' + fixedChillData + '\', [3000, 4800, 17000], \'' + figureDirectory + '\')')
+
+    full_matlab_command = matlab_command + ' "'
+
+    for c in figCommands:
+        full_matlab_command = full_matlab_command + 'try \n' + c + '; \n catch e \n fprintf(\'Plotting failed\'); \n end \n'
+
+    full_matlab_command = full_matlab_command + ' exit;"'
+ #  + makeFig5 + '; ' + makeFig6 + '; exit ;"'
 
     jobName = 'makeFigures'
 

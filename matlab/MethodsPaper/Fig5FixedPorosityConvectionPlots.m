@@ -229,7 +229,7 @@ hTemp.LineWidth = 2.0;
 %pcolor(X,Y,psiUniform); 
 
 daspect([1 1 1]);
-colormap(axTemperature, bluewhitered);
+colormap(axTemperature, bluewhitered(257));
 cTemp = colorbar(axTemperature, 'Location', 'northoutside');
 cTemp.Ticks = [min(min(plot_T))*0.98 max(max(plot_T))*0.98];
 cTemp.TickLabels = {'0', '1'};

@@ -210,7 +210,7 @@ daspect([1 1 1]);
 %pcolor(X,Y,psiUniform); 
 
 %daspect([1 1 1]);
-colormap(axSl, flipud(bluewhitered));
+colormap(axSl, flipud(bluewhitered(257)));
 
 cSl = colorbar(axSl, 'Location', 'northoutside');
 cSl.Ticks = [minSl*0.98 maxSl*1.01];

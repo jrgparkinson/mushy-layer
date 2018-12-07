@@ -1,7 +1,7 @@
 % This scripts makes use of the Streamfunction Color function:
 % https://uk.mathworks.com/matlabcentral/fileexchange/69268-streamfunction-color
 
-function processFixedChill(output_dir, frames)
+function processFixedChill(output_dir, frames, figure_output_dir)
 
 if nargin < 1
     output_dir = '/home/parkinsonjl/mnt/sharedStorage/Test/FixedChill-t100.0-Ra1e+07-Da5.0e-05-C5.00/Uniform-FixedChill-64--0/';
@@ -12,6 +12,10 @@ end
 if nargin < 2
     frames = [-1]; % just process the last frame by default
     frames = [3000, 4800, 17000]; % Testing
+end
+
+if nargin < 3
+    figure_output_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
 end
 
 % folders = dir(output_dir);
@@ -27,14 +31,17 @@ end
 %     
 % end
 
- processSpecificFolder(output_dir, frames);
+ processSpecificFolder(output_dir, frames, figure_output_dir);
  
 end
 
 
-function processSpecificFolder(output_dir, frames)
+function processSpecificFolder(output_dir, frames, figure_output_dir)
+
+
 
 savePNG = true;
+pcolorShadingInterp = false;
 close all; 
 
 domWidth = 1.0;
@@ -165,7 +172,7 @@ for frame_i=1:length(frames)
         colormapLims = [-1, 0];
         colormapLabel = 'S_l';
         
-        colormap(axPorosity{frame_i}, bluewhitered);
+        colormap(axPorosity{frame_i}, bluewhitered(257));
         
         cmapTickLabels = {'-1.0', '0.0'};
         cmapTicks = [-1, 0];
@@ -200,7 +207,9 @@ for frame_i=1:length(frames)
         
     end
     
+    if pcolorShadingInterp
     shading interp;
+    end
     
   %  caxis(colormapLims);
     
@@ -443,7 +452,7 @@ for frame_i=1:length(frames)
         axLabels{frame_i}.XTick = [];
     end
     
-    ylab{frame_i} = ylabel(allAxes{frame_i}(1), '$y$');
+    ylab{frame_i} = ylabel(allAxes{frame_i}(1), '$z$');
     ylab{frame_i}.Position(1) = ylab{frame_i}.Position(1) + 0.05;
     axLabels{frame_i}.YTick = yl;
 
@@ -465,14 +474,20 @@ end
     set(h,'Units','Inches');
     pos = get(h,'Position');
     set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-    filename = fullfile(output_dir, 'fixedChillSimulation.png');
+    filename = fullfile(figure_output_dir, 'fixedChillSimulation');
+    
+    if pcolorShadingInterp
+        filename = [filename, '-shadingInterp'];
+    else
+        filename = [filename, '-noShadingInterp'];
+    end
 
     %%if savePDF
       % print(h,[filename, '.pdf'],'-dpdf','-r0')
     % end
 
     if savePNG
-        print(h,filename,'-dpng','-r800')
+        print(h,[filename, '.png'],'-dpng','-r800')
     end
 
     
