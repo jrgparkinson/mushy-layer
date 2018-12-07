@@ -276,8 +276,11 @@ axVel = axes;
 % streamline(Xbig,Ybig,Ubig,Vbig,startx,starty)
 % 
 
-xlim([0.25 0.75]);
-ylim([0.25,0.75]);
+xlimits = [0.25 0.75];
+ylimits = [0.25,0.75];
+
+xlim(xlimits);
+ylim(ylimits);
 
 daspect([1 1 1]);
 axVel.Visible = 'off';
@@ -314,27 +317,62 @@ edgeColor(2, :) = [1 0 1];
 edgeColor(3, :) = [0 1 1];
 
 % Draw on the different meshes
-for l = 2:length(AMRsol.levelArray)
-    lev = AMRsol.levelArray(l);
-    levDx = 0.5*lev.dx;
+% for l = 2:length(AMRsol.levelArray)
+%     lev = AMRsol.levelArray(l);
+%     levDx = 0.5*lev.dx;
+%     
+%     for b = 1:length(lev.boxArray)
+%         thisBox = lev.boxArray(b);
+%     
+%         %lev_width = lev.xhi-lev.xlow+2*levDx;
+%         %lev_height = lev.yhi-lev.ylow+2*levDx;
+%         %lev_bottom = lev.ylow;
+%         fcl = meshColor(l, :);
+%         ecl = edgeColor(l, :);
+%         fcl(4) = opacity(l); % opacity
+%         %rectangle('Position', [thisBox.ylow thisBox.xlow  thisBox.yhi thisBox.xhi ],...
+%         rectangle('Position', [thisBox.xlow+levDx    thisBox.ylow  ...
+%             thisBox.xhi-thisBox.xlow-levDx thisBox.yhi-thisBox.ylow ],...
+%             'FaceColor', fcl, 'EdgeColor', ecl, 'LineWidth', 2.0);
+%     
+%     end
+%     
+% end
+
+% New method
+if exist('polyshape')
+   lev1 = AMRsol.levelArray(l);
+   lev1Dx = 0.5*lev1.dx;
     
-    for b = 1:length(lev.boxArray)
-        thisBox = lev.boxArray(b);
+    domainBox = polyshape([xlimits(1)+lev1Dx xlimits(1)+lev1Dx xlimits(end)-lev1Dx xlimits(end)-lev1Dx], ...
+        [ylimits(1)+lev1Dx ylimits(end)-lev1Dx ylimits(end)-lev1Dx ylimits(1)+lev1Dx]);
     
-        %lev_width = lev.xhi-lev.xlow+2*levDx;
-        %lev_height = lev.yhi-lev.ylow+2*levDx;
-        %lev_bottom = lev.ylow;
-        fcl = meshColor(l, :);
-        ecl = edgeColor(l, :);
-        fcl(4) = opacity(l); % opacity
-        %rectangle('Position', [thisBox.ylow thisBox.xlow  thisBox.yhi thisBox.xhi ],...
-        rectangle('Position', [thisBox.xlow+levDx    thisBox.ylow  ...
-            thisBox.xhi-thisBox.xlow-levDx thisBox.yhi-thisBox.ylow ],...
-            'FaceColor', fcl, 'EdgeColor', ecl, 'LineWidth', 2.0);
+    meshes = AMRsol.getMeshes(domainBox);
     
+    % Plot meshes
+    pshape = meshes(2);
+        
+    mesh2 = plot(axPolyshapes, pshape); % meshes on chombo level 1
+    
+    %plot(domainBox);
+    mesh2.FaceAlpha = 0;
+    mesh2.EdgeColor = [1 0 1]; % magenta
+    mesh2.LineWidth = 2;
+    
+    if length(meshes) > 2
+        pshape = meshes(3);
+                
+        mesh3 = plot(axPolyshapes, pshape); % meshes on chombo level 2
+        mesh3.FaceAlpha = 0;
+        mesh3.EdgeColor = [0 1 1]; %cyan
+        mesh3.LineWidth = 2;
     end
     
+else
+    fprintf('Not plotting level outlines as polyshape cannot be found \n');
 end
+
+
 hold off
 
 pcAxis = axSl;
