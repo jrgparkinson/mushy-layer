@@ -8,7 +8,8 @@ if nargin < 2
 end
 
 if exist(output_dir, 'dir') ~= 7
-    fprintf('getFinalPlotFile: Output directory does not exist!');
+    fprintf('getFinalPlotFile: Output directory does not exist! \n');
+    fprintf('   %s \n', output_dir);
 end
 
 plotFile = getNPlotFile(output_dir,plot_prefix, -1);
