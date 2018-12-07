@@ -7,7 +7,7 @@
 % And saves to a file in the AMR run directory for easy future access
 %
 
-function computeAMRerror(AMRDir, HighResFile, redoRuns, saveFilename, plotDir)
+function computeAMRerror(AMRDir, HighResFile, redoRuns, saveFilename, plotDir, verbosity)
 
 % Default values:
 if nargin < 2
@@ -29,12 +29,21 @@ if nargin < 5
     plotDir = 'errPlots';
 end
 
+if nargin < 6
+    verbosity = 0;
+end
+
+if verbosity > 0
 fprintf('Analysing error for %s \n', AMRDir);
+end
 
 saveFile = fullfile(AMRDir, saveFilename);
 
 if exist(saveFile, 'file') == 2 && ~redoRuns
+    if verbosity > 0
     fprintf('Folder already analysed \n');
+    end
+    
     return
 end
     
@@ -68,7 +77,10 @@ AMRPlotFile =   getFinalPlotFile(AMRDir);
 
 % Check we loaded succesfully
 if length(AMRPlotFile.levelArray) == 0
+    if verbosity > 0
     fprintf('No plot file exists \n');
+    end
+    
     return
 end
 
@@ -86,14 +98,19 @@ compsToCompute = [AMRPlotFile.components.xAdvectionvelocity, ...
 % Compute error for all components
 compsToCompute = 1:1:length(compNames);
 
+if verbosity > 0
 fprintf('Differencing component : ');
+end
 
 for comp_i = 1:length(compsToCompute)
     
     
 comp = compsToCompute(comp_i); %AMRPlotFile.components.Temperature; %AMRPlotFile.components.xAdvectionvelocity; %AMRPlotFile.components.Temperature;
 compName = compNames{comp}; 
+
+if verbosity > 0
 fprintf('%s, ', compName);
+end
 
 try
 
@@ -174,8 +191,10 @@ errPltFile = fullfile(compFolder, [finalFolder, '.png']);
 
 end % end loop over components
 
+if verbosity > 0
 fprintf('\n');
-    
+end
+
   % Catch any errors that occured  
 catch e %e is an MException struct
         fprintf(1,'The identifier was:\n%s \n',e.identifier);
@@ -185,8 +204,10 @@ end
     
 
 % Print out the result
+if verbosity > 0
 fprintf('Runtime: %1.3e \n', runTime);
 fprintf('============= \n');
+end
 
 highResFilename = HighResFile.filename;
 save(saveFile, 'runTime', 'err', 'highResFilename');
