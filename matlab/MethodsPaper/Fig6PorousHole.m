@@ -341,7 +341,7 @@ edgeColor(3, :) = [0 1 1];
 
 % New method
 if exist('polyshape')
-   lev1 = AMRsol.levelArray(l);
+   lev1 = AMRsol.levelArray(1);
    lev1Dx = 0.5*lev1.dx;
     
     domainBox = polyshape([xlimits(1)+lev1Dx xlimits(1)+lev1Dx xlimits(end)-lev1Dx xlimits(end)-lev1Dx], ...
