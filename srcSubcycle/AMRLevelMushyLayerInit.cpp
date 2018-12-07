@@ -2250,6 +2250,12 @@ void AMRLevelMushyLayer::initialData()
 
 void AMRLevelMushyLayer::addPerturbation(int a_var, Real alpha, int waveNumber, Real phaseShift)
 {
+  // ignore small perturbations
+  if (alpha < 1e-20)
+  {
+    return;
+  }
+
   pout() << "Adding perturbation " << alpha << " with wavenumber " << waveNumber << endl;
 
   Real domainWidth = m_domainWidth;

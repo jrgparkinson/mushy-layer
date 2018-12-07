@@ -3119,9 +3119,11 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   // Copy to U^* before projection
   EdgeToCell(a_advVel, *m_vectorNew[m_advUstar]);
 
+  a_advVel.exchange();
   int exitStatus = m_projection.levelMacProject(a_advVel, m_dt, crsePressurePtr, pressureScalePtr,
                                crsePressureScalePtr, pressureScaleEdgePtr, crsePressureScaleEdgePtr, alreadyHasPressure);
 
+  a_advVel.exchange();
   Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
   Real maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
   pout() << "  MAC Projection (level "<< m_level << "), exit status = " << exitStatus << ", max(div u) = " << maxDivU << endl;

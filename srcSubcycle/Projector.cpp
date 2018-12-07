@@ -51,7 +51,7 @@ Real Projector::s_solver_tolerance = 1.0e-5; // pmc, 18 oct 2007:  was -10
 Real Projector::s_solver_hang = 1e-15;
 
 int  Projector::s_num_smooth_up = 4;
-int  Projector::s_num_smooth_down = 4;
+int  Projector::s_num_smooth_down = 2;
 int  Projector::s_num_precond_smooth = 4;
 int  Projector::s_numMG = 1;
 bool  Projector::s_relax_bottom_solver = false;
@@ -484,7 +484,7 @@ void Projector::define(const DisjointBoxLayout& a_grids,
   // also initialize all other fields to a bogus value
   Real bogus = 1.0e300;
   setValLevel(m_Pi, bogus);
-  setValLevel(m_phi, bogus);
+  setValLevel(m_phi, 0.0);
   // these need to start as 0 for boundary conditions
   // for first intermediate solve if more than one level
   // of refinement
@@ -1013,6 +1013,8 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     //            MacRHS[dit].mult(2);
     oldPhi[dit].copy(m_phi[dit]);
   }
+
+  MACrhs().exchange();
 
   int exitStatus = solveMGlevel(m_phi, a_crsePressurePtr, MACrhs(), a_pressureScalePtr, a_crsePressureScalePtr,
                a_pressureScaleEdgePtr, a_crsePressureScaleEdgePtr);
@@ -3319,7 +3321,10 @@ int Projector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
   pp.query("initPhi", initPhi);
 
   // Initialize a_phi to zero.
-  setValLevel(a_phi, 0.0);
+  if (!initPhi)
+  {
+    setValLevel(a_phi, 0.0);
+  }
 
   Vector< LevelData<FArrayBox>* > phiVect;
   Vector< LevelData<FArrayBox>* > rhsVect;

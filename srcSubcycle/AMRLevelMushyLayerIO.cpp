@@ -935,7 +935,7 @@ void AMRLevelMushyLayer::getExtraPlotFields()
 
 //      (*m_scalarNew[m_CCrhs])[dit].mult(m_dt);
 
-      (*m_scalarNew[m_MACrhs])[dit].mult(phiScale);
+//      (*m_scalarNew[m_MACrhs])[dit].mult(phiScale);
 
 
 //      if (scaleMACBCWithChi)
