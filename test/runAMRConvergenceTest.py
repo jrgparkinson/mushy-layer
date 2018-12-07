@@ -107,7 +107,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                     
      
             elif physicalProblem == 'DBVariablePorosity':
-                integrationTime = 1e-3
+                integrationTime = 2e-4
                 
                 Nx_coarse = Nz_coarse
                 
@@ -130,10 +130,10 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 #runTypes = ['amr']
                 
                 # For a fixed dt:
-                dt = (5e-6)*float(128.0/float(Nz_coarse))
+                dt = (1e-5)*float(16.0/float(Nz_coarse))
                 numSteps = float(integrationTime)/dt
                 
-                params['main.plot_interval'] = str(int(numSteps/10.0))
+                params['main.plot_interval'] = str(int(numSteps/5.0))
                 
                 params['main.max_step'] = '100000'
                 
@@ -150,7 +150,6 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
                 #bf = max(maxGridSize/2,4)
                 bf = max(Nx_coarse*maxRefinement/8,4)
-
 
                 gridBuffer = 0 #max(bf/4,1)
                 tagBuffer = 0 #gridBuffer
@@ -175,29 +174,13 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 #params['main.tag_buffer_size'] = '0'
                 #params['main.grid_buffer_size'] = '0'
 
-                params['projection.eta'] = '0.96'
-
-                params['parameters.darcy'] = '1e-4'
-                params['parameters.prandtl'] = '1.0'
-                params['parameters.rayleighTemp'] = '1e7'
-                params['main.periodic_bc'] = '0 1 1'
-                
                 chi = '0.05'
                 params['bc.porosityHiVal'] = chi + ' ' + chi # 0.4 0.4
                 params['bc.porosityLoVal'] = chi + ' ' + chi
-                
-               
 
                 params['main.fixed_dt'] = str(dt)
-                params['main.plot_interval'] = '50'
-                
-                params['main.checkpoint_interval'] = params['main.plot_interval']
-                
-                # 1 - linear
-                # 2 - gaussian
-                params['parameters.porosityFunction'] = '2'
-                params['main.time_integration_order'] = '2'
-                
+
+
 
             elif physicalProblem == 'FixedChill':
 
