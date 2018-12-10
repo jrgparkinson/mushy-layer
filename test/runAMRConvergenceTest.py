@@ -100,7 +100,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 params['main.max_dt'] = '1e-1'
 
                 
-                params['main.plot_interval'] = '1000' #str(int(100.0*float(Nz_coarse)/16.0))
+                params['main.plot_interval'] = '10000' #str(int(100.0*float(Nz_coarse)/16.0))
                 params['main.checkpoint_interval'] = params['main.plot_interval']
 
                 params['main.time_integration_order'] = '2'
