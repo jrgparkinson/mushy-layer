@@ -932,8 +932,6 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
       pout() << "AMRLevelMushyLayer::computeAdvectionVelocities - doing advection of velocities" << endl;
     }
 
-
-
     if (m_implicitAdvectionSolve)
     {
 
@@ -1029,8 +1027,6 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
             // Also need to scale source term
             advectionSourceTerm[dit].divide( porosityGrown[dit], porosityGrown[dit].box(), 0, dir, 1);
           }
-          //            setVelZero(U_to_advect, advPorosityLimit);
-
 
         }
 
@@ -1047,8 +1043,6 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
           {
             ccAdvVel[dit].divide(porosityAv[dit], ccAdvVel[dit].box(), 0, dir);
           }
-          //            }
-
 
           // this does BCs (doesn't fill interior)
           fillVectorField(ccAdvVel, old_time, m_fluidVel, false);
@@ -1077,6 +1071,10 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
       edgeVelBC.applyBCs(m_advVel, m_grids, m_problem_domain, m_dx,
                                    false); // inhomogeneous
+
+
+      //U_to_advect.exchange();
+      //ccAdvVel.exchange();
 
       // m_dt is the full timestep, and this always returns the half time velocity
       // changed this from m_dt (full timestep) to half_dt*2 incase we want to compute velocities
@@ -2506,24 +2504,6 @@ void AMRLevelMushyLayer::computeUDelU(LevelData<FArrayBox>& U_adv_src, const Lev
       pp.query("doAdvVelFRupdates", doVelFRupdates);
       predictVelocities(UdelU_porosity, m_advVel, advectionSourceTerm, a_oldTime, a_dt, doVelFRupdates);
 
-      // MASSIVE HACK
-      //        for (DataIterator dit = UdelU_porosity.dataIterator(); dit.ok(); ++dit)
-      //                {
-      //          Box b = UdelU_porosity[dit].box();
-      //          b &=(*m_scalarNew[m_porosity])[dit].box();
-      //
-      //          for (BoxIterator bit(b); bit.ok(); ++bit)
-      //          {
-      //            IntVect iv = bit();
-      //            if ((*m_scalarNew[m_porosity])[dit](iv) < 0.9)
-      //            {
-      //                  UdelU_porosity[dit](iv) = 0.0;
-      //            }
-      //          }
-      //
-      //                }
-
-
     }
     else if (uDeluMethod == 1)
     {
@@ -3448,6 +3428,8 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
     pout() << "AMRLevelMushyLayer::predictVelocities: " << m_level << endl;
   }
 
+  ParmParse ppMain("main");
+
   const DisjointBoxLayout& levelGrids = a_advVel.getBoxes();
   // for tracing, will need to fill in boundary values for
   // grown copy of velocity
@@ -3509,7 +3491,7 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
   }
 
   Real advVelChiLimit = min(pow(10,5)*m_lowerPorosityLimit, pow(10,-10)) ; //was 1e-10
-  ParmParse ppMain("main");
+
   ppMain.query("advPorosityLimit", advVelChiLimit);
   setVelZero(UtoAdvect_old, advVelChiLimit);
   setVelZero(advectionVelocity, advVelChiLimit);
@@ -3529,9 +3511,8 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
     fillScalarFace(pressureScale, old_time, m_pressureScaleVar, true);
 
     bool legacyCompute = false;
-    ParmParse ppMain("main");
-    ppMain.query("legacy_predict_vel", legacyCompute);
 
+    ppMain.query("legacy_predict_vel", legacyCompute);
 
     // Get the true pressure correction (scaled with chi if appropriate)
     if (m_scaleP_MAC)
@@ -4619,8 +4600,6 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   LevelData<FArrayBox> velOld(m_grids, SpaceDim, m_numGhostAdvection * IntVect::Unit);
   LevelData<FArrayBox> permeability(m_grids, 1, m_numGhostAdvection * IntVect::Unit);
 
-
-
   calculatePermeability();
   fillScalars(permeability, src_time, m_permeability, true);
 
@@ -4654,7 +4633,6 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   //  m_projection.gradPiBCs(pressure, true);
   fillPressureSrcTerm(pressure, pressureScale, src_time-m_dt/2,
                       false); // false - make sure we use Pi (true means use phi)
-
 
   ParmParse ppAdvsrc("advSrc");
   bool pressureSrc = false;
@@ -4846,15 +4824,21 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
 
   for (dit.reset(); dit.ok(); ++dit)
   {
-
     // This source term is centered at step n, so store it in vectorOld.
     (*m_vectorOld[m_advectionSrc])[dit].copy(a_src[dit], 0, 0, SpaceDim);
 
     // Also need to store in vectorNew so that we can interpolate in time when subcycling
     (*m_vectorNew[m_advectionSrc])[dit].copy(a_src[dit], 0, 0, SpaceDim);
-
-
   }
+
+//  if (s_verbosity >= 1)
+//    {
+//      DisjointBoxLayout* finerGridsPtr = NULL;
+//      int nRefFine = -1;
+//      Real sumRHS = computeSum(*m_vectorNew[m_advectionSrc], finerGridsPtr,
+//                               nRefFine, m_dx, m_vectorNew[m_advectionSrc]->interval());
+//      pout() << "  Advection Velocity Src (level " << m_level << ") -- sum(RHS) = " << sumRHS << endl;
+//    }
 
   if (crseVelPtr != NULL)
   {
@@ -6779,11 +6763,26 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   Real max_dt = -1;
   ppMain.query("max_dt", max_dt);
   Real maxAdvU = getMaxVelocity();
-  Real maxUChi = ::computeMax(*m_vectorNew[m_U_porosity], NULL, -1, Interval(0,SpaceDim-1));
-  if (maxUChi > 1e10)
+
+
+  // If we're doing advection with u/chi as the advection velocity,
+  // then we need to use it for our cfl condition
+  bool considerUChi = (m_advectionMethod == m_porosityOutsideAdvection ||  m_advectionMethod == m_noPorosity);
+  ppMain.query("consider_u_chi_dt", considerUChi);
+  Real maxUChi = 0.0;
+
+  if (considerUChi)
   {
-    maxUChi = 1e-100;
+    LevelData<FArrayBox> U_chi(m_grids, SpaceDim, IntVect::Zero);
+    fillVectorField(U_chi, m_time, m_U_porosity, true);
+
+    maxUChi = ::computeMax(U_chi, NULL, -1, Interval(0,SpaceDim-1));
+    if (maxUChi > 1e10)
+    {
+      maxUChi = 1e-100;
+    }
   }
+
   if (s_verbosity > 4)
   {
     pout() << "  Max(U) = " << maxAdvU << ", max(U/chi) = " << maxUChi << endl;
@@ -7001,11 +7000,6 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
 {
   Interval vectorComps(0, SpaceDim - 1);
 
-  //  if (s_set_bogus_values)
-  //  {
-  //    setValLevel(a_vel, s_bogus_value);
-  //  }
-
   Real old_time = m_time - m_dt;
 
   LevelData<FArrayBox> porosityOld(m_grids, 1, a_vector.ghostVect());
@@ -7016,6 +7010,7 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
 
   if (a_var == m_U_porosity)
   {
+
     for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
     {
       (*m_vectorOld[m_U_porosity])[dit].copy((*m_vectorOld[m_fluidVel])[dit]);
@@ -7027,6 +7022,9 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
         (*m_vectorNew[m_U_porosity])[dit].divide(porosityNew[dit], 0, dir, 1);
       }
     }
+
+//    m_vectorOld[m_U_porosity]->exchange();
+//    m_vectorNew[m_U_porosity]->exchange();
   }
 
 
@@ -7035,9 +7033,18 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
     if (abs(a_time - old_time) < TIME_EPS)
     {
       m_vectorOld[a_var]->copyTo(vectorComps, a_vector, vectorComps);
-    } else if (abs(a_time - m_time) < TIME_EPS)
+//      for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+//      {
+//        a_vector[dit].copy((*m_vectorOld[a_var])[dit]);
+//      }
+    }
+    else if (abs(a_time - m_time) < TIME_EPS)
     {
-      m_vectorNew[a_var]->copyTo(vectorComps, a_vector, vectorComps);
+            m_vectorNew[a_var]->copyTo(vectorComps, a_vector, vectorComps);
+//      for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+//      {
+//        a_vector[dit].copy((*m_vectorNew[a_var])[dit]);
+//      }
     } else {
       // do linear interpolation in time
       timeInterp(a_vector, a_time, *m_vectorOld[a_var], old_time,
@@ -7112,8 +7119,6 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
     const DisjointBoxLayout& levelGrids = a_vector.getBoxes();
 
     // Changing U and U/chi to other BCs, as these ones were filling interior CF ghost cells
-    //
-    //a_var == m_fluidVel or a_var == m_U_porosity
     if (1==0)
     {
       if (m_isViscous)
