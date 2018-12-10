@@ -242,10 +242,10 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
 
                 # AMR options
-                if 'main.vel_refine_thresh' in params:
-                    params.pop('main.vel_refine_thresh')
+                #if 'main.vel_refine_thresh' in params:
+                #    params.pop('main.vel_refine_thresh')
 
-                params['main.taggingVar'] = 3 # porosity
+                #params['main.taggingVar'] = 3 # porosity
                 params['main.refine_thresh'] = float(params['main.radius'])*1.0/float(Nz_coarse) #0.05*64.0/float(Nz_coarse)
 
                 bf = max(int(Nx_coarse/4), 4)
