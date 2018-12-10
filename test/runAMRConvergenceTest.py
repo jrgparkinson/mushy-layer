@@ -189,6 +189,8 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
                 params = readInputs(params_file)
 
+                
+
                 output_dir = ''
 
                 #Nx_coarse = Nz_coarse*2
