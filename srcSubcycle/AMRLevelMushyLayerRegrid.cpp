@@ -501,7 +501,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       pout() << "AMRLevelMushyLayer::tagCells - tag velocity >  " << vel_thresh << endl;
     }
 
-
     tagCellsVar(localTags, vel_thresh, 1, -1, m_fluidVel);
   }
   else if ((ppRegrid.contains("plume_vel") || ppRegrid.contains("plume_salinity")))
@@ -512,8 +511,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     {
       pout() << "AMRLevelMushyLayer::tagCells - refine plume mush - " << m_level << endl;
     }
-
-
 
 
     // Place finest reoslution around channels
