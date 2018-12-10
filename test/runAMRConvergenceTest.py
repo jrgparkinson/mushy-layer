@@ -141,7 +141,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 params['main.max_time'] = integrationTime
 
                 #params['main.vel_refine_thresh'] = 5.0
-                params['main.stdev'] = '0.002'
+                #params['main.stdev'] = '0.002'
                 
                 regrid_int = int(4.0*float(Nx_coarse)/16.0)
 

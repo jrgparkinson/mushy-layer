@@ -44,7 +44,8 @@ def testUniformPorousConvection(argv):
         Nz_vm = Nz_uniform #int(float(Nz_uniform) / 2)
 
     AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]},
-                {'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz_vm]}]
+                {'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz_vm]},
+                {'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(Nz_vm/2)]}]
 
 
     num_procs = [1]

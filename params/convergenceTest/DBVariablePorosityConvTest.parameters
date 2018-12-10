@@ -116,6 +116,7 @@ projection.numSmoothUp=8
 projection.solverTol=1e-15
 projector.verbosity=0
 run_name=Uniform
+main.stdev=0.002
 
 main.implicitAdvectionSolve = false
 projection.usePiAdvectionBCs=true
