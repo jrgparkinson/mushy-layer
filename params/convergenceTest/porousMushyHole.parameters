@@ -75,7 +75,7 @@ main.solverFailRestartMethod=0
 main.steady_state=1e-5
 main.symmetric_domain=false
 main.tag_buffer_size=0
-main.taggingVar=3
+
 main.time_integration_order=1
 main.usePhiForImplicitAdvectionSolve=false
 main.use_limiting=false
@@ -131,3 +131,7 @@ parameters.nonDimReluctance=1e-10
 main.plot_interval=10
 HCMultigrid.num_smooth_up = 8
 projection.eta=0.99
+
+# Two possible refinement options:
+#main.taggingVar=3
+main.vel_refine_thresh = 300
