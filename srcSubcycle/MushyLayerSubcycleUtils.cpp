@@ -124,7 +124,7 @@ defineAMR(AMR&                                          a_amr,
 
   if (max_level > 0)
   {
-    std::vector<int> ref_ratios; // (num_read_levels,1);
+    std::vector<int> ref_ratios = std::vector<int>(); // (num_read_levels,1);
     ppMain.getarr("ref_ratio", ref_ratios, 0, num_read_levels);
     for (int i=0; i<=max_level; i++)
     {

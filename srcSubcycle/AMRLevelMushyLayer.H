@@ -244,6 +244,9 @@ public:
     MayDay::Error("never called--historical");
   }
 
+  /// Set default values
+  void setDefaults();
+
   /// Define new AMRLevelMushyLayer from coarser
   /**
    */

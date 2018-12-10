@@ -365,9 +365,7 @@ public:
         a_state.setVal(value[comp], face, comp);
       }
 
-
-
-      delete value;
+      delete[] value;
       value = NULL;
     }
   }

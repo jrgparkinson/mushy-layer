@@ -1443,14 +1443,14 @@ void AMRLevelMushyLayer::copyNewToOldStates()
 {
   if (s_verbosity > 4)
   {
-    pout() << "AMRLevelMushyLayer::copyNewToOldStates() " << endl;
+    pout() << "AMRLevelMushyLayer::copyNewToOldStates(" << m_time << " to " << m_time-m_dt << ") " << endl;
   }
 
   // Before we do this, populate d(porosity)/dt, which we need for computing advection update source terms
+  // We actually don't use d(porosity)/dt any more, so stop doing this
+  /*
   LevelData<FArrayBox> porosity_new(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
   LevelData<FArrayBox> porosity_old(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
-
-
 
   fillScalars(porosity_new, m_time, m_porosity, true, true);
   fillScalars(porosity_old, m_time-m_dt, m_porosity, true, true);
@@ -1461,6 +1461,7 @@ void AMRLevelMushyLayer::copyNewToOldStates()
     m_dPorosity_dt[dit].minus(porosity_old[dit]);
     m_dPorosity_dt[dit].mult(1/m_dt);
   }
+  */
 
   // Copy the new to the old
   // Old now contains values at n, new will contain values at n+1 eventually
@@ -1660,6 +1661,12 @@ Real AMRLevelMushyLayer::advance()
   // Updates 'new' variables
   updateEnthalpyVariables();
 
+#ifdef CH_MPI
+  {
+      CH_TIME("MPI_Barrier exchange");
+      MPI_Barrier(Chombo_MPI::comm);
+  }
+#endif
 
 
   Real old_time = m_time;
@@ -1667,6 +1674,8 @@ Real AMRLevelMushyLayer::advance()
   //  Real half_time = new_time - m_dt / 2;
 
   m_time = new_time;
+
+
 
   // Move 'new' variables to 'old' variables
   // do this after we've incremeneted m_time for consistency with coarser levels
@@ -1743,7 +1752,7 @@ Real AMRLevelMushyLayer::advance()
 
   bool skipNewLevelScalars = false;
   ppMain.query("skipNewLevelScalars", skipNewLevelScalars);
-  if (m_newLevel  && m_level > 0)
+  if (m_newLevel && m_level > 0)
   {
     if (skipNewLevelScalars)
     {
@@ -4079,6 +4088,10 @@ void AMRLevelMushyLayer::computePredictedVelocities(
 
 void AMRLevelMushyLayer::calculatePermeability()
 {
+  if (s_verbosity >= 5)
+  {
+    pout() << "  AMRLevelMushyLayer::calculatePermeability" << endl;
+  }
   LevelData<FArrayBox> porosityNew(m_grids, 1, m_numGhost*IntVect::Unit);
   LevelData<FArrayBox> porosityOld(m_grids, 1, m_numGhost*IntVect::Unit);
 
@@ -6659,19 +6672,20 @@ Real AMRLevelMushyLayer::computeDt(bool growdt)
 
 Real AMRLevelMushyLayer::getMaxAdvVel()
 {
-  Real maxAdvU = 0.0;
+  Real maxAdvULocal = 0.0;
 
   if (SpaceDim==3)
   {
 
     LevelData<FArrayBox> U(m_grids, SpaceDim);
     EdgeToCell(m_advVel, U);
-    maxAdvU = ::computeNorm(U, NULL, 1, m_dx, Interval(0,SpaceDim-1), 0);
-    return maxAdvU;
+    maxAdvULocal = ::computeNorm(U, NULL, 1, m_dx, Interval(0,SpaceDim-1), 0);
+    return maxAdvULocal;
   }
 
   // alternate method
   Box domBox = m_problem_domain.domainBox();
+
 
 
   for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
@@ -6679,12 +6693,6 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
     for (int dir=0; dir < SpaceDim-1; dir++)
     {
       Box faceBox = domBox.surroundingNodes(dir);
-//      Box faceBox = domBox.enclosedCells(dir);
-//      faceBox.shiftHalf(BASISV(dir));
-      //        Box faceBox = domBox.surroundingNodes();
-      //        domBox.
-
-
 
       FArrayBox& velDir = m_advVel[dit][dir];
       Box b = velDir.box();
@@ -6696,16 +6704,30 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
       }
       Real thisMax = velDir.norm(b, 0, 0);
 
-      maxAdvU = max(maxAdvU, thisMax);
+      maxAdvULocal = max(maxAdvULocal, thisMax);
     }
   }
 
-  if (maxAdvU > 1e100)
+  // Need to gather max values across all processors
+#ifdef CH_MPI
+  Real recv;
+  int result = MPI_Allreduce(&maxAdvULocal, &recv, 1, MPI_CH_REAL,
+                             MPI_MAX, Chombo_MPI::comm);
+
+  if (result != MPI_SUCCESS)
   {
-    pout() << "  WARNING: max advection velocity (level " << m_level << ") = " << maxAdvU << endl;
+    MayDay::Error("Sorry, but I had a communication error in getMaxAdvVel");
   }
 
-  return maxAdvU;
+  maxAdvULocal = recv;
+#endif
+
+  if (maxAdvULocal > 1e100)
+  {
+    pout() << "  WARNING: max advection velocity (level " << m_level << ") = " << maxAdvULocal << endl;
+  }
+
+  return maxAdvULocal;
 }
 
 Real AMRLevelMushyLayer::getMaxVelocity()
@@ -6787,6 +6809,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   {
     pout() << "  Max(U) = " << maxAdvU << ", max(U/chi) = " << maxUChi << endl;
   }
+
   if (maxUChi < 1000*maxAdvU)
   {
     maxAdvU = max(maxAdvU, maxUChi);
@@ -7395,7 +7418,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   if (doInterior)
   {
-    if (s_verbosity >= 5)
+    if (s_verbosity >= 6)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - start interior filling, a_time:" << a_time << ", old_time: " << old_time << endl;
     }
@@ -7414,7 +7437,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 6)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - done interior filling" << endl;
   }
@@ -7462,7 +7485,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
                                         //                                        false, doSecondOrderCorners);
                                         false);
 
-    if (s_verbosity >= 5)
+    if (s_verbosity >= 6)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - defined fill patch" << endl;
     }
@@ -7471,14 +7494,14 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
                           crse_time_interp_coeff,
                           scalComps.begin(), scalComps.end(), scalComps.size());
 
-    if (s_verbosity >= 5)
+    if (s_verbosity >= 6)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - done fill patch" << endl;
     }
 
     if (quadInterp && m_quadCFInterpScalar.isDefined())
     {
-      if (s_verbosity >= 5)
+      if (s_verbosity >= 6)
       {
         pout() << "  AMRLevelMushyLayer::fillScalars - do quad interp" << endl;
       }
@@ -7486,7 +7509,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       LevelData<FArrayBox> avCrseScal(crseGrids, 1, oldCrseScal.ghostVect());
       ::timeInterp(avCrseScal, a_time, oldCrseScal, crse_old_time, newCrseScal, crse_new_time, scalComps);
 
-      if (s_verbosity >= 5)
+      if (s_verbosity >= 6)
       {
         pout() << "  AMRLevelMushyLayer::fillScalars - made quadInterp CF BC" << endl;
       }
@@ -7502,7 +7525,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   const ProblemDomain& physDomain = problemDomain();
 
   int numGhost = a_scal.ghostVect()[0];
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 6)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - num ghost: " << numGhost << endl;
   }
@@ -7532,13 +7555,16 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     pout() << "  AMRLevelMushyLayer::fillScalars - regularisation ops" << endl;
   }
 
-  doRegularisationOps(a_scal, a_var);
+  ParmParse ppMain("main");
 
+  doRegularisationOps(a_scal, a_var);
 
   a_scal.exchange();
 
   // Try a corner copier?
-  if (a_scal.ghostVect()[0] > 0)
+  bool doCorners = true;
+  ppMain.query("scalarExchangeCorners", doCorners);
+  if (a_scal.ghostVect()[0] > 0 && doCorners)
   {
     if (s_verbosity >= 5)
     {

@@ -3,6 +3,14 @@
 #include "analyticSolns.H"
 #include "SetValLevel.H"
 
+void AMRLevelMushyLayer::setDefaults()
+{
+  // Need to make sure these are initialised,
+  // else  Some conditional statements will depends on uninitialised value(s)
+  m_newGrids_different = false;
+  m_newLevel=false;
+  m_perturbationTime = 0.0;
+}
 
 void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
                                 const ProblemDomain& a_problemDomain, int a_level, int a_refRatio)
@@ -37,6 +45,8 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
           "AMRLevelMushyLayer::define: a_coarserLevelPtr is not castable to AMRLevelMushyLayer*");
     }
   }
+
+  setDefaults();
 
   // Why wasn't this line here before?
   m_problem_domain = a_problemDomain;
