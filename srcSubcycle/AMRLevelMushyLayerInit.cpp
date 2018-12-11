@@ -3473,13 +3473,6 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     // Turn this off so we can do continuation easier
     m_doAutomaticRestart = false;
 
-    Real perturbation = 0.0;
-    if (perturbation != 0)
-    {
-      // For now just apply to enthalpy - eventually let this be a choice
-      addPerturbation(m_enthalpy, m_restartPerturbation, m_perturbationWavenumber);
-      updateEnthalpyVariables();
-    }
 
 
     addMeltPond();
@@ -3491,6 +3484,18 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     {
       horizontallyAverage(*m_scalarNew[m_enthalpy], *m_scalarNew[m_enthalpy]);
       horizontallyAverage(*m_scalarNew[m_bulkConcentration], *m_scalarNew[m_bulkConcentration]);
+    }
+
+    m_restartPerturbation = 0.0;
+    ppMain.query("restart_perturbation", m_restartPerturbation);
+    if (m_restartPerturbation != 0)
+    {
+      int restart_perturbation_var = m_enthalpy;
+      ppMain.query("restart_perturbation_var", restart_perturbation_var);
+      // For now just apply to enthalpy - eventually let this be a choice
+      addPerturbation(restart_perturbation_var, m_restartPerturbation, m_perturbationWavenumber);
+      copyNewToOldStates();
+      updateEnthalpyVariables();
     }
 
     // Calculate initial sum of salt
