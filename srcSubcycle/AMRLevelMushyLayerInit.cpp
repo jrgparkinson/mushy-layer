@@ -3468,8 +3468,6 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     m_diagnostics.printHeader();
   }
 
-
-
   if (a_restart)
   {
     // Turn this off so we can do continuation easier
@@ -3485,6 +3483,15 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
 
 
     addMeltPond();
+
+    bool horizAverage = false;
+    ParmParse ppMain("main");
+    ppMain.query("horizontallyAverageRestart", horizAverage);
+    if (horizAverage)
+    {
+      horizontallyAverage(*m_scalarNew[m_enthalpy], *m_scalarNew[m_enthalpy]);
+      horizontallyAverage(*m_scalarNew[m_bulkConcentration], *m_scalarNew[m_bulkConcentration]);
+    }
 
     // Calculate initial sum of salt
     if (m_level == 0)
