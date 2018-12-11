@@ -5,7 +5,7 @@
 ebase = setupnewrun
 
 ## location of 'lib' directory
-CHOMBO_HOME = ../../../chombofork/lib
+CHOMBO_HOME = ../../chombofork/lib
 
 
 #include $(CHOMBO_HOME)/mk/Make.defs
