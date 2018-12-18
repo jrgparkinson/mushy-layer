@@ -35,7 +35,7 @@ def testUniformPorousConvection(argv):
         elif opt in ("-v"):
             Nz_vm = int(arg)
         elif opt in ("-p"):
-            chi = int(arg)
+            chi = float(arg)
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
