@@ -49,7 +49,7 @@ daspect([1 1 1]);
 %text(0.0, -0.15, {'$H=H(\theta=0, \chi=1)$,','$\Theta=0, \mathbf{U} = 0.$' }, 'FontSize', 16);
 
 
-text(0.1, 0.55, {'Eqn''s 3-6 with:', '$St=0, Pr=1$, and', '(b) $\chi=0.4$, or', '(c) $\chi$ given by eq. 36.'}, 'FontSize', 16);
+text(0.1, 0.55, {'Eqn''s 3-6 with:', '$St=0, Pr=1$, and', '(b) $\chi=0.4$, or', '(c) $\chi$ given by eq. 40.'}, 'FontSize', 16);
 
 insulatingStr = {'b: $\partial H/\partial x = \partial \Theta / \partial x = 0, \mathbf{U} = 0.$', ...
     'c: periodic.'};
@@ -57,9 +57,9 @@ insulatingStr = {'b: $\partial H/\partial x = \partial \Theta / \partial x = 0, 
 %text(1.12 , 0.0, insulatingStr, 'FontSize', 16, 'Rotation', 90);
 
 
-text(-0.12, -0.02, '$H=H(\theta=1, \chi=1), \Theta=0, \mathbf{U} = 0.$', ...
+text(-0.12, -0.02, '$H=H(\theta=1, \chi=0.4), \Theta=0, \mathbf{U} = 0.$', ...
     'FontSize', 16, 'Rotation', 90);
-text(1.15 , -0.02, '$H=H(\theta=0, \chi=1), \Theta=0, \mathbf{U} = 0.$', ...
+text(1.15 , -0.02, '$H=H(\theta=0, \chi=0.4), \Theta=0, \mathbf{U} = 0.$', ...
     'FontSize', 16, 'Rotation', 90);
 
 text(-0.01, 1.11 ,insulatingStr, 'FontSize', 16);
