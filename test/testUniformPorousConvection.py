@@ -21,7 +21,7 @@ def testUniformPorousConvection(argv):
     chi = 0.4
 
     try:
-       opts, args = getopt.getopt(argv,"n:v:c:")
+       opts, args = getopt.getopt(argv,"n:v:c:p:")
     except getopt.GetoptError as err:
         print(str(err))
         print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points> -c<cfl> -p <chi>')
@@ -91,7 +91,7 @@ def testUniformPorousConvection(argv):
             	extra_params['parameters.darcy'] = Da * pow(1 - chi, 2) / pow(chi, 3.0)
             else:
             	extra_params['parameters.darcy'] = Da 
-            	
+
             extra_params['bc.porosityHiVal'] = str(chi) + ' ' + str(chi)  # 0.4 0.4
             extra_params['bc.porosityLoVal'] = str(chi) + ' ' + str(chi)
 
