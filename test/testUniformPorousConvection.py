@@ -18,21 +18,24 @@ def testUniformPorousConvection(argv):
     cfl = 0.1
     Nz_uniform = 128
     Nz_vm = -1
+    chi = 0.4
 
     try:
        opts, args = getopt.getopt(argv,"n:v:c:")
     except getopt.GetoptError as err:
         print(str(err))
-        print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points> -c<cfl>')
+        print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points> -c<cfl> -p <chi>')
         sys.exit(2)
 
     for opt, arg in opts:
         if opt in ("-n"):
-            Nz = int(arg)
+            Nz_uniform = int(arg)
         elif opt in ("-c"):
             cfl = float(arg)
         elif opt in ("-v"):
             Nz_vm = int(arg)
+        elif opt in ("-p"):
+            chi = int(arg)
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
@@ -49,7 +52,7 @@ def testUniformPorousConvection(argv):
 
 
     num_procs = [1]
-    chi = 0.4
+    #chi = 0.4
 
     # Try and speed things up for now, should eventually make this criteria smaller
     extra_params = {'main.steady_state': 1e-4}
@@ -84,8 +87,11 @@ def testUniformPorousConvection(argv):
         for Ra in Da_Ra['RaT']:
             extra_params['parameters.rayleighTemp'] = Ra
 
-            extra_params['parameters.darcy'] = Da * pow(1 - chi, 2) / pow(chi, 3.0)
-
+            if chi < 1.0:
+            	extra_params['parameters.darcy'] = Da * pow(1 - chi, 2) / pow(chi, 3.0)
+            else:
+            	extra_params['parameters.darcy'] = Da 
+            	
             extra_params['bc.porosityHiVal'] = str(chi) + ' ' + str(chi)  # 0.4 0.4
             extra_params['bc.porosityLoVal'] = str(chi) + ' ' + str(chi)
 
