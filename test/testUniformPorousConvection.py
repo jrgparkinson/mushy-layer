@@ -53,7 +53,7 @@ def testUniformPorousConvection(argv):
     if Nz_vm > 0:
         AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz_vm]})
         AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(Nz_vm/2)]})
-  
+
     num_procs = [1]
     #chi = 0.4
 
