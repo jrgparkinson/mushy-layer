@@ -1256,6 +1256,7 @@ void AMRLevelMushyLayer::initialDataConvectionMixedPorous()
   diagsToPrint.push_back(m_diagnostics.m_dt);
   diagsToPrint.push_back(m_diagnostics.m_Nu);
   m_diagnostics.setPrintDiags(diagsToPrint);
+
   // Now do data
   Real initVel = 0;
   ParmParse pp("init");
@@ -3463,10 +3464,7 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
   levelSetup();
   defineSolvers(m_time);
 
-  if (m_level == 0 && procID() == 0)
-  {
-    m_diagnostics.printHeader();
-  }
+
 
   if (a_restart)
   {
@@ -3596,6 +3594,11 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
        */
     }
 
+  }
+
+  if (m_level == 0 && procID() == 0)
+  {
+    m_diagnostics.printHeader();
   }
 
 }
