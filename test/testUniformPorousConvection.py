@@ -17,7 +17,7 @@ def testUniformPorousConvection(argv):
     # Default vals:
     cfl = 0.1
     Nz_uniform = 128
-    Nz_vm = -1
+    Nz_vm = 64
     chi = 0.4
 
     try:
@@ -43,14 +43,17 @@ def testUniformPorousConvection(argv):
     print(Fore.GREEN + 'Setup tests for convection in a fixed uniform porous medium' + Style.RESET_ALL)
     physicalProblem = 'convectionDB'
     #Nz_uniform = 128
-    if Nz_vm <= 0:
-        Nz_vm = Nz_uniform #int(float(Nz_uniform) / 2)
+    #if Nz_vm <= 0:
+    #    Nz_vm = Nz_uniform #int(float(Nz_uniform) / 2)
 
-    AMRSetup = [{'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]},
-                {'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz_vm]},
-                {'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(Nz_vm/2)]}]
+    AMRSetup = []
+    if Nz_uniform > 0:
+        AMRSetup.append({'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]})
 
-
+    if Nz_vm > 0:
+        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz_vm]})
+        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(Nz_vm/2)]})
+  
     num_procs = [1]
     #chi = 0.4
 
