@@ -40,7 +40,7 @@ def testUniformPorousConvection(argv):
             chi = float(arg)
         elif opt in ("-b"):
            	BCAccuracy = int(arg)
-        elif opt in ("-u")
+        elif opt in ("-u"):
             uDelUMethod = int(arg)
 
     base_output_dir = getBaseOutputDir()
