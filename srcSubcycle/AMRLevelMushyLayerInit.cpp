@@ -929,6 +929,8 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_viscousBCs = m_isViscous; //(m_parameters.prandtl > 0);
   ppMain.query("viscousBCs", m_viscousBCs);
 
+  ppMain.query("BCAccuracy", m_parameters.m_BCAccuracy);
+
   // For mushy layer calculations, we want to try and kick off the instability if we've converged
   m_doAutomaticRestart = false; //(m_parameters.physicalProblem == MushyLayerParams::m_mushyLayer);
   ppMain.query("doAutomaticRestart",m_doAutomaticRestart);
@@ -1249,13 +1251,7 @@ void AMRLevelMushyLayer::initialDataHRL()
 
 void AMRLevelMushyLayer::initialDataConvectionMixedPorous()
 {
-  // First setup diagnostics
-  Vector<int> diagsToPrint;
 
-  diagsToPrint.push_back(m_diagnostics.m_time);
-  diagsToPrint.push_back(m_diagnostics.m_dt);
-  diagsToPrint.push_back(m_diagnostics.m_Nu);
-  m_diagnostics.setPrintDiags(diagsToPrint);
 
   // Now do data
   Real initVel = 0;
@@ -3596,8 +3592,29 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
 
   }
 
+  // Setup diagnostics
+  if (m_parameters.physicalProblem == MushyLayerParams::m_convectionMixedPorous)
+  {
+
+    Vector<int> diagsToPrint;
+
+    diagsToPrint.push_back(m_diagnostics.m_time);
+    diagsToPrint.push_back(m_diagnostics.m_dt);
+    diagsToPrint.push_back(m_diagnostics.m_Nu);
+    diagsToPrint.push_back(m_diagnostics.m_NuRight);
+    diagsToPrint.push_back(m_diagnostics.m_NuLeft);
+    diagsToPrint.push_back(m_diagnostics.m_maxVhalf);
+    diagsToPrint.push_back(m_diagnostics.m_maxUhalf);
+
+    diagsToPrint.push_back(m_diagnostics.m_dSdt);
+    diagsToPrint.push_back(m_diagnostics.m_dUdt);
+    diagsToPrint.push_back(m_diagnostics.m_dTdt);
+    m_diagnostics.setPrintDiags(diagsToPrint);
+  }
+
   if (m_level == 0 && procID() == 0)
   {
+
     m_diagnostics.printHeader();
   }
 

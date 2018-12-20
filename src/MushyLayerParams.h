@@ -451,6 +451,9 @@ public:
 	/// Solid concentration BCs on hi-side boundaries
 	bcValSolidConcentrationHi;
 
+	/// First or second order BCs
+	int m_BCAccuracy;
+
 	/// Time, in case BCs are time-dependent
 	Real m_time;
 

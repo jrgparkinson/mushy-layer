@@ -656,19 +656,7 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
 
   // Override to let us converge without salinity having actually converged
   ppMain.query("ignoreBulkConcentrationSteadyState", Cconverged);
-  //
-  //  if (m_parameters.physicalProblem == MushyLayerParams::m_mushyLayer)
-  //  {
-  //    // For mushy layer, only consider salt flux convergence.
-  //    if (metricConverged)
-  //    {
-  //      pout() << "Steady state reached (metric converged)" << endl;
-  //      hasConverged = true; // converged
-  //    }
-  //
-  //  }
-  //
-  //
+
   if (Tconverged
       && Cconverged
       && velConverged)
@@ -1082,6 +1070,14 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
       traceAdvectionVel(m_advVel, ccAdvVel, U_to_advect,
                         advectionSourceTerm, m_patchGodVelocity, old_time, half_dt*2);
 
+      EdgeToCell(m_advVel, *m_vectorNew[m_advectionVel]);
+      Real maxAdvU = ::computeNorm(*m_vectorNew[m_advectionVel], NULL, 1, m_dx, Interval(0,0));
+
+      if (s_verbosity >= 1 && maxAdvU > 1e10)
+      {
+        pout() << "WARNING - max advection velocity (pre-projection) = " << maxAdvU << endl;
+      }
+
 
       // Need to recover the advection velocity, as
       // traceAdvectionVel will replce m_advVel with the upwinded U_to_advect
@@ -1111,10 +1107,6 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
     setVelZero(m_advVel, advPorosityLimit);
 
-
-
-
-
     //m_advVel contains predicted face centred velocity at half time step
     //Now need to project it and do lambda corrections etc
     Real project_dt = 2*half_dt; // this usually just works out at m_dt, for time centred advection velocities
@@ -1122,7 +1114,6 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
     {
       project_dt = m_dt;
     }
-
 
     correctEdgeCentredVelocity(m_advVel, project_dt);
 
@@ -1178,37 +1169,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
     fillScalarFace(porosityFace, m_time-m_dt, m_porosity, true, true);
     porosityFace.exchange();
 
-    // Now check that U(chi=0) = 0
-//    int errors = 0;
-//    for (DataIterator dit = m_advVel.dataIterator(); dit.ok(); ++dit)
-//    {
-//      Box b = m_advVel[dit].box();
-//      b &= m_problem_domain.domainBox();
-//
-//      for (BoxIterator bit=BoxIterator(b); bit.ok(); ++bit)
-//      {
-//        IntVect iv = bit();
-//
-//        for (int dir=0; dir<SpaceDim; dir++)
-//        {
-//
-//          Real vel = m_advVel[dit][dir](iv);
-//          Real chi = porosityFace[dit][dir](iv);
-//
-//          if (chi < 1e-10 && vel/chi > 1)
-//          {
-//            errors= errors + 1;
-//            //            pout() << "Adv vel not small enough!" << endl;
-//          }
-//
-//        }
-//      }
-//    }
-//
-//    if (errors > 0)
-//    {
-//      pout() << "Num Adv vel not small enough: " << errors << endl;
-//    }
+
 
   }
   else
@@ -1610,13 +1571,13 @@ Real AMRLevelMushyLayer::advance()
 
   }
 
-  if (s_verbosity >= 1 && m_level == 0)
+  if (s_verbosity >= 1) // && m_level == 0
   {
     // Let's determine the CFL number we're running at
     Real maxAdvU = getMaxVelocity();
     m_computedCFL = m_dt*maxAdvU/m_dx;
 
-    pout() << "  AMRLevelMushyLayer::advance (level = "<< m_level << ", time=" << m_time << ", dt = " << m_dt << ", CFL=" << m_computedCFL << ")" << endl;
+    pout() << " AMRLevelMushyLayer::advance (level = "<< m_level << ", time=" << m_time << ", dt = " << m_dt << ", CFL=" << m_computedCFL << ")" << endl;
   }
 
   // Reset BCs if they change with time
@@ -1915,6 +1876,12 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
 
 
   computeUstar(*m_vectorNew[m_UdelU], advectionSourceTerm, a_oldTime, a_dt, doFRupdates, a_MACprojection, compute_uDelU);
+
+  Real maxUstar = ::computeNorm(*m_vectorNew[ustarVar], NULL, 1, m_dx, Interval(0,0));
+  if (s_verbosity >= 1 && maxUstar > 1e10)
+  {
+    pout() << "WARNING - max cell-centred velocity (pre-projection) = " << maxUstar << endl;
+  }
 
   // Don't think this really helps
   Real porositySmoothing = 0.001;
@@ -3745,8 +3712,11 @@ void AMRLevelMushyLayer::traceAdvectionVel(LevelData<FluxBox>& a_advVel,
   // also need to fill grown advection velocity
   // by cell-to-edge averaging old-time velocity
   //	CellToEdge(a_old_vel, a_advVel);
-  a_advVel.exchange(); // definitely need this
-  U_chi.exchange(); // may need this
+  CornerCopier cornerCopy(a_advVel.disjointBoxLayout(), a_advVel.disjointBoxLayout(), m_problem_domain, a_advVel.ghostVect(), true);
+  a_advVel.exchange(cornerCopy); // definitely need this
+
+  CornerCopier cornerCopy2(U_chi.disjointBoxLayout(), U_chi.disjointBoxLayout(), m_problem_domain, U_chi.ghostVect(), true);
+  U_chi.exchange(cornerCopy2); // may need this
 
 
   // loop over grids and predict face-centered velocities at the half
@@ -3788,6 +3758,15 @@ void AMRLevelMushyLayer::traceAdvectionVel(LevelData<FluxBox>& a_advVel,
 
       thisAdvVel[idir].copy(U_chi_new[idir], srcComp, destComp, numComp);
     }
+
+    EdgeToCell(a_advVel, *m_vectorNew[m_advectionVel]);
+    Real maxAdvU = ::computeNorm(*m_vectorNew[m_advectionVel], NULL, 1, m_dx, Interval(0,0));
+
+    if (s_verbosity >= 1 && maxAdvU > 1e10)
+    {
+      pout() << "WARNING - max advection velocity (post tracing, pre-projection) = " << maxAdvU << endl;
+    }
+
   } // end loop over grids
 
   //  int temp = 0;
@@ -5066,6 +5045,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     }
 
   } // end if compute advective src
+
   full_src.copyTo(Interval(0,0), *m_scalarNew[m_enthalpySrc], Interval(0,0));
   full_src.copyTo(Interval(1,1), *m_scalarNew[m_saltEqnSrcGodunov], Interval(0,0));
 
@@ -5911,23 +5891,61 @@ void AMRLevelMushyLayer::computeDiagnostics()
       scale = 1.0/ml->m_dx;
       Tflux[lev]->incrFlux(*gradEdgeT[lev], scale);
 
-
-
     } // end loop over levels
 
 
     // Scale with coarsest dx
-    scale = 1.0;
+    scale = -1.0;
 
     Real Nuleft  = Tflux[0]->getFluxHierarchy(0, Side::Lo, scale);
     Real Nuright = Tflux[0]->getFluxHierarchy(0, Side::Hi, scale);
 
     Real Nu = 0.5*abs(Nuleft + Nuright);
 
-
     m_diagnostics.addDiagnostic(Diagnostics::m_Nu, m_time, Nu);
+    m_diagnostics.addDiagnostic(Diagnostics::m_NuLeft, m_time, Nuleft);
+    m_diagnostics.addDiagnostic(Diagnostics::m_NuRight, m_time, Nuright);
+
+    // Alternative calculation
+//    fillScalars(*m_scalarNew[m_temperature], m_time, m_temperature);
+//
+//    Nu = ::computeNusselt(*m_scalarNew[m_temperature], *m_vectorNew[m_fluidVel],
+//                                   m_dx, m_parameters,
+//                                   m_domainWidth, m_domainHeight);
+
+    // Compute max velocities at midpoints
+    Box horizBox = ::adjCellHi(m_problem_domain.domainBox(), 1, 1);
+    horizBox.shift(1, -int(m_numCells[1]/2));
+
+    Real maxVertVel = 0.0;
+
+    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+    {
+      Box b = m_grids[dit];
+      b &= horizBox;
+
+      FArrayBox& vel = (*m_vectorNew[m_fluidVel])[dit];
+      // TODO: this won't work in parallel
+      maxVertVel = max(maxVertVel, vel.max(b, 1));
+    }
 
 
+    Box vertBox = ::adjCellHi(m_problem_domain.domainBox(), 0, 1);
+    vertBox.shift(0, -int(m_numCells[0]/2));
+
+    Real maxHorizVel = 0.0;
+    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+        {
+          Box b = m_grids[dit];
+          b &= vertBox;
+
+          FArrayBox& vel = (*m_vectorNew[m_fluidVel])[dit];
+          // TODO: this won't work in parallel
+          maxHorizVel = max(maxHorizVel, vel.max(b, 0));
+        }
+
+    m_diagnostics.addDiagnostic(Diagnostics::m_maxVhalf, m_time, maxHorizVel);
+    m_diagnostics.addDiagnostic(Diagnostics::m_maxUhalf, m_time, maxVertVel);
 
     for (int lev=0; lev<nLevels; lev++)
     {

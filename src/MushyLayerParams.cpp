@@ -115,13 +115,15 @@ MushyLayerParams::MushyLayerParams() {
   m_advectionCoeff = 1.0;
   m_buoyancyTCoeff = 1.0;
   m_nondimensionalisation = 0;
- m_heatDiffusionCoeff= 1;
-    m_saltDiffusionCoeff = 1;
-           m_viscosityCoeff = 1;
-           m_buoyancyTCoeff = 1;
-           m_buoyancySCoeff = 1;
-           m_darcyCoeff = 1;
-           m_advectionCoeff = 1;
+  m_heatDiffusionCoeff= 1;
+  m_saltDiffusionCoeff = 1;
+  m_viscosityCoeff = 1;
+  m_buoyancyTCoeff = 1;
+  m_buoyancySCoeff = 1;
+  m_darcyCoeff = 1;
+  m_advectionCoeff = 1;
+
+  m_BCAccuracy = 1;
 
 }
 

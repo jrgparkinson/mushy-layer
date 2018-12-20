@@ -23,6 +23,13 @@ Diagnostics::Diagnostics ()
 
   m_diagnosticNames[m_dt] = "dt";
   m_diagnosticNames[m_Nu] = "Nusselt";
+  m_diagnosticNames[m_NuLeft] = "NusseltLeft";
+  m_diagnosticNames[m_NuRight] = "NusseltRight";
+  m_diagnosticNames[m_maxVhalf] = "MaxVHalf";
+  m_diagnosticNames[m_maxUhalf] = "MaxUHalf";
+
+
+
   m_diagnosticNames[m_soluteFluxTop] = "Fs_top";
   m_diagnosticNames[m_soluteFluxBottom] = "Fs_bottom";
   m_diagnosticNames[m_dUdt] = "dUdt";

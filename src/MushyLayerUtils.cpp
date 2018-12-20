@@ -279,6 +279,8 @@ Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& v
   {
     Gradient::levelGradientMAC(gradTedge, T, a_dx);
 
+    Real scale = 0.5*a_dx/sideLength;
+
     for (SideIterator sit = SideIterator(); sit.ok(); ++sit)
     {
 
@@ -309,11 +311,15 @@ Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& v
         {
           IntVect iv = bit();
 
-          Nu += gradTedge[dit][dir](iv)*a_dx/sideLength;
+          Nu += gradTedge[dit][dir](iv)*scale;
         }
       }
 
+
+
     }
+
+    int temp=0;
 
 
   }

@@ -592,9 +592,10 @@ public:
     {
       MayDay::Error("undefined AdvectDiffuseScalarBC object");
     }
+
     a_homogeneous = a_homogeneous || m_homogeneous;
 
-    int order = 1;
+    int order = m_params.m_BCAccuracy;
 
     const Box& domainBox = a_domain.domainBox();
 
@@ -616,14 +617,7 @@ public:
             for (int comp = m_interval.begin(); comp <= m_interval.end(); comp++)
             {
               Real diriVal;
-              //              if (isign > 0)
-              //              {
-              //                diriVal = m_topVal[comp];
-              //              }
-              //              else
-              //              {
-              //                diriVal = m_bottomVal[comp];
-              //              }
+
 
               int bcType;
 
@@ -673,7 +667,6 @@ public:
                                    m_dx,
                                    comp);
 
-              //              int temp = 0;
 
 
             }
@@ -1309,7 +1302,6 @@ public:
                                  side,
                                  order);
 
-//                    int temp = 0;
                   }
                   else
                   {
@@ -3186,7 +3178,7 @@ BCHolder PhysBCUtil::ThetaLFuncBC(bool a_homogeneous, LevelData<FluxBox>* a_advV
 BCHolder PhysBCUtil::BasicthetaFuncBC(bool a_homogeneous, LevelData<FluxBox>* a_advVel) const
 {
 
-  Vector<Vector<int> > customLoBC, customHiBC; // First index refers to direction, second to component
+  Vector<Vector<int> >   customLoBC, customHiBC;       // First index refers to direction, second to component
   Vector< Vector<Real> > customLoBCVal, customHiBCVal; // first index refers to direction, second to component
 
   Vector<Real> plumeVal(1, m_params.thetaPlumeInflow);
