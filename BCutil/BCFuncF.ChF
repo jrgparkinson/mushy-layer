@@ -43,7 +43,8 @@ C
        else if (order .eq. 1) then
          phi(CHF_IX[i;j;k],comp) = 2*bcVal - phi1
        else if (order .eq. 2) then
-         phi(CHF_IX[i;j;k],comp) = (8/3)*bcVal  - 2*phi1 + (1/3)*phi2
+C         phi(CHF_IX[i;j;k],comp) = (8/3)*bcVal  - 2*phi1 + (1/3)*phi2
+         phi(CHF_IX[i;j;k],comp) = (-2/3)*bcVal  - 2*phi1 + (-4/3)*phi2
        else
          
        endif

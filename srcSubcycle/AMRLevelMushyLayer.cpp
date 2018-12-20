@@ -3415,6 +3415,8 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
 
   LevelData<FArrayBox> traceVel(levelGrids, SpaceDim, advectionGhostVect);
   LevelData<FArrayBox> UtoAdvect_old(m_grids, SpaceDim, advectionGhostVect);
+
+  // Advection velocity is either U or U/chi depending on how we're doing things
   LevelData<FluxBox> advectionVelocity(levelGrids, 1, advectionGhostVect);
 
   LevelData<FArrayBox> porosity(levelGrids, 1, advectionGhostVect);
@@ -3437,13 +3439,13 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
   {
     advectionVelocity[dit].copy(a_advVel[dit]);
 
-    if ( m_advectionMethod == m_noPorosity)
+    if ( m_advectionMethod == m_noPorosity || m_advectionMethod == m_porosityInAdvection)
     {
       // do nothing
     }
-    else if ( m_advectionMethod == m_porosityOutsideAdvection || m_advectionMethod == m_porosityInAdvection)
+    else if ( m_advectionMethod == m_porosityOutsideAdvection)
     {
-      // We do this for both porosity in and out of advection operator now
+
       advectionVelocity[dit].divide(porosityFace[dit], porosityFace[dit].box(), 0, 0);
       for (int dir=0; dir<SpaceDim; dir++)
       {
@@ -3457,7 +3459,7 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
     }
   }
 
-  if ( m_advectionMethod == m_porosityInAdvection)
+  if (m_advectionMethod == m_porosityInAdvection)
   {
     fillVectorField(UtoAdvect_old, old_time, m_U_porosity, true);
   }
@@ -3474,7 +3476,7 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
 
   // will need edge-centered storage for all velocity components
   // This is the half time predicted value of whatever we were advecting (u or u/chi)
-  LevelData<FluxBox> advectedField(levelGrids, SpaceDim);
+  LevelData<FluxBox> U_chi_advected(levelGrids, SpaceDim);
 
   { //this is to allow this fluxbox to go out of scope
     // will also need grad(eLambda) and grad(phi_mac)
@@ -3509,12 +3511,13 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
     gradPhi.exchange();
     pressureScale.exchange();
 
-    computePredictedVelocities(advectedField, traceVel, advectionVelocity,
+    // This should U_chi_advected - if we've only advected U, then it should divide by chi before returning
+    computePredictedVelocities(U_chi_advected, traceVel, advectionVelocity,
                                UtoAdvect_old, a_src, m_patchGodVelocity,
                                grad_eLambda, gradPhi, pressureScale, old_time, a_dt,
                                legacyCompute);
 
-    advectedField.exchange();
+    U_chi_advected.exchange();
 
 
   } // FluxBox goes out of scope, memory reclaimed.
@@ -3528,20 +3531,21 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
   // any ghost cells.
 
   // reduce, reuse, recycle...
+  // cellAdvVel is U_advection averaged to cells. Never any factors of chi in here.
   LevelData<FArrayBox> cellAdvVel(m_grids, SpaceDim);
-  EdgeToCell(advectionVelocity, cellAdvVel);
+  EdgeToCell(a_advVel, cellAdvVel);
 
   // Compute flux for flux registers - U*(U/chi)
   // Also might want this to compute div(flux) as the source term
-  LevelData<FluxBox> momentumFlux(advectedField.disjointBoxLayout(), SpaceDim, advectedField.ghostVect());
-  advectedField.copyTo(Interval(0, SpaceDim-1), momentumFlux, Interval(0, SpaceDim-1));
+  LevelData<FluxBox> momentumFlux(U_chi_advected.disjointBoxLayout(), SpaceDim, U_chi_advected.ghostVect());
+  U_chi_advected.copyTo(Interval(0, SpaceDim-1), momentumFlux, Interval(0, SpaceDim-1));
 
   for (dit.reset(); dit.ok(); ++dit)
   {
     for (int dir = 0; dir < SpaceDim; dir++)
     {
       FArrayBox& thisFlux = momentumFlux[dit][dir];
-      FArrayBox& thisAdvVel = advectionVelocity[dit][dir];
+      FArrayBox& thisAdvVel = a_advVel[dit][dir];
 
       // now need to loop over traced velocity components
       for (int velComp = 0; velComp < SpaceDim; ++velComp)
@@ -3565,7 +3569,7 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
 
     for (dit.reset(); dit.ok(); ++dit)
     {
-      FluxBox& thisU_chiHalf = advectedField[dit];
+      FluxBox& thisU_chiHalf = U_chi_advected[dit];
       FArrayBox& thisCellAdvVel = cellAdvVel[dit];
       const Box& thisBox = levelGrids[dit];
       FArrayBox& this_uDelU = a_uDelU[dit];
@@ -4020,7 +4024,6 @@ void AMRLevelMushyLayer::computePredictedVelocities(
             int srcComp = 0;
             int destComp = velComp;
 
-
             this_U_chi_Dir.copy(thisAdvVelDir, srcComp, destComp, 1);
 
             // now need to subtract off grad(eLambda)
@@ -4037,22 +4040,32 @@ void AMRLevelMushyLayer::computePredictedVelocities(
               {
                 this_U_chi_Dir.divide(porosityDir, 0, dir, 1);
               }
-              else if (m_advectionMethod == m_porosityOutsideAdvection)
-              {
-                this_U_chi_Dir.mult(porosityDir, 0, dir, 1);
-              }
+              // if we were doing porosity outside advection then thisAdvVelDir was already U/chi
+//              else if (m_advectionMethod == m_porosityOutsideAdvection)
+//              {
+//                this_U_chi_Dir.mult(porosityDir, 0, dir, 1);
+//              }
             }
 
           } // end if dir is velcomp
           else
           {
-            // need to add MAC correction to traced velocities
+            // add MAC correction to traced velocities
             // if we are advecting u/chi, need to divide correction by chi too
 
-            if (m_advectionMethod == m_porosityInAdvection)
+            // First make sure advected velocity is U/chi
+            if (m_advectionMethod == m_porosityOutsideAdvection)
             {
-              a_gradPhi[dit()][dir].divide(porosityDir, 0, dir, 1);
+              this_U_chi_Dir.divide(porosityDir, 0, dir, 1);
             }
+
+            // Scale correction with chi too
+//            if (m_advectionMethod == m_porosityInAdvection)
+//            {
+              a_gradPhi[dit()][dir].divide(porosityDir, 0, dir, 1);
+//            }
+
+              // subtract correction
             this_U_chi_Dir.minus(a_gradPhi[dit()][dir], velComp,
                                  velComp, 1);
           } // end if tangential direction
