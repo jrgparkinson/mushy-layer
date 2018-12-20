@@ -89,7 +89,7 @@ def testUniformPorousConvection(argv):
 
         for Ra in Da_Ra['RaT']:
             extra_params['parameters.rayleighTemp'] = Ra
-            extra_params['main.plot_interval'] = int(1000.0*Ra*Da)
+            extra_params['main.plot_interval'] = int(100000.0*Ra*Da)
 
             if chi < 1.0:
             	extra_params['parameters.darcy'] = Da * pow(1 - chi, 2) / pow(chi, 3.0)
