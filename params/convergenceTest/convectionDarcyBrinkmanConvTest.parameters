@@ -9,12 +9,20 @@ amrmultigrid.num_smooth=16
 amrmultigrid.relaxMode=1
 amrmultigrid.tolerance=1.0e-10
 amrmultigrid.verbosity=0
-bc.bulkConcentrationHiVal=0.01 0.01
-bc.bulkConcentrationLoVal=0.01 0.01
+
+#bc.bulkConcentrationHiVal=0.01 0.01
+#bc.bulkConcentrationLoVal=0.01 0.01
+#bc.liquidConcentrationHiVal=0.01 0.01
+#bc.liquidConcentrationLoVal=0.01 0.01
+
+bc.bulkConcentrationHiVal=0.0 0.0
+bc.bulkConcentrationLoVal=0.0 0.0
+bc.liquidConcentrationHiVal=0.0 0.0
+bc.liquidConcentrationLoVal=0.0 0.0
+
 bc.enthalpyHiVal=0.0 0.0
 bc.enthalpyLoVal=1.0 0.0
-bc.liquidConcentrationHiVal=0.01 0.01
-bc.liquidConcentrationLoVal=0.01 0.01
+
 bc.porosityHiVal= 0.4 0.4 # 0.4 0.4
 bc.porosityLoVal= 0.4 0.4 #0.4 0.4
 bc.scalarHi=0 1
@@ -54,8 +62,8 @@ main.max_grid_size=64
 #main.fixed_dt = 1e-6
 main.max_level=1
 main.max_step=100000000
-main.max_time=1.0
-main.min_time=10000.0
+main.max_time=3.0
+main.min_time=0.2
 
 main.num_cells= 16 16 8 #128 32  8
 main.num_init_passes=0
@@ -125,5 +133,8 @@ projection.MACbcScale=-0.5 #0.4
 main.usePhiForImplicitAdvectionSolve=false
 
 main.nondimensionalisation=0
-main.useAccelDt=1
+main.useAccelDt=0 # was 1 originally
 
+main.steady_state=0.0001
+main.steadyStateNormType=0
+main.ignoreBulkConcentrationSteadyState=1
