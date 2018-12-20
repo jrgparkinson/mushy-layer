@@ -20,9 +20,10 @@ def testUniformPorousConvection(argv):
     Nz_vm = 64
     chi = 0.4
     BCAccuracy = 1
+    uDelUMethod = 0
 
     try:
-       opts, args = getopt.getopt(argv,"n:v:c:p:b:")
+       opts, args = getopt.getopt(argv,"n:v:c:p:b:u:")
     except getopt.GetoptError as err:
         print(str(err))
         print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points> -c<cfl> -p <chi>')
@@ -39,6 +40,8 @@ def testUniformPorousConvection(argv):
             chi = float(arg)
         elif opt in ("-b"):
            	BCAccuracy = int(arg)
+        elif opt in ("-u")
+            uDelUMethod = int(arg)
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
@@ -64,6 +67,7 @@ def testUniformPorousConvection(argv):
     #extra_params = {'main.steady_state': 1e-4}
     extra_params = {}
     extra_params['main.BCAccuracy'] = BCAccuracy
+    extra_params['main.uDeluMethod'] = uDelUMethod
     #cfl = 0.45
     extra_params['main.cfl'] = cfl
     extra_params['main.initial_cfl'] = cfl / 10
