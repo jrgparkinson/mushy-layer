@@ -19,9 +19,10 @@ def testUniformPorousConvection(argv):
     Nz_uniform = 128
     Nz_vm = 64
     chi = 0.4
+    BCAccuracy = 1
 
     try:
-       opts, args = getopt.getopt(argv,"n:v:c:p:")
+       opts, args = getopt.getopt(argv,"n:v:c:p:b:")
     except getopt.GetoptError as err:
         print(str(err))
         print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points> -c<cfl> -p <chi>')
@@ -36,6 +37,8 @@ def testUniformPorousConvection(argv):
             Nz_vm = int(arg)
         elif opt in ("-p"):
             chi = float(arg)
+        elif opt in ("-b"):
+           	BCAccuracy = int(arg)
 
     base_output_dir = getBaseOutputDir()
     matlab_command = getMatlabBaseCommand()
@@ -58,7 +61,8 @@ def testUniformPorousConvection(argv):
     #chi = 0.4
 
     # Try and speed things up for now, should eventually make this criteria smaller
-    extra_params = {'main.steady_state': 1e-4}
+    #extra_params = {'main.steady_state': 1e-4}
+    extra_params['main.BCAccuracy'] = BCAccuracy
     #cfl = 0.45
     extra_params['main.cfl'] = cfl
     extra_params['main.initial_cfl'] = cfl / 10
