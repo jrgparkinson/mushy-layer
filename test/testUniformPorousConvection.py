@@ -90,6 +90,7 @@ def testUniformPorousConvection(argv):
         for Ra in Da_Ra['RaT']:
             extra_params['parameters.rayleighTemp'] = Ra
             extra_params['main.plot_interval'] = int(100000.0*Ra*Da)
+            extra_params['main.checkpoint_interval'] = extra_params['main.plot_interval']
             print('Plot interval: ' + str(extra_params['main.plot_interval']) + '\n')
 
             if chi < 1.0:
