@@ -5921,12 +5921,16 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
     for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
     {
+      FArrayBox& vel = (*m_vectorNew[m_fluidVel])[dit];
+
       Box b = m_grids[dit];
       b &= horizBox;
 
-      FArrayBox& vel = (*m_vectorNew[m_fluidVel])[dit];
-      // TODO: this won't work in parallel
-      maxVertVel = max(maxVertVel, vel.max(b, 1));
+      if (b.size() >= IntVect::Unit)
+      {
+        // TODO: this won't work in parallel
+        maxVertVel = max(maxVertVel, vel.max(b, 1));
+      }
     }
 
 
@@ -5940,8 +5944,11 @@ void AMRLevelMushyLayer::computeDiagnostics()
           b &= vertBox;
 
           FArrayBox& vel = (*m_vectorNew[m_fluidVel])[dit];
+          if (b.size() >= IntVect::Unit)
+               {
           // TODO: this won't work in parallel
           maxHorizVel = max(maxHorizVel, vel.max(b, 0));
+               }
         }
 
     m_diagnostics.addDiagnostic(Diagnostics::m_maxVhalf, m_time, maxHorizVel);
