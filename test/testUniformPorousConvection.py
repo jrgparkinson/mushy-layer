@@ -62,6 +62,7 @@ def testUniformPorousConvection(argv):
 
     # Try and speed things up for now, should eventually make this criteria smaller
     #extra_params = {'main.steady_state': 1e-4}
+    extra_params = {}
     extra_params['main.BCAccuracy'] = BCAccuracy
     #cfl = 0.45
     extra_params['main.cfl'] = cfl
