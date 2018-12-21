@@ -4024,6 +4024,9 @@ void AMRLevelMushyLayer::computePredictedVelocities(
             int srcComp = 0;
             int destComp = velComp;
 
+            // Copy whatever we used to to advection
+            // if m_porosityInAdvection, thisAdvVelDir = U
+            // if m_porosityOutsideAdvection, thisAdvVelDir = U/chi
             this_U_chi_Dir.copy(thisAdvVelDir, srcComp, destComp, 1);
 
             // now need to subtract off grad(eLambda)
@@ -4060,12 +4063,11 @@ void AMRLevelMushyLayer::computePredictedVelocities(
             }
 
             // Scale correction with chi too
-//            if (m_advectionMethod == m_porosityInAdvection)
-//            {
-              a_gradPhi[dit()][dir].divide(porosityDir, 0, dir, 1);
-//            }
+            //, as the correction was computed for U, and we're in fact correction U/chi
+            FArrayBox& gradPhiDir = a_gradPhi[dit()][dir];
+            gradPhiDir.divide(porosityDir, 0, dir, 1);
 
-              // subtract correction
+            // subtract correction
             this_U_chi_Dir.minus(a_gradPhi[dit()][dir], velComp,
                                  velComp, 1);
           } // end if tangential direction
@@ -4774,9 +4776,6 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   //todo - write this more cleanly
   if (m_advectionMethod == m_porosityOutsideAdvection)
   {
-    //    Real old_time = m_time - m_dt;
-    //            LevelData<FArrayBox> ccVel(m_grids, SpaceDim, IntVect::Unit);
-    LevelData<FArrayBox> gradChi_chiSquared(m_grids, SpaceDim, IntVect::Unit);
     LevelData<FArrayBox> extraSrc(m_grids, SpaceDim, IntVect::Unit);
 
     Gradient::levelGradientCC(extraSrc, porosity, m_dx, extraSrc.ghostVect()[0]);
