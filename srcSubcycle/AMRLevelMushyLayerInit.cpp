@@ -245,10 +245,11 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
       m_outputVectorVars.push_back(m_MACcorrection);
 
       m_outputVectorVars.push_back(m_UdelU);
+      m_outputVectorVars.push_back(m_U_porosity);
 
       m_outputVectorVars.push_back(m_advVelCorr);
 
-        m_outputVectorVars.push_back(m_advSrcLapU);
+//        m_outputVectorVars.push_back(m_advSrcLapU);
       //  m_outputVectorVars.push_back(m_lapUfinal);
 
 
