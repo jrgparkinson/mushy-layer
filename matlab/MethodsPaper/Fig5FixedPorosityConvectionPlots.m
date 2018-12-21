@@ -86,7 +86,7 @@ text(0.04, 0.92, '(b)', 'FontSize', 16, 'Color', [0 0 0]);
 
 subplot(m, n, 3);
 
-AMRsol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-DBVariablePorosity-32--0'));
+AMRsol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, 'AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref2-DBVariablePorosity-32--0'));
 UniformFineSol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, 'Uniform-DBVariablePorosity-64--0'));
 
 makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
