@@ -6,7 +6,7 @@ import re
 
 class SlurmTask:
 
-    MAX_TASKS_PER_NODE = 8
+    MAX_TASKS_PER_NODE = 16
     MAX_MEMORY = 128000.0 # MB
     
     def __init__(self, folder, jobname, execFile, num_proc=1, timeLimit = 7.0, memoryLimit=4000, numNodes=0, mpirun=True):
