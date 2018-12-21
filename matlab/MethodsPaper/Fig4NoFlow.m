@@ -108,7 +108,7 @@ text(0.0, 4.25,{'$H=H(\theta_e=0, \chi_e)$,', '$\Theta=-1$.'}, 'FontSize', 16);
 
 %text(0.2, -0.2, '$\Theta=-1$,', 'FontSize', 16);
 %text(-0.3, -0.42, '$H=H(\theta_{analytic}, \chi=1)$.', 'FontSize', 16);
-text(0.0, -0.35, {'$H=H(\theta_{analytic}, \chi=1)$,','$\Theta=-1$.' }, 'FontSize', 16);
+text(0.0, -0.35, {'$H=H(\theta=1.1, \chi=1)$,','$\Theta=-1$.' }, 'FontSize', 16);
 
 text(-0.1, 1.6, 'Periodic', 'FontSize', 16, 'Rotation', 90);
 text(1.12, 1.6, 'Periodic', 'FontSize', 16, 'Rotation', 90);
