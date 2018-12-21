@@ -4822,7 +4822,6 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
       // Add this extra source term to the full source term
       a_src[dit].minus(extraSrc[dit], 0, 0, SpaceDim);
 
-
     }
   }
 
@@ -5932,6 +5931,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
     // Scale with coarsest dx
     scale = -1.0;
 
+    // This makes sure we get the most accurate fluxes (using the finest level available)
     Real Nuleft  = Tflux[0]->getFluxHierarchy(0, Side::Lo, scale);
     Real Nuright = Tflux[0]->getFluxHierarchy(0, Side::Hi, scale);
 
@@ -6849,7 +6849,8 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 
   // If we're doing advection with u/chi as the advection velocity,
   // then we need to use it for our cfl condition
-  bool considerUChi = (m_advectionMethod == m_porosityOutsideAdvection ||  m_advectionMethod == m_noPorosity);
+  bool considerUChi = (m_advectionMethod == m_porosityInAdvection ||
+      m_advectionMethod == m_porosityOutsideAdvection ||  m_advectionMethod == m_noPorosity);
   ppMain.query("consider_u_chi_dt", considerUChi);
   Real maxUChi = 0.0;
 
