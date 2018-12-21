@@ -12,7 +12,7 @@ end
 
 count = 1;
 while isempty(file_contents) && count < 10
-    fprintf('Waiting for diagnostics file to not be empty');
+   % fprintf('Waiting for diagnostics file to not be empty');
     pause(1.0);
     %fclose(fid);
     file_contents = fileread(file);
