@@ -13,6 +13,10 @@ set(0, 'defaultaxeslinewidth',2);
 set(0, 'defaultpatchlinewidth',2);
 set(0, 'defaultAxesFontSize',22);
 
+font = 'Latin Modern Math';
+font = 'Times';
+set(0, 'defaultAxesFontName', font); 
+set(0, 'defaultTextFontName', font); 
 
 savePlots = true;
 
@@ -167,7 +171,9 @@ hold off
 
 if doColorbar
     c = colorbar('north');
+    c.AxisLocation = 'out';
     c.Label.String = '\chi';
+    
     
     
     cbar_loc = 'top';
@@ -176,10 +182,13 @@ if doColorbar
         
         thisaxPos = axLeft.Position;
         
-        c.Position = [thisaxPos(1) + 0.04 thisaxPos(2) + thisaxPos(4) + 0.02 thisaxPos(3)*0.5 0.03];
+        c.Position = [thisaxPos(1) + 0.04, thisaxPos(2) + thisaxPos(4) + 0.03 ...
+            thisaxPos(3)*0.5, 0.03];
         
         
-        c.Label.Position = [0.9 1.6]; % this is relative to the colorbar position
+        
+        c.Label.Position = [0.9 1.4]; % this is relative to the colorbar position
+        
         
     else
         c.Label.Rotation = 0;
@@ -351,7 +360,7 @@ legend({'(16,32,64)', '16', '32', '64'}, 'Position',...
     [axRightPos(1)-0.08 axRightPos(2)+axRightPos(4)+0.05 0.2 0.06], ...
     'Orientation', 'horizontal');
 
-text(-11.5,labelPos(2),'(d)','FontSize', textFontSize);
+text(-7.0,labelPos(2),'(d)','FontSize', textFontSize);
 
 subplot(m, n, 5);
 %Error plot
