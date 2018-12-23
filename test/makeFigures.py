@@ -34,12 +34,21 @@ def makeFigures():
     figCommands.append('Fig6PorousHole(\'' + porousMushyHoleFolder + '\', \'' + figureDirectory + '\')')
     figCommands.append('Fig7FixedChill(\'' + fixedChillData + '\', [3000, 4800, 17000], \'' + figureDirectory + '\')')
 
-    full_matlab_command = matlab_command + ' "'
+    full_matlab_command = ''
 
     for c in figCommands:
-        full_matlab_command = full_matlab_command + 'try \n' + c + '; \n catch e \n fprintf(\'Plotting failed\'); \n end \n'
+        full_matlab_command = full_matlab_command + 'try \n' + c + ';  catch e \n fprintf(\'Plotting failed\'); \n end \n'
 
-    full_matlab_command = full_matlab_command + ' exit;"'
+   
+    # Write out as a script then run that
+    scriptFile = os.path.join(base_output_dir, 'makeFigureScript.m')
+    f = open(scriptFile, "w")
+    f.write(full_matlab_command)
+    f.close()
+
+
+    slurmCommand = matlab_command + ' " makeFigureScript exit; "'
+    #slurmCommand = matlab_command + ' "' + full_matlab_command + ' exit;"'
  #  + makeFig5 + '; ' + makeFig6 + '; exit ;"'
 
     jobName = 'makeFigures'
@@ -47,7 +56,7 @@ def makeFigures():
     s = SlurmTask(base_output_dir, jobName, '', 4)
 
     #s.setDependency(job_ids)
-    s.setCustomCommand(full_matlab_command)
+    s.setCustomCommand(slurmCommand)
 
     s.writeSlurmFile(jobName + '.sh')
     s.runTask(jobName + '.sh')
