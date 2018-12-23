@@ -37,12 +37,13 @@ def makeFigures():
     full_matlab_command = ''
 
     for c in figCommands:
-        full_matlab_command = full_matlab_command + 'try \n' + c + ';  catch e \n fprintf(\'Plotting failed\'); \n end \n'
+        full_matlab_command = full_matlab_command + 'try \n' + c + ';  \n catch e \n fprintf(\'Plotting failed\'); \n end \n'
 
    
     # Write out as a script then run that
     scriptFile = os.path.join(base_output_dir, 'makeFigureScript.m')
     f = open(scriptFile, "w")
+    full_matlab_command = "set(groot, 'DefaultAxesFontName', 'Latin Modern Math'); \n set(groot, 'DefaultTextFontName', 'Latin Modern Math'); \n" + full_matlab_command
     f.write(full_matlab_command)
     f.close()
 
