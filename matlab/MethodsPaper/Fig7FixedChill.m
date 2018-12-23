@@ -1,7 +1,7 @@
 % This scripts makes use of the Streamfunction Color function:
 % https://uk.mathworks.com/matlabcentral/fileexchange/69268-streamfunction-color
 
-function processFixedChill(output_dir, frames, figure_output_dir)
+function Fig7FixedChill(output_dir, frames, figure_output_dir)
 
 if nargin < 1
     output_dir = '/home/parkinsonjl/mnt/sharedStorage/Test/FixedChill-t100.0-Ra1e+07-Da5.0e-05-C5.00/Uniform-FixedChill-64--0/';
@@ -474,7 +474,7 @@ end
     set(h,'Units','Inches');
     pos = get(h,'Position');
     set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-    filename = fullfile(figure_output_dir, 'fixedChillSimulation');
+    filename = fullfile(figure_output_dir, 'Fig7FixedChillSimulation');
     
     if pcolorShadingInterp
         filename = [filename, '-shadingInterp'];
