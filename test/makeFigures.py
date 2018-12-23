@@ -46,8 +46,7 @@ def makeFigures():
     f.write(full_matlab_command)
     f.close()
 
-
-    slurmCommand = matlab_command + ' " makeFigureScript exit; "'
+    slurmCommand = '  matlab -nodisplay -nosplash -nodesktop -r " makeFigureScript exit; "'
     #slurmCommand = matlab_command + ' "' + full_matlab_command + ' exit;"'
  #  + makeFig5 + '; ' + makeFig6 + '; exit ;"'
 
