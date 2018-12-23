@@ -29,7 +29,7 @@ def makeFigures():
     fixedChillData = os.path.join(base_output_dir, 'FixedChill-t1.0e-01-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
 
     figCommands = []
-    figCommands.append('Fig4NoFlow(\'' + noFlowData + '\', \'' + figureDirectory + '/Fig4BenchmarkNoFlow.pdf\')')
+    figCommands.append('Fig4NoFlow(\'' + noFlowData + '\', \'' + figureDirectory + 'Fig4BenchmarkNoFlow.pdf\')')
     figCommands.append('Fig5FixedPorosityConvectionPlots(\'' + dataFolderNu + '\', \'' + dataFolderVariablePorosity + '\', \'' + figureDirectory + '\')')
     figCommands.append('Fig6PorousHole(\'' + porousMushyHoleFolder + '\', \'' + figureDirectory + '\')')
     figCommands.append('Fig7FixedChill(\'' + fixedChillData + '\', [3000, 4800, 17000], \'' + figureDirectory + '\')')
@@ -37,13 +37,13 @@ def makeFigures():
     full_matlab_command = ''
 
     for c in figCommands:
-        full_matlab_command = full_matlab_command + 'try \n' + c + ';  \n catch e \n fprintf(\'Plotting failed\'); \n end \n'
+        full_matlab_command = full_matlab_command + 'try \n' + c + ';  \ncatch e \n fprintf(\'Plotting failed\'); \nend \n'
 
    
     # Write out as a script then run that
     scriptFile = os.path.join(base_output_dir, 'makeFigureScript.m')
     f = open(scriptFile, "w")
-    full_matlab_command = "set(groot, 'DefaultAxesFontName', 'Latin Modern Math'); \n set(groot, 'DefaultTextFontName', 'Latin Modern Math'); \n" + full_matlab_command
+    full_matlab_command = "set(groot, 'defaultAxesFontName', 'Times'); \nset(groot, 'defaultTextFontName', 'Times'); \n" + full_matlab_command
     f.write(full_matlab_command)
     f.close()
 
