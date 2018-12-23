@@ -1,9 +1,9 @@
-function noFlowSolution(dataFolder, figureName)
+function Fig4NoFlow(dataFolder, figureName)
 
 if nargin < 2
    %dataFolder = '/home/parkinsonjl/convection-in-sea-ice/MushyLayer/matlab/MethodsPaper/';
    dataFolder = getDataDir('Test/NoFlow/');
-   figureName = 'benchmarkNoFlow.pdf';
+   figureName = 'Fig4BenchmarkNoFlow.pdf';
 end
 
 close all;
