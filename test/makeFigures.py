@@ -29,7 +29,7 @@ def makeFigures():
     fixedChillData = os.path.join(base_output_dir, 'FixedChill-t1.0e-01-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
 
     figCommands = []
-    figCommands.append('Fig4NoFlow(\'' + noFlowData + '\', \'' + figureDirectory + ' \')')
+    figCommands.append('Fig4NoFlow(\'' + noFlowData + '\', \'' + figureDirectory + '/Fig4BenchmarkNoFlow.pdf\')')
     figCommands.append('Fig5FixedPorosityConvectionPlots(\'' + dataFolderNu + '\', \'' + dataFolderVariablePorosity + '\', \'' + figureDirectory + '\')')
     figCommands.append('Fig6PorousHole(\'' + porousMushyHoleFolder + '\', \'' + figureDirectory + '\')')
     figCommands.append('Fig7FixedChill(\'' + fixedChillData + '\', [3000, 4800, 17000], \'' + figureDirectory + '\')')
@@ -46,7 +46,7 @@ def makeFigures():
     f.write(full_matlab_command)
     f.close()
 
-    slurmCommand = '  matlab -nodisplay -nosplash -nodesktop -r " makeFigureScript exit; "'
+    slurmCommand = '  matlab -nodisplay -nosplash -nodesktop -r " makeFigureScript; exit; "'
     #slurmCommand = matlab_command + ' "' + full_matlab_command + ' exit;"'
  #  + makeFig5 + '; ' + makeFig6 + '; exit ;"'
 
