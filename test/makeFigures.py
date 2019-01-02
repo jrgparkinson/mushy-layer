@@ -21,7 +21,7 @@ def makeFigures():
     dataFolderNu = os.path.join(base_output_dir, 'ConvectionDB-cfl0.15','chi0.4-Da1.0e-02-Ra1.0e+05')
     dataFolderVariablePorosity = os.path.join(base_output_dir, 'FixedPorousHole-1proc')
 
-    porousMushyHoleFolder = os.path.join(base_output_dir, 'PorousMushyHole-t0.0002')
+    porousMushyHoleFolder = os.path.join(base_output_dir, 'PorousMushyHole-t0.00015')
 
     figureDirectory = base_output_dir
 
@@ -32,7 +32,7 @@ def makeFigures():
     figCommands.append('Fig4NoFlow(\'' + noFlowData + '\', \'' + figureDirectory + 'Fig4BenchmarkNoFlow.pdf\')')
     figCommands.append('Fig5FixedPorosityConvectionPlots(\'' + dataFolderNu + '\', \'' + dataFolderVariablePorosity + '\', \'' + figureDirectory + '\')')
     figCommands.append('Fig6PorousHole(\'' + porousMushyHoleFolder + '\', \'' + figureDirectory + '\')')
-    figCommands.append('Fig7FixedChill(\'' + fixedChillData + '\', [3000, 4800, 17000], \'' + figureDirectory + '\')')
+    figCommands.append('Fig7FixedChill(\'' + fixedChillData + '\', [3000, 4000, 7000], \'' + figureDirectory + '\')')
 
     full_matlab_command = ''
 
