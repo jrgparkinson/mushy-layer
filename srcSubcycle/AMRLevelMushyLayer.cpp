@@ -1620,10 +1620,17 @@ Real AMRLevelMushyLayer::advance()
 
   // Move 'new' variables to 'old' variables
   // do this after we've incremented m_time for consistency with coarser levels
+
+  // Make sure we fill ghost cells before computing d(porosity)/dt
+  LevelData<FArrayBox> oldPorosity(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
+  LevelData<FArrayBox> newPorosity(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
+  fillScalars(oldPorosity, m_time-m_dt, m_porosity, true, true);
+  fillScalars(newPorosity, m_time, m_porosity, true, true);
+
   for (DataIterator dit = m_dPorosity_dt.dataIterator(); dit.ok(); ++dit)
   {
-    m_dPorosity_dt[dit].copy((*m_scalarNew[m_porosity])[dit]);
-    m_dPorosity_dt[dit].minus((*m_scalarOld[m_porosity])[dit]);
+    m_dPorosity_dt[dit].copy(newPorosity[dit]);
+    m_dPorosity_dt[dit].minus(oldPorosity[dit]);
     m_dPorosity_dt[dit].divide(m_dt);
   }
   copyNewToOldStates();
@@ -6850,7 +6857,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   // If we're doing advection with u/chi as the advection velocity,
   // then we need to use it for our cfl condition
   bool considerUChi = (m_advectionMethod == m_porosityInAdvection ||
-      m_advectionMethod == m_porosityOutsideAdvection ||  m_advectionMethod == m_noPorosity);
+  m_advectionMethod == m_porosityOutsideAdvection ||  m_advectionMethod == m_noPorosity);
   ppMain.query("consider_u_chi_dt", considerUChi);
   Real maxUChi = 0.0;
 
