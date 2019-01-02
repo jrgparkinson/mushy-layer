@@ -37,3 +37,4 @@ visitlog.py
 *.cproject
 *.tmp
 *.eps
+**/OldClasses/*
