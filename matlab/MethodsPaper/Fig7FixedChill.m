@@ -41,7 +41,7 @@ function processSpecificFolder(output_dir, frames, figure_output_dir)
 
 
 savePNG = true;
-pcolorShadingInterp = false;
+pcolorShadingInterp = true;
 close all; 
 
 domWidth = 1.0;
