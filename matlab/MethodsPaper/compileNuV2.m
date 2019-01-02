@@ -98,7 +98,9 @@ for f_i=1:length(folders)
                 [Nu_subfolder, stillRunning] = getNuFolder(fullfolder);
                 
                 Nu_i = find(Nxs == Nx);
-                if stillRunning
+                if isempty(Nu_i)
+                    % Do nothing
+                elseif stillRunning
                     Nu_vals{Nu_i} = sprintf('%8.2f*', Nu_subfolder);  
                 else
                     Nu_vals{Nu_i} = sprintf('%9.2f', Nu_subfolder);
