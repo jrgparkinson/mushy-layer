@@ -21,7 +21,7 @@ def testUniformPorousConvection(argv):
     chi = 0.4
     BCAccuracy = 1
     uDelUMethod = 0
-    advectionMethod = 0
+    advectionMethod = 1
 
     try:
        opts, args = getopt.getopt(argv,"n:v:c:p:b:u:a:")
