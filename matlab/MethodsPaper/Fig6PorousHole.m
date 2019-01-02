@@ -4,7 +4,7 @@ function Fig6PorousHole(dataFolder, figureDirectory)
 if nargin < 1
    % dataFolder = getDataDir('AMRConvergenceTest/MushyConvectionLiquid2-t0.5/');
    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
-   dataFolder = fullfile(base_dir, '/PorousMushyHole-t0.0001/');
+   dataFolder = fullfile(base_dir, '/PorousMushyHole-t0.00015/');
 end
 
 if nargin < 2
@@ -63,7 +63,7 @@ text(0.16, 0.85, '(b)', 'FontSize', 16);
 
 subplot(m, n, 3);
 
-AMRsol = getFinalPlotFile(fullfile(dataFolder, plotPrefixAMR(64)));
+AMRsol = getFinalPlotFile(fullfile(dataFolder, plotPrefixAMR(64, dataFolder)));
 UniformFineSol = getFinalPlotFile(fullfile(dataFolder,  plotPrefixUniform(64)));
 
 makeSubplot(AMRsol, UniformFineSol, [0.7 axBottom 0.3 axHeight])
@@ -135,8 +135,19 @@ end
 
 end
 
-function f = plotPrefixAMR(N)
-f =  ['AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-PorousMushyHole-',num2str(N),'--0'];
+function f = plotPrefixAMR(N, dataFolder)
+% Use dataFolder to determine the freestream value
+
+folders = dir(fullfile(dataFolder, 'AMR-Subcycle-Reflux-Freestream*'));
+
+for i=1:length(folders)
+    fname = folders(i).name;
+    if contains(fname, ['-',num2str(N),'--0'])
+       f = fname;
+       return;
+    end
+end
+%f =  ['AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-PorousMushyHole-',num2str(N),'--0'];
 end
 
 function f = plotPrefixUniform(N)
