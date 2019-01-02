@@ -228,7 +228,7 @@ cSl.Ticks = [minSl*0.98 maxSl*1.01];
 cSl.TickLabels = {sprintf('%1.1f', minSl), sprintf('%1.1f', maxSl)};
 cSl.Label.String = '\Theta_l';
 oldPos = cSl.Label.Position;
-cSl.Label.Position = [(minSl+maxSl)/2 oldPos(2)+0.5];
+cSl.Label.Position = [(minSl+maxSl)/2 oldPos(2)+0.0];
 
 box on;
 %set(axTemperature, 'Layer', 'top');
