@@ -13,7 +13,7 @@ end
 
 close all;
 
-figureName =  fullfile(figureDirectory, 'porousHoleFigure'); % thisFilename; %[dataFolderNu, 'benchmark2Convergence'];
+figureName =  fullfile(figureDirectory, 'Fig6PorousHoleFigure'); % thisFilename; %[dataFolderNu, 'benchmark2Convergence'];
 saveFigure = true;
 
 %highRes = getFinalPlotFile([dataFolderNu, plotPrefixUniform(gridRes(end)*2)]);

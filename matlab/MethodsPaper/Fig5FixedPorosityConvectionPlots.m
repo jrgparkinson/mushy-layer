@@ -16,7 +16,7 @@ end
 
 close all;
 
-figureName =  [figureDirectory, 'fixedPorousFigure']; %[dataFolderNu, 'benchmark2Convergence'];
+figureName =  [figureDirectory, 'Fig5FixedPorousFigure']; %[dataFolderNu, 'benchmark2Convergence'];
 saveFigure = true;
 
 NuUniformRes = 128;
