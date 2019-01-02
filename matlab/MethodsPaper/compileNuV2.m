@@ -9,11 +9,11 @@ if nargin == 0
    
     % u del u: 0, advection: 1, fixed code (hopefully) - good, clean up
     % some runs
-    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.23/';
+    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/zzConvectionDB-cfl0.23/';
     
     % Also advection 1, but smaller cfl - quite good, needs finishing some
     % runs
-    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.09/';
+   % base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.09/';
     
    
     %base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.1/';
@@ -23,7 +23,7 @@ if nargin == 0
    %base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.24/';
    
    % Good too, but maybe old
-  % base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.15/';
+   %base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.15/';
     
     %  chi = '0.4';
     

@@ -62,8 +62,8 @@ main.max_grid_size=64
 #main.fixed_dt = 1e-6
 main.max_level=1
 main.max_step=100000000
-main.max_time=3.0
-main.min_time=0.2
+main.max_time=5.0
+main.min_time=1.0
 
 main.num_cells= 16 16 8 #128 32  8
 main.num_init_passes=0

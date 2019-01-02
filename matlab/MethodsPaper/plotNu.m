@@ -12,18 +12,21 @@ if plotSingle
     %folder = ['/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.29', ...
     %    '/chi0.4-Da1.0e-06-Ra1.0e+09/VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-32--0/'];
     
-    folders = {'/home/parkinsonjl/mushy-layer/execSubcycle/Nu/method0/', ...
-        '/home/parkinsonjl/mushy-layer/execSubcycle/Nu/method1/'};
+    %folders = {'/home/parkinsonjl/mushy-layer/execSubcycle/Nu/method0/', ...
+    %    '/home/parkinsonjl/mushy-layer/execSubcycle/Nu/method1/'};
+    
+    folders = {['/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.23/', ...
+        'chi0.4-Da1.0e-06-Ra1.0e+08/VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-32--0/']};
     
     UniformPrefix = 'Uniform-convectionDB-';
-AMRPrefix = 'VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-';
+    AMRPrefix = 'VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-';
 
 
     remoteBaseFolder = ['/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.09/'];
     
-    folders = {[remoteBaseFolder, 'chi0.4-Da1.0e-06-Ra1.0e+07/', UniformPrefix,'128--0']...
-        [remoteBaseFolder, 'chi0.4-Da1.0e-06-Ra1.0e+08/', UniformPrefix, '128--0'], ...
-        [remoteBaseFolder, 'chi0.4-Da1.0e-06-Ra1.0e+09/', UniformPrefix, '128--0']};
+    %folders = {[remoteBaseFolder, 'chi0.4-Da1.0e-06-Ra1.0e+07/', UniformPrefix,'128--0']...
+    %    [remoteBaseFolder, 'chi0.4-Da1.0e-06-Ra1.0e+08/', UniformPrefix, '128--0'], ...
+    %    [remoteBaseFolder, 'chi0.4-Da1.0e-06-Ra1.0e+09/', UniformPrefix, '128--0']};
     
     NuLeBars = 12.9;
     NuLeBars = 3.17;
