@@ -33,6 +33,7 @@ def makeFigures():
     figCommands.append('Fig5FixedPorosityConvectionPlots(\'' + dataFolderNu + '\', \'' + dataFolderVariablePorosity + '\', \'' + figureDirectory + '\')')
     figCommands.append('Fig6PorousHole(\'' + porousMushyHoleFolder + '\', \'' + figureDirectory + '\')')
     figCommands.append('Fig7FixedChill(\'' + fixedChillData + '\', [3000, 4000, 7000], \'' + figureDirectory + '\')')
+    figCommands.append('Fig7MakeVideo(\'' + fixedChillData + '\')')
 
     full_matlab_command = ''
 

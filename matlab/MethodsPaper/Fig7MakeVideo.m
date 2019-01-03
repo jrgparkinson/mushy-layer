@@ -1,4 +1,4 @@
-function makeVideo(folder)
+function Fig7MakeVideo(folder)
 
 set(0, 'defaultlinelinewidth',2);
 set(0, 'defaultaxeslinewidth',2);
@@ -160,7 +160,7 @@ for i = framesToMakeVideo
     
     frame = frameList(i);
     frameFile = sprintf('frame%d.png', frame);
-    fullFilename = fullfile(folder, frameFile);
+    fullFilename = fullfile(videoFolder, frameFile);
     if exist(fullFilename, 'file') == 2
         
         img = imread(fullFilename);
