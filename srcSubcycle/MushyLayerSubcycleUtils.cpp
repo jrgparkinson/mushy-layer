@@ -166,7 +166,10 @@ defineAMR(AMR&                                          a_amr,
   ppMain.get("checkpoint_interval",checkpoint_interval);
 
   int plot_interval = 0;
-  ppMain.get("plot_interval",plot_interval);
+  ppMain.query("plot_interval",plot_interval);
+
+  Real plot_period = 0;
+  ppMain.query("plot_period", plot_period);
 
   Real max_dt_growth = 1.1;
   ppMain.get("max_dt_growth",max_dt_growth);
@@ -195,6 +198,7 @@ defineAMR(AMR&                                          a_amr,
   // set output parameters
   a_amr.checkpointInterval(checkpoint_interval);
   a_amr.plotInterval(plot_interval);
+  a_amr.plotPeriod(plot_period);
   a_amr.regridIntervals(regrid_intervals);
   a_amr.maxDtGrow(max_dt_growth);
   a_amr.dtToleranceFactor(dt_tolerance_factor);

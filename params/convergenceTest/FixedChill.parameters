@@ -48,13 +48,13 @@ main.max_grid_size=32
 main.max_init_dt=1e-2
 main.max_level=2
 main.max_step=800000
-main.max_time=0.1
-main.min_time=0.1
+main.max_time=0.05
+main.min_time=0.05
 main.nondimensionalisation=0
 main.num_cells=32 32 32
 main.output_folder=/network/group/aopp/oceans/AW002_PARKINSON_MUSH/fixedChillAMR/TBottom1.3AMR4-2-0
 main.periodic_bc=0 0 0
-main.plot_interval=1000
+
 main.plot_prefix=plt
 main.postTraceSmoothing=0.0
 main.printAccelDt=0
@@ -123,4 +123,7 @@ regrid.plume_vel=10.0
 run_name=Uniform
 
 main.time_integration_order=2
-main.checkpoint_interval=10
+main.checkpoint_interval=100
+main.plot_period = 0.00005
+#main.plot_interval=1
+#main.plot_interval=100
