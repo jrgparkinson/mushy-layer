@@ -33,9 +33,8 @@ if exist(videoFolder, 'dir') ~= 7
     mkdir(videoFolder);
 end
 
-testing = true;
+testing = false;
 
-makeFrameFunction = @(folder, plotFile, options) fakeHeleShawFrame(folder, plotFile, options);
 options.SlMax = 0.1;
 options.axPos = [0.15 0.15 0.65 0.75];
 options.topFraction = 0.5;

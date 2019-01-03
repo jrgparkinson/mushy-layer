@@ -128,20 +128,6 @@ end
     
 end
 
-% Trim polyshapes to stay within domain
-function pshape_trimmed = trimShape(pshape)
 
-dx = 1/128;
-dz = 1/128;
-domainPolyshape = polyshape([dx dx 1-dx 1-dx], [dz  1-dz 1-dz dz]);
-
-%pshape_trimmed = intersect(pshape, domainPolyshape);
-
-for i = 1:length(pshape)
-     pshape_trimmed(i) = intersect(pshape(i), domainPolyshape);
-end
-stop =0;
-
-end
 
 
