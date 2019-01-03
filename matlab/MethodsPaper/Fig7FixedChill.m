@@ -19,6 +19,7 @@ if nargin < 2
     frames = [-1]; % just process the last frame by default
     frames = [3000, 4800, 17000]; % Testing
     frames = [2288, 3874, 4576]; % Testing
+    %frames = [2286, 3872, 4574]; % Testing
 end
 
 if nargin < 3
@@ -92,12 +93,15 @@ end
 % Load plotfile
 for frame_i=1:length(frames)
     options.axPos = axPositions{frame_i}; %[0.08 0.08 0.8 0.75];
+    options.maxSearchFrame = 100000;
     thisFrame = frames(frame_i);
+    
+   
     
     textLabels = {'(a)', '(b)', '(c)'};
     options.subPlotLabel = textLabels{frame_i};
     
-    Fig7PlotFrame(options, axPos, output_dir, actual_plot_prefix, thisFrame, frame_i);
+    Fig7PlotFrame(options, output_dir, actual_plot_prefix, thisFrame, frame_i);
     
 end
 

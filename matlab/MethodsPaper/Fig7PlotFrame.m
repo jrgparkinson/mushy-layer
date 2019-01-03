@@ -9,12 +9,25 @@ function success = Fig7PlotFrame(options, output_dir, actual_plot_prefix, thisFr
         
     end
     
-    mlSmooth =  MushyLayerOutput(2, thisFrame, output_dir, actual_plot_prefix, true, 'bicubic');
-
-    if isempty(isprop(ml, 'levelArray'))
-        fprintf('Folder does not contain any plot files \n');
-        return;
+   
+    if isempty(isprop(ml, 'levelArray')) || length(ml.levelArray) == 0
+        
+        if isfield(options, 'maxSearchFrame')
+            while isempty(isprop(ml, 'levelArray')) || length(ml.levelArray) == 0 ...
+                    && thisFrame < options.maxSearchFrame
+                thisFrame = thisFrame + 1;
+                fprintf('  Trying frame %d \n', thisFrame);
+                ml = MushyLayerOutput(2, thisFrame, output_dir, actual_plot_prefix, true);
+       
+            end
+        else
+            fprintf('Could not find plot file \n');
+            return;
+        end
     end
+    
+     mlSmooth =  MushyLayerOutput(2, thisFrame, output_dir, actual_plot_prefix, true, 'bicubic');
+
 
     % Get data to plot
     [X,Y] = ml.grid();
