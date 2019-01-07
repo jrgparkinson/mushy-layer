@@ -412,13 +412,13 @@ public:
                               const Real a_dtSync
                              );
 
+   /// returns uEdge - G(phi_mac); C/F BC is CFscale*Pi(crse)
+    /**
+     * \f[ \mathbf{u}^{edge} - \nabla \phi^{mac} \f]
+     */
+    void applyMacCorrection(LevelData<FluxBox>& a_uEdge, LevelData<FArrayBox>* crseBCDataPtr, Real phiScale=1.0);
 
 protected:
-  /// returns uEdge - G(phi_mac); C/F BC is CFscale*Pi(crse)
-  /**
-   * \f[ \mathbf{u}^{edge} - \nabla \phi^{mac} \f]
-   */
-  void applyMacCorrection(LevelData<FluxBox>& a_uEdge, LevelData<FArrayBox>* crseBCDataPtr, Real phiScale=1.0);
 
   /// vel := vel - scale*G_CC(pi)
   /**

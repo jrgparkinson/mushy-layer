@@ -1105,7 +1105,7 @@ void Projector::checkDivergence(LevelData<FluxBox>& a_uEdge)
 
   int minNumSmooth = 2;
   int maxNumSmooth = 20;
-  Real tol = 1e-10;
+  Real tol = 1e-11;
 
   ParmParse pp("projection");
   pp.query("maxNumSmooth", maxNumSmooth);
@@ -1335,7 +1335,8 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 }
 
 // --------------------------------------------------------------
-void Projector::applyMacCorrection(LevelData<FluxBox>& a_uEdge,
+void
+Projector::applyMacCorrection(LevelData<FluxBox>& a_uEdge,
                                      LevelData<FArrayBox>* crseBCDataPtr,
                                      Real phiScale)
 {

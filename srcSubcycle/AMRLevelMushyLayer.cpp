@@ -3052,6 +3052,27 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
     fillUnprojectedDarcyVelocity(a_advVel, time);
 
+    // Subtract best guess at pressure if possible
+    if (getMaxLevel() == 0)
+    {
+      // todo - subtract pressure
+//      LevelData<FluxBox> gradPhi(a_advVel.disjointBoxLayout(), 1, a_advVel.ghostVect());
+//      m_projection.gradPhi(gradPhi);
+
+      Real basic_phiScale = 1;
+      ParmParse pp("projection");
+      pp.get("phiScale", basic_phiScale);
+
+      Real phiScale = m_projection.getScale(basic_phiScale, m_dt);
+
+      // Apply last calculated MAC correction
+      m_projection.applyMacCorrection(a_advVel,
+                                      NULL,
+                                      phiScale);
+      alreadyHasPressure = true;
+
+    }
+
   }
 
   // Apply domain BCs and project
@@ -3093,9 +3114,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   if (enforceAnalyticVel)
   {
     fillAnalyticVel(a_advVel);
-
   } // end if enforce analytic vel
-
 
   if (s_verbosity >= 5)
   {
@@ -3117,6 +3136,15 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     pout() << "AMRLevelMushyLayer::calculateTimeIndAdvectionVel - finished (level " << m_level << ")"    << endl;
   }
 
+}
+
+int AMRLevelMushyLayer::getMaxLevel()
+{
+  int maxLevel = -1;
+  ParmParse pp("main");
+  pp.get("max_level", maxLevel);
+
+  return maxLevel;
 }
 
 void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advVel, Real time)

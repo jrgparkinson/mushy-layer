@@ -738,6 +738,9 @@ protected:
   void calculateTimeIndAdvectionVel(Real a_time, LevelData<FluxBox>& a_advVel);
   void fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advVel, Real time);
 
+  /// Get maximum level allowed in AMR hierarchy
+  int getMaxLevel();
+
   /// Fill advection velocity ghost cells
   void fillAdvVel(Real time, LevelData<FluxBox>& a_advVel);
 
