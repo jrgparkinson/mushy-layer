@@ -1370,7 +1370,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
       Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
 
-      maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
+      maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0), 0);
       pout() << "  MAC Projection (#" << projNum << " on level "<< m_level << "), exit status = " << exitStatus << ", max(div u) = " << maxDivU << endl;
 
 
@@ -1870,7 +1870,7 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
 
   computeUstar(*m_vectorNew[m_UdelU], advectionSourceTerm, a_oldTime, a_dt, doFRupdates, a_MACprojection, compute_uDelU);
 
-  Real maxUstar = ::computeNorm(*m_vectorNew[ustarVar], NULL, 1, m_dx, Interval(0,0));
+  Real maxUstar = ::computeNorm(*m_vectorNew[ustarVar], NULL, 1, m_dx, Interval(0,0), 0);
   if (s_verbosity >= 1 && maxUstar > 1e10)
   {
     pout() << "WARNING - max cell-centred velocity (pre-projection) = " << maxUstar << endl;
@@ -3074,7 +3074,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
   a_advVel.exchange();
   Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
-  Real maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
+  Real maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0), 0);
   pout() << "  MAC Projection (level "<< m_level << "), exit status = " << exitStatus << ", max(div u) = " << maxDivU << endl;
 
   fillAdvVel(time, a_advVel);
@@ -3761,7 +3761,7 @@ void AMRLevelMushyLayer::traceAdvectionVel(LevelData<FluxBox>& a_advVel,
     }
 
     EdgeToCell(a_advVel, *m_vectorNew[m_advectionVel]);
-    Real maxAdvU = ::computeNorm(*m_vectorNew[m_advectionVel], NULL, 1, m_dx, Interval(0,0));
+    Real maxAdvU = ::computeNorm(*m_vectorNew[m_advectionVel], NULL, 1, m_dx, Interval(0,0), 0);
 
     if (s_verbosity >= 1 && maxAdvU > 1e10)
     {
@@ -5777,59 +5777,7 @@ bool AMRLevelMushyLayer::finestLevel()
   return !hasFinerLevel();
 }
 
-void AMRLevelMushyLayer::computeSaltResidual(LevelData<FluxBox>& totalSoluteFlux)
-{
-  MayDay::Warning("AMRLevelMushyLayer::computeSaltResidual - not implemented");
-  //  RefCountedPtr<AMRNonLinearVCOp> amrpop = RefCountedPtr<AMRNonLinearVCOp>(
-  //      (AMRNonLinearVCOp*)s_diffuseOpFact[m_bulkConcentration]->AMRnewOp(m_problem_domain));
-  //
-  //  LevelData<FluxBox> diffusiveSoluteFlux(m_grids, 1);
-  //  LevelData<FluxBox> advectiveSoluteFlux(m_grids, 1);
-  //  LevelData<FluxBox> frameAdvectionSoluteFlux(m_grids, 1);
-  //  //  LevelData<FluxBox> totalSoluteFlux(m_grids, 1);
-  //  LevelData<FArrayBox> diffusiveSrc(m_grids, 1);
-  //  LevelData<FArrayBox> residual(m_grids, 1);
-  //
-  //  // Advective part is div(u Theta_l)
-  //  computeScalarAdvectiveFlux(advectiveSoluteFlux, m_liquidConcentration, m_bulkConcentration, m_advVel, m_time-m_dt, m_dt);
-  //  computeScalarAdvectiveFlux(frameAdvectionSoluteFlux, m_bulkConcentration, m_bulkConcentration, m_frameAdvVel, m_time-m_dt, m_dt);
-  //
-  //  LevelData<FArrayBox> S(m_grids, 1, IntVect::Unit);
-  //  fillScalars(S, m_time, m_bulkConcentration, true, true);
-  //
-  //  for (DataIterator dit = m_scalarNew[m_bulkConcentration]->dataIterator(); dit.ok(); ++dit)
-  //  {
-  //    //    Box box = m_grids[dit];
-  //    //    Box box = S[dit].box();
-  //    amrpop->getFlux(diffusiveSoluteFlux[dit], S, diffusiveSoluteFlux[dit].box(), dit(), 1.0);
-  //
-  //    for (int idir=0; idir<SpaceDim; idir++)
-  //    {
-  //      totalSoluteFlux[dit][idir].copy(diffusiveSoluteFlux[dit][idir]);
-  //      if (m_parameters.rayleighComposition != 0.0 || m_parameters.rayleighTemp != 0.0)
-  //      {
-  //        totalSoluteFlux[dit][idir].minus(advectiveSoluteFlux[dit][idir]);
-  //      }
-  //
-  //      if (m_parameters.nonDimVel != 0.0)
-  //      {
-  //        totalSoluteFlux[dit][idir].minus(frameAdvectionSoluteFlux[dit][idir]);
-  //      }
-  //    }
-  //  }
-  //
-  //  Divergence::levelDivergenceMAC(residual, totalSoluteFlux, m_dx);
-  //  for (DataIterator dit = m_scalarNew[m_bulkConcentration]->dataIterator(); dit.ok(); ++dit)
-  //  {
-  //    residual[dit].mult(-m_dt);
-  //    residual[dit].plus((*m_scalarNew[m_bulkConcentration])[dit]);
-  //    residual[dit].minus((*m_scalarOld[m_bulkConcentration])[dit]);
-  //  }
-  //
-  //  residual.copyTo(*m_scalarNew[m_saltResidual]);
 
-
-}
 void AMRLevelMushyLayer::computeDiagnostics()
 {
   if (!m_computeDiagnostics)
@@ -6280,7 +6228,6 @@ void AMRLevelMushyLayer::computeDiagnostics()
         (*levelLambda)[dit].plus(-1.0);
       }
     }
-
 
     Real sumLambda = ::computeNorm(amrLambda,nRef,m_dx, Interval(0,0), 2, m_level) ;
     Real maxLambda = ::computeMax(amrLambda, nRef, Interval(0,0), m_level); //::computeSum(amrLambda,nRef,m_dx, Interval(0,0), m_level);

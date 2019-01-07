@@ -445,7 +445,6 @@ void AMRLevelMushyLayer::levelSetup()
                               fineProj, crsProj, m_ref_ratio, m_level, *m_physBCPtr, usePiAdvectionBCs);
     m_projectionBackup.verbosity(projectionVerbosity);
 
-
   }
 
   if (!hasFinerLevel())

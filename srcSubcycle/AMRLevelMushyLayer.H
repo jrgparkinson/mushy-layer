@@ -512,8 +512,7 @@ protected:
   /// Returns \f$ \Delta t \f$
   Real computeDt(bool growdt);
 
-  /// Compute salt equation residual
-  void computeSaltResidual(LevelData<FluxBox>& totalSoluteFlux);
+
 
   /// Replace with data from before the last backup
   void restartTimestepFromBackup(bool ignorePressure = false);

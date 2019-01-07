@@ -150,6 +150,12 @@ public:
    */
   Real getPhiScale(Real a_dt);
 
+  /// Check if the divergence of the velocity is sufficiently small
+  /**
+   * If not, increase the number of smoothing steps
+   */
+  void checkDivergence(LevelData<FluxBox>& a_uEdge);
+
   /// Return the scale for \f$ \phi \f$
   Real getScale(Real a_scale, Real a_dt);
 

@@ -436,10 +436,10 @@ void Projector::define(const DisjointBoxLayout& a_grids,
   // set physical boundary condition object
   setPhysBC(a_physBC);
 
-  //  if (!pp_init)
-  //  {
-  variableSetUp();
-  //  }
+  if (!pp_init)
+  {
+    variableSetUp();
+  }
 
   CH_assert (a_level > -1);
   m_level = a_level;
@@ -558,7 +558,6 @@ void Projector::variableSetUp()
   ppProjection.query("bottomSolveMaxIter", s_bottomSolveMaxIter);
   ppProjection.query("solverHang", s_solver_hang);
   ppProjection.query("mg_relaxation", s_multigrid_relaxation);
-
 
   tempBool = (int) s_constantLambdaScaling;
   ppProjection.query("constantLambdaScaling", tempBool);
@@ -1091,7 +1090,51 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     }
   }
 
+  checkDivergence(a_uEdge);
+
   return exitStatus;
+
+}
+
+void Projector::checkDivergence(LevelData<FluxBox>& a_uEdge)
+{
+  LevelData<FArrayBox> DivU(getBoxes(),1);
+  Divergence::levelDivergenceMAC(DivU, a_uEdge, m_dx);
+
+  Real maxDivU = ::computeNorm(DivU, NULL, 1, m_dx, Interval(0,0), 0);
+
+  int minNumSmooth = 2;
+  int maxNumSmooth = 20;
+  Real tol = 1e-10;
+
+  ParmParse pp("projection");
+  pp.query("maxNumSmooth", maxNumSmooth);
+  pp.query("minNumSmooth", minNumSmooth);
+
+  if (maxDivU < tol)
+  {
+    // We might be able to reduce the number of smoothings
+    if (s_num_smooth_down > minNumSmooth || s_num_smooth_up > minNumSmooth)
+    {
+      s_num_smooth_down = max(s_num_smooth_down-2, minNumSmooth);
+      s_num_smooth_up = max(s_num_smooth_up-2, minNumSmooth);
+
+      pout() << "  max(div U)  = " << maxDivU << " < " << tol << ", decreasing number of smoothing steps to " <<
+          s_num_smooth_down << " (down) " << s_num_smooth_up << " (up) "<< endl;
+    }
+
+  }
+  else
+  {
+    // Increasing the number of smoothings may help
+    if (s_num_smooth_down < maxNumSmooth || s_num_smooth_up < maxNumSmooth)
+    {
+      s_num_smooth_down = min(s_num_smooth_down+2, maxNumSmooth);
+      s_num_smooth_up = min(s_num_smooth_up+2, maxNumSmooth);
+      pout() << "  max(div U)  = " << maxDivU << " > " << tol << ", increasing number of smoothing steps to " <<
+          s_num_smooth_down << " (down) " << s_num_smooth_up << " (up) " << endl;
+    }
+  }
 
 }
 
@@ -1103,10 +1146,7 @@ Real Projector::getPhiScale(Real a_dt)
 //Real CCProjector::getScale(const char* param, Real a_dt)
 Real Projector::getScale(Real a_scale, Real a_dt)
 {
-  //  Real scale = 1.0;
 
-  //  ParmParse pp("projection");
-  //  pp.query(param, scale);
 
   Real newScale = a_scale;
 
@@ -1288,6 +1328,8 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 
     }
   }
+
+  checkDivergence(a_uEdge);
 
   return exitStatus;
 }
