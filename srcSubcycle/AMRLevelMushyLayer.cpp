@@ -3052,20 +3052,23 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
     fillUnprojectedDarcyVelocity(a_advVel, time);
 
-    // Subtract best guess at pressure if possible
-    if (getMaxLevel() == 0)
-    {
-      // todo - subtract pressure
-//      LevelData<FluxBox> gradPhi(a_advVel.disjointBoxLayout(), 1, a_advVel.ghostVect());
-//      m_projection.gradPhi(gradPhi);
+    // Subtract best guess at pressure by default for non-AMR sims
+    bool useIncrementalPressure = (getMaxLevel() == 0);
+    ParmParse pp("projection");
+    pp.query("useIncrementalPressure", useIncrementalPressure);
 
+    // Don't do this on refined levels as it messes up the CF boundary condition
+    if (useIncrementalPressure && m_level == 0)
+    {
       Real basic_phiScale = 1;
-      ParmParse pp("projection");
+
       pp.get("phiScale", basic_phiScale);
 
       Real phiScale = m_projection.getScale(basic_phiScale, m_dt);
 
       // Apply last calculated MAC correction
+      m_projection.setPressureScaleEdgePtr(pressureScaleEdgePtr);
+
       m_projection.applyMacCorrection(a_advVel,
                                       NULL,
                                       phiScale);
