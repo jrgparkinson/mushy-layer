@@ -180,6 +180,12 @@ public:
   void getCFBC(LevelData<FArrayBox>& crseVelPtr, LevelData<FArrayBox>* a_crseVelPtr,
                LevelData<FArrayBox>* a_crsePorosityPtr, Real a_dt);
 
+
+  /// Set the pressure scale pointer
+  void setPressureScalePtr(RefCountedPtr<LevelData<FArrayBox> > a_pressureScalePtr);
+
+  void setPressureScaleEdgePtr(RefCountedPtr<LevelData<FluxBox> > a_pressureScaleEdgePtr);
+
   /// Refactored to use in implicit MAC solve
   void scaleRHS(LevelData<FArrayBox>& a_rhs, Real a_scale);
 

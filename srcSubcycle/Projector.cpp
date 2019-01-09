@@ -1008,8 +1008,6 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
   // now solve for phi
   for (dit.reset(); dit.ok(); ++dit)
   {
-    // think is is required for proper scaling
-    //            MacRHS[dit].mult(2);
     oldPhi[dit].copy(m_phi[dit]);
   }
 
@@ -1079,13 +1077,10 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     }
   }
 
-
   if(alreadyHasPhi)
   {
     for (dit.reset(); dit.ok(); ++dit)
     {
-      // think is is required for proper scaling
-      //            MacRHS[dit].mult(2);
       m_phi[dit].plus(oldPhi[dit]);
     }
   }
@@ -1383,6 +1378,16 @@ Projector::applyMacCorrection(LevelData<FluxBox>& a_uEdge,
   //    delete crseBCDataPtr;
   //    crseBCDataPtr = NULL;
   //  }
+}
+
+void Projector::setPressureScalePtr(RefCountedPtr<LevelData<FArrayBox> > a_pressureScalePtr)
+{
+  m_porosityPtr = a_pressureScalePtr;
+}
+
+void Projector::setPressureScaleEdgePtr(RefCountedPtr<LevelData<FluxBox> > a_pressureScaleEdgePtr)
+{
+  m_porosityEdgePtr = a_pressureScaleEdgePtr;
 }
 
 void Projector::getCFBC(LevelData<FArrayBox>& velBC, LevelData<FArrayBox>* a_crseVelPtr,
