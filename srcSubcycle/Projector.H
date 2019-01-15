@@ -173,7 +173,8 @@ public:
                        const RefCountedPtr<LevelData<FArrayBox> > a_crsePorosityPtr,
                        const RefCountedPtr<LevelData<FluxBox> > a_porosityEdgePtr,
                        const RefCountedPtr<LevelData<FluxBox> > a_crsePorosityEdgePtr,
-                       bool alreadyhasPhi = false);
+                       bool alreadyhasPhi = false,
+                       Real correctScale = 1.0);
 
 
   /// Refactored this so we can use for an implicit MAC solve

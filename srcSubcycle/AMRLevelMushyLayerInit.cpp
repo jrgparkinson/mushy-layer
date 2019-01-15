@@ -986,7 +986,7 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   }
   else
   {
-    s_initialize_pressures = false;
+    s_initialize_pressures = true;
     s_project_initial_vel = false;
   }
 
@@ -2829,36 +2829,52 @@ void AMRLevelMushyLayer::postInitialize()
     if (s_initialize_pressures)
     {
       if (s_verbosity >= 3)
-            {
-              pout() << "AMRlevelMushyLayer::postInitialize - initialize pressures" << endl;
-            }
-
-      Real dtInit = computeDtInit(numLevels-1);
-      Real scale = 0.1;
-      ParmParse ppMain("main");
-      ppMain.query("init_dt_scale", scale);
-      dtInit *= scale;
-
-      thisLevelData = this->getCoarsestLevel();
-      for (int lev = 0; lev < numLevels; lev++)
       {
-        thisLevelData->m_projection.setNonSubcycledMACBCs();
-        thisLevelData = thisLevelData->getFinerLevel();
+        pout() << "AMRlevelMushyLayer::postInitialize - initialize pressures" << endl;
       }
 
-
-      initializeGlobalPressure(dtInit, true);
-
-      // Reset lambda
-      thisLevelData = this->getCoarsestLevel();
-      for (int lev = 0; lev < numLevels; lev++)
+      if(solvingFullDarcyBrinkman())
       {
-        thisLevelData->resetLambda();
+        Real dtInit = computeDtInit(numLevels-1);
+        Real scale = 0.1;
+        ParmParse ppMain("main");
+        ppMain.query("init_dt_scale", scale);
+        dtInit *= scale;
 
-        thisLevelData->m_projection.setSubcycledMACBCs();
+        thisLevelData = this->getCoarsestLevel();
+        for (int lev = 0; lev < numLevels; lev++)
+        {
+          thisLevelData->m_projection.setNonSubcycledMACBCs();
+          thisLevelData = thisLevelData->getFinerLevel();
+        }
 
-        thisLevelData = thisLevelData->getFinerLevel();
+        initializeGlobalPressure(dtInit, true);
+
+        // Reset lambda
+        thisLevelData = this->getCoarsestLevel();
+        for (int lev = 0; lev < numLevels; lev++)
+        {
+          thisLevelData->resetLambda();
+
+          thisLevelData->m_projection.setSubcycledMACBCs();
+
+          thisLevelData = thisLevelData->getFinerLevel();
+        }
+
       }
+      else
+      {
+        // Compute advection vel on every level, and keep doing so until div u is small enough
+
+        // For now, just do one level
+        //todo - extend to AMR
+        AMRLevelMushyLayer* lev = this->getCoarsestLevel();
+
+        initTimeIndependentPressure(lev);
+
+
+      }
+
     }
 
   }
@@ -2909,6 +2925,24 @@ void AMRLevelMushyLayer::postInitialize()
     }
   }
 
+}
+
+void AMRLevelMushyLayer::initTimeIndependentPressure(AMRLevelMushyLayer* lev)
+{
+  Real maxDivU = 1e10;
+  int i = 1;
+  int maxNumIter = 20;
+
+  while(maxDivU > 1e-10 && i < maxNumIter)
+  {
+    lev->calculateTimeIndAdvectionVel(lev->m_time, lev->m_advVel);
+
+    Divergence::levelDivergenceMAC(*lev->m_scalarNew[m_divUadv], lev->m_advVel, m_dx);
+    maxDivU = ::computeNorm(*lev->m_scalarNew[m_divUadv], NULL, 1, lev->m_dx, Interval(0,0), 0);
+    pout() << "Pressure init " << i << ", max(div U) = " << maxDivU << endl;
+
+    i = i + 1;
+  }
 }
 
 void AMRLevelMushyLayer::resetLambda()
@@ -3461,7 +3495,6 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
   defineSolvers(m_time);
 
 
-
   if (a_restart)
   {
     // Turn this off so we can do continuation easier
@@ -3535,10 +3568,18 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     // whilst that stored in m_projection is.
 
     LevelData<FArrayBox>& pi = m_projection.Pi();
+    LevelData<FArrayBox>& phi = m_projection.phi();
     m_scalarNew[m_pressure]->copyTo(pi);
+    m_scalarNew[m_pressure]->copyTo(phi);
     for (DataIterator dit = pi.dataIterator(); dit.ok(); ++dit)
     {
       pi[dit].divide(m_dt);
+    }
+
+    if (!solvingFullDarcyBrinkman())
+    {
+      AMRLevelMushyLayer* lev = this->getCoarsestLevel();
+      initTimeIndependentPressure(lev);
     }
 
 

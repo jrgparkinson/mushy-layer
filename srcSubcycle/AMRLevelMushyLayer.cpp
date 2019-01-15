@@ -1655,8 +1655,7 @@ Real AMRLevelMushyLayer::advance()
 
   calculatePermeability(); //make sure this is up to date
 
-  // This fills all the ghost cells of advectionSourceTerm
-  computeAdvectionVelSourceTerm(advectionSourceTerm);
+
 
   LevelData<FArrayBox> zeroSrc(m_grids, 1, ivGhost);
   setValLevel(zeroSrc, 0.0);
@@ -1666,6 +1665,9 @@ Real AMRLevelMushyLayer::advance()
 
   if (solvingFullDarcyBrinkman())
   {
+    // This fills all the ghost cells of advectionSourceTerm
+     computeAdvectionVelSourceTerm(advectionSourceTerm);
+
     //    Real vel_centering = 0.5;
     //    ppMain.query("adv_vel_centering", vel_centering);
     computeAdvectionVelocities(advectionSourceTerm, m_adv_vel_centering);
@@ -2961,9 +2963,74 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
   AMRLevelMushyLayer* amrMLcrse = getCoarserLevel();
 
-  EdgeVelBCHolder edgeVelBC(m_physBCPtr->edgeVelFuncBC(m_viscousBCs));
+  LevelData<FluxBox>* velocityBCVals = new LevelData<FluxBox>(m_grids, 1, a_advVel.ghostVect());
+  LevelData<FluxBox> gradP(m_grids, 1, IntVect::Zero);
+  LevelData<FluxBox> Theta_l_face(m_grids, 1, IntVect::Unit);
+
+  m_projection.gradPhi(gradP);
+  fillScalarFace(Theta_l_face, time, m_liquidConcentration, true, false);
+
+  // TODO - fill this with -dp/dz - Theta_l
+  for (DataIterator dit = velocityBCVals->dataIterator(); dit.ok(); ++dit)
+  {
+    FluxBox& bcVel = (*velocityBCVals)[dit];
+
+    FArrayBox& bc_u = bcVel[0];
+    FArrayBox& bc_v = bcVel[1];
+
+    FArrayBox& Sl = Theta_l_face[dit][1];
+    FArrayBox& gradP_z = gradP[dit][1];
+
+    bc_u.setVal(0.0);
+
+    // vertical velocity boundary cells:
+//    Box v_boundary = ::adjCellLo(m_problem_domain, 1, 1);
+//    v_boundary.shift(1, 1);
+    Box v_box = bc_v.box();
+    Box valid = m_grids[dit];
+    valid &= m_problem_domain.domainBox();
+
+    Box toRegion(valid);
+
+    // Setting BC for vertical velocity (component = 1) in vertical direction (idir=1) on low side.
+    int velComp = 1;
+    Side::LoHiSide side = Side::Lo;
+    int idir = 1;
+
+    if (idir == velComp)
+    {
+      toRegion.surroundingNodes(idir);
+      int coord = toRegion.sideEnd(side)[idir];
+      toRegion.setRange(idir, coord);
+
+    }
+    else
+    {
+      toRegion.surroundingNodes(velComp);
+      toRegion = adjCellBox(toRegion, idir, side, 1);
+
+    }
+
+    toRegion &= v_box;
+
+    for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+    {
+      IntVect iv = bit();
+      bc_v(iv) = -gradP_z(iv) - m_parameters.m_buoyancySCoeff*Sl(iv);
+
+    }
+
+    // Testing
+//    bc_v.setVal(-20);
+
+  }
+
+  EdgeVelBCHolder edgeVelBC(m_physBCPtr->edgeVelFuncBC(m_viscousBCs, velocityBCVals));
+
   VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
   VelBCHolder velBCExtrap(m_physBCPtr->velExtrapBC());
+
+  calculatePermeability();
 
   //  bool quadInterp = true;
 
@@ -2975,7 +3042,6 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     //    crseVelOldPtr = new LevelData<FArrayBox>(crseGrids, SpaceDim);
     crsePressurePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(crseGrids, 1));
     // coarse velocity BC data is interpolated in time
-
 
     // If we're not doing +/- grad(P) stuff then just pass in the velocity before it was projected
     // else the divergence at coarse-fine boundaries will be crazy
@@ -3019,8 +3085,6 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   LevelData<FArrayBox> T(m_grids, 1, IntVect::Unit);
   LevelData<FArrayBox> C(m_grids, 1, IntVect::Unit);
   LevelData<FArrayBox> porosity(m_grids, 1, IntVect::Unit);
-
-
 
   fillScalars(porosity, time, m_porosity,            true);
   fillScalars(T,        time, m_temperature,         true);
@@ -3083,23 +3147,69 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
                      m_problem_domain, m_dx,
                      false); // inhomogeneous
 
+  // Do some smoothing
+  int nghost = a_advVel.ghostVect()[0];
+  Real smoothingCoeff = 0.0; //0.01;
+  ParmParse ppProj("projection");
+  ppProj.query("pre_smoothing", smoothingCoeff);
 
-  if (s_verbosity >= 5)
+  for (DataIterator dit = a_advVel.dataIterator(); dit.ok(); ++dit)
   {
-    pout() << "AMRLevelMushyLayer::calculateTimeIndAdvectionVel - do projection (level " << m_level << ")"    << endl;
+    for (int dir=0; dir<SpaceDim; dir++)
+    {
+      FArrayBox& velDir = a_advVel[dit][dir];
+      Box b = velDir.box();
+      b.grow(-(nghost+2));
+
+      for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
+      {
+        IntVect iv = bit();
+        Real lapU = -4*velDir(iv) +
+            velDir(iv+BASISV(0)) + velDir(iv-BASISV(0)) + velDir(iv+BASISV(1)) + velDir(iv-BASISV(1));
+
+        velDir(iv) = velDir(iv) - smoothingCoeff*lapU;
+      }
+    }
+
   }
 
-  // Copy to U^* before projection
-  EdgeToCell(a_advVel, *m_vectorNew[m_advUstar]);
+  // Allow multiple projections
+  // This doesn't actually really help
+  Real maxDivU = 1e10;
+  int proj_i = 1;
+  int maxNumProj = 1;
 
-  a_advVel.exchange();
-  int exitStatus = m_projection.levelMacProject(a_advVel, m_dt, crsePressurePtr, pressureScalePtr,
-                               crsePressureScalePtr, pressureScaleEdgePtr, crsePressureScaleEdgePtr, alreadyHasPressure);
+  Real correctScale = 1.0;
 
-  a_advVel.exchange();
-  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
-  Real maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0), 0);
-  pout() << "  MAC Projection (level "<< m_level << "), exit status = " << exitStatus << ", max(div u) = " << maxDivU << endl;
+  while(maxDivU > 1e-10 && proj_i <= maxNumProj)
+  {
+
+    if (s_verbosity >= 5)
+    {
+      pout() << "AMRLevelMushyLayer::calculateTimeIndAdvectionVel - do projection (level " << m_level << ")"    << endl;
+    }
+
+    // Copy to U^* before projection
+    EdgeToCell(a_advVel, *m_vectorNew[m_advUstar]);
+
+    a_advVel.exchange();
+    int exitStatus = m_projection.levelMacProject(a_advVel, m_dt, crsePressurePtr, pressureScalePtr,
+                                 crsePressureScalePtr, pressureScaleEdgePtr, crsePressureScaleEdgePtr,
+                                 alreadyHasPressure, correctScale);
+
+    correctScale = correctScale/10;
+//    correctScale = 0.0;
+
+    a_advVel.exchange();
+    Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
+    maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0), 0);
+    pout() << "  MAC Projection (level "<< m_level << "), exit status = " << exitStatus << ", max(div u) = " << maxDivU << endl;
+
+
+
+    proj_i++;
+  }
+
 
   fillAdvVel(time, a_advVel);
   a_advVel.exchange();
@@ -3139,6 +3249,14 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     pout() << "AMRLevelMushyLayer::calculateTimeIndAdvectionVel - finished (level " << m_level << ")"    << endl;
   }
 
+  // CLean up
+  if (velocityBCVals != NULL)
+  {
+    delete velocityBCVals;
+    velocityBCVals = NULL;
+
+  }
+
 }
 
 int AMRLevelMushyLayer::getMaxLevel()
@@ -3154,6 +3272,8 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
 {
   IntVect ghost = a_advVel.ghostVect();
   DataIterator dit = a_advVel.dataIterator();
+
+
 
   LevelData<FluxBox> permeability_face(m_grids, 1, ghost);
   LevelData<FluxBox> T_face(m_grids, 1, ghost);
@@ -4101,10 +4221,8 @@ void AMRLevelMushyLayer::computePredictedVelocities(
 
           } // end if tangential direction
 
-          int temp = 0;
         } // end loop over face directions
 
-        int temp=0;
       } // end loop over velocity components
 
     } // end if altering our predicted velocities

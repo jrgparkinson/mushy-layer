@@ -769,18 +769,20 @@ public:
   bool m_isViscous;
   /// Currently unused
   Interval m_interval;
-
+  LevelData<FluxBox>* m_velBCvals;
 
   /// Full constructor
   BasicECVelBCFunction(bool a_isHomogeneous,
                        bool a_isViscous,
                        int  a_comp,
                        const Interval& a_interval,
-                       MushyLayerParams a_params) : AbstractFaceBCFunction(a_isHomogeneous,
+                       MushyLayerParams a_params,
+                       LevelData<FluxBox>* a_velocityBCVals = NULL) : AbstractFaceBCFunction(a_isHomogeneous,
                                                                            a_comp,
                                                                            a_params),
                                                                            m_isViscous(a_isViscous),
-                                                                           m_interval(a_interval)
+                                                                           m_interval(a_interval),
+                                                                           m_velBCvals(a_velocityBCVals)
   {
   }
 
@@ -868,7 +870,6 @@ public:
                       order  = 2;
                       ExtraBC(a_state, a_valid,
                               idir, side, order);
-                      //									  ExtrapBC(  a_state, a_valid,  idir,   side, order);
                     }
                   } // end if tangential
                   break;
@@ -948,29 +949,7 @@ public:
                       //                                                                          ExtrapBC(  a_state, a_valid,  idir,   side, order);
                     }
                   } // end if tangential
-                  //                  if (!m_isHomogeneous && idir == m_comp)
-                  //                  {
-                  //
-                  //
-                  //                    DiriEdgeBC(a_state, a_valid, a_dx,
-                  //                               a_homogeneous,
-                  //                               BCValueHolder(inflowBCValueFunc),
-                  //                               idir, side);
-                  //
-                  //
-                  //                  }
-                  //                  else
-                  //                  {
-                  //
-                  //                    // See DFM comment above about valid regions and box centering
-                  //                    Box validFace(a_valid);
-                  //                    validFace.surroundingNodes(m_comp);
-                  //                    DiriBC(a_state, validFace, a_dx,
-                  //                           a_homogeneous,
-                  //                           BCValueHolder(zeroFunc),
-                  //                           idir, side, order);
-                  //
-                  //                  }
+
                   break;
                 }
                 case PhysBCUtil::Outflow :
@@ -978,15 +957,81 @@ public:
                   // this is set to whatever it is set to by MAC
                   // NoOp
 
-                  // JP - try extrap BCs
-
-                  //                  ExtraBC(a_state, a_valid,
-                  //                          idir, side, order);
-
-                  //							  ExtrapBC(  a_state, a_valid,  idir,   side, order);
 
                   break;
                 }
+                case PhysBCUtil::OutflowPressureGrad :
+                {
+
+                  // Set a_state  = m_velBCvals on face
+                  // a_state is FACE-centered on face idir;
+                  // a_valid is CELL-centered.
+
+                  // Need to find the correct dataiterator
+                  DataIterator dit = m_velBCvals->dataIterator();
+
+//                  FluxBox* velBCVals = NULL;
+                  FArrayBox* velBCValComp = NULL;
+
+                  Box domBox2(domainBox);
+                  domBox2.surroundingNodes(idir);
+
+                  Box domBox3(domainBox);
+                  domBox3.surroundingNodes(m_comp);
+
+                  Box stateBox = a_state.box();
+                  stateBox &= domBox3;
+
+                  for (dit.reset(); dit.ok(); ++dit)
+                  {
+                    Box velBox = (*m_velBCvals)[dit][m_comp].box();
+                    velBox &= domBox3;
+
+                    IntVect se = velBox.smallEnd();
+                    IntVect be = velBox.bigEnd();
+//                    pout() << velBox.smallEnd() << " - " << velBox.bigEnd() << endl;
+//                    pout() << stateBox.smallEnd() << " - " << stateBox.bigEnd() << endl;
+
+                    if (velBox == stateBox || stateBox.contains(velBox))
+                    {
+//                      velBCVals = &(*m_velBCvals)[dit];
+                      velBCValComp = &(*m_velBCvals)[dit][m_comp];
+                    }
+
+                  }
+
+                  if (velBCValComp != NULL)
+                  {
+
+                    Box toRegion(a_valid);
+
+                    if (idir == m_comp)
+                    {
+                      toRegion.surroundingNodes(idir);
+                      int coord = toRegion.sideEnd(side)[idir];
+                      toRegion.setRange(idir, coord);
+                      toRegion &= a_state.box();
+                    }
+                    else
+                    {
+                      toRegion.surroundingNodes(m_comp);
+                      toRegion = adjCellBox(toRegion, idir, side, 1);
+                      toRegion &= a_state.box();
+                    }
+
+                    Box sbox = a_state.box();
+                    Box bc_box = (*velBCValComp).box();
+
+
+
+                    a_state.copy(*velBCValComp, toRegion, 0, toRegion, 0, a_state.nComp());
+
+
+                  }
+
+                  break;
+                }
+
                 case PhysBCUtil::VelInflowOutflow :
                 case PhysBCUtil::OutflowNormal :
                 {
@@ -1338,6 +1383,7 @@ public:
                 }
                 case PhysBCUtil::VelInflowOutflow :
                 case PhysBCUtil::OutflowNormal :
+                case PhysBCUtil::OutflowPressureGrad :
                 {
                   // normal component - no gradient
                   if (idir == m_comp)
@@ -1734,6 +1780,7 @@ public:
                 case PhysBCUtil::OutflowNormal :
                 case PhysBCUtil::VelInflowOutflow:
                 case PhysBCUtil::VelInflowPlume:
+                case PhysBCUtil::OutflowPressureGrad :
                 {
                   // not sure if this right or not
                   NeumBC(a_state, a_valid, a_dx,
@@ -1823,6 +1870,8 @@ public:
                 case PhysBCUtil::Inflow :
                 case PhysBCUtil::noShear :
                 case PhysBCUtil::Symmetry : // think this is right for symmetry
+//                case PhysBCUtil::Outflow :
+
                 {
                   NeumBC(a_state, a_valid, a_dx,
                          a_homogeneous,
@@ -1832,6 +1881,7 @@ public:
                 }
                 case PhysBCUtil::Outflow :
                 case PhysBCUtil::OutflowNormal :
+                case PhysBCUtil::OutflowPressureGrad :
                 {
                   //Constant pressure BC
                   // Doesn't work with higher order?
@@ -1840,6 +1890,8 @@ public:
                          a_homogeneous,
                          BCValueHolder(zeroFunc),
                          idir, side, order);
+
+
                   break;
                 }
                 case PhysBCUtil::VelInflowOutflow:
@@ -2449,6 +2501,7 @@ public:
                 case PhysBCUtil::VelInflowOutflow :
                 case PhysBCUtil::OutflowNormal :
                 case PhysBCUtil::VelInflowPlume :
+                case PhysBCUtil::OutflowPressureGrad :
                 {
                   DiriBC(a_state, a_valid, a_dx,
                          a_homogeneous,
@@ -2539,6 +2592,7 @@ public:
                 case PhysBCUtil::noShear :
                 case PhysBCUtil::VelInflowPlume :
                 case PhysBCUtil::Symmetry :
+//                case PhysBCUtil::Outflow :
                 {
                   int order = 2;// equivalent of HOExtrapBC. This is crucial to get projection right.
                   ExtraBC(a_state, a_valid,
@@ -2547,6 +2601,7 @@ public:
                 }
                 case PhysBCUtil::Outflow :
                 case PhysBCUtil::OutflowNormal :
+                case PhysBCUtil::OutflowPressureGrad :
                 {
                   //Constant pressure BC
                   // Doesn't work with higher order?
@@ -2558,11 +2613,7 @@ public:
                   break;
                 }
 
-                //                case PhysBCUtil::Symmetry :
-                //                {
-                //                  MayDay::Error("BasicGradPressureBCFunction - ReflectOddBC not implemented");
-                //                  break;
-                //                }
+
                 default:
                 {
                   MayDay::Error("BasicGradPressureBCFunction - unknown BC type");
@@ -2929,7 +2980,8 @@ PhysBCUtil::uStarFuncBC(bool a_isViscous, int a_order) const
 }
 
 Tuple<BCHolder, SpaceDim>
-PhysBCUtil::edgeVelFuncBC(bool a_isViscous) const
+PhysBCUtil::edgeVelFuncBC(bool a_isViscous,
+                          LevelData<FluxBox>* velocityBCVals) const
 {
   Tuple<BCHolder, SpaceDim> bcVec;
   bool isHomogeneous = false;
@@ -2938,7 +2990,7 @@ PhysBCUtil::edgeVelFuncBC(bool a_isViscous) const
     // data will have one component in each space dimension
     Interval intvl(0, 0);
     bcVec[idir] = basicECVelFuncBC(isHomogeneous, a_isViscous, idir,
-                                   intvl);
+                                   intvl, velocityBCVals);
   }
   return bcVec;
 }
@@ -3025,13 +3077,14 @@ PhysBCUtil::fluxExtrapBC() const
 BCHolder PhysBCUtil::basicECVelFuncBC(bool a_isHomogeneous,
                                       bool a_isViscous,
                                       int  a_comp,
-                                      const Interval& a_interval) const
+                                      const Interval& a_interval,
+                                      LevelData<FluxBox>* a_velocityBCVals) const
 {
   RefCountedPtr<BasicECVelBCFunction>
   basicECVelBCFunction(new BasicECVelBCFunction(a_isHomogeneous,
                                                 a_isViscous,
                                                 a_comp,
-                                                a_interval, m_params));
+                                                a_interval, m_params, a_velocityBCVals));
 
   return BCHolder(basicECVelBCFunction);
 }

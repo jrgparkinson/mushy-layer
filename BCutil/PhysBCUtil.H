@@ -46,6 +46,7 @@ public:
 		noShear,
 		Symmetry,
 		VelInflowPlume,
+		OutflowPressureGrad,
 		NUM_PHYS_BC_TYPES
 	};
 
@@ -100,7 +101,8 @@ public:
 //	virtual Tuple<BCHolder, SpaceDim> velFuncBC(bool a_isViscous = false) const;
 
 	/// BC holder for \f$ \mathbf{u} \f$ (edge centred)
-	virtual Tuple<BCHolder, SpaceDim> edgeVelFuncBC(bool a_isViscous = false) const;
+	virtual Tuple<BCHolder, SpaceDim> edgeVelFuncBC(bool a_isViscous = false,
+	                                                LevelData<FluxBox>* velocityBCVals = NULL) const;
 
 
 //	virtual Tuple<BCHolder, SpaceDim> fluxExtrapFuncBC() const;
@@ -334,7 +336,8 @@ protected:
 	virtual BCHolder basicECVelFuncBC(bool a_isHomogeneous,
 			bool a_isViscous,
 			int  a_comp,
-			const Interval& a_interval) const;
+			const Interval& a_interval,
+			LevelData<FluxBox>* a_velocityBCVals = NULL) const;
 
 
 

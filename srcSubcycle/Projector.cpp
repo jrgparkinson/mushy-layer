@@ -29,7 +29,7 @@
 #include "EdgeToCell.H"
 #include "RelaxSolver.H"
 #include "computeNorm.H"
-
+#include "BoxIterator.H"
 
 #ifdef CH_USE_HDF5
 #include "CH_HDF5.H"
@@ -979,12 +979,24 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
                                   const RefCountedPtr<LevelData<FArrayBox> > a_crsePressureScalePtr,
                                   const RefCountedPtr<LevelData<FluxBox> > a_pressureScaleEdgePtr,
                                   const RefCountedPtr<LevelData<FluxBox> > a_crsePressureScaleEdgePtr,
-                                  bool alreadyHasPhi)
+                                  bool alreadyHasPhi,
+                                  Real correctScale)
 {
   if (s_verbosity >= 5)
   {
     pout() << "CCProjector::levelMacProject (level " << m_level << ")"    << endl;
   }
+
+
+//  if (s_multigrid_relaxation == 1)
+//  {
+//    s_multigrid_relaxation = 4;
+//  }
+//  else
+//  {
+//    s_multigrid_relaxation = 1;
+//  }
+//  pout() << "  Multigrid relaxation = " << s_multigrid_relaxation << endl;
 
   // MAC rhs should have no ghost values
   //  LevelData<FArrayBox> MacRHS(getBoxes(),1);
@@ -999,6 +1011,44 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     Real sumRHS = computeSum(MACrhs(), finerGridsPtr,
                              nRefFine, m_dx, MACrhs().interval());
     pout() << "  MAC projection (level " << m_level << ") -- sum(RHS) = " << sumRHS << endl;
+
+
+    // Compute sum over just the interior
+    DisjointBoxLayout interiorGrids(MACrhs().disjointBoxLayout());
+//    interiorGrids.grow(-2);
+
+    LevelData<FArrayBox> rhsInterior(interiorGrids, 1);
+    MACrhs().copyTo(rhsInterior);
+
+    Box domBox = m_domain.domainBox();
+
+    for (DataIterator dit = rhsInterior.dataIterator(); dit.ok(); ++dit)
+    {
+      SideIterator sit;
+      for (sit.reset(); sit.ok(); ++sit)
+      {
+        Side::LoHiSide side = sit();
+        int sideSign = sign(side);
+
+        for (int dir=0; dir < SpaceDim; dir++)
+        {
+          int boxSize = 5;
+          Box zeroBox = adjCellBox(domBox, dir, side, boxSize);
+          zeroBox.shift(dir, -boxSize);
+//          zeroBox.grow(dir, )
+
+          Box stateBox = rhsInterior[dit].box();
+
+          zeroBox &= stateBox;
+          rhsInterior[dit].setVal(0.0, zeroBox, 0);
+        }
+      }
+    }
+
+    Real sumRHSInterior = ::computeSum(rhsInterior, finerGridsPtr,
+                                       nRefFine, m_dx, MACrhs().interval());
+    pout() << "  MAC projection (level " << m_level << ") -- sum(interior RHS) = " << sumRHSInterior << endl;
+
   }
 
   DataIterator dit = m_phi.dataIterator();
@@ -1009,6 +1059,7 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
   for (dit.reset(); dit.ok(); ++dit)
   {
     oldPhi[dit].copy(m_phi[dit]);
+    MACrhs()[dit].mult(correctScale);
   }
 
   MACrhs().exchange();
@@ -1071,7 +1122,9 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
       if (m_porosityEdgePtr != NULL)
       {
         thisGradDir.mult((*m_porosityEdgePtr)[dit][dir],thisGradDir.box(), 0, 0);
+
       }
+//      thisGradDir.mult(correctScale);
 
       thisVelDir -= thisGradDir;
     }
@@ -2999,6 +3052,7 @@ void Projector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
   a_solver.m_eps = s_solver_tolerance;
   a_solver.m_pre = s_num_smooth_down; // smoothings before avging
   a_solver.m_post = s_num_smooth_up; // smoothings after avging
+  a_solver.m_numMG = s_numMG;
   //a_solver.m_iterMax = 20;
 
 }

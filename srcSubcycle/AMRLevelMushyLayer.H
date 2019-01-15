@@ -831,6 +831,9 @@ protected:
   /// Compute initial advection velocities
   void computeInitAdvectionVel();
 
+  /// Initialise phi (pressure for Darcy equation)
+  void initTimeIndependentPressure(AMRLevelMushyLayer* lev);
+
   /// Flag if a new level has been added
 //  bool newLevelAdded();
 

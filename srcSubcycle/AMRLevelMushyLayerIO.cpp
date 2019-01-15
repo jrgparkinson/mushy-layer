@@ -924,7 +924,7 @@ void AMRLevelMushyLayer::getExtraPlotFields()
 
     pp.query("MACbcScale", BCscale);
 
-    Real phiScale = m_projection.getPhiScale(m_dt);
+//    Real phiScale = m_projection.getPhiScale(m_dt);
 
     AMRLevelMushyLayer* coarsestML = this->getCoarsestLevel();
     Real coarsestDt = coarsestML->dt();
