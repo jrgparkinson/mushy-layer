@@ -1,0 +1,12 @@
+# -*- Mode: Makefile -*- 
+
+# If variable GYRE is contained in HOST (e.g. HOST=gyre1, gyre2, ...), then add .GYRE to the compiled names
+# This is because we can only run code on the gyre servers which has been compiled there
+
+HOST=$(shell hostname)
+GYRE=gyre
+LOCAL=atmlxlap005
+
+ifneq (,$(findstring $(GYRE),$(HOST)))
+    XTRACONFIG = .GYRE
+endif
