@@ -8,8 +8,7 @@ ebase = process
 CHOMBO_HOME = ../../chombofork/lib
 
 
-#include $(CHOMBO_HOME)/mk/Make.defs
-#include $(CHOMBO_HOME)/mk/Make.defs.config
+include ../mk/Make.defs.MushyLayer
 
 
 ##
