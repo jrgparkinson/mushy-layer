@@ -11,6 +11,10 @@ if nargin == 0
     % some runs
     base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/zzConvectionDB-cfl0.23/';
     
+    % New
+    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.2/';
+    
+    
     % Also advection 1, but smaller cfl - quite good, needs finishing some
     % runs
    % base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.09/';
@@ -55,9 +59,9 @@ folders = dir(base_dir);
 
 % Compile all data
 field = '%10s';
-fprintf(['%3s | %6s | %7s |',field,'|',field,'|',field,'|',field,'|',field,'|',field,'\n'], '\chi', 'Da', 'Ra', ...
-    'Nu (16)', 'Nu (32)', 'Nu (64)', 'Nu (128)', 'Nu (256)', 'Nu (Le Bars)');
-Nxs = [16, 32, 64, 128, 256];
+fprintf(['%3s | %6s | %7s |',field,'|',field,'|',field,'|',field,'\n'], '\chi', 'Da', 'Ra', ...
+   'Nu (32)', 'Nu (64)', 'Nu (128)', 'Nu (Le Bars)');
+Nxs = [32, 64, 128];
 
 
 

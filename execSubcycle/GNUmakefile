@@ -10,21 +10,9 @@ CHOMBO_HOME = ../../chombofork/lib
 # Compile with chombo trunk to check everything will work for other users
 #CHOMBO_HOME = ../../Chombo-trunk/lib 
 
-HOST=$(shell hostname)
-GYRE=gyre
-LOCAL=atmlxlap005
 
-# If variable GYRE is contained in HOST (e.g. HOST=gyre1, gyre2, ...), then add .GYRE to the compiled names
-# This is because we can only run code on the gyre servers which has been compiled there
-ifneq (,$(findstring $(GYRE),$(HOST)))
-    XTRACONFIG = .GYRE
-endif
 
-#ifneq (,$(findstring $(LOCAL),$(HOST)))
-#    XTRACONFIG = .LOCAL
-#endif
-
-#XTRACONFIG= ifeq ($(GCC_MINOR),$(filter $(GCC_MINOR),4 5)) .GYRE
+include ../mk/Make.defs.MushyLayer
 
 
 include $(CHOMBO_HOME)/mk/Make.defs

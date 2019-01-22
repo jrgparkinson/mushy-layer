@@ -27,6 +27,9 @@ class SlurmTask:
         self.jobID = -1
         self.customCommand = ''
 
+        self.partitions = ['shared','priority-ocean']
+        self.exclude = None
+
         # Default setup: all tasks on one node
         # This will fail for large numbers of processors - need to implement 
         # some clever load balancing
@@ -75,9 +78,11 @@ class SlurmTask:
     def setCustomCommand(self, cmd):
         self.customCommand = cmd
 
-    def writeSlurmFile(self, runFileName='run.sh', inputsFileName='inputs'):
+    def setPartitionExclude(self, partitions=None, exclude=None):
+        self.partitions = partitions
+        self.exclude = exclude
 
-        # self.execFile = self.execFile.replace('OPT.', '')
+    def writeSlurmFile(self, runFileName='run.sh', inputsFileName='inputs'):
 
         fh = open(self.getRunFile(runFileName), 'w+')
 
@@ -98,10 +103,20 @@ class SlurmTask:
         else:
             depStr = ''
 
+        if self.partitions and len(self.partitions) > 0:
+            partitionsStr = '#SBATCH --partition=' +  ','.join(self.partitions) + '\n'
+        else:
+            partitionsStr = ''
+
+        if self.exclude and len(self.exclude) > 0:
+            excludeStr = '#SBATCH -x ' +  ','.join(self.exclude) + '\n'
+        else:
+            excludeStr = ''
+
         file_contents = ['#!/bin/bash \n',
                          '# Set your minimum acceptable walltime, format: day-hours:minutes:seconds \n',
                          '#SBATCH --time=' + time_string + '\n',
-                         '#SBATCH --partition=shared,priority-ocean' + '\n',
+                         partitionsStr, excludeStr,
                          '# Set name of job shown in squeue' + '\n',
                          '#SBATCH --job-name ' + self.jobname + '\n',
                          '# Request CPU resources' + '\n',
@@ -122,13 +137,29 @@ class SlurmTask:
                          depStr,
                          'cd ' + self.folder + '; \n \n ']
 
+        file_contents.append('\n' + self.preprocessCommand + '\n')
+
         if self.customCommand:
             file_contents.append(self.customCommand)
 
         else:
-            file_contents.append(
+            run_str = mpiStr + ' ' + self.execFile + ' ' + os.path.join(self.folder, inputsFileName)
 
-        self.preprocessCommand + ' ' + mpiStr + ' ' + self.execFile + ' ' + os.path.join(self.folder, inputsFileName))
+            # If we may be running on legacy, need to possibly use a different executable
+            if 'legacy' in self.partitions:
+                legacy_run_str = run_str.replace('.ex', '.GYRE.ex')
+
+                custom_cmd = 'hs=$HOSTNAME \n' \
+                             'if [[ $hs == *"gyre"* ]]; then \n' \
+                             '%s \n' \
+                             'else\n' \
+                             '%s' \
+                             'fi' % (legacy_run_str, run_str)
+
+                file_contents.append(custom_cmd)
+
+            else:
+                file_contents.append(run_str)
 
         file_contents.append('\n' + self.postprocessCommand + '\n')
 

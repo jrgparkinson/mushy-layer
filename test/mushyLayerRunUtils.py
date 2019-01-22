@@ -4,6 +4,7 @@ import time
 import math
 import sys
 import subprocess
+import socket
 
 def getBaseOutputDir():
     #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
@@ -22,6 +23,18 @@ def getMatlabBaseCommand():
 
     return matlab_command
 
+def getExecutable(base_name, dim=2):
+    host = ''
+
+    # If we're on gyre, append set host string to .GYRE
+
+    hostname = socket.gethostname()
+    if 'gyre' in hostname:
+        host = '.GYRE'
+
+    executable_name = '%s%dd.Linux.64.mpiCC.gfortran.OPT.MPI%s.ex' % (base_name, dim, host)
+
+    return executable_name
 
 
 def getCurrentGitRevision():
