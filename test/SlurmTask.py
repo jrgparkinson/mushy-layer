@@ -153,8 +153,8 @@ class SlurmTask:
                              'if [[ $hs == *"gyre"* ]]; then \n' \
                              '%s \n' \
                              'else\n' \
-                             '%s' \
-                             'fi' % (legacy_run_str, run_str)
+                             '%s\n' \
+                             'fi\n' % (legacy_run_str, run_str)
 
                 file_contents.append(custom_cmd)
 
