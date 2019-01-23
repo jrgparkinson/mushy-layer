@@ -11,23 +11,24 @@ class SlurmTask:
 
     postprocess_command = ''
 
-    def __init__(self, folder, jobname, execFile, num_proc=1, timeLimit=7.0, memoryLimit=4000, numNodes=0, mpirun=True):
+    def __init__(self, folder, jobname, exec_file, num_proc=1, time_limit=7.0, memory_limit=4000, num_nodes=0,
+                 mpi_run=True):
 
         self.jobname = jobname
         self.folder = folder
         self.num_proc = num_proc
 
-        self.exec_file = execFile
-        self.time_limit = timeLimit  # Measured in days
-        self.memory_limit = memoryLimit  # in MB
-        self.mpirun = mpirun
+        self.exec_file = exec_file
+        self.time_limit = time_limit  # Measured in days
+        self.memory_limit = memory_limit  # in MB
+        self.mpi_run = mpi_run
 
-        self.preprocessCommand = ''
+        self.preprocess_command = ''
         self.dependency = []
-        self.jobID = -1
-        self.customCommand = ''
+        self.job_id = -1
+        self.custom_command = ''
 
-        self.partitions = ['shared','priority-ocean']
+        self.partitions = ['shared', 'priority-ocean']
         self.exclude = None
 
         # Default setup: all tasks on one node
@@ -38,8 +39,8 @@ class SlurmTask:
         self.cpu_per_task = 1
 
         # Number of nodes to use
-        if numNodes > 0:
-            self.num_nodes = numNodes
+        if num_nodes > 0:
+            self.num_nodes = num_nodes
         else:
             # Determine number of nodes based on number of processors and MAX_TASKS_PER_NODE
             self.num_nodes = math.ceil(float(self.num_proc) / float(self.MAX_TASKS_PER_NODE))
@@ -63,32 +64,33 @@ class SlurmTask:
             print('Reducing memory limit to %1.0f GB per node to avoid exceeding node memory limit. \n' % (
                     self.memory_limit / 1000))
 
-    def setPreprocess(self, cmd):
-        self.preprocessCommand = cmd
+    def set_preprocess(self, cmd):
+        self.preprocess_command = cmd
 
-    def setPostProcess(self, cmd):
+    def set_post_process(self, cmd):
         self.postprocess_command = cmd
 
-    def setDependency(self, dep):
+    def set_dependency(self, dep):
         if isinstance(dep, list):
             self.dependency = [str(a) for a in dep]
         else:
             self.dependency = [str(dep)]
 
-    def setCustomCommand(self, cmd):
-        self.customCommand = cmd
+    def set_custom_command(self, cmd):
+        self.custom_command = cmd
 
-    def setPartitionExclude(self, partitions=None, exclude=None):
+    def set_partition_exclude(self, partitions=None, exclude=None):
         self.partitions = partitions
         self.exclude = exclude
 
     def set_exec_file(self, exec_file):
         self.exec_file = exec_file
 
-    def writeSlurmFile(self, runFileName='run.sh', inputsFileName='inputs'):
+    def write_slurm_file(self, runFileName='run.sh', inputs_file_name='inputs'):
 
-        fh = open(self.getRunFile(runFileName), 'w+')
+        fh = open(self.get_run_file(runFileName), 'w+')
 
+        # Get time limit in the format days-hours:mins:secs
         days, remainder = divmod(self.time_limit, 1)
         hours, remainder = divmod(remainder * 24, 1)
         mins, remainder = divmod(remainder * 60, 1)
@@ -96,30 +98,30 @@ class SlurmTask:
 
         time_string = '%d-%d:%d:%d' % (days, hours, mins, secs)
 
-        mpiStr = ''
-        if self.mpirun:
-            mpiStr = 'mpirun -np ' + str(self.num_proc)
+        mpi_str = ''
+        if self.mpi_run:
+            mpi_str = 'mpirun -np ' + str(self.num_proc)
 
         if len(self.dependency) > 0:
             dependencies = ':'.join(self.dependency)
-            depStr = '#SBATCH --dependency=afterok:' + dependencies + ' \n'
+            dependency_str = '#SBATCH --dependency=afterok:' + dependencies + ' \n'
         else:
-            depStr = ''
+            dependency_str = ''
 
         if self.partitions and len(self.partitions) > 0:
-            partitionsStr = '#SBATCH --partition=' +  ','.join(self.partitions) + '\n'
+            partitions_str = '#SBATCH --partition=' + ','.join(self.partitions) + '\n'
         else:
-            partitionsStr = ''
+            partitions_str = ''
 
         if self.exclude and len(self.exclude) > 0:
-            excludeStr = '#SBATCH -x ' +  ','.join(self.exclude) + '\n'
+            exclude_str = '#SBATCH -x ' + ','.join(self.exclude) + '\n'
         else:
-            excludeStr = ''
+            exclude_str = ''
 
         file_contents = ['#!/bin/bash \n',
                          '# Set your minimum acceptable walltime, format: day-hours:minutes:seconds \n',
                          '#SBATCH --time=' + time_string + '\n',
-                         partitionsStr, excludeStr,
+                         partitions_str, exclude_str,
                          '# Set name of job shown in squeue' + '\n',
                          '#SBATCH --job-name ' + self.jobname + '\n',
                          '# Request CPU resources' + '\n',
@@ -137,16 +139,16 @@ class SlurmTask:
                          '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
                          '#SBATCH --output=' + os.path.join(self.folder,
                                                             'sbatch.out') + '   # Standard output and error log' + '\n',
-                         depStr,
+                         dependency_str,
                          'cd ' + self.folder + '; \n \n ']
 
-        file_contents.append('\n' + self.preprocessCommand + '\n')
+        file_contents.append('\n' + self.preprocess_command + '\n')
 
-        if self.customCommand:
-            file_contents.append(self.customCommand)
+        if self.custom_command:
+            file_contents.append(self.custom_command)
 
         else:
-            run_str = mpiStr + ' ' + self.exec_file + ' ' + os.path.join(self.folder, inputsFileName)
+            run_str = mpi_str + ' ' + self.exec_file + ' ' + os.path.join(self.folder, inputs_file_name)
 
             # If we may be running on legacy, need to possibly use a different executable
             if 'legacy' in self.partitions:
@@ -176,9 +178,8 @@ class SlurmTask:
 
         fh.close()
 
-
-    def runTask(self, runFileName='run.sh'):
-        cmd = 'cd ' + self.folder + ' ; sbatch ' + self.getRunFile(runFileName)
+    def run_task(self, runFileName='run.sh'):
+        cmd = 'cd ' + self.folder + ' ; sbatch ' + self.get_run_file(runFileName)
 
         # os.system(cmd)
         # result = subprocess.run(cmd, stdout=subprocess.PIPE)
@@ -195,16 +196,15 @@ class SlurmTask:
         # print(res)
 
         if res:
-            self.jobID = int(res[0])
+            self.job_id = int(res[0])
 
         # Make a file in the output folder stating the slurm job id
         F = open(os.path.join(self.folder, 'jobid'), 'w')
-        F.write(str(self.jobID))
+        F.write(str(self.job_id))
         F.close()
 
         # Pause briefly in case submitting lots of slurm jobs
         time.sleep(0.5)
 
-
-    def getRunFile(self, runFileName):
+    def get_run_file(self, runFileName):
         return os.path.join(self.folder, runFileName)

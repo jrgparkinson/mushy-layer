@@ -422,11 +422,11 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
             s = SlurmTask(base_dir, jobName, '', 4)
 
-            s.setDependency(job_ids)
-            s.setCustomCommand(analysis_command)
+            s.set_dependency(job_ids)
+            s.set_custom_command(analysis_command)
 
-            s.writeSlurmFile(runAnalysisName)
-            s.runTask(runAnalysisName)
+            s.write_slurm_file(runAnalysisName)
+            s.run_task(runAnalysisName)
             print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
 

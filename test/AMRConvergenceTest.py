@@ -89,7 +89,7 @@ def AMRConvergenceTest(params, full_output_dir, physicalProblem, Nzs, num_procs 
         ml_run = MushyLayerRunSimple(full_output_dir, num_proc, p, s, allowRestarts, get_executable_name())
         ml_run.single_run(run_name)
 
-        dependencies.append(s.jobID)
+        dependencies.append(s.job_id)
 
         print('==================')
 

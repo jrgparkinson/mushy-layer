@@ -138,10 +138,10 @@ def testUniformPorousConvection(argv):
     jobName = physicalProblem + '-analysis'
     s = SlurmTask(base_dataFolder, jobName, '')
 
-    s.setDependency(all_job_ids)
-    s.setCustomCommand(analysis_command)
-    s.writeSlurmFile(runAnalysisName)
-    s.runTask(runAnalysisName)
+    s.set_dependency(all_job_ids)
+    s.set_custom_command(analysis_command)
+    s.write_slurm_file(runAnalysisName)
+    s.run_task(runAnalysisName)
     print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
 
