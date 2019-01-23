@@ -35,6 +35,12 @@ $ cd /execSubcycle/
 $ make all
 ```
 
+You should also add an environment variable `MUSHY_LAYER_DIR` which points to `/path/to/mushy-layer/` for some of the python scripts to work. E.g.
+
+```console
+EXPORT MUSHY_LAYER_DIR=/path/to/mushy-layer/
+```
+
 # Testing
 `/test/` contains python scripts for running various test problems, which demonstrate the accuracy and efficiency of the code. You can run all the problems via the script `runMethodsPaperTests.py`. 
 
@@ -74,7 +80,12 @@ $ doxygen
 This repository contains various other pieces of code for running simulations. 
 
 `/setupNewRun/` takes a checkpoint file and creates a new file with the same data on a domain with a different width, which is useful for computing optimal states.
-`/postProcess/` loads checkpoint files and computes various diagnostics that were not run during the simulations
+`/postProcess/` loads checkpoint files and computes various diagnostics that were not run during the simulations.
+`/VisitPatch/` describes a small patch for the VISIT software to allow you to open checkpoint files as well as plot files.
+`/params/` contains input files for different types of simulations. They may not all work, sorry.
+`/grids/` contains gridfiles which can be loaded via `main.gridfile=/path/to/gridfile` in an inputs file, and sets a fixed variable mesh (i.e. not adaptive) for simulations.
+`/mk/` contains some custom Makefile options for compiling on some of the machines in AOPP at the University of Oxford.
+
 
 
 
