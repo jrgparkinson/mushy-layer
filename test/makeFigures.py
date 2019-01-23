@@ -4,7 +4,7 @@ from colorama import Fore, Style
 import getopt
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
 from SlurmTask import SlurmTask
 
 ##########################################################################
@@ -13,8 +13,8 @@ from SlurmTask import SlurmTask
 
 def makeFigures():
 
-    base_output_dir = getBaseOutputDir()
-    matlab_command = getMatlabBaseCommand()
+    base_output_dir = get_base_output_dir()
+    matlab_command = get_matlab_base_command()
 
     print(Fore.GREEN + 'Make figures' + Style.RESET_ALL)
 

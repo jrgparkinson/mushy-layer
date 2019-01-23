@@ -5,7 +5,7 @@ import getopt
 
 from runAMRConvergenceTest import runTest
 from SlurmTask import SlurmTask
-from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
 
 ######################################
 # 2) Convection in a fixed porous medium
@@ -46,8 +46,8 @@ def testUniformPorousConvection(argv):
         elif opt in ("-a"):
             advectionMethod = int(arg)
 
-    base_output_dir = getBaseOutputDir()
-    matlab_command = getMatlabBaseCommand()
+    base_output_dir = get_base_output_dir()
+    matlab_command = get_matlab_base_command()
 
     print(Fore.GREEN + 'Setup tests for convection in a fixed uniform porous medium' + Style.RESET_ALL)
     physicalProblem = 'convectionDB'

@@ -10,7 +10,7 @@ pythonDir = os.path.join(parDir, 'python')
 sys.path.append(pythonDir)
 
 from MushyLayerRunSimple import MushyLayerRunSimple
-from mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, getRestartFile, getExecName
+from mushyLayerRunUtils import construct_run_name, read_inputs, write_inputs, get_restart_file, get_executable_name
 from SlurmTask import SlurmTask
 # Params is a vector of params dicts
 
@@ -64,7 +64,7 @@ def AMRConvergenceTest(params, full_output_dir, physicalProblem, Nzs, num_procs 
                     
                 most_recent_path = os.path.join(full_output_dir, run_name + '-' + str(i-1))  
                 # Now get the restart file
-                restartFile = getRestartFile(most_recent_path)
+                restartFile = get_restart_file(most_recent_path)
                 if restartFile:
                     p['main.restart_file'] = os.path.join(most_recent_path, restartFile)
                     allowRestarts = True
@@ -86,7 +86,7 @@ def AMRConvergenceTest(params, full_output_dir, physicalProblem, Nzs, num_procs 
         # Don't need output dir or exec dir here, MushyLayerRun will fill these in
         s = SlurmTask('', p['concise_run_name'], '', num_proc)
 
-        ml_run = MushyLayerRunSimple(full_output_dir, num_proc, p, s, allowRestarts, getExecName())
+        ml_run = MushyLayerRunSimple(full_output_dir, num_proc, p, s, allowRestarts, get_executable_name())
         ml_run.single_run(run_name)
 
         dependencies.append(s.jobID)

@@ -4,7 +4,7 @@ from colorama import Fore, Style
 import getopt
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
 
 ##########################################################################
 # 3) Convection in a mushy layer with an initial porous hole
@@ -26,8 +26,8 @@ def testPorousMushyHole(argv):
         if opt in ("-t"):
             max_time = float(arg)
 
-    base_output_dir = getBaseOutputDir()
-    matlab_command = getMatlabBaseCommand()
+    base_output_dir = get_base_output_dir()
+    matlab_command = get_matlab_base_command()
 
     print(Fore.GREEN + 'Setup tests for porous mushy hole' + Style.RESET_ALL)
     physicalProblem = 'PorousMushyHole'

@@ -3,15 +3,15 @@ import os, sys
 from colorama import Fore, Style
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import getBaseOutputDir, getMatlabBaseCommand
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
 
 ######################################
 # 1) Diffusive solidification problem
 #######################################
 def testDiffusiveSolidification():
 
-    base_output_dir = getBaseOutputDir()
-    matlab_command = getMatlabBaseCommand()
+    base_output_dir = get_base_output_dir()
+    matlab_command = get_matlab_base_command()
 
     print(Fore.GREEN + 'Setup tests for solidification without flow' + Style.RESET_ALL)
 

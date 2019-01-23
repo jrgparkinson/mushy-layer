@@ -6,7 +6,7 @@ import getopt
 from colorama import Fore, Style
 
 
-from mushyLayerRunUtils import constructRunName, readInputs, writeParamsFile, isPowerOfTwo, str2arr
+from mushyLayerRunUtils import construct_run_name, read_inputs, write_inputs, is_power_of_two, string_to_array
 from SlurmTask import SlurmTask
 from AMRConvergenceTest import AMRConvergenceTest
 
@@ -55,7 +55,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
             defaultParamsFile = os.path.join(mushyLayerBaseDir, '/params/convergenceTest/'+physicalProblem+'.parameters')
             if os.path.exists(defaultParamsFile):
-                params = readInputs(defaultParamsFile)
+                params = read_inputs(defaultParamsFile)
 
             output_dir = '' #AMRConvergenceTest/' + physicalProblem + '/'
             
@@ -65,7 +65,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 if not params_file:
                     params_file = mushyLayerBaseDir + '/params/convergenceTest/noFlowConvTest.parameters'
 
-                params = readInputs(params_file)
+                params = read_inputs(params_file)
                 
                 
                 Nx_coarse = 4
@@ -88,7 +88,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 if not params_file:
                     params_file = mushyLayerBaseDir + '/params/convergenceTest/convectionDarcyBrinkmanConvTest.parameters'
 
-                params = readInputs(params_file)
+                params = read_inputs(params_file)
                 
 
                 params['main.refine_thresh'] = str(3.0/float(Nz_coarse))
@@ -122,7 +122,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 if not params_file:
                     params_file = mushyLayerBaseDir + '/params/convergenceTest/DBVariablePorosityConvTest.parameters'
 
-                params = readInputs(params_file)
+                params = read_inputs(params_file)
                 
                 #runTypes = ['uniform', 'amr', 'variable']
                 #runTypes = ['uniform', 'amr']
@@ -187,7 +187,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 if not params_file:
                     params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
 
-                params = readInputs(params_file)
+                params = read_inputs(params_file)
 
                 
 
@@ -206,7 +206,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 if not params_file:
                     params_file = mushyLayerBaseDir + '/params/convergenceTest/porousMushyHole.parameters'
 
-                params = readInputs(params_file)
+                params = read_inputs(params_file)
 
                 sameDt = 5e-7
                 dt64 = sameDt
@@ -268,7 +268,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
             # Default options
             if Nx_coarse == -1:
                 print('Trying to convert to an array: ' + str(params['main.num_cells']))
-                gridPts = str2arr(params['main.num_cells'])
+                gridPts = string_to_array(params['main.num_cells'])
 
                 aspectRatio = gridPts[0]/gridPts[1]
                 Nx_coarse = aspectRatio*Nz_coarse
@@ -306,7 +306,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 #print('Initial optimal grid guess: %d' % optimalGrid)
                 
                 # increase to next power of 2
-                while not isPowerOfTwo(optimalGrid):
+                while not is_power_of_two(optimalGrid):
                     optimalGrid = optimalGrid + 1
 
                 #print('Final optimal grid guess: %d' % optimalGrid)

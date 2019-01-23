@@ -7,7 +7,7 @@ from os.path import isfile, join, exists
 import subprocess
 import socket
 
-from mushyLayerRunUtils import readInputs, writeParamsFile, getCurrentGitRevision
+from mushyLayerRunUtils import read_inputs, write_inputs, get_current_vcs_revision
 
 # This class basically just makes the output directory and dumps an input file into it
 # It also performs various sanity checks
@@ -156,9 +156,9 @@ class MushyLayerRunSimple:
         
         extraParams = {}
         if PARAMS_KEY in self.parameters:
-            extraParams = readInputs(self.parameters[PARAMS_KEY])
+            extraParams = read_inputs(self.parameters[PARAMS_KEY])
         elif PARAMS_KEY in inputsParams:
-            extraParams = readInputs(inputsParams[PARAMS_KEY])
+            extraParams = read_inputs(inputsParams[PARAMS_KEY])
 
         # Merge all dictionary's
         # Important that it's done in this order, so that parameters
@@ -182,13 +182,13 @@ class MushyLayerRunSimple:
             
             
         # Let's add another item to the parameters: the code repository version.
-        self.parameters['gitRevision'] = getCurrentGitRevision()
+        self.parameters['gitRevision'] = get_current_vcs_revision()
         
         # Also add the current machine to the parameter list so we now where each run was done from
         self.parameters['machineCodeIsRunOn'] = socket.gethostname()
 
         # Write out final params file
-        writeParamsFile(new_input_file, self.parameters)
+        write_inputs(new_input_file, self.parameters)
 
         # Set remaining parameters on the slurm jobs
 

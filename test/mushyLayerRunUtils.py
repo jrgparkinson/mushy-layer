@@ -6,7 +6,8 @@ import sys
 import subprocess
 import socket
 
-def getBaseOutputDir():
+
+def get_base_output_dir():
     #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
     base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDiffusiveTimescale/'
 
@@ -16,18 +17,36 @@ def getBaseOutputDir():
     return base_output_dir
 
 
-def getMatlabBaseCommand():
-    parDir = os.path.abspath(os.pardir)
-    matlabFolder = os.path.join(parDir, 'matlab', 'MethodsPaper')
-    matlab_command = 'cd ' + matlabFolder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
+def get_matlab_base_command():
+    parent_dir = os.path.abspath(os.pardir)
+    matlab_folder = os.path.join(parent_dir, 'matlab', 'MethodsPaper')
+    matlab_command = 'cd ' + matlab_folder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
 
     return matlab_command
 
-def getExecutable(base_name, dim=2):
+
+def get_current_vcs_revision():
+    # For mercurial:
+    # pipe = subprocess.Popen(
+    #    ["hg", "identify", "--num"],
+    #    stdout=subprocess.PIPE
+    # )
+    # repoVersion = pipe.stdout.read()
+    # repoVersion = repoVersion.replace('\n', '')  # clean up a bit
+
+    # For git:
+    repo_version = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
+
+    return repo_version
+
+
+def get_executable(base_name, dim=2):
+    """ Given some program name, and assuming compilation options (mpiCC, gfortran, OPT, MPI etc.)
+     return the correct executable for this system"""
+
     host = ''
 
     # If we're on gyre, append set host string to .GYRE
-
     hostname = socket.gethostname()
     if 'gyre' in hostname:
         host = '.GYRE'
@@ -37,23 +56,13 @@ def getExecutable(base_name, dim=2):
     return executable_name
 
 
-def getCurrentGitRevision():
-    # For mercurial:
-    #pipe = subprocess.Popen(
-    #    ["hg", "identify", "--num"],
-    #    stdout=subprocess.PIPE
-    #)
-    #repoVersion = pipe.stdout.read()
-    #repoVersion = repoVersion.replace('\n', '')  # clean up a bit
+def get_executable_name():
+    """ Get the executable in MUSHY_LAYER_DIR/execSubcycle/ which contains mushyLayer2d,
+     prioritising OPT over DEBUG compilations.
+     Independent of the architecture (i.e. will find for different C++ compilers, fortran versions etc.) """
 
-    # For git:
-    repoVersion = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
-
-    return repoVersion
-
-def getExecName():
-    mushyLayerDir = os.path.dirname(os.path.dirname(__file__))
-    exec_dir = os.path.join(mushyLayerDir, 'execSubcycle')
+    mushy_layer_dir = os.environ['MUSHY_LAYER_DIR'] # previously: os.path.dirname(os.path.dirname(__file__))
+    exec_dir = os.path.join(mushy_layer_dir, 'execSubcycle')
 
     # Get files in exec dir starting with mushyLayer2d and ending with ex
     possible_exec_files = [f for f in os.listdir(exec_dir) if f[:12] == 'mushyLayer2d' and f[-2:] == 'ex']
@@ -80,8 +89,7 @@ def getExecName():
         exec_file = possible_exec_files[1]
 
     # Can also specify the file manually
-    #exec = 'mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex'
-
+    # exec = 'mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex'
 
     # Sanity check
     if not os.path.exists(os.path.join(exec_dir, exec_file)):
@@ -90,39 +98,35 @@ def getExecName():
 
     return exec_file
 
-def constructRunName(params):
+
+def construct_run_name(params):
     # run_name = 'CR' + str(params['parameters.compositionRatio']) + 'RaC' + str(params['parameters.rayleighComp'])
 
-    longToShortName = {'parameters.compositionRatio': 'CR',
-                       'parameters.rayleighComp': 'RaC',
-                       'parameters.lewis': 'Le',
-                       'parameters.darcy': 'Da',
-                       'parameters.nonDimReluctance': 'R',
-                       'parameters.bottomEnthalpy': 'HBottom'}
+    long_to_short_name = {'parameters.compositionRatio': 'CR',
+                          'parameters.rayleighComp': 'RaC',
+                          'parameters.lewis': 'Le',
+                          'parameters.darcy': 'Da',
+                          'parameters.nonDimReluctance': 'R',
+                          'parameters.bottomEnthalpy': 'HBottom'}
 
-    paramsToInclude = ['parameters.compositionRatio',
-                       'parameters.rayleighComp',
-                       'parameters.lewis',
-                       'parameters.permeabilityFunction']
-                       
-                       
-                       #'parameters.bottomEnthalpy',
-                       #'parameters.nonDimReluctance',
-    
-    paramFormat = {'parameters.compositionRatio': '%1.3f',
-                       'parameters.lewis': '%d',
-                       'parameters.darcy': '%.1e',
-                       'parameters.nonDimReluctance': '%.1e',
-                       'parameters.bottomEnthalpy': '%1.2f'}
+    params_to_include = ['parameters.compositionRatio',
+                         'parameters.rayleighComp',
+                         'parameters.lewis',
+                         'parameters.permeabilityFunction']
+
+    param_format = {'parameters.compositionRatio': '%1.3f',
+                    'parameters.lewis': '%d',
+                    'parameters.darcy': '%.1e',
+                    'parameters.nonDimReluctance': '%.1e',
+                    'parameters.bottomEnthalpy': '%1.2f'}
                        
     if 'parameters.rayleighComp' in params:
         if float(params['parameters.rayleighComp']) > 1000:
-            paramFormat['parameters.rayleighComp'] = '%.1e'
+            param_format['parameters.rayleighComp'] = '%.1e'
         else:
-            paramFormat['parameters.rayleighComp'] = '%d'
-                
-             
-    permeabilityFunctions = ['UniformPermeability',
+            param_format['parameters.rayleighComp'] = '%d'
+
+    permeability_functions = ['UniformPermeability',
                              'ChiCubedPermeability',
                              'KozenyPermeability',
                              'LogPermeability',
@@ -130,19 +134,19 @@ def constructRunName(params):
 
     run_name = ''
 
-    for p in paramsToInclude:
-        if p in longToShortName.keys() and p in params:
-            run_name = run_name + longToShortName[p] + paramFormat[p] % float(params[p])
+    for p in params_to_include:
+        if p in long_to_short_name.keys() and p in params:
+            run_name = run_name + long_to_short_name[p] + param_format[p] % float(params[p])
         elif p == 'parameters.permeabilityFunction' and p in params:
-            permFunc = int(params[p])
-            run_name = run_name + permeabilityFunctions[permFunc]
+            perm_func = int(params[p])
+            run_name = run_name + permeability_functions[perm_func]
         else:
             # Don't know how to handle this. Just do nothing.
             pass
             
     if float(params['parameters.darcy']) > 0:
-            run_name = run_name + longToShortName['parameters.darcy'] + paramFormat['parameters.darcy'] % float(params['parameters.darcy'])
-            run_name = run_name + longToShortName['parameters.nonDimReluctance'] + paramFormat['parameters.nonDimReluctance'] % float(params['parameters.nonDimReluctance'])
+            run_name = run_name + long_to_short_name['parameters.darcy'] + param_format['parameters.darcy'] % float(params['parameters.darcy'])
+            run_name = run_name + long_to_short_name['parameters.nonDimReluctance'] + param_format['parameters.nonDimReluctance'] % float(params['parameters.nonDimReluctance'])
 
     # params which don't follow the same format
 
@@ -161,80 +165,76 @@ def constructRunName(params):
         
     return run_name
 
-# Load up an inputs file and parse it into a dictionary
-def readInputs(inputs_file):
 
-	params = {}
+def read_inputs(inputs_file):
+    """ Load up an inputs file and parse it into a dictionary """
 
-        # Read in the file
-        filedata = None
-        with open(inputs_file, 'r') as f:
-            filedata = f.readlines()
+    params = {}
 
-        for line in filedata:
-            # print(line)
-            # Ignore lines that are commented out
-            if line.startswith('#'):
-                continue
+    # Read in the file
+    file_data = None
+    with open(inputs_file, 'r') as f:
+        file_data = f.readlines()
 
-            # Remove anything after a #
-            line = re.sub('#[^\n]*[\n]', '', line)
-            # print(line)
+    for line in file_data:
+        # print(line)
+        # Ignore lines that are commented out
+        if line.startswith('#'):
+            continue
 
-            parts = line.split('=')
-            if len(parts) > 1:
-                key = parts[0].strip()
-                val = parts[1].strip()
-                params[key] = val
+        # Remove anything after a #
+        line = re.sub('#[^\n]*[\n]', '', line)
 
-       # print(params)
-        return params
+        parts = line.split('=')
+        if len(parts) > 1:
+            key = parts[0].strip()
+            val = parts[1].strip()
+            params[key] = val
 
-    
+    # print(params)
+    return params
 
-def writeParamsFile(location, params, ignoreList = [], doSort=True):
+
+def write_inputs(location, params, ignore_list = None, doSort=True):
     output_file = ''
 
-
-    
-    keyList = params.keys()
+    key_list = params.keys()
     if doSort:
-        keyList.sort()    
+        key_list.sort()
     
-    for key in keyList:
-        if key not in ignoreList:
+    for key in key_list:
+        if not ignore_list or key not in ignore_list:
             
             if isinstance(params[key], list):
-                keyVal = ' '.join([str(a) for a in params[key]])
+                key_val = ' '.join([str(a) for a in params[key]])
                 
             else:
-                keyVal = str(params[key])
-
-
+                key_val = str(params[key])
 
             output_file = output_file + '\n' + \
-                key + '=' + keyVal
+                key + '=' + key_val
 
     with open(location, 'w') as f:
         f.write(output_file)
-        
-        
-def hasReachedSteadyState(folder):
-    timeTableFile = os.path.join(folder, 'time.table.0')
-    #print(timeTableFile)
-    if os.path.exists(timeTableFile):
+
+
+def has_reached_steady_state(folder):
+    time_table_file = os.path.join(folder, 'time.table.0')
+
+    if os.path.exists(time_table_file):
         return True
         
 
-def timeSinceFolderUpdated(directory):
+def time_since_folder_updated(directory):
     smallest_t = 1e100
     for filename in os.listdir(directory):
-        this_time_diff = timeSinceFileUpdated(os.path.join(directory, filename))
+        this_time_diff = time_since_file_updated(os.path.join(directory, filename))
         smallest_t = min(smallest_t, this_time_diff)
         
     return smallest_t
-        
-def timeSinceFileUpdated(filename):
+
+
+def time_since_file_updated(filename):
     current_t = time.time()
     t = os.path.getmtime(filename)
         
@@ -242,58 +242,60 @@ def timeSinceFileUpdated(filename):
     
     return this_time_diff
     
-def getRestartFile(most_recent_path):
+def get_restart_file(most_recent_path):
 
-    restartFile = ''
+    restart_file = ''
     
-    chkFiles = [f for f in os.listdir(most_recent_path) if len(f) > 4 and f[:3] == 'chk']
+    chk_files = [f for f in os.listdir(most_recent_path) if len(f) > 4 and f[:3] == 'chk']
     
-    #print('Chk files in ' + most_recent_path + ': ')
-    #print(chkFiles)
+    # print('Chk files in ' + most_recent_path + ': ')
+    # print(chk_files)
 
-    if len(chkFiles) > 0:
-        restartFile = chkFiles[-1]
+    if len(chk_files) > 0:
+        restart_file = chk_files[-1]
         
-    print('Found ' + str(len(chkFiles)) + ' checkpoint files, most recent: ' + restartFile)
+    print('Found ' + str(len(chk_files)) + ' checkpoint files, most recent: ' + restart_file)
 
-    return restartFile
+    return restart_file
 
-def getFinalPlotFile(directory):
-    filesDir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
-    pltFiles = []
-    #print(filesDir)
-    for f in filesDir:
-        #print(f)
-        #print(f[-5:])
+
+def get_final_plot_file(directory):
+    files_dir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
+    plt_files = []
+    # print(files_dir)
+    for f in files_dir:
+        # print(f)
+        # print(f[-5:])
         if len(f) > 5 and not 'chk' in f and f[-5:] == '.hdf5':
-            pltFiles.append(f)
+            plt_files.append(f)
 
-    pltFiles = sorted(pltFiles)
+    plt_files = sorted(plt_files)
 
-    if pltFiles:
-        return pltFiles[-1]
+    if plt_files:
+        return plt_files[-1]
     else:
         return None
 
 
-def getFinalChkFile(directory):
-    filesDir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
-    pltFiles = []
-    #print(filesDir)
-    for f in filesDir:
-        #print(f)
-        #print(f[-5:])
+def get_final_chk_file(directory):
+    files_dir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
+    plt_files = []
+    # print(files_dir)
+    for f in files_dir:
+        # print(f)
+        # print(f[-5:])
         if len(f) > 5 and 'chk' in f and f[-5:] == '.hdf5':
-            pltFiles.append(f)
+            plt_files.append(f)
 
-    pltFiles = sorted(pltFiles)
+    plt_files = sorted(plt_files)
 
-    if pltFiles:
-        return pltFiles[-1]
+    if plt_files:
+        return plt_files[-1]
     else:
         return None
 
-def isPowerOfTwo(n):
+
+def is_power_of_two(n):
     test = math.log(n)/math.log(2)
     
     if round(test) == test:
@@ -301,18 +303,18 @@ def isPowerOfTwo(n):
     else:
         return False
 
-def str2arr(string):
-    #print(string)
+
+def string_to_array(string):
+
     if isinstance(string, list):
         return string
 
-
     parts = string.split(' ')
-
     array = [int(i) for i in parts]
     return array
 
-def arr2str(array):
+
+def array_to_string(array):
     str_array = [str(a) for a in array]
     string = ' '.join(str_array)
     return string
