@@ -194,8 +194,8 @@ class MushyLayerRunSimple:
         # Set remaining parameters on the slurm jobs
 
         self.slurmJob.folder = output_folder
-        self.slurmJob.execFile = os.path.join(self.exec_dir, self.program_name)
-        print('Exec dir: %s, program name: %s, exec file: %s', ( self.exec_dir, self.program_name, os.path.join(self.exec_dir, self.program_name)) )
+        self.slurmJob.set_exec_file(os.path.join(self.exec_dir, self.program_name))
+        print('Exec dir: %s, program name: %s, exec file: %s' % ( self.exec_dir, self.program_name, os.path.join(self.exec_dir, self.program_name)) )
 
         self.slurmJob.writeSlurmFile()
         self.slurmJob.runTask()

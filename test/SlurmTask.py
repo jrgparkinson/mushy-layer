@@ -82,6 +82,9 @@ class SlurmTask:
         self.partitions = partitions
         self.exclude = exclude
 
+    def set_exec_file(self, exec_file):
+        self.exec_file = exec_file
+
     def writeSlurmFile(self, runFileName='run.sh', inputsFileName='inputs'):
 
         fh = open(self.getRunFile(runFileName), 'w+')
