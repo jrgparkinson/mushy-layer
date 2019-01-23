@@ -86,6 +86,18 @@ This repository contains various other pieces of code for running simulations.
 `/grids/` contains gridfiles which can be loaded via `main.gridfile=/path/to/gridfile` in an inputs file, and sets a fixed variable mesh (i.e. not adaptive) for simulations.
 `/mk/` contains some custom Makefile options for compiling on some of the machines in AOPP at the University of Oxford.
 
+# Source code
+The source code is spread across a number of directories, which are briefly summarised here.
+
+`/BCutil/` contains code for implementing boundary conditions.
+`/util/` contains code for various non-mushy layer specific operations, e.g. computing gradients, divergences etc.
+`/src/` contains mushy layer code
+`/srcSubcycle/` contains mushy layer code for the subcycled algorithm
+`/execSubcyle/` contains the driver code the subcycled application
+`/srcNonSubcycle/` contains mushy layer code for the non-subcycled algorithm (currently broken)
+`/execNonSubcycle/` contains the driver code for the non-subcycle application (currently broken)
+
+
 
 
 
