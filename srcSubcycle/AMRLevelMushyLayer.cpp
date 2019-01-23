@@ -3124,19 +3124,34 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     // Don't do this on refined levels as it messes up the CF boundary condition
     if (useIncrementalPressure && m_level == 0)
     {
-      Real basic_phiScale = 1;
+      // Before doing this, check that the pressure isn't getting too big
+      // Only use incremental pressure if max (pressure) < 10^3
+      // hopefully this is stable
+      // if we don't do this, the pressure can grow out of control
 
-      pp.get("phiScale", basic_phiScale);
+      Real maxPressure = ::computeNorm(m_projection.phi(), NULL, 1, m_dx, Interval(0,0), 0);
+      // This is chosen empirically and may need some refinement
+      Real pressureCap = 1e3;
 
-      Real phiScale = m_projection.getScale(basic_phiScale, m_dt);
+      // A better indicator of issues arising is that the pressure becomes negative
+      // as we fix P = 0 on the bottom boundary, and it should increase up through the domain, use this condition instead
+      Real minPressure = ::computeMin(m_projection.phi(), NULL, 1, Interval(0,0));
+      if (minPressure > 0 && maxPressure < pressureCap)
+      {
+        Real basic_phiScale = 1;
 
-      // Apply last calculated MAC correction
-      m_projection.setPressureScaleEdgePtr(pressureScaleEdgePtr);
+        pp.get("phiScale", basic_phiScale);
 
-      m_projection.applyMacCorrection(a_advVel,
-                                      NULL,
-                                      phiScale);
-      alreadyHasPressure = true;
+        Real phiScale = m_projection.getScale(basic_phiScale, m_dt);
+
+        // Apply last calculated MAC correction
+        m_projection.setPressureScaleEdgePtr(pressureScaleEdgePtr);
+
+        m_projection.applyMacCorrection(a_advVel,
+                                        NULL,
+                                        phiScale);
+        alreadyHasPressure = true;
+      }
 
     }
 
@@ -3203,7 +3218,9 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     a_advVel.exchange();
     Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], a_advVel, m_dx);
     maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0), 0);
-    pout() << "  MAC Projection (level "<< m_level << "), exit status = " << exitStatus << ", max(div u) = " << maxDivU << endl;
+    Real minPressure = ::computeMin(m_projection.phi(), NULL, 1, Interval(0,0));
+    pout() << "  MAC Projection (level "<< m_level << "), exit status = " << exitStatus
+        << ", max(div u) = " << maxDivU << ", min pressure = " << minPressure << endl;
 
 
 
