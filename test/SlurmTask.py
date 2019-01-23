@@ -150,7 +150,9 @@ class SlurmTask:
                 legacy_run_str = run_str.replace('.ex', '.GYRE.ex')
 
                 # exec_dir_parts = self.execFile.split('/')
+                print('Exec file: %s ' % self.exec_file)
                 exec_dir = os.path.dirname(self.exec_file)
+                print('Exec dir: %s' % exec_dir)
 
                 custom_cmd = 'hs=$HOSTNAME \n' \
                              'if [[ $hs == *"gyre"* ]]; then \n' \
