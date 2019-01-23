@@ -154,7 +154,7 @@ class SlurmTask:
 
                 custom_cmd = 'hs=$HOSTNAME \n' \
                              'if [[ $hs == *"gyre"* ]]; then \n' \
-                             ' cd %s; make all; \n' \                            
+                             ' cd %s; make all; \n' \
                              ' %s \n' \
                              'else\n' \
                              ' %s\n' \
