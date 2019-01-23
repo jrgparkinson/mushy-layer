@@ -149,12 +149,16 @@ class SlurmTask:
             if 'legacy' in self.partitions:
                 legacy_run_str = run_str.replace('.ex', '.GYRE.ex')
 
+                # exec_dir_parts = self.execFile.split('/')
+                exec_dir = os.path.dirname(self.execFile)
+
                 custom_cmd = 'hs=$HOSTNAME \n' \
                              'if [[ $hs == *"gyre"* ]]; then \n' \
-                             '%s \n' \
+                             ' cd %s; make all; \n' \                            
+                             ' %s \n' \
                              'else\n' \
-                             '%s\n' \
-                             'fi\n' % (legacy_run_str, run_str)
+                             ' %s\n' \
+                             'fi\n' % (exec_dir, legacy_run_str, run_str)
 
                 file_contents.append(custom_cmd)
 
