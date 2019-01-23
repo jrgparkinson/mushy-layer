@@ -2,7 +2,7 @@ import sys
 import os
 import re
 import math
-from os import listdir, rename
+from os import listdir
 from os.path import isfile, join, exists
 import subprocess
 import socket
@@ -29,7 +29,8 @@ class MushyLayerRunSimple:
 
         self.base_output_dir = base_output_dir
 
-        mushyLayerDir = os.path.dirname(os.path.dirname(__file__))
+        mushyLayerDir = os.environ['MUSHY_LAYER_DIR']
+        print('Mushy layer dir: %s' % mushyLayerDir)
         self.exec_dir = os.path.join(mushyLayerDir, 'execSubcycle')
 
         #self.base_command = "mpirun --mca mpi_warn_on_fork 0  -np " + \
