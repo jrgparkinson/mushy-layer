@@ -57,10 +57,10 @@ def makeFigures():
     s = SlurmTask(base_output_dir, jobName, '', 4)
 
     #s.setDependency(job_ids)
-    s.setCustomCommand(slurmCommand)
+    s.set_custom_command(slurmCommand)
 
-    s.writeSlurmFile(jobName + '.sh')
-    s.runTask(jobName + '.sh')
+    s.write_slurm_file(jobName + '.sh')
+    s.run_task(jobName + '.sh')
     print(Fore.GREEN + 'Submitted make figures job \n' + Fore.RESET)
 
 
