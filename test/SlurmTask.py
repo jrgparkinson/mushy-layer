@@ -148,11 +148,16 @@ class SlurmTask:
             file_contents.append(self.custom_command)
 
         else:
+            print('Create slurm command, exec file = %s' % self.exec_file)
             run_str = mpi_str + ' ' + self.exec_file + ' ' + os.path.join(self.folder, inputs_file_name)
 
             # If we may be running on legacy, need to possibly use a different executable
             if 'legacy' in self.partitions:
-                legacy_run_str = run_str.replace('.ex', '.GYRE.ex')
+
+                if '.GYRE.ex' not in run_str:
+                    legacy_run_str = run_str.replace('.ex', '.GYRE.ex')
+                else:
+                    legacy_run_str = run_str
 
                 # exec_dir_parts = self.execFile.split('/')
                 print('Exec file: %s ' % self.exec_file)

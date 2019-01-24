@@ -71,6 +71,19 @@ def get_executable_name():
         print('Cannot find any executable files - have you compiled the code?')
         sys.exit(0)
 
+    init_possible_exec_files = possible_exec_files
+
+    # Remove/keep .GYRE in list as appropriate
+    if 'gyre' in socket.gethostname():
+        possible_exec_files = [f for f in possible_exec_files if 'GYRE' in f]
+    else:
+        possible_exec_files = [f for f in possible_exec_files if 'GYRE' not in f]
+
+    if len(possible_exec_files) == 0:
+        print('Cannot find any executable files that match the current system.')
+        print('Executable founds: ' + '\n'.join(init_possible_exec_files))
+        sys.exit(0)
+
     # Choose optimised execs over DEBUG execs as they will be quicker
     opthigh_exec = ''
     opt_exec = ''
@@ -87,6 +100,8 @@ def get_executable_name():
         exec_file = opt_exec
     else:
         exec_file = possible_exec_files[1]
+
+
 
     # Can also specify the file manually
     # exec = 'mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex'
