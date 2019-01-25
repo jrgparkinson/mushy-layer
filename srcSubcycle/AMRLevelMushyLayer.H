@@ -1227,9 +1227,9 @@ protected:
   /// Operator factories for scalar vars
   RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > HCOpFact;
 
-  /// bottom solver
-  static BiCGStabSolver<LevelData<FArrayBox> >                    s_botSolver;
-//  static RelaxSolver<LevelData<FArrayBox> >                    s_botSolver;
+  /// bottom solvers for multigrid
+  static BiCGStabSolver<LevelData<FArrayBox> >                    s_botSolverUStar;
+  static RelaxSolver<LevelData<FArrayBox> >                    s_botSolverHC;
 
   /// AMRMultigrid solver for unprojected velocity, \f$ \mathbf{u}^* \f$
   RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >      s_uStarAMRMG[SpaceDim];

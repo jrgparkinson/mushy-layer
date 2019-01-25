@@ -51,7 +51,8 @@
 
 #include "NamespaceHeader.H"
 
-BiCGStabSolver<LevelData<FArrayBox> > AMRLevelMushyLayer::s_botSolver;
+BiCGStabSolver<LevelData<FArrayBox> > AMRLevelMushyLayer::s_botSolverUStar;
+RelaxSolver<LevelData<FArrayBox> > AMRLevelMushyLayer::s_botSolverHC;
 
 /*******/
 AMRLevelMushyLayer::~AMRLevelMushyLayer()
@@ -98,9 +99,10 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
 
   IntVect ivGhost = m_numGhost * IntVect::Unit;
 
-  int numSmoothUp=4, numSmoothDown=1, numMG=1, maxIter=10, mgverb=0;
+  int numSmoothUp=4, numSmoothDown=1, numMG=1, maxIter=10, mgverb=0, bottomSolveIterations=40;
   Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
   int relaxMode = 1; // 1=GSRB, 4=jacobi
+  bool useRelaxBottomSolverForHC = true;
 
   ParmParse ppAmrmultigrid("HCMultigrid");
   ppAmrmultigrid.query("num_smooth_up", numSmoothUp);
@@ -112,6 +114,10 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
   ppAmrmultigrid.query("verbosity", mgverb);
   ppAmrmultigrid.query("numSmoothDown", numSmoothDown);
   ppAmrmultigrid.query("relaxMode", relaxMode);
+  ppAmrmultigrid.query("bottomSolveIterations", bottomSolveIterations);
+  ppAmrmultigrid.query("useRelaxBottomSolver", useRelaxBottomSolverForHC);
+
+  s_botSolverHC.m_imax = bottomSolveIterations;
 
   Vector<AMRLevelMushyLayer*> hierarchy;
   Vector<DisjointBoxLayout> grids;
@@ -132,8 +138,8 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
     nRefCrse = coarserAMRLevel->m_ref_ratio;
   }
 
-  s_botSolver.m_verbosity = max(mgverb - 2, 0);
-
+  s_botSolverUStar.m_verbosity = max(mgverb - 2, 0);
+  s_botSolverHC.m_verbosity = max(mgverb - 2, 0);
 
   for (int dir = 0; dir < SpaceDim; dir++)
   {
@@ -314,13 +320,21 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
   else if (m_MGtype == m_FAS)
   {
     //FAS multigrid
-
-
     s_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
         new AMRFASMultiGrid<LevelData<FArrayBox> >());
 
-    s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolver,
-                             maxAMRlevels);
+
+    if (useRelaxBottomSolverForHC)
+    {
+      s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverHC,
+                               maxAMRlevels);
+    }
+    else
+    {
+      // Borrow the BiCGStab bottom solver from U star
+      s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverUStar,
+                                    maxAMRlevels);
+    }
 
     s_multiCompFASMG->setSolverParameters(numSmoothDown, numSmoothUp, numSmoothUp, numMG,
                                           maxIter, tolerance, hang, normThresh);
@@ -480,7 +494,7 @@ void AMRLevelMushyLayer::defineUstarSolver()
     s_uStarOpFact[idir] = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcamrpop); // m_UstarVCAMRPOp[idir]);
 
     s_uStarAMRMG[idir]->define(lev0Dom, *s_uStarOpFact[idir],
-                               &s_botSolver, nlevels);
+                               &s_botSolverUStar, nlevels);
 
     s_uStarAMRMG[idir]->setSolverParameters(numSmooth, numSmooth, numSmooth,
                                             numMG, maxIter, tolerance, hang, normThresh);
@@ -1748,8 +1762,6 @@ Real AMRLevelMushyLayer::advance()
     bool doFRUpdates = true;
 
     exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, doFRUpdates, doAdvectiveSrc);
-
-
 
     bool solverFailed = (exitStatus == 2 || exitStatus == 4 || exitStatus == 6);
 //    bool solveSuccess = !solverFailed;
