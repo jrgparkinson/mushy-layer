@@ -1,2 +1,38 @@
 
 Initializing...
+addExtraParams() from /home/parkinsonjl/mnt/sharedStorage/optimalStates-restructured/Le200/CR76.000/RaC70/pts128-steady/inputs
+addExtraParams() from /home/parkinsonjl/mnt/sharedStorage/optimalStates-restructured/Le200/CR76.000/RaC70/pts128-steady/postProcess.inputs
+Finding files...
+Diffusive timescale, advective velocity scale
+read ref_ratio = 2
+read tag_buffer_size = 4
+read dx = 0.0015625
+read dt = 1.5625e-05
+read time = 0
+Converting Katz to Wells units (H=H-1; S=S+1)
+dt reduced by factor 10 to 1.5625e-06
+Diffusive timescale, advective velocity scale
+read ref_ratio = 2
+read tag_buffer_size = 4
+read dx = 0.0015625
+read dt = 7.71953e-07
+read time = 0.834425
+Converting Katz to Wells units (H=H-1; S=S+1)
+dt reduced by factor 10 to 7.71953e-08
+Done...
+
+Vector Ss: 16 bytes (0 Mb)
+Vector d: 496 bytes (0 Mb)
+Vector i: 320 bytes (0 Mb)
+Arena 20BasicCCVelBCFunction: 6304 bytes (0 Mb)
+Arena 39BasicPorosityPermeabilityFaceBCFunction: 13568 bytes (0 Mb)
+Arena 35BasicPorosityPermeabilityBCFunction: 3504 bytes (0 Mb)
+Arena 21AdvectDiffuseScalarBC: 66576 bytes (0 Mb)
+Arena 23ExtrapolationBCFunction: 96 bytes (0 Mb)
+Arena 32BasicPressureBCFunctionSubcycled: 6368 bytes (0 Mb)
+Arena 15AMRFASMultiGridI9LevelDataI9FArrayBoxEE: 1200 bytes (0 Mb)
+Arena 12AMRMultiGridI9LevelDataI9FArrayBoxEE: -1200 bytes (0 Mb)
+Arena 10BCFunction: -96416 bytes (0 Mb)
+---------------------------------
+Total Unfreed : 832 bytes (0 Mb)
+peak memory usage: 117657660 bytes (112 Mb)
