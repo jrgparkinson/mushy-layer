@@ -76,36 +76,12 @@ int main(int argc, char* argv[])
   inputsFullPath += runInputs;
   addExtraParams(inputsFullPath, pp);
 
-
   // Overwrite original params with any of those in our file
   addExtraParams(in_file, pp);
-
-
-  // Get variables for initializing amrlevelmushylayer objects
-  Real cfl, domainWidth=0.0, refineThresh;
-  int tagBufferSize;
-  bool useLimiting;
-
-  ParmParse ppMain("main");
-  ppMain.get("cfl", cfl);
-
-  // Try domain width first
-  ppMain.query("domain_width", domainWidth);
-  if (domainWidth == 0)
-  {
-    ppMain.get("domain_length", domainWidth);
-  }
-
-  ppMain.get("refine_thresh", refineThresh);
-  ppMain.get("tag_buffer_size", tagBufferSize);
-  ppMain.get("use_limiting", useLimiting);
 
   // If we've specified a particular file, use it.
   // Else, search for files in the directory
   Vector<string> fileNames;
-
-
-
 
     pout() << "Finding files..." << endl;
 

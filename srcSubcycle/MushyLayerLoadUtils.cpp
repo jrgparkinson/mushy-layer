@@ -14,17 +14,17 @@ void getAMRHierarchy(string inFile, Vector<AMRLevelMushyLayer*>& amrlevels, int&
   std::vector<bool> periodic;
 
   ParmParse ppMain("main");
-  ppMain.get("cfl", cfl);
+//  ppMain.get("cfl", cfl);
 
-  ppMain.query("domain_width", domainWidth);
-  if (domainWidth == 0.0)
-  {
-    ppMain.get("domain_length", domainWidth);
-  }
+//  ppMain.query("domain_width", domainWidth);
+//  if (domainWidth == 0.0)
+//  {
+//    ppMain.get("domain_length", domainWidth);
+//  }
 
-  ppMain.get("refine_thresh", refineThresh);
-  ppMain.get("tag_buffer_size", tagBufferSize);
-  ppMain.get("use_limiting", useLimiting);
+//  ppMain.get("refine_thresh", refineThresh);
+//  ppMain.get("tag_buffer_size", tagBufferSize);
+//  ppMain.get("use_limiting", useLimiting);
 
   int max_level = 0;
   ppMain.get("max_level",max_level);
@@ -139,6 +139,7 @@ void getAMRHierarchy(string inFile, Vector<AMRLevelMushyLayer*>& amrlevels, int&
 
 void addExtraParams(string runInputs, ParmParse& pp)
 {
+  pout() << "addExtraParams() from " << runInputs << endl;
   const char* pFile = runInputs.c_str();
     std::ifstream t(pFile);
     std::string str((std::istreambuf_iterator<char>(t)),
