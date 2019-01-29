@@ -19,6 +19,7 @@ visitlog.py
 *.dummy
 *.project
 *.pydevproject
+*.ex
 *~
 *pout.*
 *time.table.*
