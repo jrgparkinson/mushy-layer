@@ -38,3 +38,5 @@ visitlog.py
 *.tmp
 *.eps
 **/OldClasses/*
+**/venv*/*
+**/env/*
