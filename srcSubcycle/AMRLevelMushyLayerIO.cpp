@@ -559,18 +559,18 @@ readCheckpointLevel(HDF5Handle& a_handle)
     }
   }
 
-  LevelData<FluxBox> tempFluxBox(m_grids, 1);
-
-  if (s_verbosity >= 10)
-  {
-    pout() << "     reading in advVel" << endl;
-  }
-  dataStatus = read<FluxBox>(a_handle, tempFluxBox, "advVel", m_grids);
-  tempFluxBox.copyTo(Interval(0,0), m_advVel, Interval(0,0));
-  if (s_verbosity >= 10)
-  {
-    pout() << "       ... done " << endl;
-  }
+//  LevelData<FluxBox> tempFluxBox(m_grids, 1);
+//
+//  if (s_verbosity >= 10)
+//  {
+//    pout() << "     reading in advVel" << endl;
+//  }
+//  dataStatus = read<FluxBox>(a_handle, tempFluxBox, "advVel", m_grids);
+//  tempFluxBox.copyTo(Interval(0,0), m_advVel, Interval(0,0));
+//  if (s_verbosity >= 10)
+//  {
+//    pout() << "       ... done " << endl;
+//  }
 
   // Take care of changing dimensionless units if necessary
   ParmParse pp("parameters");
