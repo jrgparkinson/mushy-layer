@@ -4,8 +4,6 @@ import sys
 import math
 import getopt
 from colorama import Fore, Style
-
-
 from mushyLayerRunUtils import construct_run_name, read_inputs, write_inputs, is_power_of_two, string_to_array
 from SlurmTask import SlurmTask
 from AMRConvergenceTest import AMRConvergenceTest

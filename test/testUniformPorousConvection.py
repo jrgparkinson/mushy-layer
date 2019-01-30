@@ -2,7 +2,6 @@
 import os, sys
 from colorama import Fore, Style
 import getopt
-
 from runAMRConvergenceTest import runTest
 from SlurmTask import SlurmTask
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
@@ -12,39 +11,40 @@ from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
 # Just run for a single grid resolution and compare to previously published values
 ######################################
 
-def testUniformPorousConvection(argv):
+def test_uniform_porous_convection(argv):
 
     # Default vals:
     cfl = 0.2
-    Nz_uniform = 128
-    Nz_vm = 64
+    nz_uniform = 128
+    nz_vm = 64
     chi = 0.4
-    BCAccuracy = 1
-    uDelUMethod = 0
-    advectionMethod = 1
+    bc_accuracy = 1
+    u_del_u_method = 0
+    advection_method = 1
 
     try:
        opts, args = getopt.getopt(argv,"n:v:c:p:b:u:a:")
     except getopt.GetoptError as err:
         print(str(err))
-        print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points> -c<cfl> -p <chi> -b <BC accuracy> -u <u del u method> -a <advection method>')
+        print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points>'
+              ' -c<cfl> -p <chi> -b <BC accuracy> -u <u del u method> -a <advection method>')
         sys.exit(2)
 
     for opt, arg in opts:
         if opt in ("-n"):
-            Nz_uniform = int(arg)
+            nz_uniform = int(arg)
         elif opt in ("-c"):
             cfl = float(arg)
         elif opt in ("-v"):
-            Nz_vm = int(arg)
+            nz_vm = int(arg)
         elif opt in ("-p"):
             chi = float(arg)
         elif opt in ("-b"):
-           	BCAccuracy = int(arg)
+            bc_accuracy = int(arg)
         elif opt in ("-u"):
-            uDelUMethod = int(arg)
+            u_del_u_method = int(arg)
         elif opt in ("-a"):
-            advectionMethod = int(arg)
+            advection_method = int(arg)
 
     base_output_dir = get_base_output_dir()
     matlab_command = get_matlab_base_command()
@@ -56,12 +56,12 @@ def testUniformPorousConvection(argv):
     #    Nz_vm = Nz_uniform #int(float(Nz_uniform) / 2)
 
     AMRSetup = []
-    if Nz_uniform > 0:
-        AMRSetup.append({'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]})
+    if nz_uniform > 0:
+        AMRSetup.append({'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [nz_uniform]})
 
-    if Nz_vm > 0:
-        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [Nz_vm]})
-        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(Nz_vm/2)]})
+    if nz_vm > 0:
+        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [nz_vm]})
+        AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(nz_vm/2)]})
 
     num_procs = [1]
     #chi = 0.4
@@ -69,9 +69,9 @@ def testUniformPorousConvection(argv):
     # Try and speed things up for now, should eventually make this criteria smaller
     #extra_params = {'main.steady_state': 1e-4}
     extra_params = {}
-    extra_params['main.BCAccuracy'] = BCAccuracy
-    extra_params['main.uDeluMethod'] = uDelUMethod
-    extra_params['main.advectionMethod'] = advectionMethod
+    extra_params['main.BCAccuracy'] = bc_accuracy
+    extra_params['main.uDeluMethod'] = u_del_u_method
+    extra_params['main.advectionMethod'] = advection_method
     #cfl = 0.45
     extra_params['main.cfl'] = cfl
     extra_params['main.initial_cfl'] = cfl / 10
@@ -127,7 +127,7 @@ def testUniformPorousConvection(argv):
         Ra_str_vals = [RaFormat % a for a in Da_Ra['RaT']]
         Ra_str = '{\'' + '\',\''.join(Ra_str_vals) + '\'}'
 
-        analysis_command = analysis_command + ' compileNu(\'' + base_dataFolder + '\', \'' + chi_str + '\', \'' + Da_str + '\', ' + Ra_str + ', ' + str(Nz_uniform) + ', ' + str(Nz_vm) + ', [' + ','.join(NuLebars) + ']);'
+        analysis_command = analysis_command + ' compileNu(\'' + base_dataFolder + '\', \'' + chi_str + '\', \'' + Da_str + '\', ' + Ra_str + ', ' + str(nz_uniform) + ', ' + str(nz_vm) + ', [' + ','.join(NuLebars) + ']);'
 
         # Now do analysis
     analysis_command = analysis_command + ' exit; " '
@@ -147,4 +147,4 @@ def testUniformPorousConvection(argv):
 
 
 if __name__ == "__main__":
-    testUniformPorousConvection(sys.argv[1:])
+    test_uniform_porous_convection(sys.argv[1:])
