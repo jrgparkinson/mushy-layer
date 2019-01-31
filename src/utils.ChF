@@ -94,3 +94,54 @@ c     sweep direction, if required.
      
       return
       end
+      
+
+c   Enforce a minimum and maximum value cap on phi      
+      subroutine SETMINMAXVAL(
+     &     CHF_FRA[phi],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[minVal],
+     &     CHF_CONST_REAL[maxVal])
+     
+      integer n, ncomp
+      integer CHF_DDECL[i;j;k]
+      
+      ncomp = CHF_NCOMP[phi]
+      
+      CHF_MULTIDO[region; i; j; k]
+        do n = 0, ncomp-1
+          if (phi(CHF_IX[i;j;k],n) .le. minVal) then
+            phi(CHF_IX[i;j;k],n) = minVal
+          else if (phi(CHF_IX[i;j;k],n) .gt. maxVal) then
+          	phi(CHF_IX[i;j;k],n) = maxVal
+          endif
+        enddo
+     
+      CHF_ENDDO
+     
+      return
+      end
+      
+c   Enforce a minimum value cap on phi      
+      subroutine SETMINVAL(
+     &     CHF_FRA[phi],
+     &     CHF_BOX[region],
+     &     CHF_CONST_REAL[minVal])
+     
+      integer n, ncomp
+      integer CHF_DDECL[i;j;k]
+      
+      ncomp = CHF_NCOMP[phi]
+      
+      CHF_MULTIDO[region; i; j; k]
+        do n = 0, ncomp-1
+          if (phi(CHF_IX[i;j;k],n) .le. minVal) then
+            phi(CHF_IX[i;j;k],n) = minVal
+          endif
+        enddo
+     
+      CHF_ENDDO
+     
+      return
+      end
+      

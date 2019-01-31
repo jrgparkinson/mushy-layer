@@ -5,9 +5,9 @@
 void getAMRHierarchy(string inFile, Vector<AMRLevelMushyLayer*>& amrlevels, int& finest_level, HDF5HeaderData& header)
 {
   // Get variables for initializing amrlevelmushylayer objects
-  Real cfl, domainWidth=0.0, refineThresh;
-  int tagBufferSize;
-  bool useLimiting;
+//  Real cfl, domainWidth=0.0, refineThresh;
+//  int tagBufferSize;
+//  bool useLimiting;
   Vector<int> steps_since_regrid; //regrid_intervals,
   std::vector<int> regrid_intervals; // (num_read_levels,1);
 
@@ -131,7 +131,6 @@ void getAMRHierarchy(string inFile, Vector<AMRLevelMushyLayer*>& amrlevels, int&
 
     amrlevels[level]->defineSolvers(amrlevels[level]->time());
   }
-
 
   handle.close();
 }

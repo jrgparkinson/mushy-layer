@@ -957,7 +957,6 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
 
   CH_TIME("AMRLevelMushyLayer::computeVorticityStreamfunction");
 
-
   // First vorticity = curl (u)
   computeVorticity();
 

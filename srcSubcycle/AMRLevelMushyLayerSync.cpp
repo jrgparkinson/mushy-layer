@@ -759,7 +759,13 @@ if (s_verbosity >= 3)
   computeDiagnostics();
 
   // Could possibly do this in an AMR sense instead
-  computeVorticityStreamfunction();
+  bool computeVorticityStreamFunction = true;
+  pp.query("computeVorticity", computeVorticityStreamFunction);
+  if (computeVorticityStreamFunction)
+  {
+    computeVorticityStreamfunction();
+  }
+
   getExtraPlotFields();
 
   // Do some things from level 0 but across entire hierarchy

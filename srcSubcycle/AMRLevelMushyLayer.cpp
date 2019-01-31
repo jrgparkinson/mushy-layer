@@ -87,8 +87,9 @@ void AMRLevelMushyLayer::getHierarchyAndGrids(
 }
 
 /*******/
-void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alpha, Real beta)
+void AMRLevelMushyLayer::defineSolvers(Real a_time)
 {
+
   if (s_verbosity >= 5)
   {
     pout() << "AMRLevelMushyLayer::defineSolvers" << endl;
@@ -96,6 +97,10 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
   CH_TIME("AMRLevelMushyLayer::defineSolvers");
   //  Real old_time = m_time-m_dt;
   //  Real new_time = m_time;
+
+  bool a_homogeneous = false;
+  Real alpha = 1.0;
+  Real beta = 1.0;
 
   IntVect ivGhost = m_numGhost * IntVect::Unit;
 
@@ -141,6 +146,9 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
   s_botSolverUStar.m_verbosity = max(mgverb - 2, 0);
   s_botSolverHC.m_verbosity = max(mgverb - 2, 0);
 
+  {
+
+    CH_TIME("AMRLevelMushyLayer::defineSolvers::defineViscousOp");
   for (int dir = 0; dir < SpaceDim; dir++)
   {
     BCHolder viscousBCcomp = m_physBCPtr->velFuncBC(dir, m_viscousBCs);
@@ -149,26 +157,25 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
     m_viscousOp[dir]->define(m_grids, crseGridsPtr, m_dx, nRefCrse,
                              m_problem_domain, viscousBCcomp);
 
-
-
-
-//    RealVect dxVect;
-//    for (int i=0; i < SpaceDim; i++) { dxVect[i]=m_dx; }
-//    NewPoissonOp4Factory opFact(dxVect, viscousBCcomp);
-//
-////    m_viscousOpHO[dir] = RefCountedPtr<NewPoissonOp4>(new NewPoissonOp4());
-////    m_viscousOpHO[dir]->define(dxVect, m_problem_domain, viscousBCcomp);
-//    m_viscousOpHO[dir] = RefCountedPtr<NewPoissonOp4>(opFact.MGnewOp(m_problem_domain, 0, False));
+  }
   }
 
+
+  {
+    CH_TIME("AMRLevelMushyLayer::defineSolvers::defineUStarAMRMG");
   for (int idir = 0; idir < SpaceDim; idir++)
   {
-    s_uStarAMRMG[idir] =
-        RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >(
-            new AMRMultiGrid<LevelData<FArrayBox> >());
-    s_uStarAMRMG[idir]->setSolverParameters(numSmoothUp, numSmoothUp, numSmoothUp,
-                                            numMG, maxIter, tolerance, hang, normThresh);
-    s_uStarAMRMG[idir]->m_verbosity = mgverb;
+    // I think we only have to define this once
+    if (s_uStarAMRMG[idir] == NULL)
+    {
+      s_uStarAMRMG[idir] =
+          RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >(
+              new AMRMultiGrid<LevelData<FArrayBox> >());
+      s_uStarAMRMG[idir]->setSolverParameters(numSmoothUp, numSmoothUp, numSmoothUp,
+                                              numMG, maxIter, tolerance, hang, normThresh);
+      s_uStarAMRMG[idir]->m_verbosity = mgverb;
+    }
+  }
   }
 
   if (s_verbosity >= 5)
@@ -308,8 +315,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
                mlParamsPtr, temperature_Sl_BC,
                relaxMode, porosityEdgeBC);
 
-  HCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(
-      HCop);
+  HCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(HCop);
 
   int maxAMRlevels = hierarchy.size();
 
@@ -320,28 +326,29 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
   else if (m_MGtype == m_FAS)
   {
     //FAS multigrid
-    s_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
-        new AMRFASMultiGrid<LevelData<FArrayBox> >());
 
 
-    if (useRelaxBottomSolverForHC)
-    {
-      s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverHC,
-                               maxAMRlevels);
-    }
-    else
-    {
-      // Borrow the BiCGStab bottom solver from U star
-      s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverUStar,
-                                    maxAMRlevels);
-    }
 
-    s_multiCompFASMG->setSolverParameters(numSmoothDown, numSmoothUp, numSmoothUp, numMG,
-                                          maxIter, tolerance, hang, normThresh);
-    s_multiCompFASMG->m_verbosity = mgverb;
+      s_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
+          new AMRFASMultiGrid<LevelData<FArrayBox> >());
 
-    //    OLD_FASMG_type type = FULL;
-    //    s_multiCompFASMG->setCycleType(type); // full multigrid
+      if (useRelaxBottomSolverForHC)
+      {
+        s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverHC,
+                                 maxAMRlevels);
+      }
+      else
+      {
+        // Borrow the BiCGStab bottom solver from U star
+        s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverUStar,
+                                      maxAMRlevels);
+      }
+
+      s_multiCompFASMG->setSolverParameters(numSmoothDown, numSmoothUp, numSmoothUp, numMG,
+                                            maxIter, tolerance, hang, normThresh);
+      s_multiCompFASMG->m_verbosity = mgverb;
+
+
 
     // Not doing TGA yet
     s_enthalpySalinityTGA = RefCountedPtr<LevelTGA>(
@@ -353,11 +360,6 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
         new LevelBackwardEuler(grids, refRat, lev0Dom, HCOpFact,
                                s_multiCompFASMG));
 
-    //    s_enthalpySalinityCN = RefCountedPtr<LevelCrankNicolson>(
-    //            new LevelBackwardEuler(grids, refRat, lev0Dom, HCOpFact,
-    //                                   s_multiCompFASMG));
-
-
   }
   else
   {
@@ -366,8 +368,10 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time, bool a_homogeneous, Real alp
 
 }
 
-void AMRLevelMushyLayer::defineUstarSolver()
+void AMRLevelMushyLayer::defineUstarMultigrid()
 {
+  CH_TIME("AMRLevelMushyLayer::defineUstarMultigrid");
+
   // Define multigrid solver for this level and coarser level if one exists
 
   Vector<AMRLevelMushyLayer*> hierarchy;
@@ -490,7 +494,6 @@ void AMRLevelMushyLayer::defineUstarSolver()
     vcamrpop->define(lev0Dom, allGrids, refRat, lev0Dx, viscousBC,
                      0.0, aCoef, -1.0, bCoef, cCoef); // Note that we should set m_dt*etc in bCoef, not beta!
 
-
     s_uStarOpFact[idir] = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcamrpop); // m_UstarVCAMRPOp[idir]);
 
     s_uStarAMRMG[idir]->define(lev0Dom, *s_uStarOpFact[idir],
@@ -504,6 +507,7 @@ void AMRLevelMushyLayer::defineUstarSolver()
 void AMRLevelMushyLayer::defineUstarSolver(	Vector<RefCountedPtr<LevelBackwardEuler> >& UstarBE,
                                            	Vector<RefCountedPtr<LevelTGA> >& UstarTGA)
 {
+  CH_TIME("AMRLevelMushyLayer::defineUstarSolver");
 
   Vector<AMRLevelMushyLayer*> hierarchy;
   Vector<DisjointBoxLayout> allGrids;
@@ -512,7 +516,7 @@ void AMRLevelMushyLayer::defineUstarSolver(	Vector<RefCountedPtr<LevelBackwardEu
   Real lev0Dx;
   getHierarchyAndGrids(hierarchy, allGrids, refRat, lev0Dom, lev0Dx);
 
-  defineUstarSolver();
+  defineUstarMultigrid();
 
   UstarBE.resize(SpaceDim);
   UstarTGA.resize(SpaceDim);
@@ -6052,6 +6056,9 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
       Box domainBox = ml->m_problem_domain.domainBox();
 
+      // Ensure BCs are set
+      ml->fillScalars(*ml->m_scalarNew[m_temperature], ml->m_time, m_temperature, false, true);
+
       Gradient::levelGradientMAC(*gradEdgeT[lev], (*ml->m_scalarNew[m_temperature]),
                                  ml->m_dx);
 
@@ -7611,6 +7618,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   if (doInterior)
   {
+    CH_TIME("AMRLevelMushyLayer::fillScalars::interior");
     if (s_verbosity >= 6)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - start interior filling, a_time:" << a_time << ", old_time: " << old_time << endl;
@@ -7638,6 +7646,8 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   // Only do CF interp if we have ghost vectors
   if (m_level > 0  && a_scal.ghostVect() >= IntVect::Unit )
   {
+    CH_TIME("AMRLevelMushyLayer::fillScalars::coarseFineInterp");
+
     // fill in coarse-fine BC data by conservative linear interp
     AMRLevelMushyLayer& crseLevel = *getCoarserLevel();
 
@@ -7672,28 +7682,35 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     const IntVect& scalGrowVect = a_scal.ghostVect();
     int scalGrow = scalGrowVect[0];
 
-    //    bool doSecondOrderCorners = (CFinterpOrder_advection==2);
-    PiecewiseLinearFillPatch filpatcher(levelGrids, crseGrids,
-                                        a_scal.nComp(), crseDomain, nRefCrse, scalGrow,
-                                        //                                        false, doSecondOrderCorners);
-                                        false);
-
-    if (s_verbosity >= 6)
     {
-      pout() << "  AMRLevelMushyLayer::fillScalars - defined fill patch" << endl;
-    }
+      CH_TIME("AMRLevelMushyLayer::fillScalars::linearFillPatch");
 
-    filpatcher.fillInterp(a_scal, oldCrseScal, newCrseScal,
-                          crse_time_interp_coeff,
-                          scalComps.begin(), scalComps.end(), scalComps.size());
+//      PiecewiseLinearFillPatch filpatcher(levelGrids, crseGrids,
+//                                          a_scal.nComp(), crseDomain, nRefCrse, scalGrow, false);
 
-    if (s_verbosity >= 6)
-    {
-      pout() << "  AMRLevelMushyLayer::fillScalars - done fill patch" << endl;
+      if (scalGrow == 1)
+      {
+        m_piecewiseLinearFillPatchScalarOne.fillInterp(a_scal, oldCrseScal, newCrseScal,
+                            crse_time_interp_coeff,
+                            scalComps.begin(), scalComps.end(), scalComps.size());
+      }
+      else if (scalGrow == 4)
+      {
+        m_piecewiseLinearFillPatchScalarFour.fillInterp(a_scal, oldCrseScal, newCrseScal,
+                            crse_time_interp_coeff,
+                            scalComps.begin(), scalComps.end(), scalComps.size());
+      }
+      else
+      {
+        pout() << "ERROR: No fill patch object for " << scalGrow << "ghost cells" << endl;
+        MayDay::Error("No fill patch object for this number of ghost cells");
+      }
+
     }
 
     if (quadInterp && m_quadCFInterpScalar.isDefined())
     {
+      CH_TIME("AMRLevelMushyLayer::fillScalars::quadCFinterp");
       if (s_verbosity >= 6)
       {
         pout() << "  AMRLevelMushyLayer::fillScalars - do quad interp" << endl;
@@ -7726,6 +7743,8 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   // Do domain BCs if we have ghost cells
   if (numGhost > 0)
   {
+    CH_TIME("AMRLevelMushyLayer::fillScalars::domainBCs");
+
     if (s_verbosity >= 5)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - do  BCs" << endl;
@@ -7752,20 +7771,25 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   doRegularisationOps(a_scal, a_var);
 
-  a_scal.exchange();
-
-  // Try a corner copier?
-  bool doCorners = true;
-  ppMain.query("scalarExchangeCorners", doCorners);
-  if (a_scal.ghostVect()[0] > 0 && doCorners)
   {
-    if (s_verbosity >= 5)
+    CH_TIME("AMRLevelMushyLayer::fillScalars::exchange");
+
+    a_scal.exchange();
+
+    // Try a corner copier?
+    bool doCorners = true;
+    ppMain.query("scalarExchangeCorners", doCorners);
+    if (a_scal.ghostVect()[0] > 0 && doCorners)
     {
-      pout() << "  AMRLevelMushyLayer::fillScalars - corner copier" << endl;
+      if (s_verbosity >= 5)
+      {
+        pout() << "  AMRLevelMushyLayer::fillScalars - corner copier" << endl;
+      }
+
+      CornerCopier cornerCopy(m_grids, m_grids, m_problem_domain, a_scal.ghostVect(), true);
+      a_scal.exchange(a_scal.interval(), cornerCopy);
     }
 
-    CornerCopier cornerCopy(m_grids, m_grids, m_problem_domain, a_scal.ghostVect(), true);
-    a_scal.exchange(a_scal.interval(), cornerCopy);
   }
 
   if (s_verbosity >= 5)
@@ -7777,36 +7801,50 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
 void AMRLevelMushyLayer::doRegularisationOps(LevelData<FluxBox>& a_scal, int a_var)
 {
-  DataIterator dit2 = a_scal.dataIterator();
-
-  for (dit2.reset(); dit2.ok(); ++dit2)
+  if (a_var == m_porosity || a_var == m_permeability || a_var == m_bulkConcentration)
   {
-    Box b = a_scal[dit2].box();
+    DataIterator dit2 = a_scal.dataIterator();
 
-    for (int dir=0; dir<SpaceDim; dir++)
+    ParmParse ppMain("main");
+      bool use_new_version = false;
+      ppMain.query("fortranRegularisationFace", use_new_version);
+
+    for (dit2.reset(); dit2.ok(); ++dit2)
     {
+      Box b = a_scal[dit2].box();
 
-      doRegularisationOps(a_var, a_scal[dit2][dir]);
-
+      for (int dir=0; dir<SpaceDim; dir++)
+      {
+        if (use_new_version)
+        {
+          doRegularisationOpsNew(a_var, a_scal[dit2][dir]);
+        }
+        else
+        {
+          doRegularisationOps(a_var, a_scal[dit2][dir]);
+        }
+      }
     }
-
-
   }
+
 }
 
 void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
 {
+  CH_TIME("AMRLevelMushyLayer::doRegularisationOpsOld");
+
   Box b = a_state.box();
 
   if (a_var == m_porosity)
   {
-    // Ensure porosity is greater than 0 and less than 1
+    // Ensure porosity is greater than 0 and less than or equal to 1
     for (BoxIterator bit(b); bit.ok(); ++bit)
     {
       IntVect iv = bit();
       a_state(iv) = max(m_lowerPorosityLimit, a_state(iv));
       a_state(iv) = min(1.0, a_state(iv));
     }
+
   }
   else if (a_var == m_permeability)
   {
@@ -7819,6 +7857,7 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
 
       a_state(iv) = max(minPermeability, a_state(iv));
     }
+
   }
   else if (a_var == m_bulkConcentration)
   {
@@ -7827,6 +7866,8 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
     //Real minPermeability = m_parameters.calculatePermeability(m_lowerPorosityLimit);
     Real minVal = -m_parameters.compositionRatio;
     Real maxVal = 0;
+
+
     // Ensure porosity is greater than 0
     for (BoxIterator bit(b); bit.ok(); ++bit)
     {
@@ -7836,6 +7877,50 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
       a_state(iv) = min(maxVal, a_state(iv));
     }
 
+
+  }
+
+
+}
+
+void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
+{
+  CH_TIME("AMRLevelMushyLayer::doRegularisationOpsNew");
+  Box region = a_state.box();
+
+  if (a_var == m_porosity)
+  {
+
+    Real maxVal = 1.0;
+    Real minVal = 0.01; //m_lowerPorosityLimit;
+
+    FORT_SETMINMAXVAL( CHF_FRA(a_state),
+                       CHF_BOX(region),
+                       CHF_CONST_REAL(minVal),
+                       CHF_CONST_REAL(maxVal));
+  }
+  else if (a_var == m_permeability)
+  {
+    //Real minPermeability = m_parameters.calculatePermeability(m_lowerPorosityLimit);
+    Real minPermeability = pow(m_lowerPorosityLimit,3);
+
+    FORT_SETMINVAL( CHF_FRA(a_state),
+                          CHF_BOX(region),
+                          CHF_CONST_REAL(minPermeability));
+
+  }
+  else if (a_var == m_bulkConcentration)
+  {
+    // Was hoping the enthalpy-concentration update would guarantee this, but maybe not
+
+    Real minVal = -m_parameters.compositionRatio;
+    Real maxVal = 0;
+
+    FORT_SETMINMAXVAL( CHF_FRA(a_state),
+                       CHF_BOX(region),
+                       CHF_CONST_REAL(minVal),
+                       CHF_CONST_REAL(maxVal));
+
   }
 
 
@@ -7844,11 +7929,24 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
 void AMRLevelMushyLayer::doRegularisationOps(LevelData<FArrayBox>& a_scal,
                                              int a_var)
 {
+  CH_TIME("AMRLevelMushyLayer::doRegularisationOps");
   DataIterator dit2 = a_scal.dataIterator();
+
+  ParmParse ppMain("main");
+  bool use_new_version = true;
+  ppMain.query("fortranRegularisation", use_new_version);
 
   for (dit2.reset(); dit2.ok(); ++dit2)
   {
-    doRegularisationOps(a_var, a_scal[dit2]);
+
+    if (use_new_version)
+    {
+      doRegularisationOpsNew(a_var, a_scal[dit2]);
+    }
+    else
+    {
+      doRegularisationOps(a_var, a_scal[dit2]);
+    }
 
   }
 }

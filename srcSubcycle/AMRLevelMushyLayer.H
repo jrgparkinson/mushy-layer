@@ -432,7 +432,7 @@ public:
   void computeDiagnostics();
 
   /// Define solvers
-  void defineSolvers(Real a_time, bool a_homogeneous = false, Real alpha = 1.0, Real beta = 1.0);
+  void defineSolvers(Real a_time);
 
   /// Compute chimney diagnostics
   void computeChimneyDiagnostics();
@@ -451,6 +451,9 @@ public:
 
   /// Set \f$ \Delta x \f$ on this level
   void dx(Real newDx);
+
+  /// Get \f$ \Delta x \f$ on this level
+  Real dx();
 
   /// Transfer data to new disjoint box layout
   void reshapeData(DisjointBoxLayout newGrids,  ProblemDomain newDomain);
@@ -819,8 +822,8 @@ protected:
   void defineUstarSolver(Vector<RefCountedPtr<LevelBackwardEuler> >&  a_UstarBE,
                          Vector<RefCountedPtr<LevelTGA> >& a_UstarTGA);
 
-  /// Define implicit solver for \f$ \mathbf{u}^* \f$
-  void defineUstarSolver();
+  /// Define multigrid solver for \f$ \mathbf{u}^* \f$
+  void defineUstarMultigrid();
 
   /// Initialize pressure on this level
   void initializeLevelPressure(Real a_currentTime, Real a_dtInit);
@@ -953,6 +956,7 @@ protected:
 
   /// Operations to keep variables bounded correctly.
   void doRegularisationOps(int a_var, FArrayBox& a_state);
+  void doRegularisationOpsNew(int a_var, FArrayBox& a_state);
 
   /// Setup menagerie of data structures
   void levelSetup();
@@ -1443,6 +1447,12 @@ protected:
 
   /// For doing quadratic interpolation at coarse fine boundaries (for vectors)
   m_quadCFInterpVector;
+
+  /// Scalar fill patch for one ghost cell
+  PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarOne;
+
+  /// Scalar fill patch for four ghost cells
+  PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarFour;
 
   /// Number of ghost cells for standard calculations
   int m_numGhost,

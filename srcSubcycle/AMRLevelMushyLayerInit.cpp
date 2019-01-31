@@ -460,10 +460,24 @@ void AMRLevelMushyLayer::levelSetup()
     //    }
   }
 
+  if (m_hasCoarser)
+  {
   m_quadCFInterpScalar.define(m_grids, crseGridsPtr, m_dx, nRefCrse, 1,
                               m_problem_domain);
   m_quadCFInterpVector.define(m_grids, crseGridsPtr, m_dx, nRefCrse, SpaceDim,
                               m_problem_domain);
+
+  ///  PiecewiseLinearFillPatch
+  AMRLevelMushyLayer* crseML = getCoarserLevel();
+  const ProblemDomain& crseDomain = crseML->problemDomain();
+
+  m_piecewiseLinearFillPatchScalarOne.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
+                                             1, false);
+
+  m_piecewiseLinearFillPatchScalarFour.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
+                                               4, false);
+
+  }
 
   //Some things don't care about coarser/finer levels, define them here:
 
@@ -2833,7 +2847,7 @@ void AMRLevelMushyLayer::postInitialize()
         pout() << "AMRlevelMushyLayer::postInitialize - initialize pressures" << endl;
       }
 
-      if(solvingFullDarcyBrinkman())
+      if (solvingFullDarcyBrinkman())
       {
         Real dtInit = computeDtInit(numLevels-1);
         Real scale = 0.1;
@@ -3488,7 +3502,6 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     pout() << "AMRLevel::postInitialGrid (level " << m_level << ")" << endl;
   }
 
-  // Need this here so we call it after restarts
 
   // Set up operators and stuff
   levelSetup();
@@ -3887,5 +3900,10 @@ void AMRLevelMushyLayer::reshapeData(DisjointBoxLayout newGrids, ProblemDomain n
 void AMRLevelMushyLayer::dx(Real newDx)
 {
   m_dx = newDx;
+}
+
+Real AMRLevelMushyLayer::dx()
+{
+  return m_dx;
 }
 
