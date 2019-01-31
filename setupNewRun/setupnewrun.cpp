@@ -149,8 +149,8 @@ int main(int argc, char* argv[])
   //  pp.get("Ny" ,Ny);
   //  pp.get("H" ,H);
 
-  Real newDx = -1;
-  pp.query("newDx", newDx);
+  Real newLev0Dx = -1;
+  pp.query("newDx", newLev0Dx);
 
   addExtraParams(runInputs, pp);
 
@@ -286,6 +286,9 @@ int main(int argc, char* argv[])
       //      ml->regrid(outBoxes);
       //      ml->reshapeData(outGrids, domain);
 
+      // Update dx
+      ml->dx(ml->dx()/refinement);
+
     }
   }
 
@@ -393,13 +396,11 @@ int main(int argc, char* argv[])
   Real lev0dt = amrlevels[0]->dt();
   amrlevels[0]->dt(lev0dt/dtReductionFactor); // need this
 
-
-
   // might have changed dx
-  if (newDx > 0)
+  if (newLev0Dx > 0)
   {
-    amrlevels[0]->dx(newDx);
-    Real prevDx = newDx;
+    amrlevels[0]->dx(newLev0Dx);
+    Real prevDx = newLev0Dx;
     for (int level = 1; level <= finest_level; ++level)
     {
       Real levDx = prevDx/amrlevels[level]->refRatio();
