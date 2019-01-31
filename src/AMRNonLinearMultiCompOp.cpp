@@ -538,7 +538,7 @@ void AMRNonLinearMultiCompOp::restrictResidual(LevelData<FArrayBox>&       a_res
   restrictResidual(a_resCoarse, a_phiFine, NULL, a_rhsFine, true);
 }
 
-void AMRNonLinearMultiCompOp::restrict(LevelData<FArrayBox>& a_phiCoarse,
+void AMRNonLinearMultiCompOp::restrictR(LevelData<FArrayBox>& a_phiCoarse,
                                        const LevelData<FArrayBox>& a_phiFine)
 {
   //	a_phiFine.exchange(a_phiFine.interval(), m_exchangeCopier);

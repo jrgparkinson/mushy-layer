@@ -138,7 +138,7 @@ public:
                                 const LevelData<FArrayBox>& a_correctCoarse);
 
   /// Restrict solution to coarser level
-  virtual void restrict(LevelData<FArrayBox>& a_phiCoarse, const LevelData<FArrayBox>& a_phiFine);
+  virtual void restrictR(LevelData<FArrayBox>& a_phiCoarse, const LevelData<FArrayBox>& a_phiFine);
 
   /// Apply operator
   void applyOpMg(LevelData<FArrayBox>& a_lhs,
