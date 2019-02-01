@@ -1451,6 +1451,9 @@ protected:
   /// Scalar fill patch for one ghost cell
   PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarOne;
 
+  PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarTwo;
+  PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarThree;
+
   /// Scalar fill patch for four ghost cells
   PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarFour;
 

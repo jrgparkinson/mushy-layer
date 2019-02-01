@@ -473,6 +473,10 @@ void AMRLevelMushyLayer::levelSetup()
 
   m_piecewiseLinearFillPatchScalarOne.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
                                              1, false);
+  m_piecewiseLinearFillPatchScalarTwo.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
+                                              2, false);
+  m_piecewiseLinearFillPatchScalarThree.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
+                                              3, false);
 
   m_piecewiseLinearFillPatchScalarFour.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
                                                4, false);

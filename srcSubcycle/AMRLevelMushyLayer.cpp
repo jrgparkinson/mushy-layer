@@ -7694,6 +7694,18 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
                             crse_time_interp_coeff,
                             scalComps.begin(), scalComps.end(), scalComps.size());
       }
+      else if (scalGrow == 2)
+            {
+              m_piecewiseLinearFillPatchScalarTwo.fillInterp(a_scal, oldCrseScal, newCrseScal,
+                                  crse_time_interp_coeff,
+                                  scalComps.begin(), scalComps.end(), scalComps.size());
+            }
+      else if (scalGrow == 3)
+            {
+              m_piecewiseLinearFillPatchScalarThree.fillInterp(a_scal, oldCrseScal, newCrseScal,
+                                  crse_time_interp_coeff,
+                                  scalComps.begin(), scalComps.end(), scalComps.size());
+            }
       else if (scalGrow == 4)
       {
         m_piecewiseLinearFillPatchScalarFour.fillInterp(a_scal, oldCrseScal, newCrseScal,
