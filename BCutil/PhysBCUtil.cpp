@@ -3523,10 +3523,7 @@ PhysBCUtil::scalarTraceIBC(RealVect bcValLo, RealVect bcValHi,
 }
 
 
-
-
-
-BCHolder PhysBCUtil::basicLambdaFuncBC(bool a_homogeneous, bool a_scaleWithPorosity) const
+BCHolder PhysBCUtil::lambdaBC(bool a_homogeneous, bool a_scaleWithPorosity) const
 {
 
   Vector<Vector<int> > customLoBC, customHiBC; // First index refers to direction, second to component

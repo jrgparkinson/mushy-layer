@@ -8118,11 +8118,11 @@ void AMRLevelMushyLayer::getScalarBCs(BCHolder& thisBC, int a_var, bool a_homoge
   }
   else if (a_var == m_lambda)
   {
-    thisBC = m_physBCPtr->basicLambdaFuncBC(a_homogeneous);
+    thisBC = m_physBCPtr->lambdaBC(a_homogeneous);
   }
   else if (a_var == m_lambda_porosity)
   {
-    thisBC = m_physBCPtr->basicLambdaFuncBC(a_homogeneous,
+    thisBC = m_physBCPtr->lambdaBC(a_homogeneous,
                                             true); // true - scale with porosity
   }
   else
