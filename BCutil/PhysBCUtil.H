@@ -288,7 +288,7 @@ public:
 	virtual BCHolder ThetaFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel = NULL) const;
 
 	/// BC holder for \f$ \lambda \f$ (for finding freestream preservation errors)
-	virtual BCHolder basicLambdaFuncBC(bool a_homogeneous = false, bool a_scaleWithPorosity=false)const;
+	virtual BCHolder lambdaBC(bool a_homogeneous = false, bool a_scaleWithPorosity=false)const;
 
 	/// BCs for no flux boundaries
 	virtual BCHolder noFluxBC() const;
