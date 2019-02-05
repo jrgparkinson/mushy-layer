@@ -83,7 +83,7 @@ def amr_convergence_test(params, full_output_dir, physicalProblem, nzs,
             s.set_dependency(prev_job_id)
             s.set_preprocess(preprocess_cmd)
             
-            p['main.restart_file'] = os.path.join(full_output_dir, 'restart.2d.hdf5')
+            p['main.restart_file'] = os.path.join(new_dir, 'restart.2d.hdf5')
 
         ml_run = MushyLayerRunSimple(full_output_dir, num_proc, p, s, allow_restarts, get_executable_name())
         ml_run.single_run(run_name)
