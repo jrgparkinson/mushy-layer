@@ -1,12 +1,13 @@
 # Run all convergence tests for the methods paper
-import os, sys
+import os
+import sys
 from colorama import Fore, Style
 import getopt
 
 from runAMRConvergenceTest import runTest
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name
 from MushyLayerRunSimple import MushyLayerRunSimple
-from SlurmTask import  SlurmTask
+from SlurmTask import SlurmTask
 
 ##########################################################################
 # 3) Convection in a mushy layer with an initial porous hole

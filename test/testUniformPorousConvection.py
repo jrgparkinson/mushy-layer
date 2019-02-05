@@ -1,5 +1,6 @@
 # Run all convergence tests for the methods paper
-import os, sys
+import os
+import sys
 from colorama import Fore, Style
 import getopt
 from runAMRConvergenceTest import runTest
@@ -26,7 +27,7 @@ def test_uniform_porous_convection(argv):
         opts, args = getopt.getopt(argv, "n:v:c:p:b:u:a:")
     except getopt.GetoptError as err:
         print(str(err))
-        print('testUniformPorousConvection.py -n<num uniform mesh grid points> -v<num variable mesh points>'
+        print('test_uniform_porous_convection.py -n<num uniform mesh grid points> -v<num variable mesh points>'
               ' -c<cfl> -p <chi> -b <BC accuracy> -u <u del u method> -a <advection method>')
         sys.exit(2)
 
@@ -76,8 +77,10 @@ def test_uniform_porous_convection(argv):
 
     base_dataFolder = os.path.join(base_output_dir, 'ConvectionDB-cfl' + str(cfl))
 
-    da_ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9], 'lebars': [1.08, 3.07, 12.9]},
-                  {'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5], 'lebars': [1.01, 1.41, 3.17, 5.24]}]
+    da_ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9],
+                   'lebars': [1.08, 3.07, 12.9]},
+                  {'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5],
+                   'lebars': [1.01, 1.41, 3.17, 5.24]}]
 
     # [1.01, 1.41, 3.17, 5.24];
     # [1.08, 3.07, 12.9];
@@ -101,10 +104,13 @@ def test_uniform_porous_convection(argv):
 
         for ra in da_ra['RaT']:
             extra_params['parameters.rayleighTemp'] = ra
-            extra_params['main.plot_interval'] = int(100000.0 * ra * da)
-            extra_params['main.checkpoint_interval'] = extra_params['main.plot_interval']
-            # print('Plot interval: ' + str(extra_params['main.plot_interval']) + '\n')
-
+            extra_params['main.plot_interval'] = -1
+            extra_params['main.plot_period'] = 0.1
+            extra_params['main.checkpoint_interval'] = 10000
+            
+            # TODO: remove this testing
+            extra_params['main.max_step'] = 10
+           
             if chi < 1.0:
                 extra_params['parameters.darcy'] = da * pow(1 - chi, 2) / pow(chi, 3.0)
             else:
@@ -117,9 +123,10 @@ def test_uniform_porous_convection(argv):
             ra_str = ra_format % ra
             output_dir = "chi" + chi_str + "-Da" + da_str + "-Ra" + ra_str
 
-            # extra_params = {}
             this_data_folder = os.path.join(base_dataFolder, output_dir)
-            job_ids = runTest(this_data_folder, physical_problem, amr_setup, num_procs, '', extra_params)
+            job_ids = runTest(this_data_folder, physical_problem, amr_setup, 
+                              num_procs, '', extra_params, restart_from_low_res=True)
+            
             all_job_ids = all_job_ids + job_ids
 
         ra_str_vals = [ra_format % a for a in da_ra['RaT']]
