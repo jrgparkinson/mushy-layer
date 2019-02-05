@@ -130,7 +130,9 @@ class SlurmTask:
                          '#SBATCH --distribution=cyclic:cyclic # Distribute tasks cyclically on nodes and sockets' + '\n',
                          '# Memory usage (MB)' + '\n', '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
                          '#SBATCH --output=' + os.path.join(self.folder, 'sbatch.out') + '   # Standard output and error log' + '\n',
-                         dependency_str, 'cd ' + self.folder + '; \n \n ', '\n' + self.preprocess_command + '\n']
+                         dependency_str,
+                         self.preprocess_command + '\n \n',
+                         'cd ' + self.folder + '; \n \n']
 
         if self.custom_command:
             file_contents.append(self.custom_command)
