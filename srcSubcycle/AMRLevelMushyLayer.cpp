@@ -496,7 +496,7 @@ void AMRLevelMushyLayer::copyNewToOldStates()
     m_dPorosity_dt[dit].minus(porosity_old[dit]);
     m_dPorosity_dt[dit].mult(1/m_dt);
   }
-  */
+   */
 
   // Copy the new to the old
   // Old now contains values at n, new will contain values at n+1 eventually
@@ -644,8 +644,8 @@ Real AMRLevelMushyLayer::advance()
 
 #ifdef CH_MPI
   {
-      CH_TIME("MPI_Barrier exchange");
-      MPI_Barrier(Chombo_MPI::comm);
+    CH_TIME("MPI_Barrier exchange");
+    MPI_Barrier(Chombo_MPI::comm);
   }
 #endif
 
@@ -706,7 +706,7 @@ Real AMRLevelMushyLayer::advance()
   if (solvingFullDarcyBrinkman())
   {
     // This fills all the ghost cells of advectionSourceTerm
-     computeAdvectionVelSourceTerm(advectionSourceTerm);
+    computeAdvectionVelSourceTerm(advectionSourceTerm);
 
     //    Real vel_centering = 0.5;
     //    ppMain.query("adv_vel_centering", vel_centering);
@@ -729,9 +729,9 @@ Real AMRLevelMushyLayer::advance()
   }
 
   // Another sanity check
-//  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], m_advVel, m_dx);
-//  Real  maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
-//  pout() << "  Sanity check: max(div u) = " << maxDivU << endl;
+  //  Divergence::levelDivergenceMAC(*m_scalarNew[m_divUadv], m_advVel, m_dx);
+  //  Real  maxDivU = ::computeNorm(*m_scalarNew[m_divUadv], NULL, 1, m_dx, Interval(0,0));
+  //  pout() << "  Sanity check: max(div u) = " << maxDivU << endl;
 
   // always* advect lambda (and update flux registers)
   // do this as soon as we have advection velocities, in case we want to
@@ -790,7 +790,7 @@ Real AMRLevelMushyLayer::advance()
     exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, doFRUpdates, doAdvectiveSrc);
 
     bool solverFailed = (exitStatus == 2 || exitStatus == 4 || exitStatus == 6);
-//    bool solveSuccess = !solverFailed;
+    //    bool solveSuccess = !solverFailed;
 
     //    if (solveSuccess)
     //    {
@@ -1736,7 +1736,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
         full_src[dit].setVal(0.0, 1);
       }
       // this needs to be done before operators are defined - just set lewis=1e300 in inputs file
-//      m_parameters.m_saltDiffusionCoeff = 0;
+      //      m_parameters.m_saltDiffusionCoeff = 0;
     }
 
   } // end if compute advective src
@@ -1855,44 +1855,44 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
       }
 
       for (int i=0; i < num_iter; i++)
-            {
+      {
 
         // Need to define solvers first and foremost
-//        defineSolvers(m_time);
+        //        defineSolvers(m_time);
 
-      // Try replacing with single level relax solver
-      RefCountedPtr<AMRNonLinearMultiCompOp> amrpop = RefCountedPtr<AMRNonLinearMultiCompOp>(
+        // Try replacing with single level relax solver
+        RefCountedPtr<AMRNonLinearMultiCompOp> amrpop = RefCountedPtr<AMRNonLinearMultiCompOp>(
             (AMRNonLinearMultiCompOp*) HCOpFact->AMRnewOp(m_problem_domain));
 
-      // Solving (1-dt Op) HC^{n+1} = HC^{n}
-      amrpop->setAlphaAndBeta(1.0, -m_dt);
+        // Solving (1-dt Op) HC^{n+1} = HC^{n}
+        amrpop->setAlphaAndBeta(1.0, -m_dt);
 
-      LevelData<FArrayBox> a_res(m_grids, 2, IntVect::Unit);
+        LevelData<FArrayBox> a_res(m_grids, 2, IntVect::Unit);
 
-      amrpop->relax(a_phi_new, thisSrc, 1000);
+        amrpop->relax(a_phi_new, thisSrc, 1000);
 
-      amrpop->residual(a_res, a_phi_new, thisSrc, false);
-      Real maxRes = ::computeNorm(a_res, NULL, 1, m_dx, Interval(0, 1), 0);
-      pout() << "  Max residual = " << maxRes << endl;
+        amrpop->residual(a_res, a_phi_new, thisSrc, false);
+        Real maxRes = ::computeNorm(a_res, NULL, 1, m_dx, Interval(0, 1), 0);
+        pout() << "  Max residual = " << maxRes << endl;
 
-      if (maxRes < 1e-10)
-      {
-        pout() << "   Converged " << endl;
-        break;
+        if (maxRes < 1e-10)
+        {
+          pout() << "   Converged " << endl;
+          break;
 
-      }
+        }
 
       }
     }
     else
     {
 
-    s_enthalpySalinityBE->updateSoln(a_phi_new,
-                                     a_phi_old, full_src, finerFRPtr, coarserFRPtr,
-                                     coarserDataOldPtr, coarserDataNewPtr, old_time, tCoarserOld,
-                                     tCoarserNew, m_dt, m_level, false); //false - don't zero phi
+      s_enthalpySalinityBE->updateSoln(a_phi_new,
+                                       a_phi_old, full_src, finerFRPtr, coarserFRPtr,
+                                       coarserDataOldPtr, coarserDataNewPtr, old_time, tCoarserOld,
+                                       tCoarserNew, m_dt, m_level, false); //false - don't zero phi
 
-    baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*s_enthalpySalinityBE));
+      baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*s_enthalpySalinityBE));
     }
 
   }
@@ -2452,414 +2452,428 @@ void AMRLevelMushyLayer::computeDiagnostics()
   int nLevels = mlVect.size();
 
   // Compute Nusselt number
-  if ((m_parameters.physicalProblem == MushyLayerParams::m_HRL
-      || m_parameters.physicalProblem == MushyLayerParams::m_rayleighBenard)
-      && m_level == 0)
   {
-    fillScalars(*m_scalarNew[m_temperature], m_time, m_temperature);
+    CH_TIME("AMRLevelMushyLayer::computeDiagnostics::computeNusselt");
 
-    Real Nu = ::computeNusselt(*m_scalarNew[m_temperature], *m_vectorNew[m_fluidVel],
-                               m_dx, m_parameters,
-                               m_domainWidth, m_domainHeight);
-
-    m_diagnostics.addDiagnostic(Diagnostics::m_Nu, m_time, Nu);
-  }
-  else if (m_parameters.physicalProblem == MushyLayerParams::m_convectionMixedPorous
-      && m_level == 0)
-  {
-
-    // Calculate average dT/dx at left and right boundaries
-
-    //    Vector<LevelData<FArrayBox>* > T(nLevels);
-    Vector<LevelData<FArrayBox>* > gradT(nLevels);
-    Vector<LevelData<FArrayBox>* > AMRNu(nLevels);
-    Vector<LevelData<FluxBox>* > gradEdgeT(nLevels);
-    LevelData<FArrayBox>* crseT = NULL;
-    //    LevelData<FArrayBox>* fineT = NULL;
-
-    // Use domain flux registers to calculate Nu
-    Vector<LevelDomainFluxRegister*> Tflux(nLevels);
-
-    LevelDomainFluxRegister* fineFR = NULL;
-    LevelDomainFluxRegister* coarseFR = NULL;
-
-    for (int lev=0; lev<nLevels; lev++)
+    if ((m_parameters.physicalProblem == MushyLayerParams::m_HRL
+        || m_parameters.physicalProblem == MushyLayerParams::m_rayleighBenard)
+        && m_level == 0)
     {
-      Tflux[lev] = new LevelDomainFluxRegister();
+      fillScalars(*m_scalarNew[m_temperature], m_time, m_temperature);
+
+      Real Nu = ::computeNusselt(*m_scalarNew[m_temperature], *m_vectorNew[m_fluidVel],
+                                 m_dx, m_parameters,
+                                 m_domainWidth, m_domainHeight);
+
+      m_diagnostics.addDiagnostic(Diagnostics::m_Nu, m_time, Nu);
     }
-
-    //    Real Nu = 0;
-    Real scale = 1.0;
-
-    for (int lev=0; lev<nLevels; lev++)
+    else if (m_parameters.physicalProblem == MushyLayerParams::m_convectionMixedPorous
+        && m_level == 0)
     {
-      AMRLevelMushyLayer* ml = mlVect[lev];
 
-      gradT[lev] = new LevelData<FArrayBox>(ml->m_grids, SpaceDim);
-      gradEdgeT[lev] = new LevelData<FluxBox>(ml->m_grids, SpaceDim);
-      AMRNu[lev] = new LevelData<FArrayBox>(ml->m_grids, 1);
+      // Calculate average dT/dx at left and right boundaries
 
-      if (lev > 0)
-      {
-        coarseFR = Tflux[lev-1];
-      }
-      else
-      {
-        coarseFR = NULL;
-      }
+      //    Vector<LevelData<FArrayBox>* > T(nLevels);
+      Vector<LevelData<FArrayBox>* > gradT(nLevels);
+      Vector<LevelData<FArrayBox>* > AMRNu(nLevels);
+      Vector<LevelData<FluxBox>* > gradEdgeT(nLevels);
+      LevelData<FArrayBox>* crseT = NULL;
+      //    LevelData<FArrayBox>* fineT = NULL;
 
-      if (lev < (nLevels-1))
+      // Use domain flux registers to calculate Nu
+      Vector<LevelDomainFluxRegister*> Tflux(nLevels);
+
+      LevelDomainFluxRegister* fineFR = NULL;
+      LevelDomainFluxRegister* coarseFR = NULL;
+
+      for (int lev=0; lev<nLevels; lev++)
       {
-        fineFR = Tflux[lev+1];
-      }
-      else
-      {
-        fineFR = NULL;
+        Tflux[lev] = new LevelDomainFluxRegister();
       }
 
+      //    Real Nu = 0;
+      Real scale = 1.0;
 
-      Tflux[lev]->define(ml->m_problem_domain, ml->m_grids,refRat[lev], ml->m_dx, fineFR, coarseFR, SpaceDim);
-
-      AMRLevelMushyLayer* mlCrse = ml->getCoarserLevel();
-      if (mlCrse)
+      for (int lev=0; lev<nLevels; lev++)
       {
-        crseT = mlCrse->m_scalarNew[m_temperature];
-      }
+        AMRLevelMushyLayer* ml = mlVect[lev];
 
-      Box domainBox = ml->m_problem_domain.domainBox();
+        gradT[lev] = new LevelData<FArrayBox>(ml->m_grids, SpaceDim);
+        gradEdgeT[lev] = new LevelData<FluxBox>(ml->m_grids, SpaceDim);
+        AMRNu[lev] = new LevelData<FArrayBox>(ml->m_grids, 1);
 
-      // Ensure BCs are set
-      ml->fillScalars(*ml->m_scalarNew[m_temperature], ml->m_time, m_temperature, false, true);
-
-      Gradient::levelGradientMAC(*gradEdgeT[lev], (*ml->m_scalarNew[m_temperature]),
-                                 ml->m_dx);
-
-      scale = 1.0/ml->m_dx;
-      Tflux[lev]->incrFlux(*gradEdgeT[lev], scale);
-
-    } // end loop over levels
-
-
-    // Scale with coarsest dx
-    scale = -1.0;
-
-    // This makes sure we get the most accurate fluxes (using the finest level available)
-    Real Nuleft  = Tflux[0]->getFluxHierarchy(0, Side::Lo, scale);
-    Real Nuright = Tflux[0]->getFluxHierarchy(0, Side::Hi, scale);
-
-    Real Nu = 0.5*abs(Nuleft + Nuright);
-
-    m_diagnostics.addDiagnostic(Diagnostics::m_Nu, m_time, Nu);
-    m_diagnostics.addDiagnostic(Diagnostics::m_NuLeft, m_time, Nuleft);
-    m_diagnostics.addDiagnostic(Diagnostics::m_NuRight, m_time, Nuright);
-
-    // Alternative calculation
-//    fillScalars(*m_scalarNew[m_temperature], m_time, m_temperature);
-//
-//    Nu = ::computeNusselt(*m_scalarNew[m_temperature], *m_vectorNew[m_fluidVel],
-//                                   m_dx, m_parameters,
-//                                   m_domainWidth, m_domainHeight);
-
-    // Compute max velocities at midpoints
-    Box horizBox = ::adjCellHi(m_problem_domain.domainBox(), 1, 1);
-    horizBox.shift(1, -int(m_numCells[1]/2));
-
-    Real maxVertVel = 0.0;
-
-    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
-    {
-      FArrayBox& vel = (*m_vectorNew[m_fluidVel])[dit];
-
-      Box b = m_grids[dit];
-      b &= horizBox;
-
-      if (b.size() >= IntVect::Unit)
-      {
-        // TODO: this won't work in parallel
-        maxVertVel = max(maxVertVel, vel.max(b, 1));
-      }
-    }
-
-
-    Box vertBox = ::adjCellHi(m_problem_domain.domainBox(), 0, 1);
-    vertBox.shift(0, -int(m_numCells[0]/2));
-
-    Real maxHorizVel = 0.0;
-    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+        if (lev > 0)
         {
-          Box b = m_grids[dit];
-          b &= vertBox;
-
-          FArrayBox& vel = (*m_vectorNew[m_fluidVel])[dit];
-          if (b.size() >= IntVect::Unit)
-               {
-          // TODO: this won't work in parallel
-          maxHorizVel = max(maxHorizVel, vel.max(b, 0));
-               }
+          coarseFR = Tflux[lev-1];
+        }
+        else
+        {
+          coarseFR = NULL;
         }
 
-    m_diagnostics.addDiagnostic(Diagnostics::m_maxVhalf, m_time, maxHorizVel);
-    m_diagnostics.addDiagnostic(Diagnostics::m_maxUhalf, m_time, maxVertVel);
+        if (lev < (nLevels-1))
+        {
+          fineFR = Tflux[lev+1];
+        }
+        else
+        {
+          fineFR = NULL;
+        }
 
-    for (int lev=0; lev<nLevels; lev++)
+
+        Tflux[lev]->define(ml->m_problem_domain, ml->m_grids,refRat[lev], ml->m_dx, fineFR, coarseFR, SpaceDim);
+
+        AMRLevelMushyLayer* mlCrse = ml->getCoarserLevel();
+        if (mlCrse)
+        {
+          crseT = mlCrse->m_scalarNew[m_temperature];
+        }
+
+        Box domainBox = ml->m_problem_domain.domainBox();
+
+        // Ensure BCs are set
+        ml->fillScalars(*ml->m_scalarNew[m_temperature], ml->m_time, m_temperature, false, true);
+
+        Gradient::levelGradientMAC(*gradEdgeT[lev], (*ml->m_scalarNew[m_temperature]),
+                                   ml->m_dx);
+
+        scale = 1.0/ml->m_dx;
+        Tflux[lev]->incrFlux(*gradEdgeT[lev], scale);
+
+      } // end loop over levels
+
+
+      // Scale with coarsest dx
+      scale = -1.0;
+
+      // This makes sure we get the most accurate fluxes (using the finest level available)
+      Real Nuleft  = Tflux[0]->getFluxHierarchy(0, Side::Lo, scale);
+      Real Nuright = Tflux[0]->getFluxHierarchy(0, Side::Hi, scale);
+
+      Real Nu = 0.5*abs(Nuleft + Nuright);
+
+      m_diagnostics.addDiagnostic(Diagnostics::m_Nu, m_time, Nu);
+      m_diagnostics.addDiagnostic(Diagnostics::m_NuLeft, m_time, Nuleft);
+      m_diagnostics.addDiagnostic(Diagnostics::m_NuRight, m_time, Nuright);
+
+
+      // Cleanup after nusselt calculation
+      for (int lev=0; lev<nLevels; lev++)
+      {
+        if (Tflux[lev] != NULL)
+        {
+          delete Tflux[lev];
+          Tflux[lev] = NULL;
+        }
+
+        if (gradT[lev] != NULL)
+        {
+          delete gradT[lev];
+          gradT[lev] = NULL;
+        }
+
+        if ( gradEdgeT[lev] != NULL)
+        {
+          delete gradEdgeT[lev] ;
+          gradEdgeT[lev]  = NULL;
+        }
+
+        if ( AMRNu[lev]  != NULL)
+        {
+          delete  AMRNu[lev] ;
+          AMRNu[lev]  = NULL;
+        }
+
+      }
+
+    }
+
+    if (m_diagnostics.diagnosticIsIncluded(Diagnostics::m_maxUhalf))
     {
-      if (Tflux[lev] != NULL)
+      CH_TIME("AMRLevelMushyLayer::computeDiagnostics::computeMaxVel");
+
+      // Compute max velocities at midpoints
+      Box horizBox = ::adjCellHi(m_problem_domain.domainBox(), 1, 1);
+      horizBox.shift(1, -int(m_numCells[1]/2));
+
+      Real maxVertVel = 0.0;
+
+      for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
       {
-        delete Tflux[lev];
-        Tflux[lev] = NULL;
+        FArrayBox& vel = (*m_vectorNew[m_fluidVel])[dit];
+
+        Box b = m_grids[dit];
+        b &= horizBox;
+
+        if (b.size() >= IntVect::Unit)
+        {
+          // TODO: this won't work in parallel
+          maxVertVel = max(maxVertVel, vel.max(b, 1));
+        }
       }
 
-      if (gradT[lev] != NULL)
+
+      Box vertBox = ::adjCellHi(m_problem_domain.domainBox(), 0, 1);
+      vertBox.shift(0, -int(m_numCells[0]/2));
+
+      Real maxHorizVel = 0.0;
+      for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
       {
-        delete gradT[lev];
-        gradT[lev] = NULL;
+        Box b = m_grids[dit];
+        b &= vertBox;
+
+        FArrayBox& vel = (*m_vectorNew[m_fluidVel])[dit];
+        if (b.size() >= IntVect::Unit)
+        {
+          // TODO: this won't work in parallel
+          maxHorizVel = max(maxHorizVel, vel.max(b, 0));
+        }
       }
 
-      if ( gradEdgeT[lev] != NULL)
-      {
-        delete gradEdgeT[lev] ;
-        gradEdgeT[lev]  = NULL;
-      }
-
-      if ( AMRNu[lev]  != NULL)
-      {
-        delete  AMRNu[lev] ;
-        AMRNu[lev]  = NULL;
-      }
+      m_diagnostics.addDiagnostic(Diagnostics::m_maxVhalf, m_time, maxHorizVel);
+      m_diagnostics.addDiagnostic(Diagnostics::m_maxUhalf, m_time, maxVertVel);
 
     }
 
   }
 
-  // Composite Nusselt calculation
 
-  // Compute increments to solute flux on each level
-  int numComp = 2;
-
-  IntVect fluxGhost = IntVect::Zero;
-
-  LevelData<FluxBox> totalFlux(m_grids, numComp, IntVect::Unit);
-  getTotalFlux(totalFlux);
-
-  LevelData<FluxBox> totalFluxNoGhost(m_grids, numComp, IntVect::Zero);
-  totalFlux.copyTo(totalFluxNoGhost);
-
-  // new way of keeping track of fluxes
-  Real scale = (1/m_dx)*m_dt;
-
-  m_heatDomainFluxRegister.incrFlux(totalFluxNoGhost, scale, 0);
-  m_saltDomainFluxRegister.incrFlux(totalFluxNoGhost, scale, 1);
-
-  // Calculate horizontally averaged fluxes
-  LevelData<FArrayBox> averageFrameFlux(m_grids, numComp);
-  LevelData<FArrayBox> averageAdvectiveFlux(m_grids, numComp);
-  LevelData<FArrayBox> averageDiffusiveFlux(m_grids, numComp);
-  LevelData<FArrayBox> averageVerticalFlux(m_grids, numComp);
-
-  horizontallyAverage(averageVerticalFlux, totalFluxNoGhost);
-
-  // Copy across for writing to plot files
-  averageVerticalFlux.copyTo(Interval(0, 0), *m_scalarNew[m_averageHeatFlux], Interval(0,0));
-  averageVerticalFlux.copyTo(Interval(1, 1), *m_scalarNew[m_averageVerticalFlux], Interval(0,0));
-
-  // Also want solute flux at each point in space written out
-  int soluteComp = 1;
-  for (DataIterator dit = totalFlux.dataIterator(); dit.ok(); ++dit)
+  if (m_diagnostics.diagnosticIsIncluded(Diagnostics::m_soluteFluxTop))
   {
-    FluxBox& flux = totalFlux[dit];
-    FArrayBox& fab = flux[SpaceDim-1];
-    Box b = flux.box();
+    CH_TIME("AMRLevelMushyLayer::computeDiagnostics::computeSoluteFluxes");
 
-    b.growDir(1, Side::Hi, -1); // need this because we also grab the flux in the cell one up
 
-    Box b2 = (*m_scalarNew[m_verticalFlux])[dit].box();
-    b &= b2; // ensure we don't try and fill cells which don't exist
-    for (BoxIterator bit(b); bit.ok(); ++bit)
+    // Compute increments to solute flux on each level
+    int numComp = 2;
+
+    IntVect fluxGhost = IntVect::Zero;
+
+    LevelData<FluxBox> totalFlux(m_grids, numComp, IntVect::Unit);
+    getTotalFlux(totalFlux);
+
+    LevelData<FluxBox> totalFluxNoGhost(m_grids, numComp, IntVect::Zero);
+    totalFlux.copyTo(totalFluxNoGhost);
+
+    // new way of keeping track of fluxes
+    Real scale = (1/m_dx)*m_dt;
+
+    m_heatDomainFluxRegister.incrFlux(totalFluxNoGhost, scale, 0);
+    m_saltDomainFluxRegister.incrFlux(totalFluxNoGhost, scale, 1);
+
+    // Calculate horizontally averaged fluxes
+    LevelData<FArrayBox> averageFrameFlux(m_grids, numComp);
+    LevelData<FArrayBox> averageAdvectiveFlux(m_grids, numComp);
+    LevelData<FArrayBox> averageDiffusiveFlux(m_grids, numComp);
+    LevelData<FArrayBox> averageVerticalFlux(m_grids, numComp);
+
+    horizontallyAverage(averageVerticalFlux, totalFluxNoGhost);
+
+    // Copy across for writing to plot files
+    averageVerticalFlux.copyTo(Interval(0, 0), *m_scalarNew[m_averageHeatFlux], Interval(0,0));
+    averageVerticalFlux.copyTo(Interval(1, 1), *m_scalarNew[m_averageVerticalFlux], Interval(0,0));
+
+    // Also want solute flux at each point in space written out
+    int soluteComp = 1;
+    for (DataIterator dit = totalFlux.dataIterator(); dit.ok(); ++dit)
     {
-      IntVect iv = bit();
-      IntVect ivUp = iv + BASISV(1);
-      (*m_scalarNew[m_verticalFlux])[dit](iv) = 0.5*(fab(iv, soluteComp) + fab(ivUp, soluteComp));
+      FluxBox& flux = totalFlux[dit];
+      FArrayBox& fab = flux[SpaceDim-1];
+      Box b = flux.box();
+
+      b.growDir(1, Side::Hi, -1); // need this because we also grab the flux in the cell one up
+
+      Box b2 = (*m_scalarNew[m_verticalFlux])[dit].box();
+      b &= b2; // ensure we don't try and fill cells which don't exist
+      for (BoxIterator bit(b); bit.ok(); ++bit)
+      {
+        IntVect iv = bit();
+        IntVect ivUp = iv + BASISV(1);
+        (*m_scalarNew[m_verticalFlux])[dit](iv) = 0.5*(fab(iv, soluteComp) + fab(ivUp, soluteComp));
+      }
     }
-  }
 
 
+    if (m_level == 0)
+    {
+      // Need to calculate:
+      // 1. Sum of new bulk salinity over valid regions
+      // 2. Sum of old bulk salinity over valid regions
+      // 3. Salt flux at top of domain over valid regions
+      // 4. Salt flux at bottom of domain over valid regions
 
-  if (m_level == 0)
+      Vector<LevelData<FArrayBox>* > S_new, S_old, dSdt, H_new, horizAvFs, Fs_vert_diffusion, Fs_vert_fluid, Fs_vert_frame;
+      Vector<LevelData<FluxBox>* > soluteFluxTop, soluteFluxBottom;
+
+      S_new.resize(nLevels);
+      H_new.resize(nLevels);
+      horizAvFs.resize(nLevels);
+      Fs_vert_diffusion.resize(nLevels);
+      Fs_vert_fluid.resize(nLevels);
+      Fs_vert_frame.resize(nLevels);
+
+      AMRLevelMushyLayer* ml = this;
+
+      for(int lev = 0; lev < nLevels; lev++)
+      {
+        S_new[lev] = ml->m_scalarNew[m_bulkConcentration];
+        H_new[lev] = ml->m_scalarNew[m_enthalpy];
+        horizAvFs[lev] = new LevelData<FArrayBox>(ml->m_grids, 1, IntVect::Zero); // no ghost vector
+        Fs_vert_diffusion[lev] = new LevelData<FArrayBox>(ml->m_grids, 1, IntVect::Zero); // no ghost vector
+        Fs_vert_fluid[lev] = new LevelData<FArrayBox>(ml->m_grids, 1, IntVect::Zero); // no ghost vector
+        Fs_vert_frame[lev] = new LevelData<FArrayBox>(ml->m_grids, 1, IntVect::Zero); // no ghost vector
+
+        ml->m_scalarNew[m_averageVerticalFlux]->copyTo(*horizAvFs[lev]);
+        ml->m_scalarNew[m_FsVertDiffusion]->copyTo(*Fs_vert_diffusion[lev]);
+        ml->m_scalarNew[m_FsVertFluid]->copyTo(*Fs_vert_fluid[lev]);
+        ml->m_scalarNew[m_FsVertFrame]->copyTo(*Fs_vert_frame[lev]);
+
+        ml = ml->getFinerLevel();
+
+      }
+
+      // Another diagnostic - average vertical solute flux across the whole domain
+      //    Real domainSize = m_domainWidth*m_domainHeight;
+      Real volume = 0.0;
+      Real domainAverageFs = computeSum(volume, horizAvFs, refRat, lev0Dx, Interval(0,0), 0);
+      //    domainAverageFs = domainAverageFs / domainSize;
+      domainAverageFs = domainAverageFs/volume;
+      m_diagnostics.addDiagnostic(Diagnostics::m_averageVerticalSaltFlux, m_time, domainAverageFs);
+
+      Real L2FsVertDiffusion = computeNorm(Fs_vert_diffusion, refRat, lev0Dx, Interval(0,0), 2);
+      Real L2FsVertFluid = computeNorm(Fs_vert_fluid, refRat, lev0Dx, Interval(0,0), 2);
+      Real L2FsVertFrame = computeNorm(Fs_vert_frame, refRat, lev0Dx, Interval(0,0), 2);
+
+      m_diagnostics.addDiagnostic(Diagnostics::m_L2FsVertDiffusion, m_time, L2FsVertDiffusion);
+      m_diagnostics.addDiagnostic(Diagnostics::m_L2FsVertFluid, m_time, L2FsVertFluid);
+      m_diagnostics.addDiagnostic(Diagnostics::m_L2FsVertFrame, m_time, L2FsVertFrame);
+
+
+      Real L1FsVertDiffusion = computeNorm(Fs_vert_diffusion, refRat, lev0Dx, Interval(0,0), 1);
+      Real L1FsVertFluid = computeNorm(Fs_vert_fluid, refRat, lev0Dx, Interval(0,0), 1);
+      Real L1FsVertFrame = computeNorm(Fs_vert_frame, refRat, lev0Dx, Interval(0,0), 1);
+
+      m_diagnostics.addDiagnostic(Diagnostics::m_L1FsVertDiffusion, m_time, L1FsVertDiffusion);
+      m_diagnostics.addDiagnostic(Diagnostics::m_L1FsVertFluid, m_time, L1FsVertFluid);
+      m_diagnostics.addDiagnostic(Diagnostics::m_L1FsVertFrame, m_time, L1FsVertFrame);
+
+      Real L0FsVertDiffusion = computeNorm(Fs_vert_diffusion, refRat, lev0Dx, Interval(0,0), 0);
+      Real L0FsVertFluid = computeNorm(Fs_vert_fluid, refRat, lev0Dx, Interval(0,0), 0);
+      Real L0FsVertFrame = computeNorm(Fs_vert_frame, refRat, lev0Dx, Interval(0,0), 0);
+
+      m_diagnostics.addDiagnostic(Diagnostics::m_L0FsVertDiffusion, m_time, L0FsVertDiffusion);
+      m_diagnostics.addDiagnostic(Diagnostics::m_L0FsVertFluid, m_time, L0FsVertFluid);
+      m_diagnostics.addDiagnostic(Diagnostics::m_L0FsVertFrame, m_time, L0FsVertFrame);
+
+      //Clean up
+      for(int lev = 0; lev < nLevels; lev++)
+      {
+        delete horizAvFs[lev];
+        horizAvFs[lev] = NULL;
+
+        delete Fs_vert_diffusion[lev];
+        Fs_vert_diffusion[lev] = NULL;
+
+        delete Fs_vert_fluid[lev];
+        Fs_vert_fluid[lev]= NULL;
+
+        delete Fs_vert_frame[lev];
+        Fs_vert_frame[lev]= NULL;
+      }
+
+      // Calculate sums over valid regions
+
+      // Volume averaged sum i.e. sum[H*dx^(SpaceDim)]
+      AMRSaltSum_new = ::computeSum(S_new, refRat, lev0Dx, Interval(0,0), 0);
+      AMREnthalpySum_new = ::computeSum(H_new, refRat, lev0Dx, Interval(0,0), 0);
+
+      //    Real Fs_bottom = ::computeSum(fluxBottom, refRat, lev0Dx, Interval(1, 1), 0)/scale;
+      //    Real Fs_top = ::computeSum(fluxTop, refRat, lev0Dx, Interval(1, 1), 0)/scale;
+
+      Real Fs_bottom = m_saltDomainFluxRegister.getFluxHierarchy(1, Side::Lo, 1.0);
+      Real Fs_top = m_saltDomainFluxRegister.getFluxHierarchy(1, Side::Hi, 1.0);
+      //    Real Fs_left = m_saltDomainFluxRegister.getFluxHierarchy(0, Side::Lo, 1.0);
+      //    Real Fs_right = m_saltDomainFluxRegister.getFluxHierarchy(0, Side::Hi, 1.0);
+
+      Real Fh_bottom = m_heatDomainFluxRegister.getFluxHierarchy(1, Side::Lo, 1.0);
+      Real Fh_top =m_heatDomainFluxRegister.getFluxHierarchy(1, Side::Hi, 1.0);
+      //    Real Fh_left = m_heatDomainFluxRegister.getFluxHierarchy(0, Side::Lo, 1.0);
+      //    Real Fh_right = m_heatDomainFluxRegister.getFluxHierarchy(0, Side::Hi, 1.0);
+
+
+      Real scale = 1/(m_dt*m_domainWidth);
+      Real totalF_bottom = Fs_bottom*scale;
+      Real totalF_top = Fs_top*scale;
+
+      Real totalFh_top = Fh_top*scale;
+      Real totalFh_bottom = Fh_bottom*scale;
+
+      Real ds_diff = (AMRSaltSum_new - AMRSaltSum_old);
+      Real H_diff = (AMREnthalpySum_new - AMREnthalpySum_old);
+
+      // Calculate flux differences by considering all sides/directions
+      Real salt_flux_diff = 0;
+      Real heat_flux_diff = 0;
+      for (int dir=0; dir < SpaceDim; dir++)
+      {
+        Real Fs_hi = m_saltDomainFluxRegister.getFluxHierarchy(dir, Side::Hi, 1.0);
+        Real Fs_lo = m_saltDomainFluxRegister.getFluxHierarchy(dir, Side::Lo, 1.0);
+
+        Real Fh_hi = m_heatDomainFluxRegister.getFluxHierarchy(dir, Side::Hi, 1.0);
+        Real Fh_lo = m_heatDomainFluxRegister.getFluxHierarchy(dir, Side::Lo, 1.0);
+
+        salt_flux_diff += Fs_hi - Fs_lo;
+        heat_flux_diff += Fh_hi - Fh_lo;
+      }
+
+      //    Real salt_mismatch = (ds_diff- flux_diff)/Fs_top;
+      //    Real heat_mismatch = (H_diff - heat_flux_diff)/Fh_top;
+
+      Real salt_mismatch = (ds_diff + salt_flux_diff);
+      Real heat_mismatch = (H_diff + heat_flux_diff);
+
+      Real rel_salt_mismatch = salt_mismatch/salt_flux_diff;
+      Real rel_heat_mismatch = heat_mismatch/heat_flux_diff;
+
+
+      m_diagnostics.addDiagnostic(Diagnostics::m_soluteFluxBottom, m_time, totalF_bottom);
+      m_diagnostics.addDiagnostic(Diagnostics::m_soluteFluxTop, m_time, totalF_top);
+
+      m_diagnostics.addDiagnostic(Diagnostics::m_heatFluxAbsMismatch, m_time, heat_mismatch);
+      m_diagnostics.addDiagnostic(Diagnostics::m_saltFluxAbsMismatch, m_time, salt_mismatch);
+
+      m_diagnostics.addDiagnostic(Diagnostics::m_heatFluxRelMismatch, m_time, rel_heat_mismatch);
+      m_diagnostics.addDiagnostic(Diagnostics::m_saltFluxRelMismatch, m_time, rel_salt_mismatch);
+
+      m_diagnostics.addDiagnostic(Diagnostics::m_heatFluxBottom, m_time, totalFh_bottom);
+      m_diagnostics.addDiagnostic(Diagnostics::m_heatFluxTop, m_time, totalFh_top);
+
+      // Clean up ready for next full timestep
+      AMRSaltSum_old = AMRSaltSum_new;
+      AMREnthalpySum_old = AMREnthalpySum_new;
+      ml = this;
+
+      while(ml)
+      {
+        setValLevel(ml->m_saltFluxTop, 0.0);
+        setValLevel(ml->m_saltFluxBottom, 0.0);
+
+        (ml->m_heatDomainFluxRegister).setToZero();
+        (ml->m_saltDomainFluxRegister).setToZero();
+
+        ml = ml->getFinerLevel();
+
+      }
+
+    } // end if level 0
+
+  } // end if we care about solute fluxes
+
+
+  if (calcDiagnostics
+      && m_diagnostics.diagnosticIsIncluded(Diagnostics::m_maxLambda))
   {
-    // Need to calculate:
-    // 1. Sum of new bulk salinity over valid regions
-    // 2. Sum of old bulk salinity over valid regions
-    // 3. Salt flux at top of domain over valid regions
-    // 4. Salt flux at bottom of domain over valid regions
+    CH_TIME("AMRLevelMushyLayer::computeDiagnostics::computeMaxLambda");
 
-    Vector<LevelData<FArrayBox>* > S_new, S_old, dSdt, H_new, horizAvFs, Fs_vert_diffusion, Fs_vert_fluid, Fs_vert_frame;
-    Vector<LevelData<FluxBox>* > soluteFluxTop, soluteFluxBottom;
-
-    S_new.resize(nLevels);
-    H_new.resize(nLevels);
-    horizAvFs.resize(nLevels);
-    Fs_vert_diffusion.resize(nLevels);
-    Fs_vert_fluid.resize(nLevels);
-    Fs_vert_frame.resize(nLevels);
-
-    AMRLevelMushyLayer* ml = this;
-
-    for(int lev = 0; lev < nLevels; lev++)
-    {
-      S_new[lev] = ml->m_scalarNew[m_bulkConcentration];
-      H_new[lev] = ml->m_scalarNew[m_enthalpy];
-      horizAvFs[lev] = new LevelData<FArrayBox>(ml->m_grids, 1, IntVect::Zero); // no ghost vector
-      Fs_vert_diffusion[lev] = new LevelData<FArrayBox>(ml->m_grids, 1, IntVect::Zero); // no ghost vector
-      Fs_vert_fluid[lev] = new LevelData<FArrayBox>(ml->m_grids, 1, IntVect::Zero); // no ghost vector
-      Fs_vert_frame[lev] = new LevelData<FArrayBox>(ml->m_grids, 1, IntVect::Zero); // no ghost vector
-
-      ml->m_scalarNew[m_averageVerticalFlux]->copyTo(*horizAvFs[lev]);
-      ml->m_scalarNew[m_FsVertDiffusion]->copyTo(*Fs_vert_diffusion[lev]);
-      ml->m_scalarNew[m_FsVertFluid]->copyTo(*Fs_vert_fluid[lev]);
-      ml->m_scalarNew[m_FsVertFrame]->copyTo(*Fs_vert_frame[lev]);
-
-      ml = ml->getFinerLevel();
-
-    }
-
-    // Another diagnostic - average vertical solute flux across the whole domain
-    //    Real domainSize = m_domainWidth*m_domainHeight;
-    Real volume = 0.0;
-    Real domainAverageFs = computeSum(volume, horizAvFs, refRat, lev0Dx, Interval(0,0), 0);
-    //    domainAverageFs = domainAverageFs / domainSize;
-    domainAverageFs = domainAverageFs/volume;
-    m_diagnostics.addDiagnostic(Diagnostics::m_averageVerticalSaltFlux, m_time, domainAverageFs);
-
-    Real L2FsVertDiffusion = computeNorm(Fs_vert_diffusion, refRat, lev0Dx, Interval(0,0), 2);
-    Real L2FsVertFluid = computeNorm(Fs_vert_fluid, refRat, lev0Dx, Interval(0,0), 2);
-    Real L2FsVertFrame = computeNorm(Fs_vert_frame, refRat, lev0Dx, Interval(0,0), 2);
-
-    m_diagnostics.addDiagnostic(Diagnostics::m_L2FsVertDiffusion, m_time, L2FsVertDiffusion);
-    m_diagnostics.addDiagnostic(Diagnostics::m_L2FsVertFluid, m_time, L2FsVertFluid);
-    m_diagnostics.addDiagnostic(Diagnostics::m_L2FsVertFrame, m_time, L2FsVertFrame);
-
-
-    Real L1FsVertDiffusion = computeNorm(Fs_vert_diffusion, refRat, lev0Dx, Interval(0,0), 1);
-    Real L1FsVertFluid = computeNorm(Fs_vert_fluid, refRat, lev0Dx, Interval(0,0), 1);
-    Real L1FsVertFrame = computeNorm(Fs_vert_frame, refRat, lev0Dx, Interval(0,0), 1);
-
-    m_diagnostics.addDiagnostic(Diagnostics::m_L1FsVertDiffusion, m_time, L1FsVertDiffusion);
-    m_diagnostics.addDiagnostic(Diagnostics::m_L1FsVertFluid, m_time, L1FsVertFluid);
-    m_diagnostics.addDiagnostic(Diagnostics::m_L1FsVertFrame, m_time, L1FsVertFrame);
-
-    Real L0FsVertDiffusion = computeNorm(Fs_vert_diffusion, refRat, lev0Dx, Interval(0,0), 0);
-    Real L0FsVertFluid = computeNorm(Fs_vert_fluid, refRat, lev0Dx, Interval(0,0), 0);
-    Real L0FsVertFrame = computeNorm(Fs_vert_frame, refRat, lev0Dx, Interval(0,0), 0);
-
-    m_diagnostics.addDiagnostic(Diagnostics::m_L0FsVertDiffusion, m_time, L0FsVertDiffusion);
-    m_diagnostics.addDiagnostic(Diagnostics::m_L0FsVertFluid, m_time, L0FsVertFluid);
-    m_diagnostics.addDiagnostic(Diagnostics::m_L0FsVertFrame, m_time, L0FsVertFrame);
-
-    //Clean up
-    for(int lev = 0; lev < nLevels; lev++)
-    {
-      delete horizAvFs[lev];
-      horizAvFs[lev] = NULL;
-
-      delete Fs_vert_diffusion[lev];
-      Fs_vert_diffusion[lev] = NULL;
-
-      delete Fs_vert_fluid[lev];
-      Fs_vert_fluid[lev]= NULL;
-
-      delete Fs_vert_frame[lev];
-      Fs_vert_frame[lev]= NULL;
-    }
-
-    // Calculate sums over valid regions
-
-    // Volume averaged sum i.e. sum[H*dx^(SpaceDim)]
-    AMRSaltSum_new = ::computeSum(S_new, refRat, lev0Dx, Interval(0,0), 0);
-    AMREnthalpySum_new = ::computeSum(H_new, refRat, lev0Dx, Interval(0,0), 0);
-
-    //    Real Fs_bottom = ::computeSum(fluxBottom, refRat, lev0Dx, Interval(1, 1), 0)/scale;
-    //    Real Fs_top = ::computeSum(fluxTop, refRat, lev0Dx, Interval(1, 1), 0)/scale;
-
-    Real Fs_bottom = m_saltDomainFluxRegister.getFluxHierarchy(1, Side::Lo, 1.0);
-    Real Fs_top = m_saltDomainFluxRegister.getFluxHierarchy(1, Side::Hi, 1.0);
-    //    Real Fs_left = m_saltDomainFluxRegister.getFluxHierarchy(0, Side::Lo, 1.0);
-    //    Real Fs_right = m_saltDomainFluxRegister.getFluxHierarchy(0, Side::Hi, 1.0);
-
-    Real Fh_bottom = m_heatDomainFluxRegister.getFluxHierarchy(1, Side::Lo, 1.0);
-    Real Fh_top =m_heatDomainFluxRegister.getFluxHierarchy(1, Side::Hi, 1.0);
-    //    Real Fh_left = m_heatDomainFluxRegister.getFluxHierarchy(0, Side::Lo, 1.0);
-    //    Real Fh_right = m_heatDomainFluxRegister.getFluxHierarchy(0, Side::Hi, 1.0);
-
-
-    Real scale = 1/(m_dt*m_domainWidth);
-    Real totalF_bottom = Fs_bottom*scale;
-    Real totalF_top = Fs_top*scale;
-
-    Real totalFh_top = Fh_top*scale;
-    Real totalFh_bottom = Fh_bottom*scale;
-
-    Real ds_diff = (AMRSaltSum_new - AMRSaltSum_old);
-    Real H_diff = (AMREnthalpySum_new - AMREnthalpySum_old);
-
-    // Calculate flux differences by considering all sides/directions
-    Real salt_flux_diff = 0;
-    Real heat_flux_diff = 0;
-    for (int dir=0; dir < SpaceDim; dir++)
-    {
-      Real Fs_hi = m_saltDomainFluxRegister.getFluxHierarchy(dir, Side::Hi, 1.0);
-      Real Fs_lo = m_saltDomainFluxRegister.getFluxHierarchy(dir, Side::Lo, 1.0);
-
-      Real Fh_hi = m_heatDomainFluxRegister.getFluxHierarchy(dir, Side::Hi, 1.0);
-      Real Fh_lo = m_heatDomainFluxRegister.getFluxHierarchy(dir, Side::Lo, 1.0);
-
-      salt_flux_diff += Fs_hi - Fs_lo;
-      heat_flux_diff += Fh_hi - Fh_lo;
-    }
-
-    //    Real salt_mismatch = (ds_diff- flux_diff)/Fs_top;
-    //    Real heat_mismatch = (H_diff - heat_flux_diff)/Fh_top;
-
-    Real salt_mismatch = (ds_diff + salt_flux_diff);
-    Real heat_mismatch = (H_diff + heat_flux_diff);
-
-    Real rel_salt_mismatch = salt_mismatch/salt_flux_diff;
-    Real rel_heat_mismatch = heat_mismatch/heat_flux_diff;
-
-
-    m_diagnostics.addDiagnostic(Diagnostics::m_soluteFluxBottom, m_time, totalF_bottom);
-    m_diagnostics.addDiagnostic(Diagnostics::m_soluteFluxTop, m_time, totalF_top);
-
-    m_diagnostics.addDiagnostic(Diagnostics::m_heatFluxAbsMismatch, m_time, heat_mismatch);
-    m_diagnostics.addDiagnostic(Diagnostics::m_saltFluxAbsMismatch, m_time, salt_mismatch);
-
-    m_diagnostics.addDiagnostic(Diagnostics::m_heatFluxRelMismatch, m_time, rel_heat_mismatch);
-    m_diagnostics.addDiagnostic(Diagnostics::m_saltFluxRelMismatch, m_time, rel_salt_mismatch);
-
-    m_diagnostics.addDiagnostic(Diagnostics::m_heatFluxBottom, m_time, totalFh_bottom);
-    m_diagnostics.addDiagnostic(Diagnostics::m_heatFluxTop, m_time, totalFh_top);
-
-    // Clean up ready for next full timestep
-    AMRSaltSum_old = AMRSaltSum_new;
-    AMREnthalpySum_old = AMREnthalpySum_new;
-    ml = this;
-
-    while(ml)
-    {
-      setValLevel(ml->m_saltFluxTop, 0.0);
-      setValLevel(ml->m_saltFluxBottom, 0.0);
-
-      (ml->m_heatDomainFluxRegister).setToZero();
-      (ml->m_saltDomainFluxRegister).setToZero();
-
-      ml = ml->getFinerLevel();
-
-    }
-
-  } // end if level 0
-
-
-  if (calcDiagnostics)
-  {
     Real maxVel = getMaxVelocity();
     m_diagnostics.addDiagnostic(Diagnostics::m_maxVel, m_time, maxVel);
 
@@ -2904,7 +2918,8 @@ void AMRLevelMushyLayer::computeDiagnostics()
   }
 
   // Work out average liquid salinity at various vertical points in domain
-  if (calcDiagnostics)
+  if (calcDiagnostics
+      && m_diagnostics.diagnosticIsIncluded(Diagnostics::m_avSalinity))
   {
     //    pout() << "AMRLevelMushyLayer::computeDiagnostics - compute average salinity" << endl;
     Vector<Real> averagedSalinity;
@@ -2912,15 +2927,6 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
     // Also do average of liquid salinity over liquid regions
     Real averageSl = averageOverLiquidRegion(m_liquidConcentration);
-
-    //    if (printDiagnostics)
-    //    {
-    //      diagnosticsFile << "Horizontally averaged salinity at (0, 20%, 40%, 60%):  ";
-    //      for (int i = 1; i < 5; i++)
-    //      {
-    //        int y_i = round(averagedSalinity.size()*0.2*(i-1));
-    //        diagnosticsFile << averagedSalinity[y_i] << ", ";
-    //      }
 
 
     int y_0 = round(averagedSalinity.size()*0.2*(1-1));
@@ -2936,26 +2942,15 @@ void AMRLevelMushyLayer::computeDiagnostics()
     m_diagnostics.addDiagnostic(Diagnostics::m_avSalinity, m_time, averageSl);
 
 
-    //      diagnosticsFile << endl;
-
-    //      diagnosticsFile << "Average salinity over all liquid regions: " << averageSl << endl;
-    //    }
-
-
-
   }
 
   // Work out mushy layer depth
-  if (calcDiagnostics)
+  if (calcDiagnostics
+      && m_diagnostics.diagnosticIsIncluded(Diagnostics::m_mushDepth))
   {
     Vector<Real> averagedPorosity;
     horizontallyAverage(averagedPorosity, *m_scalarNew[m_porosity]);
 
-
-
-    //    if (printDiagnostics)
-    //    {
-    //      diagnosticsFile << "Mushy layer depth = ";
     int depth_i = 0;
     Real depth = -1.0;
     for (int i = averagedPorosity.size()-1; i >= 0 ; i--)
@@ -2971,13 +2966,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
     m_diagnostics.addDiagnostic(Diagnostics::m_mushDepth, m_time, depth);
 
-
-    //      diagnosticsFile << endl;
-    //    }
-
   }
-
-
 
   // Now lets work out some chimney geometry:
   // - how big
@@ -2985,18 +2974,9 @@ void AMRLevelMushyLayer::computeDiagnostics()
   bool doChimneyDiagnostics = false; // turn this off for now as it seems to be very slow
   if (m_level == 0 && doChimneyDiagnostics)
   {
-    //    AMRLevelMushyLayer* ml = this;
-
     computeChimneyDiagnostics();
-  }// end if level = 0
+  }
 
-
-  // Deferred this to convergedToSteadyState(), so we also print out d/dt info
-  //  bool printDiagnostics = (m_level == 0 && procID() ==0 ); // only print results on proc 0
-  //  if (printDiagnostics)
-  //  {
-  //    m_diagnostics.printDiagnostics(m_time);
-  //  }
 
 }
 
@@ -3518,7 +3498,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 
   Real finest_dx = ml->m_dx;
 
-//  Real maxTemp = ::computeMax(*m_scalarNew[m_temperature], NULL, -1, Interval(0,0));
+  //  Real maxTemp = ::computeMax(*m_scalarNew[m_temperature], NULL, -1, Interval(0,0));
   Real maxPorosity = ::computeMax(*m_scalarNew[m_porosity], NULL, -1, Interval(0,0));
   //  Real maxUChi = ::computeMax(*m_vectorNew[m_U_porosity], NULL, -1, Interval(0,SpaceDim-1));
   //   Real minPerm = ::computeMin(*m_scalarNew[m_permeability], NULL, -1, Interval(0,0));
@@ -3528,24 +3508,24 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   Real buoyancy_acceleration = abs(max(m_parameters.m_buoyancyTCoeff, m_parameters.m_buoyancySCoeff) * maxPorosity);
   Real darcy_acceleration = abs(m_parameters.m_darcyCoeff*maxUChi); //*maxPorosity/minPerm
   Real viscous_acceleration = abs(m_parameters.m_viscosityCoeff*maxAdvU/(m_domainHeight));
-//  Real acceleration = max(buoyancy_acceleration, darcy_acceleration);
-//    acceleration = max(acceleration, viscous_acceleration);
+  //  Real acceleration = max(buoyancy_acceleration, darcy_acceleration);
+  //    acceleration = max(acceleration, viscous_acceleration);
 
-   Real acceleration = computeNorm(*m_vectorNew[m_advectionSrc], NULL, 1, m_dx, Interval(0, SpaceDim-1), 0);
+  Real acceleration = computeNorm(*m_vectorNew[m_advectionSrc], NULL, 1, m_dx, Interval(0, SpaceDim-1), 0);
 
-   // Ignore bogus values
-   if (abs(acceleration) > 1e100)
-   {
-     acceleration = 0.0;
-   }
+  // Ignore bogus values
+  if (abs(acceleration) > 1e100)
+  {
+    acceleration = 0.0;
+  }
 
-    // Could just compute norm of advection velocity solve source term?
+  // Could just compute norm of advection velocity solve source term?
 
-//  acceleration = max(acceleration);
+  //  acceleration = max(acceleration);
 
   // Factor of 10 is fairly arbitrary
-   Real accelCFL = cfl;
-   ppMain.query("accelCFL", accelCFL);
+  Real accelCFL = cfl;
+  ppMain.query("accelCFL", accelCFL);
   Real accelDt = sqrt(accelCFL*finest_dx/acceleration);
 
   bool printAccelDt = false;
@@ -3745,8 +3725,8 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
       }
     }
 
-//    m_vectorOld[m_U_porosity]->exchange();
-//    m_vectorNew[m_U_porosity]->exchange();
+    //    m_vectorOld[m_U_porosity]->exchange();
+    //    m_vectorNew[m_U_porosity]->exchange();
   }
 
 
@@ -3755,18 +3735,18 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
     if (abs(a_time - old_time) < TIME_EPS)
     {
       m_vectorOld[a_var]->copyTo(vectorComps, a_vector, vectorComps);
-//      for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
-//      {
-//        a_vector[dit].copy((*m_vectorOld[a_var])[dit]);
-//      }
+      //      for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+      //      {
+      //        a_vector[dit].copy((*m_vectorOld[a_var])[dit]);
+      //      }
     }
     else if (abs(a_time - m_time) < TIME_EPS)
     {
-            m_vectorNew[a_var]->copyTo(vectorComps, a_vector, vectorComps);
-//      for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
-//      {
-//        a_vector[dit].copy((*m_vectorNew[a_var])[dit]);
-//      }
+      m_vectorNew[a_var]->copyTo(vectorComps, a_vector, vectorComps);
+      //      for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+      //      {
+      //        a_vector[dit].copy((*m_vectorNew[a_var])[dit]);
+      //      }
     } else {
       // do linear interpolation in time
       timeInterp(a_vector, a_time, *m_vectorOld[a_var], old_time,
@@ -4030,8 +4010,8 @@ void AMRLevelMushyLayer::doRegularisationOps(LevelData<FluxBox>& a_scal, int a_v
     DataIterator dit2 = a_scal.dataIterator();
 
     ParmParse ppMain("main");
-      bool use_new_version = false;
-      ppMain.query("fortranRegularisationFace", use_new_version);
+    bool use_new_version = false;
+    ppMain.query("fortranRegularisationFace", use_new_version);
 
     for (dit2.reset(); dit2.ok(); ++dit2)
     {
@@ -4129,8 +4109,8 @@ void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
     Real minPermeability = pow(m_lowerPorosityLimit,3);
 
     FORT_SETMINVAL( CHF_FRA(a_state),
-                          CHF_BOX(region),
-                          CHF_CONST_REAL(minPermeability));
+                    CHF_BOX(region),
+                    CHF_CONST_REAL(minPermeability));
 
   }
   else if (a_var == m_bulkConcentration)
@@ -4317,7 +4297,7 @@ void AMRLevelMushyLayer::getScalarBCs(BCHolder& thisBC, int a_var, bool a_homoge
   else if (a_var == m_lambda_porosity)
   {
     thisBC = m_physBCPtr->lambdaBC(a_homogeneous,
-                                            true); // true - scale with porosity
+                                   true); // true - scale with porosity
   }
   else
   {
@@ -4405,9 +4385,9 @@ bool AMRLevelMushyLayer::currentCFLIsSafe(bool printWarning)
     if (printWarning)
     {
       pout() << "WARNING: new max(U) = " << maxAdvU << " means that CFL = " << newCFL << " which may be unstable" << endl;
-//      pout() << "Therefore, we will be skipping fluid advection during this timestep" << endl;
+      //      pout() << "Therefore, we will be skipping fluid advection during this timestep" << endl;
     }
-//    return false;
+    //    return false;
     //always return true for now
     return true;
   }

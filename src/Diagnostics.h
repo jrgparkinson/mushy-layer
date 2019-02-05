@@ -64,6 +64,9 @@ public:
   /// Print diagnostics at given time to a certain file
   void printDiagnostics(Real a_time, std::ofstream& a_file);
 
+  /// Returns whether or not the specified diagnostic is one that's in one list of diagnostics to print
+  bool diagnosticIsIncluded(const int a_diag);
+
   /// Different diagnostics we consider
   enum diagnosticNames{
     m_time,

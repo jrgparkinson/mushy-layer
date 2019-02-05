@@ -83,7 +83,6 @@ main.reflux_scalar=1 #1
 main.regrid_interval=4 4 8
 main.scalePwithChi=1
 main.solverFailRestartMethod=0
-main.steady_state=1e-3
 main.symmetric_domain=false
 main.tag_buffer_size=1
 main.taggingVar=0
@@ -135,6 +134,7 @@ main.usePhiForImplicitAdvectionSolve=false
 main.nondimensionalisation=0
 main.useAccelDt=0 # was 1 originally
 
-main.steady_state=0.0001
+main.steady_state=0.001
 main.steadyStateNormType=0
 main.ignoreBulkConcentrationSteadyState=1
+main.computeVorticity=false # turn this off to save time

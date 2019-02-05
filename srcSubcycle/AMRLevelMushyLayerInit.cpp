@@ -806,7 +806,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
   //  Real old_time = m_time-m_dt;
   //  Real new_time = m_time;
 
-  bool a_homogeneous = false;
+//  bool a_homogeneous = false;
   Real alpha = 1.0;
   Real beta = 1.0;
 

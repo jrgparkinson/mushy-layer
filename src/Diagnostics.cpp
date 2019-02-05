@@ -271,6 +271,19 @@ bool Diagnostics::movingAverageHasConverged(int a_diagnostic, Real a_time, Real 
   }
 }
 
+bool Diagnostics::diagnosticIsIncluded(const int a_diag)
+{
+  std::vector<int> stdVect = m_diagsToPrint.stdVector();
+  if (std::find(stdVect.begin(), stdVect.end(), a_diag) != stdVect.end())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 void Diagnostics::printHeader()
 {
   printHeader(m_diagnosticsFile);
