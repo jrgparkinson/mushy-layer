@@ -325,7 +325,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
 {
   if (s_verbosity >= 3)
   {
-    pout() << "AMRLevelMushyLayer::readCheckpointLevel" << endl;
+    pout() << "AMRLevelMushyLayer::readCheckpointLevel (level " << m_level << ")" << endl;
   }
 
   // Setup the level string
