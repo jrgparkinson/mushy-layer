@@ -34,13 +34,13 @@
 #include "BiCGStabSolver.H"
 #include "RelaxSolver.H"
 #include "AMRFASMultiGrid.H"
+#include "Gradient.H"
 
 #include "computeSum.H"
 #include "computeNorm.H"
 #include "SetValLevel.H"
 
 #include "VCAMRPoissonOp2.H"
-//#include "NewPoissonOp4.H"
 #include "AdvectionPhysics.H"
 #include "VelBCHolder.H"
 
@@ -49,8 +49,11 @@
 #include "EdgeToCell.H"
 #include "FourthOrderFineInterp.H"
 #include "Divergence.H"
+#include "PiecewiseLinearFillPatchFace.H"
+#include "timeInterp.H"
 
 // Files I made myself
+#include "DarcyBrinkmanOp.H"
 #include "MushyLayerParams.h"
 #include "MushyLayerUtils.H"
 #include "Diagnostics.h"
@@ -58,6 +61,7 @@
 #include "Projector.H"
 #include "PhysIBC.H"
 #include "phaseDiagram.H"
+#include "AMRNonLinearMultiCompOp.H"
 
 // Fortran files
 #include "AdvectUtilF_F.H"
@@ -514,6 +518,12 @@ protected:
 
   /// Get largest velocity in domain
   Real getMaxVelocity();
+
+  /// get largest advection velocity, considering \f$ \mathbf{U}/\chi \f$ if appropriate
+  Real getMaxVelocityForCFL();
+
+  /// Compute max \f$ \mathbf{U}/\chi \f$
+  Real computeMaxUChi();
 
   /// Get max advection velocity
   Real getMaxAdvVel();

@@ -3,6 +3,10 @@
 #include "analyticSolns.H"
 #include "SetValLevel.H"
 
+/**
+ * This source file contains methods for initialising and defining objects
+ */
+
 void AMRLevelMushyLayer::setDefaults()
 {
   // Need to make sure these are initialised,
@@ -626,6 +630,451 @@ void AMRLevelMushyLayer::levelSetup()
 
 }
 
+
+void AMRLevelMushyLayer::defineUstarMultigrid()
+{
+  CH_TIME("AMRLevelMushyLayer::defineUstarMultigrid");
+
+  // Define multigrid solver for this level and coarser level if one exists
+
+  Vector<AMRLevelMushyLayer*> hierarchy;
+  Vector<DisjointBoxLayout> allGrids, solverGrids;
+  Vector<int> refRat;
+  ProblemDomain lev0Dom;
+  Real lev0Dx;
+  IntVect ivGhost = IntVect::Unit;
+  getHierarchyAndGrids(hierarchy, allGrids, refRat, lev0Dom, lev0Dx);
+
+  int numSmooth=2, numMG=1, maxIter=10, mgverb=0;
+  Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
+
+  ParmParse ppAmrmultigrid("VelocityMultigrid");
+  ppAmrmultigrid.query("num_smooth", numSmooth);
+  ppAmrmultigrid.query("num_mg", numMG);
+  ppAmrmultigrid.query("hang_eps", hang);
+  ppAmrmultigrid.query("norm_thresh", normThresh);
+  ppAmrmultigrid.query("tolerance", tolerance);
+  ppAmrmultigrid.query("max_iter", maxIter);
+  ppAmrmultigrid.query("verbosity", mgverb);
+
+
+  //  Real half_time = m_time - m_dt / 2;
+  //  Real new_time = m_time;
+  Real old_time = m_time-m_dt;
+
+  //    int nlevels = (m_level == 0) ? 1 : 2; // only 1 level if m_level = 0, as no coarser grids in this case
+  //    int coarsestLevel = (m_level == 0) ? 0 : m_level - 1; // the coarsest level we care about
+  int nlevels = allGrids.size();
+  int coarsestLevel  = 0;
+
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > aCoef;
+  Vector<RefCountedPtr<LevelData<FluxBox> > > bCoef;
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > cCoef;
+
+  aCoef.resize(nlevels);
+  bCoef.resize(nlevels);
+  cCoef.resize(nlevels);
+
+  // I'm not sure we actually need this
+  solverGrids.resize(nlevels);
+
+  for (int lev = coarsestLevel; lev < nlevels; lev++)
+  {
+
+    int relativeLev = lev - coarsestLevel;
+
+    AMRLevelMushyLayer* thisLevel =
+        (AMRLevelMushyLayer*) (hierarchy[lev]);
+    DisjointBoxLayout& levelGrids = thisLevel->m_grids;
+
+    solverGrids[relativeLev] = levelGrids;
+
+    bCoef[relativeLev] = RefCountedPtr<LevelData<FluxBox> >(
+        new LevelData<FluxBox>(levelGrids, 1, ivGhost)); // = 1
+    aCoef[relativeLev] = RefCountedPtr<LevelData<FArrayBox> >(
+        new LevelData<FArrayBox>(levelGrids, 1, ivGhost)); // = 1
+    cCoef[relativeLev] = RefCountedPtr<LevelData<FArrayBox> >(
+        new LevelData<FArrayBox>(levelGrids, 1, ivGhost)); // = porosity.pi_0/(pi)
+
+
+    // Only actually fill levels if they're at m_level or coarser
+    if (lev <= m_level)
+    {
+      LevelData<FArrayBox> porosity(levelGrids, 1, ivGhost);
+      LevelData<FArrayBox> permeability(levelGrids, 1, ivGhost);
+
+      // Fill these at the new time
+      // this is correct for backward euler (where we evaluate the darcy term
+      // at the new time) but we should modify this for TGA where we evaluate U at
+      // different times within an update
+      if (m_timeIntegrationOrder == 2 && m_time-m_dt == 0)
+      {
+        // Only display this warning at initial timestep
+        //        MayDay::Warning("AMRlevelMushyLayer::defineUstarSolver - darcy term coefficient not time centred correctly for TGA");
+      }
+
+      // Try and lag this for stability (was previously new_time)
+      Real coeff_time = old_time;
+      thisLevel->fillScalars(porosity, coeff_time, m_porosity, true);
+      thisLevel->fillScalars(permeability, coeff_time, m_permeability, true);
+
+      //Make aCoef
+      DataIterator dit = aCoef[relativeLev]->dataIterator();
+      for (dit.reset(); dit.ok(); ++dit)
+      {
+        // do this or darcy as a source term
+
+        // this is what multiplies the U term (darcy's law)
+        if (explicitDarcyTerm)
+        {
+          (*cCoef[relativeLev])[dit].setVal(0.0);
+        }
+        else
+        {
+          (*cCoef[relativeLev])[dit].copy(porosity[dit]);
+          (*cCoef[relativeLev])[dit].divide(permeability[dit]);
+          (*cCoef[relativeLev])[dit].mult(m_parameters.m_darcyCoeff);
+        }
+
+        //                                                      (*cCoef[relativeLev])[dit].setVal(0.0); // testing
+
+        // This is what multiplies du/dt
+        (*aCoef[relativeLev])[dit].setVal(1.0);
+
+        // this is what multiplies laplacian(u). Note the minus sign.
+        (*bCoef[relativeLev])[dit].setVal(- m_parameters.m_viscosityCoeff );
+      } // end loop over boxes
+
+    } // end if level <= m_level
+  } // end loop over levels
+
+  for (int idir = 0; idir < SpaceDim; idir++)
+  {
+
+    BCHolder viscousBC = m_physBCPtr->velFuncBC(idir, m_viscousBCs);
+
+    RefCountedPtr<DarcyBrinkmanOpFactory> vcamrpop = RefCountedPtr<DarcyBrinkmanOpFactory>(new DarcyBrinkmanOpFactory());
+    vcamrpop->define(lev0Dom, allGrids, refRat, lev0Dx, viscousBC,
+                     0.0, aCoef, -1.0, bCoef, cCoef); // Note that we should set m_dt*etc in bCoef, not beta!
+
+    s_uStarOpFact[idir] = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcamrpop); // m_UstarVCAMRPOp[idir]);
+
+    s_uStarAMRMG[idir]->define(lev0Dom, *s_uStarOpFact[idir],
+                               &s_botSolverUStar, nlevels);
+
+    s_uStarAMRMG[idir]->setSolverParameters(numSmooth, numSmooth, numSmooth,
+                                            numMG, maxIter, tolerance, hang, normThresh);
+  }
+}
+
+void AMRLevelMushyLayer::defineUstarSolver(     Vector<RefCountedPtr<LevelBackwardEuler> >& UstarBE,
+                                                Vector<RefCountedPtr<LevelTGA> >& UstarTGA)
+{
+  CH_TIME("AMRLevelMushyLayer::defineUstarSolver");
+
+  Vector<AMRLevelMushyLayer*> hierarchy;
+  Vector<DisjointBoxLayout> allGrids;
+  Vector<int> refRat;
+  ProblemDomain lev0Dom;
+  Real lev0Dx;
+  getHierarchyAndGrids(hierarchy, allGrids, refRat, lev0Dom, lev0Dx);
+
+  defineUstarMultigrid();
+
+  UstarBE.resize(SpaceDim);
+  UstarTGA.resize(SpaceDim);
+
+
+  for (int idir = 0; idir < SpaceDim; idir++)
+  {
+    // Now define Backward Euler for timestepping
+    UstarBE[idir] = RefCountedPtr<LevelBackwardEuler> (new LevelBackwardEuler(allGrids, refRat, lev0Dom, s_uStarOpFact[idir], s_uStarAMRMG[idir]));
+    UstarTGA[idir] = RefCountedPtr<LevelTGA> (new LevelTGA(allGrids, refRat, lev0Dom, s_uStarOpFact[idir], s_uStarAMRMG[idir]));
+  }
+
+}
+
+
+void AMRLevelMushyLayer::defineSolvers(Real a_time)
+{
+
+  if (s_verbosity >= 5)
+  {
+    pout() << "AMRLevelMushyLayer::defineSolvers" << endl;
+  }
+  CH_TIME("AMRLevelMushyLayer::defineSolvers");
+  //  Real old_time = m_time-m_dt;
+  //  Real new_time = m_time;
+
+  bool a_homogeneous = false;
+  Real alpha = 1.0;
+  Real beta = 1.0;
+
+  IntVect ivGhost = m_numGhost * IntVect::Unit;
+
+  int numSmoothUp=4, numSmoothDown=1, numMG=1, maxIter=10, mgverb=0, bottomSolveIterations=40;
+  Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
+  int relaxMode = 1; // 1=GSRB, 4=jacobi
+  bool useRelaxBottomSolverForHC = true;
+
+  ParmParse ppAmrmultigrid("HCMultigrid");
+  ppAmrmultigrid.query("num_smooth_up", numSmoothUp);
+  ppAmrmultigrid.query("num_mg", numMG);
+  ppAmrmultigrid.query("hang_eps", hang);
+  ppAmrmultigrid.query("norm_thresh", normThresh);
+  ppAmrmultigrid.query("tolerance", tolerance);
+  ppAmrmultigrid.query("max_iter", maxIter);
+  ppAmrmultigrid.query("verbosity", mgverb);
+  ppAmrmultigrid.query("numSmoothDown", numSmoothDown);
+  ppAmrmultigrid.query("relaxMode", relaxMode);
+  ppAmrmultigrid.query("bottomSolveIterations", bottomSolveIterations);
+  ppAmrmultigrid.query("useRelaxBottomSolver", useRelaxBottomSolverForHC);
+
+  s_botSolverHC.m_imax = bottomSolveIterations;
+
+  Vector<AMRLevelMushyLayer*> hierarchy;
+  Vector<DisjointBoxLayout> grids;
+  Vector<int> refRat;
+  ProblemDomain lev0Dom;
+  Real lev0Dx;
+  getHierarchyAndGrids(hierarchy, grids, refRat, lev0Dom, lev0Dx);
+
+  int numLevels = grids.size();
+
+  const DisjointBoxLayout* crseGridsPtr = NULL;
+  int nRefCrse = -1;
+
+  if (m_level > 0)
+  {
+    AMRLevelMushyLayer* coarserAMRLevel = getCoarserLevel();
+    crseGridsPtr = &(coarserAMRLevel->m_grids);
+    nRefCrse = coarserAMRLevel->m_ref_ratio;
+  }
+
+  s_botSolverUStar.m_verbosity = max(mgverb - 2, 0);
+  s_botSolverHC.m_verbosity = max(mgverb - 2, 0);
+
+  {
+
+    CH_TIME("AMRLevelMushyLayer::defineSolvers::defineViscousOp");
+  for (int dir = 0; dir < SpaceDim; dir++)
+  {
+    BCHolder viscousBCcomp = m_physBCPtr->velFuncBC(dir, m_viscousBCs);
+
+    m_viscousOp[dir] = RefCountedPtr<AMRPoissonOp>(new AMRPoissonOp());
+    m_viscousOp[dir]->define(m_grids, crseGridsPtr, m_dx, nRefCrse,
+                             m_problem_domain, viscousBCcomp);
+
+  }
+  }
+
+
+  {
+    CH_TIME("AMRLevelMushyLayer::defineSolvers::defineUStarAMRMG");
+  for (int idir = 0; idir < SpaceDim; idir++)
+  {
+    // I think we only have to define this once
+    if (s_uStarAMRMG[idir] == NULL)
+    {
+      s_uStarAMRMG[idir] =
+          RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >(
+              new AMRMultiGrid<LevelData<FArrayBox> >());
+      s_uStarAMRMG[idir]->setSolverParameters(numSmoothUp, numSmoothUp, numSmoothUp,
+                                              numMG, maxIter, tolerance, hang, normThresh);
+      s_uStarAMRMG[idir]->m_verbosity = mgverb;
+    }
+  }
+  }
+
+  if (s_verbosity >= 5)
+  {
+    pout() << "AMRLevelMushyLayer::defineSolvers - finished Ustar" << endl;
+  }
+
+  Vector<RefCountedPtr<LevelData<FluxBox> > > porosityFace(numLevels);
+
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > porosity(numLevels);
+
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > enthalpy(numLevels);
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > bulkConcentration(numLevels);
+
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > enthalpySolidus(numLevels);
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > enthalpyLiquidus(numLevels);
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > enthalpyEutectic(numLevels);
+
+  //Get coarsest level
+  AMRLevelMushyLayer* amrML = this;
+  while(amrML->getCoarserLevel())
+  {
+    amrML = amrML->getCoarserLevel();
+  }
+
+  // Fill all levels
+  int lev = 0;
+
+  while(amrML != NULL && lev < numLevels)
+  {
+
+    porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, IntVect::Zero));
+    //    porosity[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+
+    enthalpy[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+    bulkConcentration[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+
+    enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+    enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+    enthalpyEutectic[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+
+    // Can only fill these at the current level or coarser
+    bool secondOrder = true; // Should probably use quadratic CF interp here
+
+    // Only fill at levels which have reached m_time
+    // in general, than means this level and coarser
+    // however in postTimeStep(), all finer levels will have reached m_time too
+    //    if (lev <= m_level)
+    if (amrML->m_time <= (m_time + TIME_EPS))
+    {
+      // Should be new time, as we evaluate operators at new time
+      // Actually, make this an argument as it should be different in different cases
+      //      Real a_time = m_time;
+      // NO! setup solvers at the start of a timestep so have to use fields at a_time-dt
+      // else we can't set up the
+
+      amrML->fillScalarFace(*porosityFace[lev], a_time, m_porosity, true, secondOrder);
+
+      //      amrML->fillScalars(*porosity[lev], m_time-m_dt/2, m_porosity, true, secondOrder);
+
+      amrML->fillScalars(*enthalpy[lev], a_time, m_enthalpy, true , secondOrder);
+      amrML->fillScalars(*bulkConcentration[lev], a_time, m_bulkConcentration, true, secondOrder);
+
+      amrML->fillScalars(*enthalpySolidus[lev],a_time, m_enthalpySolidus, true, secondOrder);
+      amrML->fillScalars(*enthalpyLiquidus[lev], a_time, m_enthalpyLiquidus, true, secondOrder);
+      amrML->fillScalars(*enthalpyEutectic[lev],a_time, m_enthalpyEutectic, true ,secondOrder);
+    }
+
+    amrML = amrML->getFinerLevel();
+    lev = lev + 1;
+  }
+
+  if (s_verbosity >= 5)
+  {
+    pout() << "AMRLevelMushyLayer::defineSolvers - finished filling scalars" << endl;
+  }
+
+
+  EdgeVelBCHolder porosityEdgeBC(m_physBCPtr->porosityFaceBC());
+
+  // two components: enthalpy and salinity
+  int numComps = 2;
+  int Hcomp = 0;
+  int Ccomp = 1;
+
+  Vector<RefCountedPtr<LevelData<FluxBox> > > bCoef(numLevels);
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > aCoef(numLevels);
+
+  for (int lev=0; lev<numLevels; lev++)
+  {
+
+    bCoef[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], numComps, ivGhost));
+    aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], numComps, ivGhost));
+
+    for (DataIterator dit = bCoef[lev]->dataIterator(); dit.ok(); ++dit)
+    {
+      (*aCoef[lev])[dit].setVal(1.0);
+      (*bCoef[lev])[dit].setVal(1.0);
+
+      // bCoef for salt solve
+      (*bCoef[lev])[dit].mult((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Ccomp);
+
+      // for heat solve
+      (*bCoef[lev])[dit].minus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
+      for (int dir=0; dir<SpaceDim; dir++)
+      {
+        (*bCoef[lev])[dit][dir].mult(m_parameters.heatConductivityRatio, Hcomp);
+      }
+      (*bCoef[lev])[dit].plus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
+
+
+      for (int dir=0; dir<SpaceDim; dir++)
+      {
+        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[m_enthalpy], Hcomp);
+        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[m_bulkConcentration], Ccomp);
+      }
+    }
+
+  } // end loop over levels
+
+  if (s_verbosity >= 5)
+  {
+    pout() << "AMRLevelMushyLayer::defineSolvers - finished setting coefficients" << endl;
+  }
+
+  MushyLayerParams* mlParamsPtr = &m_parameters;
+
+  //        EnthalpyVariable calcTemperature = computeTemperatureFunc;
+  BCHolder temperature_Sl_BC; // = m_physBCPtr->BasicthetaFuncBC();
+  temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC();
+  BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC();
+
+  AMRNonLinearMultiCompOpFactory* HCop = new AMRNonLinearMultiCompOpFactory();
+  HCop->define(lev0Dom, grids, refRat, lev0Dx, HC_BC,
+               alpha, aCoef, beta, bCoef,
+               enthalpySolidus, enthalpyLiquidus, enthalpyEutectic,
+               mlParamsPtr, temperature_Sl_BC,
+               relaxMode, porosityEdgeBC);
+
+  HCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(HCop);
+
+  int maxAMRlevels = hierarchy.size();
+
+  if (m_MGtype == m_standard)
+  {
+    MayDay::Error("Standard multigrid no longer supported");
+  }
+  else if (m_MGtype == m_FAS)
+  {
+    //FAS multigrid
+
+
+
+      s_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
+          new AMRFASMultiGrid<LevelData<FArrayBox> >());
+
+      if (useRelaxBottomSolverForHC)
+      {
+        s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverHC,
+                                 maxAMRlevels);
+      }
+      else
+      {
+        // Borrow the BiCGStab bottom solver from U star
+        s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverUStar,
+                                      maxAMRlevels);
+      }
+
+      s_multiCompFASMG->setSolverParameters(numSmoothDown, numSmoothUp, numSmoothUp, numMG,
+                                            maxIter, tolerance, hang, normThresh);
+      s_multiCompFASMG->m_verbosity = mgverb;
+
+
+
+    // Not doing TGA yet
+    s_enthalpySalinityTGA = RefCountedPtr<LevelTGA>(
+        new LevelTGA(grids, refRat, lev0Dom, HCOpFact,
+                     s_multiCompFASMG));
+
+
+    s_enthalpySalinityBE = RefCountedPtr<LevelBackwardEuler>(
+        new LevelBackwardEuler(grids, refRat, lev0Dom, HCOpFact,
+                               s_multiCompFASMG));
+
+  }
+  else
+  {
+    MayDay::Error("Unknown multigrid type specified");
+  }
+
+}
 
 // Refactored this so we can call it in each timestep if necessary
 void AMRLevelMushyLayer::setAdvectionBCs()
