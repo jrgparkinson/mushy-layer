@@ -25,13 +25,12 @@ void CellToEdge2(const LevelData<FArrayBox>& a_cellData,
 		CellToEdgeAveragingMethod method)
 
 {
-	// this is just a wrapper around single-gridBox version
-	DataIterator dit = a_cellData.dataIterator();
-	for (dit.reset(); dit.ok(); ++dit)
-	{
-		CellToEdge2(a_cellData[dit()], a_edgeData[dit()], method);
-		int temp = 0;
-	}
+  // this is just a wrapper around single-gridBox version
+  DataIterator dit = a_cellData.dataIterator();
+  for (dit.reset(); dit.ok(); ++dit)
+  {
+    CellToEdge2(a_cellData[dit()], a_edgeData[dit()], method);
+  }
 }
 
 ///
