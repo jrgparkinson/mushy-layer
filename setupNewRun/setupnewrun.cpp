@@ -161,6 +161,12 @@ int main(int argc, char* argv[])
   HDF5HeaderData header;
   getAMRHierarchy(inFile, amrlevels, finest_level, header);
 
+  // Setup levels, including defining piecewise linear fill patch
+//  for (int level = 0; level <= finest_level; level++)
+//  {
+//    AMRLevelMushyLayer* ml = amrlevels[level];
+//    ml->levelSetup();
+//  }
 
   // Get parameters
   int block_factor;
@@ -191,11 +197,7 @@ int main(int argc, char* argv[])
     // Initially level 0 domain, then get's refined
     Box newDomainBox(oldLev0Domain.domainBox());
 
-
-
     ProblemDomain newDomain(oldLev0Domain);
-
-
 
 
     // Grow/shrink domain
@@ -205,8 +207,6 @@ int main(int argc, char* argv[])
 
     newDomain.growLo(1, changeBottom);
     newDomain.growHi(1, changeTop);
-
-
 
 
     for (int level = 0; level <= finest_level; level++)
@@ -262,8 +262,12 @@ int main(int argc, char* argv[])
   else if (refinement != 1)
   {
     pout() << "Refining data with refinement factor: " << refinement << endl;
+
+
+
     // Refine current data/domain
-    for (int level = 0; level <= finest_level; level++)
+    // DO this from finest level down, so we have the coarsest level available for interpolation if needed
+    for (int level = finest_level; level >= 0; level--)
     {
       Vector<Box> outBoxes;
       Vector<int> outProcs;
@@ -275,16 +279,27 @@ int main(int argc, char* argv[])
       domain.refine(refinement);
 
       pout() << "Generating boxes on level: " << level << endl;
-      getBoxes(outBoxes, domain.domainBox(), block_factor, box_size);
 
-      LoadBalance(outProcs, outBoxes);
+      DisjointBoxLayout outGrids;
 
-      DisjointBoxLayout outGrids(outBoxes, outProcs, domain);
+      // Level 0 is easy - just split the domain into boxes
+      if (level == 0)
+      {
+        getBoxes(outBoxes, domain.domainBox(), block_factor, box_size);
+        outGrids.define(outBoxes, outProcs, domain);
+      }
+      else
+      {
+        // Finer levels are more difficult - need to refine the current boxes
+        refine(outGrids, ml->grids(), refinement);
+
+      }
+
+//      LoadBalance(outProcs, outBoxes);
+//      DisjointBoxLayout outGrids(outBoxes, outProcs, domain);
 
       // Need to interpolate data onto newgrids
       ml->refine(refinement, outGrids, domain);
-      //      ml->regrid(outBoxes);
-      //      ml->reshapeData(outGrids, domain);
 
       // Update dx
       ml->dx(ml->dx()/refinement);

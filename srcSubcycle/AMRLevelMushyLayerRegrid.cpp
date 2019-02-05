@@ -1282,6 +1282,7 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
 }
 
 
+// Note - for levels > 0, we need the lower level to be defined consistently for doing interpolation
 void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, ProblemDomain a_domain)
 {
   // Need data structures to backup old data
@@ -1289,14 +1290,17 @@ void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, Probl
   LevelData<FluxBox> prevAdvVel;
 
   IntVect advectionGhost = m_numGhostAdvection*IntVect::Unit;
-  IntVect ivGhost = IntVect::Unit;
+  IntVect ivGhost = 4*IntVect::Unit;
 
   Interval scalInterval(0,0);
   Interval vectInterval(0, SpaceDim-1);
 
   // Need things to interpolate from old grids to new
-  FourthOrderFineInterp scalarInterp, vectorInterp;
+//  FourthOrderFineInterp scalarInterp, vectorInterp;
+//  scalarInterp.define(a_grids, 1, ref_ratio, a_domain);
+//  vectorInterp.define(a_grids, SpaceDim, ref_ratio, a_domain);
 
+  FineInterp scalarInterp, vectorInterp;
   scalarInterp.define(a_grids, 1, ref_ratio, a_domain);
   vectorInterp.define(a_grids, SpaceDim, ref_ratio, a_domain);
 
@@ -1312,7 +1316,8 @@ void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, Probl
 
   for (int scalarVar = 0; scalarVar < m_numScalarVars; scalarVar++)
   {
-    m_scalarNew[scalarVar]->copyTo(scalInterval, *previousScal, scalInterval);
+//    m_scalarNew[scalarVar]->copyTo(scalInterval, *previousScal, scalInterval);
+    fillScalars(*previousScal, m_time, scalarVar, true, true);
     m_scalarNew[scalarVar]->define(a_grids, 1, ivGhost); //reshape
     //    previousScal->copyTo(scalInterval, *m_scalarNew[scalarVar], scalInterval); // copy back
     scalarInterp.interpToFine(*m_scalarNew[scalarVar], *previousScal);

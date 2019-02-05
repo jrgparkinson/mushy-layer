@@ -292,6 +292,12 @@ public:
                    int taggingVar, int vectorTaggingVar,
                    int taggingMethod, int comp=-1);
 
+  /// Setup menagerie of data structures
+  void levelSetup();
+
+  /// Setup CF interp objects
+  void defineCFInterp();
+
   /// Set eta on all projection operators
   /**
    * Only call from level 0
@@ -870,14 +876,6 @@ protected:
                                    Real& a_tCoarserOld,
                                    Real& a_tCoarserNew);
 
-  /// Utility function to get pointers to coarse level objects
-//  void getCoarseVectorDataPointers(const int a_vectorVar,
-//                                   LevelData<FArrayBox>** a_coarserDataOldPtr,
-//                                   LevelData<FArrayBox>** a_coarserDataNewPtr,
-//                                   LevelFluxRegister**    a_coarserFRPtr,
-//                                   LevelFluxRegister**    a_finerFRPtr,
-//                                   Real& a_tCoarserOld,
-//                                   Real& a_tCoarserNew);
 
   /// Doesn't do any time interpolation - just fills ghost cells if necessary
   void fillVectorField(LevelData<FArrayBox>& a_vector, Real a_time, int a_var,
@@ -892,8 +890,6 @@ protected:
   /// Helper function
   void fillBuoyancy(LevelData<FArrayBox>& a_buoyancy, Real a_time, bool quadInterp);
 
-  /// Helper function
-//  void fillBuoyancyFace(LevelData<FluxBox>& a_buoyancy, Real a_time, bool quadInterp);
 
   /// Fill ghost cells of scalar field (edge-centred)
   void fillScalarFace(LevelData<FluxBox>& a_scal,
@@ -958,8 +954,7 @@ protected:
   void doRegularisationOps(int a_var, FArrayBox& a_state);
   void doRegularisationOpsNew(int a_var, FArrayBox& a_state);
 
-  /// Setup menagerie of data structures
-  void levelSetup();
+
 
   /// Reset all flux registers
   void setFluxRegistersZero();

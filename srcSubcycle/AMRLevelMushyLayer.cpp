@@ -7648,6 +7648,12 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   {
     CH_TIME("AMRLevelMushyLayer::fillScalars::coarseFineInterp");
 
+    // Make sure fill objects are defined
+    if (!m_piecewiseLinearFillPatchScalarOne.isDefined())
+    {
+      defineCFInterp();
+    }
+
     // fill in coarse-fine BC data by conservative linear interp
     AMRLevelMushyLayer& crseLevel = *getCoarserLevel();
 
@@ -7667,10 +7673,13 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     if (abs(a_time - crse_old_time) < TIME_EPS)
     {
       crse_time_interp_coeff = 0.0;
-    } else if (abs(a_time - crse_new_time) < TIME_EPS)
+    }
+    else if (abs(a_time - crse_new_time) < TIME_EPS)
     {
       crse_time_interp_coeff = 1.0;
-    } else {
+    }
+    else
+    {
       crse_time_interp_coeff = (a_time - crse_old_time) / crse_dt;
     }
 
@@ -7685,32 +7694,29 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     {
       CH_TIME("AMRLevelMushyLayer::fillScalars::linearFillPatch");
 
-//      PiecewiseLinearFillPatch filpatcher(levelGrids, crseGrids,
-//                                          a_scal.nComp(), crseDomain, nRefCrse, scalGrow, false);
-
       if (scalGrow == 1)
       {
         m_piecewiseLinearFillPatchScalarOne.fillInterp(a_scal, oldCrseScal, newCrseScal,
-                            crse_time_interp_coeff,
-                            scalComps.begin(), scalComps.end(), scalComps.size());
+                                                       crse_time_interp_coeff,
+                                                       scalComps.begin(), scalComps.end(), scalComps.size());
       }
       else if (scalGrow == 2)
-            {
-              m_piecewiseLinearFillPatchScalarTwo.fillInterp(a_scal, oldCrseScal, newCrseScal,
-                                  crse_time_interp_coeff,
-                                  scalComps.begin(), scalComps.end(), scalComps.size());
-            }
+      {
+        m_piecewiseLinearFillPatchScalarTwo.fillInterp(a_scal, oldCrseScal, newCrseScal,
+                                                       crse_time_interp_coeff,
+                                                       scalComps.begin(), scalComps.end(), scalComps.size());
+      }
       else if (scalGrow == 3)
-            {
-              m_piecewiseLinearFillPatchScalarThree.fillInterp(a_scal, oldCrseScal, newCrseScal,
-                                  crse_time_interp_coeff,
-                                  scalComps.begin(), scalComps.end(), scalComps.size());
-            }
+      {
+        m_piecewiseLinearFillPatchScalarThree.fillInterp(a_scal, oldCrseScal, newCrseScal,
+                                                         crse_time_interp_coeff,
+                                                         scalComps.begin(), scalComps.end(), scalComps.size());
+      }
       else if (scalGrow == 4)
       {
         m_piecewiseLinearFillPatchScalarFour.fillInterp(a_scal, oldCrseScal, newCrseScal,
-                            crse_time_interp_coeff,
-                            scalComps.begin(), scalComps.end(), scalComps.size());
+                                                        crse_time_interp_coeff,
+                                                        scalComps.begin(), scalComps.end(), scalComps.size());
       }
       else
       {
@@ -8122,7 +8128,9 @@ void AMRLevelMushyLayer::getScalarBCs(BCHolder& thisBC, int a_var, bool a_homoge
   else
   {
     pout() << "WARNING No BCs for " << m_scalarVarNames[a_var] << endl;
-    MayDay::Error("AMRLevelMushyLayer::getScalarBCs - No BCs for scalar variable ");
+    MayDay::Warning("AMRLevelMushyLayer::getScalarBCs - No BCs for scalar variable, using extrapolation ");
+
+    thisBC = m_physBCPtr->extrapFuncBC();
   }
 }
 

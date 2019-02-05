@@ -277,6 +277,36 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
 }
 
 
+void AMRLevelMushyLayer::defineCFInterp()
+{
+  AMRLevelMushyLayer* mlCrse = getCoarserLevel();
+
+  if (mlCrse)
+  {
+    DisjointBoxLayout* crseGridsPtr = &(mlCrse->m_grids);
+    int nRefCrse = mlCrse->m_ref_ratio;
+
+    m_quadCFInterpScalar.define(m_grids, crseGridsPtr, m_dx, nRefCrse, 1,
+                                m_problem_domain);
+    m_quadCFInterpVector.define(m_grids, crseGridsPtr, m_dx, nRefCrse, SpaceDim,
+                                m_problem_domain);
+
+    ///  PiecewiseLinearFillPatch
+//    AMRLevelMushyLayer* crseML = getCoarserLevel();
+    const ProblemDomain& crseDomain = mlCrse->problemDomain();
+
+    m_piecewiseLinearFillPatchScalarOne.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
+                                               1, false);
+    m_piecewiseLinearFillPatchScalarTwo.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
+                                               2, false);
+    m_piecewiseLinearFillPatchScalarThree.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
+                                                 3, false);
+    m_piecewiseLinearFillPatchScalarFour.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
+                                                4, false);
+
+  }
+}
+
 void AMRLevelMushyLayer::levelSetup()
 {
   CH_TIME("AMRLevelMushyLayer::levelSetup");
@@ -294,7 +324,8 @@ void AMRLevelMushyLayer::levelSetup()
   m_hasCoarser = (amrMLCoarserPtr != NULL);
   m_hasFiner = (amrMLFinerPtr != NULL);
 
-  int nRefCrse = 2;
+  int nRefCrse = -1;
+
   DisjointBoxLayout* crseGridsPtr = NULL;
 
   Projector *crsProj = NULL;
@@ -323,6 +354,7 @@ void AMRLevelMushyLayer::levelSetup()
     crsProj = &(amrMLCoarserPtr->m_projection);
     crsProjBackup = &(amrMLCoarserPtr->m_projectionBackup);
     crseGridsPtr = &(amrMLCoarserPtr->m_grids);
+    nRefCrse = amrMLCoarserPtr->m_ref_ratio;
   }
 
   LevelDomainFluxRegister* fineDomainFRheat = NULL;
@@ -452,36 +484,10 @@ void AMRLevelMushyLayer::levelSetup()
     m_projection.isFinestLevel(true);
     m_projectionBackup.isFinestLevel(true);
 
-    //    if (hasCoarserLevel())
-    //    {
-    //      AMRLevelMushyLayer* mlCrse = getCoarserLevel();
-    //      mlCrse->m_projection.isFinestLevel(false);
-    //      mlCrse->m_projectionBackup.isFinestLevel(false);
-    //    }
-  }
-
-  if (m_hasCoarser)
-  {
-  m_quadCFInterpScalar.define(m_grids, crseGridsPtr, m_dx, nRefCrse, 1,
-                              m_problem_domain);
-  m_quadCFInterpVector.define(m_grids, crseGridsPtr, m_dx, nRefCrse, SpaceDim,
-                              m_problem_domain);
-
-  ///  PiecewiseLinearFillPatch
-  AMRLevelMushyLayer* crseML = getCoarserLevel();
-  const ProblemDomain& crseDomain = crseML->problemDomain();
-
-  m_piecewiseLinearFillPatchScalarOne.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
-                                             1, false);
-  m_piecewiseLinearFillPatchScalarTwo.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
-                                              2, false);
-  m_piecewiseLinearFillPatchScalarThree.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
-                                              3, false);
-
-  m_piecewiseLinearFillPatchScalarFour.define(m_grids, *crseGridsPtr,  1, crseDomain, nRefCrse,
-                                               4, false);
 
   }
+
+  defineCFInterp();
 
   //Some things don't care about coarser/finer levels, define them here:
 
@@ -2105,7 +2111,7 @@ void AMRLevelMushyLayer::initialDataCornerFlow()
 /*******/
 void AMRLevelMushyLayer::initialData()
 {
-  pout() << "AMRLevelMushyLayer::initialData - setting initial data on " << m_level << endl;
+  pout() << "AMRLevelMushyLayer::initialData - setting initial data on level " << m_level << endl;
 
   // For some reason AMR calls initialData() on levels
   // which don't have any grids yet. Can't fill empty grids
