@@ -76,9 +76,10 @@ def amr_convergence_test(params, full_output_dir, physicalProblem, nzs,
         s = SlurmTask('', p['concise_run_name'], '', num_proc)
         
         if restart_from_low_res and prev_job_id > -1:
-            new_dir = full_output_dir
+            new_dir = full_path
             refinement = int(float(p['main.num_cells'][0])/float(prev_num_cells[0]))
-            preprocess_cmd = 'python create_refined_restart.py -p %s -n %s -r %d \n' % (prev_dir, new_dir, refinement)
+            python_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'create_refined_restart.py')
+            preprocess_cmd = 'python %s -p %s -n %s -r %d \n' % (python_file, prev_dir, new_dir, refinement)
             s.set_dependency(prev_job_id)
             s.set_preprocess(preprocess_cmd)
             
@@ -88,7 +89,7 @@ def amr_convergence_test(params, full_output_dir, physicalProblem, nzs,
         ml_run.single_run(run_name)
         
         prev_job_id = s.job_id
-        prev_dir = full_output_dir
+        prev_dir = full_path
         prev_num_cells = p['main.num_cells']
         dependencies.append(s.job_id)
 

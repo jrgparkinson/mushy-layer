@@ -27,7 +27,7 @@ def create_refined_restart(argv):
             refinement = int(arg)
             
             
-    prev_chk_file = get_final_chk_file(old_dir)
+    prev_chk_file = os.path.join(old_dir, get_final_chk_file(old_dir))
     old_inputs_loc = os.path.join(old_dir, 'inputs')
     old_inputs = read_inputs(old_inputs_loc)
     new_box_size = int(old_inputs['main.max_grid_size']) * refinement
