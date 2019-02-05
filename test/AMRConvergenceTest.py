@@ -2,7 +2,8 @@
 import os
 from colorama import Fore
 from MushyLayerRunSimple import MushyLayerRunSimple
-from mushyLayerRunUtils import get_restart_file, get_executable_name
+from mushyLayerRunUtils import get_restart_file, get_executable_name,\
+    get_final_chk_file
 from SlurmTask import SlurmTask
 
 
@@ -75,15 +76,32 @@ def amr_convergence_test(params, full_output_dir, physicalProblem, nzs,
         # Don't need output dir or exec dir here, MushyLayerRun will fill these in
         s = SlurmTask('', p['concise_run_name'], '', num_proc)
         
-        if restart_from_low_res and prev_job_id > -1:
-            new_dir = full_path
-            refinement = int(float(p['main.num_cells'][0])/float(prev_num_cells[0]))
+        if restart_from_low_res:
             python_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'create_refined_restart.py')
-            preprocess_cmd = 'python %s -p %s -n %s -r %d \n' % (python_file, prev_dir, new_dir, refinement)
-            s.set_dependency(prev_job_id)
-            s.set_preprocess(preprocess_cmd)
+            new_dir = full_path
             
-            p['main.restart_file'] = os.path.join(new_dir, 'restart.2d.hdf5')
+            if prev_job_id > -1:
+                
+                refinement = int(float(p['main.num_cells'][0])/float(prev_num_cells[0]))
+                
+                preprocess_cmd = 'python %s -p %s -n %s -r %d \n' % (python_file, prev_dir, new_dir, refinement)
+                s.set_dependency(prev_job_id)
+                s.set_preprocess(preprocess_cmd)
+                p['main.restart_file'] = os.path.join(new_dir, 'restart.2d.hdf5')
+            else:
+                # Search for an old file we can restart from, just in case
+                refinement = 2
+                this_nx = int(p['main.num_cells'][0])
+                coarse_nx = int(float(this_nx)/2.0)
+                coarser_dir = new_dir.replace(str(this_nx), str(coarse_nx))
+                
+                if os.path.exists(coarser_dir) and get_final_chk_file(coarser_dir):
+                    preprocess_cmd = 'python %s -p %s -n %s -r %d \n' % (python_file, coarser_dir, new_dir, refinement)
+                    s.set_preprocess(preprocess_cmd)
+                    p['main.restart_file'] = os.path.join(new_dir, 'restart.2d.hdf5')
+                
+            
+            
 
         ml_run = MushyLayerRunSimple(full_output_dir, num_proc, p, s, allow_restarts, get_executable_name())
         ml_run.single_run(run_name)
