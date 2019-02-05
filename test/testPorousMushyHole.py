@@ -23,7 +23,7 @@ def testPorousMushyHole(argv):
         sys.exit(2)
 
     for opt, arg in opts:
-        if opt in ("-t"):
+        if opt in "-t":
             max_time = float(arg)
 
     base_output_dir = get_base_output_dir()

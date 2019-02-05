@@ -19,14 +19,12 @@ def testHeleShawFixedChill(argv):
 
     # Defaults
     defaultParams = read_inputs(params_file)
-    extra_params = {}
-
-    extra_params['main.max_time']=float(defaultParams['main.max_time'])
-    extra_params['parameters.rayleighComp']=float(defaultParams['parameters.rayleighComp'])
-    extra_params['parameters.darcy']=float(defaultParams['parameters.darcy'])
-    extra_params['parameters.compositionRatio']=float(defaultParams['parameters.compositionRatio'])
-    extra_params['parameters.nonDimReluctance'] = float(defaultParams['parameters.nonDimReluctance'])
-    extra_params['parameters.prandtl'] = float(defaultParams['parameters.prandtl'])
+    extra_params = {'main.max_time': float(defaultParams['main.max_time']),
+                    'parameters.rayleighComp': float(defaultParams['parameters.rayleighComp']),
+                    'parameters.darcy': float(defaultParams['parameters.darcy']),
+                    'parameters.compositionRatio': float(defaultParams['parameters.compositionRatio']),
+                    'parameters.nonDimReluctance': float(defaultParams['parameters.nonDimReluctance']),
+                    'parameters.prandtl': float(defaultParams['parameters.prandtl'])}
 
     doAMR = True
 
@@ -44,7 +42,7 @@ def testHeleShawFixedChill(argv):
         sys.exit(2)
 
     for opt, arg in opts:
-        if opt in ("-t"):
+        if opt in "-t":
             extra_params['main.max_time'] = float(arg)
         elif opt in ("-R"):
             extra_params['parameters.rayleighComp'] = float(arg)

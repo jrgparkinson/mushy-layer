@@ -1,44 +1,38 @@
-import sys
 import os
 import re
 import math
 from os import listdir
 from os.path import isfile, join, exists
-import subprocess
 import socket
 
 from mushyLayerRunUtils import read_inputs, write_inputs, get_current_vcs_revision
 
-# This class basically just makes the output directory and dumps an input file into it
-# It also performs various sanity checks
+""" 
+This class basically just makes the output directory and dumps an input file into it
+ It also performs various sanity checks """
 class MushyLayerRunSimple:
 
-    def __init__(self, base_output_dir, num_proc, parameters, slurmJob, allowMultipleDirs, programName):
+    def __init__(self, base_output_dir, num_proc, parameters, slurm_job, allow_multiple_dirs, program_name):
         
         self.num_proc = num_proc
         self.parameters = parameters
-        self.program_name = programName
+        self.program_name = program_name
             
         # Allow us to create output dirs -0, -1, -2 etc.
         # If set to false, and the output dir ending -0 already exists,
         # then we won't do the run
-        self.allowMultipleOutputDirs = allowMultipleDirs
+        self.allow_multiple_output_dirs = allow_multiple_dirs
 
         self.makeSlurmJob = True
-        self.slurmJob = slurmJob
+        self.slurm_job = slurm_job
 
         self.base_output_dir = base_output_dir
 
-        mushyLayerDir = os.environ['MUSHY_LAYER_DIR']
-        print('Mushy layer dir: %s' % mushyLayerDir)
-        self.exec_dir = os.path.join(mushyLayerDir, 'execSubcycle')
-
-        #self.base_command = "mpirun --mca mpi_warn_on_fork 0  -np " + \
-        #    str(self.num_proc) + " " + self.exec_dir + \
-        #    self.program_name + " "
+        mushy_layer_dir = os.environ['MUSHY_LAYER_DIR']
+        print('Mushy layer dir: %s' % mushy_layer_dir)
+        self.exec_dir = os.path.join(mushy_layer_dir, 'execSubcycle')
 
         # Make outputDir if it doesn't exist
-        
         if not (exists(self.base_output_dir)):
             os.makedirs(self.base_output_dir)
 
@@ -51,7 +45,7 @@ class MushyLayerRunSimple:
             
             with open(parameters['main.gridfile'], 'r') as f:
                 #all_lines = f.read()
-                maxBoxLength = 0.0
+                max_box_length = 0.0
                 pattern = '\(\((\d+),(\d+)\) \((\d+),(\d+)\) \((\d+),(\d+)\)\)'
                 
                 for line in f.readlines():
@@ -66,13 +60,13 @@ class MushyLayerRunSimple:
                         z_lo = int(m.group(5))
                         z_hi = int(m.group(6))
 
-                        maxBoxLength = max(maxBoxLength, y_hi+1-y_lo)
-                        maxBoxLength = max(maxBoxLength, x_hi+1-x_lo)
-                        maxBoxLength = max(maxBoxLength, z_hi+1-z_lo)
+                        max_box_length = max(max_box_length, y_hi+1-y_lo)
+                        max_box_length = max(max_box_length, x_hi+1-x_lo)
+                        max_box_length = max(max_box_length, z_hi+1-z_lo)
 
                 # Make sure max_grid_size is at least as big as the largest
                 # box in the specified grid
-                parameters['main.max_grid_size'] = str(max(int(parameters['main.max_grid_size']), maxBoxLength))
+                parameters['main.max_grid_size'] = str(max(int(parameters['main.max_grid_size']), max_box_length))
         elif 'main.num_cells' in parameters and 'main.max_grid_size' not in parameters:
                 # want to choose max_grid_size to do parallel stuff most effectively
                 # Want to choose a box size to make the parallel computations most
@@ -102,11 +96,11 @@ class MushyLayerRunSimple:
 
         this_run_directory = self.get_most_recent_directory(run_name)
 
-        exitStatus = self.run_model(self.parameters['main.num_cells'],
+        exit_status = self.run_model(self.parameters['main.num_cells'],
                                     join(self.base_output_dir, this_run_directory),
                                     False)
 
-        return exitStatus
+        return exit_status
 
     def run_model(self,  grid_res,  output_folder,  analytic):
 
@@ -150,16 +144,16 @@ class MushyLayerRunSimple:
 
         # copyfile(inputs_file, new_input_file)
         # Read in the file
-        PARAMS_KEY = 'main.params_file'
+        params_key = 'main.params_file'
 
         #inputsParams = readInputs(inputs_file)
         inputsParams = {}
         
         extraParams = {}
-        if PARAMS_KEY in self.parameters:
-            extraParams = read_inputs(self.parameters[PARAMS_KEY])
-        elif PARAMS_KEY in inputsParams:
-            extraParams = read_inputs(inputsParams[PARAMS_KEY])
+        if params_key in self.parameters:
+            extraParams = read_inputs(self.parameters[params_key])
+        elif params_key in inputsParams:
+            extraParams = read_inputs(inputsParams[params_key])
 
         # Merge all dictionary's
         # Important that it's done in this order, so that parameters
@@ -193,12 +187,12 @@ class MushyLayerRunSimple:
 
         # Set remaining parameters on the slurm jobs
 
-        self.slurmJob.folder = output_folder
-        self.slurmJob.set_exec_file(os.path.join(self.exec_dir, self.program_name))
+        self.slurm_job.folder = output_folder
+        self.slurm_job.set_exec_file(os.path.join(self.exec_dir, self.program_name))
         print('Exec dir: %s, program name: %s, exec file: %s' % ( self.exec_dir, self.program_name, os.path.join(self.exec_dir, self.program_name)) )
 
-        self.slurmJob.write_slurm_file()
-        self.slurmJob.run_task()
+        self.slurm_job.write_slurm_file()
+        self.slurm_job.run_task()
 
         return 1
 
@@ -207,7 +201,7 @@ class MushyLayerRunSimple:
     def make_next_dir(self,  basename):
         i = 0
         new_dir = basename + "-" + str(i) + "/"
-        while(os.path.isdir(new_dir)):
+        while os.path.isdir(new_dir):
             print('    Path exists: ' + new_dir + ', ' + str(os.path.isdir(new_dir)))
             onlyfiles = [f for f in listdir(new_dir) if isfile(join(new_dir, f))]
             print(str(onlyfiles))
@@ -216,26 +210,25 @@ class MushyLayerRunSimple:
             new_dir = basename + "-" + str(i) + "/"
             
         # If we already have directory -0, we may not want to create -1, -2 etc.
-        if i > 0 and not self.allowMultipleOutputDirs:
+        if i > 0 and not self.allow_multiple_output_dirs:
             return -1
             
         # Also check for directories ending in -steady with the same name
-        if not self.allowMultipleOutputDirs:
-            steadyName = new_dir.replace('-' + str(i), '-steady')
-            if os.path.isdir(steadyName):
-                print('    Path exists: ' + steadyName)
+        if not self.allow_multiple_output_dirs:
+            steady_name = new_dir.replace('-' + str(i), '-steady')
+            if os.path.isdir(steady_name):
+                print('    Path exists: ' + steady_name)
                 return -1
 
         os.makedirs(new_dir)
 
-        #print("New output directory is " + new_dir)
         return new_dir
 
     def get_most_recent_directory(self, run_name):
         basename = join(self.base_output_dir, str(run_name))
         i = 0
         new_dir = basename + "-" + str(i) + "/"
-        while(os.path.exists(new_dir)):
+        while os.path.exists(new_dir):
             i = i + 1
             new_dir = basename + "-" + str(i) + "/"
 

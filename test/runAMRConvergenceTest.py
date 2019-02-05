@@ -4,9 +4,9 @@ import sys
 import math
 import getopt
 from colorama import Fore, Style
-from mushyLayerRunUtils import construct_run_name, read_inputs, write_inputs, is_power_of_two, string_to_array
+from mushyLayerRunUtils import read_inputs, is_power_of_two, string_to_array
 from SlurmTask import SlurmTask
-from AMRConvergenceTest import AMRConvergenceTest
+from AMRConvergenceTest import amr_convergence_test
 
 
 def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '', extra_params={}, numRestarts=0, params_file = ''):
@@ -31,7 +31,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
     
         finestRefinement = pow(ref_rat, max_level)
         maxRefinement = ref_rat**max_level
-
+        output_dir = ''
         Nz_i = -1
 
         # Construct the params files 
@@ -87,19 +87,9 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                     params_file = mushyLayerBaseDir + '/params/convergenceTest/convectionDarcyBrinkmanConvTest.parameters'
 
                 params = read_inputs(params_file)
-                
 
                 params['main.refine_thresh'] = str(3.0/float(Nz_coarse))
                 params['main.tag_buffer_size']=str(max(2,int(float(Nz_coarse)/8)))
-                
-
-                #params['main.steady_state'] = '1e-8'
-                #params['main.max_time'] = '50000000.0'
-                #params['main.max_dt'] = '1e-1'
-
-                
-                #params['main.plot_interval'] = '100000' #str(int(100.0*float(Nz_coarse)/16.0))
-                #params['main.checkpoint_interval'] = params['main.plot_interval']
 
                 params['main.time_integration_order'] = '2'
                     
@@ -128,7 +118,7 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
                 #runTypes = ['amr']
                 
                 # For a fixed dt:
-                dt = (1e-5)*float(16.0/float(Nz_coarse))
+                dt = 1e-5 * float(16.0 / float(Nz_coarse))
                 numSteps = float(integrationTime)/dt
                 
                 params['main.plot_interval'] = str(int(numSteps/5.0))
@@ -397,12 +387,9 @@ def runTest(base_dir, physicalProblem, AMRSetup, num_procs, analysis_command = '
 
         # Actually run the convergence test
         full_output_dir = os.path.join(base_dir, output_dir)
-        #print('Data dir: ' + base_dir + '\n')
-        #print('Output dir: ' + output_dir + '\n')
-        #print('Full output dir: ' + full_output_dir + '\n')
+
         
-        
-        these_job_ids = AMRConvergenceTest(all_params, full_output_dir, physicalProblem, Nzs, num_procs, numRestarts, analysis_command)
+        these_job_ids = amr_convergence_test(all_params, full_output_dir, physicalProblem, Nzs, num_procs, numRestarts, analysis_command)
 
         # Concatenate lists
         job_ids = job_ids + these_job_ids
@@ -490,9 +477,8 @@ def main(argv):
 
     base_dir = os.path.join(base_dir, 'AMRConvergenceTestMushyConvection')
 
-    runTest(base_dir, physicalProblem, AMRSetup, Nzs, num_procs)
+    runTest(base_dir, physicalProblem, AMRSetup, num_procs)
 
-            
 
 if __name__ == "__main__":
     print('Running script')

@@ -120,29 +120,17 @@ class SlurmTask:
 
         file_contents = ['#!/bin/bash \n',
                          '# Set your minimum acceptable walltime, format: day-hours:minutes:seconds \n',
-                         '#SBATCH --time=' + time_string + '\n',
-                         partitions_str, exclude_str,
-                         '# Set name of job shown in squeue' + '\n',
-                         '#SBATCH --job-name ' + self.jobname + '\n',
-                         '# Request CPU resources' + '\n',
-                         '#SBATCH --ntasks=' + str(
-                             int(self.num_proc)) + '                  # Number of MPI ranks' + '\n',
-                         '#SBATCH --cpus-per-task=' + str(
-                             int(self.cpu_per_task)) + '            # Number of cores per MPI rank ' + '\n',
+                         '#SBATCH --time=' + time_string + '\n', partitions_str, exclude_str,
+                         '# Set name of job shown in squeue' + '\n', '#SBATCH --job-name ' + self.jobname + '\n',
+                         '# Request CPU resources' + '\n', '#SBATCH --ntasks=' + str(int(self.num_proc)) + '                  # Number of MPI ranks' + '\n',
+                         '#SBATCH --cpus-per-task=' + str(int(self.cpu_per_task)) + '            # Number of cores per MPI rank ' + '\n',
                          '#SBATCH --nodes=' + str(int(self.num_nodes)) + '                    # Number of nodes' + '\n',
-                         '#SBATCH --ntasks-per-node=' + str(
-                             int(self.tasks_per_node)) + '         # How many tasks on each node' + '\n',
-                         '#SBATCH --ntasks-per-socket=' + str(int(
-                             self.tasks_per_socket)) + '        # How many tasks on each CPU or socket (not sure what this really means)' + '\n',
+                         '#SBATCH --ntasks-per-node=' + str(int(self.tasks_per_node)) + '         # How many tasks on each node' + '\n',
+                         '#SBATCH --ntasks-per-socket=' + str(int(self.tasks_per_socket)) + '        # How many tasks on each CPU or socket (not sure what this really means)' + '\n',
                          '#SBATCH --distribution=cyclic:cyclic # Distribute tasks cyclically on nodes and sockets' + '\n',
-                         '# Memory usage (MB)' + '\n',
-                         '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
-                         '#SBATCH --output=' + os.path.join(self.folder,
-                                                            'sbatch.out') + '   # Standard output and error log' + '\n',
-                         dependency_str,
-                         'cd ' + self.folder + '; \n \n ']
-
-        file_contents.append('\n' + self.preprocess_command + '\n')
+                         '# Memory usage (MB)' + '\n', '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
+                         '#SBATCH --output=' + os.path.join(self.folder, 'sbatch.out') + '   # Standard output and error log' + '\n',
+                         dependency_str, 'cd ' + self.folder + '; \n \n ', '\n' + self.preprocess_command + '\n']
 
         if self.custom_command:
             file_contents.append(self.custom_command)
