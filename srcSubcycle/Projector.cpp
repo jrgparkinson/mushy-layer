@@ -1028,14 +1028,12 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
       for (sit.reset(); sit.ok(); ++sit)
       {
         Side::LoHiSide side = sit();
-        int sideSign = sign(side);
 
         for (int dir=0; dir < SpaceDim; dir++)
         {
           int boxSize = 5;
           Box zeroBox = adjCellBox(domBox, dir, side, boxSize);
           zeroBox.shift(dir, -boxSize);
-//          zeroBox.grow(dir, )
 
           Box stateBox = rhsInterior[dit].box();
 
@@ -1671,15 +1669,8 @@ void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
 
     divU.exchange();
 
-    Real maxDivU = ::computeNorm(divU, NULL, 1, m_dx, Interval(0,0), 0);
-    Real maxVel = ::computeNorm(a_velocity, NULL, 1, m_dx, Interval(0,SpaceDim-1), 0);
-
-    // Don't correct if div(u) is very small, or of order U
-    //    if (maxDivU > 1e-10 && maxVel/maxDivU > 100)
-    //    {
     pout() << "  CCProjector - smoothing div(u) " << endl;
 
-    //    Gradient::levelGradientMAC(correction, divU, m_dx);
     Gradient::levelGradientCC(correction, divU, m_dx);
 
     correction.exchange();
