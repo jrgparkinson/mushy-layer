@@ -61,8 +61,9 @@ def test_uniform_porous_convection(argv):
         amr_setup.append({'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [nz_uniform]})
 
     if nz_vm > 0:
-        amr_setup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [nz_vm]})
-        amr_setup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(nz_vm / 2)]})
+        # amr_setup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [nz_vm]})
+        # amr_setup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(nz_vm / 2)]})
+        amr_setup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(nz_vm / 2), nz_vm]})
 
     num_procs = [1]
     # chi = 0.4
