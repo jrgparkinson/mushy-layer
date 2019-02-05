@@ -109,8 +109,8 @@ def test_uniform_porous_convection(argv):
             extra_params['main.plot_period'] = 0.1
             extra_params['main.checkpoint_interval'] = 10000
             
-            # TODO: remove this testing
-            extra_params['main.max_step'] = 10
+            # this is for testing purposes
+            # extra_params['main.max_step'] = 10
            
             if chi < 1.0:
                 extra_params['parameters.darcy'] = da * pow(1 - chi, 2) / pow(chi, 3.0)
