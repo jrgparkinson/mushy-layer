@@ -40,7 +40,7 @@ def make_figures():
     # Write out as a script then run that
     scriptFile = os.path.join(base_output_dir, 'makeFigureScript.m')
     f = open(scriptFile, "w")
-    full_matlab_command = "set(groot, 'defaultAxesFontName', 'Times'); \nset(groot, 'defaultTextFontName', 'Times'); \n" + full_matlab_command
+    full_matlab_command = "set(groot, 'defaultAxesFontName', 'Latin Modern Math'); \nset(groot, 'defaultTextFontName', 'Latin Modern Math'); \n" + full_matlab_command
     f.write(full_matlab_command)
     f.close()
 
