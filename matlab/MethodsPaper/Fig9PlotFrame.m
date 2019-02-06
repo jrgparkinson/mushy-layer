@@ -2,6 +2,8 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
 
    success= false;
    
+   textFontSize = 9;
+   
     if thisFrame == -1
         ml = getFinalPlotFile(output_dir);
     else
@@ -314,8 +316,8 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
             
         else
             cbar.Label.Position(1) = cbar.Label.Position(1) -1.0;
-            cbar.Position(2) = cbar.Position(2)-0.1;
-            cbar.Position(4) = cbar.Position(4)+0.2;
+            cbar.Position(2) = cbar.Position(2)+0.1;
+            cbar.Position(4) = cbar.Position(4)+0.05;
         end
         
         %cPorosity.Label.Position = [0.5 1.2];
@@ -384,7 +386,7 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
     if options.timeTitle 
         title(allAxes{frame_i}(1), thisLabel);
     else
-        text(0.02, 0.55, thisLabel, 'FontSize', 16);
+        text(0.02, 0.55, thisLabel, 'FontSize', textFontSize);
     end
     
     success = true;

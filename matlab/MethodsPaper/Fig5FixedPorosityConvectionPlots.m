@@ -15,7 +15,7 @@ if nargin < 3
 end
 
 close all;
-
+  
 figureName =  [figureDirectory, 'Fig5FixedPorousFigure']; %[dataFolderNu, 'benchmark2Convergence'];
 saveFigure = true;
 

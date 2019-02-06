@@ -15,7 +15,7 @@ def make_figures():
 
     print(Fore.GREEN + 'Make figures' + Style.RESET_ALL)
 
-    data_folder_nu = os.path.join(base_output_dir, 'ConvectionDB-cfl0.15','chi0.4-Da1.0e-02-Ra1.0e+05')
+    data_folder_nu = os.path.join(base_output_dir, 'ConvectionDB-cfl0.2','chi0.4-Da1.0e-02-Ra1.0e+05')
     data_folder_variable_porosity = os.path.join(base_output_dir, 'FixedPorousHole-1proc')
 
     porous_mushy_hole_folder = os.path.join(base_output_dir, 'PorousMushyHole-t0.00015')

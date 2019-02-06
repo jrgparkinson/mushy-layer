@@ -46,7 +46,6 @@ options.subPlotLabel = ''; % no a/b/c/ label
 options.timeTitle = true;
 options.cbarPos = [];
 
-figPos = [100 100 900 400];
 
 close all;
 
@@ -94,6 +93,24 @@ try
     
     h = figure();
     
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    set(h,'Units','Inches');
+    figPos = [2.0 2.0 4.5 2.0] ;
+
+    h.Position = figPos;
+    textFontSize = 9;
+    legendFontSize = 8;
+    domainFontSize = 8;
+
+    set(0, 'defaultlinelinewidth',1);
+    set(0, 'defaultaxeslinewidth',1);
+    set(0, 'defaultpatchlinewidth',1);
+    set(0, 'defaultAxesFontSize', textFontSize);
+    set(0, 'defaultAxesFontName', 'times');
+    set(0, 'defaultTextFontName', 'times');
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    
     set(h, 'Position', figPos);
     fprintf('Setting figure position: [%d %d %d %d]\n', figPos(1), figPos(2), figPos(3), figPos(4));
       
@@ -106,8 +123,7 @@ try
         % Set position again to be sure
         set(h, 'Position', figPos);
         fprintf('Setting figure position: [%d %d %d %d]\n', figPos(1), figPos(2), figPos(3), figPos(4));
-        
-        
+           
         % Make sure we specify the paper position
         paperPos =  [0 0 figPos(3)/100 figPos(4)/100];
         set(h, 'PaperUnits', 'inches', 'PaperPosition', paperPos);
