@@ -28,8 +28,8 @@ end
 
 
 % For png's, need times font I think
-set(groot, 'DefaultAxesFontName', 'times');
-set(groot, 'DefaultTextFontName', 'times');
+%set(groot, 'DefaultAxesFontName', 'times');
+%set(groot, 'DefaultTextFontName', 'times');
 
 processSpecificFolder(output_dir, frames, figure_output_dir);
  
@@ -70,8 +70,8 @@ set(0, 'defaultlinelinewidth',1);
 set(0, 'defaultaxeslinewidth',1);
 set(0, 'defaultpatchlinewidth',1);
 set(0, 'defaultAxesFontSize', textFontSize);
-set(0, 'defaultAxesFontName', 'times');
-set(0, 'defaultTextFontName', 'times');
+%set(0, 'defaultAxesFontName', 'times');
+%set(0, 'defaultTextFontName', 'times');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -132,6 +132,8 @@ end
 if savePNG
     print(h,[filename, '.png'],'-dpng','-r800')
 end
+
+print(h,[filename, '.eps'],'-depsc','-50')
 
 
 

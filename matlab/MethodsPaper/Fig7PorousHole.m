@@ -95,7 +95,7 @@ set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(
 
 if saveFigure
     fprintf('Saved to %s \n', figureName);
-    print(h,[figureName, '.pdf'],'-dpdf','-r50')
+    print(h,[figureName, '.eps'],'-depsc','-r50')
     print(h,[figureName, '.png'],'-dpng','-r1000')
 end
 

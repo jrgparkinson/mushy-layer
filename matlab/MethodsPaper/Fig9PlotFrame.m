@@ -316,8 +316,8 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
             
         else
             cbar.Label.Position(1) = cbar.Label.Position(1) -1.0;
-            cbar.Position(2) = cbar.Position(2)+0.1;
-            cbar.Position(4) = cbar.Position(4)+0.05;
+            cbar.Position(2) = cbar.Position(2)+0.5;
+            cbar.Position(4) = cbar.Position(4)+0.2;
         end
         
         %cPorosity.Label.Position = [0.5 1.2];

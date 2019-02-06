@@ -69,7 +69,7 @@ text(-0.12, -0.02, '$H=H(\theta=1, \chi=0.4), \Theta=0, \mathbf{U} = 0.$', ...
 text(1.15 , -0.02, '$H=H(\theta=0, \chi=0.4), \Theta=0, \mathbf{U} = 0.$', ...
     'FontSize', domainFontSize, 'Rotation', 90);
 
-text(-0.01, 1.11 ,insulatingStr, 'FontSize', domainFontSize);
+text(-0.01, 1.08 ,insulatingStr, 'FontSize', domainFontSize);
 text(-0.01, -0.11, insulatingStr, 'FontSize', domainFontSize);
 
 %axis arrows
@@ -181,6 +181,13 @@ end
 
 function makeSubplot(AMRsol,UniformFineSol, axisExtent)
 
+onLaptop = false;
+[~, name] = system('hostname'); 
+name = strtrim(name);
+if strcmp(name, 'atmlxlap005')
+onLaptop = true;
+end
+
 T = AMRsol.dataForComp(AMRsol.components.Temperature).';
 psi = AMRsol.dataForComp(AMRsol.components.streamfunction).';
 psiUniform = UniformFineSol.dataForComp(UniformFineSol.components.streamfunction).';
@@ -244,7 +251,11 @@ cTemp.TickLabels = {'0', '1'};
 %cTemp.Position(2) = cTemp.Position(2)-0.05;
 cTemp.Label.String = '\theta';
 oldPos = cTemp.Label.Position;
-cTempLabelOffset = 1.2;
+if onLaptop
+    cTempLabelOffset = 1.2;
+else
+    cTempLabelOffset = 0.0;
+end
 cTemp.Label.Position = [oldPos(1) oldPos(2)+cTempLabelOffset];
 
 
@@ -342,14 +353,20 @@ cPsi.TickLabels = {sprintf(formatMin,newTicks(1)), sprintf(formatMax,newTicks(en
 
 oldPos = cPsi.Position;
 
-cTemp.Position(2) = cTemp.Position(2)-0.02;
-cTemp.Position(4) = cTemp.Position(4)-0.02;
+if onLaptop
+    cTemp.Position(2) = cTemp.Position(2)-0.02;
+    cTemp.Position(4) = cTemp.Position(4)-0.02;
+end
 
 thetaColorbarPos = cTemp.Position;
 %cPsi.Position = [oldPos(1) oldPos(2)-0.05 oldPos(3)-0.035 oldPos(4)];
 cPsi.Position = [thetaColorbarPos(1) axisExtent(2)-0.15 thetaColorbarPos(3) thetaColorbarPos(4)];
 
-cPsiLabelOffset = 0.7;
+if onLaptop
+    cPsiLabelOffset = 0.7;
+else
+    cPsiLabelOffset = 1.2;
+end
 oldPos = cPsi.Label.Position;
 cPsi.Label.Position = [oldPos(1) oldPos(2) + cPsiLabelOffset];
 

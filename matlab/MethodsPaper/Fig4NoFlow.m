@@ -64,7 +64,7 @@ axPos(3,:) = [axPos(2,1)+axPos(2,3) plotBottom 0.12 plotHeight];
 axPos(4,:) = [axPos(3,1)+axPos(3,3)+horizSpacing+0.02  plotBottom 0.13 plotHeight];
 %axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*3 plotBottom 0.12 plotHeight];
 smallPlotHeight = plotHeight/2.0;
-axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*3 plotBottom+smallPlotHeight 0.16 smallPlotHeight];
+axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing plotBottom+smallPlotHeight 0.16 smallPlotHeight];
 axPos(6,:) =  [axPos(5,1) plotBottom axPos(5,3) axPos(5,4)];
 
 %perm = perm(:, 40:(end-5));
@@ -401,8 +401,8 @@ ylim([-4.5 -1.5]);
 
 axMaxErr.XTick = [-2, -1, 0];
 axMaxErr.XTickLabels = {'', '', ''};
-
-text(-2.0,-1.7,'(e)','FontSize', textFontSize, 'Parent', axMaxErr);
+x_lab_pos = -2.1;
+text(x_lab_pos,-1.8,'(e)','FontSize', textFontSize, 'Parent', axMaxErr);
 ylabel('log$_{10}($Max$|\theta_{err}|)$');
 
 %legPos = [ax.Position(1)+0.065 ax.Position(2)+plotHeight-0.16 0.05 0.05];
@@ -440,7 +440,7 @@ axMaxErr.Position = axPos(5,:);
 axErrProfiles.Position = axPos(4,:);
 
 
-text(-2.0,-2.2,'(f)','FontSize', textFontSize, 'Parent', axMeanErr);
+text(x_lab_pos,-2.2,'(f)','FontSize', textFontSize, 'Parent', axMeanErr);
 
 xlabel('log$_{10}(\Delta z)$');
 ylabel('log$_{10}(\bar{|\theta_{err}|})$');
