@@ -66,7 +66,7 @@ insulatingStr = {'b: $\partial H/\partial x = \partial \Theta / \partial x = 0, 
 
 text(-0.12, -0.02, '$H=H(\theta=1, \chi=0.4), \Theta=0, \mathbf{U} = 0.$', ...
     'FontSize', domainFontSize, 'Rotation', 90);
-text(1.15 , -0.02, '$H=H(\theta=0, \chi=0.4), \Theta=0, \mathbf{U} = 0.$', ...
+text(1.08 , -0.02, '$H=H(\theta=0, \chi=0.4), \Theta=0, \mathbf{U} = 0.$', ...
     'FontSize', domainFontSize, 'Rotation', 90);
 
 text(-0.01, 1.08 ,insulatingStr, 'FontSize', domainFontSize);
@@ -254,7 +254,7 @@ oldPos = cTemp.Label.Position;
 if onLaptop
     cTempLabelOffset = 1.2;
 else
-    cTempLabelOffset = 0.0;
+    cTempLabelOffset = -0.8;
 end
 cTemp.Label.Position = [oldPos(1) oldPos(2)+cTempLabelOffset];
 

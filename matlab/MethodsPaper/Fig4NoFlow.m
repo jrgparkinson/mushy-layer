@@ -64,7 +64,7 @@ axPos(3,:) = [axPos(2,1)+axPos(2,3) plotBottom 0.12 plotHeight];
 axPos(4,:) = [axPos(3,1)+axPos(3,3)+horizSpacing+0.02  plotBottom 0.13 plotHeight];
 %axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*3 plotBottom 0.12 plotHeight];
 smallPlotHeight = plotHeight/2.0;
-axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing plotBottom+smallPlotHeight 0.16 smallPlotHeight];
+axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*2 plotBottom+smallPlotHeight 0.16 smallPlotHeight];
 axPos(6,:) =  [axPos(5,1) plotBottom axPos(5,3) axPos(5,4)];
 
 %perm = perm(:, 40:(end-5));
