@@ -216,7 +216,7 @@ def runTest(base_dir, physical_problem, AMRSetup, num_procs,
 
                 bf = max(int(nx_coarse / 4), 4)
                 
-                maxGridSize = bf * 2
+                maxGridSize = 1024 #bf * 2
                 gbs = max(bf / 8, 2)
 
                 params['main.block_factor'] = str(bf)
