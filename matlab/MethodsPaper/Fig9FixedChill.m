@@ -67,6 +67,9 @@ set(0, 'defaultaxeslinewidth',1);
 set(0, 'defaultpatchlinewidth',1);
 set(0, 'defaultAxesFontSize', textFontSize);
 
+font = 'Latin Modern Math';
+set(0, 'defaultAxesFontName', font); 
+set(0, 'defaultTextFontName', font); 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
