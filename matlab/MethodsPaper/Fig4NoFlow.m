@@ -60,8 +60,8 @@ chiUniform = outputUniformFine.dataForComp(output2lev.components.Porosity);
 
 axPos(1,:) = [0.05 plotBottom 0.13 plotHeight];
 axPos(2,:) = [axPos(1,1)+axPos(1,3)+horizSpacing plotBottom 0.16 plotHeight];
-axPos(3,:) = [axPos(2,1)+axPos(2,3) plotBottom 0.12 plotHeight];
-axPos(4,:) = [axPos(3,1)+axPos(3,3)+horizSpacing+0.02  plotBottom 0.13 plotHeight];
+axPos(3,:) = [axPos(2,1)+axPos(2,3) plotBottom 0.13 plotHeight];
+axPos(4,:) = [axPos(3,1)+axPos(3,3)+horizSpacing+0.01  plotBottom 0.13 plotHeight];
 %axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*3 plotBottom 0.12 plotHeight];
 smallPlotHeight = plotHeight/2.0;
 axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*2 plotBottom+smallPlotHeight 0.16 smallPlotHeight];
