@@ -30,7 +30,8 @@ h.Position = [200 200 1200 500];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 set(h,'Units','Inches');
 h.Position = [2.0 2.0 6.5 2.9];
-textFontSize = 10;
+% Caption font size is 8pt
+textFontSize = 8;
 legendFontSize = 8;
 domainFontSize = 8;
 

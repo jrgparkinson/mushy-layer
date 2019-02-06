@@ -27,7 +27,8 @@ h = figure();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 set(h,'Units','Inches');
 h.Position = [2.0 2.0 6.5 2.7];
-textFontSize = 10;
+% Caption font size is 8pt
+textFontSize = 8;
 legendFontSize = 8;
 domainFontSize = 8;
 
