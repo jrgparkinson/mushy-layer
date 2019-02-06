@@ -458,7 +458,7 @@ box on;
 axRight.Position = [0.66 pltBottom 0.32 pltHeight];
 
 xlabel('Refinement ratio');
-legend('Normalized cells', 'Normalized time');
+legend({'Normalized cells advanced', 'Normalized CPU time'}, 'FontSize', legendFontSize);
 %title('(b)');
 text(-0.8, 1.02, '(b)');
 
