@@ -2,8 +2,8 @@ function Fig4NoFlow(dataFolder, figureName)
 
 if nargin < 2
    %dataFolder = '/home/parkinsonjl/convection-in-sea-ice/MushyLayer/matlab/MethodsPaper/';
-   dataFolder = getDataDir('Test/NoFlow/');
-   figureName = 'Fig4BenchmarkNoFlow.pdf';
+   dataFolder = getDataDir('TestDiffusiveTimescale/NoFlow/');
+   figureName = 'Fig4BenchmarkNoFlow.eps';
 end
 
 close all;
@@ -24,21 +24,21 @@ savePlots = true;
 uniformPrefix = 'Uniform-noFlow-';
 gridRes = [8,16,32,64,128,256];
 dz = 4./gridRes;
-errUniform = NaN*ones(length(gridRes), 1);
-errAMR = NaN*ones(length(gridRes), 1);
+errUniformL1 = NaN*ones(length(gridRes), 1);
+errAMRL1 = NaN*ones(length(gridRes), 1);
 
 amrPrefix2lev = 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel2-ref2-noFlow-';
 amrPrefix1lev = 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-noFlow-';
 
 
 textFontSize = 16;
-labelPos = [0.05 4.0];
+labelPos = [0.05 3.9];
 
 plotWindowSize =  [200 200 1400 550];
 
-plotHeight = 0.7;
-plotWidth = 0.18;
-plotBottom = 0.18;
+plotHeight = 0.63;
+%plotWidth = 0.18;
+plotBottom = 0.14;
 horizSpacing = 0.03;
 
 doColorbar = true;
@@ -59,10 +59,13 @@ Tuniform  = outputUniformFine.dataForComp(output2lev.components.Temperature);
 chiUniform = outputUniformFine.dataForComp(output2lev.components.Porosity);
 
 axPos(1,:) = [0.05 plotBottom 0.13 plotHeight];
-axPos(2,:) = [axPos(1,1)+axPos(1,3)+horizSpacing plotBottom 0.17 plotHeight];
-axPos(3,:) = [axPos(2,1)+axPos(2,3) plotBottom 0.1 plotHeight];
-axPos(4,:) = [axPos(3,1)+axPos(3,3)+horizSpacing  plotBottom 0.15 plotHeight];
-axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*4 plotBottom plotWidth plotHeight];
+axPos(2,:) = [axPos(1,1)+axPos(1,3)+horizSpacing plotBottom 0.16 plotHeight];
+axPos(3,:) = [axPos(2,1)+axPos(2,3) plotBottom 0.12 plotHeight];
+axPos(4,:) = [axPos(3,1)+axPos(3,3)+horizSpacing+0.02  plotBottom 0.13 plotHeight];
+%axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*3 plotBottom 0.12 plotHeight];
+smallPlotHeight = plotHeight/2.0;
+axPos(5,:) =  [axPos(4,1)+axPos(4,3)+horizSpacing*3 plotBottom+smallPlotHeight 0.16 smallPlotHeight];
+axPos(6,:) =  [axPos(5,1) plotBottom axPos(5,3) axPos(5,4)];
 
 %perm = perm(:, 40:(end-5));
 %perm = log10(perm);
@@ -88,11 +91,25 @@ xhi = double(probDomain.domainExtent.hi_i)*dx;
 width = xhi-xlo;
 
 h = figure();
-set(h, 'Position', plotWindowSize);
-%colormap bone;
+%set(h, 'Position', plotWindowSize);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Setting figure size appropriate for paper
+set(h,'Units','Inches');
+h.Position = [2.0 2.0 6.5 3.5];
+textFontSize = 9;
+legendFontSize = 8;
+domainFontSize = 8;
+
+set(0, 'defaultlinelinewidth',1);
+set(0, 'defaultaxeslinewidth',1);
+set(0, 'defaultpatchlinewidth',1);
+set(0, 'defaultAxesFontSize', textFontSize);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 m = 1;
-n = 5;
+n = 6;
 
 subplot(m, n, 1);
 
@@ -106,22 +123,22 @@ axBCs.XTick = [];
 %axBCs.YTickLabels = {'-4','0'};
 %axBCs.XTickLabels = {'0','1'};
 
-%text(-0.2, 4.35, '$H=H(\theta_e=0, \chi_e)$,', 'FontSize', 16);
-%text(0.2, 4.1, '$\Theta=-1$.', 'FontSize', 16);
-text(0.0, 4.25,{'$H=H(\theta_e=0, \chi_e)$,', '$\Theta=-1$.'}, 'FontSize', 16);
+%text(-0.2, 4.35, '$H=H(\theta_e=0, \chi_e)$,', 'FontSize', textFontSize);
+%text(0.2, 4.1, '$\Theta=-1$.', 'FontSize', textFontSize);
+text(-0.3, 4.45,{'$H=H(\theta_e=0, \chi_e)$,', '$\Theta=-1$.'}, 'FontSize', domainFontSize);
 
-%text(0.2, -0.2, '$\Theta=-1$,', 'FontSize', 16);
-%text(-0.3, -0.42, '$H=H(\theta_{analytic}, \chi=1)$.', 'FontSize', 16);
-text(0.0, -0.35, {'$H=H(\theta=1.1, \chi=1)$,','$\Theta=-1$.' }, 'FontSize', 16);
+%text(0.2, -0.2, '$\Theta=-1$,', 'FontSize', textFontSize);
+%text(-0.3, -0.42, '$H=H(\theta_{analytic}, \chi=1)$.', 'FontSize', textFontSize);
+text(-0.3, -0.6, {'$H=H(\theta=1.1, \chi=1)$,','$\Theta=-1$.' }, 'FontSize', domainFontSize);
 
-text(-0.1, 1.6, 'Periodic', 'FontSize', 16, 'Rotation', 90);
-text(1.12, 1.6, 'Periodic', 'FontSize', 16, 'Rotation', 90);
-text(0.52, 1.8, '$V$', 'FontSize', 16);
+text(-0.1, 1.6, 'Periodic', 'FontSize', domainFontSize, 'Rotation', 90);
+text(1.12, 1.6, 'Periodic', 'FontSize', domainFontSize, 'Rotation', 90);
+text(0.52, 1.8, '$V$', 'FontSize', domainFontSize);
 annotation('arrow',[0.1 0.1], [0.45 0.6]);
 
 axBCs.Position = axPos(1,:);
 
-text(-0.2,labelPos(2), '(a)', 'FontSize', textFontSize);
+text(-0.25,labelPos(2), '(a)', 'FontSize', textFontSize);
 
 subplot(m, n, 2);
 
@@ -148,8 +165,9 @@ opacity(2) = 0.0;
 opacity(3) = 0.0;
 
 edgeColor(1, :) = [1 1 1];
-edgeColor(2, :) = [1 0 1];
-edgeColor(3, :) = [0 1 1];
+edgeColor(3, :) = [1 0 1]; % magenta
+% edgeColor(3, :) = [0 1 1]; % cyan
+edgeColor(2, :) = [0 1 0]; % green
 
 % Draw on the different meshes
 for l = 2:length(output2lev.levelArray)
@@ -239,7 +257,7 @@ axLeft.YTickLabels = ({'-4', '0'});
 axLeft.XTick = ([0 0.97]);
 axLeft.XTickLabels = ({'0', '1'});
 
-text(-0.7,labelPos(2), '(b)', 'FontSize', textFontSize); %'Color', [1 1 1]
+text(-0.6,labelPos(2), '(b)', 'FontSize', textFontSize); %'Color', [1 1 1]
 
 % Now make the figure next to it
 subplot(m, n, 3);
@@ -261,7 +279,9 @@ xlim([0 1.2]);
 
 axMiddle.YTick = [];
 
-legend({'$\theta$','$\chi$'}, 'Location', 'southwest');
+% 'Location', 'southwest', 
+legend({'$\theta$','$\chi$'}, 'FontSize', legendFontSize, ...
+    'Position', [axMiddle.Position(1)+0.04 axMiddle.Position(2)+0.06 0.02 0.05]);
 
 text(-0.3,labelPos(2), '(c)', 'FontSize', textFontSize);
 
@@ -309,13 +329,6 @@ for f =1:length(gridResPlot)
         
     end
     
-%     plot_prefix = [amrPrefix1lev, num2str(gridRes(f)),'--0'];
-%     output = getFinalPlotFile([dataFolder, plot_prefix]);
-%     if length(output.levelArray) > 0
-%         TerrAMR = output.dataForComp(output.components.Terr);
-%         Te = squeeze(TerrAMR(2,:));
-%         errAMR(f) = mean(abs(Te));
-%     end
     
 end
 box on;
@@ -324,9 +337,13 @@ xlabel('log$_{10} (|\theta_{err}|)$');
 
 
 forceRecalculate = false;
-err2lev = getErr(dataFolder, amrPrefix2lev, gridRes, forceRecalculate);
-errAMR = getErr(dataFolder, amrPrefix1lev, gridRes, forceRecalculate);
-errUniform = getErr(dataFolder, uniformPrefix, gridRes);
+err2levL1 = getErr(dataFolder, amrPrefix2lev, gridRes, forceRecalculate);
+errAMRL1 = getErr(dataFolder, amrPrefix1lev, gridRes, forceRecalculate);
+errUniformL1 = getErr(dataFolder, uniformPrefix, gridRes, forceRecalculate);
+
+err2levMax = getErr(dataFolder, amrPrefix2lev, gridRes, forceRecalculate, 'Max');
+errAMRMax = getErr(dataFolder, amrPrefix1lev, gridRes, forceRecalculate, 'Max');
+errUniformMax = getErr(dataFolder, uniformPrefix, gridRes, forceRecalculate, 'Max');
 
 timeUniform = getTimes(dataFolder, uniformPrefix, gridRes);
 timeAMR = getTimes(dataFolder, amrPrefix1lev, gridRes);
@@ -339,63 +356,108 @@ for i=1:length(gridRes)
     
 end
 
-err2lev(end-1:end) = NaN;
-errAMR(end) = NaN;
+err2levL1(end-1:end) = NaN;
+errAMRL1(end) = NaN;
 
 %xlim([-1.4e-4 2e-3]);
 
-axRight = gca;
-axRight.Position = axPos(4,:);
+axErrProfiles = gca;
+axErrProfiles.Position = axPos(4,:);
 
-axRight.YTick = [];
-%axRight.XTick = [0  1e-4, 1e-3];
-%axRight.XTickLabels = {'0', '10^{-4}', '10^{-3}'};
+axErrProfiles.YTick = [];
 
-%axRight.XTick = [0  1e-4, 1e-3];
-%axRight.XTickLabels = {'0', '10^{-4}', '10^{-3}'};
+xlim([-6.2, -2]);
 
 % legend({'16-32-64', '16', '32', '64'}, 'Location', 'northwest');
-axRightPos = axRight.Position;
-legend({'(16,32,64)', '16', '32', '64'}, 'Position',...
-    [axRightPos(1)-0.08 axRightPos(2)+axRightPos(4)+0.05 0.2 0.06], ...
-    'Orientation', 'horizontal');
+%legPos = [axRightPos(1)-0.02 axRightPos(2)+axRightPos(4)+0.05 0.2 0.06];
+%orientation = 'horizontal';
+% orientation = 'vertical';
+% legPos = [axRightPos(1)-0.02 axRightPos(2)+axRightPos(4)+0.05 0.05   0.06];
+% legend({'(16,32,64)', '16', '32', '64'}, ...
+%     'Position', legPos, ...
+%     'Orientation', orientation, ...
+%     'FontSize', legendFontSize);
 
-text(-7.0,labelPos(2),'(d)','FontSize', textFontSize);
+legend({'(16,32,64)', '16', '32', '64'}, ...
+    'Location', 'northoutside', 'FontSize', legendFontSize);
+axErrProfiles.Position = axPos(4,:);
 
-subplot(m, n, 5);
-%Error plot
-ax = gca;
+text(-7.2,labelPos(2),'(d)','FontSize', textFontSize);
+
+%Max Error plot
+%subplot(m, n, 5);
+axMaxErr = axes;
 box on;
+plotUniform = plot(log10(dz), log10(errUniformMax), 'x-');
 
-plotUniform = plot(log10(dz), log10(errUniform), 'x-');
 hold on;
-plotAMR = plot(log10(dz), log10(errAMR), 'x-');
-plotAMR2lev = plot(log10(dz), log10(err2lev), 'x-');
-
-plotComparison = plot([-2.1 -0.1], [-5 -1], '--');
-
+plotAMR = plot(log10(dz), log10(errAMRMax), 'x-');
+plotAMR2lev = plot(log10(dz), log10(err2levMax), 'x-');
+plotComparison = plot([-2.5 -0.5], [-5 -1], '--');
 hold off;
 
-xlim([-4 0]);
+xlim([-2.3 0]);
+ylim([-4.5 -1.5]);
 
-ax.Position = axPos(5,:);
+axMaxErr.XTick = [-2, -1, 0];
+axMaxErr.XTickLabels = {'', '', ''};
+
+text(-3.2,-1.4,'(e)','FontSize', textFontSize, 'Parent', axMaxErr);
+ylabel('log$_{10}($Max$|\theta_{err}|)$');
+
+%legPos = [ax.Position(1)+0.065 ax.Position(2)+plotHeight-0.16 0.05 0.05];
+%legPos = [ax.Position(1)+ax.Position(3), ax.Position(2) + 0.4, 0.05, 0.05];
+%legPos = [axMaxErr.Position(1) + 0.2, axMaxErr.Position(2)+axMaxErr.Position(4)+0.0, 0.05, 0.05];
+leg = {'Uniform', '$n_{ref}=2$', '$n_{ref}=(2,2)$', '2nd order'};
+%legend([plotUniform, plotAMR, plotAMR2lev, plotComparison], leg, ...
+%    'Position', legPos, ...
+%    'FontSize', legendFontSize); %, 'Location', 'northwest'
+
+legend([plotUniform, plotAMR, plotAMR2lev, plotComparison], leg, ...
+    'Location', 'northoutside','FontSize', legendFontSize);
+
+
+
+%Mean Error plot
+%subplot(m, n, 6);
+axMeanErr = axes;
+
+box on;
+plotUniform = plot(log10(dz), log10(errUniformL1), 'x-');
+
+hold on;
+plotAMR = plot(log10(dz), log10(errAMRL1), 'x-');
+plotAMR2lev = plot(log10(dz), log10(err2levL1), 'x-');
+plotComparison = plot([-2.1 -0.1], [-5 -1], '--');
+hold off;
+
+xlim([-2.3 0]);
+ylim([-5 -1.9]);
+
+% Need to see *both* axes here
+axMeanErr.Position = axPos(6,:);
+axMaxErr.Position = axPos(5,:);
+axErrProfiles.Position = axPos(4,:);
+
+
+text(-3.2,-2.1,'(f)','FontSize', textFontSize, 'Parent', axMeanErr);
+
 xlabel('log$_{10}(\Delta z)$');
 ylabel('log$_{10}(\bar{|\theta_{err}|})$');
-legend([plotUniform, plotAMR, plotAMR2lev, plotComparison], {'Uniform', '$n_{ref}=2$', ...
-    '$n_{ref}=(2,2)$', '2nd order'}, 'Location', 'northwest');
-
-text(-5.2,-1,'(e)','FontSize', textFontSize);
 
 
+% Save plot
 h =gcf;
-set(h,'Units','Inches');
+
 pos = get(h,'Position');
+fprintf('Saving plot with position: ');
+disp(pos);
 set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 
 if savePlots
     %print(h,[dataFolder, 'noFlowSolution.png'],'-dpng','-r300')
     fprintf('Saved to %s \n', figureName);
-    print(h,figureName,'-dpdf','-r50')
+    print(h,figureName,'-depsc','-r50')
     
 end
 
@@ -403,7 +465,11 @@ end
 
 
 
-function err = getErr(dataFolder, prefix, gridRes, forceRecalculate)
+function err = getErr(dataFolder, prefix, gridRes, forceRecalculate, errType)
+if nargin < 5
+    errType = 'L1';
+end
+
 if nargin < 4
     forceRecalculate  = false;
 end
@@ -411,9 +477,7 @@ end
 err = NaN*ones(length(gridRes), 1);
 
 for f =1:length(gridRes)
-    
-    
-    
+
     thisRes = gridRes(f);
     
     folder_name = [prefix, num2str(gridRes(f)),'--0'];
@@ -434,6 +498,7 @@ for f =1:length(gridRes)
             Terr = output.dataForComp(output.components.Terr);
             Te = squeeze(Terr(2,:));
             e.meanTerr =  mean(abs(Te));
+            e.maxTerr = max(abs(Te));
             save(errFile, 'e');
 
         end
@@ -441,7 +506,11 @@ for f =1:length(gridRes)
 
     end
     
-    err(f) = e.meanTerr;
+    if strcmp(errType, 'L1')
+        err(f) = e.meanTerr;
+    elseif strcmp(errType, 'Max')
+        err(f) = e.maxTerr;
+    end
     
     catch e
         fprintf('Error processing %s \n', thisFolder);

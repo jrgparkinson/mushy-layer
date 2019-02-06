@@ -6,7 +6,7 @@ if nargin < 3
    % dataFolderVariablePorosity = getDataDir('AMRConvergenceTest/DBVariablePorosityGaussian1proc-t1.6-v2/');
     
     base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
-    dataFolderNu = fullfile(base_dir, '/ConvectionDB-cfl0.15/chi0.4-Da1.0e-02-Ra1.0e+05/');
+    dataFolderNu = fullfile(base_dir, '/ConvectionDB-cfl0.2/chi0.4-Da1.0e-02-Ra1.0e+05/');
     dataFolderVariablePorosity = fullfile(base_dir, '/FixedPorousHole-1proc/');
     
     %thisFilename = mfilename('fullpath');
@@ -26,6 +26,20 @@ NuAMRRes = 128;
 
 h = figure();
 h.Position = [200 200 1200 500];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+set(h,'Units','Inches');
+h.Position = [2.0 2.0 6.5 2.9];
+textFontSize = 10;
+legendFontSize = 8;
+domainFontSize = 8;
+
+set(0, 'defaultlinelinewidth',1);
+set(0, 'defaultaxeslinewidth',1);
+set(0, 'defaultpatchlinewidth',1);
+set(0, 'defaultAxesFontSize', textFontSize);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 axHeight = 0.55;
 axBottom = 0.25;
 
@@ -44,34 +58,27 @@ axBCs.XTick = [];
 daspect([1 1 1]);
 
 
-
-%text(0.0, 1.13 ,{'$H=H(\theta=1, \chi=1)$,', '$\Theta=0, \mathbf{U} = 0.$'}, 'FontSize', 16);
-%text(0.0, -0.15, {'$H=H(\theta=0, \chi=1)$,','$\Theta=0, \mathbf{U} = 0.$' }, 'FontSize', 16);
-
-
-text(0.1, 0.55, {'Eqn''s 3-6 with:', '$St=0, Pr=1$, and', '(b) $\chi=0.4$, or', '(c) $\chi$ given by eq. 40.'}, 'FontSize', 16);
+text(0.1, 0.55, {'Eqn''s 3-6 with:', '$St=0, Pr=1$, and', '(b) $\chi=0.4$, or', '(c) $\chi$ given by eq. 40.'}, ...
+    'FontSize', domainFontSize);
 
 insulatingStr = {'b: $\partial H/\partial x = \partial \Theta / \partial x = 0, \mathbf{U} = 0.$', ...
     'c: periodic.'};
-%text(-0.1, 0.0, insulatingStr, 'FontSize', 16, 'Rotation', 90);
-%text(1.12 , 0.0, insulatingStr, 'FontSize', 16, 'Rotation', 90);
-
 
 text(-0.12, -0.02, '$H=H(\theta=1, \chi=0.4), \Theta=0, \mathbf{U} = 0.$', ...
-    'FontSize', 16, 'Rotation', 90);
+    'FontSize', domainFontSize, 'Rotation', 90);
 text(1.15 , -0.02, '$H=H(\theta=0, \chi=0.4), \Theta=0, \mathbf{U} = 0.$', ...
-    'FontSize', 16, 'Rotation', 90);
+    'FontSize', domainFontSize, 'Rotation', 90);
 
-text(-0.01, 1.11 ,insulatingStr, 'FontSize', 16);
-text(-0.01, -0.11, insulatingStr, 'FontSize', 16);
+text(-0.01, 1.11 ,insulatingStr, 'FontSize', domainFontSize);
+text(-0.01, -0.11, insulatingStr, 'FontSize', domainFontSize);
 
 %axis arrows
-annotation('arrow',[0.03 0.07], [0.06 0.06]);
-annotation('arrow',[0.03 0.03], [0.06 0.16]);
-text(-0.05, -0.4, '$x$', 'FontSize', 16);
-text(-0.23 , -0.2   , '$z$', 'FontSize', 16);
+annotation('arrow',[0.03 0.07], [0.06 0.06], 'HeadWidth', 5, 'HeadLength', 5);
+annotation('arrow',[0.03 0.03], [0.06 0.16], 'HeadWidth', 5, 'HeadLength', 5);
+text(-0.05, -0.4, '$x$', 'FontSize', textFontSize);
+text(-0.19 , -0.2   , '$z$', 'FontSize', textFontSize);
 
-text(0.04, 0.93, '(a)', 'FontSize', 16);
+text(0.04, 0.93, '(a)', 'FontSize', textFontSize);
 
 subplot(m, n, 2)
 
@@ -81,7 +88,7 @@ UniformFineSol = getFinalPlotFile(fullfile(dataFolderNu, plotPrefixUniform(NuUni
 makeSubplot(AMRsol, UniformFineSol, [0.35 axBottom 0.3 axHeight])
 
 
-text(0.04, 0.92, '(b)', 'FontSize', 16, 'Color', [0 0 0]);
+text(0.04, 0.92, '(b)', 'FontSize', textFontSize, 'Color', [0 0 0]);
 %text(-0.2, 1.2, '(b)', 'FontSize', 16);
 
 subplot(m, n, 3);
@@ -96,8 +103,8 @@ makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
 % axErr.Position =  [0.76 axBottom 0.2 axHeight];
 % 
 % 
-% text(axErr.XLim(2)-0.5, axErr.YLim(1)+0.3, '(c)', 'FontSize', 16);
-text(0.04, 0.92, '(c)', 'FontSize', 16, 'Color', [0 0 0]);
+% text(axErr.XLim(2)-0.5, axErr.YLim(1)+0.3, '(c)', 'FontSize', textFontSize);
+text(0.04, 0.92, '(c)', 'FontSize', textFontSize, 'Color', [0 0 0]);
 
 set(h,'Units','Inches');
 pos = get(h,'Position');
@@ -106,7 +113,7 @@ set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(
 
 if saveFigure
     fprintf('Saved to %s \n', figureName);
-    print(h,[figureName, '.pdf'],'-dpdf','-r50')
+    print(h,[figureName, '.eps'],'-depsc','-r50')
     print(h,[figureName, '.png'],'-dpng','-r1000')
 end
 
@@ -229,13 +236,17 @@ hTemp.LineWidth = 2.0;
 %pcolor(X,Y,psiUniform); 
 
 daspect([1 1 1]);
+
 colormap(axTemperature, bluewhitered(257));
 cTemp = colorbar(axTemperature, 'Location', 'northoutside');
 cTemp.Ticks = [min(min(plot_T))*0.98 max(max(plot_T))*0.98];
 cTemp.TickLabels = {'0', '1'};
+%cTemp.Position(2) = cTemp.Position(2)-0.05;
 cTemp.Label.String = '\theta';
 oldPos = cTemp.Label.Position;
-cTemp.Label.Position = [oldPos(1) oldPos(2)+1.4];
+cTempLabelOffset = 1.2;
+cTemp.Label.Position = [oldPos(1) oldPos(2)+cTempLabelOffset];
+
 
 box on;
 %set(axTemperature, 'Layer', 'top');
@@ -253,6 +264,7 @@ set(axPsi, 'Layer', 'top');
 
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot meshes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -265,9 +277,12 @@ opacity(1) = 0.0;
 opacity(2) = 0.0;
 opacity(3) = 0.0;
 
-edgeColor(1, :) = [1 1 1];
-edgeColor(2, :) = [1 0 1];
-edgeColor(3, :) = [0 1 1];
+edgeColor(1, :) = [1 1 1]; % black
+edgeColor(2, :) = [1 0 1]; % magenta
+edgeColor(3, :) = [0 1 1]; % cyan
+
+% edgeColor(2, :) = [0 1 0]; % green
+% edgeColor(3, :) = [1 0 1]; % magenta
 
 % Draw on the different meshes
 for l = 2:length(AMRsol.levelArray)
@@ -326,12 +341,17 @@ end
 cPsi.TickLabels = {sprintf(formatMin,newTicks(1)), sprintf(formatMax,newTicks(end))};
 
 oldPos = cPsi.Position;
+
+cTemp.Position(2) = cTemp.Position(2)-0.02;
+cTemp.Position(4) = cTemp.Position(4)-0.02;
+
 thetaColorbarPos = cTemp.Position;
 %cPsi.Position = [oldPos(1) oldPos(2)-0.05 oldPos(3)-0.035 oldPos(4)];
-cPsi.Position = [thetaColorbarPos(1) axisExtent(2)-0.15 thetaColorbarPos(3) oldPos(4)];
+cPsi.Position = [thetaColorbarPos(1) axisExtent(2)-0.15 thetaColorbarPos(3) thetaColorbarPos(4)];
 
+cPsiLabelOffset = 0.7;
 oldPos = cPsi.Label.Position;
-cPsi.Label.Position = [oldPos(1) oldPos(2) + 1.2];
+cPsi.Label.Position = [oldPos(1) oldPos(2) + cPsiLabelOffset];
 
 axPsi.XTick = [0 1];
 axPsi.YTick = [0 1];
