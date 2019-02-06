@@ -133,7 +133,7 @@ if savePNG
     print(h,[filename, '.png'],'-dpng','-r800')
 end
 
-print(h,[filename, '.eps'],'-depsc','-50')
+print(h,[filename, '.eps'],'-depsc','-r50')
 
 
 
