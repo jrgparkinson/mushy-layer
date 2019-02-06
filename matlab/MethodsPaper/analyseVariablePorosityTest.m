@@ -6,12 +6,12 @@ close all;
 if nargin < 1
     fprintf('**Warning - the directory containing the data has not been specified** \n');
     base_dir = 'FixedPorousHole';
+    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc/';
 end
 
 if nargin < 2
     Nzs = [16,32,64,128];
 end
-fineNumCells = Nzs(end);
 
 if nargin < 3
     redoAnalysis = false;
@@ -34,6 +34,31 @@ if nargin < 7
     % other options: L1, Max
 end
 
+[~, name] = system('hostname'); 
+name = strtrim(name);
+
+if strcmp(name, 'atmlxlap005')
+
+% For running the fixed porous test problem on laptop:
+base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc/';
+Nzs = [16,32,64,128,256,512];
+redoAnalysis = false;
+runAnalysis = false;
+uniform_prefix = 'Uniform-DBVariablePorosity-';
+compName  = 'xDarcyvelocity';
+errType = 'L2';
+
+base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015/';
+Nzs = [16,32,64,128,256,512];
+redoAnalysis = false;
+runAnalysis = false;
+uniform_prefix = 'Uniform-PorousMushyHole-';
+compName = 'Porosity';
+errType = 'L2';
+
+end
+
+fineNumCells = Nzs(end);
 fine_res_dir = [uniform_prefix,num2str(fineNumCells),'--0'];
 
 % For uniform grids
@@ -68,7 +93,7 @@ if runAnalysis
 
     tic;
     
-   %TODO: return to parfor
+   
     for i=1:length(folders)
         folder = folders(i);
         folderName = folder.name;
@@ -233,69 +258,70 @@ for i=1:length(runs)
     
 end
 
-h = figure();
-set(h, 'Position', [100 100 1400 800]);
+
+makeSummaryFig = false;
+if makeSummaryFig
+    h = figure();
+    set(h, 'Position', [100 100 1400 800]);
 
 
+    marker = {};
+    for i=1:length(runs)
+        marker{i} = 'x';
 
-marker = {};
-for i=1:length(runs)
-    marker{i} = 'x';
-    
-    if runs{i}(1:3) == 'AMR'
-        marker{i} = 'o';
-    elseif runs{i}(1:8) == 'Variable'
-        marker{i} = '+';
+        if runs{i}(1:3) == 'AMR'
+            marker{i} = 'o';
+        elseif runs{i}(1:8) == 'Variable'
+            marker{i} = '+';
+        end
     end
+
+
+
+    m = 2; n=2;
+
+    subplot(m, n, 1)
+
+    hold on;
+    for i=1:length(runs)
+    plot(log10(thisNumCells(i, :)), log10(thisRunTime(i, :)), marker{i});
+    end
+    hold off;
+    box on;
+    xlabel('num cells'); ylabel('runtime');
+
+    subplot(m, n, 2)
+
+    hold on;
+    for i=1:length(runs)
+    plot(log10(thisNumCells(i, :)), log10(thisError(i, :)), marker{i});
+    end
+    hold off;
+    box on;
+    xlabel('num cells'); ylabel('error');
+
+
+
+    subplot(m, n, [3 4])
+
+    hold on;
+    for i=1:length(runs)
+    plot(log10(thisRunTime(i, :)), log10(thisError(i, :)), marker{i});
+    end
+    hold off;
+
+    xlabel('runtime'); ylabel('error');
+
+
+    runsShort = {};
+    for i=1:length(runs)
+       runsShort{i} = runs{i}(1:10); 
+    end
+
+    legend(runs, 'Location', 'eastoutside');
+    box on;
 end
 
-
-
-m = 2; n=2;
-
-subplot(m, n, 1)
-
-hold on;
-for i=1:length(runs)
-plot(log10(thisNumCells(i, :)), log10(thisRunTime(i, :)), marker{i});
-end
-hold off;
-box on;
-xlabel('num cells'); ylabel('runtime');
-
-subplot(m, n, 2)
-
-hold on;
-for i=1:length(runs)
-plot(log10(thisNumCells(i, :)), log10(thisError(i, :)), marker{i});
-end
-hold off;
-box on;
-xlabel('num cells'); ylabel('error');
-
-
-
-subplot(m, n, [3 4])
-
-hold on;
-for i=1:length(runs)
-plot(log10(thisRunTime(i, :)), log10(thisError(i, :)), marker{i});
-end
-hold off;
-
-xlabel('runtime'); ylabel('error');
-
-
-
-
-runsShort = {};
-for i=1:length(runs)
-   runsShort{i} = runs{i}(1:10); 
-end
-
-legend(runs, 'Location', 'eastoutside');
-
-box on;
 
 extrapolateRunTime = false;
 
@@ -328,10 +354,117 @@ if extrapolateRunTime
 
 end
 
-% Compute single level rates
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Make figure version of tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+h = figure();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+set(h,'Units','Inches');
+h.Position = [2.0 2.0 6.0 2.5];
+textFontSize = 10;
+legendFontSize = 8;
+domainFontSize = 8;
+
+set(0, 'defaultlinelinewidth',1);
+set(0, 'defaultaxeslinewidth',1);
+set(0, 'defaultpatchlinewidth',1);
+set(0, 'defaultAxesFontSize', textFontSize);
+
+pltBottom = 0.18;
+pltHeight = 0.77;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+errors = [];
+num_cells = [];
+
+for j=1:length(errStruct)
+    if j > 1
+        errStruct(j).rate = ( errStruct(j-1).richardson /  errStruct(j).richardson ) * ...
+            (errStruct(j-1).numCells / errStruct(j).numCells);
+   
+    end
+    
+  % s = sprintf(format, errStruct(j).numCells, errStruct(j).richardson, errStruct(j).rate, errStruct(j).singleLevel, ...
+   %    errStruct(j).nref2, errStruct(j).nref4, errStruct(j).nref22);
+   
+   num_cells(end+1) = errStruct(j).numCells;
+   errors(end+1, :) = [ errStruct(j).richardson, errStruct(j).singleLevel,  ...
+       errStruct(j).nref2, errStruct(j).nref4, errStruct(j).nref22];
+
+end
+
+styles = {'x-', 'x-', 's-', 'd-', 'o-'};
+
+hold on;
+for i=1:size(errors, 2)
+plot(num_cells, errors(:, i), styles{i});
+end
+
+ncells_second_order = [num_cells, num_cells(end)*1.4];
+second_order = 1.2 * max(errors(1, :))*(ncells_second_order/num_cells(1)).^(-2) ;
+plot(ncells_second_order, second_order, '--');
+
+hold off;
+box on;
+
+axLeft = gca;
+axLeft.YScale = 'log';
+axLeft.XScale = 'log';
+
+axLeft.Position = [0.1 pltBottom 0.48 pltHeight];
+%ax.Position(3) = ax.Position(3) + 0.05;
+
+axLeft.XLim(2) = axLeft.XLim(2)*2;
+axLeft.YLim(2) = axLeft.YLim(2)*2;
+
+ylab = [format_err_type(errType), ' error (', nice_comp_name(compName), ')'];
+
+xlabel('$1/\Delta x$');
+ylabel(ylab);
+legend({'Single-level Richarson', 'Single-level 512 difference', '$n_{ref}=2$', '$n_{ref}=4$', '$n_{ref}=(2,2)$', '2nd order'}, ...
+    'FontSize', legendFontSize,...
+    'Position', [axLeft.Position(1)+axLeft.Position(3)-0.15, axLeft.Position(2)+pltHeight-0.2, 0.01, 0.01]);
+
+xp = axLeft.XLim(1)*0.5;
+yp = axLeft.YLim(2);
+text(xp, yp, '(a)');
 
 
 
+axRight = axes;
+
+normalizedCells = [];
+normalizedCPU = [];
+nref = [0, 2, 4];
+
+for j=1:length(performance)
+    normalizedCells(end+1) = performance(j).ncells/performance(1).ncells;
+    normalizedCPU(end+1) = performance(j).runtime/performance(1).runtime;
+    
+   %fprintf(format, performance(j).n_ref, performance(j).ncells, performance(j).runtime, ...
+   %    normalizedCells, normalizedCPU);
+end
+
+hold on;
+plot(nref, normalizedCells, '-x');
+plot(nref, normalizedCPU, '-x');
+hold off;
+
+box on;
+
+axRight.Position = [0.66 pltBottom 0.32 pltHeight];
+
+xlabel('Refinement ratio');
+legend('Normalized cells', 'Normalized time');
+%title('(b)');
+text(-0.8, 1.02, '(b)');
+
+figureName = fullfile(base_dir, [uniform_prefix, compName, errType]);
+fprintf('Saved to %s \n', figureName);
+print(h,[figureName, '.eps'],'-depsc','-r50')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Print tables, first latex then human readable format
@@ -413,5 +546,26 @@ end
 end
 
 
+function formatted = format_err_type(errType)
 
+if errType(1) == 'L'
+    formatted = ['$L_', errType(2), '$'];
+else
+    formatted = errType;
+end
 
+end
+
+function formatted = nice_comp_name(compName)
+
+if compName(1) == 'x' || compName(1) == 'y'
+    formatted = compName;
+    
+    if strcmp(compName, 'xDarcyvelocity')
+        formatted = '$x-$velocity';
+    end
+else
+ formatted = compName;
+end
+
+end
