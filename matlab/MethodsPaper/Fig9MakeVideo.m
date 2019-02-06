@@ -7,12 +7,10 @@ set(0, 'defaultAxesFontSize',20);
 set(groot, 'DefaultTextInterpreter', 'latex')
 set(groot, 'DefaultLegendInterpreter', 'latex')
 set(groot,'DefaultSurfaceEdgeColor','none') % removes edges from pcolor plots
-set(groot, 'DefaultAxesFontName', 'times');
-set(groot, 'DefaultTextFontName', 'times');
-set(groot, 'defaultAxesFontName', 'times');
-set(groot, 'defaultTextFontName', 'times');
-set(0, 'defaultAxesFontName', 'times');
-set(0, 'defaultTextFontName', 'times');
+
+font = 'Latin Modern Math';
+set(groot, 'defaultAxesFontName', font); 
+set(groot, 'defaultTextFontName', font); 
 
 if nargin < 1
     

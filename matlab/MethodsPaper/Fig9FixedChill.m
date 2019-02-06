@@ -27,10 +27,6 @@ if nargin < 3
 end
 
 
-% For png's, need times font I think
-%set(groot, 'DefaultAxesFontName', 'times');
-%set(groot, 'DefaultTextFontName', 'times');
-
 processSpecificFolder(output_dir, frames, figure_output_dir);
  
 end
@@ -70,8 +66,7 @@ set(0, 'defaultlinelinewidth',1);
 set(0, 'defaultaxeslinewidth',1);
 set(0, 'defaultpatchlinewidth',1);
 set(0, 'defaultAxesFontSize', textFontSize);
-set(0, 'defaultAxesFontName', 'times');
-set(0, 'defaultTextFontName', 'times');
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

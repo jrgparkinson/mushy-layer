@@ -2,7 +2,7 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
 
    success= false;
    
-   textFontSize = 9;
+   textFontSize = 8;
    
     if thisFrame == -1
         ml = getFinalPlotFile(output_dir);
@@ -315,9 +315,12 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
         if isfield(options, 'cbarPos')
             
         else
-            cbar.Label.Position(1) = cbar.Label.Position(1) - 0.0;
+            cbar.Label.Position(1) = cbar.Label.Position(1) + 0.0;            
+            cbar.Position(1) = cbar.Position(1)+0.05;
+            
             cbar.Position(2) = cbar.Position(2)-0.1;
-            cbar.Position(4) = cbar.Position(4)+0.2;
+            cbar.Position(4) = cbar.Position(4)*2.0;
+            cbar.Position(3) = cbar.Position(3)*0.8;
             
         end
         
@@ -389,6 +392,8 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
     else
         text(0.02, 0.55, thisLabel, 'FontSize', textFontSize);
     end
+    
+    % allAxes{frame_i}(1).FontName = 'Times'
     
     success = true;
     
