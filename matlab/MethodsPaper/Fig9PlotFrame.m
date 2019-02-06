@@ -273,7 +273,8 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
 
         %plot(domainBox);
         mesh2.FaceAlpha = 0;
-        mesh2.EdgeColor = [1 0 1]; % magenta
+        % [1 0 1]; % magenta
+        mesh2.EdgeColor = [0 1 0]; % green
         mesh2.LineWidth = 2;
 
         if length(meshes) > 2
@@ -282,7 +283,8 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
             
             mesh3 = plot(axPolyshapes, pshape); % meshes on chombo level 2
             mesh3.FaceAlpha = 0;
-            mesh3.EdgeColor = [0 1 1]; %cyan
+            % [0 1 1]; %cyan
+            mesh3.EdgeColor = [1 0 1]; % magenta
             mesh3.LineWidth = 2;
         end
         
