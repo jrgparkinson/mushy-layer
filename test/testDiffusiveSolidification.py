@@ -28,7 +28,7 @@ def testDiffusiveSolidification():
     # Setup up the post processing command
     dataFolder = os.path.join(base_output_dir, 'NoFlow')
     figureName = os.path.join(dataFolder, 'noFlow.pdf')
-    analysis_command = matlab_command + ' "noFlowSolution(\'' + dataFolder + '\', \'' + figureName + '\'); exit;"'
+    analysis_command = matlab_command + ' "Fig4NoFlow(\'' + dataFolder + '\', \'' + figureName + '\'); exit;"'
 
     # Run
     extra_params = {'main.debug': 'true'}

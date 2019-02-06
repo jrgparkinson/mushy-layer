@@ -27,9 +27,9 @@ def make_figures():
 
     fig_commands = ['Fig4NoFlow(\'' + no_flow_data + '\', \'' + figure_directory + 'Fig4BenchmarkNoFlow.pdf\')',
                    'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')',
-                   'Fig6PorousHole(\'' + porous_mushy_hole_folder + '\', \'' + figure_directory + '\')',
-                   'Fig7FixedChill(\'' + fixed_chill_data + '\', [3000, 4000, 7000], \'' + figure_directory + '\')',
-                   'Fig7MakeVideo(\'' + fixed_chill_data + '\')']
+                   'Fig7PorousHole(\'' + porous_mushy_hole_folder + '\', \'' + figure_directory + '\')',
+                   'Fig9FixedChill(\'' + fixed_chill_data + '\', [3000, 4000, 7000], \'' + figure_directory + '\')',
+                   'Fig9MakeVideo(\'' + fixed_chill_data + '\')']
 
     full_matlab_command = ''
 

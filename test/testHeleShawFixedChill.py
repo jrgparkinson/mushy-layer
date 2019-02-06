@@ -71,7 +71,8 @@ def testHeleShawFixedChill(argv):
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
 
-    analysis_command = matlab_command + ' "processFixedChill(\'' + dataFolder + '\', [3000, 4800, 17000]); exit;"'
+    # No analysis needed for this problem - just plotting
+    analysis_command = '' # matlab_command + ' "Fig9FixedChill(\'' + dataFolder + '\', [3000, 4800, 17000]); exit;"'
 
 
     singleRun = True
