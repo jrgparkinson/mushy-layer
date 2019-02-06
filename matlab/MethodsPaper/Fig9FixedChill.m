@@ -26,18 +26,6 @@ if nargin < 3
     figure_output_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
 end
 
-% folders = dir(output_dir);
-% 
-% 
-% for i=1:length(folders)
-%     if strcmp(folders(i).name, '.') || strcmp(folders(i).name, '..')
-%         continue
-%     end
-%     fprintf('Processing %s \n', folders(i).name);
-%    
-%     processSpecificFolder(fullfile(output_dir, folders(i).name), frames);
-%     
-% end
 
 % For png's, need times font I think
 set(groot, 'DefaultAxesFontName', 'times');
@@ -67,7 +55,23 @@ plotScreenHeight = plotScreenWidth/plotAspectRatio;
 
 % Start plotting stuff
 h = figure();
-h.Position = [200 200 plotScreenWidth+70 plotScreenHeight*length(frames)];
+%h.Position = [200 200 plotScreenWidth+70 plotScreenHeight*length(frames)];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+set(h,'Units','Inches');
+width = 3.5;
+height = (plotScreenHeight*length(frames)/(plotScreenWidth+70)) * width;
+h.Position = [2.0 2.0 width height];
+textFontSize = 9;
+legendFontSize = 8;
+domainFontSize = 8;
+
+set(0, 'defaultlinelinewidth',1);
+set(0, 'defaultaxeslinewidth',1);
+set(0, 'defaultpatchlinewidth',1);
+set(0, 'defaultAxesFontSize', textFontSize);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 % Common for all plots
 options.pcolorShadingInterp = true;
