@@ -39,7 +39,7 @@ plotWindowSize =  [200 200 1400 550];
 plotHeight = 0.63;
 %plotWidth = 0.18;
 plotBottom = 0.14;
-horizSpacing = 0.03;
+horizSpacing = 0.05;
 
 doColorbar = true;
 
@@ -257,7 +257,7 @@ axLeft.YTickLabels = ({'-4', '0'});
 axLeft.XTick = ([0 0.97]);
 axLeft.XTickLabels = ({'0', '1'});
 
-text(-0.6,labelPos(2), '(b)', 'FontSize', textFontSize); %'Color', [1 1 1]
+text(-0.8,labelPos(2), '(b)', 'FontSize', textFontSize); %'Color', [1 1 1]
 
 % Now make the figure next to it
 subplot(m, n, 3);
@@ -402,7 +402,7 @@ ylim([-4.5 -1.5]);
 axMaxErr.XTick = [-2, -1, 0];
 axMaxErr.XTickLabels = {'', '', ''};
 
-text(-3.2,-1.4,'(e)','FontSize', textFontSize, 'Parent', axMaxErr);
+text(-2.0,-1.7,'(e)','FontSize', textFontSize, 'Parent', axMaxErr);
 ylabel('log$_{10}($Max$|\theta_{err}|)$');
 
 %legPos = [ax.Position(1)+0.065 ax.Position(2)+plotHeight-0.16 0.05 0.05];
@@ -440,7 +440,7 @@ axMaxErr.Position = axPos(5,:);
 axErrProfiles.Position = axPos(4,:);
 
 
-text(-3.2,-2.1,'(f)','FontSize', textFontSize, 'Parent', axMeanErr);
+text(-2.0,-2.2,'(f)','FontSize', textFontSize, 'Parent', axMeanErr);
 
 xlabel('log$_{10}(\Delta z)$');
 ylabel('log$_{10}(\bar{|\theta_{err}|})$');
