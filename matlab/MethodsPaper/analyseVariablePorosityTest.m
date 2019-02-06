@@ -48,13 +48,13 @@ uniform_prefix = 'Uniform-DBVariablePorosity-';
 compName  = 'xDarcyvelocity';
 errType = 'L2';
 
-base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015/';
-Nzs = [16,32,64,128,256,512];
-redoAnalysis = false;
-runAnalysis = false;
-uniform_prefix = 'Uniform-PorousMushyHole-';
-compName = 'Porosity';
-errType = 'L2';
+% base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015/';
+% Nzs = [16,32,64,128,256,512];
+% redoAnalysis = false;
+% runAnalysis = false;
+% uniform_prefix = 'Uniform-PorousMushyHole-';
+% compName = 'Porosity';
+% errType = 'L2';
 
 end
 
@@ -462,7 +462,13 @@ legend('Normalized cells', 'Normalized time');
 %title('(b)');
 text(-0.8, 1.02, '(b)');
 
-figureName = fullfile(base_dir, [uniform_prefix, compName, errType]);
+if contains(uniform_prefix, 'VariablePorosity')
+    fig_num = 6;
+else
+    fig_num = 8;
+end
+
+figureName = fullfile(base_dir, ['Fig', num2str(fig_num), uniform_prefix, compName, errType]);
 fprintf('Saved to %s \n', figureName);
 print(h,[figureName, '.eps'],'-depsc','-r50')
 

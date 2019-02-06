@@ -1,7 +1,7 @@
 % This scripts makes use of the Streamfunction Color function:
 % https://uk.mathworks.com/matlabcentral/fileexchange/69268-streamfunction-color
 
-function Fig7FixedChill(output_dir, frames, figure_output_dir)
+function Fig9FixedChill(output_dir, frames, figure_output_dir)
 
 if nargin < 1
     
@@ -101,7 +101,7 @@ for frame_i=1:length(frames)
     textLabels = {'(a)', '(b)', '(c)'};
     options.subPlotLabel = textLabels{frame_i};
     
-    Fig7PlotFrame(options, output_dir, actual_plot_prefix, thisFrame, frame_i);
+    Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFrame, frame_i);
     
 end
 
@@ -111,7 +111,7 @@ h.Color = 'white';
 set(h,'Units','Inches');
 pos = get(h,'Position');
 set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-filename = fullfile(figure_output_dir, 'Fig7FixedChillSimulation');
+filename = fullfile(figure_output_dir, 'Fig9FixedChillSimulation');
 
 if options.pcolorShadingInterp
     filename = [filename, '-shadingInterp'];

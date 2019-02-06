@@ -1,4 +1,4 @@
-function Fig7MakeVideo(folder)
+function Fig9MakeVideo(folder)
 
 set(0, 'defaultlinelinewidth',2);
 set(0, 'defaultaxeslinewidth',2);
@@ -99,7 +99,7 @@ try
       
     %success = makeFrameFunction(folder, plotFile, options);
     
-    success = Fig7PlotFrame(options, folder, plot_prefix, thisFrame, 1); 
+    success = Fig9PlotFrame(options, folder, plot_prefix, thisFrame, 1); 
     
     % pause(0.5);
     if success

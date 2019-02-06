@@ -1,4 +1,4 @@
-function success = Fig7PlotFrame(options, output_dir, actual_plot_prefix, thisFrame, frame_i)
+function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFrame, frame_i)
 
    success= false;
    

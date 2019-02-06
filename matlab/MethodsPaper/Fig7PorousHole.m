@@ -1,5 +1,5 @@
 % Plot  typical AMR solutions for darcy brinkman problems 
-function Fig6PorousHole(dataFolder, figureDirectory)
+function Fig7PorousHole(dataFolder, figureDirectory)
 
 if nargin < 1
    % dataFolder = getDataDir('AMRConvergenceTest/MushyConvectionLiquid2-t0.5/');
@@ -13,7 +13,7 @@ end
 
 close all;
 
-figureName =  fullfile(figureDirectory, 'Fig6PorousHoleFigure'); % thisFilename; %[dataFolderNu, 'benchmark2Convergence'];
+figureName =  fullfile(figureDirectory, 'Fig7PorousHoleFigure'); % thisFilename; %[dataFolderNu, 'benchmark2Convergence'];
 saveFigure = true;
 
 
