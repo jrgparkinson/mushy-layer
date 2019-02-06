@@ -16,11 +16,27 @@ close all;
 figureName =  fullfile(figureDirectory, 'Fig6PorousHoleFigure'); % thisFilename; %[dataFolderNu, 'benchmark2Convergence'];
 saveFigure = true;
 
+
+
 %highRes = getFinalPlotFile([dataFolderNu, plotPrefixUniform(gridRes(end)*2)]);
 
 
 h = figure();
-h.Position = [200 200 1200 500];
+%h.Position = [200 200 1200 500];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+set(h,'Units','Inches');
+h.Position = [2.0 2.0 6.5 2.7];
+textFontSize = 10;
+legendFontSize = 8;
+domainFontSize = 8;
+
+set(0, 'defaultlinelinewidth',1);
+set(0, 'defaultaxeslinewidth',1);
+set(0, 'defaultpatchlinewidth',1);
+set(0, 'defaultAxesFontSize', textFontSize);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 axHeight = 0.55;
 axBottom = 0.25;
 
@@ -39,14 +55,14 @@ axBCs.XTick = [0 1];
 daspect([1 1 1]);
 
 
-text(0.04, 0.5, {'Eqn''s 3-6.', 'All boundaries are periodic.'}, 'FontSize', 16);
+text(0.04, 0.5, {'Eqn''s 3-6.', 'All boundaries are periodic.'}, 'FontSize', domainFontSize);
 
 periodicStr = {'Periodic'};
 
 xl = xlabel('$x$');
 yl = ylabel('$y$');
 
-text(-0.2, 1.2, '(a)', 'FontSize', 16);
+text(-0.2, 1.2, '(a)', 'FontSize', textFontSize);
 
 
 subplot(m, n, 2)
@@ -58,7 +74,7 @@ UniformFineSol = getInitialPlotFile(fullfile(dataFolder, plotPrefixUniform(64)))
 makeSubplot(UniformFineSol, UniformFineSol, [0.35 axBottom 0.3 axHeight])
 
 
-text(0.16, 0.85, '(b)', 'FontSize', 16);
+text(0.16, 0.85, '(b)', 'FontSize', textFontSize);
 %text(-0.2, 1.2, '(b)', 'FontSize', 16);
 
 subplot(m, n, 3);
@@ -70,7 +86,7 @@ makeSubplot(AMRsol, UniformFineSol, [0.7 axBottom 0.3 axHeight])
 
 axErr = gca;
 
- text(0.16, 0.85, '(c)', 'FontSize', 16, 'Color', [0 0 0]);
+ text(0.16, 0.85, '(c)', 'FontSize', textFontSize, 'Color', [0 0 0]);
 
 set(h,'Units','Inches');
 pos = get(h,'Position');
@@ -158,6 +174,13 @@ end
 
 function makeSubplot(AMRsol,UniformFineSol, axisExtent)
 
+onLaptop = false;
+[~, name] = system('hostname'); 
+name = strtrim(name);
+if strcmp(name, 'atmlxlap005')
+onLaptop = true;
+end
+
 %T = AMRsol.dataForComp(AMRsol.components.Temperature).';
 
 %psi = AMRsol.dataForComp(AMRsol.components.streamfunction).';
@@ -221,14 +244,24 @@ daspect([1 1 1]);
 %pcolor(X,Y,psiUniform); 
 
 %daspect([1 1 1]);
+
+if onLaptop
+    SlLabOffset = +1.0; 
+else
+    SlLabOffset = -1.2;
+end
+
 colormap(axSl, flipud(bluewhitered(257)));
 
 cSl = colorbar(axSl, 'Location', 'northoutside');
 cSl.Ticks = [minSl*0.98 maxSl*1.01];
 cSl.TickLabels = {sprintf('%1.1f', minSl), sprintf('%1.1f', maxSl)};
 cSl.Label.String = '\Theta_l';
+
+%cSl.Position(4) = cSl.Position(4)*SlHeightScale;
+ 
 oldPos = cSl.Label.Position;
-cSl.Label.Position = [(minSl+maxSl)/2 oldPos(2)-1.25];
+cSl.Label.Position = [(minSl+maxSl)/2 oldPos(2)+SlLabOffset];
 
 box on;
 %set(axTemperature, 'Layer', 'top');
@@ -263,6 +296,8 @@ v = linspace(0.7, 1.0, 6);
 hChi.LineWidth = 2.0;
 
 daspect([1 1 1]);
+
+caxis([0.7 1.0]);
 
 box on;
 
@@ -309,6 +344,9 @@ axVel.Position = axisExtent;
 % Set pcolor on top
 set(axSl, 'Layer', 'top');
 
+
+cSl.Position(4) = 0.05;
+cPorosity.Position(4) = 0.05;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -421,6 +459,15 @@ box on;
 %     formatMin = formatMax;
 % end
 
+if onLaptop
+    PorosityLabOffset = 1.2;
+    PorosityColorbarShift = -0.15;
+else
+    PorosityLabOffset = 1.2;
+    PorosityColorbarShift = -0.15;
+end
+
+
 formatMin = '%1.1f';
 formatMax = '%1.1f';
 
@@ -429,10 +476,12 @@ cPorosity.TickLabels = {sprintf(formatMin,newTicks(1)), sprintf(formatMax,newTic
 oldPos = cPorosity.Position;
 thetaColorbarPos = cSl.Position;
 %cPsi.Position = [oldPos(1) oldPos(2)-0.05 oldPos(3)-0.035 oldPos(4)];
-cPorosity.Position = [thetaColorbarPos(1) axisExtent(2)-0.15 thetaColorbarPos(3) oldPos(4)];
+cPorosity.Position = [thetaColorbarPos(1) axisExtent(2)+PorosityColorbarShift thetaColorbarPos(3) oldPos(4)];
 
 oldPos = cPorosity.Label.Position;
-cPorosity.Label.Position = [oldPos(1) oldPos(2) + 1.2];
+
+
+cPorosity.Label.Position = [oldPos(1) oldPos(2) + PorosityLabOffset];
 
 minX = min(min(X));
 maxX = max(max(X));
