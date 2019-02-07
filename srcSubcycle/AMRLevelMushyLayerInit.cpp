@@ -4114,8 +4114,11 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     diagsToPrint.push_back(m_diagnostics.m_time);
     diagsToPrint.push_back(m_diagnostics.m_dt);
     diagsToPrint.push_back(m_diagnostics.m_Nu);
-    diagsToPrint.push_back(m_diagnostics.m_NuRight);
     diagsToPrint.push_back(m_diagnostics.m_NuLeft);
+    diagsToPrint.push_back(m_diagnostics.m_NuMiddle);
+    diagsToPrint.push_back(m_diagnostics.m_NuRight);
+
+
     diagsToPrint.push_back(m_diagnostics.m_maxVhalf);
     diagsToPrint.push_back(m_diagnostics.m_maxUhalf);
 

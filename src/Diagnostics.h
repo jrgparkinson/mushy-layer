@@ -101,6 +101,7 @@ public:
     m_Nu,
     m_NuRight,
     m_NuLeft,
+    m_NuMiddle,
     m_maxVhalf,
     m_maxUhalf,
     m_heatFluxAbsMismatch,

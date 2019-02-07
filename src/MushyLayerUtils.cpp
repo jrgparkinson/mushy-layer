@@ -344,14 +344,11 @@ Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& v
   Real deltaT = a_params.bcValTemperatureHi[0] - a_params.bcValTemperatureLo[0]; // Just fix this for now
   Nu /= deltaT/a_domHeight;
 
-  //  pout() << "Nu = " << Nu << endl;
-
   // Nu is only calculated by proc 0, apparently
   // need to broadcast to all procs
   int srcProc = 0;
   broadcast(Nu, srcProc);
 
-  //  pout() << "Nu = " << Nu << endl;
 
   return Nu;
 }

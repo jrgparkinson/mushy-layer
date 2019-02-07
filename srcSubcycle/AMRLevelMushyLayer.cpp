@@ -2191,15 +2191,7 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
     }
   }
 
-  // These things are useful for debugging
-  //  LevelData<FArrayBox> fluidAdvSrc(m_grids, numComp, IntVect::Zero); // want this for debugging
 
-  //  LevelData<FArrayBox> frameAdvSrc(m_grids, numComp, IntVect::Zero); // want this for debugging
-
-  //  Divergence::levelDivergenceMACMultiComp(fluidAdvSrc, edgeScalFluidAdv, m_dx);
-
-  //  Divergence::levelDivergenceMACMultiComp(frameAdvSrc, edgeScalFrameAdvection, m_dx);
-  //  int temp = 0;
 }
 
 void AMRLevelMushyLayer::computeScalarAdvectiveSrcHC(LevelData<FArrayBox>& a_src,
@@ -2491,7 +2483,6 @@ void AMRLevelMushyLayer::computeDiagnostics()
         Tflux[lev] = new LevelDomainFluxRegister();
       }
 
-      //    Real Nu = 0;
       Real scale = 1.0;
 
       for (int lev=0; lev<nLevels; lev++)
@@ -2555,6 +2546,46 @@ void AMRLevelMushyLayer::computeDiagnostics()
       m_diagnostics.addDiagnostic(Diagnostics::m_Nu, m_time, Nu);
       m_diagnostics.addDiagnostic(Diagnostics::m_NuLeft, m_time, Nuleft);
       m_diagnostics.addDiagnostic(Diagnostics::m_NuRight, m_time, Nuright);
+
+      // Also compute the flux in the middle of the domain on level 0
+
+      LevelData<FluxBox> fluidFlux(m_grids, 2, IntVect::Unit);
+      computeTotalAdvectiveFluxes(fluidFlux);
+
+      Real Nu_sum = 0;
+      Box middleBox(m_problem_domain.domainBox());
+      middleBox.surroundingNodes(0);
+
+      int width = middleBox.hiVect()[0]-middleBox.loVect()[0];
+      int shrink_cells = int(width/2);
+      middleBox.growLo(0, -shrink_cells);
+      middleBox.growHi(0, -shrink_cells);
+//      middleBox.shift(0, 0.5);
+
+      // we already have dt/dx, now add u*T to it
+      int numBoxes = 0;
+      for (DataIterator dit = gradEdgeT[0]->dataIterator(); dit.ok(); ++dit)
+      {
+        FluxBox& fb = (*gradEdgeT[0])[dit];
+
+        FArrayBox& horizFlux = fb[0];
+        FArrayBox& fluidFluxFAB = fluidFlux[dit][0];
+
+        horizFlux.plus(fluidFluxFAB);
+
+        Box b(horizFlux.box());
+        b &= middleBox;
+
+        int numBoxCells = b.numPts();
+
+        Real thisNu = horizFlux.sum(b, 0)/numBoxCells;
+        Nu_sum = Nu_sum + thisNu;
+        numBoxes++;
+      }
+
+      Nu_sum = Nu_sum / numBoxes;
+      m_diagnostics.addDiagnostic(Diagnostics::m_NuMiddle, m_time, Nu_sum);
+
 
 
       // Cleanup after nusselt calculation

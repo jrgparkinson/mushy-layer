@@ -24,6 +24,7 @@ Diagnostics::Diagnostics ()
   m_diagnosticNames[m_dt] = "dt";
   m_diagnosticNames[m_Nu] = "Nusselt";
   m_diagnosticNames[m_NuLeft] = "NusseltLeft";
+  m_diagnosticNames[m_NuMiddle] = "NusseltMiddle";
   m_diagnosticNames[m_NuRight] = "NusseltRight";
   m_diagnosticNames[m_maxVhalf] = "MaxVHalf";
   m_diagnosticNames[m_maxUhalf] = "MaxUHalf";
