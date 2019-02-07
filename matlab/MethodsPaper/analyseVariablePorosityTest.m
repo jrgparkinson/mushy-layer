@@ -48,15 +48,17 @@ uniform_prefix = 'Uniform-DBVariablePorosity-';
 compName  = 'xDarcyvelocity';
 errType = 'L2';
 
-% base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015/';
-% Nzs = [16,32,64,128,256,512];
-% redoAnalysis = false;
-% runAnalysis = false;
-% uniform_prefix = 'Uniform-PorousMushyHole-';
-% compName = 'Porosity';
-% errType = 'L2';
+base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015/';
+Nzs = [16,32,64,128,256,512];
+redoAnalysis = false;
+runAnalysis = false;
+uniform_prefix = 'Uniform-PorousMushyHole-';
+compName = 'Porosity';
+errType = 'L2';
 
 end
+
+
 
 fineNumCells = Nzs(end);
 fine_res_dir = [uniform_prefix,num2str(fineNumCells),'--0'];
@@ -363,7 +365,9 @@ h = figure();
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 set(h,'Units','Inches');
 h.Position = [2.0 2.0 6.0 2.5];
-textFontSize = 10;
+
+% Caption font is 8pt
+textFontSize = 8;
 legendFontSize = 8;
 domainFontSize = 8;
 
@@ -371,6 +375,10 @@ set(0, 'defaultlinelinewidth',1);
 set(0, 'defaultaxeslinewidth',1);
 set(0, 'defaultpatchlinewidth',1);
 set(0, 'defaultAxesFontSize', textFontSize);
+
+font = 'Latin Modern Math';
+set(0, 'defaultAxesFontName', font); 
+set(0, 'defaultTextFontName', font); 
 
 pltBottom = 0.18;
 pltHeight = 0.77;

@@ -133,5 +133,5 @@ HCMultigrid.num_smooth_up = 8
 projection.eta=0.99
 
 # Two possible refinement options:
-#main.taggingVar=3
-main.vel_refine_thresh = 100
+main.taggingVar=3
+# main.vel_refine_thresh = 100
