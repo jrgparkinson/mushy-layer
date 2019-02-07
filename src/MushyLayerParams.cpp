@@ -335,6 +335,7 @@ void MushyLayerParams::getParameters()
     nonDimVel = (height/liquidHeatDiffusivity) * V;
   }
 
+  pp.query("BCAccuracy", m_BCAccuracy);
 
   // Default nondimensionalisation is about eutectic
   referenceTemperature = eutecticTemp;
@@ -349,36 +350,6 @@ void MushyLayerParams::getParameters()
   ThetaInitial = concToTheta(initialComposition);
   ThetaInf = ThetaInitial;
 
-
-  // Given how we do non dimensionalisation, this is always 1. concToTheta(initialComposition);
-  // however we want to be able to set the salinity to be 0 in some case, so allow it like this
-  //  if (initialComposition == 0)
-  //  {
-  //    ThetaInitial = 0.0;
-  //  }
-  //  else
-  //  {
-  //    ThetaInitial = -1.0;
-  //  }
-
-  //  HTop = -999; HBottom = -99; ThetaTop = -999; ThetaBottom = -999;
-
-  //See if H and C have been specified
-  //  pp.query("topEnthalpy", HTop);
-  //  pp.query("bottomEnthalpy", HBottom);
-  //  pp.query("topBulkConc", ThetaTop);
-  //  pp.query("bottomBulkConc", ThetaBottom);
-
-  //  if (HBottom <= -99)
-  //  {
-  //    Real TBottom = -99;
-  //    pp.query("bottomTemperature", TBottom);
-  //    if (TBottom > -99)
-  //    {
-  //      // Assume porosity 1 at bottom
-  //      HBottom = stefan*1 + tempTotheta(TBottom);
-  //    }
-  //  }
 
   plumeBounds.resize(2);
   if (pp.contains("plumeBounds"))
@@ -644,6 +615,8 @@ void MushyLayerParams::getParameters()
 
 
   }
+
+
 
 
 

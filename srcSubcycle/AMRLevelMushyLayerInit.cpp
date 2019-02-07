@@ -1402,7 +1402,7 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_viscousBCs = m_isViscous; //(m_parameters.prandtl > 0);
   ppMain.query("viscousBCs", m_viscousBCs);
 
-  ppMain.query("BCAccuracy", m_parameters.m_BCAccuracy);
+
 
   // For mushy layer calculations, we want to try and kick off the instability if we've converged
   m_doAutomaticRestart = false; //(m_parameters.physicalProblem == MushyLayerParams::m_mushyLayer);
