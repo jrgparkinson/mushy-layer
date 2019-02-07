@@ -10,12 +10,15 @@ runs = {};
 for i =1:length(folders)
     folderName = folders(i).name;
     
-    if folderName(1:2) == 'zz'
+    
+    
+    if length(folderName) > 5
+        
+       if strcmp( folderName(1:2), 'zz')
         fprintf('Skipping zz folder: %s \n', folderName);
         continue
-    end
+       end
     
-    if (length(folderName) > 5)
         if strcmp( folderName(end-1:end) , '-0')
             %thisPrefix = regexprep(folderName,'\.\dd\.hdf5','');
             %thisPrefix = regexprep(folderName,'\d+-(ref\d)--0$','$1');
