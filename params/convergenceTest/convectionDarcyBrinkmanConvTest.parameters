@@ -134,7 +134,8 @@ main.usePhiForImplicitAdvectionSolve=false
 main.nondimensionalisation=0
 main.useAccelDt=0 # was 1 originally
 
-main.steady_state=0.001
+main.steady_state=0.005
 main.steadyStateNormType=0
 main.ignoreBulkConcentrationSteadyState=1
 main.computeVorticity=false # turn this off to save time
+parameters.BCAccuracy=2
