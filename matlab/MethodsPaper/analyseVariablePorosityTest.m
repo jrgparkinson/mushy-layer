@@ -58,7 +58,7 @@ errType = 'L2';
 
 end
 
-
+tic;
 
 fineNumCells = Nzs(end);
 fine_res_dir = [uniform_prefix,num2str(fineNumCells),'--0'];
@@ -555,6 +555,10 @@ for j=1:length(performance)
 end
 
 
+
+finished = toc;
+
+fprintf('\n\nCode finished after execution time %f seconds \n\n', finished);
 
 
 end
