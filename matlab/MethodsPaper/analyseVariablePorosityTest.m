@@ -135,6 +135,7 @@ thisRunTime = NaN*ones(length(runs), 10);
 for i=1:length(runs)
     folders = dir([fullfile(base_dir, runs{i}), '*']);
     
+    
     for j=1:length(folders)
         folder_dir = fullfile(base_dir, folders(j).name);
         fprintf('%s \n', folders(j).name);
