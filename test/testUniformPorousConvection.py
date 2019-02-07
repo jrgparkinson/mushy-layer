@@ -63,7 +63,7 @@ def test_uniform_porous_convection(argv):
     if nz_vm > 0:
         amr_setup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(nz_vm / 2), nz_vm, 2*nz_vm]})
 
-    num_procs = [1, 1]
+    num_procs = [1, 1, 1]
     # chi = 0.4
 
     # Try and speed things up for now, should eventually make this criteria smaller
