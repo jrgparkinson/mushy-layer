@@ -2567,26 +2567,56 @@ void AMRLevelMushyLayer::computeDiagnostics()
       for (DataIterator dit = gradEdgeT[0]->dataIterator(); dit.ok(); ++dit)
       {
         FluxBox& fb = (*gradEdgeT[0])[dit];
-
         FArrayBox& horizFlux = fb[0];
-        FArrayBox& fluidFluxFAB = fluidFlux[dit][0];
 
-        horizFlux.plus(fluidFluxFAB);
 
         Box b(horizFlux.box());
         b &= middleBox;
-
         int numBoxCells = b.numPts();
 
-        Real thisNu = horizFlux.sum(b, 0)/numBoxCells;
+        Real thisNu = 0;
+
+
+        // Either use the explicity discretization, or the advective fluxes computed by our algorithm
+        // both seem to give very similar results (equal to around 4 significant figures)
+        bool useExplicitDiscretization = false;
+
+        if (useExplicitDiscretization)
+        {
+          FArrayBox& U = m_advVel[dit][0];
+          FArrayBox& T = (*m_scalarNew[m_temperature])[dit];
+          Box TBox = T.box();
+
+          // Check if we can get cells from the box to the right
+          // note that b is face centred, so we only have to shift by 1/2
+          Box bRight(b);
+          bRight.enclosedCells(0);
+          if (TBox.contains(bRight))
+          {
+            for (BoxIterator bit(b); bit.ok(); ++bit)
+            {
+              IntVect iv = bit();
+              IntVect ivUp = iv + BASISV(0);
+              Real cellNu = U(iv)*( T(ivUp) + T(iv))/2 - ( T(ivUp) - T(iv))/m_dx ;
+              thisNu += cellNu;
+            }
+          }
+        }
+        else
+        {
+          FArrayBox& fluidFluxFAB = fluidFlux[dit][0];
+          horizFlux.minus(fluidFluxFAB);
+          thisNu =  horizFlux.sum(b, 0);
+        }
+
+        thisNu =  thisNu/numBoxCells;
+
         Nu_sum = Nu_sum + thisNu;
         numBoxes++;
       }
 
-      Nu_sum = Nu_sum / numBoxes;
+      Nu_sum = abs(Nu_sum) / numBoxes;
       m_diagnostics.addDiagnostic(Diagnostics::m_NuMiddle, m_time, Nu_sum);
-
-
 
       // Cleanup after nusselt calculation
       for (int lev=0; lev<nLevels; lev++)
