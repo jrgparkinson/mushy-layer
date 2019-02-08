@@ -105,7 +105,7 @@ def test_uniform_porous_convection(argv):
             extra_params['parameters.rayleighTemp'] = ra
             extra_params['main.plot_interval'] = -1
             extra_params['main.plot_period'] = 0.1
-            extra_params['main.checkpoint_interval'] = 10000
+            extra_params['main.checkpoint_interval'] = 2000
             
             # this is for testing purposes
             # extra_params['main.max_step'] = 10
