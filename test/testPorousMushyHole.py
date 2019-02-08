@@ -14,24 +14,27 @@ def testPorousMushyHole(argv):
 
     # Defaults:
     max_time = 5.0e-5
+    hole_radius = 0.02
 
     try:
-        opts, args = getopt.getopt(argv, "t:")
+        opts, args = getopt.getopt(argv, "t:h:")
     except getopt.GetoptError as err:
         print(str(err))
-        print('testPorousMushyHole.py -t<max time>')
+        print('testPorousMushyHole.py -t<max time> -h<hole radius=0.02>')
         sys.exit(2)
 
     for opt, arg in opts:
         if opt in "-t":
             max_time = float(arg)
+        elif opt in "-h":
+            hole_radius = float(arg)
 
     base_output_dir = get_base_output_dir()
     matlab_command = get_matlab_base_command()
 
     print(Fore.GREEN + 'Setup tests for porous mushy hole' + Style.RESET_ALL)
     physicalProblem = 'PorousMushyHole'
-    dataFolder = os.path.join(base_output_dir, 'PorousMushyHole-t' + str(max_time) )
+    dataFolder = os.path.join(base_output_dir, 'PorousMushyHole-t' + str(max_time) + '-hole' + str(hole_radius) )
 
     Nz_uniform = [16, 32, 64, 128, 256, 512]
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
@@ -55,7 +58,9 @@ def testPorousMushyHole(argv):
      'true, true, \'' + uniform_prefix + '\', \'Porosity\', \'L2\'); exit;"'
 
     # Run
-    extra_params = {'main.max_time':max_time}
+    extra_params = {'main.max_time':max_time,
+                    'main.radius': hole_radius}
+
     runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
 
 if __name__ == "__main__":
