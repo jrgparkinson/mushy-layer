@@ -2,13 +2,57 @@
 import os, sys
 from colorama import Fore, Style
 import getopt
+import math
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs
 
 ##########################################################################
 # 3) Convection in a mushy layer with an initial porous hole
 ##########################################################################
+
+
+def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat):
+    mushyLayerBaseDir = os.environ['MUSHY_LAYER_DIR']
+    params_file = os.path.join(mushyLayerBaseDir,'params/convergenceTest/porousMushyHole.parameters')
+
+    params = read_inputs(params_file)
+
+
+    nx_coarse = nz_coarse
+
+    Nx_grid = nx_coarse
+    if ref_rat == 4:
+        Nx_grid = 2 * nx_coarse
+
+    gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(Nx_grid) + 'x' + str(Nx_grid)
+
+    # dx = 1 / float(nx_coarse)
+    # dt = 5e-7 * 64.0 / float(nx_coarse)
+    # Coarsest Nx is 8
+    coarsest_dt = 1e-5
+    coarsest_nx = 8
+    dt = float(coarsest_dt) * float(coarsest_nx) / float(nx_coarse)
+    params['main.fixed_dt'] = dt  # dt
+    params['main.plot_period'] = float(params['main.max_time'])/4  # produce 4 same number of plot files per run
+
+    regrid_int = int(math.ceil(8 * float(nz_coarse) / 32.0))
+    regrid_int = max(regrid_int, 1)
+
+    params['main.refine_thresh'] = float(params['main.radius']) * 1.0 / float(nz_coarse)  # 0.05*64.0/float(nz_coarse)
+
+    bf = max(int(nx_coarse / 4), 4)
+
+    maxGridSize = 1024 #bf * 2
+    gbs = max(bf / 8, 2)
+
+    params['main.block_factor'] = str(bf)
+    params['main.grid_buffer_size'] = gbs
+    params['main.tag_buffer_size'] = 0
+    params['main.regrid_interval'] = str(regrid_int) + ' ' + str(regrid_int) + ' ' + str(regrid_int)
+    params['main.max_grid_size'] = str(maxGridSize)  # Must be greater than block factor
+
+    return nx_coarse, params, gridFile
 
 def testPorousMushyHole(argv):
 
@@ -61,8 +105,11 @@ def testPorousMushyHole(argv):
     extra_params = {'main.max_time':max_time,
                     'main.radius': hole_radius}
 
-    runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
+    runTest(dataFolder, physicalProblem, porous_mushy_hole_resolution_specific_params,
+            AMRSetup, num_procs, analysis_command, extra_params)
 
 if __name__ == "__main__":
     testPorousMushyHole(sys.argv[1:])
+
+
 

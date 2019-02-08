@@ -9,7 +9,7 @@ from SlurmTask import SlurmTask
 from AMRConvergenceTest import amr_convergence_test
 
 
-def runTest(base_dir, physical_problem, AMRSetup, num_procs,
+def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, num_procs,
             analysis_command='', extra_params={},
             numRestarts=0, params_file='', restart_from_low_res=False):
 
@@ -51,179 +51,182 @@ def runTest(base_dir, physical_problem, AMRSetup, num_procs,
             if os.path.exists(defaultParamsFile):
                 params = read_inputs(defaultParamsFile)
 
-            output_dir = '' 
+            output_dir = ''
 
-            if physical_problem == 'noFlow':
-                
-                if not params_file:
-                    params_file = mushyLayerBaseDir + '/params/convergenceTest/noFlowConvTest.parameters'
+            nx_coarse, params, gridFile = resolution_specific_params(nz_coarse, ref_rat)
 
-                params = read_inputs(params_file)
-                
-                nx_coarse = 4
-                params['main.domain_width'] = str(4.0 * float(nx_coarse) / float(nz_coarse))
-                linearTgradient = 1.0 / 4.0  # delta T / height
-                params['main.refine_thresh'] = str(linearTgradient * 16.0 / float(nz_coarse))
-                params['main.tag_buffer_size'] = str(int(float(nz_coarse) / 8))
-                params['main.steady_state'] = '1e-8'  # str(1e-4 * pow(32.0/float(nz_coarse),2))
-                params['main.max_grid_size'] = '32'
-                params['main.max_step'] = 10000
-                params['main.debug'] = 'true'  # make sure we output things like Temperature error
-
-            elif physical_problem == 'convectionDB':
-
-                nx_coarse = nz_coarse
-
-                gridFile = mushyLayerBaseDir + '/grids/leftRight/' + str(nx_coarse) + 'x' + str(nz_coarse)
-                # params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/.parameters')
-                if not params_file:
-                    params_file = mushyLayerBaseDir + '/params/convergenceTest/convectionDarcyBrinkmanConvTest.parameters'
-
-                params = read_inputs(params_file)
-
-                params['main.refine_thresh'] = str(3.0 / float(nz_coarse))
-                params['main.tag_buffer_size'] = str(max(2, int(float(nz_coarse) / 8)))
-
-            elif physical_problem == 'DBVariablePorosity':
-                integrationTime = 2e-4
-                nx_coarse = nz_coarse
-
-                if ref_rat == 2:
-                    gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(nx_coarse) + 'x' + str(nz_coarse)           
-                else:
-                    gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(nx_coarse * 2) + 'x' + str(nz_coarse * 2)   
-                # params = readInputs(mushyLayerBaseDir + )
-                if not params_file:
-                    params_file = mushyLayerBaseDir + '/params/convergenceTest/DBVariablePorosityConvTest.parameters'
-
-                params = read_inputs(params_file)
-                
-                # runTypes = ['uniform', 'amr', 'variable']
-                # runTypes = ['uniform', 'amr']
-                # runTypes = ['uniform']
-                # runTypes = ['amr']
-                
-                # For a fixed dt:
-                dt = 1e-5 * float(16.0 / float(nz_coarse))
-                numSteps = float(integrationTime) / dt
-                
-                params['main.plot_interval'] = str(int(numSteps / 5.0))
-                
-                params['main.max_step'] = '100000'
-                
-                params['main.min_time'] = integrationTime
-                params['main.max_time'] = integrationTime
-
-                # params['main.vel_refine_thresh'] = 5.0
-                # params['main.stdev'] = '0.002'
-                
-                regrid_int = int(4.0 * float(nx_coarse) / 16.0)
-
-                # Make sure we always have one grid
-                maxGridSize = max(nx_coarse * maxRefinement, 4)
-
-                # bf = max(maxGridSize/2,4)
-                bf = max(nx_coarse * maxRefinement / 8, 4)
-
-                gridBuffer = 0  # max(bf/4,1)
-                tagBuffer = 0  # gridBuffer
-
-                if max_level == 2:
-                    gridBuffer = max(bf / 4, 4)
-
-                # if ref_rat == 4:
-                #    bf = bf/2
-                #   gridBuffer = bf
-                #   tagBuffer = gridBuffer
-
-                params['main.block_factor'] = str(bf)
-                params['main.grid_buffer_size'] = str(gridBuffer)
-                params['main.tag_buffer_size'] = str(tagBuffer)
-                params['main.regrid_interval'] = str(regrid_int) + ' ' + str(regrid_int) + ' ' + str(regrid_int)
-                params['main.max_grid_size'] = str(maxGridSize)  # Must be greater than block factor
-
-                # To pretend AMR is VM:
-                # params['regrid.tagCenterOnly'] = '0.375'
-                # params['main.tag_buffer_size'] = '0'
-                # params['main.grid_buffer_size'] = '0'
-
-                chi = '0.05'
-                params['bc.porosityHiVal'] = chi + ' ' + chi  # 0.4 0.4
-                params['bc.porosityLoVal'] = chi + ' ' + chi
-
-                params['main.fixed_dt'] = str(dt)
-
-            elif physical_problem == 'FixedChill':
-
-                if not params_file:
-                    params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
-
-                params = read_inputs(params_file)
-
-                output_dir = ''
-
-                # nx_coarse = nz_coarse*2
-                gridFile = mushyLayerBaseDir + '/grids/topMiddle/' + str(nx_coarse) + 'x' + str(nz_coarse)
-
-                # pltInt = int(100.0*float(nz_coarse)/64.0)
-                # params['main.plot_interval'] = str(pltInt)
-                # params['main.chk_interval'] = params['main.plot_interval']
-
-            elif physical_problem == 'PorousMushyHole' or physical_problem == 'MushyConvectionLiquid' or physical_problem == 'MushyConvectionLiquid2':
-
-                if not params_file:
-                    params_file = mushyLayerBaseDir + '/params/convergenceTest/porousMushyHole.parameters'
-
-                params = read_inputs(params_file)
-
-                output_dir = ''  # physical_problem+'-t' + str(maxTime) + '/'
-                # output_dir = 'AMRConvergenceTest/'+physical_problem+'-t' + str(maxTime) + '-1proc/'
-
-                nx_coarse = nz_coarse
-
-                Nx_grid = nx_coarse
-                if ref_rat == 4:
-                    Nx_grid = 2 * nx_coarse
-
-                gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(Nx_grid) + 'x' + str(Nx_grid)
-
-                dx = 1 / float(nx_coarse)
-                #dt = 5e-7 * 64.0 / float(nx_coarse)
-                # Coarsest Nx is 8
-                coarsest_dt = 1e-5
-                coarsest_nx = 8
-                dt = float(coarsest_dt) * float(coarsest_nx) / float(nx_coarse)
-                params['main.fixed_dt'] = dt  # dt
-                params['main.plot_period'] = float(params['main.max_time'])/4  # produce 4 same number of plot files per run
-
-                regrid_int = int(math.ceil(8 * float(nz_coarse) / 32.0))
-                regrid_int = max(regrid_int, 1)
-
-                # pltInt = 800  # large interval, save disk space
-                # params['main.plot_interval'] = str(pltInt)
-                # params['main.checkpoint_interval'] = params['main.plot_interval']
-
-                # AMR options
-                # if 'main.vel_refine_thresh' in params:
-                #    params.pop('main.vel_refine_thresh')
-
-                # params['main.taggingVar'] = 3 # porosity
-                params['main.refine_thresh'] = float(params['main.radius']) * 1.0 / float(nz_coarse)  # 0.05*64.0/float(nz_coarse)
-
-                bf = max(int(nx_coarse / 4), 4)
-                
-                maxGridSize = 1024 #bf * 2
-                gbs = max(bf / 8, 2)
-
-                params['main.block_factor'] = str(bf)
-                params['main.grid_buffer_size'] = gbs
-                params['main.tag_buffer_size'] = 0
-                params['main.regrid_interval'] = str(regrid_int) + ' ' + str(regrid_int) + ' ' + str(regrid_int)
-                params['main.max_grid_size'] = str(maxGridSize)  # Must be greater than block factor
-
-            else:
-                print(Fore.RED + 'Unknown convergence test option' + Style.RESET_ALL)
-                sys.exit(2)
+            # Moving this logic to separate functions
+            # if physical_problem == 'noFlow':
+            #
+            #     if not params_file:
+            #         params_file = mushyLayerBaseDir + '/params/convergenceTest/noFlowConvTest.parameters'
+            #
+            #     params = read_inputs(params_file)
+            #
+            #     nx_coarse = 4
+            #     params['main.domain_width'] = str(4.0 * float(nx_coarse) / float(nz_coarse))
+            #     linearTgradient = 1.0 / 4.0  # delta T / height
+            #     params['main.refine_thresh'] = str(linearTgradient * 16.0 / float(nz_coarse))
+            #     params['main.tag_buffer_size'] = str(int(float(nz_coarse) / 8))
+            #     params['main.steady_state'] = '1e-8'  # str(1e-4 * pow(32.0/float(nz_coarse),2))
+            #     params['main.max_grid_size'] = '32'
+            #     params['main.max_step'] = 10000
+            #     params['main.debug'] = 'true'  # make sure we output things like Temperature error
+            #
+            # elif physical_problem == 'convectionDB':
+            #
+            #     nx_coarse = nz_coarse
+            #
+            #     gridFile = mushyLayerBaseDir + '/grids/leftRight/' + str(nx_coarse) + 'x' + str(nz_coarse)
+            #     # params = readInputs(mushyLayerBaseDir + '/params/convergenceTest/.parameters')
+            #     if not params_file:
+            #         params_file = mushyLayerBaseDir + '/params/convergenceTest/convectionDarcyBrinkmanConvTest.parameters'
+            #
+            #     params = read_inputs(params_file)
+            #
+            #     params['main.refine_thresh'] = str(3.0 / float(nz_coarse))
+            #     params['main.tag_buffer_size'] = str(max(2, int(float(nz_coarse) / 8)))
+            #
+            # elif physical_problem == 'DBVariablePorosity':
+            #     integrationTime = 2e-4
+            #     nx_coarse = nz_coarse
+            #
+            #     if ref_rat == 2:
+            #         gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(nx_coarse) + 'x' + str(nz_coarse)
+            #     else:
+            #         gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(nx_coarse * 2) + 'x' + str(nz_coarse * 2)
+            #     # params = readInputs(mushyLayerBaseDir + )
+            #     if not params_file:
+            #         params_file = mushyLayerBaseDir + '/params/convergenceTest/DBVariablePorosityConvTest.parameters'
+            #
+            #     params = read_inputs(params_file)
+            #
+            #     # runTypes = ['uniform', 'amr', 'variable']
+            #     # runTypes = ['uniform', 'amr']
+            #     # runTypes = ['uniform']
+            #     # runTypes = ['amr']
+            #
+            #     # For a fixed dt:
+            #     dt = 1e-5 * float(16.0 / float(nz_coarse))
+            #     numSteps = float(integrationTime) / dt
+            #
+            #     params['main.plot_interval'] = str(int(numSteps / 5.0))
+            #
+            #     params['main.max_step'] = '100000'
+            #
+            #     params['main.min_time'] = integrationTime
+            #     params['main.max_time'] = integrationTime
+            #
+            #     # params['main.vel_refine_thresh'] = 5.0
+            #     # params['main.stdev'] = '0.002'
+            #
+            #     regrid_int = int(4.0 * float(nx_coarse) / 16.0)
+            #
+            #     # Make sure we always have one grid
+            #     maxGridSize = max(nx_coarse * maxRefinement, 4)
+            #
+            #     # bf = max(maxGridSize/2,4)
+            #     bf = max(nx_coarse * maxRefinement / 8, 4)
+            #
+            #     gridBuffer = 0  # max(bf/4,1)
+            #     tagBuffer = 0  # gridBuffer
+            #
+            #     if max_level == 2:
+            #         gridBuffer = max(bf / 4, 4)
+            #
+            #     # if ref_rat == 4:
+            #     #    bf = bf/2
+            #     #   gridBuffer = bf
+            #     #   tagBuffer = gridBuffer
+            #
+            #     params['main.block_factor'] = str(bf)
+            #     params['main.grid_buffer_size'] = str(gridBuffer)
+            #     params['main.tag_buffer_size'] = str(tagBuffer)
+            #     params['main.regrid_interval'] = str(regrid_int) + ' ' + str(regrid_int) + ' ' + str(regrid_int)
+            #     params['main.max_grid_size'] = str(maxGridSize)  # Must be greater than block factor
+            #
+            #     # To pretend AMR is VM:
+            #     # params['regrid.tagCenterOnly'] = '0.375'
+            #     # params['main.tag_buffer_size'] = '0'
+            #     # params['main.grid_buffer_size'] = '0'
+            #
+            #     chi = '0.05'
+            #     params['bc.porosityHiVal'] = chi + ' ' + chi  # 0.4 0.4
+            #     params['bc.porosityLoVal'] = chi + ' ' + chi
+            #
+            #     params['main.fixed_dt'] = str(dt)
+            #
+            # elif physical_problem == 'FixedChill':
+            #
+            #     if not params_file:
+            #         params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
+            #
+            #     params = read_inputs(params_file)
+            #
+            #     output_dir = ''
+            #
+            #     # nx_coarse = nz_coarse*2
+            #     gridFile = mushyLayerBaseDir + '/grids/topMiddle/' + str(nx_coarse) + 'x' + str(nz_coarse)
+            #
+            #     # pltInt = int(100.0*float(nz_coarse)/64.0)
+            #     # params['main.plot_interval'] = str(pltInt)
+            #     # params['main.chk_interval'] = params['main.plot_interval']
+            #
+            # elif physical_problem == 'PorousMushyHole' or physical_problem == 'MushyConvectionLiquid' or physical_problem == 'MushyConvectionLiquid2':
+            #
+            #     if not params_file:
+            #         params_file = mushyLayerBaseDir + '/params/convergenceTest/porousMushyHole.parameters'
+            #
+            #     params = read_inputs(params_file)
+            #
+            #     output_dir = ''  # physical_problem+'-t' + str(maxTime) + '/'
+            #     # output_dir = 'AMRConvergenceTest/'+physical_problem+'-t' + str(maxTime) + '-1proc/'
+            #
+            #     nx_coarse = nz_coarse
+            #
+            #     Nx_grid = nx_coarse
+            #     if ref_rat == 4:
+            #         Nx_grid = 2 * nx_coarse
+            #
+            #     gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(Nx_grid) + 'x' + str(Nx_grid)
+            #
+            #     dx = 1 / float(nx_coarse)
+            #     #dt = 5e-7 * 64.0 / float(nx_coarse)
+            #     # Coarsest Nx is 8
+            #     coarsest_dt = 1e-5
+            #     coarsest_nx = 8
+            #     dt = float(coarsest_dt) * float(coarsest_nx) / float(nx_coarse)
+            #     params['main.fixed_dt'] = dt  # dt
+            #     params['main.plot_period'] = float(params['main.max_time'])/4  # produce 4 same number of plot files per run
+            #
+            #     regrid_int = int(math.ceil(8 * float(nz_coarse) / 32.0))
+            #     regrid_int = max(regrid_int, 1)
+            #
+            #     # pltInt = 800  # large interval, save disk space
+            #     # params['main.plot_interval'] = str(pltInt)
+            #     # params['main.checkpoint_interval'] = params['main.plot_interval']
+            #
+            #     # AMR options
+            #     # if 'main.vel_refine_thresh' in params:
+            #     #    params.pop('main.vel_refine_thresh')
+            #
+            #     # params['main.taggingVar'] = 3 # porosity
+            #     params['main.refine_thresh'] = float(params['main.radius']) * 1.0 / float(nz_coarse)  # 0.05*64.0/float(nz_coarse)
+            #
+            #     bf = max(int(nx_coarse / 4), 4)
+            #
+            #     maxGridSize = 1024 #bf * 2
+            #     gbs = max(bf / 8, 2)
+            #
+            #     params['main.block_factor'] = str(bf)
+            #     params['main.grid_buffer_size'] = gbs
+            #     params['main.tag_buffer_size'] = 0
+            #     params['main.regrid_interval'] = str(regrid_int) + ' ' + str(regrid_int) + ' ' + str(regrid_int)
+            #     params['main.max_grid_size'] = str(maxGridSize)  # Must be greater than block factor
+            #
+            # else:
+            #     print(Fore.RED + 'Unknown convergence test option' + Style.RESET_ALL)
+            #     sys.exit(2)
 
             # Default options
             if nx_coarse == -1:
