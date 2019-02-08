@@ -54,6 +54,7 @@ redoAnalysis = false;
 runAnalysis = false;
 uniform_prefix = 'Uniform-PorousMushyHole-';
 compName = 'Porosity';
+%compName = 'Temperature';
 errType = 'L2';
 
 end
@@ -65,7 +66,7 @@ fine_res_dir = [uniform_prefix,num2str(fineNumCells),'--0'];
 
 % For uniform grids
 if runAnalysis
-    computeRichardsonError(base_dir, uniform_prefix)
+    computeRichardsonError(base_dir, uniform_prefix, redoAnalysis)
 end
 
 
@@ -447,11 +448,17 @@ axRight = axes;
 
 normalizedCells = [];
 normalizedCPU = [];
-nref = [0, 2, 4];
+nref = [];
 
 for j=1:length(performance)
     normalizedCells(end+1) = performance(j).ncells/performance(1).ncells;
     normalizedCPU(end+1) = performance(j).runtime/performance(1).runtime;
+    
+    nref(end+1) = performance(j).n_ref;
+%     
+%     if nref(end) == 1
+%         nref(end) = 0;
+%     end
     
    %fprintf(format, performance(j).n_ref, performance(j).ncells, performance(j).runtime, ...
    %    normalizedCells, normalizedCPU);
