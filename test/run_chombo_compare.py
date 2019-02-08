@@ -3,6 +3,7 @@ import getopt
 import sys
 import os
 import re
+import numpy as np
 
 import matplotlib.pyplot as plt
 import matplotlib
@@ -40,8 +41,8 @@ def latexify(fig_width=None, fig_height=None, columns=1):
 
     # Need the mathsrfs package for \mathscr if text.usetex = True
 
-    # Pretty sure this is the standard caption font size in latex
-    font_size = 9
+
+    font_size = 8
 
     params = {'backend': 'ps',
               'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}'],
@@ -210,7 +211,7 @@ def load_error(folder):
 def run_chombo_compare(argv):
 
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
-    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
+    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.03'
 
     try:
         opts, args = getopt.getopt(argv, "f:")
@@ -224,7 +225,7 @@ def run_chombo_compare(argv):
             data_folder = str(arg)
 
     # Compute the errors
-    chombo_compare_analysis(data_folder)
+    # chombo_compare_analysis(data_folder)
 
     # Collate errors and make plots
 
@@ -238,7 +239,6 @@ def run_chombo_compare(argv):
 
     # Get folders which have error calculations in them
     all_folders = [x for x in os.listdir(data_folder) if os.path.isdir(os.path.join(data_folder, x))
-                   and os.path.exists(os.path.join(data_folder, x, richardson_error_folder))
                    and os.path.exists(os.path.join(data_folder, x, fine_error_folder))]
 
     # Load all folders and put errors into a table indexed on resolution
@@ -251,6 +251,12 @@ def run_chombo_compare(argv):
 
     err_data_sets = {}
 
+    # Timings contains entries like [max lev, ref rat, coarse nx, time, ncells]
+    timings = []
+
+    richardson_name = 'Single-level Richardson'
+
+
     for folder in all_folders:
         this_richardson_err_folder = os.path.join(data_folder, folder, richardson_error_folder)
         this_fine_err_folder = os.path.join(data_folder, folder, fine_error_folder)
@@ -259,6 +265,7 @@ def run_chombo_compare(argv):
 
         richardson_err = load_error(this_richardson_err_folder)
         fine_err = load_error(this_fine_err_folder)
+
 
 #        print(richardson_err)
         print(folder)
@@ -270,7 +277,7 @@ def run_chombo_compare(argv):
         if max_lev == 0:
 
             # Also do richardson error here
-            richardson_name = 'Single-level Richardson'
+
             if richardson_name in err_data_sets.keys():
                 err_data_sets[richardson_name].append([coarse_nx, richardson_err[field][err_type]])
             else:
@@ -293,15 +300,65 @@ def run_chombo_compare(argv):
             err_data_sets[data_set_name] = [this_err_entry]
 
 
-        # Also get and record timing details if we're interested in that
+        # Also get and record timing details
+        time_file = os.path.join(data_folder, folder, 'time.table.0')
+        time = float('NaN')
+        ncells = float('NaN')
+        with open(time_file, 'r') as f:
+            for line in f.readlines():
+                matches = re.findall('.*\[0\]main\s+(\d+\.\d+)\s+.*', line)
 
+                if matches:
+                    time = float(matches[0])
+                    break
+
+        # [0]main 49.91810 1
+
+        pout_file = os.path.join(data_folder, folder, 'pout.0')
+        #total number of points updated = 819200
+
+        with open(pout_file, 'r') as f:
+            for line in f.readlines():
+                matches = re.findall('.*total number of points updated = (\d+).*', line)
+
+                if matches:
+                    ncells = int(matches[0])
+                    break
+
+        these_timings = [max_lev, ref_rat, coarse_nx, time, ncells]
+
+        timings.append(these_timings)
 
     print(err_data_sets)
+    print(timings)
 
-    latexify(fig_width=5.5, fig_height=2.5)
-    fig, axes = plt.subplots(1, 2)
+    ref_rats = set([x[1] for x in timings])
+    print(ref_rats)
 
-    for ds_name in err_data_sets.keys():
+    finest_timing = []
+    for r in ref_rats:
+        timings_for_ref_rat = [x for x in timings if x[1] == r]
+
+        # Sort by resolution (2nd index)
+        timings_for_ref_rat = sorted(timings_for_ref_rat, key=lambda x: x[2])
+
+        # Take the last one
+        finest_timing.append(timings_for_ref_rat[-1])
+
+    print(finest_timing)
+
+
+    latexify(fig_width=6.0, fig_height=3.0)
+
+    # Make left axes wider
+    fig, axes = plt.subplots(1, 2, gridspec_kw={'width_ratios':[2,1]})
+
+    key_order = ['Single-level Richardson', 'Single-level 512 difference', '$n_{ref}$ = 2', '$n_{ref}$ = 4', '$n_{ref}$ = (2,2)']
+
+    for ds_name in key_order:
+        if ds_name not in err_data_sets.keys():
+            continue
+
         ds = err_data_sets[ds_name]
 
         print(ds)
@@ -312,6 +369,14 @@ def run_chombo_compare(argv):
 
 
     # Also add 2nd order
+    richardson_ds = err_data_sets[richardson_name]
+    nx_second_order = [x[0] for x in richardson_ds]
+    err_second_order = [4*richardson_ds[0][1]]*len(nx_second_order)
+
+    for i in range(1,len(nx_second_order)):
+        err_second_order[i] = err_second_order[i-1] * (float(nx_second_order[i-1])/float(nx_second_order[i]))**2
+
+    axes[0].plot(nx_second_order, err_second_order, linestyle=':', label ='2nd order')
 
     axes[0].set_xlabel('$1/\Delta x$')
     axes[0].set_ylabel('$L_2$ error (%s)' % field)
@@ -319,13 +384,59 @@ def run_chombo_compare(argv):
     axes[0].set_xscale('log')
     axes[0].set_yscale('log')
 
+    # Make room for the legend
+    #xl = axes[0].get_xlim()
+    #yl = axes[0].get_ylim()
+    #axes[0].set_xlim([xl[0], xl[1]*10])
+    #axes[0].set_ylim([yl[0], yl[1] * 10])
+
     # Should sort out legend ordering
-    axes[0].legend()
+    axes[0].legend(loc='center left', bbox_to_anchor=(1,0.75))
+
+    xl = axes[0].get_xlim()
+    yl = axes[0].get_ylim()
+    axes[0].text(xl[0]*0.9, yl[1]*1.2, '(a)')
+
+
+    ref_rats_plot = [x[1] for x in finest_timing]
+    timings_plot = [x[3] for x in finest_timing]
+    ncells_plot = np.array([float(x[4]) for x in finest_timing])
+
+    timings_plot = timings_plot/np.amax(timings_plot)
+    ncells_plot = ncells_plot / float(np.amax(ncells_plot))
+
+    # Make these black so they stand out from the other plot
+    axes[1].plot(ref_rats_plot, timings_plot, marker='s', color='k', linestyle='-', label='Normalized CPU time')
+    axes[1].plot(ref_rats_plot, ncells_plot, marker = 's', color='k', linestyle='--', label='Normalized cells advanced')
+
+    axes[1].set_xlabel('Refinement ratio')
+    # axes[1].set_ylabel('') # no y label
 
 
 
+    axes[1].legend(loc='center right', bbox_to_anchor=(-0.2,0.25))
+
+    axes[1].set_xlim([0, 4])
+    axes[1].set_ylim([0, 1])
+
+    xl = axes[1].get_xlim()
+    yl = axes[1].get_ylim()
+    axes[1].text(-0.05, 1.02, '(b)')
+
+    # set axis positions
+    axes[0].set_position([0.1, 0.14, 0.3, 0.78])
+    axes[1].set_position([0.77, 0.14, 0.2, 0.78])
+
+
+    # Finally, save plot
+
+    figure_output_directory = data_folder
+    filename = 'err-%s-%s.eps' % (field, err_type)
+    figure_full_path = os.path.join(figure_output_directory, filename)
+    plt.savefig(figure_full_path, format='eps')
 
     plt.show()
+
 
 
 
