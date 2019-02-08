@@ -3,7 +3,7 @@ import os, sys
 from colorama import Fore, Style
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, chombo_compare_analysis
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs
 
 ##########################################################################
 # 3) Convection in a fixed porous medium with variable porosity
@@ -96,7 +96,8 @@ def test_fixed_porous_hole():
 
     uniform_prefix = 'Uniform-DBVariablePorosity-'
 
-    chombo_compare_analyse = chombo_compare_analysis(data_folder, nz_uniform, uniform_prefix)
+    python_compare_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'run_chombo_compare.py')
+    chombo_compare_analyse ='python %s -n %s \n \n' % (python_compare_file, data_folder)
 
     analysis_command = chombo_compare_analyse + '\n\n' + \
                        matlab_command + ' "analyseVariablePorosityTest(\'' + data_folder + '\', [' + ','.join([str(a) for a in nz_uniform]) + '], ' \
