@@ -127,7 +127,7 @@ parameters.rayleighComp=1e6
 parameters.rayleighTemp=1e1
 parameters.darcy=1e-3
 parameters.nonDimReluctance=1e-10
-main.plot_interval=10
+# main.plot_interval=10
 HCMultigrid.num_smooth_up = 8
 projection.eta=0.99
 
