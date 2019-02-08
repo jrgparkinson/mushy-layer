@@ -2610,6 +2610,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
         }
         else
         {
+          // Skip to next box
           continue;
         }
 
