@@ -2602,11 +2602,15 @@ void AMRLevelMushyLayer::computeDiagnostics()
             }
           }
         }
-        else
+        else if (numBoxCells > 0)
         {
           FArrayBox& fluidFluxFAB = fluidFlux[dit][0];
           horizFlux.minus(fluidFluxFAB);
           thisNu =  horizFlux.sum(b, 0);
+        }
+        else
+        {
+          continue;
         }
 
         thisNu =  thisNu/numBoxCells;
