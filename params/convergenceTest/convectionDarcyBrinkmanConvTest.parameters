@@ -1,5 +1,3 @@
-# #((16, 8) (31,25) (0,0))  old grids
-# ((32, 16) (63, 51) (0,0))
 amrmultigrid.MGtype=1
 amrmultigrid.hang_eps=1.0e-10
 amrmultigrid.max_iter=15
@@ -10,36 +8,29 @@ amrmultigrid.relaxMode=1
 amrmultigrid.tolerance=1.0e-10
 amrmultigrid.verbosity=0
 
-#bc.bulkConcentrationHiVal=0.01 0.01
-#bc.bulkConcentrationLoVal=0.01 0.01
-#bc.liquidConcentrationHiVal=0.01 0.01
-#bc.liquidConcentrationLoVal=0.01 0.01
-
 bc.bulkConcentrationHiVal=0.0 0.0
 bc.bulkConcentrationLoVal=0.0 0.0
 bc.liquidConcentrationHiVal=0.0 0.0
 bc.liquidConcentrationLoVal=0.0 0.0
-
 bc.enthalpyHiVal=0.0 0.0
 bc.enthalpyLoVal=1.0 0.0
-
-bc.porosityHiVal= 0.4 0.4 # 0.4 0.4
-bc.porosityLoVal= 0.4 0.4 #0.4 0.4
+bc.porosityHiVal= 0.4 0.4 
+bc.porosityLoVal= 0.4 0.4 
 bc.scalarHi=0 1
 bc.scalarLo=0 1
 bc.temperatureHiVal=0.0 0.0
 bc.temperatureLoVal=1.0 0.0
 bc.velHi=0 0
 bc.velLo=0 0
+
 init.initVel=0.0
-machineCodeIsRunOn=atmnode011
 main.addSubtractGradP=1
 main.block_factor=1
-main.cfl= 0.1  #0.45 
+main.cfl= 0.2
 main.checkpoint_interval=0
 main.chk_prefix=chkUniform-convectionDarcyBrinkman-64-
 main.computeDiagnostics=true
-main.debug=true
+main.debug=false
 main.doEuler=1
 main.doProjection=1
 main.doSyncOperations=1
@@ -67,7 +58,6 @@ main.min_time=0.1
 
 main.num_cells= 16 16 8 #128 32  8
 main.num_init_passes=0
-#main.gridfile=grids
 main.output_folder=outputAMR
 main.periodic_bc=0 0 1
 main.plot_interval=1
@@ -93,7 +83,6 @@ main.use_subcycling=1
 main.verbosity=2
 main.viscous_solver_tol=1e-15
 main.vel_refine_thresh=25
-mercurialRepository=920+
 parameters.K=1
 parameters.compositionRatio=5
 parameters.darcy= 6.67e-7 #0.01  #0.0005625
@@ -116,8 +105,6 @@ parameters.referenceTemperature=-3.5
 parameters.specificHeatRatio=1
 parameters.stefan=0
 parameters.waterDistributionCoeff=1e-3
-picardSolver.max_iter=8
-picardSolver.tol=1e-5
 projection.eta= 0.9 
 projection.numSmoothDown=8
 projection.numSmoothUp=8

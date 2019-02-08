@@ -176,12 +176,6 @@ def runTest(base_dir, physical_problem, AMRSetup, num_procs,
 
                 params = read_inputs(params_file)
 
-                sameDt = 5e-7
-                dt64 = sameDt
-
-                # Scale dt with grid spacing
-                sameDt = -1
-
                 output_dir = ''  # physical_problem+'-t' + str(maxTime) + '/'
                 # output_dir = 'AMRConvergenceTest/'+physical_problem+'-t' + str(maxTime) + '-1proc/'
 
@@ -193,19 +187,21 @@ def runTest(base_dir, physical_problem, AMRSetup, num_procs,
 
                 gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(Nx_grid) + 'x' + str(Nx_grid)
 
-                dt = dt64 * 64.0 / float(nx_coarse)
-                if sameDt > 0:
-                    params['main.fixed_dt'] = sameDt  # dt
-                else:
-                    params['main.fixed_dt'] = dt  # dt
+                dx = 1 / float(nx_coarse)
+                #dt = 5e-7 * 64.0 / float(nx_coarse)
+                # Coarsest Nx is 8
+                coarsest_dt = 1e-5
+                coarsest_nx = 8
+                dt = float(coarsest_dt) * float(coarsest_nx) / float(nx_coarse)
+                params['main.fixed_dt'] = dt  # dt
+                params['main.plot_period'] = float(params['main.max_time'])/4  # produce 4 same number of plot files per run
 
-                pltInt = int(math.ceil(4 * float(nz_coarse) / 32.0))
-                pltInt = max(pltInt, 1)
-                regrid_int = max(pltInt / 4, 1)
+                regrid_int = int(math.ceil(8 * float(nz_coarse) / 32.0))
+                regrid_int = max(regrid_int, 1)
 
-                pltInt = 800  # large interval, save disk space
-                params['main.plot_interval'] = str(pltInt)
-                params['main.checkpoint_interval'] = params['main.plot_interval']
+                # pltInt = 800  # large interval, save disk space
+                # params['main.plot_interval'] = str(pltInt)
+                # params['main.checkpoint_interval'] = params['main.plot_interval']
 
                 # AMR options
                 # if 'main.vel_refine_thresh' in params:

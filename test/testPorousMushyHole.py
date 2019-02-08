@@ -13,7 +13,7 @@ from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
 def testPorousMushyHole(argv):
 
     # Defaults:
-    max_time = 1.5e-4
+    max_time = 5.0e-5
 
     try:
         opts, args = getopt.getopt(argv, "t:")
