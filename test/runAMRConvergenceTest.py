@@ -31,9 +31,9 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
         if 'run_types' in setup:
             runTypes = setup['run_types']
 
-        finestRefinement = pow(ref_rat, max_level)
+        # finestRefinement = pow(ref_rat, max_level)
         maxRefinement = ref_rat ** max_level
-        output_dir = ''
+        # output_dir = ''
         Nz_i = -1
 
         # Construct the params files
@@ -44,16 +44,16 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
             # Some default options
 
             # Use same aspect ratio as already defined
-            nx_coarse = -1  # if this isn't changed, we'll eventually just use the predetermined aspect ratio
-            gridFile = ''
+            # nx_coarse = -1  # if this isn't changed, we'll eventually just use the predetermined aspect ratio
+            # gridFile = ''
 
-            defaultParamsFile = os.path.join(mushyLayerBaseDir, '/params/convergenceTest/' + physical_problem + '.parameters')
-            if os.path.exists(defaultParamsFile):
-                params = read_inputs(defaultParamsFile)
+            # defaultParamsFile = os.path.join(mushyLayerBaseDir, '/params/convergenceTest/' + physical_problem + '.parameters')
+            # if os.path.exists(defaultParamsFile):
+            #    params = read_inputs(defaultParamsFile)
 
             output_dir = ''
 
-            nx_coarse, params, gridFile = resolution_specific_params(nz_coarse, ref_rat)
+            nx_coarse, params, gridFile = resolution_specific_params(nz_coarse, ref_rat, max_level, maxRefinement)
 
             # Moving this logic to separate functions
             # if physical_problem == 'noFlow':
@@ -356,7 +356,8 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
                 all_params.append(p)
 
         # Actually run the convergence test
-        full_output_dir = os.path.join(base_dir, output_dir)
+        #full_output_dir = os.path.join(base_dir, output_dir)
+        full_output_dir = base_dir
         
         these_job_ids = amr_convergence_test(all_params, full_output_dir, 
                                              physical_problem, Nzs, num_procs, 
@@ -381,7 +382,7 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
             s.set_dependency(job_ids)
             s.set_custom_command(analysis_command)
 
-            s.write_slurm_file(runAnalysisName)
+            # s.write_slurm_file(runAnalysisName)
             s.run_task(runAnalysisName)
             print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 

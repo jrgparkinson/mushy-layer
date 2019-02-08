@@ -56,16 +56,17 @@ def get_executable(base_name, dim=2):
     return executable_name
 
 
-def get_executable_name():
+def get_executable_name(exec_dir='', exec_name='mushyLayer2d'):
     """ Get the executable in MUSHY_LAYER_DIR/execSubcycle/ which contains mushyLayer2d,
      prioritising OPT over DEBUG compilations.
      Independent of the architecture (i.e. will find for different C++ compilers, fortran versions etc.) """
 
-    mushy_layer_dir = os.environ['MUSHY_LAYER_DIR'] # previously: os.path.dirname(os.path.dirname(__file__))
-    exec_dir = os.path.join(mushy_layer_dir, 'execSubcycle')
+    if not exec_dir:
+        mushy_layer_dir = os.environ['MUSHY_LAYER_DIR'] # previously: os.path.dirname(os.path.dirname(__file__))
+        exec_dir = os.path.join(mushy_layer_dir, 'execSubcycle')
 
     # Get files in exec dir starting with mushyLayer2d and ending with ex
-    possible_exec_files = [f for f in os.listdir(exec_dir) if f[:12] == 'mushyLayer2d' and f[-2:] == 'ex']
+    possible_exec_files = [f for f in os.listdir(exec_dir) if f[:len(exec_name)] == exec_name and f[-2:] == 'ex']
 
     if len(possible_exec_files) == 0:
         print('Cannot find any executable files - have you compiled the code?')
@@ -100,7 +101,6 @@ def get_executable_name():
         exec_file = opt_exec
     else:
         exec_file = possible_exec_files[1]
-
 
 
     # Can also specify the file manually
@@ -333,3 +333,56 @@ def array_to_string(array):
     str_array = [str(a) for a in array]
     string = ' '.join(str_array)
     return string
+
+
+def chombo_compare_analysis(data_folder, nz_uniform, uniform_prefix):
+    '''
+    Create inputs files and run them for doing chombo compare on all simulations in this directory
+    '''
+    chombo_dir = os.environ['CHOMBO_HOME']
+    compare_dir = os.path.join(chombo_dir, 'lib', 'util', 'ChomboCompare')
+    compare_exec = get_executable_name(compare_dir, 'compare2d')
+    compare_exec = os.path.join(compare_dir, compare_exec)
+    print('Found executable %s ' % compare_exec)
+
+    all_folders = [x for x in os.listdir(data_folder) if os.path.isdir(os.path.join(data_folder,x))]
+    # print(all_folders)
+    # Firstly compute richardson errors
+    uniform_folders = [x for x in all_folders if 'Uniform' in x]
+    uniform_folders = sorted(uniform_folders)
+    print(uniform_folders)
+
+
+    finest_resolution = uniform_folders[-1]
+    uniform_folders = uniform_folders[:-1]
+
+    exact_file = get_final_plot_file(os.path.join(data_folder, finest_resolution))
+
+    for i in range(0, len(uniform_folders)-1):
+        # for run_folder in uniform_folders:
+        this_folder = os.path.join(data_folder, uniform_folders[i])
+        next_folder = os.path.join(data_folder, uniform_folders[i+1])
+
+        compare_params_file = os.path.join(this_folder, 'compare-richardson.inputs')
+        error_file = os.path.join(this_folder, 'err-richardson.2d.hdf5')
+        computed_file = os.path.join(this_folder, get_final_plot_file(this_folder))
+
+        exact_file = os.path.join(next_folder, get_final_plot_file(next_folder))
+
+        compare_params = {'compare.sameSize':  0,
+                            'compare.exactRoot': exact_file,
+                            'compare.computedRoot' : computed_file,
+                            'compare.errorRoot' : error_file,
+                            'compare.doPlots' : 1,
+                            'compare.HOaverage':  0}
+
+        write_inputs(compare_params_file, compare_params)
+
+        cmd = 'cd %s \n %s %s \n \n' % (this_folder, compare_exec, compare_params_file)
+        print(cmd)
+        os.system(cmd)
+
+
+
+    return ''
+

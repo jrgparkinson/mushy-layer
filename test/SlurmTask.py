@@ -174,24 +174,22 @@ class SlurmTask:
         fh.close()
 
     def run_task(self, runFileName='run.sh'):
+        '''
+        This method will write out a batch file for the slurm queuing system, then run it.
+        If you don't have slurm, you'll need to rewrite this method
+        '''
+        self.write_slurm_file(runFileName)
+
         cmd = 'cd ' + self.folder + ' ; sbatch ' + self.get_run_file(runFileName)
 
-        # os.system(cmd)
-        # result = subprocess.run(cmd, stdout=subprocess.PIPE)
         result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
-
-        res_str = result
 
         print(result)
 
-        # Submitted batch job 223086
-        res = re.findall('Submitted batch job (\d+)', res_str)
+        job_id_search = re.findall('Submitted batch job (\d+)', result)
 
-        # print(res_str)
-        # print(res)
-
-        if res:
-            self.job_id = int(res[0])
+        if job_id_search:
+            self.job_id = int(job_id_search[0])
 
         # Make a file in the output folder stating the slurm job id
         F = open(os.path.join(self.folder, 'jobid'), 'w')

@@ -55,7 +55,7 @@ def make_figures():
     #s.setDependency(job_ids)
     s.set_custom_command(slurm_command)
 
-    s.write_slurm_file(job_name + '.sh')
+    # s.write_slurm_file(job_name + '.sh')
     s.run_task(job_name + '.sh')
     print(Fore.GREEN + 'Submitted make figures job \n' + Fore.RESET)
 

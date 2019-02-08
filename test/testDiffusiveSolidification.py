@@ -3,11 +3,33 @@ import os, sys
 from colorama import Fore, Style
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs
 
 ######################################
 # 1) Diffusive solidification problem
 #######################################
+
+def diffusive_solidification_resolution_specific_params(nz_coarse, ref_rat):
+    mushyLayerBaseDir = os.environ['MUSHY_LAYER_DIR']
+    params_file = os.path.join(mushyLayerBaseDir,'params/convergenceTest/noFlowConvTest.parameters')
+
+    params = read_inputs(params_file)
+    gridFile = ''
+
+    nx_coarse = 4
+    params['main.domain_width'] = str(4.0 * float(nx_coarse) / float(nz_coarse))
+    linearTgradient = 1.0 / 4.0  # delta T / height
+    params['main.refine_thresh'] = str(linearTgradient * 16.0 / float(nz_coarse))
+    params['main.tag_buffer_size'] = str(int(float(nz_coarse) / 8))
+    params['main.steady_state'] = '1e-8'  # str(1e-4 * pow(32.0/float(nz_coarse),2))
+    params['main.max_grid_size'] = '32'
+    params['main.max_step'] = 10000
+    params['main.debug'] = 'true'  # make sure we output things like Temperature error
+
+
+    return nx_coarse, params, gridFile
+
+
 def testDiffusiveSolidification():
 
     base_output_dir = get_base_output_dir()
@@ -32,20 +54,13 @@ def testDiffusiveSolidification():
 
     # Run
     extra_params = {'main.debug': 'true'}
-    runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params)
+    runTest(dataFolder, physicalProblem, diffusive_solidification_resolution_specific_params,
+            AMRSetup, num_procs, analysis_command, extra_params)
 
 
 
 def main(argv):
-    # try:
-    #    opts, args = getopt.getopt(argv,"n:f:H:")
-    # except getopt.GetoptError:
-    #    print 'runAMRConvergenceTest.py -n <num processors>'
-    #    sys.exit(2)
-    #
-    # for opt, arg in opts:
-    #     if opt in ("-n"):
-    #         num_proc = int(arg)
+
 
     testDiffusiveSolidification()
 

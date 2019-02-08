@@ -5,13 +5,28 @@ from colorama import Fore, Style
 import getopt
 from runAMRConvergenceTest import runTest
 from SlurmTask import SlurmTask
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs
 
 
 ######################################
 # 2) Convection in a fixed porous medium
 # Just run for a single grid resolution and compare to previously published values
 ######################################
+
+def uniform_porous_resolution_specific_params(nz_coarse, ref_rat):
+    mushyLayerBaseDir = os.environ['MUSHY_LAYER_DIR']
+
+    nx_coarse = nz_coarse
+
+    gridFile = mushyLayerBaseDir + '/grids/leftRight/' + str(nx_coarse) + 'x' + str(nz_coarse)
+
+    params_file = mushyLayerBaseDir + '/params/convergenceTest/convectionDarcyBrinkmanConvTest.parameters'
+    params = read_inputs(params_file)
+
+    params['main.refine_thresh'] = str(3.0 / float(nz_coarse))
+    params['main.tag_buffer_size'] = str(max(2, int(float(nz_coarse) / 8)))
+
+    return nx_coarse, params, gridFile
 
 def test_uniform_porous_convection(argv):
     # Default vals:
@@ -123,8 +138,8 @@ def test_uniform_porous_convection(argv):
             output_dir = "chi" + chi_str + "-Da" + da_str + "-Ra" + ra_str
 
             this_data_folder = os.path.join(base_dataFolder, output_dir)
-            job_ids = runTest(this_data_folder, physical_problem, amr_setup, 
-                              num_procs, '', extra_params, restart_from_low_res=True)
+            job_ids = runTest(this_data_folder, physical_problem, uniform_porous_resolution_specific_params,
+                              amr_setup, num_procs, '', extra_params, restart_from_low_res=True)
             
             all_job_ids = all_job_ids + job_ids
 
@@ -144,7 +159,7 @@ def test_uniform_porous_convection(argv):
 
     s.set_dependency(all_job_ids)
     s.set_custom_command(analysis_command)
-    s.write_slurm_file(run_analysis_name)
+    # s.write_slurm_file(run_analysis_name)
     s.run_task(run_analysis_name)
     print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 

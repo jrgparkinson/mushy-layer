@@ -13,6 +13,18 @@ from SlurmTask import SlurmTask
 # 3) Convection in a mushy layer with an initial porous hole
 ##########################################################################
 
+def hele_shaw_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
+    mushyLayerBaseDir = os.environ['MUSHY_LAYER_DIR']
+
+    params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
+
+    params = read_inputs(params_file)
+    nx_coarse = -1
+
+    gridFile = '' # mushyLayerBaseDir + '/grids/topMiddle/' + str(nx_coarse) + 'x' + str(nz_coarse)
+
+    return nx_coarse, params, gridFile
+
 def testHeleShawFixedChill(argv):
     mushyLayerBaseDir = os.path.abspath(os.pardir)
     # params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
@@ -118,7 +130,8 @@ def testHeleShawFixedChill(argv):
 
         #analysis_command = '' # No analysis yet. Eventually should collate run times, make some plots, and maybe compute differences between solutions
 
-        runTest(dataFolder, physicalProblem, AMRSetup, num_procs, analysis_command, extra_params, 0, params_file)
+        runTest(dataFolder, physicalProblem, hele_shaw_resolution_specific_params,
+                AMRSetup, num_procs, analysis_command, extra_params, 0, params_file)
 
 if __name__ == "__main__":
     testHeleShawFixedChill(sys.argv[1:])
