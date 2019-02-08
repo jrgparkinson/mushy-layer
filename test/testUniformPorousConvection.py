@@ -13,7 +13,7 @@ from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, rea
 # Just run for a single grid resolution and compare to previously published values
 ######################################
 
-def uniform_porous_resolution_specific_params(nz_coarse, ref_rat):
+def uniform_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
     mushyLayerBaseDir = os.environ['MUSHY_LAYER_DIR']
 
     nx_coarse = nz_coarse

@@ -12,7 +12,7 @@ from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, rea
 ##########################################################################
 
 
-def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat):
+def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
     mushyLayerBaseDir = os.environ['MUSHY_LAYER_DIR']
     params_file = os.path.join(mushyLayerBaseDir,'params/convergenceTest/porousMushyHole.parameters')
 
