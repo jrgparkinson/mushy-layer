@@ -41,17 +41,17 @@ class MushyLayerRunSimple:
         if 'main.max_level' in parameters:
                 max_level = int(parameters['main.max_level'])
 
-        if 'main.gridfile' in parameters and max_level > 0:
-            
+        if 'main.gridfile' in parameters and max_level > 0 and os.path.exists(parameters['main.gridfile']):
+
             with open(parameters['main.gridfile'], 'r') as f:
                 #all_lines = f.read()
                 max_box_length = 0.0
                 pattern = '\(\((\d+),(\d+)\) \((\d+),(\d+)\) \((\d+),(\d+)\)\)'
-                
+
                 for line in f.readlines():
                     m = re.search(pattern, line)
                     if m:
-                        
+
                         # Determine size of box
                         x_lo = int(m.group(1))
                         y_lo = int(m.group(2))
