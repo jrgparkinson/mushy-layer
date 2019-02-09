@@ -64,7 +64,7 @@ def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, 
 def testPorousMushyHole(argv):
 
     # Defaults:
-    max_time = 5.0e-4
+    max_time = 1.5e-4
     hole_radius = 0.04
 
     try:
