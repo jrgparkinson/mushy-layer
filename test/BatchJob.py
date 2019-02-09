@@ -176,10 +176,11 @@ class BatchJob:
 
         commands_to_execute.append('\n' + self.postprocess_command + '\n')
 
-        file_contents = ['#!/bin/bash \n',
-                         slurm_header,
-                         dependency_str,
-                         commands_to_execute]
+        file_contents = ['#!/bin/bash \n']
+        file_contents.extend(slurm_header)
+        file_contents.append(dependency_str)
+        file_contents.extend(commands_to_execute)
+                        
 
         fh.writelines(file_contents)
 
