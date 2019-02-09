@@ -36,6 +36,13 @@ def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, 
     params['main.fixed_dt'] = dt  # dt
     params['main.plot_period'] = float(params['main.max_time'])/4  # produce 4 same number of plot files per run
 
+    # Check this dt will go into max_time an integer number of times
+    # If it doesn't, different simulations will be integrated for different lengths of time which can be an issue
+    # when we come to comparing them (they won't be the same)
+    num_steps = float(params['main.max_time'])/dt
+    if not num_steps.is_integer():
+        print(Fore.RED + 'WARNING: dt is not an integer division of max time')
+
     regrid_int = int(math.ceil(float(nz_coarse) / 16.0))
     regrid_int = max(regrid_int, 1)
 
