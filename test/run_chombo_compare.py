@@ -225,7 +225,7 @@ def run_chombo_compare(argv):
             data_folder = str(arg)
 
     # Compute the errors
-    # chombo_compare_analysis(data_folder)
+    chombo_compare_analysis(data_folder)
 
     # Collate errors and make plots
 
@@ -351,7 +351,7 @@ def run_chombo_compare(argv):
     latexify(fig_width=6.0, fig_height=3.0)
 
     # Make left axes wider
-    fig, axes = plt.subplots(1, 2, gridspec_kw={'width_ratios':[2,1]})
+    fig, axes = plt.subplots(1, 2) #  gridspec_kw={'width_ratios':[2,1]}
 
     key_order = ['Single-level Richardson', 'Single-level 512 difference', '$n_{ref}$ = 2', '$n_{ref}$ = 4', '$n_{ref}$ = (2,2)']
 
