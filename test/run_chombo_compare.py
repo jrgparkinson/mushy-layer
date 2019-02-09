@@ -428,7 +428,7 @@ def run_chombo_compare(argv):
     # Need to pick a data set to base this off
     all_nx = [x[0] for x in [err_data_sets[k] for k in err_data_sets.keys()]]
     min_nx = np.amin(all_nx)
-    max_nx = np.amax(all_nx)
+    max_nx = np.amax(all_nx)*2
 
     all_err = [x[1] for x in [err_data_sets[k] for k in err_data_sets.keys()]]
     max_err = np.amax(all_err)
