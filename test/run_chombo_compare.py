@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+# plt.style.use('classic')
 
 def latexify(fig_width=None, fig_height=None, columns=1):
     """Set up matplotlib's RC params for LaTeX plotting.
@@ -42,7 +43,7 @@ def latexify(fig_width=None, fig_height=None, columns=1):
         fig_height = max_height_inches
 
     # Need the mathsrfs package for \mathscr if text.usetex = True
-    font_size = 8
+    font_size = 9
 
     params = {'backend': 'ps',
               'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}'],
@@ -178,7 +179,7 @@ def load_error(folder):
 
     error_file = os.path.join(folder, 'pout.0')
     if not os.path.exists(error_file):
-        print('Cannot find %s' % error_file)
+        # print('Cannot find %s' % error_file)
         return errors
 
     with open(error_file, 'r') as f:
@@ -186,9 +187,9 @@ def load_error(folder):
 
         float_format = ['(-?\d\.\d+e[+-]\d+)']*4
 
-        error_line_format = '(\w+):\s+' + ', '.join(float_format)
+        error_line_format = '^([\w\s]+):\s+' + ', '.join(float_format)
 
-        #print(error_line_format)
+        # print(error_line_format)
 
         for line in f.readlines():
 
@@ -211,14 +212,25 @@ def run_chombo_compare(argv):
 
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.03'
+    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.0001-hole0.04'
+
 
     run_analysis = False
 
+    # Need to decide what we're interested in
+    field = 'Porosity'
+    err_type = 'L2'
+
+    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc'
+    run_analysis = True
+    field = 'xDarcy velocity'
+    err_type = 'L2'
+
     try:
-        opts, args = getopt.getopt(argv, "f:a")
+        opts, args = getopt.getopt(argv, "f:v:e:a")
     except getopt.GetoptError as err:
         print(str(err))
-        print('run_chombo_compare.py -f <folder> -a<run analysis>')
+        print('run_chombo_compare.py -f <folder> -a<run analysis> -v <variable to consider> -e < err type>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -226,6 +238,10 @@ def run_chombo_compare(argv):
             data_folder = str(arg)
         elif opt in "-a":
             run_analysis = True
+        elif opt in "-v":
+            field = str(arg)
+        elif opt in "-e":
+            err_type = str(arg)
 
     # Compute the errors
     if run_analysis:
@@ -233,9 +249,7 @@ def run_chombo_compare(argv):
 
     # Collate errors and make plots
 
-    # Need to decide what we're interested in
-    field = 'Porosity'
-    err_type = 'L2'
+
 
     # Each subfolder have these two folders:
     richardson_error_folder = 'error-richardson'
@@ -270,10 +284,16 @@ def run_chombo_compare(argv):
         richardson_err = load_error(this_richardson_err_folder)
         fine_err = load_error(this_fine_err_folder)
 
+        if field not in richardson_err.keys():
+            print('Field %s not found' % field)
+            print('Available fields: ' + str(richardson_err.keys()))
+            continue
+
+
 
 #        print(richardson_err)
-        print(folder)
-        print(fine_err)
+        # print(folder)
+        # print(fine_err)
 
         if len(fine_err) == 0:
             continue
@@ -333,11 +353,11 @@ def run_chombo_compare(argv):
 
         timings.append(these_timings)
 
-    print(err_data_sets)
+    # print(err_data_sets)
     print(timings)
 
     ref_rats = set([x[1] for x in timings])
-    print(ref_rats)
+    # print(ref_rats)
 
     finest_timing = []
     for r in ref_rats:
@@ -352,7 +372,7 @@ def run_chombo_compare(argv):
     print(finest_timing)
 
 
-    latexify(fig_width=6.0, fig_height=3.0)
+    latexify(fig_width=6.0, fig_height=2.5)
 
     # Make left axes wider
     fig, axes = plt.subplots(1, 2) #  gridspec_kw={'width_ratios':[2,1]}
@@ -395,7 +415,8 @@ def run_chombo_compare(argv):
     #axes[0].set_ylim([yl[0], yl[1] * 10])
 
     # Should sort out legend ordering
-    axes[0].legend(loc='center left', bbox_to_anchor=(1,0.75))
+    leg_font_size = 8
+    axes[0].legend(loc='center left', bbox_to_anchor=(1,0.75), prop={'size': leg_font_size})
 
     xl = axes[0].get_xlim()
     yl = axes[0].get_ylim()
@@ -418,7 +439,7 @@ def run_chombo_compare(argv):
 
 
 
-    axes[1].legend(loc='center right', bbox_to_anchor=(-0.2,0.25))
+    axes[1].legend(loc='center right', bbox_to_anchor=(-0.2,0.25),  prop={'size': leg_font_size})
 
     axes[1].set_xlim([0, 4])
     axes[1].set_ylim([0, 1])
@@ -430,6 +451,9 @@ def run_chombo_compare(argv):
     # set axis positions
     axes[0].set_position([0.1, 0.14, 0.3, 0.78])
     axes[1].set_position([0.77, 0.14, 0.2, 0.78])
+
+    axes[0].tick_params(direction='in', which='both')
+    axes[1].tick_params(direction='in', which='both')
 
 
     # Finally, save plot
