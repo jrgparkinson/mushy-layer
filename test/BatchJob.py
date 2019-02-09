@@ -180,7 +180,7 @@ class BatchJob:
         file_contents.extend(slurm_header)
         file_contents.append(dependency_str)
         file_contents.extend(commands_to_execute)
-                        
+
 
         fh.writelines(file_contents)
 
