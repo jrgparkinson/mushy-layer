@@ -57,7 +57,7 @@ class BatchJob:
             # Add an extra task per node to ensure we have enough processors
 
             self.tasks_per_node = tasks_per_node + 1
-            print('SlurmTask - Warning - number of processors doesn\'t split evenly onto number of nodes. \n')
+            print('BatchJob - Warning - number of processors doesn\'t split evenly onto number of nodes. \n')
 
         # Each node usually has two sockets
         self.tasks_per_socket = math.ceil(self.tasks_per_node / 2)  # self.tasks_per_node #
@@ -90,7 +90,7 @@ class BatchJob:
     def set_exec_file(self, exec_file):
         self.exec_file = exec_file
 
-    def write_slurm_file(self, runFileName='run.sh', inputs_file_name='inputs'):
+    def write_batch_file(self, runFileName='run.sh', inputs_file_name='inputs'):
 
         fh = open(self.get_run_file(runFileName), 'w+')
 
@@ -106,6 +106,7 @@ class BatchJob:
         if self.mpi_run:
             mpi_str = 'mpirun -np ' + str(self.num_proc)
 
+        # If you don't have SLURM, the dependency command will be different
         if len(self.dependency) > 0:
             dependencies = ':'.join(self.dependency)
             dependency_str = '#SBATCH --dependency=afterok:' + dependencies + ' \n'
@@ -122,8 +123,8 @@ class BatchJob:
         else:
             exclude_str = ''
 
-        file_contents = ['#!/bin/bash \n',
-                         '# Set your minimum acceptable walltime, format: day-hours:minutes:seconds \n',
+        # If you don't have slurm, this should be different
+        slurm_header = ['# Set your minimum acceptable walltime, format: day-hours:minutes:seconds \n',
                          '#SBATCH --time=' + time_string + '\n', partitions_str, exclude_str,
                          '# Set name of job shown in squeue' + '\n', '#SBATCH --job-name ' + self.jobname + '\n',
                          '# Request CPU resources' + '\n', '#SBATCH --ntasks=' + str(int(self.num_proc)) + '                  # Number of MPI ranks' + '\n',
@@ -133,16 +134,18 @@ class BatchJob:
                          '#SBATCH --ntasks-per-socket=' + str(int(self.tasks_per_socket)) + '        # How many tasks on each CPU or socket (not sure what this really means)' + '\n',
                          '#SBATCH --distribution=cyclic:cyclic # Distribute tasks cyclically on nodes and sockets' + '\n',
                          '# Memory usage (MB)' + '\n', '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
-                         '#SBATCH --output=' + os.path.join(self.folder, 'sbatch.out') + '   # Standard output and error log' + '\n',
-                         dependency_str,
-                         self.preprocess_command + '\n \n',
+                         '#SBATCH --output=' + os.path.join(self.folder, 'sbatch.out') + '   # Standard output and error log' + '\n']
+
+
+        # The commands to execute will look the same regardless of whether you're using SLURM or not
+        commands_to_execute = [self.preprocess_command + '\n \n',
                          'cd ' + self.folder + '; \n \n']
 
         if self.custom_command:
-            file_contents.append(self.custom_command)
+            commands_to_execute.append(self.custom_command)
 
         else:
-            print('Create slurm command, exec file = %s' % self.exec_file)
+            print('Create batch command, exec file = %s' % self.exec_file)
             run_str = mpi_str + ' ' + self.exec_file + ' ' + os.path.join(self.folder, inputs_file_name)
 
             # If we may be running on legacy, need to possibly use a different executable
@@ -166,12 +169,17 @@ class BatchJob:
                              ' %s\n' \
                              'fi\n' % (exec_dir, self.folder, legacy_run_str, run_str)
 
-                file_contents.append(custom_cmd)
+                commands_to_execute.append(custom_cmd)
 
             else:
-                file_contents.append(run_str)
+                commands_to_execute.append(run_str)
 
-        file_contents.append('\n' + self.postprocess_command + '\n')
+        commands_to_execute.append('\n' + self.postprocess_command + '\n')
+
+        file_contents = ['#!/bin/bash \n',
+                         slurm_header,
+                         dependency_str,
+                         commands_to_execute]
 
         fh.writelines(file_contents)
 
@@ -182,9 +190,10 @@ class BatchJob:
         This method will write out a batch file for the slurm queuing system, then run it.
         If you don't have slurm, you'll need to rewrite this method
         '''
-        self.write_slurm_file(runFileName)
+        self.write_batch_file(runFileName)
+        slurm_command = 'sbatch' # change this if you're not using slurm!
 
-        cmd = 'cd ' + self.folder + ' ; sbatch ' + self.get_run_file(runFileName)
+        cmd = 'cd ' + self.folder + '; ' + slurm_command + ' ' + self.get_run_file(runFileName)
 
         result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
 
