@@ -454,6 +454,9 @@ public:
 	/// First or second order BCs
 	int m_BCAccuracy;
 
+	/// Accuracy for pressure bcs
+	int m_pressureBCAccuracy;
+
 	/// Time, in case BCs are time-dependent
 	Real m_time;
 

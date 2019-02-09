@@ -124,6 +124,7 @@ MushyLayerParams::MushyLayerParams() {
   m_advectionCoeff = 1;
 
   m_BCAccuracy = 1;
+  m_pressureBCAccuracy = 1;
 
 }
 
@@ -336,6 +337,7 @@ void MushyLayerParams::getParameters()
   }
 
   pp.query("BCAccuracy", m_BCAccuracy);
+  pp.query("pressureBCAccuracy", m_pressureBCAccuracy);
 
   // Default nondimensionalisation is about eutectic
   referenceTemperature = eutecticTemp;

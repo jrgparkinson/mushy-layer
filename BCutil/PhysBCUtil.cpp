@@ -431,42 +431,6 @@ public:
          }
 
 
-//     // a_state is FACE-centered on face idir;
-//     // a_valid is CELL-centered.
-//     Box face(a_valid);
-//     face.surroundingNodes(a_idir);
-//     int coord = face.sideEnd(a_side)[a_idir];
-//     face.setRange(a_idir, coord);
-//
-//     if (a_homogeneous)
-//     {
-//       a_state.setVal(0.);
-//     }
-//     else
-//     {
-//       RealVect facePos;
-//       int ncomp = a_state.nComp();
-//       Real* value = new Real[ncomp];
-//       RealVect junk;
-//       a_value(junk.dataPtr(), &a_idir, &a_side, value);
-//       for (int comp = 0; comp < ncomp; comp++)
-//       {
-//         a_state.setVal(value[comp], face, comp);
-//       }
-//
-//       // fill outer cells
-//       //todo - fill outer cells for dirichlet edge BCs?
-//       //      int plusMinusSide = (a_side == Side::Lo) ? -1 : 1;
-//       //
-//       //      face.shift(a_idir, plusMinusSide);
-//       //      for (int comp = 0; comp < ncomp; comp++)
-//       //      {
-//       //        a_state.setVal(value[comp], face, comp);
-//       //      }
-//
-//       delete value;
-//       value = NULL;
-//     }
    }
 
   /// Apply neumann BCs (edge centred)
@@ -595,7 +559,10 @@ public:
 
     a_homogeneous = a_homogeneous || m_homogeneous;
 
-    int order = m_params.m_BCAccuracy;
+
+    //int order = m_params.m_BCAccuracy;
+    // always use 1st order for stability
+    int order = 1;
 
     const Box& domainBox = a_domain.domainBox();
 
@@ -1204,13 +1171,10 @@ public:
   /// Physical parameters for the problem
   MushyLayerParams m_params;
 
-  /// order of accuracy
-  int m_order;
-
   /// Default constructor
   BasicCCVelBCFunction()
   :
-    m_comp(-1),  m_isHomogeneous(false), m_isViscous(false), m_order(1)
+    m_comp(-1),  m_isHomogeneous(false), m_isViscous(false)
   {
   }
 
@@ -1219,14 +1183,12 @@ public:
                        bool a_isViscous,
                        int  a_comp,
                        const Interval& a_interval,
-                       MushyLayerParams a_params,
-                       int a_order=1)
+                       MushyLayerParams a_params)
   : m_comp(a_comp),
     m_isHomogeneous(a_isHomogeneous),
     m_isViscous(a_isViscous),
     m_interval(a_interval),
-    m_params(a_params),
-    m_order(a_order)
+    m_params(a_params)
   {
   }
   /// Apply BC
@@ -1248,7 +1210,8 @@ public:
       RefCountedPtr<ConstValueFunction>
       bcValueFunc(new ConstValueFunction(m_params.inflowVelocity, aliasStateFab.nComp()));
 
-      int order = m_order;
+      int order = m_params.m_BCAccuracy;
+//      order = 1;
 
       // loop over directions
       for (int idir = 0; idir < SpaceDim; idir++)
@@ -1273,7 +1236,7 @@ public:
                   // always no-flow
                   if (idir == m_comp)
                   {
-
+                    order = 1;
                     DiriBC(aliasStateFab, a_valid, a_dx,
                            a_homogeneous,
                            BCValueHolder(zeroFunc),
@@ -1285,7 +1248,7 @@ public:
                     // no-slip if viscous, extrap if inviscid
                     if (m_isViscous)
                     {
-
+                      order = 1;
                       DiriBC(aliasStateFab, a_valid, a_dx,
                              a_homogeneous,
                              BCValueHolder(zeroFunc),
@@ -1294,6 +1257,7 @@ public:
                     else // inviscid
                     {
 
+                      order = 1;
                       ExtraBC(aliasStateFab, a_valid,
                               idir, side, order);
                       //									  ExtrapBC(aliasStateFab, a_valid, idir, side, order);
@@ -1306,7 +1270,7 @@ public:
                   // this will most likely get overwritten in a derived class
                   if (!m_isHomogeneous && idir == m_comp)
                   {
-
+                    order = 1;
                     DiriBC(aliasStateFab, a_valid, a_dx,
                            a_homogeneous,
                            BCValueHolder(bcValueFunc),
@@ -1314,7 +1278,7 @@ public:
                   }
                   else
                   {
-
+                    order = 1;
                     DiriBC(aliasStateFab, a_valid, a_dx,
                            a_homogeneous,
                            BCValueHolder(zeroFunc),
@@ -1335,7 +1299,7 @@ public:
 //                           BCValueHolder(zeroFunc),
 //                           idir, side, order);
 
-
+                    order = 1;
                     OnlyInflowBC(aliasStateFab,
                                  a_valid,
                                  a_homogeneous,
@@ -1354,7 +1318,7 @@ public:
                     // no-slip if viscous, extrap if inviscid
                     if (m_isViscous)
                     {
-
+                      order = 1;
                       DiriBC(aliasStateFab, a_valid, a_dx,
                              a_homogeneous,
                              BCValueHolder(zeroFunc),
@@ -1362,7 +1326,7 @@ public:
                     }
                     else // inviscid
                     {
-
+                      order = 1;
                       ExtraBC(aliasStateFab, a_valid,
                               idir, side, order);
                       //                                                                          ExtrapBC(aliasStateFab, a_valid, idir, side, order);
@@ -1377,6 +1341,7 @@ public:
                 case PhysBCUtil::Outflow :
                 {
 
+                  order = 1;
                   ExtrapBC(aliasStateFab, a_valid, idir, side, order);
 
                   break;
@@ -1397,6 +1362,7 @@ public:
                   else
                   {
                     // tangential components = 0
+                    order = 1;
                     DiriBC(aliasStateFab, a_valid, a_dx,
                            a_homogeneous,
                            BCValueHolder(zeroFunc),
@@ -1411,7 +1377,7 @@ public:
                   // normal velocity BC's still no-flow
                   if (idir == m_comp)
                   {
-
+                    order = 1;
                     DiriBC(aliasStateFab, a_valid, a_dx,
                            a_homogeneous,
                            BCValueHolder(zeroFunc),
@@ -1601,6 +1567,8 @@ public:
                                                                                                 m_params.plumeBounds[0],
                                                                                                 m_params.plumeBounds[1], &m_params));
 
+      int order = m_params.m_pressureBCAccuracy;
+
       for (int idir = 0; idir < SpaceDim; idir++)
       {
         if (!a_domain.isPeriodic(idir))
@@ -1619,8 +1587,7 @@ public:
                 case PhysBCUtil::SolidWall :
                 case PhysBCUtil::Inflow :
                 case PhysBCUtil::noShear :
-                case PhysBCUtil::Symmetry : // think this is right for symmetry
-//                case PhysBCUtil::Outflow :
+                case PhysBCUtil::Symmetry :
 
                 {
                   NeumBC(a_state, a_valid, a_dx,
@@ -1633,9 +1600,8 @@ public:
                 case PhysBCUtil::OutflowNormal :
                 case PhysBCUtil::OutflowPressureGrad :
                 {
-                  //Constant pressure BC
-                  // Doesn't work with higher order?
-                  int order = 1;
+                  // Fix as first order for stability ?
+//                  int order = 1;
                   DiriBC(a_state, a_valid, a_dx,
                          a_homogeneous,
                          BCValueHolder(zeroFunc),
@@ -1646,7 +1612,7 @@ public:
                 }
                 case PhysBCUtil::VelInflowOutflow:
                 {
-                  int order = 1;
+//                  int order = 1;
                   PressureInflowOutflow(a_state, a_valid, a_dx,
                                         a_homogeneous,
                                         m_advVel, // advection velocity
@@ -1655,39 +1621,12 @@ public:
                                         idir, side, order, m_dx);
 
 
-                  //                                    ExtraBC(a_state, a_valid,
-                  //                                            idir, side, order);
 
-
-                  //TODO- change this back
-                  //                  DiriBC(a_state, a_valid, a_dx,
-                  //                                           a_homogeneous,
-                  //                                           BCValueHolder(zeroFunc),
-                  //                                           idir, side);
                   break;
                 }
-                //                case PhysBCUtil::Symmetry :
-                //                {
-                //                  MayDay::Error("BasicPressureBCFunction - ReflectBC not implemented");
-                //                  break;
-                //                }
+
                 case PhysBCUtil::VelInflowPlume:
                 {
-//                  int order = 1;
-                  //                                    PressurePlumeInflow(a_state, a_valid, a_dx,
-                  //                                                        a_homogeneous,
-                  //                                                        m_params.plumeBounds, // where the plume is
-                  //                                                        0, // dirichlet value (outflow)
-                  //                                                        10000, // neumann value (inflow) needs to be large and positive for inflow
-                  //                                                        idir, side, order);
-
-
-                  //                  DiriBC(a_state, a_valid, a_dx,
-                  //                         a_homogeneous,
-                  //                         BCValueHolder(inflowFunc),
-                  //                         idir, side, order);
-
-                  // Our custom function doesn't seem to work, go back to this
 
                   NeumBC(a_state, a_valid, a_dx,
                          a_homogeneous,
@@ -1766,7 +1705,6 @@ public:
                   bool                 a_homogeneous)
   {
 
-    //		int order = 1;
 
     // a_state is FACE-centered, now in m_comp direction;
     // a_valid is CELL-centered
@@ -1774,14 +1712,6 @@ public:
     {
       const Box& domainBox = a_domain.domainBox();
 
-      //      RefCountedPtr<ConstValueFunction> zeroFunc(new ConstValueFunction(0.0, a_state.nComp()));
-      //      //      RefCountedPtr<ConstValueFunction> topBC(new ConstValueFunction(m_params.porosityTop, a_state.nComp()));
-      //      RefCountedPtr<ConstValueFunction> bottomBC(new ConstValueFunction(m_bottomVal, a_state.nComp()));
-      //
-      //      RefCountedPtr<InflowValueFunction>  topBC = RefCountedPtr<InflowValueFunction>(
-      //          new InflowValueFunction(m_topVal,
-      //                                  a_state.nComp(), m_plumeVal,
-      //                                  m_params.plumeBounds[0], m_params.plumeBounds[1]));
 
       // loop over directions
       for (int idir = 0; idir < SpaceDim; idir++)
@@ -2716,7 +2646,7 @@ PhysBCUtil::advectionVelIBC() const
 
 // ---------------------------------------------------------------
 Tuple<BCHolder, SpaceDim>
-PhysBCUtil::uStarFuncBC(bool a_isViscous, int a_order) const
+PhysBCUtil::uStarFuncBC(bool a_isViscous) const
 {
   Tuple<BCHolder, SpaceDim> bcVec;
   bool isHomogeneous = false;
@@ -2724,7 +2654,7 @@ PhysBCUtil::uStarFuncBC(bool a_isViscous, int a_order) const
   {
     Interval intvl(idir, idir);
     bcVec[idir] = basicCCVelFuncBC(isHomogeneous, a_isViscous, idir,
-                                   intvl, a_order);
+                                   intvl);
   }
   return bcVec;
 }
@@ -3779,16 +3709,14 @@ BCHolder PhysBCUtil::extrapVelFuncInterior(bool a_isHomogeneous,
 BCHolder PhysBCUtil::basicCCVelFuncBC(bool a_isHomogeneous,
                                       bool a_isViscous,
                                       int  a_comp,
-                                      const Interval& a_interval,
-                                      int a_order) const
+                                      const Interval& a_interval) const
 {
 
   RefCountedPtr<BasicCCVelBCFunction> basicCCVelBCFunction(new BasicCCVelBCFunction(a_isHomogeneous,
                                                                                     a_isViscous,
                                                                                     a_comp,
                                                                                     a_interval,
-                                                                                    m_params,
-                                                                                    a_order));
+                                                                                    m_params));
 
   return BCHolder(basicCCVelBCFunction);
 }
