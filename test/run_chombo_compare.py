@@ -15,7 +15,8 @@ def format_field_name(field):
 
     formatted_names = {'Porosity': 'Porosity, $\chi$',
                        'xDarcy velocity': '$x-$velocity',
-                       'yDarcy velocity': '$y-$velocity'}
+                       'yDarcy velocity': '$y-$velocity',
+                       'T err': '$\theta$'}
 
     if field in formatted_names.keys():
         return formatted_names[field]
@@ -175,7 +176,8 @@ def run_compare(next_folder, this_folder, err_type):
                       'compare.computedRoot': computed_file,
                       'compare.errorRoot': error_file,
                       'compare.doPlots': 1,
-                      'compare.HOaverage': 0}
+                      'compare.HOaverage': 0,
+                      'compare.no_average_var': 'T err'}
 
     write_inputs(compare_params_file, compare_params)
     cmd = 'cd %s \n %s %s \n \n' % (this_err_folder, compare_exec, compare_params_file)
@@ -227,6 +229,7 @@ def run_chombo_compare(argv):
 
 
     run_analysis = False
+    include_richardson = True # for problems with no analytic solution
 
     # Need to decide what we're interested in
     field = 'Porosity'
@@ -237,11 +240,17 @@ def run_chombo_compare(argv):
     field = 'xDarcy velocity'
     err_type = 'L2'
 
+    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/NoFlow/'
+    run_analysis = True
+    field = 'T err'
+    err_type = 'Max'
+    include_richardson = False
+
     try:
-        opts, args = getopt.getopt(argv, "f:v:e:a")
+        opts, args = getopt.getopt(argv, "f:v:e:r:a")
     except getopt.GetoptError as err:
         print(str(err))
-        print('run_chombo_compare.py -f <folder> -a<run analysis> -v <variable to consider> -e < err type>')
+        print('run_chombo_compare.py -f <folder> -a<run analysis> -v <variable to consider> -e < err type> -r <include richardson errors?>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -253,6 +262,9 @@ def run_chombo_compare(argv):
             field = str(arg)
         elif opt in "-e":
             err_type = str(arg)
+        elif opt in "-r":
+            include_richardson = bool(arg)
+
 
     # Compute the errors
     if run_analysis:
@@ -313,14 +325,17 @@ def run_chombo_compare(argv):
         if max_lev == 0:
 
             # Also do richardson error here
+            if include_richardson:
 
-            if richardson_name in err_data_sets.keys():
-                err_data_sets[richardson_name].append([coarse_nx, richardson_err[field][err_type]])
+                if richardson_name in err_data_sets.keys():
+                    err_data_sets[richardson_name].append([coarse_nx, richardson_err[field][err_type]])
+                else:
+                    err_data_sets[richardson_name] =  [[coarse_nx, richardson_err[field][err_type]]]
+
+
+                data_set_name = 'Single-level 512 difference'
             else:
-                err_data_sets[richardson_name] =  [[coarse_nx, richardson_err[field][err_type]]]
-
-
-            data_set_name = 'Single-level 512 difference'
+                data_set_name = 'Uniform'
 
         elif max_lev == 1:
             data_set_name  = '$n_{ref}$ = %d' % ref_rat
@@ -389,7 +404,12 @@ def run_chombo_compare(argv):
     # Make left axes wider
     fig, axes = plt.subplots(1, 2) #  gridspec_kw={'width_ratios':[2,1]}
 
-    key_order = ['Single-level Richardson', 'Single-level 512 difference', '$n_{ref}$ = 2', '$n_{ref}$ = 4', '$n_{ref}$ = (2,2)']
+    if include_richardson:
+        key_order = ['Single-level Richardson', 'Single-level 512 difference']
+    else:
+        key_order = ['Uniform']
+
+    key_order.extend(['$n_{ref}$ = 2', '$n_{ref}$ = 4', '$n_{ref}$ = (2,2)'])
 
     for ds_name in key_order:
         if ds_name not in err_data_sets.keys():
@@ -405,7 +425,9 @@ def run_chombo_compare(argv):
 
 
     # Also add 2nd order
-    richardson_ds = err_data_sets[richardson_name]
+    # Need to pick a data set to base this off
+    a_ds_name = err_data_sets.keys()[0]
+    richardson_ds = err_data_sets[a_ds_name]
     nx_second_order = [x[0] for x in richardson_ds]
     err_second_order = [4*richardson_ds[0][1]]*len(nx_second_order)
 
