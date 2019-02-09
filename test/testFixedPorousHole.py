@@ -97,7 +97,7 @@ def test_fixed_porous_hole():
     uniform_prefix = 'Uniform-DBVariablePorosity-'
 
     python_compare_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'run_chombo_compare.py')
-    chombo_compare_analyse ='python %s -f %s \n \n' % (python_compare_file, data_folder)
+    chombo_compare_analyse ='python %s -f %s -a \n \n' % (python_compare_file, data_folder)
 
     analysis_command = chombo_compare_analyse + '\n\n' + \
                        matlab_command + ' "analyseVariablePorosityTest(\'' + data_folder + '\', [' + ','.join([str(a) for a in nz_uniform]) + '], ' \

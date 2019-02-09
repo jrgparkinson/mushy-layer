@@ -7,7 +7,7 @@ import numpy as np
 
 
 import matplotlib
-matplotlib.use('Agg') 
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 def latexify(fig_width=None, fig_height=None, columns=1):
@@ -42,8 +42,6 @@ def latexify(fig_width=None, fig_height=None, columns=1):
         fig_height = max_height_inches
 
     # Need the mathsrfs package for \mathscr if text.usetex = True
-
-
     font_size = 8
 
     params = {'backend': 'ps',
@@ -63,11 +61,10 @@ def latexify(fig_width=None, fig_height=None, columns=1):
     matplotlib.rcParams.update(params)
 
 
-
 def chombo_compare_analysis(data_folder):
-    '''
+    """
     Create inputs files and run them for doing chombo compare on all simulations in this directory
-    '''
+    """
 
     all_folders = [x for x in os.listdir(data_folder) if os.path.isdir(os.path.join(data_folder,x))]
     # print(all_folders)
@@ -215,19 +212,24 @@ def run_chombo_compare(argv):
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.03'
 
+    run_analysis = False
+
     try:
-        opts, args = getopt.getopt(argv, "f:")
+        opts, args = getopt.getopt(argv, "f:a")
     except getopt.GetoptError as err:
         print(str(err))
-        print('run_chombo_compare.py -f <folder>')
+        print('run_chombo_compare.py -f <folder> -a<run analysis>')
         sys.exit(2)
 
     for opt, arg in opts:
         if opt in "-f":
             data_folder = str(arg)
+        elif opt in "-a":
+            run_analysis = True
 
     # Compute the errors
-    chombo_compare_analysis(data_folder)
+    if run_analysis:
+        chombo_compare_analysis(data_folder)
 
     # Collate errors and make plots
 
