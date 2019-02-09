@@ -240,6 +240,8 @@ def run_chombo_compare(argv):
     field = 'xDarcy velocity'
     err_type = 'L2'
 
+    figure_number = 0
+
     # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/NoFlow/'
     # run_analysis = True
     # field = 'T err'
@@ -247,10 +249,10 @@ def run_chombo_compare(argv):
     # include_richardson = False
 
     try:
-        opts, args = getopt.getopt(argv, "f:v:e:r:a")
+        opts, args = getopt.getopt(argv, "f:v:e:r:n:a")
     except getopt.GetoptError as err:
         print(str(err))
-        print('run_chombo_compare.py -f <folder> -a<run analysis> -v <variable to consider> -e < err type> -r <include richardson errors?>')
+        print('run_chombo_compare.py -f <folder> -a<run analysis> -v <variable to consider> -e < err type> -r <include richardson errors?> -n <figure number>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -264,6 +266,8 @@ def run_chombo_compare(argv):
             err_type = str(arg)
         elif opt in "-r":
             include_richardson = bool(arg)
+        elif opt in "-n":
+            figure_number = int(arg)
 
 
     # Compute the errors
@@ -510,7 +514,7 @@ def run_chombo_compare(argv):
     # Finally, save plot
 
     figure_output_directory = data_folder
-    filename = 'err-%s-%s.eps' % (field, err_type)
+    filename = 'Fig%dError-%s-%s.eps' % (figure_number, field, err_type)
     figure_full_path = os.path.join(figure_output_directory, filename)
     plt.savefig(figure_full_path, format='eps')
 
