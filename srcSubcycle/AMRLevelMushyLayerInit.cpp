@@ -1149,20 +1149,7 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_tagBufferSize = a_tagBufferSize;
   m_useLimiting = a_useLimiting;
 
-//  // 1st/2nd order interpolation for advection
-//  CFinterpOrder_advection = 1;
-//  ppMain.query("advectionInterpOrder", CFinterpOrder_advection);
-//
-//  // 1 for volume averaged, 0 for max
-//  m_steadyStateNormType = 1;
-//  ppMain.query("steadyStateNormType", m_steadyStateNormType);
-//
-//  //  m_fixedDt = -1;
-//  ppMain.query("fixed_dt", m_fixedDt);
-//
-//  //Initialise to something large
-//  //  m_max_dt_growth = 1.1;
-//  ppMain.query("max_dt_growth", m_max_dt_growth);
+
   CFinterpOrder_advection = a_CFInterpOrder;
   m_steadyStateNormType = a_steadyStateNormType;
   m_fixedDt = a_fixedDt;
@@ -1172,17 +1159,6 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_timestepFailed = false;
 
 
-//  ppMain.query("ignoreSolverFails", m_ignoreSolverFails);
-//  m_solverFailRestartMethod = m_restartHalveDt;
-//  ppMain.query("solverFailRestartMethod", m_solverFailRestartMethod);
-//
-//  m_adv_vel_centering = 0.5;
-//  m_adv_vel_centering_growth = 1.01;
-//  ppMain.query("adv_vel_centering_growth", m_adv_vel_centering_growth);
-//
-//  m_dtReduction = -1;
-//
-//  ppMain.query("initial_cfl", m_initial_dt_multiplier);
   m_ignoreSolverFails = a_ignoreSolverFails;
   m_initial_dt_multiplier = a_initial_dt_multiplier;
   m_adv_vel_centering_growth = a_adv_vel_centering_growth;
@@ -1191,9 +1167,7 @@ void AMRLevelMushyLayer::define(const Real& a_cfl,
   m_adv_vel_centering = 0.5;
   m_dtReduction = -1;
 
-
   m_parameters.getParameters();
-
 
   m_physBCPtr = new PhysBCUtil(m_parameters, m_dx);
   m_physBCPtr->setAdvVel(&m_advVel);
