@@ -34,7 +34,7 @@ def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, 
     coarsest_nx = 8
     dt = float(coarsest_dt) * float(coarsest_nx) / float(nx_coarse)
     params['main.fixed_dt'] = dt  # dt
-    params['main.plot_period'] = float(params['main.max_time'])/4  # produce 4 same number of plot files per run
+    params['main.plot_period'] = float(params['main.max_time'])/4  # produce same number of plot files per run (4)
 
     # Check this dt will go into max_time an integer number of times
     # If it doesn't, different simulations will be integrated for different lengths of time which can be an issue
@@ -109,9 +109,12 @@ def testPorousMushyHole(argv):
     python_compare_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'run_chombo_compare.py')
     chombo_compare_analyse ='python %s -f %s -a -v Porosity -e L2 -r True \n \n' % (python_compare_file, dataFolder)
 
+    make_figures  = 'Fig7PorousHole(\'' + dataFolder + '\', \'' + dataFolder + '\')',
+    analyse_in_matlab = 'analyseVariablePorosityTest(\'' + dataFolder + '\', [' + ','.join([str(a) for a in Nz_uniform]) + '],' \
+     'true, true, \'' + uniform_prefix + '\', \'Porosity\', \'L2\');'
+
     analysis_command = chombo_compare_analyse + '\n\n' + \
-                       matlab_command + ' "analyseVariablePorosityTest(\'' + dataFolder + '\', [' + ','.join([str(a) for a in Nz_uniform]) + '],' \
-     'true, true, \'' + uniform_prefix + '\', \'Porosity\', \'L2\'); exit;"'
+                       matlab_command + ' " %s exit;"' % make_figures
 
     # Run
     extra_params = {'main.max_time':max_time,
