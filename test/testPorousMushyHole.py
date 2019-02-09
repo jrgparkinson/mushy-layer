@@ -30,7 +30,7 @@ def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, 
     # dx = 1 / float(nx_coarse)
     # dt = 5e-7 * 64.0 / float(nx_coarse)
     # Coarsest Nx is 8
-    coarsest_dt = 1e-5
+    coarsest_dt = 1e-4
     coarsest_nx = 8
     dt = float(coarsest_dt) * float(coarsest_nx) / float(nx_coarse)
     params['main.fixed_dt'] = dt  # dt
@@ -57,8 +57,8 @@ def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, 
 def testPorousMushyHole(argv):
 
     # Defaults:
-    max_time = 5.0e-5
-    hole_radius = 0.02
+    max_time = 5.0e-4
+    hole_radius = 0.04
 
     try:
         opts, args = getopt.getopt(argv, "t:h:")
@@ -100,7 +100,7 @@ def testPorousMushyHole(argv):
     uniform_prefix = 'Uniform-' + physicalProblem + '-'
 
     python_compare_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'run_chombo_compare.py')
-    chombo_compare_analyse ='python %s -n %s \n \n' % (python_compare_file, dataFolder)
+    chombo_compare_analyse ='python %s -f %s \n \n' % (python_compare_file, dataFolder)
 
     analysis_command = chombo_compare_analyse + '\n\n' + \
                        matlab_command + ' "analyseVariablePorosityTest(\'' + dataFolder + '\', [' + ','.join([str(a) for a in Nz_uniform]) + '],' \
