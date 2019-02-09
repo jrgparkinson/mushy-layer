@@ -240,11 +240,11 @@ def run_chombo_compare(argv):
     field = 'xDarcy velocity'
     err_type = 'L2'
 
-    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/NoFlow/'
-    run_analysis = True
-    field = 'T err'
-    err_type = 'Max'
-    include_richardson = False
+    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/NoFlow/'
+    # run_analysis = True
+    # field = 'T err'
+    # err_type = 'Max'
+    # include_richardson = False
 
     try:
         opts, args = getopt.getopt(argv, "f:v:e:r:a")
@@ -426,13 +426,24 @@ def run_chombo_compare(argv):
 
     # Also add 2nd order
     # Need to pick a data set to base this off
-    a_ds_name = err_data_sets.keys()[0]
-    richardson_ds = err_data_sets[a_ds_name]
-    nx_second_order = [x[0] for x in richardson_ds]
-    err_second_order = [4*richardson_ds[0][1]]*len(nx_second_order)
+    all_nx = [x[0] for x in [err_data_sets[k] for k in err_data_sets.keys()]]
+    min_nx = np.amin(all_nx)
+    max_nx = np.amax(all_nx)
 
-    for i in range(1,len(nx_second_order)):
-        err_second_order[i] = err_second_order[i-1] * (float(nx_second_order[i-1])/float(nx_second_order[i]))**2
+    all_err = [x[1] for x in [err_data_sets[k] for k in err_data_sets.keys()]]
+    max_err = np.amax(all_err)
+    init_err = max_err*4
+
+    print('all nx: ' + str(all_nx))
+
+    #min_nx = np
+    #a_ds_name = err_data_sets.keys()[0]
+    #richardson_ds = err_data_sets[a_ds_name]
+    nx_second_order = np.linspace(min_nx, max_nx)
+    err_second_order = [init_err, init_err*(min_nx/max_nx)^2]
+
+    # for i in range(1,len(nx_second_order)):
+    #    err_second_order[i] = err_second_order[i-1] * (float(nx_second_order[i-1])/float(nx_second_order[i]))**2
 
     axes[0].plot(nx_second_order, err_second_order, linestyle=':', label ='2nd order')
 
