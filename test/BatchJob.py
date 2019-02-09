@@ -5,7 +5,11 @@ import subprocess
 import re
 
 
-class SlurmTask:
+class BatchJob:
+    '''
+    This is setup for SLURM, but should be fairly straightforward to modify for other queuing systems
+    '''
+
     MAX_TASKS_PER_NODE = 16
     MAX_MEMORY = 128000.0  # MB
 

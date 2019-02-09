@@ -7,7 +7,7 @@ import getopt
 from runAMRConvergenceTest import runTest
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name
 from MushyLayerRunSimple import MushyLayerRunSimple
-from SlurmTask import SlurmTask
+from BatchJob import BatchJob
 
 ##########################################################################
 # 3) Convection in a mushy layer with an initial porous hole
@@ -95,7 +95,7 @@ def testHeleShawFixedChill(argv):
         defaultParams['concise_run_name'] = folderName
 
         allowRestarts = False
-        s = SlurmTask('', defaultParams['concise_run_name'], '', num_proc)
+        s = BatchJob('', defaultParams['concise_run_name'], '', num_proc)
         ml_run = MushyLayerRunSimple(base_output_dir, num_proc, defaultParams, s, allowRestarts, get_executable_name())
         ml_run.single_run(folderName)
 

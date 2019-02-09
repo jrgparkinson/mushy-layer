@@ -5,7 +5,7 @@ import math
 import getopt
 from colorama import Fore, Style
 from mushyLayerRunUtils import read_inputs, is_power_of_two, string_to_array
-from SlurmTask import SlurmTask
+from BatchJob import BatchJob
 from AMRConvergenceTest import amr_convergence_test
 
 
@@ -377,7 +377,7 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
         else:
             jobName = physical_problem + '-analysis'
 
-            s = SlurmTask(base_dir, jobName, '', 4)
+            s = BatchJob(base_dir, jobName, '', 4)
 
             s.set_dependency(job_ids)
             s.set_custom_command(analysis_command)

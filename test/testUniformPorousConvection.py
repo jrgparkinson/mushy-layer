@@ -4,7 +4,7 @@ import sys
 from colorama import Fore, Style
 import getopt
 from runAMRConvergenceTest import runTest
-from SlurmTask import SlurmTask
+from BatchJob import BatchJob
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs
 
 
@@ -155,7 +155,7 @@ def test_uniform_porous_convection(argv):
     run_analysis_name = 'runAnalysis.sh'
 
     job_name = physical_problem + '-analysis'
-    s = SlurmTask(base_dataFolder, job_name, '')
+    s = BatchJob(base_dataFolder, job_name, '')
 
     s.set_dependency(all_job_ids)
     s.set_custom_command(analysis_command)

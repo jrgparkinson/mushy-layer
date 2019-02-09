@@ -4,7 +4,7 @@ from colorama import Fore
 from MushyLayerRunSimple import MushyLayerRunSimple
 from mushyLayerRunUtils import get_restart_file, get_executable_name,\
     get_final_chk_file
-from SlurmTask import SlurmTask
+from BatchJob import BatchJob
 
 
 def amr_convergence_test(params, full_output_dir, physicalProblem, nzs, 
@@ -74,7 +74,7 @@ def amr_convergence_test(params, full_output_dir, physicalProblem, nzs,
         print(Fore.GREEN + '    **Do run**' + Fore.RESET)
 
         # Don't need output dir or exec dir here, MushyLayerRun will fill these in
-        s = SlurmTask('', p['concise_run_name'], '', num_proc)
+        s = BatchJob('', p['concise_run_name'], '', num_proc)
         
         if restart_from_low_res:
             python_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'create_refined_restart.py')

@@ -2,7 +2,7 @@
 import os
 from colorama import Fore, Style
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
-from SlurmTask import SlurmTask
+from BatchJob import BatchJob
 
 ##########################################################################
 # Make figures for methods paper
@@ -50,7 +50,7 @@ def make_figures():
 
     job_name = 'makeFigures'
 
-    s = SlurmTask(base_output_dir, job_name, '', 4)
+    s = BatchJob(base_output_dir, job_name, '', 4)
 
     #s.setDependency(job_ids)
     s.set_custom_command(slurm_command)

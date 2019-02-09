@@ -5,8 +5,10 @@ import os
 import re
 import numpy as np
 
-import matplotlib.pyplot as plt
+
 import matplotlib
+matplotlib.use('Agg') 
+import matplotlib.pyplot as plt
 
 def latexify(fig_width=None, fig_height=None, columns=1):
     """Set up matplotlib's RC params for LaTeX plotting.
