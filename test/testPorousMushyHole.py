@@ -36,7 +36,7 @@ def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, 
     params['main.fixed_dt'] = dt  # dt
     params['main.plot_period'] = float(params['main.max_time'])/4  # produce 4 same number of plot files per run
 
-    regrid_int = int(math.ceil(8 * float(nz_coarse) / 32.0))
+    regrid_int = int(math.ceil(float(nz_coarse) / 16.0))
     regrid_int = max(regrid_int, 1)
 
     params['main.refine_thresh'] = float(params['main.radius']) * 1.0 / float(nz_coarse)  # 0.05*64.0/float(nz_coarse)
