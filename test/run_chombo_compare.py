@@ -426,21 +426,27 @@ def run_chombo_compare(argv):
 
     # Also add 2nd order
     # Need to pick a data set to base this off
-    all_nx = [x[0] for x in [err_data_sets[k] for k in err_data_sets.keys()]]
+    #TODO finish this
+    collated_datasets = [value for values in err_data_sets.values() for value in values]
+    # print('Collated datasets: ' + str(collated_datasets))
+    all_nx = [x[0] for x in collated_datasets]
     min_nx = np.amin(all_nx)
-    max_nx = np.amax(all_nx)
+    max_nx = np.amax(all_nx)*1.5
 
-    all_err = [x[1] for x in [err_data_sets[k] for k in err_data_sets.keys()]]
+    all_err = [x[1] for x in collated_datasets]
     max_err = np.amax(all_err)
     init_err = max_err*4
 
-    print('all nx: ' + str(all_nx))
+    # print('all nx: ' + str(all_nx))
 
     #min_nx = np
     #a_ds_name = err_data_sets.keys()[0]
     #richardson_ds = err_data_sets[a_ds_name]
-    nx_second_order = np.linspace(min_nx, max_nx)
-    err_second_order = [init_err, init_err*(min_nx/max_nx)^2]
+    nx_second_order = [min_nx, max_nx]
+    err_second_order = [init_err, init_err*(float(min_nx)/float(max_nx))**2.0]
+
+    print('nx 2nd order:' + str(nx_second_order))
+    print('err 2nd order:' + str(err_second_order))
 
     # for i in range(1,len(nx_second_order)):
     #    err_second_order[i] = err_second_order[i-1] * (float(nx_second_order[i-1])/float(nx_second_order[i]))**2
