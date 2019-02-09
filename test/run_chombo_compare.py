@@ -222,7 +222,7 @@ def run_chombo_compare(argv):
     err_type = 'L2'
 
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc'
-    run_analysis = True
+    # run_analysis = True
     field = 'xDarcy velocity'
     err_type = 'L2'
 
@@ -284,8 +284,8 @@ def run_chombo_compare(argv):
         richardson_err = load_error(this_richardson_err_folder)
         fine_err = load_error(this_fine_err_folder)
 
-        if field not in richardson_err.keys():
-            print('Field %s not found' % field)
+        if field not in fine_err.keys():
+            print('Field %s not found in folder %s' % (field, folder))
             print('Available fields: ' + str(richardson_err.keys()))
             continue
 
