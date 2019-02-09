@@ -11,6 +11,17 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 # plt.style.use('classic')
 
+def format_field_name(field):
+
+    formatted_names = {'Porosity': 'Porosity, $\chi$',
+                       'xDarcy velocity': '$x-$velocity',
+                       'yDarcy velocity': '$y-$velocity'}
+
+    if field in formatted_names.keys():
+        return formatted_names[field]
+    else:
+        return field
+
 def latexify(fig_width=None, fig_height=None, columns=1):
     """Set up matplotlib's RC params for LaTeX plotting.
     Call this before plotting a figure.
@@ -249,9 +260,10 @@ def run_chombo_compare(argv):
 
     # Collate errors and make plots
 
-
-
     # Each subfolder have these two folders:
+    # richardson error is computed between consecutive simulations (128 vs 256, 256 vs 512)
+    # fine error is always computed vs the finest resolution uniform mesh (64 vs 512, 128 vs 512 etc.)
+    # richardson error only exists for uniform meshes
     richardson_error_folder = 'error-richardson'
     fine_error_folder = 'error-finest'
 
@@ -403,7 +415,7 @@ def run_chombo_compare(argv):
     axes[0].plot(nx_second_order, err_second_order, linestyle=':', label ='2nd order')
 
     axes[0].set_xlabel('$1/\Delta x$')
-    axes[0].set_ylabel('$L_2$ error (%s)' % field)
+    axes[0].set_ylabel('$L_2$ error (%s)' % format_field_name(field))
 
     axes[0].set_xscale('log')
     axes[0].set_yscale('log')
