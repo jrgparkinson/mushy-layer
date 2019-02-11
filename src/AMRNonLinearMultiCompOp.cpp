@@ -621,8 +621,6 @@ void AMRNonLinearMultiCompOp::resetLambda()
       // Take its reciprocal
       lambdaFab.invert(1.0);
 
-      //todo - remove?
-//      lambdaFab.mult(0.5);
     }
 
     // Lambda is reset.
@@ -1260,7 +1258,6 @@ setTime(Real a_time)
   m_bc.setTime(a_time);
 
   // Notify our observers that the time has been set.
-  // FIXME: Must implement response of multigrid operators!
   notifyObserversOfChange();
 }
 //-----------------------------------------------------------------------

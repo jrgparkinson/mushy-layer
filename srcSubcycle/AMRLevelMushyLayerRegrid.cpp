@@ -528,11 +528,11 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
 
       IntVectSet porosityGradientCells;
-      tagCellsVar(porosityGradientCells, m_refineThresh, taggingMethod, m_porosity, -1);
+      tagCellsVar(porosityGradientCells, m_opt.refineThresh, taggingMethod, m_porosity, -1);
 
       // Grow these cells to go further into the channel,
       // where the salinity is high and fluid velocities are large and negative
-      porosityGradientCells.grow(2*m_tagBufferSize);
+      porosityGradientCells.grow(2*m_opt.tagBufferSize);
 
       // Tag regions of downflow
       tagCellsVar(downflowCells,
@@ -583,13 +583,13 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
         if (s_verbosity >= 5)
         {
-          pout() << "Refining on level " << m_level << " where porosity gradients > refine thresh (" << m_refineThresh << ")" << endl;
+          pout() << "Refining on level " << m_level << " where porosity gradients > refine thresh (" << m_opt.refineThresh << ")" << endl;
         }
 
         // Refine mushy regions which may be about generate channels
         IntVectSet mushyCells;
         tagCellsVar(mushyCells,
-                    m_refineThresh, // refine thresh for gradients
+                    m_opt.refineThresh, // refine thresh for gradients
                     0, // refine around undivided gradient
                     m_porosity, -1);
 
@@ -618,7 +618,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       }
     }
 
-    tagCellsVar(localTags, m_refineThresh, taggingMethod, taggingVar, taggingVectorVar );
+    tagCellsVar(localTags, m_opt.refineThresh, taggingMethod, taggingVar, taggingVectorVar );
   }
   else
   {
@@ -699,7 +699,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
   }
 
-  localTags.grow(m_tagBufferSize);
+  localTags.grow(m_opt.tagBufferSize);
 
   // New option - when regridding, move to specified gridfile
 
@@ -1617,13 +1617,11 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       }
 
       // Reset dt
-      // todo: Should also reset fields?
       thisLevelData = this;
       for (int lev = m_level;  lev < numLevels; lev++)
       {
         thisLevelData->dt(dtSave[lev]);
         thisLevelData->restartTimestepFromBackup(true); // true - don't replace pressure
-
         thisLevelData = thisLevelData->getFinerLevel();
       }
 
@@ -1632,10 +1630,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
         writeAMRHierarchy("regrid8.hdf5");
       }
 
-
     } // end if initialising lambda correction
-
-
 
   } // end if level 0 and doing projection
 

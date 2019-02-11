@@ -39,7 +39,6 @@ amrMushyLayer::setDefaults()
   // domain size default is unit square/cube
   m_domainSize = RealVect(D_DECL(1.0,1.0,1.0));
   m_steady_state = false;
-  //todo make this 4 unless periodic
   m_num_ghost = 4; // Warning - think this wants to be 4, or else stuff breaks
   m_ghostVect = m_num_ghost*IntVect::Unit;
   m_parameters.getParameters();

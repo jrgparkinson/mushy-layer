@@ -415,7 +415,6 @@ doImplicitReflux(int a_var, int refluxLevel)
   // in the case refluxLevel > 0, refluxLevel-1 is only used for boundary conditions
   for (int lev= refluxLevel; lev < m_finest_level; lev++)
   {
-    //TODO: should this be negative or positive?
     Real dxLev = m_amrDx[lev];
     Real refluxScale = 1.0/dxLev;
 

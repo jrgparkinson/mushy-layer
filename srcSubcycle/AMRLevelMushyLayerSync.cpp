@@ -390,7 +390,7 @@ if (s_verbosity >= 3)
         mlPtr->m_timestepFailed = timestepFailed; // Store this on every level
 
         // Try turning this off - just halve dt
-        if (m_solverFailRestartMethod == m_restartResetData)
+        if (m_opt.solverFailRestartMethod == m_restartResetData)
         {
           restartTimestepFromBackup(); // why was this turned off?
         }
@@ -414,7 +414,7 @@ if (s_verbosity >= 3)
 
 
     // Grow m_adv_vel_centering
-    m_adv_vel_centering = m_adv_vel_centering*m_adv_vel_centering_growth;
+    m_adv_vel_centering = m_adv_vel_centering*m_opt.adv_vel_centering_growth;
     m_adv_vel_centering = min(m_adv_vel_centering, 0.5);
 
     // Set the same value on all levels of refinement

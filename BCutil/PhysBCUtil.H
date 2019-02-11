@@ -98,14 +98,10 @@ public:
 	virtual Tuple<BCHolder, SpaceDim> uStarFuncBC(bool a_isViscous = false) const;
 
 
-//	virtual Tuple<BCHolder, SpaceDim> velFuncBC(bool a_isViscous = false) const;
-
 	/// BC holder for \f$ \mathbf{u} \f$ (edge centred)
 	virtual Tuple<BCHolder, SpaceDim> edgeVelFuncBC(bool a_isViscous = false,
 	                                                LevelData<FluxBox>* velocityBCVals = NULL) const;
 
-
-//	virtual Tuple<BCHolder, SpaceDim> fluxExtrapFuncBC() const;
 
 	/// BC holder for porosity \f$ \chi \f$, (edge centred)
 	virtual Tuple<BCHolder, SpaceDim> porosityFaceBC() const;

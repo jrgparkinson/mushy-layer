@@ -62,6 +62,7 @@
 #include "PhysIBC.H"
 #include "phaseDiagram.H"
 #include "AMRNonLinearMultiCompOp.H"
+#include "mushyLayerOpt.h"
 
 // Fortran files
 #include "AdvectUtilF_F.H"
@@ -111,7 +112,7 @@ public:
     m_timestepFailed = false;
     m_timestepReduced = false;
     m_useLimiting = false;
-    m_useSubcycling = false;
+    m_opt.useSubcycling = false;
     m_timeIntegrationOrder = 1;
     m_tagBufferSize = 1;
     m_refineThresh = 1;
@@ -193,48 +194,49 @@ public:
 }
 
   /// Full constructor. Arguments are same as in define()
-  AMRLevelMushyLayer(
-      const Real&                 a_cfl,
-      const Real&                 a_domainWidth,
-      const Real&                 a_refineThresh,
-      const int&                  a_tagBufferSize,
-      const bool&                 a_useLimiting,
-      const int a_CFInterpOrder,
-      const int a_steadyStateNormType,
-      const Real a_fixedDt,
-      const Real a_max_dt_growth,
-      const int  a_verbosity,
-      const bool a_useSubcycling,
-      const bool a_ignoreSolverFails,
-      const Real a_initial_dt_multiplier,
-      const Real a_adv_vel_centering_growth,
-      const int a_restartMethod)
+  AMRLevelMushyLayer(mushy_layer_options a_opt)
+//      const Real&                 a_cfl,
+//      const Real&                 a_domainWidth,
+//      const Real&                 a_refineThresh,
+//      const int&                  a_tagBufferSize,
+//      const bool&                 a_useLimiting,
+//      const int a_CFInterpOrder,
+//      const int a_steadyStateNormType,
+//      const Real a_fixedDt,
+//      const Real a_max_dt_growth,
+//      const int  a_verbosity,
+//      const bool a_useSubcycling,
+//      const bool a_ignoreSolverFails,
+//      const Real a_initial_dt_multiplier,
+//      const Real a_adv_vel_centering_growth,
+//      const int a_restartMethod)
   {
-    define(a_cfl, a_domainWidth, a_refineThresh,
-           a_tagBufferSize,  a_useLimiting,
-           a_CFInterpOrder, a_steadyStateNormType, a_fixedDt,
-           a_max_dt_growth, a_verbosity, a_useSubcycling,
-           a_ignoreSolverFails, a_initial_dt_multiplier,  a_adv_vel_centering_growth, a_restartMethod);
+    define(a_opt);
+//    define(a_cfl, a_domainWidth, a_refineThresh,
+//           a_tagBufferSize,  a_useLimiting,
+//           a_CFInterpOrder, a_steadyStateNormType, a_fixedDt,
+//           a_max_dt_growth, a_verbosity, a_useSubcycling,
+//           a_ignoreSolverFails, a_initial_dt_multiplier,  a_adv_vel_centering_growth, a_restartMethod);
   }
 
 
 
   /// Defines this AMRLevelMushyLayer
-  void define(
-      /// CFL number
-      const Real&                 a_cfl,
-      /// physical width of domain
-      const Real&                 a_domainWidth,
-      /// undivided gradient size over which a cell will be tagged for refinement
-      const Real&                 a_refineThresh,
-      /// number of buffer cells around each tagged cell that will also be tagged
-      const int&                  a_tagBufferSize,
-      /// whether to use van Leer limiting
-      const bool&                 a_useLimiting,
-      const int a_CFInterpOrder, const int a_steadyStateNormType, const Real a_fixedDt, const Real a_max_dt_growth,
-      const int  a_verbosity, const bool a_useSubcycling,
-      const bool a_ignoreSolverFails,  const Real a_initial_dt_multiplier,
-      const Real a_adv_vel_centering_growth,  const int a_restartMethod);
+  void define(mushy_layer_options a_opt);
+//      /// CFL number
+//      const Real&                 a_cfl,
+//      /// physical width of domain
+//      const Real&                 a_domainWidth,
+//      /// undivided gradient size over which a cell will be tagged for refinement
+//      const Real&                 a_refineThresh,
+//      /// number of buffer cells around each tagged cell that will also be tagged
+//      const int&                  a_tagBufferSize,
+//      /// whether to use van Leer limiting
+//      const bool&                 a_useLimiting,
+//      const int a_CFInterpOrder, const int a_steadyStateNormType, const Real a_fixedDt, const Real a_max_dt_growth,
+//      const int  a_verbosity, const bool a_useSubcycling,
+//      const bool a_ignoreSolverFails,  const Real a_initial_dt_multiplier,
+//      const Real a_adv_vel_centering_growth,  const int a_restartMethod);
 
   /// Destructor
   virtual ~AMRLevelMushyLayer();
@@ -252,8 +254,6 @@ public:
   void setDefaults();
 
   /// Define new AMRLevelMushyLayer from coarser
-  /**
-   */
   virtual void define(
       AMRLevel*            a_coarserLevelPtr,
       const ProblemDomain& a_problemDomain,
@@ -1253,6 +1253,14 @@ protected:
   /// Is object defined
   bool m_isDefined;
 
+  /// Struct to contain all the options for this simulation
+  /**
+   * This is so we can easily pass all the options around,
+   * and don't have to keep going into parmparse
+   */
+
+  mushy_layer_options m_opt;
+
   /// CFL number - to control timestep
   Real                 m_cfl;
 
@@ -1294,7 +1302,7 @@ protected:
   Real m_scalarDiffusionCoeffs[m_numScalarVars];
 
   /// Whether or not to do subcycling
-  bool m_useSubcycling;
+//  bool m_opt.useSubcycling;
 
   /// So we can set multigrid verbosity off
   int m_verbosity_multigrid;

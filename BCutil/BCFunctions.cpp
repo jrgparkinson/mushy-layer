@@ -376,12 +376,8 @@ void OnlyInflowBC(FArrayBox&      a_state,
   // if homogeneous, apply homogeneous dirichlet BCs
   if (a_homogeneous)
   {
-    // TODO - should this be dirichlet everywhere or inflow/outflow with dirichlet = 0?
     ConstantDiriBC(a_state, a_valid, a_homogeneous, a_otherValue, a_dir, a_side, a_order);
     return;
-    // Surely keep inflow/outflow, just set value to be 0?
-    //    a_DiriValue = 0;
-
   }
 
   int isign = sign(a_side);

@@ -9,13 +9,11 @@
 
 Channel::Channel ()
 {
-  // TODO Auto-generated constructor stub
   m_finished = false;
 }
 
 Channel::~Channel ()
 {
-  // TODO Auto-generated destructor stub
 }
 
 

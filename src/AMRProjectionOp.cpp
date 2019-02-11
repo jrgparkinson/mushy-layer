@@ -27,13 +27,11 @@
 
 AMRProjectionOp::AMRProjectionOp ()
 {
-  // TODO Auto-generated constructor stub
 
 }
 
 AMRProjectionOp::~AMRProjectionOp ()
 {
-  // TODO Auto-generated destructor stub
 }
 
 void AMRProjectionOp::resetLambda()

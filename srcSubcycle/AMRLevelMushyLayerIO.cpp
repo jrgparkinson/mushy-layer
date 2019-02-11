@@ -1069,7 +1069,7 @@ void AMRLevelMushyLayer::computeVorticity()
     {
       for (int dir=0; dir<SpaceDim; dir++)
       {
-        //todo - vorticity needs more components in 3D, can't really store it in m_scalarNew.
+        //todo - 3D: vorticity needs more components in 3D, can't really store it in m_scalarNew.
         // will need to make a new data structure which has the write number of componenets for the dimensionality of the problem
 
         // and then compute vorticity

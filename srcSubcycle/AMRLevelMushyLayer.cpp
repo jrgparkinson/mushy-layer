@@ -287,8 +287,6 @@ bool AMRLevelMushyLayer::solvingFullDarcyBrinkman()
 void AMRLevelMushyLayer::compute_d_dt(const int a_var, LevelData<FArrayBox>& diff, bool vector)
 {
 
-
-
   if (vector)
   {
     diff.define(m_grids, SpaceDim);
@@ -301,8 +299,6 @@ void AMRLevelMushyLayer::compute_d_dt(const int a_var, LevelData<FArrayBox>& dif
     m_scalarNew[a_var]->copyTo(diff);
 
   }
-
-
 
   DataIterator dit(m_grids);
   for (dit.reset(); dit.ok(); ++dit)
@@ -403,7 +399,7 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
     largestDim = SpaceDim-1;
   }
 
-  Real norm = ::computeNorm(diff, NULL, -1, m_dx, Interval(0, largestDim), m_steadyStateNormType);
+  Real norm = ::computeNorm(diff, NULL, -1, m_dx, Interval(0, largestDim), m_opt.steadyStateNormType);
 
   norm = norm/max;
 
@@ -427,6 +423,8 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
 
 void AMRLevelMushyLayer::horizontallySmooth(LevelData<FluxBox>& a_flux)
 {
+  CH_TIME("AMRLevelMushyLayer::horizontallySmooth");
+
   ParmParse ppMain("main");
   DataIterator dit = a_flux.dataIterator();
 
@@ -441,7 +439,7 @@ void AMRLevelMushyLayer::horizontallySmooth(LevelData<FluxBox>& a_flux)
     return;
   }
 
-  // todo - write post trace smoothing in fortran
+  // todo - write post trace smoothing in fortran. We currently don't use this though so not high priority.
   for (dit.reset(); dit.ok(); ++dit)
   {
     for (int velDir=0; velDir < SpaceDim; velDir++)
@@ -803,7 +801,7 @@ Real AMRLevelMushyLayer::advance()
 
     if (solverFailed)
     {
-      if (m_ignoreSolverFails)
+      if (m_opt.ignoreSolveFails)
       {
         pout() << "Ignoring all solver fails." << endl;
       }
@@ -1473,7 +1471,7 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
         int y_i = iv[SpaceDim-1];
         IntVect ivUp = iv + BASISV(idir);
 
-        averaged[y_i-y_init] += fluxDir(iv, comp)*m_dx/m_domainWidth;
+        averaged[y_i-y_init] += fluxDir(iv, comp)*m_dx/m_opt.domainWidth;
       }
     }
 
@@ -1548,7 +1546,7 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
   //  Real length = domBox.hiVect()[1] + 2 - domBox.loVect()[1];
   Real length = m_numCells[SpaceDim-1]+1; // need an extra cell here
   //  Real width = (domBox.hiVect()[0] + 1 - domBox.loVect()[0])*m_dx;
-  Real width = m_domainWidth;
+  Real width = m_opt.domainWidth;
   Vector<Real> averaged(length, 0.0);
 
   globalAveraged.resize(length, 0.0);
@@ -2007,10 +2005,10 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
 
   fillHC(HC_old, old_time,
          true,  // fill interior?
-         (CFinterpOrder_advection==2)); // do quadratic interpolation at CF boundaries?
+         (m_opt.CFinterpOrder_advection==2)); // do quadratic interpolation at CF boundaries?
   fillTCl(TCl_old, old_time,
           true,  // fill interior?
-          (CFinterpOrder_advection==2)); //  do quadratic interpolation at CF boundaries? - need this for corner cells that border CF and domain boundaries
+          (m_opt.CFinterpOrder_advection==2)); //  do quadratic interpolation at CF boundaries? - need this for corner cells that border CF and domain boundaries
 
 
   // Compute frame advection src term
@@ -2239,7 +2237,7 @@ void AMRLevelMushyLayer::computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeSc
   EdgeToCell(a_advVel, vel);
   fillScalars(scalar_advection_old, a_old_time, a_advectionVar,
               true, //do interior
-              (CFinterpOrder_advection==2) // quad interp - this seems to fix previous issues at insulating side walls
+              (m_opt.CFinterpOrder_advection==2) // quad interp - this seems to fix previous issues at insulating side walls
   );
 
   // Make diffusive source
@@ -2455,7 +2453,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
       Real Nu = ::computeNusselt(*m_scalarNew[m_temperature], *m_vectorNew[m_fluidVel],
                                  m_dx, m_parameters,
-                                 m_domainWidth, m_domainHeight);
+                                 m_opt.domainWidth, m_domainHeight);
 
       m_diagnostics.addDiagnostic(Diagnostics::m_Nu, m_time, Nu);
     }
@@ -2678,7 +2676,6 @@ void AMRLevelMushyLayer::computeDiagnostics()
         }
       }
 
-
       Box vertBox = ::adjCellHi(m_problem_domain.domainBox(), 0, 1);
       vertBox.shift(0, -int(m_numCells[0]/2));
 
@@ -2866,7 +2863,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
       //    Real Fh_right = m_heatDomainFluxRegister.getFluxHierarchy(0, Side::Hi, 1.0);
 
 
-      Real scale = 1/(m_dt*m_domainWidth);
+      Real scale = 1/(m_dt*m_opt.domainWidth);
       Real totalF_bottom = Fs_bottom*scale;
       Real totalF_top = Fs_top*scale;
 
@@ -3360,9 +3357,9 @@ Real AMRLevelMushyLayer::computeDt()
 Real AMRLevelMushyLayer::computeDt(bool growdt)
 {
   // If we have a fixed dt  and no subcycling, we must make sure we use the dt on all levels
-  if (m_fixedDt > 0 && !m_useSubcycling)
+  if (m_opt.fixedDt > 0 && !m_opt.useSubcycling)
   {
-    m_dt = m_fixedDt;
+    m_dt = m_opt.fixedDt;
     return m_dt;
   }
 
@@ -3377,10 +3374,10 @@ Real AMRLevelMushyLayer::computeDt(bool growdt)
   Real grownDt = m_dt;
   if (growdt)
   {
-    grownDt = m_dt*m_max_dt_growth;
+    grownDt = m_dt*m_opt.max_dt_growth;
   }
 
-  Real solnDt = computeDt(m_cfl);
+  Real solnDt = computeDt(m_opt.cfl);
 
   Real newDt = min(grownDt, solnDt);
 
@@ -3416,7 +3413,7 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
       b.grow(-m_advVel.ghostVect());
       if (SpaceDim < 3)
       {
-        //TODO - work out how to make this work in 3d
+        //TODO - 3D: work out how to make this work in 3d
         b &= faceBox;
       }
       Real thisMax = velDir.norm(b, 0, 0);
@@ -4446,7 +4443,7 @@ bool AMRLevelMushyLayer::currentCFLIsSafe(bool printWarning)
   Real newCFL = maxAdvU * m_dt / m_dx;
 
   // CFL above 1 definitely unstable. CFL > 2*user limit means the velocity has increased rapidly
-  if (newCFL > 1.0 || newCFL > m_cfl*2)
+  if (newCFL > 1.0 || newCFL > m_opt.cfl*2)
   {
     if (printWarning)
     {

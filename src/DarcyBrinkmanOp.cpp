@@ -306,8 +306,6 @@ void DarcyBrinkmanOp::resetLambda()
       lambdaFab.copy(aCoefFab);
       lambdaFab.mult(m_alpha);
 
-
-      // todo - how does this change with cCoef?
       lambdaFab.plus(cCoefFab, -m_beta);
 
       for (int dir = 0; dir < SpaceDim; dir++)
@@ -848,11 +846,10 @@ void DarcyBrinkmanOp::getFlux(FArrayBox&       a_flux,
       Real philo = a_data(ivlo,ivar);
       Real gradphi = (phihi - philo ) * grad_scale;
 
-      Real phi = a_data(iv, ivar) * scale;
+//      Real phi = a_data(iv, ivar) * scale;
 
-      // todo - how does this depend on cCoef?
+      // Note this doesn't depend on cCoef
       a_flux(iv,ivar) = -bCoefDir(iv, ivar) * gradphi;
-//      a_flux(iv,ivar) = -bCoefDir(iv, ivar) * gradphi - a_cCoef(iv, ivar)*phi;
 
     }
   }

@@ -131,42 +131,41 @@ void VelIBC::setBdrySlopes(FArrayBox&       a_dW,
                            const int&       a_dir,
                            const Real&      a_time)
 {
-  //  CH_assert(m_isFortranCommonSet == true);
   CH_assert(m_isDefined == true);
 
   // In periodic case, this doesn't do anything
-  if (!m_domain.isPeriodic(a_dir))
-    {
-      // This needs to be fixed
-      // CH_assert(m_isSlopeValSet);
-
-      Box loBox,hiBox,centerBox,domain;
-      int hasLo,hasHi;
-      Box slopeBox = a_dW.box()&m_domain;
-
-      Real loVal = m_slopeVal[a_dir][0];
-      Real hiVal = m_slopeVal[a_dir][1];
-
-      // Generate the domain boundary boxes, loBox and hiBox, if there are
-      // domain boundaries there
-      loHiCenter(loBox,hasLo,hiBox,hasHi,centerBox,domain,
-                 slopeBox,m_domain,a_dir);
-
-      // Set the boundary slopes if necessary
-      if ((hasLo != 0) || (hasHi != 0))
-        {
-          FORT_SLOPEBCSF(CHF_FRA(a_dW),
-                         CHF_CONST_FRA(a_W),
-                         CHF_CONST_REAL(m_dx),
-                         CHF_CONST_INT(a_dir),
-                         CHF_CONST_REAL(loVal),
-                         CHF_BOX(loBox),
-                         CHF_CONST_INT(hasLo),
-                         CHF_CONST_REAL(hiVal),
-                         CHF_BOX(hiBox),
-                         CHF_CONST_INT(hasHi));
-        }
-    }
+//  if (!m_domain.isPeriodic(a_dir))
+//    {
+//      // This needs to be fixed
+//      // CH_assert(m_isSlopeValSet);
+//
+//      Box loBox,hiBox,centerBox,domain;
+//      int hasLo,hasHi;
+//      Box slopeBox = a_dW.box()&m_domain;
+//
+//      Real loVal = m_slopeVal[a_dir][0];
+//      Real hiVal = m_slopeVal[a_dir][1];
+//
+//      // Generate the domain boundary boxes, loBox and hiBox, if there are
+//      // domain boundaries there
+//      loHiCenter(loBox,hasLo,hiBox,hasHi,centerBox,domain,
+//                 slopeBox,m_domain,a_dir);
+//
+//      // Set the boundary slopes if necessary
+//      if ((hasLo != 0) || (hasHi != 0))
+//        {
+//          FORT_SLOPEBCSF(CHF_FRA(a_dW),
+//                         CHF_CONST_FRA(a_W),
+//                         CHF_CONST_REAL(m_dx),
+//                         CHF_CONST_INT(a_dir),
+//                         CHF_CONST_REAL(loVal),
+//                         CHF_BOX(loBox),
+//                         CHF_CONST_INT(hasLo),
+//                         CHF_CONST_REAL(hiVal),
+//                         CHF_BOX(hiBox),
+//                         CHF_CONST_INT(hasHi));
+//        }
+//    }
 }
 
 // Set up initial conditions

@@ -897,8 +897,6 @@ void Projector::gradPiBCs(LevelData<FArrayBox>& a_gradPi, bool extrapBCs, bool a
   LevelData<FArrayBox> pressureTemp(m_Pi.disjointBoxLayout(), 1, m_Pi.ghostVect());
   if ( a_usePhi)
   {
-    //todo make this work
-    //    EdgeToCell(m_phi, pressureTemp);
     pressureTemp[dit].copy(m_phi[dit]);
   }
   else
@@ -1572,8 +1570,7 @@ void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
 
   // for proper scaling of pi, divide this by dt
   // so solving lap(pi) = div(u)/dt
-  //todo - change this back or amr will fail
-  Real dtScale = 1.0/a_dt; //1.0/a_dt;
+  Real dtScale = 1.0/a_dt;
   bool applyScaling = true;
   pp.query("scaleCCRHS", applyScaling);
   if (!applyScaling)
@@ -2961,7 +2958,6 @@ void Projector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
     allGrids[lev] = a_vel[lev]->getBoxes();
     allRefRatios[lev-1] = levelProj->nRefCrse(); //ref ratio to next finer level belongs to that level for CCProjector
 
-    // todo - check if this introduces a memory leak
     aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(allGrids[lev], 1));
     setValLevel(*aCoef[lev], 1.0);
   }

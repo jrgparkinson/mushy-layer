@@ -84,7 +84,7 @@ void AMRLevelMushyLayer::fillAnalyticVel(FArrayBox& velDir, int dir, int comp, b
     x = loc[0];
     y = loc[1];
 
-    Real freqx = (m_problem_domain.isPeriodic(0)) ? 2*M_PI/m_domainWidth : M_PI/m_domainWidth ;
+    Real freqx = (m_problem_domain.isPeriodic(0)) ? 2*M_PI/m_opt.domainWidth : M_PI/m_opt.domainWidth ;
     //    Real freqy = (m_problem_domain.isPeriodic(1)) ? 2*M_PI/m_domainWidth : M_PI/m_domainWidth ;
 
     Real Uscale;
@@ -246,7 +246,7 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
   Real fractionalInnerRadius = 0.2;
   pp.query("innerRadius",fractionalInnerRadius);
-  Real innerRadius = fractionalInnerRadius*m_domainWidth;
+  Real innerRadius = fractionalInnerRadius*m_opt.domainWidth;
 
   Real porosityTimescale = 1/m_parameters.darcy;
   pp.query("porosityTimescale", porosityTimescale);
@@ -275,12 +275,12 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
         Real boundaryPorosity = m_parameters.bcValPorosityLo[0];
 
-        Real xDistFromMiddle = abs(x-m_domainWidth/2);
-        Real yDistFromMiddle = abs(y-m_domainWidth/2);
+        Real xDistFromMiddle = abs(x-m_opt.domainWidth/2);
+        Real yDistFromMiddle = abs(y-m_opt.domainWidth/2);
 
 
 
-        Real gradient = (1-boundaryPorosity)/(0.5*m_domainWidth - innerRadius);
+        Real gradient = (1-boundaryPorosity)/(0.5*m_opt.domainWidth - innerRadius);
 
         Real maxDistFromMiddle = max(xDistFromMiddle, yDistFromMiddle);
 
@@ -304,14 +304,14 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
         Real boundaryPorosity = m_parameters.bcValPorosityLo[0];
 
-        Real xd = abs(x-m_domainWidth/2);
-        Real yd = abs(y-m_domainWidth/2);
+        Real xd = abs(x-m_opt.domainWidth/2);
+        Real yd = abs(y-m_opt.domainWidth/2);
 
         //Real maxDistFromMiddle = max(xDistFromMiddle, yDistFromMiddle);
 
         //Real porosity = 1 + boundaryPorosity - 2*maxDistFromMiddle;
 
-        Real porosity = boundaryPorosity + maxChi*exp(-(xd*xd + yd*yd)/(stdev*m_domainWidth));
+        Real porosity = boundaryPorosity + maxChi*exp(-(xd*xd + yd*yd)/(stdev*m_opt.domainWidth));
 
         Real maxPorosity = 1.0;
         porosity = min(porosity, maxPorosity);
@@ -326,14 +326,14 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
       {
         Real boundaryPorosity = m_parameters.bcValPorosityLo[0];
 
-        Real xd = abs(x-m_domainWidth/2);
-        Real yd = abs(y-m_domainWidth/2);
+        Real xd = abs(x-m_opt.domainWidth/2);
+        Real yd = abs(y-m_opt.domainWidth/2);
 
         //Real maxDistFromMiddle = max(xDistFromMiddle, yDistFromMiddle);
 
         //Real porosity = 1 + boundaryPorosity - 2*maxDistFromMiddle;
 
-        Real porosity = boundaryPorosity* (1-maxChi*exp(-(xd*xd + yd*yd)/(stdev*m_domainWidth)) );
+        Real porosity = boundaryPorosity* (1-maxChi*exp(-(xd*xd + yd*yd)/(stdev*m_opt.domainWidth)) );
 
         Real maxPorosity = 1.0;
         porosity = min(porosity, maxPorosity);
@@ -361,7 +361,7 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
         scale = min(scale, 4.0);
         //        Real scale = min(0.9,
-        Real chi =  1-scale*pow(y/m_domainHeight, 2)*0.3*sin(M_PI*x/m_domainWidth*2);
+        Real chi =  1-scale*pow(y/m_domainHeight, 2)*0.3*sin(M_PI*x/m_opt.domainWidth*2);
         chi = min(chi, 1.0);
         chi = max(chi, m_lowerPorosityLimit);
         a_porosity[dit](iv) = chi;

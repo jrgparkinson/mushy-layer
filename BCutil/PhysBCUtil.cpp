@@ -381,54 +381,48 @@ public:
    {
 
      // a_state is FACE-centered on face idir;
-         // a_valid is CELL-centered.
+     // a_valid is CELL-centered.
      Interval a_interval = a_state.interval();
-         Box toRegion(a_valid);
-         toRegion.surroundingNodes(a_idir);
-         int coord = toRegion.sideEnd(a_side)[a_idir];
-         toRegion.setRange(a_idir, coord);
+     Box toRegion(a_valid);
+     toRegion.surroundingNodes(a_idir);
+     int coord = toRegion.sideEnd(a_side)[a_idir];
+     toRegion.setRange(a_idir, coord);
 
-//         BCValueHolder& a_value = (BCValueHolder&)a_valueA;
-         int isign = sign(a_side);
-         RealVect facePos;
+     int isign = sign(a_side);
+     RealVect facePos;
 
-         //    Box toRegion = adjCellBox(a_valid, a_dir, a_side, 1);
-         //      toRegion.shift(a_dir, isign);
-         toRegion &= a_state.box();
+     toRegion &= a_state.box();
 
-         Box fromRegion = toRegion;
-         fromRegion.shift(a_idir, -isign);
+     Box fromRegion = toRegion;
+     fromRegion.shift(a_idir, -isign);
 
-         a_state.copy(a_state, fromRegion, 0, toRegion, 0, a_state.nComp());
+     a_state.copy(a_state, fromRegion, 0, toRegion, 0, a_state.nComp());
 
-         if (!a_homogeneous)
+     if (!a_homogeneous)
+     {
+       Real* value = new Real[a_state.nComp()];
+
+       for (BoxIterator bit(toRegion); bit.ok(); ++bit)
+       {
+         const IntVect& ivTo = bit();
+         IntVect ivClose = ivTo - isign*BASISV(a_idir);
+         IntVect ivFar = ivTo - 2*isign*BASISV(a_idir);
+
+
+         getDomainFacePosition(facePos, ivClose, a_dx, a_idir, a_side);
+
+         a_value(facePos.dataPtr(), &a_idir, &a_side, value);
+         for (int icomp = a_interval.begin(); icomp <= a_interval.end(); icomp++)
          {
-           Real* value = new Real[a_state.nComp()];
 
-           for (BoxIterator bit(toRegion); bit.ok(); ++bit)
-           {
-             const IntVect& ivTo = bit();
-             IntVect ivClose = ivTo - isign*BASISV(a_idir);
-             IntVect ivFar = ivTo - 2*isign*BASISV(a_idir);
+           //Enforce the exact value on the boundary face
+           a_state(ivTo, icomp) = value[icomp];
 
-
-             getDomainFacePosition(facePos, ivClose, a_dx, a_idir, a_side);
-
-             a_value(facePos.dataPtr(), &a_idir, &a_side, value);
-             for (int icomp = a_interval.begin(); icomp <= a_interval.end(); icomp++)
-             {
-
-               //0th order for now
-               a_state(ivTo, icomp) = value[icomp];
-
-               //TODO should possibly also fill outer ghost cells
-
-//               }
-             }
-           }
-
-           delete[] value;
          }
+       }
+
+       delete[] value;
+     }
 
 
    }
@@ -760,9 +754,7 @@ public:
                   Real                 a_dx,
                   bool                 a_homogeneous)
   {
-
-    // Try 2nd order to get projection right?
-    //todo - this was first order, probably change back
+    // Stick with 1st order for stability
     int order = 1;
 
     // a_state is FACE-centered, now in m_comp direction;
@@ -3109,7 +3101,6 @@ PhysBCUtil::scalarTraceHC_IBC() const
   plumeVals.push_back(m_params.HPlumeInflow);
   plumeVals.push_back(m_params.ThetaPlumeInflow);
   newIBCPtr->setPlume(plumeVals, m_params.plumeBounds);
-
 
   return newIBCPtr;
 }
