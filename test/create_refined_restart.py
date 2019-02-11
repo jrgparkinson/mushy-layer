@@ -34,14 +34,7 @@ def create_refined_restart(argv):
     
     out_file = os.path.join(new_dir, 'restart.2d.hdf5')
 
-    # Create inputs file
-#     inputs_refine_text = 'inFile="%s" \n' \
-#                         'run_inputs="%s" \n' \
-#                         'outFile  = %s \n' \
-#                         'box_size = %d \n' \
-#                         'refinement = %d \n' % (prev_chk_file, old_inputs_loc, 
-#                                                 out_file, new_box_size, 
-#                                                 refinement)
+  
     new_inputs = {'inFile': prev_chk_file,
                   'run_inputs': old_inputs_loc,
                   'outFile': out_file,
