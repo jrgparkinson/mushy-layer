@@ -26,6 +26,9 @@ def uniform_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max
     params['main.refine_thresh'] = str(3.0 / float(nz_coarse))
     params['main.tag_buffer_size'] = str(max(2, int(float(nz_coarse) / 8)))
 
+    # Make sure we don't split up the grids as there's currently a bug in Chombo with higher order advection methods
+    params['main.max_grid_size'] = int(nz_coarse*2)
+
     return nx_coarse, params, gridFile
 
 def test_uniform_porous_convection(argv):
@@ -119,7 +122,7 @@ def test_uniform_porous_convection(argv):
         for ra in da_ra['RaT']:
             extra_params['parameters.rayleighTemp'] = ra
             extra_params['main.plot_interval'] = -1
-            extra_params['main.plot_period'] = 0.1
+            extra_params['main.plot_period'] = 0.05
             extra_params['main.checkpoint_interval'] = 2000
             
             # this is for testing purposes

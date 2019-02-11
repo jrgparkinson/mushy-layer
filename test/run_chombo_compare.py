@@ -152,8 +152,14 @@ def run_compare(next_folder, this_folder, err_type):
 
     # check this folder contains some valid files
     valid_files = [x for x in os.listdir(this_folder) if '.hdf5' in x]
-    if len(valid_files) == 0:
+    final_computed_plt_file = get_final_plot_file(this_folder)
+    if not final_computed_plt_file:
         print('No plot files found in this folder')
+        return
+
+    final_exact_plt_file = get_final_plot_file(next_folder)
+    if not final_exact_plt_file:
+        print('No plot files found in higher resolution folder')
         return
 
     chombo_dir = os.environ['CHOMBO_HOME']
@@ -169,8 +175,9 @@ def run_compare(next_folder, this_folder, err_type):
 
     compare_params_file = os.path.join(this_err_folder, 'compare-' + err_type + '.inputs')
     error_file = os.path.join(this_err_folder, 'err-' + err_type + '.2d.hdf5')
-    computed_file = os.path.join(this_folder, get_final_plot_file(this_folder))
-    exact_file = os.path.join(next_folder, get_final_plot_file(next_folder))
+
+    computed_file = os.path.join(this_folder, final_computed_plt_file)
+    exact_file = os.path.join(next_folder, final_exact_plt_file)
     compare_params = {'compare.sameSize': 0,
                       'compare.exactRoot': exact_file,
                       'compare.computedRoot': computed_file,
@@ -242,6 +249,10 @@ def run_chombo_compare(argv):
 
     figure_number = 0
 
+    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.17/chi0.4-Da1.0e-06-Ra1.0e+09'
+    run_analysis = False
+    field = 'Temperature'
+
     # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/NoFlow/'
     # run_analysis = True
     # field = 'T err'
@@ -285,7 +296,8 @@ def run_chombo_compare(argv):
 
     # Get folders which have error calculations in them
     all_folders = [x for x in os.listdir(data_folder) if os.path.isdir(os.path.join(data_folder, x))
-                   and os.path.exists(os.path.join(data_folder, x, fine_error_folder))]
+                   and (os.path.exists(os.path.join(data_folder, x, fine_error_folder)) or
+                        os.path.exists(os.path.join(data_folder, x, richardson_error_folder)))]
 
     # Load all folders and put errors into a table indexed on resolution
     # resolution | richardson error | 512 uniform error | 512 amr errors...
@@ -310,26 +322,16 @@ def run_chombo_compare(argv):
         coarse_nx, ref_rat, max_lev = get_folder_details(folder)
 
         richardson_err = load_error(this_richardson_err_folder)
-        fine_err = load_error(this_fine_err_folder)
-
-        if field not in fine_err.keys():
-            print('Field %s not found in folder %s' % (field, folder))
-            print('Available fields: ' + str(richardson_err.keys()))
-            continue
-
-
-
-#        print(richardson_err)
-        # print(folder)
-        # print(fine_err)
-
-        if len(fine_err) == 0:
-            continue
 
         if max_lev == 0:
 
             # Also do richardson error here
             if include_richardson:
+
+                if field not in richardson_err.keys():
+                    print('Field %s not found for richardson error in folder %s' % (field, folder))
+                    print('Available fields: ' + str(richardson_err.keys()))
+                    continue
 
                 if richardson_name in err_data_sets.keys():
                     err_data_sets[richardson_name].append([coarse_nx, richardson_err[field][err_type]])
@@ -345,6 +347,16 @@ def run_chombo_compare(argv):
             data_set_name  = '$n_{ref}$ = %d' % ref_rat
         else:
             data_set_name = '$n_{ref}$ = (%s)' % ','.join(['%d' % ref_rat]*max_lev)
+
+        fine_err = load_error(this_fine_err_folder)
+
+        if len(fine_err) == 0:
+            continue
+
+        if field not in fine_err.keys():
+            print('Field %s not found for fine error in folder %s' % (field, folder))
+            print('Available fields: ' + str(fine_err.keys()))
+            continue
 
 
         this_err_entry = [coarse_nx, fine_err[field][err_type]]
@@ -430,7 +442,7 @@ def run_chombo_compare(argv):
 
     # Also add 2nd order
     # Need to pick a data set to base this off
-    #TODO finish this
+
     collated_datasets = [value for values in err_data_sets.values() for value in values]
     # print('Collated datasets: ' + str(collated_datasets))
     all_nx = [x[0] for x in collated_datasets]
@@ -478,30 +490,31 @@ def run_chombo_compare(argv):
     axes[0].text(xl[0]*0.9, yl[1]*1.2, '(a)')
 
 
-    ref_rats_plot = [x[1] for x in finest_timing]
-    timings_plot = [x[3] for x in finest_timing]
-    ncells_plot = np.array([float(x[4]) for x in finest_timing])
+    if finest_timing:
+        ref_rats_plot = [x[1] for x in finest_timing]
+        timings_plot = [x[3] for x in finest_timing]
+        ncells_plot = np.array([float(x[4]) for x in finest_timing])
 
-    timings_plot = timings_plot/np.amax(timings_plot)
-    ncells_plot = ncells_plot / float(np.amax(ncells_plot))
+        timings_plot = timings_plot/np.amax(timings_plot)
+        ncells_plot = ncells_plot / float(np.amax(ncells_plot))
 
-    # Make these black so they stand out from the other plot
-    axes[1].plot(ref_rats_plot, timings_plot, marker='s', color='k', linestyle='-', label='Normalized CPU time')
-    axes[1].plot(ref_rats_plot, ncells_plot, marker = 's', color='k', linestyle='--', label='Normalized cells advanced')
+        # Make these black so they stand out from the other plot
+        axes[1].plot(ref_rats_plot, timings_plot, marker='s', color='k', linestyle='-', label='Normalized CPU time')
+        axes[1].plot(ref_rats_plot, ncells_plot, marker = 's', color='k', linestyle='--', label='Normalized cells advanced')
 
-    axes[1].set_xlabel('Refinement ratio')
-    # axes[1].set_ylabel('') # no y label
+        axes[1].set_xlabel('Refinement ratio')
+        # axes[1].set_ylabel('') # no y label
 
 
 
-    axes[1].legend(loc='center right', bbox_to_anchor=(-0.2,0.25),  prop={'size': leg_font_size})
+        axes[1].legend(loc='center right', bbox_to_anchor=(-0.2,0.25),  prop={'size': leg_font_size})
 
-    axes[1].set_xlim([0, 4])
-    axes[1].set_ylim([0, 1])
+        axes[1].set_xlim([0, 4])
+        axes[1].set_ylim([0, 1])
 
-    xl = axes[1].get_xlim()
-    yl = axes[1].get_ylim()
-    axes[1].text(-0.05, 1.02, '(b)')
+        xl = axes[1].get_xlim()
+        yl = axes[1].get_ylim()
+        axes[1].text(-0.05, 1.02, '(b)')
 
     # set axis positions
     axes[0].set_position([0.1, 0.14, 0.3, 0.78])
