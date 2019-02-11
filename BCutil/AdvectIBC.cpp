@@ -190,7 +190,6 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
           for(dit.reset(); dit.ok(); ++dit)
           {
             Box advVelBox = (*m_advVel)[dit].box();
-            //        if (advVelBox.contains(boundaryBox))
             if (advVelBox.bigEnd() >= boundaryBox.bigEnd() &&
                 advVelBox.smallEnd() <= boundaryBox.smallEnd())
             {
@@ -216,10 +215,7 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
           case m_dirichlet:
 
             // Set variable value at the boundary
-            /* e.g. if we're calculating the advective flux u.s, set the value of s
-             *
-             *
-             */
+            /* e.g. if we're calculating the advective flux u.s, set the value of s*/
             FORT_SOLIDBCF(CHF_FRA(a_WGdnv),
                           CHF_CONST_FRA(a_Wextrap),
                           CHF_CONST_REAL(bcVal),
@@ -260,13 +256,6 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
 
 
 
-            //          FORT_SOLIDEXTRAPBCF(CHF_FRA(a_WGdnv),
-            //                                        CHF_CONST_FRA(a_Wextrap),
-            //                                        CHF_CONST_REAL(bcVal),
-            //                                        CHF_CONST_INT(lohisign),
-            //                                        CHF_CONST_REAL(m_dx),
-            //                                        CHF_CONST_INT(a_dir),
-            //                                        CHF_BOX(boundaryBox));
             break;
 
           case m_extrap:
@@ -287,7 +276,6 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
           case m_plumeInflow:
             Real plumeStart = m_plumeBounds[0];
             Real plumeEnd = m_plumeBounds[1];
-            // todo - check inflow advect BCs are correct
             FORT_ADVINFLOWPLUME(CHF_FRA(a_WGdnv),
                                 CHF_CONST_FRA(a_Wextrap),
                                 CHF_CONST_REAL(bcVal),
@@ -300,13 +288,6 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
                                 CHF_BOX(boundaryBox),
                                 CHF_CONST_INT(comp));
 
-            //          FORT_SOLIDEXTRAPBCF(CHF_FRA(a_WGdnv),
-            //                                        CHF_CONST_FRA(a_Wextrap),
-            //                                        CHF_CONST_REAL(bcVal),
-            //                                        CHF_CONST_INT(lohisign),
-            //                                        CHF_CONST_REAL(m_dx),
-            //                                        CHF_CONST_INT(a_dir),
-            //                                        CHF_BOX(boundaryBox));
             break;
 
 
@@ -328,46 +309,43 @@ void AdvectIBC::setBdrySlopes(FArrayBox&       a_dW,
                               const int&       a_dir,
                               const Real&      a_time)
 {
-  //  CH_assert(m_isFortranCommonSet == true);
-  //  CH_assert(m_isDefined == true);
 
-  // Don't know what the slopes should be, so do nothing here
+  /*
+  // We don't know what the slopes should be, so do nothing here
+  Box b = a_dW.box();
 
-  //
-  //  // In periodic case, this doesn't do anything
-  //  if (!m_domain.isPeriodic(a_dir))
-  //  {
-  //
-  //    // This needs to be fixed
-  //    // CH_assert (m_isSlopeValSet);
-  //
-  //    Box loBox,hiBox,centerBox,domain;
-  //    int hasLo,hasHi;
-  //    Box slopeBox = a_dW.box()&m_domain;
-  //
-  //    Real loVal = m_slopeVal[a_dir][0];
-  //    Real hiVal = m_slopeVal[a_dir][1];
-  //
-  //    // Generate the domain boundary boxes, loBox and hiBox, if there are
-  //    // domain boundarys there
-  //    loHiCenter(loBox,hasLo,hiBox,hasHi,centerBox,domain,
-  //               slopeBox,m_domain,a_dir);
-  //
-  //    // Set the boundary slopes if necessary
-  //    if ((hasLo != 0) || (hasHi != 0))
-  //    {
-  //      FORT_SLOPEBCSF(CHF_FRA(a_dW),
-  //                     CHF_CONST_FRA(a_W),
-  //                     CHF_CONST_REAL(m_dx),
-  //                     CHF_CONST_INT(a_dir),
-  //                     CHF_CONST_REAL(loVal),
-  //                     CHF_BOX(loBox),
-  //                     CHF_CONST_INT(hasLo),
-  //                     CHF_CONST_REAL(hiVal),
-  //                     CHF_BOX(hiBox),
-  //                     CHF_CONST_INT(hasHi));
-  //    }
-  //  }
+  // Iterate over sides
+  for (SideIterator sit = SideIterator(); sit.ok(); ++sit)
+  {
+    Box loBox(b);
+    loBox.shiftHalf(a_dir,sign(side));
+
+    if (!m_domain.contains(tmp))
+    {
+      tmp &= m_domain;
+
+      Box boundaryBox;
+
+      // Find the strip of cells next to the domain boundary
+      if (side == Side::Lo)
+      {
+        boundaryBox = bdryLo(tmp,a_dir);
+      }
+      else
+      {
+        boundaryBox = bdryHi(tmp,a_dir);
+      }
+
+      for (BoxIterator bit = BoxIterator(boundaryBox); bit.ok(); ++bit)
+      {
+        // Could potentially fill slope BCs here
+      }
+
+
+    }
+  }
+  */
+
 }
 
 // Set up initial conditions
