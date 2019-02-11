@@ -226,7 +226,7 @@ writeCheckpointLevel(HDF5Handle& a_handle) const
   header.m_real["dt"] = m_dt;
   header.m_real["time"] = m_time;
   header.m_box ["prob_domain"] = m_problem_domain.domainBox();
-  header.m_int ["tag_buffer_size"] = m_tagBufferSize;
+  header.m_int ["tag_buffer_size"] = m_opt.tagBufferSize;
 
   // Setup the periodicity info
   D_TERM(
@@ -356,11 +356,11 @@ readCheckpointLevel(HDF5Handle& a_handle)
   {
     MayDay::Error("AMRLevelMushyLayer::readCheckpointLevel: file does not contain tag_buffer_size");
   }
-  m_tagBufferSize= header.m_int["tag_buffer_size"];
+  m_opt.tagBufferSize= header.m_int["tag_buffer_size"];
 
   if (s_verbosity >= 2)
   {
-    pout() << "read tag_buffer_size = " << m_tagBufferSize << endl;
+    pout() << "read tag_buffer_size = " << m_opt.tagBufferSize << endl;
   }
 
   // Get dx
@@ -983,7 +983,7 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
   // Need a bottom solver
 //  RelaxSolver<LevelData<FArrayBox> > bottomSolver;
   BiCGStabSolver<LevelData<FArrayBox> > bottomSolver;
-  bottomSolver.m_verbosity = m_verbosity_multigrid;
+  bottomSolver.m_verbosity = m_opt.verbosity_multigrid;
 
   // And a multigrid solver
   AMRMultiGrid<LevelData<FArrayBox> > solver;
@@ -993,7 +993,7 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
   solver.define(lev0Dom, castFact,
                 &bottomSolver, nLevels);
 
-  solver.m_verbosity = m_verbosity_multigrid;
+  solver.m_verbosity = m_opt.verbosity_multigrid;
 
   // We were spending a lot of time doing this solve
   // Fix these to try and make the solve quicker

@@ -1371,7 +1371,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
   }
 
   // Only do this on level 0
-  if (m_level == 0 && s_do_postRegrid_smoothing)
+  if (m_level == 0 && m_opt.do_postRegrid_smoothing)
   {
     doPostRegridSmoothing();
   }
@@ -1380,7 +1380,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
   levelSetup();
   defineSolvers(m_time); // not entirely sure time this should be
 
-  if (m_level == 0 && m_doProjection)
+  if (m_level == 0 && m_opt.doProjection)
   {
     AMRLevelMushyLayer* thisLevelData = this;
 
@@ -1394,7 +1394,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       thisLevelData = thisLevelData->getFinerLevel();
     }
 
-    if (newLevelAdded && m_variable_eta_factor != 1.0)
+    if (newLevelAdded && m_opt.variable_eta_factor != 1.0)
     {
       // From stabilty analysis, believe this is the maximum stable eta allowed
 

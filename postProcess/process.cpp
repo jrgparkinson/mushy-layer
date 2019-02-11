@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
     for (int lev = finest_level; lev >=0 ; lev--)
     {
       // Make sure we're set up to compute diagnostics
-      amrlevels[lev]->m_computeDiagnostics = true;
+      amrlevels[lev]->m_opt.computeDiagnostics = true;
       amrlevels[lev]->computeDiagnostics();
     }
 

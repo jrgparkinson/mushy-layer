@@ -31,7 +31,7 @@ public:
   /// Constructor
   /**
    */
-  AMRLevelMushyLayerFactory(mushy_layer_options opt);
+  AMRLevelMushyLayerFactory(MushyLayerOptions opt);
 
 
   /// Destructor
@@ -45,7 +45,7 @@ public:
 
 protected:
 
-  mushy_layer_options m_options;
+  MushyLayerOptions m_options;
 
 private:
 

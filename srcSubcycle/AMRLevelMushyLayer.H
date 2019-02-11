@@ -91,10 +91,9 @@ public:
   AMRLevelMushyLayer()
 {
     m_isDefined = false;
-
     m_addSubtractGradP = true;
 
-    m_doEulerPart =true;
+//    m_opt.doEulerPart =true;
     m_domainWidth = -1.0;
     m_domainHeight = -1.0;
 
@@ -104,36 +103,36 @@ public:
     m_hasCoarser = false;
     m_iter_plot_interval = -1;
     m_max_dt_growth = 1.0;
-    m_MGtype = -1;
+//    m_MGtype = -1;
     m_numGhost = 0;
     m_numGhostAdvection = 0;
-    m_cfl = 0;
+//    m_cfl = 0;
     m_computedCFL = 0;
     m_timestepFailed = false;
     m_timestepReduced = false;
     m_useLimiting = false;
-    m_opt.useSubcycling = false;
-    m_timeIntegrationOrder = 1;
-    m_tagBufferSize = 1;
-    m_refineThresh = 1;
-    m_scaleP_MAC = true;
-    m_scaleP_CC = true;
+//    m_opt.useSubcycling = false;
+//    m_timeIntegrationOrder = 1;
+//    m_tagBufferSize = 1;
+//    m_refineThresh = 1;
+//    m_scaleP_MAC = true;
+//    m_scaleP_CC = true;
     m_physBCPtr = NULL; //new PhysBCUtil();
     m_isViscous = false;
 
     m_newLevel=false;
 
-    m_computeDiagnostics = true;
-    m_steadyStateNormType = -1;
-    m_doSyncOperations = true;
-    CFinterpOrder_advection = 1;
-    s_compute_initial_VD_corr = false;
+//    m_computeDiagnostics = true;
+//    m_steadyStateNormType = -1;
+//    m_doSyncOperations = true;
+//    CFinterpOrder_advection = 1;
+//    s_compute_initial_VD_corr = false;
 
-    m_doProjection = true;
+//    m_doProjection = true;
     m_enforceGradP = false;
     m_dtReduction = 0.0;
 
-    m_enforceAnalyticSoln = false;
+//    m_enforceAnalyticSoln = false;
     m_numOutputComps = 0;
     m_verbosity_multigrid = 0;
     m_ignoreSolverFails = true;
@@ -152,7 +151,7 @@ public:
     s_viscous_solver_tol = 1e-15;
     s_implicit_reflux = true;
     s_initialize_pressures = true;
-    s_regrid_init_pressure = true;
+//    s_regrid_init_pressure = true;
     //    s_reflux_scal = true;
     s_reflux_enthalpy = true;
     s_reflux_lambda = true;
@@ -166,77 +165,41 @@ public:
     m_pressureScaleVar = -1;
 
     m_doAutomaticRestart = false;
-    m_lowerPorosityLimit = 1e-15;
-    m_implicitAdvectionSolve = false;
-    m_solidPorosity = -1;
+//    m_lowerPorosityLimit = 1e-15;
+//    m_implicitAdvectionSolve = false;
+//    m_solidPorosity = -1;
 
-    m_advectionMethod = m_porosityInAdvection;
+//    m_advectionMethod = m_porosityInAdvection;
 
-    m_maxDivUFace=5e-14;
-    m_skipTrickySourceTerm=-1;
+//    m_maxDivUFace=5e-14;
+//    m_skipTrickySourceTerm=-1;
 
-    explicitDarcyTerm = false;
+//    explicitDarcyTerm = false;
     m_viscousBCs = true;
 
-    m_initialPerturbation = 0.0;
-    m_delayedPerturbation = 0.0;
-    m_perturbationTime = 0.0;
-    m_restartPerturbation = 0.0;
-    m_perturbationWavenumber = 1;
-    m_fixedPorosity = -1.0;
-    m_perturbationSin = false;
+//    m_initialPerturbation = 0.0;
+//    m_delayedPerturbation = 0.0;
+//    m_perturbationTime = 0.0;
+//    m_restartPerturbation = 0.0;
+//    m_perturbationWavenumber = 1;
+//    m_fixedPorosity = -1.0;
+//    m_perturbationSin = false;
 
-    m_porosityFunction = -1;
+//    m_porosityFunction = -1;
 
     m_maxLambda=0.0;
-    m_variable_eta_factor = 1.0;
+//    m_variable_eta_factor = 1.0;
 
 }
 
   /// Full constructor. Arguments are same as in define()
-  AMRLevelMushyLayer(mushy_layer_options a_opt)
-//      const Real&                 a_cfl,
-//      const Real&                 a_domainWidth,
-//      const Real&                 a_refineThresh,
-//      const int&                  a_tagBufferSize,
-//      const bool&                 a_useLimiting,
-//      const int a_CFInterpOrder,
-//      const int a_steadyStateNormType,
-//      const Real a_fixedDt,
-//      const Real a_max_dt_growth,
-//      const int  a_verbosity,
-//      const bool a_useSubcycling,
-//      const bool a_ignoreSolverFails,
-//      const Real a_initial_dt_multiplier,
-//      const Real a_adv_vel_centering_growth,
-//      const int a_restartMethod)
+  AMRLevelMushyLayer(MushyLayerOptions a_opt)
   {
     define(a_opt);
-//    define(a_cfl, a_domainWidth, a_refineThresh,
-//           a_tagBufferSize,  a_useLimiting,
-//           a_CFInterpOrder, a_steadyStateNormType, a_fixedDt,
-//           a_max_dt_growth, a_verbosity, a_useSubcycling,
-//           a_ignoreSolverFails, a_initial_dt_multiplier,  a_adv_vel_centering_growth, a_restartMethod);
   }
 
-
-
   /// Defines this AMRLevelMushyLayer
-  void define(mushy_layer_options a_opt);
-//      /// CFL number
-//      const Real&                 a_cfl,
-//      /// physical width of domain
-//      const Real&                 a_domainWidth,
-//      /// undivided gradient size over which a cell will be tagged for refinement
-//      const Real&                 a_refineThresh,
-//      /// number of buffer cells around each tagged cell that will also be tagged
-//      const int&                  a_tagBufferSize,
-//      /// whether to use van Leer limiting
-//      const bool&                 a_useLimiting,
-//      const int a_CFInterpOrder, const int a_steadyStateNormType, const Real a_fixedDt, const Real a_max_dt_growth,
-//      const int  a_verbosity, const bool a_useSubcycling,
-//      const bool a_ignoreSolverFails,  const Real a_initial_dt_multiplier,
-//      const Real a_adv_vel_centering_growth,  const int a_restartMethod);
+  void define(MushyLayerOptions a_opt);
 
   /// Destructor
   virtual ~AMRLevelMushyLayer();
@@ -451,7 +414,7 @@ public:
   Diagnostics m_diagnostics;
 
   /// Whether or not to compute diagnostics
-  bool m_computeDiagnostics;
+//  bool m_computeDiagnostics;
 
   /// Get the grids on this level
   DisjointBoxLayout grids();
@@ -1038,13 +1001,13 @@ protected:
   LevelData<FArrayBox> m_frameVel;
 
   /// Cap on porosity
-  Real m_lowerPorosityLimit;
+//  Real m_lowerPorosityLimit;
 
   /// Below this porosity we artifically enforce U=0
   /**
    * Default value is 0.05, based on the 'Law of fives' (Golden et al, Science, 1998)
    */
-  Real m_solidPorosity;
+//  Real m_solidPorosity;
 
   /// List of scalar vars to write out to HDF5 files
   Vector<int> m_outputScalarVars,
@@ -1145,16 +1108,16 @@ protected:
   };
 
   /// Different multigrid methods
-  enum MGmethod {
-    /// Normal linear multigrid
-    m_standard,
-
-    /// Full Approximation Scheme (for nonlinear problems)
-    m_FAS
-  };
+//   enum MGmethod {
+//     /// Normal linear multigrid
+//     m_standard,
+//
+//     /// Full Approximation Scheme (for nonlinear problems)
+//     m_FAS
+//   };
 
   /// Which type of multigrid to use
-  int m_MGtype;
+//  int m_MGtype;
 
   /// What to do when restarting after a failed timestep
   enum solverRestart {
@@ -1178,15 +1141,15 @@ protected:
   /**
    * Default value is 1.0, i.e. don't change eta
    */
-  Real m_variable_eta_factor;
+//  Real m_variable_eta_factor;
 
   /// either first or second order interpolation at CF boundaries for
   /// advection problems
-  int CFinterpOrder_advection;
+//  int CFinterpOrder_advection;
 
   /// normType: 0 = max, 1 = volume averaged
   /// switched to 1 because we weren't converging due to single grid cells
-  int m_steadyStateNormType;
+//  int m_steadyStateNormType;
 
   /// Scalar fields at new time
   Vector<RefCountedPtr<LevelData<FArrayBox> > > m_scalarNew;
@@ -1259,10 +1222,10 @@ protected:
    * and don't have to keep going into parmparse
    */
 
-  mushy_layer_options m_opt;
+  MushyLayerOptions m_opt;
 
   /// CFL number - to control timestep
-  Real                 m_cfl;
+//  Real                 m_cfl;
 
   /// The CFL number we're currently running at
   /**
@@ -1281,10 +1244,10 @@ protected:
   IntVect               m_numCells;
 
   /// Refinement threshold
-  Real                 m_refineThresh;
+//  Real                 m_refineThresh;
 
   /// Tag buffer size
-  int                  m_tagBufferSize;
+//  int                  m_tagBufferSize;
 
   /// Maxmimum fractional growth in \f$ \Delta t \f$ between timesteps
   Real 				 m_max_dt_growth;
@@ -1311,16 +1274,16 @@ protected:
   MushyLayerParams m_parameters;
 
   /// Whether or not to include the inertial terms \f$ \mathbf{u} \cdot \nabla \mathbf{u} \f$
-  bool m_doEulerPart;
+//  bool m_doEulerPart;
 
   /// Should we projection the velocity?
-  bool m_doProjection;
+//  bool m_doProjection;
 
   /// Max allowed \f$ \nabla \cdot \mathbf{U} \f$ on cell faces
-  Real m_maxDivUFace;
+//  Real m_maxDivUFace;
 
   /// Do synchronisation operations for velocity?
-  bool m_doSyncOperations;
+//  bool m_doSyncOperations;
 
   /// Should we enforce some analytic \f$ \nabla P \f$
   /**
@@ -1337,7 +1300,7 @@ protected:
 
 
   /// Enforce analytic solution as initial conditions?
-  bool m_enforceAnalyticSoln;
+//  bool m_enforceAnalyticSoln;
 
   /// Is problem viscous?
   bool m_isViscous;
@@ -1350,13 +1313,13 @@ protected:
 
 
   /// Treat darcy term in mom equation explicitly
-  bool explicitDarcyTerm;
+//  bool explicitDarcyTerm;
 
   /// Should we calculate pressure like \f$ \chi \nabla P \f$?
-  bool m_scaleP_MAC;
+//  bool m_scaleP_MAC;
 
   /// Whether to scale pressure during CC projection
-  bool m_scaleP_CC;
+//  bool m_scaleP_CC;
 
   /// Which field scales the pressure
   /**
@@ -1368,7 +1331,7 @@ protected:
   /**
    * Default option is to instead solve explicitly.
    */
-  bool m_implicitAdvectionSolve;
+//  bool m_implicitAdvectionSolve;
 
   /// How to handle velocity advection
   /**
@@ -1381,15 +1344,9 @@ protected:
    * m_noPorosity:
    *    solve du/dt + u.grad(u) = S
    */
-  int m_advectionMethod;
+//  int m_advectionMethod;
 
-  /// Options for handling advection velocities
-  enum velocityAdvectionTypes
-  {
-    m_porosityInAdvection,
-    m_porosityOutsideAdvection,
-    m_noPorosity
-  };
+
 
 
 
@@ -1398,7 +1355,7 @@ protected:
    * When restarting and changing parameters, it can be useful to skip some source terms
    * in the velocity calculation for some period of time to stop simulations blowing up
    */
-  Real m_skipTrickySourceTerm;
+//  Real m_skipTrickySourceTerm;
 
   /// Pointer to physics boundary condition object
   PhysBCUtil* m_physBCPtr;
@@ -1564,13 +1521,13 @@ protected:
   bool s_initialize_pressures;
 
   /// Initialize pressure after regridding?
-  bool s_regrid_init_pressure;
+//  bool s_regrid_init_pressure;
 
   /// Should we project the initial velocity?
   bool s_project_initial_vel;
 
   /// Should we calculate the initial volume discrepancy correction?
-  bool s_compute_initial_VD_corr;
+//  bool s_compute_initial_VD_corr;
 
   /// Grids on this level
   DisjointBoxLayout m_grids;
@@ -1624,7 +1581,7 @@ protected:
    * 1 = backward euler
    * 2 = TGA
    */
-  int m_timeIntegrationOrder;
+//  int m_timeIntegrationOrder;
 
   /// Plot interval for picard iterations
   /**
@@ -1633,28 +1590,28 @@ protected:
   int m_iter_plot_interval;
 
   /// Size of initial perturbation
-  Real m_initialPerturbation;
+//  Real m_initialPerturbation;
 
   /// Time to introduce additional perturbation (if relevant)
-  Real m_perturbationTime;
+//  Real m_perturbationTime;
 
   /// Size of additional perturbation
-  Real m_delayedPerturbation;
+//  Real m_delayedPerturbation;
 
   /// Size of perturbation to add on restart
-  Real m_restartPerturbation;
+//  Real m_restartPerturbation;
 
   /// Wavenumber of perturbation
-  Real m_perturbationWavenumber;
+//  Real m_perturbationWavenumber;
 
   /// Whether perturbation should be a sin function (true) or cosine func
-  bool m_perturbationSin;
+//  bool m_perturbationSin;
 
   /// Value determines the fixed porosity for various test problems
-  Real m_fixedPorosity;
+//  Real m_fixedPorosity;
 
   /// Porosity function to use for various test problems where we enforce the porosity
-  int m_porosityFunction;
+//  int m_porosityFunction;
 
 private:
 

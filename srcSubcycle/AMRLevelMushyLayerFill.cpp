@@ -363,7 +363,7 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
         //        Real scale = min(0.9,
         Real chi =  1-scale*pow(y/m_domainHeight, 2)*0.3*sin(M_PI*x/m_opt.domainWidth*2);
         chi = min(chi, 1.0);
-        chi = max(chi, m_lowerPorosityLimit);
+        chi = max(chi, m_opt.lowerPorosityLimit);
         a_porosity[dit](iv) = chi;
       }
 
@@ -752,7 +752,7 @@ void AMRLevelMushyLayer::fillPressureSrcTerm(LevelData<FArrayBox>& gradP,
 
   for (dit.reset(); dit.ok(); ++dit)
   {
-    if ((a_MACprojection && m_scaleP_MAC) || (!a_MACprojection && m_scaleP_CC))
+    if ((a_MACprojection && m_opt.scaleP_MAC) || (!a_MACprojection && m_opt.scaleP_CC))
     {
       for (int dir=0;dir<SpaceDim;dir++)
       {

@@ -319,7 +319,7 @@ Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& v
 
     }
 
-    int temp=0;
+//    int temp=0;
 
 
   }

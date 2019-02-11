@@ -183,7 +183,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
                             beta);
 
     RelaxSolver<LevelData<FArrayBox> > bottomSolver;
-    bottomSolver.m_verbosity = m_verbosity_multigrid;
+    bottomSolver.m_verbosity = m_opt.verbosity_multigrid;
 
     AMRMultiGrid<LevelData<FArrayBox> > viscousSolver;
     AMRLevelOpFactory<LevelData<FArrayBox> >& viscCastFact =
@@ -191,12 +191,12 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
     viscousSolver.define(baseDomain, viscCastFact,
                          &bottomSolver, numLevels);
 
-    viscousSolver.m_verbosity = m_verbosity_multigrid;
+    viscousSolver.m_verbosity = m_opt.verbosity_multigrid;
 
-    viscousSolver.m_eps = s_viscous_solver_tol;
+    viscousSolver.m_eps = m_opt.viscous_solver_tol;
 
-    viscousSolver.m_pre = s_viscous_num_smooth_down;
-    viscousSolver.m_post = s_viscous_num_smooth_up;
+    viscousSolver.m_pre = m_opt.viscous_num_smooth_down;
+    viscousSolver.m_post = m_opt.viscous_num_smooth_up;
 
     viscousSolver.m_convergenceMetric = velNorm;
 
@@ -438,7 +438,7 @@ if (s_verbosity >= 3)
     // first do refluxing and avgDown for conservation
     // do momentum refluxing first
     Real refluxScale = -1.0 / m_dx; // petermc made negative, 7 Dec 07
-    if (s_reflux_momentum)
+    if (m_opt.reflux_momentum)
     {
       if (s_implicit_reflux)
       {
@@ -479,7 +479,7 @@ if (s_verbosity >= 3)
     {
 
       // first, do refluxing for scalars
-      if (s_reflux_enthalpy || s_reflux_concentration || s_reflux_lambda)
+      if (m_opt.reflux_enthalpy || m_opt.reflux_concentration || m_opt.reflux_lambda)
       {
 
         doExplicitReflux(m_lambda);
@@ -509,7 +509,7 @@ if (s_verbosity >= 3)
 
 //          m_diagnostics.addDiagnostic(m_diagnostics.m_lambda_err, m_time, maxLambda);
 
-          if (m_variable_eta_factor != 1.0)
+          if (m_opt.variable_eta_factor != 1.0)
           {
             Real newEta = m_projection.etaLambda();
             Real minEta = 0.99;
@@ -519,11 +519,11 @@ if (s_verbosity >= 3)
 
             if (maxLambda > m_maxLambda)
             {
-              newEta = newEta*m_variable_eta_factor;
+              newEta = newEta*m_opt.variable_eta_factor;
             }
             else
             {
-              newEta = newEta/m_variable_eta_factor;
+              newEta = newEta/m_opt.variable_eta_factor;
             }
 
             m_maxLambda = maxLambda;
@@ -540,7 +540,7 @@ if (s_verbosity >= 3)
           }
         }
 
-        if (s_reflux_enthalpy || s_reflux_concentration)
+        if (m_opt.reflux_enthalpy || m_opt.reflux_concentration)
         {
           Real refluxRHS = 100.0;
           refluxRHS = doHCreflux();
@@ -621,7 +621,7 @@ if (s_verbosity >= 3)
 
       // before we do sync projection, do implicit refluxing,
       // if appropriate
-      if (s_reflux_momentum && s_implicit_reflux)
+      if (m_opt.reflux_momentum && s_implicit_reflux)
       {
         doMomentumReflux(compVel);
       } // end implicit reflux
@@ -686,7 +686,7 @@ if (s_verbosity >= 3)
 
       // call projection-based sync operations
       // composition projection and freestream correction computation
-      if (m_doSyncOperations)
+      if (m_opt.doSyncOperations)
       {
         m_projection.doSyncOperations(compVel, compLambda, compPorosityFace, compPorosity, m_time, m_dt);
       }
@@ -1094,7 +1094,7 @@ Real AMRLevelMushyLayer::doHCreflux()
   getHierarchyAndGrids(hierarchy, grids, refRat, lev0Dom, lev0Dx);
 
   RelaxSolver<LevelData<FArrayBox> > bottomSolver;
-  bottomSolver.m_verbosity = m_verbosity_multigrid;
+  bottomSolver.m_verbosity = m_opt.verbosity_multigrid;
 
   // 0 - linear correction
   // 1 - linear VC correction
@@ -1399,12 +1399,12 @@ Real AMRLevelMushyLayer::doHCreflux()
         //(*thisMLPtr->m_scalarNew[m_enthalpy])[levelDit()].plus(levelCorr[levelDit()], 0, 0, 1);
         //(*thisMLPtr->m_scalarNew[m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], 1, 0, 1);
 
-        if (s_reflux_enthalpy)
+        if (m_opt.reflux_enthalpy)
         {
         (*thisMLPtr->m_scalarNew[m_enthalpy])[levelDit()].plus(levelCorr[levelDit()],refluxCorrSign, 0, 0, 1);
         }
 
-        if (s_reflux_concentration)
+        if (m_opt.reflux_concentration)
         {
         (*thisMLPtr->m_scalarNew[m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], refluxCorrSign, 1, 0, 1);
         }

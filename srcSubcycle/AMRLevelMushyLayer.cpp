@@ -159,7 +159,7 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   Real Cnorm = convergedToSteadyState(m_bulkConcentration);
   Real Unorm =  convergedToSteadyState(m_fluidVel, true);
 
-  if (m_computeDiagnostics)
+  if (m_opt.computeDiagnostics)
   {
     m_diagnostics.addDiagnostic(Diagnostics::m_dTdt, m_time, Tnorm);
     m_diagnostics.addDiagnostic(Diagnostics::m_dSdt, m_time, Cnorm);
@@ -186,7 +186,7 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   // For some simulations, steady state can be defined by some other metric
 
   // Only test for this on level 0
-  if (m_computeDiagnostics && !getCoarserLevel())
+  if (m_opt.computeDiagnostics && !getCoarserLevel())
   {
     if ( (m_parameters.physicalProblem == MushyLayerParams::m_HRL
         || m_parameters.physicalProblem == MushyLayerParams::m_rayleighBenard))
@@ -529,7 +529,6 @@ Real AMRLevelMushyLayer::advance()
 
   if (m_dtReduction > 0)
   {
-    //		m_dt = m_dt * m_dtReduction;
     m_dtReduction = -1;
   }
 
@@ -575,12 +574,12 @@ Real AMRLevelMushyLayer::advance()
 
 
       // Check if we want to add a perturbation
-      if (m_time < m_perturbationTime && (m_time + m_dt) > m_perturbationTime)
+      if (m_time < m_opt.perturbationTime && (m_time + m_dt) > m_opt.perturbationTime)
       {
         //pout() << "Adding perturbation with wavenumber " << m_perturbationWavenumber << endl;
         Real phaseShift = 0;
         ppMain.query("perturbationPhaseShift", phaseShift);
-        addPerturbation(m_enthalpy, m_delayedPerturbation, m_perturbationWavenumber, phaseShift);
+        addPerturbation(m_enthalpy, m_opt.delayedPerturbation, m_opt.perturbationWavenumber, phaseShift);
       }
 
 
@@ -843,7 +842,7 @@ Real AMRLevelMushyLayer::advance()
     }
 
     bool doFRupdates = true;
-    bool compute_uDelU = !m_implicitAdvectionSolve && doAdvectiveSrc;
+    bool compute_uDelU = !m_opt.implicitAdvectionSolve && doAdvectiveSrc;
     bool doProjection = true;
     computeCCvelocity(advectionSourceTerm, m_time-m_dt, m_dt, doFRupdates, doProjection, compute_uDelU);
   }
@@ -913,7 +912,7 @@ void AMRLevelMushyLayer::setVelZero(LevelData<FArrayBox>& a_vel, Real a_limit, i
 {
   if (a_limit < 0)
   {
-    a_limit = m_solidPorosity;
+    a_limit = m_opt.solidPorosity;
   }
 
   for (DataIterator dit = a_vel.dataIterator(); dit.ok(); ++dit)
@@ -926,7 +925,7 @@ void AMRLevelMushyLayer::setVelZero(LevelData<FluxBox>& a_vel, Real a_limit)
 {
   if (a_limit < 0)
   {
-    a_limit = m_solidPorosity;
+    a_limit = m_opt.solidPorosity;
   }
 
   // Get the porosity
@@ -1820,7 +1819,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
   BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister>* baseLevBE = NULL;
 
-  if (m_timeIntegrationOrder == 2)
+  if (m_opt.timeIntegrationOrder == 2)
   {
     //       MayDay::Error("multiCompAdvectDiffuse - TGA not implemented yet");
     //exitStatus = TGAUpdateScalar(a_var, a_src, converged);
@@ -2020,7 +2019,7 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
   bool allowMulticompAdvection = false;
   ppMain.query("allowMulticompAdvection", allowMulticompAdvection);
 
-  if (s_reflux_enthalpy == s_reflux_concentration && allowMulticompAdvection)
+  if (m_opt.reflux_enthalpy == m_opt.reflux_concentration && allowMulticompAdvection)
   {
     computeScalarAdvectiveFluxMultiComp(edgeScalFluidAdv, m_advVel,
                                         m_patchGodTSl, TCl_old,
@@ -2061,7 +2060,7 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
 
     computeScalDiffusion(diffusiveSrcMultiComp, old_time);
 
-    if (s_reflux_enthalpy)
+    if (m_opt.reflux_enthalpy)
     {
       enthalpy_advVel = &advVel_reflux;
     }
@@ -2070,7 +2069,7 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
       enthalpy_advVel = &advVel_noReflux;
     }
 
-    if (s_reflux_concentration)
+    if (m_opt.reflux_concentration)
     {
       conc_advVel = &advVel_reflux;
     }
@@ -2424,7 +2423,7 @@ bool AMRLevelMushyLayer::finestLevel()
 
 void AMRLevelMushyLayer::computeDiagnostics()
 {
-  if (!m_computeDiagnostics)
+  if (!m_opt.computeDiagnostics)
   {
     return;
   }
@@ -3500,8 +3499,8 @@ Real AMRLevelMushyLayer::getMaxVelocityForCFL()
 
   // If we're doing advection with u/chi as the advection velocity,
   // then we need to use it for our cfl condition
-  bool considerUChi = (m_advectionMethod == m_porosityInAdvection ||
-      m_advectionMethod == m_porosityOutsideAdvection ||  m_advectionMethod == m_noPorosity);
+  bool considerUChi = (m_opt.advectionMethod == m_porosityInAdvection ||
+      m_opt.advectionMethod == m_porosityOutsideAdvection ||  m_opt.advectionMethod == m_noPorosity);
   ppMain.query("consider_u_chi_dt", considerUChi);
   Real maxUChi = 0.0;
 
@@ -4022,10 +4021,10 @@ void AMRLevelMushyLayer::smoothScalarField(LevelData<FArrayBox>& a_phi, int a_va
                          &bottomSolver, numLevels);
 
 
-  diffusionSolver.m_verbosity = m_verbosity_multigrid;
-  diffusionSolver.m_eps = s_viscous_solver_tol;
-  diffusionSolver.m_normThresh = s_viscous_solver_tol;
-  diffusionSolver.m_hang = s_viscous_solver_tol;
+  diffusionSolver.m_verbosity = m_opt.verbosity_multigrid;
+  diffusionSolver.m_eps = m_opt.viscous_solver_tol;
+  diffusionSolver.m_normThresh = m_opt.viscous_solver_tol;
+  diffusionSolver.m_hang = m_opt.viscous_solver_tol;
 
   // Just solve on this level
   Vector<LevelData<FArrayBox>*> correction(finest_level + 1,
@@ -4108,7 +4107,7 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
     for (BoxIterator bit(b); bit.ok(); ++bit)
     {
       IntVect iv = bit();
-      a_state(iv) = max(m_lowerPorosityLimit, a_state(iv));
+      a_state(iv) = max(m_opt.lowerPorosityLimit, a_state(iv));
       a_state(iv) = min(1.0, a_state(iv));
     }
 
@@ -4116,7 +4115,7 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
   else if (a_var == m_permeability)
   {
     //Real minPermeability = m_parameters.calculatePermeability(m_lowerPorosityLimit);
-    Real minPermeability = pow(m_lowerPorosityLimit,3);
+    Real minPermeability = pow(m_opt.lowerPorosityLimit,3);
     // Ensure porosity is greater than 0
     for (BoxIterator bit(b); bit.ok(); ++bit)
     {
@@ -4169,7 +4168,7 @@ void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
   else if (a_var == m_permeability)
   {
     //Real minPermeability = m_parameters.calculatePermeability(m_lowerPorosityLimit);
-    Real minPermeability = pow(m_lowerPorosityLimit,3);
+    Real minPermeability = pow(m_opt.lowerPorosityLimit,3);
 
     FORT_SETMINVAL( CHF_FRA(a_state),
                     CHF_BOX(region),
