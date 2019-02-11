@@ -279,9 +279,11 @@ def get_final_plot_file(directory):
     plt_files = []
     # print(files_dir)
     for f in files_dir:
-        # print(f)
-        # print(f[-5:])
-        if len(f) > 5 and not 'chk' in f and f[-5:] == '.hdf5':
+
+        # Match if it doesn't start with chk, and finished like 01234.2d.hdf5
+        pattern = '^(?!chk.*$).*\d+\.\dd\.hdf5'
+        if re.match(pattern, f):
+        #if len(f) > 5 and not 'chk' in f and f[-5:] == '.hdf5':
             plt_files.append(f)
 
     plt_files = sorted(plt_files)
@@ -295,11 +297,14 @@ def get_final_plot_file(directory):
 def get_final_chk_file(directory):
     files_dir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
     plt_files = []
-    # print(files_dir)
+
     for f in files_dir:
-        # print(f)
-        # print(f[-5:])
-        if len(f) > 5 and 'chk' in f and f[-5:] == '.hdf5':
+
+        # Match if file starts with chk and ends in [frame number].2d.hdf5
+        pattern = '^chk.*\d+\.\dd\.hdf5'
+
+        if re.match(pattern, f):
+        #if len(f) > 5 and 'chk' in f and f[-5:] == '.hdf5':
             plt_files.append(f)
 
     plt_files = sorted(plt_files)
