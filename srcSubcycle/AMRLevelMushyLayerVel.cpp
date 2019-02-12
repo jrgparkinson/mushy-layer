@@ -1429,9 +1429,10 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
                                     old_time,  old_crseTime, new_crseTime,
                                     a_dt, m_level, false, comp); // False - don't zero phi
 
-
+#ifdef CH_FORK
           exitStatus = UstarBE[comp]->exitStatus();
           resid = UstarBE[comp]->finalResidual();
+#endif
 
         }
         else
@@ -1441,9 +1442,10 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
                                      UoldCrseComp, UstarCrseComp,
                                      old_time, old_crseTime, new_crseTime,
                                      a_dt, m_level, false, comp);  // False - don't zero phi
-
+#ifdef CH_FORK
           exitStatus = UstarTGA[comp]->exitStatus();
           resid = UstarTGA[comp]->finalResidual();
+#endif
         }
 
         pout() << " Component " << comp << ": residual = " << resid;
