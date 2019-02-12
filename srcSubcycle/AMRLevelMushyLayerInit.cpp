@@ -1037,6 +1037,11 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
                mlParamsPtr, temperature_Sl_BC,
                relaxMode, porosityEdgeBC);
 
+  if (m_opt.nonlinearHCOpSuperOptimised)
+  {
+    HCop->setSuperOptimised(true);
+  }
+
   HCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(HCop);
 
   int maxAMRlevels = hierarchy.size();

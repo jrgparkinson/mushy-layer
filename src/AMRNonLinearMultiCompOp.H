@@ -36,17 +36,6 @@ public:
   /**
      \name AMRNonLinearMultiCompOp functions */
   /*@{*/
-
-  ///
-  /**
-   */
-  //  AMRNonLinearMultiCompOp():
-  //	  AMRPoissonOp(false), // true = is time-dep, false= time independent
-  //    m_lambdaNeedsResetting(true)
-  //
-  //    {
-  //
-  //    }
   AMRNonLinearMultiCompOp()
 {
     m_lambdaNeedsResetting = true;
@@ -316,6 +305,9 @@ public:
   /// true if we're running in FAS mode (much quicker for nonlinear problems)
   bool m_FAS;
 
+  /// Do some dodgy stuff here
+  bool m_superOptimised;
+
 
 
 protected:
@@ -441,6 +433,8 @@ public:
   /// Set the boundary conditions m_bc
   void setBC(BCHolder& a_bc);
 
+  void setSuperOptimised(bool a_val);
+
   /// Type of coefficient averaging
   int m_coefficient_average_type;
 
@@ -519,6 +513,12 @@ private:
   bool m_FAS;
 
   int m_numComp;
+
+  /// If turned on, we'll try and do some possibly dodgy stuff to speed up the code.
+  /**
+   * Turned off by default, use with care.
+   */
+  bool m_superOptimised;
 
 };
 

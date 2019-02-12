@@ -147,6 +147,9 @@ struct MushyLayerOptions {
   int steadyStateNormType;
   Real CFinterpOrder_advection;
 
+
+  bool nonlinearHCOpSuperOptimised;
+
   /// Whether or not to do subcycling
   bool useSubcycling;
   int verbosity;

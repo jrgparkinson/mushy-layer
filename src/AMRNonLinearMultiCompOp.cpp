@@ -886,7 +886,7 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
 
   const DisjointBoxLayout& dbl = a_phi.disjointBoxLayout();
 
-  // This define possible is possibly taking an awfully long time
+  // This define is possibly taking an awfully long time
   // However I don't think there's a quicker way.
   // It's certainly quicker than defining FABs all the time
   LevelData<FArrayBox> derivedVar;
@@ -895,18 +895,12 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
     derivedVar.define(dbl, nComp,phiGhostVect);
   }
 
-
   DataIterator dit = a_phi.dataIterator();
 
-  // Should never be homogeneous as non lineasr!
+  // Should never be homogeneous as non linear!
   bool homogeneous = false;
 
-
   Vector<int> compsList;
-//  compsList.push_back(0);
-//  compsList.push_back(1);
-//  compsList.push_back(1);
-//  compsList.push_back(0);
   compsList.push_back(-1); // do both comps in one fortran routine
 
   // do first red, then black passes
@@ -914,100 +908,100 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
   {
     int whichComponent = compsList[comps_i];
 
-  for (int whichPass = 0; whichPass <= 1; whichPass++)
-  {
-
-    CH_TIMERS("AMRNonLinearMultiCompOp::levelGSRB::Compute");
-
-    // fill in intersection of ghostcells and a_phi's boxes
+    for (int whichPass = 0; whichPass <= 1; whichPass++)
     {
-      CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::homogeneousCFInterp");
-      if (homogeneous)
+
+      CH_TIMERS("AMRNonLinearMultiCompOp::levelGSRB::Compute");
+
+      // fill in intersection of ghostcells and a_phi's boxes
+      // if we're not super optimised always fill ghost cells.
+      // if we are super optimised, only do this on first pass (this is dodgy but saves some time)
+      if (!m_superOptimised || whichPass == 0)
       {
-        homogeneousCFInterp(a_phi);
-      }
-    }
-
-    {
-      CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::exchange");
-      a_phi.exchange(a_phi.interval(), m_exchangeCopier);
-    }
-
-    // Recompute the relaxation coefficient
-    resetLambda();
-
-    {
-
-      for (dit.begin(); dit.ok(); ++dit)
-      {
-        const Box& region = dbl.get(dit());
-        const FluxBox& thisBCoef  = (*m_bCoef)[dit];
-        FArrayBox& thisPhi = a_phi[dit];
-        FArrayBox& thisDerivedVar = derivedVar[dit];
-        //        FArrayBox thisDerivedVar;
-        //        {
-        //          CH_TIME("AMRNonLinearMultiCompOp::levelGSRB:derivedVarDefine");
-        //          thisDerivedVar.define(thisPhi.box(), thisPhi.nComp());
-        //        }
-
-
         {
-          CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::BCs");
-          m_bc(thisPhi, region, m_domain, m_dx, homogeneous);
+          CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::homogeneousCFInterp");
+          if (homogeneous)
+          {
+            homogeneousCFInterp(a_phi);
+          }
         }
 
+        {
+          CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::exchange");
+          if (s_exchangeMode == 0)
+            a_phi.exchange( a_phi.interval(), m_exchangeCopier );
+          else if (s_exchangeMode == 1)
+            a_phi.exchangeNoOverlap(m_exchangeCopier);
+          else
+            MayDay::Abort("exchangeMode");
 
-          // Based on testing, we only need to calculate this during the
-          // first of the two red-black sweeps, which saves a fair bit of time.
-          // I.e, I tried doing it both times vs only once and got the same answer in both cases
-          // not sure that still holds for multiple components
-//          if (whichPass == 0)
+        }
+      }
+
+      // Recompute the relaxation coefficient
+      resetLambda();
+
+      {
+        for (dit.begin(); dit.ok(); ++dit)
+        {
+          const Box& region = dbl.get(dit());
+          const FluxBox& thisBCoef  = (*m_bCoef)[dit];
+          FArrayBox& thisPhi = a_phi[dit];
+          FArrayBox& thisDerivedVar = derivedVar[dit];
+
+
+          {
+            CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::BCs");
+            m_bc(thisPhi, region, m_domain, m_dx, homogeneous);
+          }
+
+          // Need to do this every pass or convergence is very slow
+//          if (!m_superOptimised || whichPass == 0)
 //          {
-            // Is this quicker than the level data version? Trying to avoid extra grid loops
             computeDiffusedVar(thisDerivedVar, thisPhi, dit(), homogeneous);
 //          }
 
-
 #if CH_SPACEDIM == 1
-        FORT_NONLINEARSMOOTHING1D
+          FORT_NONLINEARSMOOTHING1D
 #elif CH_SPACEDIM == 2
-        FORT_NONLINEARSMOOTHING2D
+          FORT_NONLINEARSMOOTHING2D
 #elif CH_SPACEDIM == 3
-        FORT_NONLINEARSMOOTHING3D
+          FORT_NONLINEARSMOOTHING3D
 #else
-        //				This_will_not_compile!
+          //				This_will_not_compile!
 #endif
-        (CHF_FRA(thisPhi),
-         CHF_FRA(thisDerivedVar),
-         CHF_CONST_FRA(a_rhs[dit]),
-         CHF_BOX(region),
-         CHF_CONST_REAL(m_dx),
-         CHF_CONST_REAL(m_alpha),
-         CHF_CONST_FRA((*m_aCoef)[dit]),
-         CHF_CONST_REAL(m_beta),
+          (CHF_FRA(thisPhi),
+           CHF_FRA(thisDerivedVar),
+           CHF_CONST_FRA(a_rhs[dit]),
+           CHF_BOX(region),
+           CHF_CONST_REAL(m_dx),
+           CHF_CONST_REAL(m_alpha),
+           CHF_CONST_FRA((*m_aCoef)[dit]),
+           CHF_CONST_REAL(m_beta),
 #if CH_SPACEDIM >= 1
-         CHF_CONST_FRA(thisBCoef[0]),
+           CHF_CONST_FRA(thisBCoef[0]),
 #endif
 #if CH_SPACEDIM >= 2
-         CHF_CONST_FRA(thisBCoef[1]),
+           CHF_CONST_FRA(thisBCoef[1]),
 #endif
 #if CH_SPACEDIM >= 3
-         CHF_CONST_FRA(thisBCoef[2]),
+           CHF_CONST_FRA(thisBCoef[2]),
 #endif
 #if CH_SPACEDIM >= 4
-         This_will_not_compile!
+           This_will_not_compile!
 #endif
-         CHF_CONST_FRA(m_lambda[dit]),
-         CHF_CONST_INT(whichPass),
-         CHF_CONST_INT(whichComponent));
+           CHF_CONST_FRA(m_lambda[dit]),
+           CHF_CONST_INT(whichPass),
+           CHF_CONST_INT(whichComponent));
 
 
-      } // end loop through grids
+        } // end loop through grids
 
-    }
-  } // end loop through red-black
+      }
+    } // end loop through red-black
 
-  }
+  } // end loop over components
+
 }
 
 void AMRNonLinearMultiCompOp::levelMultiColor(LevelData<FArrayBox>&       a_phi,
@@ -1268,21 +1262,7 @@ AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory()
   setDefaultValues();
 }
 
-//-----------------------------------------------------------------------
-//  AMR Factory define function
-//void AMRNonLinearMultiCompOpFactory::define(const ProblemDomain&                           a_coarseDomain,
-//		const Vector<DisjointBoxLayout>&               a_grids,
-//		const Vector<int>&                             a_refRatios,
-//		const Real&                                    a_coarsedx,
-//		BCHolder                                       a_bc,
-//		const Real&                                    a_alpha,
-//		Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_aCoef,
-//		const Real&                                    a_beta,
-//		Vector<RefCountedPtr<LevelData<FluxBox> > >&   a_bCoef)
-//{
-//	define(a_coarseDomain, a_grids, a_refRatios, a_coarsedx, a_bc,
-//			a_alpha, a_aCoef, a_beta, a_bCoef);
-//}
+
 void AMRNonLinearMultiCompOpFactory::define(const ProblemDomain& a_coarseDomain,
                                             const Vector<DisjointBoxLayout>&               a_grids,
                                             const Vector<int>&                             a_refRatios,
@@ -1359,6 +1339,13 @@ void AMRNonLinearMultiCompOpFactory::define(const ProblemDomain& a_coarseDomain,
 
   m_numComp = m_bCoef[0]->nComp();
 
+  m_superOptimised = false;
+
+}
+
+void AMRNonLinearMultiCompOpFactory::setSuperOptimised(bool a_val)
+{
+  m_superOptimised = a_val;
 }
 
 void AMRNonLinearMultiCompOpFactory::setBC(BCHolder& a_bc)
@@ -1475,6 +1462,8 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
   newOp->m_params = m_params;
 
   newOp->m_diffusedVarBC = m_diffusedVarBC;
+
+  newOp->m_superOptimised = m_superOptimised;
 
   newOp->s_relaxMode = m_relaxMode; // 4 is for jacobi, 1 is for GSRB
 
@@ -1673,6 +1662,8 @@ AMRLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::AMRnewOp(cons
   //  (newOp->m_computeEnthalpyVars).define(m_computeEnthalpyVars.m_derivedVar, a_indexSpace, m_dx[ref], m_computeEnthalpyVars.m_derivedVarBC);
   //  newOp->m_porosityEdgeBC = m_porosityEdgeBC;
 
+  newOp->m_superOptimised = m_superOptimised;
+
   newOp->m_FAS = m_FAS;
 
   newOp->computeLambda();
@@ -1714,6 +1705,8 @@ void AMRNonLinearMultiCompOpFactory::setDefaultValues()
   m_beta = -1.0;
 
   m_coefficient_average_type = CoarseAverage::arithmetic;
+
+  m_superOptimised = false;
 }
 //-----------------------------------------------------------------------
 

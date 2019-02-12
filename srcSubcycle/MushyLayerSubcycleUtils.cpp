@@ -229,6 +229,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.multiCompUStarSolve = false;
   ppMain.query("multiCompUStarSolve", opt.multiCompUStarSolve);
 
+  opt.nonlinearHCOpSuperOptimised = false;
+  ppMain.query("nonlinearHCOpSuperOptimised", opt.nonlinearHCOpSuperOptimised);
+
   /***
    * Initialisation
    */
