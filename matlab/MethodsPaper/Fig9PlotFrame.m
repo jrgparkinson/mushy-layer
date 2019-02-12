@@ -30,6 +30,14 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
     
      mlSmooth =  MushyLayerOutput(2, thisFrame, output_dir, actual_plot_prefix, true, 'bicubic');
 
+     % Get matlab version
+        [v, d] = version;
+        year = str2num(d(end-4:end));
+        if year > 2016
+            recentMatlab = true;
+        else
+            recentMatlab = false;
+        end
 
     % Get data to plot
     [X,Y] = ml.grid();
@@ -315,12 +323,20 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
         if isfield(options, 'cbarPos')
             
         else
-            cbar.Label.Position(1) = cbar.Label.Position(1) + 0.0;            
             cbar.Position(1) = cbar.Position(1)+0.05;
             
             cbar.Position(2) = cbar.Position(2)-0.1;
-            cbar.Position(4) = cbar.Position(4)*2.0;
-            cbar.Position(3) = cbar.Position(3)*0.8;
+            cbar.Position(4) = cbar.Position(4)*1.6;
+            cbar.Position(3) = cbar.Position(3)*0.6;
+            
+            if recentMatlab
+                
+            cbar.Label.Position(1) = cbar.Label.Position(1) + 0.0;            
+            
+            
+            else
+                cbar.Label.Position(1) = cbar.Label.Position(1) + 1.0;            
+            end
             
         end
         

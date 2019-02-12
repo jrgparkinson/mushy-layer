@@ -4,7 +4,7 @@ function Fig7PorousHole(dataFolder, figureDirectory)
 if nargin < 1
    % dataFolder = getDataDir('AMRConvergenceTest/MushyConvectionLiquid2-t0.5/');
    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
-   dataFolder = fullfile(base_dir, '/PorousMushyHole-t0.00015/');
+   dataFolder = fullfile(base_dir, '/PorousMushyHole-t0.00015-hole0.04/');
 end
 
 if nargin < 2
@@ -61,7 +61,7 @@ text(0.04, 0.5, {'Eqn''s 3-6.', 'All boundaries are periodic.'}, 'FontSize', dom
 periodicStr = {'Periodic'};
 
 xl = xlabel('$x$');
-yl = ylabel('$y$');
+yl = ylabel('$z$');
 
 text(-0.2, 1.2, '(a)', 'FontSize', textFontSize);
 
@@ -96,8 +96,11 @@ set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(
 
 if saveFigure
     fprintf('Saved to %s \n', figureName);
-    print(h,[figureName, '.eps'],'-depsc','-r50')
-    print(h,[figureName, '.png'],'-dpng','-r1000')
+   % set(gcf,'renderer','Painters');
+   % This exports better as a pdf
+    %print(h,[figureName, '.eps'],'-depsc','-r50')
+    print(h,[figureName, '.pdf'],'-dpdf','-r50')
+    %  print(h,[figureName, '.png'],'-dpng','-r1000')
 end
 
 end
@@ -181,6 +184,14 @@ name = strtrim(name);
 if strcmp(name, 'atmlxlap005')
 onLaptop = true;
 end
+% Get matlab version
+[v, d] = version;
+year = str2num(d(end-4:end));
+if year > 2016
+    recentMatlab = true;
+else
+    recentMatlab = false;
+end
 
 %T = AMRsol.dataForComp(AMRsol.components.Temperature).';
 
@@ -246,10 +257,10 @@ daspect([1 1 1]);
 
 %daspect([1 1 1]);
 
-if onLaptop
-    SlLabOffset = +1.0; 
-else
+if recentMatlab
     SlLabOffset = -1.2;
+else
+    SlLabOffset = +1.0; 
 end
 
 colormap(axSl, flipud(bluewhitered(257)));
@@ -268,7 +279,7 @@ box on;
 %set(axTemperature, 'Layer', 'top');
 
 xl = xlabel('$x$');
-yl = ylabel('$y$');
+yl = ylabel('$z$');
 
 
 
@@ -294,7 +305,7 @@ cmap = flipud(viridis);
 
 v = linspace(0.7, 1.0, 6);
 [Cchi, hChi] = contour(XUniform, YUniform, porosityUniform, v);
-hChi.LineWidth = 2.0;
+hChi.LineWidth = 1.0;
 
 daspect([1 1 1]);
 
@@ -305,7 +316,7 @@ box on;
 cPorosity = colorbar(axPorosity,'Location', 'southoutside');
 
 %xl = xlabel('$x$');
-%yl = ylabel('$y$');
+%yl = ylabel('$z$');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

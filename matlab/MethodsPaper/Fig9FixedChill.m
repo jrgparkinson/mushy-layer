@@ -1,6 +1,8 @@
 % This scripts makes use of the Streamfunction Color function:
 % https://uk.mathworks.com/matlabcentral/fileexchange/69268-streamfunction-color
 
+
+
 function Fig9FixedChill(output_dir, frames, figure_output_dir)
 
 if nargin < 1
@@ -11,14 +13,14 @@ if nargin < 1
     % Local
     baseDir = '/home/parkinsonjl/mnt/sharedStorage/'; 
     
-    output_dir = [baseDir, 'TestDiffusiveTimescale/FixedChill-t5.0e-02-Ra1e+06-Da4.8e-04-C2.00-Rel1.0e-04-0/'];
+    output_dir = [baseDir, 'TestDiffusiveTimescale/FixedChill-t1.0e-01-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0/'];
     
 end
 
 if nargin < 2
     frames = [-1]; % just process the last frame by default
     frames = [3000, 4800, 17000]; % Testing
-    frames = [2288, 3874, 4576]; % Testing
+    frames = [3000, 4000, 7000]; % Testing
     %frames = [2286, 3872, 4574]; % Testing
 end
 
