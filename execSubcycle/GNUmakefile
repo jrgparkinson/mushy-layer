@@ -32,7 +32,7 @@ INPUT = inputs
 # shared code for building example programs
 include $(CHOMBO_HOME)/mk/Make.example
 
-CUSTOM_CHOMBO_LIB=true
+# CUSTOM_CHOMBO_LIB=true
 
 # application-specific variables
 
