@@ -148,7 +148,7 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
                 p2['projection.eta'] = '0.95'
 
                 p2['main.gridfile'] = gridFile
-                p2['run_name'] = 'VariableMesh2SubcycleRefluxFreestream' + str(p2['projection.eta']) 
+                p2['run_name'] = 'VM-Subcycle-Reflux-Freestream' + str(p2['projection.eta']) + '-MaxLevel' + str(max_level)
                 p2['concise_run_name'] = 'VM'
             
                 param_sets.append(p2)
@@ -161,7 +161,7 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
                 p3['projection.eta'] = '0.95'
 
                 p3['main.gridfile'] = gridFileThreeLevels
-                p3['run_name'] = 'VM3LevelsSubcycleRefluxFreestream' + str(p3['projection.eta']) 
+                p3['run_name'] = 'VM-Subcycle-Reflux-Freestream' + str(p3['projection.eta']) + '-MaxLevel' + str(max_level)
                 p3['concise_run_name'] = 'VM'
                 
                 param_sets.append(p3)
