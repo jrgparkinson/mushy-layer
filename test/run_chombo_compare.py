@@ -230,28 +230,30 @@ def load_error(folder):
 
 def run_chombo_compare(argv):
 
+    figure_number = 8
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.03'
-    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.0001-hole0.04'
-
+    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015-hole0.04-veryGoodUseThis'
+    field = 'Porosity'
+    err_type = 'L2'
 
     run_analysis = False
     include_richardson = True # for problems with no analytic solution
 
-    # Need to decide what we're interested in
-    field = 'Porosity'
-    err_type = 'L2'
 
-    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc'
+
+
+    # figure_number = 6
+    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc'
     # run_analysis = True
-    field = 'xDarcy velocity'
-    err_type = 'L2'
+    # field = 'xDarcy velocity'
+    # err_type = 'L2'
 
-    figure_number = 0
-
-    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.17/chi0.4-Da1.0e-06-Ra1.0e+09'
-    run_analysis = False
-    field = 'Temperature'
+    # figure_number = 0
+    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.17/chi0.4-Da1.0e-06-Ra1.0e+09'
+    # run_analysis = False
+    # field = 'Temperature'
+    # err_type = 'L2'
 
     # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/NoFlow/'
     # run_analysis = True
@@ -321,6 +323,11 @@ def run_chombo_compare(argv):
 
         coarse_nx, ref_rat, max_lev = get_folder_details(folder)
 
+        # If we couldn't understand the folder name, skip it
+        if np.isnan(coarse_nx):
+            continue
+
+
         richardson_err = load_error(this_richardson_err_folder)
 
         if max_lev == 0:
@@ -371,13 +378,14 @@ def run_chombo_compare(argv):
         time_file = os.path.join(data_folder, folder, 'time.table.0')
         time = float('NaN')
         ncells = float('NaN')
-        with open(time_file, 'r') as f:
-            for line in f.readlines():
-                matches = re.findall('.*\[0\]main\s+(\d+\.\d+)\s+.*', line)
+        if os.path.exists(time_file):
+            with open(time_file, 'r') as f:
+                for line in f.readlines():
+                    matches = re.findall('.*\[0\]main\s+(\d+\.\d+)\s+.*', line)
 
-                if matches:
-                    time = float(matches[0])
-                    break
+                    if matches:
+                        time = float(matches[0])
+                        break
 
         # [0]main 49.91810 1
 
@@ -433,6 +441,9 @@ def run_chombo_compare(argv):
 
         ds = err_data_sets[ds_name]
 
+        # Sort by nx
+        ds = sorted(ds, key=lambda x:x[0])
+
         print(ds)
 
         nx = [x[0] for x in ds]
@@ -482,12 +493,13 @@ def run_chombo_compare(argv):
     #axes[0].set_ylim([yl[0], yl[1] * 10])
 
     # Should sort out legend ordering
+    # could add a title like title="(a) $\leftarrow$", if wanted
     leg_font_size = 8
     axes[0].legend(loc='center left', bbox_to_anchor=(1,0.75), prop={'size': leg_font_size})
 
     xl = axes[0].get_xlim()
     yl = axes[0].get_ylim()
-    axes[0].text(xl[0]*0.9, yl[1]*1.2, '(a)')
+    axes[0].text(xl[0]*0.9, yl[1]*1.3, '(a)')
 
 
     if finest_timing:
@@ -495,8 +507,12 @@ def run_chombo_compare(argv):
         timings_plot = [x[3] for x in finest_timing]
         ncells_plot = np.array([float(x[4]) for x in finest_timing])
 
-        timings_plot = timings_plot/np.amax(timings_plot)
-        ncells_plot = ncells_plot / float(np.amax(ncells_plot))
+        largest_time = np.amax(timings_plot)
+        largest_ncells = float(np.amax(ncells_plot))
+        print('AMR performance normalisation. Max time = %.1f, Max num cells = %.2e' % (largest_time, largest_ncells))
+
+        timings_plot = timings_plot/ largest_time
+        ncells_plot = ncells_plot / largest_ncells
 
         # Make these black so they stand out from the other plot
         axes[1].plot(ref_rats_plot, timings_plot, marker='s', color='k', linestyle='-', label='Normalized CPU time')
@@ -505,8 +521,6 @@ def run_chombo_compare(argv):
         axes[1].set_xlabel('Refinement ratio')
         # axes[1].set_ylabel('') # no y label
 
-
-
         axes[1].legend(loc='center right', bbox_to_anchor=(-0.2,0.25),  prop={'size': leg_font_size})
 
         axes[1].set_xlim([0, 4])
@@ -514,11 +528,11 @@ def run_chombo_compare(argv):
 
         xl = axes[1].get_xlim()
         yl = axes[1].get_ylim()
-        axes[1].text(-0.05, 1.02, '(b)')
+        axes[1].text(-0.05, 1.03, '(b)')
 
     # set axis positions
-    axes[0].set_position([0.1, 0.14, 0.3, 0.78])
-    axes[1].set_position([0.77, 0.14, 0.2, 0.78])
+    axes[0].set_position([0.1, 0.14, 0.3, 0.77])
+    axes[1].set_position([0.77, 0.14, 0.2, 0.77])
 
     axes[0].tick_params(direction='in', which='both')
     axes[1].tick_params(direction='in', which='both')
@@ -528,7 +542,9 @@ def run_chombo_compare(argv):
 
     figure_output_directory = data_folder
     filename = 'Fig%dError-%s-%s.eps' % (figure_number, field, err_type)
+    filename = filename.replace(' ', '_') # remove spaces
     figure_full_path = os.path.join(figure_output_directory, filename)
+    print('Saving as %s' % figure_full_path)
     plt.savefig(figure_full_path, format='eps')
 
     plt.show()
