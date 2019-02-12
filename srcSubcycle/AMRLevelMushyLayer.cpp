@@ -4464,6 +4464,11 @@ bool AMRLevelMushyLayer::currentCFLIsSafe(bool printWarning)
   return true;
 }
 
+void AMRLevelMushyLayer::set_compute_diagnostics(bool compute_diags)
+{
+  m_opt.computeDiagnostics = true;
+}
+
 
 /*******/
 

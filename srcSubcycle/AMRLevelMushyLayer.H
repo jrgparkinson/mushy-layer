@@ -456,6 +456,8 @@ public:
   /// Compute lambda/porosity
   void computeLambdaPorosity();
 
+  void set_compute_diagnostics(bool compute_diags);
+
 protected:
 
   /// Has a particular variable converged to steady state?
