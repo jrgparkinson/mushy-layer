@@ -30,7 +30,7 @@ To fetch and merge any changes to the library, use `git pull`.
 
 
 # Installation
-To compile the code, you must first have a working Chombo installation. Define the path to your chombo library folder in the GNUMakefile (`/execSubcyle/GNUMakefile/`) then you should be able to compile by
+To compile the code, you must first have a working Chombo installation (see the ChomboInstallationGuide.md file in the docs folder). Define the path to your chombo library folder in the GNUMakefile (`/execSubcyle/GNUMakefile/`) then you should be able to compile by
 
 ```console
 $ cd /execSubcycle/
