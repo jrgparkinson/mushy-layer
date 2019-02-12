@@ -173,6 +173,8 @@ struct MushyLayerOptions {
   bool explicitDarcyTerm;
   bool implicitAdvectionSolve;
 
+  bool multiCompUStarSolve;
+
   Real solidPorosity;
 
   bool do_postRegrid_smoothing;

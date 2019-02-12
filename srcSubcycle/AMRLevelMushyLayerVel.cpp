@@ -1009,7 +1009,7 @@ void AMRLevelMushyLayer::computeLapVel(LevelData<FArrayBox>& a_lapVel,
   for (int dir = 0; dir < SpaceDim; dir++)
   {
 
-    // todo: Should be possible to replace this with the Darcy Brinkman Op, to save having the viscous op lying around
+    // todo - Nonurgent: should be possible to replace this with the Darcy Brinkman Op, to save having the viscous op lying around
     m_viscousOp[dir]->applyOpI(a_lapVel, a_vel_copy, false);
 
     a_lapVel.exchange(a_lapVel.interval());
@@ -1273,172 +1273,201 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
   }  // end if inviscid
   else
   {
-    Vector<RefCountedPtr<LevelBackwardEuler> > UstarBE;
-    Vector<RefCountedPtr<LevelTGA> > UstarTGA;
-    defineUstarSolver(UstarBE, UstarTGA);
 
-    // Do the solve for each component separately (as the solver is hardwired for one component only)
-    LevelData<FArrayBox> UstarCrse, UoldCrse, *UstarCrseComp, *UoldCrseComp, Uold;
-    LevelData<FluxBox> diffusiveFlux(m_grids, SpaceDim);
-    LevelFluxRegister *fineFluxRegPtr=NULL, *crseFluxRegPtr=NULL;
 
-    if (m_vectorFluxRegisters[VectorVars::m_fluidVel])
+
+    /*
+     * multi component solve not implemented yet. Currently we solve in each direction separately,
+     * but it might be faster if the solver could do both simultaneously, to avoid lots of extra multigrid
+     * coarsening and refinement. One to look at in the future.
+     * TODO - Future: implement multi-directional U^* solver
+     */
+    if (m_opt.multiCompUStarSolve)
     {
-      fineFluxRegPtr = &(*m_vectorFluxRegisters[VectorVars::m_fluidVel]);
+      MayDay::Error("multiCompUStarSolve not implemented yet.");
+      // Start by defining everything in a multi-comp way
+//      LevelBackwardEuler UstarBE;
+//      LevelTGA UstarTGA;
+//
+//      Vector<AMRLevelMushyLayer*> hierarchy;
+//        Vector<DisjointBoxLayout> allGrids;
+//        Vector<int> refRat;
+//        ProblemDomain lev0Dom;
+//        Real lev0Dx;
+//        getHierarchyAndGrids(hierarchy, allGrids, refRat, lev0Dom, lev0Dx);
+//
+//        // Make these thingsmulticomp
+//        defineUstarMultigrid();
+//        UstarBE.define(allGrids, refRat, lev0Dom, s_uStarOpFactMultiComp, s_uStarAMRMGMultiComp);
+//        UstarTGA.define(allGrids, refRat, lev0Dom, s_uStarOpFactMultiComp, s_uStarAMRMGMultiComp);
+
     }
-
-    Uold.define(m_grids, SpaceDim, m_numGhost*IntVect::Unit);
-    fillVectorField(Uold, old_time, m_fluidVel, true);
-
-    UstarCrseComp = NULL;
-    UoldCrseComp = NULL;
-
-    if (m_level > 0)
+    else
     {
-      AMRLevelMushyLayer* amrMLcrse = getCoarserLevel();
-      UstarCrse.define(amrMLcrse->m_grids, SpaceDim,
-                       m_numGhost * IntVect::Unit);
-      UstarCrseComp = new LevelData<FArrayBox>(amrMLcrse->m_grids, 1,
-                                               m_numGhost * IntVect::Unit);
 
-      UoldCrse.define(amrMLcrse->m_grids, SpaceDim,
-                      m_numGhost * IntVect::Unit);
-      UoldCrseComp = new LevelData<FArrayBox>(amrMLcrse->m_grids, 1,
-                                              m_numGhost * IntVect::Unit);
+      Vector<RefCountedPtr<LevelBackwardEuler> > UstarBE;
+          Vector<RefCountedPtr<LevelTGA> > UstarTGA;
+          defineUstarSolver(UstarBE, UstarTGA);
 
-      // NB these used to be m_fluidVel
-      //      amrMLcrse->fillVectorField(UstarCrse, new_crseTime, m_Ustar, true);
-      //      amrMLcrse->fillVectorField(UoldCrse, old_crseTime, m_Ustar, true);
+      // Do the solve for each component separately (as the solver is hardwired for one component only)
+      LevelData<FArrayBox> UstarCrse, UoldCrse, *UstarCrseComp, *UoldCrseComp, Uold;
+      LevelData<FluxBox> diffusiveFlux(m_grids, SpaceDim);
+      LevelFluxRegister *fineFluxRegPtr=NULL, *crseFluxRegPtr=NULL;
 
-      // Coarse boundary conditions should be either
-      //    a) the fully projected velocity on the coarse level in we're including grad(p) in the source
-      // or b) U^*, if we're not including grad(p)
-
-      int uvar = m_fluidVel;
-
-      if (!m_addSubtractGradP)
+      if (m_vectorFluxRegisters[VectorVars::m_fluidVel])
       {
-        uvar = m_Ustar;
+        fineFluxRegPtr = &(*m_vectorFluxRegisters[VectorVars::m_fluidVel]);
       }
 
-      if (a_MACprojection)
-      {
-        uvar = m_advectionVel;
-      }
-      amrMLcrse->fillVectorField(UstarCrse, new_crseTime, uvar, true);
-      amrMLcrse->fillVectorField(UoldCrse, old_crseTime, uvar, true);
+      Uold.define(m_grids, SpaceDim, m_numGhost*IntVect::Unit);
+      fillVectorField(Uold, old_time, m_fluidVel, true);
 
-      crseFluxRegPtr = &(*(amrMLcrse->m_vectorFluxRegisters[VectorVars::m_fluidVel]));
-    }
-
-
-    // Set U^* to zero if it apears to be uninitialised
-    Real maxUstar = 0;
-    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
-    {
-      for (int dir=0; dir<SpaceDim; dir++)
-      {
-        maxUstar = max(maxUstar, abs((*m_vectorNew[ustarVar])[dit].max(dir)));
-      }
-    }
-
-    if (maxUstar > 1e100)
-    {
-      setValLevel(*m_vectorNew[ustarVar], 0.0);
-    }
-
-
-    // Solve each component (x, y, z) separately.
-    //todo - surely can solve both components at the same time? Wouldn't this be quicker with multigrid?
-    pout() << "  U* solve ";
-
-    for (int comp = 0; comp < SpaceDim; comp++)
-    {
-      Interval intvl(comp, comp);
-
-      LevelData<FArrayBox> UstarComp;
-      aliasLevelData(UstarComp, &(*m_vectorNew[ustarVar]), intvl);
-
-      LevelData<FArrayBox> UoldComp;
-      aliasLevelData(UoldComp, &Uold, intvl);
-
-      LevelData<FArrayBox> compSrc;
-      aliasLevelData(compSrc, &src, intvl);
-
-
-      Vector<LevelData<FArrayBox>*> UstarVectComp;
-      Vector<LevelData<FArrayBox>*> rhsVectComp;
+      UstarCrseComp = NULL;
+      UoldCrseComp = NULL;
 
       if (m_level > 0)
       {
-        UstarCrse.copyTo(intvl, *UstarCrseComp, Interval(0, 0));
-        UoldCrse.copyTo(intvl, *UoldCrseComp, Interval(0, 0));
+        AMRLevelMushyLayer* amrMLcrse = getCoarserLevel();
+        UstarCrse.define(amrMLcrse->m_grids, SpaceDim,
+                         m_numGhost * IntVect::Unit);
+        UstarCrseComp = new LevelData<FArrayBox>(amrMLcrse->m_grids, 1,
+                                                 m_numGhost * IntVect::Unit);
 
-        UstarVectComp.push_back(UstarCrseComp);
-        rhsVectComp.push_back(NULL); //this isn't used
+        UoldCrse.define(amrMLcrse->m_grids, SpaceDim,
+                        m_numGhost * IntVect::Unit);
+        UoldCrseComp = new LevelData<FArrayBox>(amrMLcrse->m_grids, 1,
+                                                m_numGhost * IntVect::Unit);
+
+        // NB these used to be m_fluidVel
+        //      amrMLcrse->fillVectorField(UstarCrse, new_crseTime, m_Ustar, true);
+        //      amrMLcrse->fillVectorField(UoldCrse, old_crseTime, m_Ustar, true);
+
+        // Coarse boundary conditions should be either
+        //    a) the fully projected velocity on the coarse level in we're including grad(p) in the source
+        // or b) U^*, if we're not including grad(p)
+
+        int uvar = m_fluidVel;
+
+        if (!m_addSubtractGradP)
+        {
+          uvar = m_Ustar;
+        }
+
+        if (a_MACprojection)
+        {
+          uvar = m_advectionVel;
+        }
+        amrMLcrse->fillVectorField(UstarCrse, new_crseTime, uvar, true);
+        amrMLcrse->fillVectorField(UoldCrse, old_crseTime, uvar, true);
+
+        crseFluxRegPtr = &(*(amrMLcrse->m_vectorFluxRegisters[VectorVars::m_fluidVel]));
       }
 
-      UstarVectComp.push_back(&UstarComp);
-      rhsVectComp.push_back(&compSrc);
 
-      //                        s_uStarAMRMG[comp]->solve(UstarVectComp, rhsVectComp, maxLevel,
-      //                                        maxLevel, false); // don't initialize to zero
-      //                        exitStatus += s_uStarAMRMG[comp]->m_exitStatus;
-
-      if (!doFRupdates)
+      // Set U^* to zero if it apears to be uninitialised
+      Real maxUstar = 0;
+      for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
       {
-        crseFluxRegPtr = NULL;
-        fineFluxRegPtr = NULL;
+        for (int dir=0; dir<SpaceDim; dir++)
+        {
+          maxUstar = max(maxUstar, abs((*m_vectorNew[ustarVar])[dit].max(dir)));
+        }
       }
 
-      int exitStatus = -1;
-      Real resid = 0;
-
-      if (m_opt.timeIntegrationOrder == 1)
+      if (maxUstar > 1e100)
       {
-        UstarBE[comp]->updateSoln(UstarComp, UoldComp, compSrc,
-                                  &(*fineFluxRegPtr), &(*crseFluxRegPtr),
-                                  UoldCrseComp, UstarCrseComp,
-                                  old_time,  old_crseTime, new_crseTime,
-                                  a_dt, m_level, false, comp); // False - don't zero phi
-
-
-        exitStatus = UstarBE[comp]->exitStatus();
-        resid = UstarBE[comp]->finalResidual();
-
+        setValLevel(*m_vectorNew[ustarVar], 0.0);
       }
-      else
+
+
+      // Solve each component (x, y, z) separately.
+      pout() << "  U* solve ";
+
+      for (int comp = 0; comp < SpaceDim; comp++)
       {
-        UstarTGA[comp]->updateSoln(UstarComp, UoldComp, compSrc,
-                                   &(*fineFluxRegPtr), &(*crseFluxRegPtr),
-                                   UoldCrseComp, UstarCrseComp,
-                                   old_time, old_crseTime, new_crseTime,
-                                   a_dt, m_level, false, comp);  // False - don't zero phi
+        Interval intvl(comp, comp);
 
-        exitStatus = UstarTGA[comp]->exitStatus();
-        resid = UstarTGA[comp]->finalResidual();
+        LevelData<FArrayBox> UstarComp;
+        aliasLevelData(UstarComp, &(*m_vectorNew[ustarVar]), intvl);
+
+        LevelData<FArrayBox> UoldComp;
+        aliasLevelData(UoldComp, &Uold, intvl);
+
+        LevelData<FArrayBox> compSrc;
+        aliasLevelData(compSrc, &src, intvl);
+
+
+        Vector<LevelData<FArrayBox>*> UstarVectComp;
+        Vector<LevelData<FArrayBox>*> rhsVectComp;
+
+        if (m_level > 0)
+        {
+          UstarCrse.copyTo(intvl, *UstarCrseComp, Interval(0, 0));
+          UoldCrse.copyTo(intvl, *UoldCrseComp, Interval(0, 0));
+
+          UstarVectComp.push_back(UstarCrseComp);
+          rhsVectComp.push_back(NULL); //this isn't used
+        }
+
+        UstarVectComp.push_back(&UstarComp);
+        rhsVectComp.push_back(&compSrc);
+
+        if (!doFRupdates)
+        {
+          crseFluxRegPtr = NULL;
+          fineFluxRegPtr = NULL;
+        }
+
+        int exitStatus = -1;
+        Real resid = 0;
+
+        if (m_opt.timeIntegrationOrder == 1)
+        {
+          UstarBE[comp]->updateSoln(UstarComp, UoldComp, compSrc,
+                                    &(*fineFluxRegPtr), &(*crseFluxRegPtr),
+                                    UoldCrseComp, UstarCrseComp,
+                                    old_time,  old_crseTime, new_crseTime,
+                                    a_dt, m_level, false, comp); // False - don't zero phi
+
+
+          exitStatus = UstarBE[comp]->exitStatus();
+          resid = UstarBE[comp]->finalResidual();
+
+        }
+        else
+        {
+          UstarTGA[comp]->updateSoln(UstarComp, UoldComp, compSrc,
+                                     &(*fineFluxRegPtr), &(*crseFluxRegPtr),
+                                     UoldCrseComp, UstarCrseComp,
+                                     old_time, old_crseTime, new_crseTime,
+                                     a_dt, m_level, false, comp);  // False - don't zero phi
+
+          exitStatus = UstarTGA[comp]->exitStatus();
+          resid = UstarTGA[comp]->finalResidual();
+        }
+
+        pout() << " Component " << comp << ": residual = " << resid;
+
+
+
+      } // end loop over components
+
+      pout () << endl;
+
+      //Clean up
+      if (UstarCrseComp != NULL)
+      {
+        delete UstarCrseComp;
+        UstarCrseComp = NULL;
+      }
+      if (UoldCrseComp != NULL)
+      {
+        delete UoldCrseComp;
+        UoldCrseComp = NULL;
       }
 
-      pout() << " Component " << comp << ": residual = " << resid;
 
-
-
-    } // end loop over components
-
-    pout () << endl;
-
-    //Clean up
-    if (UstarCrseComp != NULL)
-    {
-      delete UstarCrseComp;
-      UstarCrseComp = NULL;
-    }
-    if (UoldCrseComp != NULL)
-    {
-      delete UoldCrseComp;
-      UoldCrseComp = NULL;
-    }
-
+    } // end separate component solve
 
 
   } // end if viscous

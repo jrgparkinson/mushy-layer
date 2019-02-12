@@ -226,6 +226,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMG.query("MGtype", mgtype);
   opt.MGtype = MGmethod(mgtype);
 
+  opt.multiCompUStarSolve = false;
+  ppMain.query("multiCompUStarSolve", opt.multiCompUStarSolve);
+
   /***
    * Initialisation
    */

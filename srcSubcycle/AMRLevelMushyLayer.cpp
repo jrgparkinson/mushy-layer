@@ -434,7 +434,7 @@ void AMRLevelMushyLayer::horizontallySmooth(LevelData<FluxBox>& a_flux)
     return;
   }
 
-  // todo - write post trace smoothing in fortran. We currently don't use this though so not high priority.
+  // todo - Future: write post trace smoothing in fortran. We currently don't use this though so not high priority.
   for (dit.reset(); dit.ok(); ++dit)
   {
     for (int velDir=0; velDir < SpaceDim; velDir++)
@@ -2648,6 +2648,9 @@ void AMRLevelMushyLayer::computeDiagnostics()
       CH_TIME("AMRLevelMushyLayer::computeDiagnostics::computeMaxVel");
 
       // Compute max velocities at midpoints
+      // Have to do this ourselves, rather than using Chombo's computeMax(), as we
+      // want to compute max over a single strip of cells
+
       Box horizBox = ::adjCellHi(m_problem_domain.domainBox(), 1, 1);
       horizBox.shift(1, -int(m_numCells[1]/2));
 
@@ -2662,10 +2665,24 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
         if (b.size() >= IntVect::Unit)
         {
-          // TODO: this won't work in parallel
           maxVertVel = max(maxVertVel, vel.max(b, 1));
         }
       }
+
+      // Do broadcast/gather on this
+      int srcProc = 0;
+      Vector<Real> allMax(numProc(), 0.0);
+      gather(allMax, maxVertVel, srcProc);
+      Real globalMaxVertVel = 0;
+      if (procID() == srcProc)
+      {
+        for (int ivec = 0; ivec<numProc(); ivec++)
+        {
+          globalMaxVertVel = max(globalMaxVertVel, allMax[ivec]);
+        }
+      }
+      broadcast(globalMaxVertVel, srcProc);
+
 
       Box vertBox = ::adjCellHi(m_problem_domain.domainBox(), 0, 1);
       vertBox.shift(0, -int(m_numCells[0]/2));
@@ -2679,13 +2696,23 @@ void AMRLevelMushyLayer::computeDiagnostics()
         FArrayBox& vel = (*m_vectorNew[VectorVars::m_fluidVel])[dit];
         if (b.size() >= IntVect::Unit)
         {
-          // TODO: this won't work in parallel
           maxHorizVel = max(maxHorizVel, vel.max(b, 0));
         }
       }
 
-      m_diagnostics.addDiagnostic(DiagnosticNames::diag_maxVhalf, m_time, maxHorizVel);
-      m_diagnostics.addDiagnostic(DiagnosticNames::diag_maxUhalf, m_time, maxVertVel);
+      gather(allMax, maxHorizVel, srcProc);
+      Real globalMaxHorizVel = 0;
+      if (procID() == srcProc)
+      {
+        for (int ivec = 0; ivec<numProc(); ivec++)
+        {
+          globalMaxHorizVel = max(globalMaxHorizVel, allMax[ivec]);
+        }
+      }
+      broadcast(globalMaxHorizVel, srcProc);
+
+      m_diagnostics.addDiagnostic(DiagnosticNames::diag_maxVhalf, m_time, globalMaxHorizVel);
+      m_diagnostics.addDiagnostic(DiagnosticNames::diag_maxUhalf, m_time, globalMaxVertVel);
 
     }
 

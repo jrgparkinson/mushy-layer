@@ -659,12 +659,8 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
   ppAmrmultigrid.query("verbosity", mgverb);
 
 
-  //  Real half_time = m_time - m_dt / 2;
-  //  Real new_time = m_time;
   Real old_time = m_time-m_dt;
 
-  //    int nlevels = (m_level == 0) ? 1 : 2; // only 1 level if m_level = 0, as no coarser grids in this case
-  //    int coarsestLevel = (m_level == 0) ? 0 : m_level - 1; // the coarsest level we care about
   int nlevels = allGrids.size();
   int coarsestLevel  = 0;
 
@@ -679,6 +675,9 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
   // I'm not sure we actually need this
   solverGrids.resize(nlevels);
 
+  // If we're doing a multi-component solve, need SpaceDim components, otherwise just one component.
+  int num_comp = m_opt.multiCompUStarSolve ? SpaceDim : 1;
+
   for (int lev = coarsestLevel; lev < nlevels; lev++)
   {
 
@@ -691,11 +690,11 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
     solverGrids[relativeLev] = levelGrids;
 
     bCoef[relativeLev] = RefCountedPtr<LevelData<FluxBox> >(
-        new LevelData<FluxBox>(levelGrids, 1, ivGhost)); // = 1
+        new LevelData<FluxBox>(levelGrids, num_comp, ivGhost)); // = 1
     aCoef[relativeLev] = RefCountedPtr<LevelData<FArrayBox> >(
-        new LevelData<FArrayBox>(levelGrids, 1, ivGhost)); // = 1
+        new LevelData<FArrayBox>(levelGrids, num_comp, ivGhost)); // = 1
     cCoef[relativeLev] = RefCountedPtr<LevelData<FArrayBox> >(
-        new LevelData<FArrayBox>(levelGrids, 1, ivGhost)); // = porosity.pi_0/(pi)
+        new LevelData<FArrayBox>(levelGrids, num_comp, ivGhost)); // = porosity.pi_0/(pi)
 
 
     // Only actually fill levels if they're at m_level or coarser
@@ -703,16 +702,6 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
     {
       LevelData<FArrayBox> porosity(levelGrids, 1, ivGhost);
       LevelData<FArrayBox> permeability(levelGrids, 1, ivGhost);
-
-      // Fill these at the new time
-      // this is correct for backward euler (where we evaluate the darcy term
-      // at the new time) but we should modify this for TGA where we evaluate U at
-      // different times within an update
-      if (m_opt.timeIntegrationOrder == 2 && m_time-m_dt == 0)
-      {
-        // Only display this warning at initial timestep
-        //        MayDay::Warning("AMRlevelMushyLayer::defineUstarSolver - darcy term coefficient not time centred correctly for TGA");
-      }
 
       // Try and lag this for stability (was previously new_time)
       Real coeff_time = old_time;
@@ -732,8 +721,12 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
         }
         else
         {
-          (*cCoef[relativeLev])[dit].copy(porosity[dit]);
-          (*cCoef[relativeLev])[dit].divide(permeability[dit]);
+          for (int comp_i = 0; comp_i < num_comp; comp_i++)
+          {
+            (*cCoef[relativeLev])[dit].copy(porosity[dit], 0, comp_i);
+            (*cCoef[relativeLev])[dit].divide(permeability[dit], 0, comp_i);
+          }
+
           (*cCoef[relativeLev])[dit].mult(m_parameters.m_darcyCoeff);
         }
 
@@ -743,28 +736,49 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
         (*aCoef[relativeLev])[dit].setVal(1.0);
 
         // this is what multiplies laplacian(u). Note the minus sign.
-        (*bCoef[relativeLev])[dit].setVal(- m_parameters.m_viscosityCoeff );
+        (*bCoef[relativeLev])[dit].setVal(- m_parameters.m_viscosityCoeff);
       } // end loop over boxes
 
     } // end if level <= m_level
   } // end loop over levels
 
-  for (int idir = 0; idir < SpaceDim; idir++)
+  if (m_opt.multiCompUStarSolve)
+  {
+    MayDay::Error("Multcomponent U start solve not implemented yet.");
+//    BCHolder viscousBC = m_physBCPtr->enthalpySalinityBC()  uStarFuncBC(m_viscousBCs); //  ->velFuncBC(idir, m_viscousBCs);
+//
+//    RefCountedPtr<DarcyBrinkmanOpFactory> vcamrpop = RefCountedPtr<DarcyBrinkmanOpFactory>(new DarcyBrinkmanOpFactory());
+//    vcamrpop->define(lev0Dom, allGrids, refRat, lev0Dx, viscousBC,
+//                     0.0, aCoef, -1.0, bCoef, cCoef); // Note that we should set m_dt*etc in bCoef, not beta!
+//
+//    s_uStarOpFactMultiComp = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcamrpop); // m_UstarVCAMRPOp[idir]);
+//
+//    s_uStarAMRMGMultiComp->define(lev0Dom, *s_uStarOpFactMultiComp,
+//                                  &s_botSolverUStar, nlevels);
+//
+//    s_uStarAMRMGMultiComp->setSolverParameters(numSmooth, numSmooth, numSmooth,
+//                                               numMG, maxIter, tolerance, hang, normThresh);
+  }
+  else
   {
 
-    BCHolder viscousBC = m_physBCPtr->velFuncBC(idir, m_viscousBCs);
+    for (int idir = 0; idir < SpaceDim; idir++)
+    {
 
-    RefCountedPtr<DarcyBrinkmanOpFactory> vcamrpop = RefCountedPtr<DarcyBrinkmanOpFactory>(new DarcyBrinkmanOpFactory());
-    vcamrpop->define(lev0Dom, allGrids, refRat, lev0Dx, viscousBC,
-                     0.0, aCoef, -1.0, bCoef, cCoef); // Note that we should set m_dt*etc in bCoef, not beta!
+      BCHolder viscousBC = m_physBCPtr->velFuncBC(idir, m_viscousBCs);
 
-    s_uStarOpFact[idir] = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcamrpop); // m_UstarVCAMRPOp[idir]);
+      RefCountedPtr<DarcyBrinkmanOpFactory> vcamrpop = RefCountedPtr<DarcyBrinkmanOpFactory>(new DarcyBrinkmanOpFactory());
+      vcamrpop->define(lev0Dom, allGrids, refRat, lev0Dx, viscousBC,
+                       0.0, aCoef, -1.0, bCoef, cCoef); // Note that we should set m_dt*etc in bCoef, not beta!
 
-    s_uStarAMRMG[idir]->define(lev0Dom, *s_uStarOpFact[idir],
-                               &s_botSolverUStar, nlevels);
+      s_uStarOpFact[idir] = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcamrpop); // m_UstarVCAMRPOp[idir]);
 
-    s_uStarAMRMG[idir]->setSolverParameters(numSmooth, numSmooth, numSmooth,
-                                            numMG, maxIter, tolerance, hang, normThresh);
+      s_uStarAMRMG[idir]->define(lev0Dom, *s_uStarOpFact[idir],
+                                 &s_botSolverUStar, nlevels);
+
+      s_uStarAMRMG[idir]->setSolverParameters(numSmooth, numSmooth, numSmooth,
+                                              numMG, maxIter, tolerance, hang, normThresh);
+    }
   }
 }
 
@@ -784,7 +798,6 @@ void AMRLevelMushyLayer::defineUstarSolver(     Vector<RefCountedPtr<LevelBackwa
 
   UstarBE.resize(SpaceDim);
   UstarTGA.resize(SpaceDim);
-
 
   for (int idir = 0; idir < SpaceDim; idir++)
   {
