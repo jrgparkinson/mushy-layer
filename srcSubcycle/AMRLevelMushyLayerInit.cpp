@@ -579,12 +579,12 @@ void AMRLevelMushyLayer::levelSetup()
   m_patchGodHC.define(m_problem_domain, m_dx, &m_advPhysHC,
                       normalPredOrderHC, useFourthOrderSlopesHC, usePrimLimitingHC,
                       useCharLimitingHC, useFlatteningHC, useArtViscHC, artViscHC);
+  m_patchGodHC.highOrderLimiter(higherOrderLimiter);
 
   m_patchGodTSl.define(m_problem_domain, m_dx, &m_advPhysTSl,
                        normalPredOrderHC, useFourthOrderSlopesHC, usePrimLimitingHC,
                        useCharLimitingHC, useFlatteningHC, useArtViscHC, artViscHC);
-  //                       normalPredOrder, useFourthOrderSlopes, usePrimLimiting,
-  //                       useCharLimiting, useFlattening, useArtVisc, artVisc);
+  m_patchGodTSl.highOrderLimiter(higherOrderLimiter);
 
   // Single component solve
   m_patchGodH.define(m_problem_domain, m_dx, &m_advPhysH,
