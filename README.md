@@ -3,7 +3,9 @@
 # Introduction
 This is code to simulate flow in a reactive porous media, a "mushy layer", within a square box.
 
-For more information on the equations, numerical method, and motivation, see the [Paper](#) (link to come) 
+In this readme we first present some instructions on downloading and installing the code, then describe how to recreate the test problems and figures found in the scientific [paper](#) (currently unpublished, email [james.parkinson@physics.ox.ac.uk] for a copy)  written about this method. The paper is a good reference for more information on the physics of this model.
+
+If you have any issues, please contact [james.parkinson@physics.ox.ac.uk].
 
 # Prerequisites
 ## Required
@@ -41,22 +43,6 @@ You should also add an environment variable `MUSHY_LAYER_DIR` which points to `/
 EXPORT MUSHY_LAYER_DIR=/path/to/mushy-layer/
 ```
 
-# Testing
-`/test/` contains python scripts for running various test problems, which demonstrate the accuracy and efficiency of the code. You can run all the problems via the script `runMethodsPaperTests.py`. 
-
-You must ensure that the `/test/` directory is in your `PYTHONPATH`, i.e. place the following in your ~/.bashrc or similar
-
-```console
-EXPORT PYTHONPATH=PYTHONPATH:/path/to/mushy-layer/test
-```
-
-The analysis is performed by matlab scripts located in `/matlab/*`, which must be added to your matlab path to be executed:
-
-```matlab
-addpath(genpath('/path/to/matlab/'))
-```
-
-Note that running all the tests will take some time unless you have lots of processors available (i.e. multiple days) and will take up a reasonable amount of disk space (~50GB).
 
 # Running
 The executable in `/execSubcycle/` requires inputs in order to run. These can either be supplied at the command line or, more sensibly, by specifying the location of a file which contains a list of inputs, e.g.
@@ -97,6 +83,28 @@ The source code is spread across a number of directories, which are briefly summ
 `/srcNonSubcycle/` contains mushy layer code for the non-subcycled algorithm (currently broken)
 `/execNonSubcycle/` contains the driver code for the non-subcycle application (currently broken)
 
+## Methods paper
+We have written a paper describing the physics of this model. A draft can be found in the `/docs/` directory. In this paper, we demonstrate the accuracy and convergence properties of our code. Everything you need to run these tests yourself should be found in the `/tests/` directory, as described below. 
+
+# Testing
+`/test/` contains python scripts for running various test problems, which demonstrate the accuracy and efficiency of the code. You can run all the problems via the script `runMethodsPaperTests.py`. For more information, see the README located in the `/test/` directory.
+
+You must ensure that the `/test/` directory is in your `PYTHONPATH`, i.e. place the following in your ~/.bashrc or similar
+
+```console
+EXPORT PYTHONPATH=PYTHONPATH:/path/to/mushy-layer/test
+```
+
+The analysis is performed by matlab scripts located in `/matlab/*`, which must be added to your matlab path to be executed:
+
+```matlab
+addpath(genpath('/path/to/matlab/'))
+```
+
+Note that running all the tests will take some time unless you have lots of processors available (i.e. multiple days) and will take up a reasonable amount of disk space (~50GB).
+
+# Figures
+Having run the test problems, some of the figures found in the paper will have been created automatically in the subdirectory for each tests problem (e.g. `/path/to/test_output/FixedPorousHole-1proc/Fig6Error-xDarcy_velocity-L2.eps`). The python script located at `mushy-layer/test/makeFigures.py` should then make the remaining figures for you, mainly by calling various matlab scripts. 
 
 
 
