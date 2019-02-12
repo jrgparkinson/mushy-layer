@@ -41,12 +41,16 @@ def test_uniform_porous_convection(argv):
     u_del_u_method = 0
     advection_method = 1
 
+    fixed_da = -1.0
+    fixed_ra = -1.0
+
+
     try:
-        opts, args = getopt.getopt(argv, "n:v:c:p:b:u:a:")
+        opts, args = getopt.getopt(argv, "n:v:c:p:b:u:a:d:r:")
     except getopt.GetoptError as err:
         print(str(err))
         print('test_uniform_porous_convection.py -n<num uniform mesh grid points> -v<num variable mesh points>'
-              ' -c<cfl> -p <chi> -b <BC accuracy> -u <u del u method> -a <advection method>')
+              ' -c<cfl> -p <chi> -b <BC accuracy> -u <u del u method> -a <advection method> -d<fixed darcy> -r<fixed Ra>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -64,6 +68,10 @@ def test_uniform_porous_convection(argv):
             u_del_u_method = int(arg)
         elif opt in ("-a"):
             advection_method = int(arg)
+        elif opt in "-d":
+            fixed_da = float(arg)
+        elif opt in "-r":
+            fixed_ra = float(arg)
 
     base_output_dir = get_base_output_dir()
     matlab_command = get_matlab_base_command()
@@ -98,6 +106,16 @@ def test_uniform_porous_convection(argv):
                    'lebars': [1.08, 3.07, 12.9]},
                   {'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5],
                    'lebars': [1.01, 1.41, 3.17, 5.24]}]
+
+    if fixed_da:
+        if fixed_ra:
+            da_ra_vals = [{'Da': fixed_da, 'RaT': [fixed_ra], 'lebars': [float('NaN')]}]
+        elif fixed_da == 1e-6:
+            da_ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9],
+                           'lebars': [1.08, 3.07, 12.9]} ]
+        elif fixed_da == 1e-2:
+            da_ra_vals = [{'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5],
+                           'lebars': [1.01, 1.41, 3.17, 5.24]}]
 
     # [1.01, 1.41, 3.17, 5.24];
     # [1.08, 3.07, 12.9];
