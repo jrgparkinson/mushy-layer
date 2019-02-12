@@ -2614,6 +2614,7 @@ BCHolder PhysBCUtil::viscousRefluxBC(int a_dir, bool a_isViscous) const
 
 // ---------------------------------------------------------------
 /// this is a BC object used in the PatchGodunov stuff
+//todo - should implement more than just solid walls BCs, for the cases where we have either slip or outflow bcs
 PhysIBC*
 PhysBCUtil::advectionVelIBC() const
 {
