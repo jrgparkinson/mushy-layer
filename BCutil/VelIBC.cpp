@@ -72,8 +72,6 @@ void VelIBC::primBC(FArrayBox&            a_WGdnv,
   // In periodic case, this doesn't do anything
   if (!m_domain.isPeriodic(a_dir))
     {
-      // This needs to be fixed
-      // CH_assert(m_isBCvalSet);
 
       int lohisign;
       Box tmp = a_WGdnv.box() & m_domain;
