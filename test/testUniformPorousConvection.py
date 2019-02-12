@@ -107,8 +107,8 @@ def test_uniform_porous_convection(argv):
                   {'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5],
                    'lebars': [1.01, 1.41, 3.17, 5.24]}]
 
-    if fixed_da:
-        if fixed_ra:
+    if fixed_da > 0.0:
+        if fixed_ra > 0.0:
             da_ra_vals = [{'Da': fixed_da, 'RaT': [fixed_ra], 'lebars': [float('NaN')]}]
         elif fixed_da == 1e-6:
             da_ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9],
