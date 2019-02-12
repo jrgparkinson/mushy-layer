@@ -159,31 +159,32 @@ int main(int argc, char* argv[])
     for (int lev = finest_level; lev >=0 ; lev--)
     {
       // Make sure we're set up to compute diagnostics
-      amrlevels[lev]->m_opt.computeDiagnostics = true;
+      amrlevels[lev]->set_compute_diagnostics(true);
       amrlevels[lev]->computeDiagnostics();
     }
 
     Diagnostics& diag = amrlevels[0]->m_diagnostics;
-    Fs_top[file_i] = diag.getDiagnostic(Diagnostics::m_soluteFluxTop, time[file_i]);
-    Fs_bottom[file_i] = diag.getDiagnostic(Diagnostics::m_soluteFluxBottom, time[file_i]);
-    Fs_av[file_i] = diag.getDiagnostic(Diagnostics::m_averageVerticalSaltFlux, time[file_i]);
 
-    FsVertDiffusionL2[file_i] = diag.getDiagnostic(Diagnostics::m_L2FsVertDiffusion, time[file_i]);
-    FsVertFluidL2[file_i] = diag.getDiagnostic(Diagnostics::m_L2FsVertFluid, time[file_i]);
-    FsVertFrameL2[file_i] = diag.getDiagnostic(Diagnostics::m_L2FsVertFrame, time[file_i]);
+    Fs_top[file_i] = diag.getDiagnostic(DiagnosticNames::diag_soluteFluxTop, time[file_i]);
+    Fs_bottom[file_i] = diag.getDiagnostic(DiagnosticNames::diag_soluteFluxBottom, time[file_i]);
+    Fs_av[file_i] = diag.getDiagnostic(DiagnosticNames::diag_averageVerticalSaltFlux, time[file_i]);
 
-    FsVertDiffusionL1[file_i] = diag.getDiagnostic(Diagnostics::m_L1FsVertDiffusion, time[file_i]);
-        FsVertFluidL1[file_i] = diag.getDiagnostic(Diagnostics::m_L1FsVertFluid, time[file_i]);
-        FsVertFrameL1[file_i] = diag.getDiagnostic(Diagnostics::m_L1FsVertFrame, time[file_i]);
+    FsVertDiffusionL2[file_i] = diag.getDiagnostic(DiagnosticNames::diag_L2FsVertDiffusion, time[file_i]);
+    FsVertFluidL2[file_i] = diag.getDiagnostic(DiagnosticNames::diag_L2FsVertFluid, time[file_i]);
+    FsVertFrameL2[file_i] = diag.getDiagnostic(DiagnosticNames::diag_L2FsVertFrame, time[file_i]);
 
-    FsVertDiffusionL0[file_i] = diag.getDiagnostic(Diagnostics::m_L0FsVertDiffusion, time[file_i]);
-       FsVertFluidL0[file_i] = diag.getDiagnostic(Diagnostics::m_L0FsVertFluid, time[file_i]);
-       FsVertFrameL0[file_i] = diag.getDiagnostic(Diagnostics::m_L0FsVertFrame, time[file_i]);
+    FsVertDiffusionL1[file_i] = diag.getDiagnostic(DiagnosticNames::diag_L1FsVertDiffusion, time[file_i]);
+        FsVertFluidL1[file_i] = diag.getDiagnostic(DiagnosticNames::diag_L1FsVertFluid, time[file_i]);
+        FsVertFrameL1[file_i] = diag.getDiagnostic(DiagnosticNames::diag_L1FsVertFrame, time[file_i]);
+
+    FsVertDiffusionL0[file_i] = diag.getDiagnostic(DiagnosticNames::diag_L0FsVertDiffusion, time[file_i]);
+       FsVertFluidL0[file_i] = diag.getDiagnostic(DiagnosticNames::diag_L0FsVertFluid, time[file_i]);
+       FsVertFrameL0[file_i] = diag.getDiagnostic(DiagnosticNames::diag_L0FsVertFrame, time[file_i]);
 
     //    amrlevels[0]->computeChimneyDiagnostics();
 
-    //    channelWidth[file_i] = diag.getDiagnostic(Diagnostics::m_chimneyWidth, time[file_i]);
-    //    channelSpacing[file_i] = diag.getDiagnostic(Diagnostics::m_chimneySpacing, time[file_i]);
+    //    channelWidth[file_i] = diag.getDiagnostic(DiagnosticNames::diag_chimneyWidth, time[file_i]);
+    //    channelSpacing[file_i] = diag.getDiagnostic(DiagnosticNames::diag_chimneySpacing, time[file_i]);
 
     // clean up memory
 
