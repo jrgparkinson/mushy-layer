@@ -590,7 +590,7 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
     Real permeability;
     Real referencePerm = params.referencePermeability;
 
-    if(params.permeabilityFunction == params.m_permeabilityXSquared)
+    if(params.permeabilityFunction == PermeabilityFunctions::m_permeabilityXSquared)
     {
       permeability = x*x;
 

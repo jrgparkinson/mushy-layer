@@ -281,11 +281,11 @@ updateEnthalpyVariables()
     LevelData<FArrayBox>& theta = *m_scalarNew[m_theta][lev];
     LevelData<FArrayBox>& compositionLiquid = *m_scalarNew[m_compositionLiquid][lev];
     LevelData<FArrayBox>& compositionSolid = *m_scalarNew[m_compositionSolid][lev];
-    LevelData<FArrayBox>& porosity = *m_scalarNew[m_porosity][lev];
+    LevelData<FArrayBox>& porosity = *m_scalarNew[ScalarVars::m_porosity][lev];
 
-    LevelData<FArrayBox>& solidus = *m_scalarNew[m_enthalpySolidus][lev];
-    LevelData<FArrayBox>& liquidus = *m_scalarNew[m_enthalpyLiquidus][lev];
-    LevelData<FArrayBox>& eutectic = *m_scalarNew[m_enthalpyEutectic][lev];
+    LevelData<FArrayBox>& solidus = *m_scalarNew[ScalarVars::m_enthalpySolidus][lev];
+    LevelData<FArrayBox>& liquidus = *m_scalarNew[ScalarVars::m_enthalpyLiquidus][lev];
+    LevelData<FArrayBox>& eutectic = *m_scalarNew[ScalarVars::m_enthalpyEutectic][lev];
 
 
 
@@ -819,7 +819,7 @@ amrMushyLayer::computeDt()
 
   // Ignoring advection and flow for now
 //  setupAdvectionSolvers(); // We need these to get dt
-//  Real maxFluidVel = m_godunovEnthalpy[0]->getMaxWaveSpeed(*m_scalarNew[m_enthalpy][0], *m_fluidAdv[0]);
+//  Real maxFluidVel = m_godunovEnthalpy[0]->getMaxWaveSpeed(*m_scalarNew[ScalarVars::m_enthalpy][0], *m_fluidAdv[0]);
   Real maxFluidVel  = 0.0;
 
   //Get the dt for the finest level based on frame advection
@@ -899,8 +899,8 @@ amrMushyLayer::convergedToSteadyState()
       (*dthetadt[lev])[dit()] /= m_dt;
 
       (*dThetadt[lev])[dit()].setVal(0);
-      (*dThetadt[lev])[dit()] += (*m_scalarNew[m_bulkConcentration][lev])[dit()];
-      (*dThetadt[lev])[dit()] -= (*m_scalarOld[m_bulkConcentration][lev])[dit()];
+      (*dThetadt[lev])[dit()] += (*m_scalarNew[ScalarVars::m_bulkConcentration][lev])[dit()];
+      (*dThetadt[lev])[dit()] -= (*m_scalarOld[ScalarVars::m_bulkConcentration][lev])[dit()];
       (*dThetadt[lev])[dit()] /= m_dt;
     }
   }

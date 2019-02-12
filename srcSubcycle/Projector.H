@@ -35,6 +35,8 @@ using std::cerr;
 #include "FluxBox.H"
 #include"BiCGStabSolver.H"
 
+#include "mushyLayerOpt.h"
+
 #include "UsingNamespace.H"
 
 /// this class manages the various forms of the projection

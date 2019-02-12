@@ -122,7 +122,7 @@ void AMRLevelMushyLayer::fillAnalyticVel(FArrayBox& velDir, int dir, int comp, b
       }
 
     }
-    else if(analyticVelType == MushyLayerParams::m_soluteFluxTest)
+    else if(analyticVelType == PhysicalProblems::m_soluteFluxTest)
     {
 
       if (dir == 0)
@@ -141,7 +141,7 @@ void AMRLevelMushyLayer::fillAnalyticVel(FArrayBox& velDir, int dir, int comp, b
       }
 
     }
-    else if (analyticVelType == MushyLayerParams::m_mushyLayer)
+    else if (analyticVelType == PhysicalProblems::m_mushyLayer)
     {
       if (project)
       {
@@ -270,7 +270,7 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
       // Porosity varies linearly from 0.4 at boundary to
       // 1.0 near the middle, c.f. Le Bars and Worster (2006)
 
-      if (m_parameters.m_porosityFunction == m_parameters.m_porosityLinear)
+      if (m_parameters.m_porosityFunction == ParamsPorosityFunctions::m_porosityLinear)
       {
 
         Real boundaryPorosity = m_parameters.bcValPorosityLo[0];
@@ -296,10 +296,10 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
         //initialDataPoiseuille(x, y, valNew,  m_porosity, -1);
         a_porosity[dit](iv) = porosity;
-        //            (*m_scalarOld[m_porosity])[dit](iv) = porosity;
+        //            (*m_scalarOld[ScalarVars::m_porosity])[dit](iv) = porosity;
 
       }
-      else if (m_parameters.m_porosityFunction == m_parameters.m_porosityGaussian)
+      else if (m_parameters.m_porosityFunction == ParamsPorosityFunctions::m_porosityGaussian)
       {
 
         Real boundaryPorosity = m_parameters.bcValPorosityLo[0];
@@ -319,10 +319,10 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
         //initialDataPoiseuille(x, y, valNew,  m_porosity, -1);
         a_porosity[dit](iv) = porosity;
-        //            (*m_scalarOld[m_porosity])[dit](iv) = porosity;
+        //            (*m_scalarOld[ScalarVars::m_porosity])[dit](iv) = porosity;
 
       }
-      else if (m_parameters.m_porosityFunction == m_parameters.m_porosityEdge)
+      else if (m_parameters.m_porosityFunction == ParamsPorosityFunctions::m_porosityEdge)
       {
         Real boundaryPorosity = m_parameters.bcValPorosityLo[0];
 
@@ -341,15 +341,15 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
         //initialDataPoiseuille(x, y, valNew,  m_porosity, -1);
         a_porosity[dit](iv) = porosity;
-        //            (*m_scalarOld[m_porosity])[dit](iv) = porosity;
+        //            (*m_scalarOld[ScalarVars::m_porosity])[dit](iv) = porosity;
       }
-      else if (m_parameters.m_porosityFunction == m_parameters.m_porosityConstant)
+      else if (m_parameters.m_porosityFunction == ParamsPorosityFunctions::m_porosityConstant)
       {
         // Assume all boundary values are equal, and just pick one
         a_porosity[dit](iv) = m_parameters.bcValPorosityLo[0];
-        //            (*m_scalarOld[m_porosity])[dit](iv) = m_parameters.bcValPorosityLo[0];
+        //            (*m_scalarOld[ScalarVars::m_porosity])[dit](iv) = m_parameters.bcValPorosityLo[0];
       }
-      else if (m_parameters.m_porosityFunction == m_parameters.m_porosityTimeDependent)
+      else if (m_parameters.m_porosityFunction == ParamsPorosityFunctions::m_porosityTimeDependent)
       {
         Real time = m_time;
         if (porosityEndTime >= 0 && m_time >= porosityEndTime)
@@ -405,7 +405,7 @@ void AMRLevelMushyLayer::fillMultiComp(LevelData<FArrayBox>& a_phi, Real a_time,
 void AMRLevelMushyLayer::fillHC(LevelData<FArrayBox>& a_phi, Real a_time,
                                 bool doInterior , bool quadInterp )
 {
-  fillMultiComp(a_phi, a_time, m_enthalpy, m_bulkConcentration, doInterior, quadInterp);
+  fillMultiComp(a_phi, a_time, ScalarVars::m_enthalpy, ScalarVars::m_bulkConcentration, doInterior, quadInterp);
 }
 
 
@@ -824,7 +824,7 @@ void AMRLevelMushyLayer::fillBuoyancy(LevelData<FArrayBox>& a_buoyancy,
     else
     {
       fillBuoyancy(a_buoyancy[dit], a_temperature[dit], a_liquidConc[dit], a_porosity[dit],
-                   (*m_vectorNew[m_bodyForce])[dit]);
+                   (*m_vectorNew[VectorVars::m_bodyForce])[dit]);
     }
   }
 }

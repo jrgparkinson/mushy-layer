@@ -109,7 +109,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
     {
       Real refluxScale = -1.0 / AmrDx[lev]; // petermc made negative, 7 Dec 07
       //
-      thisMLPtr->m_vectorFluxRegisters[m_fluidVel]->reflux(
+      thisMLPtr->m_vectorFluxRegisters[VectorVars::m_fluidVel]->reflux(
           levelRefluxData, refluxScale);
     }
 
@@ -135,7 +135,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
   thisMLPtr = this;
   for (int lev = m_level; lev <= finest_level; lev++)
   {
-    vectVel[lev] = &(*thisMLPtr->m_vectorNew[m_fluidVel]);
+    vectVel[lev] = &(*thisMLPtr->m_vectorNew[VectorVars::m_fluidVel]);
     if (lev < finest_level)
     {
       thisMLPtr = thisMLPtr->getFinerLevel();
@@ -235,7 +235,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
 //          CH_assert (fineML.m_level == lev+1);
 //
 //          CoarseAverage& avgDown = fineML.m_coarseAverageVector;
-//          LevelData<FArrayBox>& fineVel = *fineML.m_vectorNew[m_fluidVel];
+//          LevelData<FArrayBox>& fineVel = *fineML.m_vectorNew[VectorVars::m_fluidVel];
 //          avgDown.averageToCoarse(levelVel, fineVel);
 //        }
 //      }
@@ -315,7 +315,7 @@ if (s_verbosity >= 3)
 }
 
   // Get the advection velocity as a CC variable so we can write it out
-  EdgeToCell(m_advVel, *m_vectorNew[m_advectionVel]);
+  EdgeToCell(m_advVel, *m_vectorNew[VectorVars::m_advectionVel]);
 
   ParmParse pp("main");
 
@@ -444,8 +444,8 @@ if (s_verbosity >= 3)
       {
         // defer this until we're doing sync projection
       } else {
-        m_vectorFluxRegisters[m_fluidVel]->reflux(
-            *m_vectorNew[m_fluidVel], refluxScale);
+        m_vectorFluxRegisters[VectorVars::m_fluidVel]->reflux(
+            *m_vectorNew[VectorVars::m_fluidVel], refluxScale);
       }
     }
 
@@ -482,7 +482,7 @@ if (s_verbosity >= 3)
       if (m_opt.reflux_enthalpy || m_opt.reflux_concentration || m_opt.reflux_lambda)
       {
 
-        doExplicitReflux(m_lambda);
+        doExplicitReflux(ScalarVars::m_lambda);
 
         // Compute max lambda
         if (m_level==0)
@@ -600,8 +600,8 @@ if (s_verbosity >= 3)
       // now loop over levels and construct composite vel, lambda
       for (int lev = m_level; lev <= finest_level; lev++)
       {
-        compVel[lev] = &(*thisMLPtr->m_vectorNew[m_fluidVel]);
-        compLambda[lev] = &(*thisMLPtr->m_scalarNew[m_lambda]);
+        compVel[lev] = &(*thisMLPtr->m_vectorNew[VectorVars::m_fluidVel]);
+        compLambda[lev] = &(*thisMLPtr->m_scalarNew[ScalarVars::m_lambda]);
 
         RefCountedPtr<LevelData<FluxBox> > porosityFacePtr = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(thisMLPtr->m_grids, 1));
         thisMLPtr->fillScalarFace(*porosityFacePtr, m_time, m_porosity, true);
@@ -651,15 +651,15 @@ if (s_verbosity >= 3)
           CH_assert (fineML.m_level == lev+1);
 
           CoarseAverage& avgDown = fineML.m_coarseAverageVector;
-          LevelData<FArrayBox>& fineVel = *fineML.m_vectorNew[m_fluidVel];
+          LevelData<FArrayBox>& fineVel = *fineML.m_vectorNew[VectorVars::m_fluidVel];
           avgDown.averageToCoarse(levelVel, fineVel);
 
           CoarseAverage& scalAvgDown =  fineML.m_coarseAverageScalar;
 
-          scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[m_enthalpy],
-                                      *fineML.m_scalarNew[m_enthalpy]);
-          scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[m_bulkConcentration],
-                                      *fineML.m_scalarNew[m_bulkConcentration]);
+          scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[ScalarVars::m_enthalpy],
+                                      *fineML.m_scalarNew[ScalarVars::m_enthalpy]);
+          scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[ScalarVars::m_bulkConcentration],
+                                      *fineML.m_scalarNew[ScalarVars::m_bulkConcentration]);
 
           thisMLPtr->updateEnthalpyVariables();
 
@@ -672,7 +672,7 @@ if (s_verbosity >= 3)
       thisMLPtr = this;
       for (int lev = m_level; lev < finest_level; lev++)
       {
-        LevelData<FArrayBox>& levelVel = *thisMLPtr->m_vectorNew[m_fluidVel];
+        LevelData<FArrayBox>& levelVel = *thisMLPtr->m_vectorNew[VectorVars::m_fluidVel];
         const DisjointBoxLayout& levelGrids = levelVel.getBoxes();
         velBC.applyBCs(levelVel, levelGrids, thisMLPtr->problemDomain(),
                        thisMLPtr->m_dx, false); // not homogeneous
@@ -680,8 +680,8 @@ if (s_verbosity >= 3)
 
         // Calculate dSdt after reflux
         LevelData<FArrayBox> temporaryLD;
-        thisMLPtr->compute_d_dt(m_bulkConcentration, temporaryLD);
-        thisMLPtr->compute_d_dt(m_enthalpy, temporaryLD);
+        thisMLPtr->compute_d_dt(ScalarVars::m_bulkConcentration, temporaryLD);
+        thisMLPtr->compute_d_dt(ScalarVars::m_enthalpy, temporaryLD);
       }
 
       // call projection-based sync operations
@@ -696,7 +696,7 @@ if (s_verbosity >= 3)
       for (int lev = m_level; lev < finest_level; lev++)
       {
         LevelData<FArrayBox>& levelVel =
-            *thisMLPtr->m_vectorNew[m_fluidVel];
+            *thisMLPtr->m_vectorNew[VectorVars::m_fluidVel];
         const DisjointBoxLayout& levelGrids = levelVel.getBoxes();
         velBC.applyBCs(levelVel, levelGrids, thisMLPtr->problemDomain(),
                        thisMLPtr->m_dx, false); // not homogeneous
@@ -722,12 +722,12 @@ if (s_verbosity >= 3)
       // create boundary condition object and set physical BC's
       VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
 
-      velBC.applyBCs(*m_vectorNew[m_fluidVel], m_grids, m_problem_domain,
+      velBC.applyBCs(*m_vectorNew[VectorVars::m_fluidVel], m_grids, m_problem_domain,
                      m_dx, false); // not homogeneous
 
 
-      Interval velComps = m_vectorNew[m_fluidVel]->interval();
-      m_vectorNew[m_fluidVel]->exchange(velComps);
+      Interval velComps = m_vectorNew[VectorVars::m_fluidVel]->interval();
+      m_vectorNew[VectorVars::m_fluidVel]->exchange(velComps);
 
 
       bool computeFreestream = true;
@@ -774,21 +774,21 @@ if (s_verbosity >= 3)
     AMRLevelMushyLayer* AMRmlptr = this;
     while (AMRmlptr != NULL)
     {
-      DataIterator dit = (*AMRmlptr->m_vectorNew[m_fluidVelErr]).dataIterator();
+      DataIterator dit = (*AMRmlptr->m_vectorNew[VectorVars::m_fluidVelErr]).dataIterator();
       for (dit.reset(); dit.ok(); ++dit)
       {
-        (*AMRmlptr->m_vectorNew[m_fluidVelErr])[dit].setVal(0);
-        (*AMRmlptr->m_vectorNew[m_fluidVelErr])[dit].plus((*AMRmlptr->m_vectorNew[m_fluidVel])[dit]);
-        (*AMRmlptr->m_vectorNew[m_fluidVelErr])[dit].minus((*AMRmlptr->m_vectorNew[m_fluidVelAnalytic])[dit]);
+        (*AMRmlptr->m_vectorNew[VectorVars::m_fluidVelErr])[dit].setVal(0);
+        (*AMRmlptr->m_vectorNew[VectorVars::m_fluidVelErr])[dit].plus((*AMRmlptr->m_vectorNew[VectorVars::m_fluidVel])[dit]);
+        (*AMRmlptr->m_vectorNew[VectorVars::m_fluidVelErr])[dit].minus((*AMRmlptr->m_vectorNew[VectorVars::m_fluidVelAnalytic])[dit]);
 
-        (*AMRmlptr->m_scalarNew[m_Terr])[dit].copy((*AMRmlptr->m_scalarNew[m_temperatureAnalytic])[dit]);
-        (*AMRmlptr->m_scalarNew[m_Terr])[dit].minus((*AMRmlptr->m_scalarNew[m_temperature])[dit]);
+        (*AMRmlptr->m_scalarNew[ScalarVars::m_Terr])[dit].copy((*AMRmlptr->m_scalarNew[ScalarVars::m_temperatureAnalytic])[dit]);
+        (*AMRmlptr->m_scalarNew[ScalarVars::m_Terr])[dit].minus((*AMRmlptr->m_scalarNew[ScalarVars::m_temperature])[dit]);
       }
 
       // Backup data from this timestep
       AMRmlptr->backupTimestep();
 
-      Real maxU = ::computeNorm(*(AMRmlptr->m_vectorNew[m_fluidVel]), NULL, 1 , m_dx, Interval(0, SpaceDim-1), 0);
+      Real maxU = ::computeNorm(*(AMRmlptr->m_vectorNew[VectorVars::m_fluidVel]), NULL, 1 , m_dx, Interval(0, SpaceDim-1), 0);
       if (maxU > 1e10)
       {
         pout() << "WARNING - During PostTimestep,  Max U = " << maxU << endl;
@@ -1191,8 +1191,8 @@ Real AMRLevelMushyLayer::doHCreflux()
 
         for (int dir=0; dir<SpaceDim; dir++)
         {
-          (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[m_enthalpy], Hcomp);
-          (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[m_bulkConcentration], Ccomp);
+          (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[ScalarVars::m_enthalpy], Hcomp);
+          (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[ScalarVars::m_bulkConcentration], Ccomp);
         }
 
 
@@ -1396,17 +1396,17 @@ Real AMRLevelMushyLayer::doHCreflux()
       for (levelDit.reset(); levelDit.ok(); ++levelDit)
       {
 
-        //(*thisMLPtr->m_scalarNew[m_enthalpy])[levelDit()].plus(levelCorr[levelDit()], 0, 0, 1);
-        //(*thisMLPtr->m_scalarNew[m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], 1, 0, 1);
+        //(*thisMLPtr->m_scalarNew[ScalarVars::m_enthalpy])[levelDit()].plus(levelCorr[levelDit()], 0, 0, 1);
+        //(*thisMLPtr->m_scalarNew[ScalarVars::m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], 1, 0, 1);
 
         if (m_opt.reflux_enthalpy)
         {
-        (*thisMLPtr->m_scalarNew[m_enthalpy])[levelDit()].plus(levelCorr[levelDit()],refluxCorrSign, 0, 0, 1);
+        (*thisMLPtr->m_scalarNew[ScalarVars::m_enthalpy])[levelDit()].plus(levelCorr[levelDit()],refluxCorrSign, 0, 0, 1);
         }
 
         if (m_opt.reflux_concentration)
         {
-        (*thisMLPtr->m_scalarNew[m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], refluxCorrSign, 1, 0, 1);
+        (*thisMLPtr->m_scalarNew[ScalarVars::m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], refluxCorrSign, 1, 0, 1);
         }
       }
 
@@ -1451,10 +1451,10 @@ Real AMRLevelMushyLayer::doHCreflux()
 //        CH_assert(fineML.m_level = lev + 1);
 //        CoarseAverage& scalAvgDown =  fineML.m_coarseAverageScalar;
 //
-//        scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[m_enthalpy],
-//                                    *fineML.m_scalarNew[m_enthalpy]);
-//        scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[m_bulkConcentration],
-//                                    *fineML.m_scalarNew[m_bulkConcentration]);
+//        scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[ScalarVars::m_enthalpy],
+//                                    *fineML.m_scalarNew[ScalarVars::m_enthalpy]);
+//        scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[ScalarVars::m_bulkConcentration],
+//                                    *fineML.m_scalarNew[ScalarVars::m_bulkConcentration]);
 //
 //        thisMLPtr->updateEnthalpyVariables();
 //

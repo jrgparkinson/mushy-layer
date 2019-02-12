@@ -608,10 +608,10 @@ readCheckpointLevel(HDF5Handle& a_handle)
 
       for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
       {
-        (*m_scalarNew[m_enthalpy])[dit].plus(-1.0);
-        (*m_scalarOld[m_enthalpy])[dit].plus(-1.0);
-        (*m_scalarNew[m_bulkConcentration])[dit].plus(1.0);
-        (*m_scalarOld[m_bulkConcentration])[dit].plus(1.0);
+        (*m_scalarNew[ScalarVars::m_enthalpy])[dit].plus(-1.0);
+        (*m_scalarOld[ScalarVars::m_enthalpy])[dit].plus(-1.0);
+        (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit].plus(1.0);
+        (*m_scalarOld[ScalarVars::m_bulkConcentration])[dit].plus(1.0);
       }
     }
     else
@@ -897,25 +897,25 @@ void AMRLevelMushyLayer::getExtraPlotFields()
 {
 
 
-  EdgeToCell(m_advVel, *m_vectorNew[m_advectionVel]);
+  EdgeToCell(m_advVel, *m_vectorNew[VectorVars::m_advectionVel]);
 
   // Copy pi and phi from projection
   if (m_projection.isInitialized())
   {
-    m_projection.Pi().copyTo(*m_scalarNew[m_pi]);
-    m_projection.phi().copyTo(*m_scalarNew[m_phi]);
+    m_projection.Pi().copyTo(*m_scalarNew[ScalarVars::m_pi]);
+    m_projection.phi().copyTo(*m_scalarNew[ScalarVars::m_phi]);
 
-    m_projection.Pi().copyTo(*m_scalarNew[m_MACBC]);
+    m_projection.Pi().copyTo(*m_scalarNew[ScalarVars::m_MACBC]);
 
-    m_projection.MACrhs().copyTo(*m_scalarNew[m_MACrhs]);
-    m_projection.CCrhs().copyTo(*m_scalarNew[m_CCrhs]);
+    m_projection.MACrhs().copyTo(*m_scalarNew[ScalarVars::m_MACrhs]);
+    m_projection.CCrhs().copyTo(*m_scalarNew[ScalarVars::m_CCrhs]);
 
-    m_projection.CCcorrection().copyTo(*m_vectorNew[m_CCcorrection]);
-    EdgeToCell( m_projection.MACcorrection(), *m_vectorNew[m_MACcorrection]);
+    m_projection.CCcorrection().copyTo(*m_vectorNew[VectorVars::CCcorrection]);
+    EdgeToCell( m_projection.MACcorrection(), *m_vectorNew[VectorVars::m_MACcorrection]);
 
-    EdgeToCell(m_projection.grad_eLambda(), *m_vectorNew[m_freestreamCorrection]);
+    EdgeToCell(m_projection.grad_eLambda(), *m_vectorNew[VectorVars::m_freestreamCorrection]);
 
-    Divergence::levelDivergenceMAC(*m_scalarNew[m_divUcorr], m_projection.grad_eLambda(), m_dx);
+    Divergence::levelDivergenceMAC(*m_scalarNew[ScalarVars::m_divUcorr], m_projection.grad_eLambda(), m_dx);
 
     bool scaleMACBCWithChi = false;
     Real BCscale = 1.0;
@@ -929,23 +929,23 @@ void AMRLevelMushyLayer::getExtraPlotFields()
     AMRLevelMushyLayer* coarsestML = this->getCoarsestLevel();
     Real coarsestDt = coarsestML->dt();
 
-    for (DataIterator dit = m_scalarNew[m_MACBC]->dataIterator(); dit.ok(); ++dit)
+    for (DataIterator dit = m_scalarNew[ScalarVars::m_MACBC]->dataIterator(); dit.ok(); ++dit)
     {
-      (*m_scalarNew[m_MACBC])[dit].mult(0.5*m_dt);
+      (*m_scalarNew[ScalarVars::m_MACBC])[dit].mult(0.5*m_dt);
 
-//      (*m_scalarNew[m_CCrhs])[dit].mult(m_dt);
+//      (*m_scalarNew[ScalarVars::m_CCrhs])[dit].mult(m_dt);
 
-//      (*m_scalarNew[m_MACrhs])[dit].mult(phiScale);
+//      (*m_scalarNew[ScalarVars::m_MACrhs])[dit].mult(phiScale);
 
 
 //      if (scaleMACBCWithChi)
 //      {
-//  //      (*m_scalarNew[m_MACBC])[dit].mult((*m_scalarNew[m_porosity])[dit]);
-//        (*m_scalarNew[m_MACBC])[dit].mult(BCscale);
+//  //      (*m_scalarNew[ScalarVars::m_MACBC])[dit].mult((*m_scalarNew[ScalarVars::m_porosity])[dit]);
+//        (*m_scalarNew[ScalarVars::m_MACBC])[dit].mult(BCscale);
 //      }
 
       // Scale MAC correction
-      (*m_vectorNew[m_MACcorrection])[dit].divide(m_dt/coarsestDt);
+      (*m_vectorNew[VectorVars::m_MACcorrection])[dit].divide(m_dt/coarsestDt);
     }
 
   }
@@ -1009,8 +1009,8 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
   {
     AMRLevelMushyLayer* ml = hierarchy[lev];
 
-    amrPsi.push_back(&(*ml->m_scalarNew[m_streamfunction]));
-    amrVorticity.push_back(&(*ml->m_scalarNew[m_vorticity]));
+    amrPsi.push_back(&(*ml->m_scalarNew[ScalarVars::m_streamfunction]));
+    amrVorticity.push_back(&(*ml->m_scalarNew[ScalarVars::m_vorticity]));
   }
 
   // now solve on this level
@@ -1029,7 +1029,7 @@ void AMRLevelMushyLayer::computeVorticity()
   // this breaks the "const"-ness of the function,
   // but is necessary to ensure that boundary
   // conditions are properly set.
-  LevelData<FArrayBox>* velPtr = &(*m_vectorNew[m_fluidVel]);
+  LevelData<FArrayBox>* velPtr = &(*m_vectorNew[VectorVars::m_fluidVel]);
   LevelData<FArrayBox>& vel =
       *(const_cast<LevelData<FArrayBox>*>(&*velPtr));
 
@@ -1040,7 +1040,7 @@ void AMRLevelMushyLayer::computeVorticity()
     // do quadratic C/F BC's
     // for now, assume that BC's are with new velocity
     // (may need to be changed for fine-level regridding)
-    LevelData<FArrayBox>& crseVel = (*getCoarserLevel()->m_vectorNew[m_fluidVel]);
+    LevelData<FArrayBox>& crseVel = (*getCoarserLevel()->m_vectorNew[VectorVars::m_fluidVel]);
     const DisjointBoxLayout& crseGrids = crseVel.getBoxes();
     int nRefCrse = getCoarserLevel()->refRatio();
 
@@ -1073,7 +1073,7 @@ void AMRLevelMushyLayer::computeVorticity()
         // will need to make a new data structure which has the write number of componenets for the dimensionality of the problem
 
         // and then compute vorticity
-//        FORT_COMPUTEVORT(CHF_FRA1((*m_scalarNew[m_vorticity])[dit],dir),
+//        FORT_COMPUTEVORT(CHF_FRA1((*m_scalarNew[ScalarVars::m_vorticity])[dit],dir),
 //                         CHF_CONST_FRA(vel[dit]),
 //                         CHF_BOX(grids[dit]),
 //                         CHF_CONST_REAL(m_dx),
@@ -1083,7 +1083,7 @@ void AMRLevelMushyLayer::computeVorticity()
     else if (SpaceDim == 2)
     {
       int dir = 2;
-      FORT_COMPUTEVORT(CHF_FRA1((*m_scalarNew[m_vorticity])[dit],0),
+      FORT_COMPUTEVORT(CHF_FRA1((*m_scalarNew[ScalarVars::m_vorticity])[dit],0),
                        CHF_CONST_FRA(vel[dit]),
                        CHF_BOX(grids[dit]),
                        CHF_CONST_REAL(m_dx),

@@ -26,7 +26,7 @@ MushyLayerParams::MushyLayerParams() {
 
   // Use some ridiculous defaults to highlight any parameters we forget to set
 
-  physicalProblem = -999;
+  physicalProblem = PhysicalProblems::m_mushyLayer;
   viscosity = -999 ;
   heatConductivityLiquid = -999;
   heatConductivitySolid = -999 ;
@@ -82,8 +82,8 @@ MushyLayerParams::MushyLayerParams() {
 
   fixedTempDirection = -999;
   heleShaw = false;
-  permeabilityFunction = m_kozenyCarman;
-  m_porosityFunction = -1;
+  permeabilityFunction = PermeabilityFunctions::m_kozenyCarman;
+  m_porosityFunction = ParamsPorosityFunctions::m_porosityConstant;
   inflowVelocity = -999;
 
 
@@ -138,10 +138,18 @@ void MushyLayerParams::getParameters()
 
   ParmParse pp("parameters");
 
-  pp.get("problem_type", physicalProblem);
+  int phys_problem;
+  pp.get("problem_type", phys_problem);
+  physicalProblem = PhysicalProblems(phys_problem);
 
-  pp.query("permeabilityFunction", permeabilityFunction);
-  pp.query("porosityFunction", m_porosityFunction);
+  int perm_func = permeabilityFunction;
+  pp.query("permeabilityFunction", perm_func);
+  permeabilityFunction = PermeabilityFunctions(perm_func);
+
+  int poros_func = m_porosityFunction;
+  pp.query("porosityFunction", poros_func);
+  m_porosityFunction = ParamsPorosityFunctions(poros_func);
+
   pp.query("heleShaw", heleShaw);
 
   // I don't think I necessarily need these, if I'm specifying non dimensional parameters
@@ -723,49 +731,29 @@ Real MushyLayerParams::calculatePermeability(Real liquidFraction)
   Real solidFraction = 1-liquidFraction;
   //    Real referencePerm = params.referencePermeability;
 
-  if (permeabilityFunction == m_pureFluid)
+  if (permeabilityFunction == PermeabilityFunctions::m_pureFluid)
   {
     permeability = 1;
   }
-  else if (permeabilityFunction == m_cubicPermeability)
+  else if (permeabilityFunction == PermeabilityFunctions::m_cubicPermeability)
   {
     permeability = pow(liquidFraction,3);
   }
-  else if (permeabilityFunction == m_kozenyCarman)
+  else if (permeabilityFunction == PermeabilityFunctions::m_kozenyCarman)
   {
     permeability = pow(liquidFraction,3) / pow(solidFraction,2);
   }
-  else if(permeabilityFunction == m_logPermeability)
+  else if(permeabilityFunction == PermeabilityFunctions::m_logPermeability)
   {
     permeability = - pow(liquidFraction,2) * log(solidFraction);
   }
-  else if(permeabilityFunction == m_porosityPermeability)
+  else if(permeabilityFunction == PermeabilityFunctions::m_porosityPermeability)
   {
     permeability = liquidFraction;
   }
-  else if(permeabilityFunction == m_permeabilityXSquared)
+  else if(permeabilityFunction == PermeabilityFunctions::m_permeabilityXSquared)
   {
     MayDay::Error("Can't calculate permeability for x^2 from just the porosity");
-    //                  permeability = x*x;
-    //
-    //                  Real scale = 0.1;
-    //
-    //                  // Creates a channel of high permeability in the middle of the domain
-    //                  permeability = exp(-pow(x-0.5,2)/scale);
-    //
-    //                  // Create a hole of low permeabilty in the middle of the domain
-    //                  //                                      permeability = 1-exp(-pow(x-0.5,2)/scale)*exp(-pow(z-0.5,2)/scale);
-    //
-    //                  // Two permeability holes in the left and right of the domain
-    //                  scale = 0.03;
-    //                  Real zScale = 0.12;
-    //                  permeability = exp(-pow(x-0.2,2)/scale)*exp(-pow(z-0.5,2)/zScale);
-    //                  permeability = permeability + exp(-pow(x-0.8,2)/scale)*exp(-pow(z-0.5,2)/zScale);
-    //                  permeability = 1-permeability;
-    //
-    //                  //Block flow at the boundaries
-    //                  scale = 0.02;
-    //                  permeability = exp(-pow(x-0.5,2)/scale);
   }
   else
   {

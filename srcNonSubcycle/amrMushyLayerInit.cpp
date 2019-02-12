@@ -75,15 +75,15 @@ amrMushyLayer::setDefaults()
   m_varNames = Vector<string>(m_numVars, string("Placeholder name"));
 
 
-  m_varNames[m_enthalpy] = string("Enthalpy");
-  m_varNames[m_enthalpySolidus] = string("Enthalpy solidus");
-  m_varNames[m_enthalpyLiquidus] = string("Enthalpy liquidus");
-  m_varNames[m_enthalpyEutectic] = string("Enthalpy eutectic");
-  m_varNames[m_bulkConcentration] = string("Composition");
+  m_varNames[ScalarVars::m_enthalpy] = string("Enthalpy");
+  m_varNames[ScalarVars::m_enthalpySolidus] = string("Enthalpy solidus");
+  m_varNames[ScalarVars::m_enthalpyLiquidus] = string("Enthalpy liquidus");
+  m_varNames[ScalarVars::m_enthalpyEutectic] = string("Enthalpy eutectic");
+  m_varNames[ScalarVars::m_bulkConcentration] = string("Composition");
   m_varNames[m_theta] = string("temperature");
   m_varNames[m_thetaLiquidus] = string("temperature liquidus");
   m_varNames[m_thetaSolidus] = string("temperature solidus");
-  m_varNames[m_porosity] = string("Porosity");
+  m_varNames[ScalarVars::m_porosity] = string("Porosity");
   m_varNames[m_compositionLiquid] = string("Liquid Composition");
   m_varNames[m_compositionSolid] = string("Solid Composition");
   m_varNames[m_porosityEutectic] = string("Eutectic Porosity");
@@ -94,20 +94,20 @@ amrMushyLayer::setDefaults()
   m_varNames[m_Tanalytic] = string("Analytic Temperature");
   m_varNames[m_solidFractionTrue] = string("Analytic Solid Fraction");
   m_varNames[m_thetaTrue] = string("Analytic theta");
-  m_varNames[m_enthalpyAdvection] = string("Enthalpy advection");
+  m_varNames[ScalarVars::m_enthalpyAdvection] = string("Enthalpy advection");
   m_varNames[m_thetaLaplacian] = string("theta laplacian");
-  m_varNames[m_streamFunction] = string("Stream function");
+  m_varNames[ScalarVars::m_streamFunction] = string("Stream function");
   m_varNames[m_ThetaLAnalytic] = string("Analytic liquid concentration");
   m_varNames[m_resid] = string("Residual");
   m_varNames[m_concSource] = string("Concentration Eqn Source");
   m_varNames[m_ThetaDiffusion] = string("Theta Diffusion");
   m_varNames[m_ThetaDiffusionN] = string("Theta Diffusion at n");
   m_varNames[m_thetaBcoef] = string("theta B coeff");
-  m_varNames[m_permeability] = string("Permeability");
-  m_varNames[m_pressure] = string("Pressure");
+  m_varNames[ScalarVars::m_permeability] = string("Permeability");
+  m_varNames[ScalarVars::m_pressure] = string("Pressure");
   m_varNames[m_ThetaBCoef] = string("Theta B coeff");
-  m_varNames[m_divU] = string("Divergence U");
-  m_varNames[m_enthalpyAnalytic] = string("Enthalpy analytic");
+  m_varNames[ScalarVars::m_divU] = string("Divergence U");
+  m_varNames[ScalarVars::m_enthalpyAnalytic] = string("Enthalpy analytic");
   m_varNames[m_ThetaAnalytic] = string("Theta analytic");
   m_varNames[m_ThetaFrameAdvection] = string("Theta frame adv");
   m_varNames[m_ThetaSSource] = string("Theta solid source");
@@ -120,7 +120,7 @@ amrMushyLayer::setDefaults()
   m_varNames[m_CFInterpTest] = string("CF interp test");
   m_varNames[m_divUstar] = string("div U star");
   m_varNames[m_divUstarErr] = string("div U star err");
-  m_varNames[m_lambda] = string("lambda passive tracer");
+  m_varNames[ScalarVars::m_lambda] = string("lambda passive tracer");
   m_varNames[m_lambdaPostCorr] = string("lambda after correction");
   m_varNames[m_buoyancyFilter] = string("buoyancy Filter");
   //m_varNames[m_] = string("");
@@ -132,11 +132,11 @@ amrMushyLayer::setDefaults()
   m_numVectorVars = 6;
 
   m_vectorVarNames = Vector<string>(m_numVectorVars, string("Placeholder name"));
-  m_vectorVarNames[m_fluidVel] = string("Fluid velocity");
+  m_vectorVarNames[VectorVars::m_fluidVel] = string("Fluid velocity");
   m_vectorVarNames[m_fluidVelPred] = string("Fluid velocity prediction");
   m_vectorVarNames[m_gradPressure] = string("Grad pressure");
-  m_vectorVarNames[m_fluidVelAnalytic] = string("Fluid vel analytic");
-  m_vectorVarNames[m_fluidVelErr] = string("Fluid vel error");
+  m_vectorVarNames[VectorVars::m_fluidVelAnalytic] = string("Fluid vel analytic");
+  m_vectorVarNames[VectorVars::m_fluidVelErr] = string("Fluid vel error");
   m_vectorVarNames[m_gradPressureErr] = string("Grad Pressure Err");
 }
 
@@ -330,8 +330,8 @@ amrMushyLayer::initialize()
       m_dScalar[a_var].resize(m_max_level+1);
       m_fluxRegister[a_var].resize(m_max_level+1);
 
-      m_scalarDiffusionCoeffs[m_enthalpy] = 1.0;
-      m_scalarDiffusionCoeffs[m_bulkConcentration] = 1/m_parameters.lewis;
+      m_scalarDiffusionCoeffs[ScalarVars::m_enthalpy] = 1.0;
+      m_scalarDiffusionCoeffs[ScalarVars::m_bulkConcentration] = 1/m_parameters.lewis;
     }
 
     m_HC.resize(m_max_level+1, NULL);
@@ -1283,7 +1283,7 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
     aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(activeGrids[lev], numComps, ivGhost));
     porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(activeGrids[lev], 1, ivGhost));
 
-    CellToEdge(*m_scalarNew[m_porosity][lev], *porosityFace[lev]);
+    CellToEdge(*m_scalarNew[ScalarVars::m_porosity][lev], *porosityFace[lev]);
 
     for (DataIterator dit = bCoef[lev]->dataIterator(); dit.ok(); ++dit)
     {
@@ -1304,8 +1304,8 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
 
       for (int dir=0; dir<SpaceDim; dir++)
       {
-        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[m_enthalpy], Hcomp);
-        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[m_bulkConcentration], Ccomp);
+        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[ScalarVars::m_enthalpy], Hcomp);
+        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[ScalarVars::m_bulkConcentration], Ccomp);
       }
     }
 
@@ -1325,8 +1325,8 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
   AMRNonLinearMultiCompOpFactory* HCop = new AMRNonLinearMultiCompOpFactory();
   HCop->define(m_amrDomains[0], activeGrids, m_refinement_ratios, m_amrDx[0], HC_BC,
                alpha, aCoef, beta, bCoef,
-               m_scalarNew[m_enthalpySolidus], m_scalarNew[m_enthalpyLiquidus],
-               m_scalarNew[m_enthalpyEutectic],
+               m_scalarNew[ScalarVars::m_enthalpySolidus], m_scalarNew[ScalarVars::m_enthalpyLiquidus],
+               m_scalarNew[ScalarVars::m_enthalpyEutectic],
                mlParamsPtr, temperature_Sl_BC,
                relaxMode, porosityEdgeBC);
 
@@ -1419,7 +1419,7 @@ getThetaLOpCoeffs(Real& alpha, Real& beta,
   bCoef.resize(m_finest_level+1);
   b.resize(m_finest_level+1, NULL);
 
-  Vector<LevelData<FArrayBox>* > averagePorosity = timeCenteredScalar(m_porosity);
+  Vector<LevelData<FArrayBox>* > averagePorosity = timeCenteredScalar(ScalarVars::m_porosity);
 
   for (int lev=0; lev<=m_finest_level; lev++)
   {
@@ -1435,7 +1435,7 @@ getThetaLOpCoeffs(Real& alpha, Real& beta,
     {
 
       FArrayBox& fab = (*m_scalarNew[m_ThetaBCoef][lev])[dit];
-      FArrayBox& fab2 = (*m_scalarNew[m_porosity][lev])[dit];
+      FArrayBox& fab2 = (*m_scalarNew[ScalarVars::m_porosity][lev])[dit];
       fab.copy(fab2);
     }
 
@@ -1472,7 +1472,7 @@ getThetaLOpCoeffs(Real& alpha, Real& beta,
     //			FluxBox& fbox = (*bCoef[lev])[dit];
     //
     //			FArrayBox& fab = (*m_scalarNew[m_ThetaBCoef][lev])[dit];
-    //			FArrayBox& fab2 = (*m_scalarNew[m_porosity][lev])[dit];
+    //			FArrayBox& fab2 = (*m_scalarNew[ScalarVars::m_porosity][lev])[dit];
     //
     //			int temp=1;
     //		}
@@ -1525,7 +1525,7 @@ thetaVCOpCoeffs(Real& alpha, Real& beta,
   aCoef.resize(m_finest_level+1);
   bCoef.resize(m_finest_level+1);
 
-  Vector<LevelData<FArrayBox>* > chi = timeCenteredScalar(m_porosity);
+  Vector<LevelData<FArrayBox>* > chi = timeCenteredScalar(ScalarVars::m_porosity);
 
   for (int lev=0; lev<=m_finest_level; lev++)
   {
@@ -1544,9 +1544,9 @@ thetaVCOpCoeffs(Real& alpha, Real& beta,
     {
       Real k = m_parameters.heatConductivityRatio;
       (*m_scalarNew[m_thetaBcoef][lev])[dit].setVal(1);
-      (*m_scalarNew[m_thetaBcoef][lev])[dit] -= (*m_scalarNew[m_porosity][lev])[dit];
+      (*m_scalarNew[m_thetaBcoef][lev])[dit] -= (*m_scalarNew[ScalarVars::m_porosity][lev])[dit];
       (*m_scalarNew[m_thetaBcoef][lev])[dit].mult(k);
-      (*m_scalarNew[m_thetaBcoef][lev])[dit] += (*m_scalarNew[m_porosity][lev])[dit];
+      (*m_scalarNew[m_thetaBcoef][lev])[dit] += (*m_scalarNew[ScalarVars::m_porosity][lev])[dit];
 
       //Ensure we have the right minus sign!
       (*m_scalarNew[m_thetaBcoef][lev])[dit].mult(-1);
@@ -1811,7 +1811,7 @@ void amrMushyLayer::loadFromFile(const int a_var, const string filename, const i
 //
 //        {
 //          (*m_scalarNew[m_solidFraction][lev])[dit].setVal(1.0);
-//          (*m_scalarNew[m_solidFraction][lev])[dit] -= (*m_scalarNew[m_porosity][lev])[dit];
+//          (*m_scalarNew[m_solidFraction][lev])[dit] -= (*m_scalarNew[ScalarVars::m_porosity][lev])[dit];
 //        }
 //      }
 //  }

@@ -15,8 +15,60 @@
 #include "parstream.H"
 #include <iomanip>
 #include <fstream>
+#include "mushyLayerOpt.h"
 
 #include "NamespaceHeader.H"
+
+
+/// Different diagnostics we consider
+enum DiagnosticNames{
+  diag_time,
+  diag_dt,
+
+  diag_averageVerticalSaltFlux,
+  diag_L2FsVertDiffusion,
+  diag_L2FsVertFluid,
+  diag_L2FsVertFrame,
+  diag_L1FsVertDiffusion,
+  diag_L1FsVertFluid,
+  diag_L1FsVertFrame,
+  diag_L0FsVertDiffusion,
+  diag_L0FsVertFluid,
+  diag_L0FsVertFrame,
+  diag_soluteFluxTop,
+  diag_soluteFluxBottom,
+  diag_soluteFluxSponge,
+  diag_heatFluxBottom,
+  diag_heatFluxTop,
+  diag_dUdt,
+  diag_dSdt,
+  diag_dTdt,
+  diag_chimneySpacing,
+  diag_chimneyWidth,
+  diag_HorizAvSalinity0,
+  diag_HorizAvSalinity20,
+  diag_HorizAvSalinity40,
+  diag_HorizAvSalinity60,
+  diag_avSalinity,
+  diag_mushDepth,
+  diag_Nu,
+  diag_NuRight,
+  diag_NuLeft,
+  diag_NuMiddle,
+  diag_maxVhalf,
+  diag_maxUhalf,
+  diag_heatFluxAbsMismatch,
+  diag_saltFluxAbsMismatch,
+  diag_heatFluxRelMismatch,
+  diag_saltFluxRelMismatch,
+
+  diag_maxLambda,
+  diag_sumLambda,
+  diag_maxVel,
+
+  // Make sure this comes last in this list!
+  numDiagnostics
+};
 
 /// Class to contain diagnostics
 /**
@@ -35,22 +87,22 @@ public:
   virtual  ~Diagnostics ();
 
   /// Add a diagnostic
-  void addDiagnostic(int a_diagnostic, Real a_time, Real value);
+  void addDiagnostic(DiagnosticNames a_diagnostic, Real a_time, Real value);
 
   /// Get the value of a diagnostic, \f$ \alpha \f$
-  Real getDiagnostic(int a_diagnostic, Real a_time, int timestepOffset = 0);
+  Real getDiagnostic(DiagnosticNames a_diagnostic, Real a_time, int timestepOffset = 0);
 
   /// Get the moving average of a diagnostic
-  Real getMovingAverage(int a_diagnostic, Real a_endTime, Real a_timeSpan);
+  Real getMovingAverage(DiagnosticNames a_diagnostic, Real a_endTime, Real a_timeSpan);
 
   /// Get \f$ \frac{d \alpha}{d t} \f$
-  Real getRateOfChange(int a_diagnostic, Real a_endTime, Real a_dt);
+  Real getRateOfChange(DiagnosticNames a_diagnostic, Real a_endTime, Real a_dt);
 
   /// Calculate \f$ \frac{d^2 \alpha}{dt^2} \f$
-  Real getSecondRateOfChange(int a_diagnostic, Real a_endTime, Real a_dt);
+  Real getSecondRateOfChange(DiagnosticNames a_diagnostic, Real a_endTime, Real a_dt);
 
   /// Determine if the moving average has reached steady state
-  bool movingAverageHasConverged(int a_diagnostic, Real m_time, Real a_dt);
+  bool movingAverageHasConverged(DiagnosticNames a_diagnostic, Real m_time, Real a_dt);
 
   /// Print header of all diagnostic names
   void printHeader();
@@ -65,61 +117,12 @@ public:
   void printDiagnostics(Real a_time, std::ofstream& a_file);
 
   /// Returns whether or not the specified diagnostic is one that's in one list of diagnostics to print
-  bool diagnosticIsIncluded(const int a_diag);
-
-  /// Different diagnostics we consider
-  enum diagnosticNames{
-    m_time,
-    m_dt,
-
-    m_averageVerticalSaltFlux,
-    m_L2FsVertDiffusion,
-    m_L2FsVertFluid,
-    m_L2FsVertFrame,
-    m_L1FsVertDiffusion,
-    m_L1FsVertFluid,
-    m_L1FsVertFrame,
-    m_L0FsVertDiffusion,
-    m_L0FsVertFluid,
-    m_L0FsVertFrame,
-    m_soluteFluxTop,
-    m_soluteFluxBottom,
-    m_soluteFluxSponge,
-    m_heatFluxBottom,
-    m_heatFluxTop,
-    m_dUdt,
-    m_dSdt,
-    m_dTdt,
-    m_chimneySpacing,
-    m_chimneyWidth,
-    m_HorizAvSalinity0,
-    m_HorizAvSalinity20,
-    m_HorizAvSalinity40,
-    m_HorizAvSalinity60,
-    m_avSalinity,
-    m_mushDepth,
-    m_Nu,
-    m_NuRight,
-    m_NuLeft,
-    m_NuMiddle,
-    m_maxVhalf,
-    m_maxUhalf,
-    m_heatFluxAbsMismatch,
-    m_saltFluxAbsMismatch,
-    m_heatFluxRelMismatch,
-    m_saltFluxRelMismatch,
-
-    m_maxLambda,
-    m_sumLambda,
-    m_maxVel,
+  bool diagnosticIsIncluded(const DiagnosticNames a_diag);
 
 
-    // Make sure this comes last in this list!
-    m_numDiagnostics
-  };
 
   /// Specify which diagnostics we should print out
-  void setPrintDiags(Vector<int> a_diagsToPrint);
+  void setPrintDiags(Vector<DiagnosticNames> a_diagsToPrint);
 
 private:
 
@@ -133,7 +136,7 @@ private:
   Vector<string> m_diagnosticNames;
 
   /// Diagnostics to print out
-  Vector<int> m_diagsToPrint;
+  Vector<DiagnosticNames> m_diagsToPrint;
 
   /// Timescale for computing moving averages
   Real movingAverageTimescale;

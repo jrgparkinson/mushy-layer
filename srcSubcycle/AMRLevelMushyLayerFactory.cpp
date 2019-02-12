@@ -16,8 +16,6 @@
 
 #include "NamespaceHeader.H"
 
-//todo - mushy layer factory should own far more properties than this
-// for example can probably contain mushy layer params in this class
 
 AMRLevelMushyLayerFactory::
 AMRLevelMushyLayerFactory( MushyLayerOptions a_opt)

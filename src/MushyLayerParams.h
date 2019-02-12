@@ -17,6 +17,45 @@
 #include "CH_HDF5.H"
 
 
+/// Different options for enforced porosity
+enum ParamsPorosityFunctions {
+  m_porosityConstant,
+  m_porosityLinear,
+  m_porosityGaussian,
+  m_porosityEdge,
+  m_porosityTimeDependent,
+};
+
+
+/// Different possible permeability functions
+enum PermeabilityFunctions {
+  m_pureFluid,
+  m_cubicPermeability,
+  m_kozenyCarman,
+  m_logPermeability,
+  m_permeabilityXSquared,
+  m_porosityPermeability
+};
+
+/// Different physical problems
+enum PhysicalProblems {
+  m_mushyLayer,
+  m_burgersSin,
+  m_burgersPeriodic,
+  m_poiseuilleFlow,
+  m_diffusion,
+  m_solidificationNoFlow,
+  m_cornerFlow,
+  m_sidewallHeating,
+  m_HRL,
+  m_rayleighBenard,
+  m_soluteFluxTest,
+  m_refluxTest,
+  m_zeroPorosityTest,
+  m_meltingIceBlock,
+  m_convectionMixedPorous,
+  m_vortexPair,
+};
 
 /// Class to handle the physical parameters of a mushy layer simulation
 /**
@@ -30,7 +69,7 @@ public:
 
 	// So many parameters
 
-	int
+	PhysicalProblems
 	/// Benchmark problem to solve
         physicalProblem;
 
@@ -484,52 +523,13 @@ public:
 	int fixedTempDirection;
 
 	/// Which permeability function should we use?
-	int permeabilityFunction;
+	PermeabilityFunctions permeabilityFunction;
 
 	/// Are we running the experiment in a Hele-Shaw cell?
 	bool heleShaw;
 
-	/// Different possible permeability functions
-	enum permeabilityFunctions {
-		m_pureFluid,
-		m_cubicPermeability,
-		m_kozenyCarman,
-		m_logPermeability,
-		m_permeabilityXSquared,
-		m_porosityPermeability
-	};
-
 	/// For cases where want to impose a porosity, e.g. for benchmarking
-	int m_porosityFunction;
-
-	/// Different options for enforced porosity
-	enum porosityFunctions {
-	  m_porosityConstant,
-	  m_porosityLinear,
-	  m_porosityGaussian,
-	  m_porosityEdge,
-	  m_porosityTimeDependent,
-	};
-
-	/// Different physical problems
-	enum physicalProblems {
-			m_mushyLayer,
-			m_burgersSin,
-			m_burgersPeriodic,
-			m_poiseuilleFlow,
-			m_diffusion,
-			m_solidificationNoFlow,
-			m_cornerFlow,
-			m_sidewallHeating,
-			m_HRL,
-			m_rayleighBenard,
-			m_soluteFluxTest,
-			m_refluxTest,
-			m_zeroPorosityTest,
-			m_meltingIceBlock,
-			m_convectionMixedPorous,
-			m_vortexPair,
-		};
+	ParamsPorosityFunctions m_porosityFunction;
 
 	/// Get all parameters from the inputs file
 	void getParameters();

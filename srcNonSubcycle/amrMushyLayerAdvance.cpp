@@ -20,7 +20,7 @@ void amrMushyLayer::enforcePorosity()
 {
   for (int lev=0; lev<=m_finest_level; lev++)
   {
-    LevelData<FArrayBox>& levelPhiNew = *(m_scalarNew[m_porosity][lev]);
+    LevelData<FArrayBox>& levelPhiNew = *(m_scalarNew[ScalarVars::m_porosity][lev]);
     DataIterator levelDit = levelPhiNew.dataIterator();
     for (levelDit.begin(); levelDit.ok(); ++levelDit)
     {
@@ -116,7 +116,7 @@ amrMushyLayer::timeStep()
 //    a_ThetaLOld[lev] = &(*a_scalarOld[m_compositionLiquid][lev]);
 //
 //    Theta_prev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
-//    m_scalarNew[m_bulkConcentration][lev]->copyTo(*Theta_prev[lev]);
+//    m_scalarNew[ScalarVars::m_bulkConcentration][lev]->copyTo(*Theta_prev[lev]);
 //
 //    H_prev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
 //    m_scalarNew[m_HC][lev]->copyTo(*H_prev[lev]);
@@ -125,7 +125,7 @@ amrMushyLayer::timeStep()
 //    m_scalarNew[m_HC][lev]->copyTo(*H_twoPrev[lev]);
 //
 //    Theta_twoPrev[lev] = RefCountedPtr<LevelData<FArrayBox> > (new LevelData<FArrayBox>(m_amrGrids[lev], 1, zeroGhost));
-//    m_scalarNew[m_bulkConcentration][lev]->copyTo(*Theta_twoPrev[lev]);
+//    m_scalarNew[ScalarVars::m_bulkConcentration][lev]->copyTo(*Theta_twoPrev[lev]);
 //
 //  }
 
@@ -469,13 +469,13 @@ calculatePermeability(bool oldTime)
 
       if (oldTime)
       {
-        ::calculatePermeability((*m_scalarOld[m_permeability][lev])[dit],
+        ::calculatePermeability((*m_scalarOld[ScalarVars::m_permeability][lev])[dit],
                                 (*m_scalarOld[m_solidFraction][lev])[dit],
                                 m_parameters, m_amrDx[lev]);
       }
       else
       {
-        ::calculatePermeability((*m_scalarNew[m_permeability][lev])[dit],
+        ::calculatePermeability((*m_scalarNew[ScalarVars::m_permeability][lev])[dit],
                                 (*m_scalarNew[m_solidFraction][lev])[dit],
                                 m_parameters, m_amrDx[lev]);
       }
@@ -540,7 +540,7 @@ doImplicitVelocityReflux(int m_level)
     if  ((lev >= m_level) && (lev < m_finest_level))
     {
       refluxScale = -1.0/m_amrDx[lev]; // petermc made negative, 7 Dec 07
-      m_vectorFluxRegister[m_fluidVel][lev]->reflux(levelRefluxData,
+      m_vectorFluxRegister[VectorVars::m_fluidVel][lev]->reflux(levelRefluxData,
                                                     refluxScale);
     }
 
@@ -577,7 +577,7 @@ doImplicitVelocityReflux(int m_level)
   int normType = 0;
   Interval allVelComps(0, SpaceDim-1);
 
-  Real velNorm = computeNorm(m_vectorNew[m_fluidVel], m_refinement_ratios,
+  Real velNorm = computeNorm(m_vectorNew[VectorVars::m_fluidVel], m_refinement_ratios,
                              m_amrDx[m_level], allVelComps, normType, m_level);
 
   // now loop over directions
@@ -658,7 +658,7 @@ doImplicitVelocityReflux(int m_level)
     // now increment velocity with reflux correction
     for (int lev=m_level; lev<=m_finest_level; ++lev)
     {
-      //			LevelData<FArrayBox>& levelVel = *(m_vectorNew[m_fluidVel][lev]);
+      //			LevelData<FArrayBox>& levelVel = *(m_vectorNew[VectorVars::m_fluidVel][lev]);
       LevelData<FluxBox>& levelVel = *(m_fluidAdv[lev]);
       LevelData<FArrayBox>& levelCorr = *(refluxCorr[lev]);
       DataIterator levelDit = levelCorr.dataIterator();
@@ -728,7 +728,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
   {
     zFluidVel[lev] = RefCountedPtr<LevelData<FArrayBox> >
     (new LevelData<FArrayBox>(m_amrGrids[lev], 1,m_ghostVect));
-    m_vectorNew[m_fluidVel][lev]->copyTo(Interval(1,1), *zFluidVel[lev], Interval(0,0));
+    m_vectorNew[VectorVars::m_fluidVel][lev]->copyTo(Interval(1,1), *zFluidVel[lev], Interval(0,0));
 
     if (lev > 0)
     {
@@ -736,7 +736,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
     }
 
     LevelData<FArrayBox>& uStar = *m_vectorNew[m_fluidVelPred][lev];
-    LevelData<FArrayBox>& uAnalytic = *m_vectorNew[m_fluidVelAnalytic][lev];
+    LevelData<FArrayBox>& uAnalytic = *m_vectorNew[VectorVars::m_fluidVelAnalytic][lev];
     LevelData<FArrayBox>& gradPErr = *m_vectorNew[m_gradPressureErr][lev];
     LevelData<FArrayBox>& divUstarAnalytic = *m_scalarNew[m_divUstarErr][lev];
     LevelData<FArrayBox>& pressureErr = *m_scalarNew[m_pressureError][lev];
@@ -760,16 +760,16 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
         Real permeability, theta, Theta;
 
         //Time average permeability
-        Real permeabilityNew = (*m_scalarNew[m_permeability][lev])[dit](iv,0);
-        Real permeabilityOld = (*m_scalarOld[m_permeability][lev])[dit](iv,0);
+        Real permeabilityNew = (*m_scalarNew[ScalarVars::m_permeability][lev])[dit](iv,0);
+        Real permeabilityOld = (*m_scalarOld[ScalarVars::m_permeability][lev])[dit](iv,0);
 
 
         Real thetaNew = (*m_scalarNew[m_theta][lev])[dit](iv,0);
         Real thetaOld = (*m_scalarOld[m_theta][lev])[dit](iv,0);
 
 
-        Real ThetaNew = (*m_scalarNew[m_bulkConcentration][lev])[dit](iv,0);
-        Real ThetaOld = (*m_scalarOld[m_bulkConcentration][lev])[dit](iv,0);
+        Real ThetaNew = (*m_scalarNew[ScalarVars::m_bulkConcentration][lev])[dit](iv,0);
+        Real ThetaOld = (*m_scalarOld[ScalarVars::m_bulkConcentration][lev])[dit](iv,0);
 
         permeability = (1-alpha) * permeabilityOld + alpha * permeabilityNew;
         theta = (1-alpha) * thetaOld + alpha * thetaNew;
@@ -885,9 +885,9 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
 
   CCProjectorComp proj;
   proj.define(activeGrids, m_amrDomains, m_amrDx, m_refinement_ratios, m_finest_level,
-              *m_physBCPtr, m_scalarNew[m_theta], m_scalarNew[m_permeability], m_num_ghost);
+              *m_physBCPtr, m_scalarNew[m_theta], m_scalarNew[ScalarVars::m_permeability], m_num_ghost);
 
-  proj.projectVelocity(m_vectorNew[m_fluidVel], m_scalarNew[m_permeability],
+  proj.projectVelocity(m_vectorNew[VectorVars::m_fluidVel], m_scalarNew[ScalarVars::m_permeability],
                        m_fluidAdv, m_vectorNew[m_fluidVelPred], m_fluidVelDiffOrder);
 
   logMessage(10, "    amrMushyLayerAdvance::updateVelocity - apply corrections");
@@ -910,11 +910,11 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
 
   for (int lev=0; lev <= m_finest_level; lev++)
   {
-    //		setValLevel(*m_scalarNew[m_lambda][lev], 1.0);
-    for (DataIterator dit = m_scalarNew[m_lambda][lev]->dataIterator(); dit.ok(); ++dit)
+    //		setValLevel(*m_scalarNew[ScalarVars::m_lambda][lev], 1.0);
+    for (DataIterator dit = m_scalarNew[ScalarVars::m_lambda][lev]->dataIterator(); dit.ok(); ++dit)
     {
-      (*m_scalarNew[m_lambda][lev])[dit].setVal(1.0);
-      (*m_scalarOld[m_lambda][lev])[dit].setVal(1.0);
+      (*m_scalarNew[ScalarVars::m_lambda][lev])[dit].setVal(1.0);
+      (*m_scalarOld[ScalarVars::m_lambda][lev])[dit].setVal(1.0);
       (*m_scalarNew[m_lambdaPostCorr][lev])[dit].setVal(1.0);
       (*m_scalarOld[m_lambdaPostCorr][lev])[dit].setVal(1.0);
       (*zeroSource[lev])[dit].setVal(0.0);
@@ -924,7 +924,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
   advectScalar(m_lambda, zeroSource, m_fluidAdv);
 
   Vector<LevelData<FArrayBox>* > a_lambda(m_finest_level+1, NULL);
-  refCountedPtrToPtr(m_scalarNew[m_lambda], a_lambda);
+  refCountedPtrToPtr(m_scalarNew[ScalarVars::m_lambda], a_lambda);
 
   proj.doLambdaCorrection(m_fluidAdv, a_lambda, m_time, m_dt);*/
 
@@ -942,7 +942,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
 //  {
 //    for (DataIterator dit = m_scalarNew[m_lambdaPostCorr][lev]->dataIterator(); dit.ok(); ++dit)
 //    {
-//      (*m_scalarNew[m_lambda][lev])[dit].plus(-1);
+//      (*m_scalarNew[ScalarVars::m_lambda][lev])[dit].plus(-1);
 //      (*m_scalarNew[m_lambdaPostCorr][lev])[dit].plus(-1);
 //    }
 //  }
@@ -956,7 +956,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
   }
 
   proj.getDivUStar(m_scalarNew[m_divUstar]);
-  proj.getPressure(m_scalarNew[m_pressure]);
+  proj.getPressure(m_scalarNew[ScalarVars::m_pressure]);
   proj.getGradPressure(m_vectorNew[m_gradPressure]);
   proj.getGradPressureEdge(gradPressureEdge);
 
@@ -996,7 +996,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
       uEdgeFinePtr = NULL;
       dxFine = NULL;
     }
-    Divergence::compDivergenceMAC(*m_scalarNew[m_divU][lev], *m_fluidAdv[lev], uEdgeFinePtr,
+    Divergence::compDivergenceMAC(*m_scalarNew[ScalarVars::m_divU][lev], *m_fluidAdv[lev], uEdgeFinePtr,
                                   m_amrDx[lev],
                                   dxFine,
                                   getRefinementRatio(lev),
@@ -1438,24 +1438,24 @@ calculateThetaLSourceTerm(Vector<LevelData<FArrayBox>* > V_dThetadz_n, Vector<Le
   {
     for (DataIterator dit = m_amrGrids[lev].dataIterator(); dit.ok(); ++dit)
     {
-      (*m_dScalar[m_bulkConcentration][lev])[dit].setVal(0);
+      (*m_dScalar[ScalarVars::m_bulkConcentration][lev])[dit].setVal(0);
 
       // Frame advection, averaged over times n+1 and n
       if (m_frameAdvectionMethod == m_finiteDifference)
       {
-        (*m_dScalar[m_bulkConcentration][lev])[dit].setVal(0);
-        (*m_dScalar[m_bulkConcentration][lev])[dit] += (*V_dThetadz_n[lev])[dit];
-        (*m_dScalar[m_bulkConcentration][lev])[dit] += (*V_dThetadz_nPlusOne[lev])[dit];
-        (*m_dScalar[m_bulkConcentration][lev])[dit] /= 2;
+        (*m_dScalar[ScalarVars::m_bulkConcentration][lev])[dit].setVal(0);
+        (*m_dScalar[ScalarVars::m_bulkConcentration][lev])[dit] += (*V_dThetadz_n[lev])[dit];
+        (*m_dScalar[ScalarVars::m_bulkConcentration][lev])[dit] += (*V_dThetadz_nPlusOne[lev])[dit];
+        (*m_dScalar[ScalarVars::m_bulkConcentration][lev])[dit] /= 2;
       }
 
       //Theta_s source term
       (*m_dScalar[m_compositionSolid][lev])[dit].setVal(1);
-      (*m_dScalar[m_compositionSolid][lev])[dit].minus((*m_scalarNew[m_porosity][lev])[dit]);
+      (*m_dScalar[m_compositionSolid][lev])[dit].minus((*m_scalarNew[ScalarVars::m_porosity][lev])[dit]);
       (*m_dScalar[m_compositionSolid][lev])[dit].mult((*m_scalarNew[m_compositionSolid][lev])[dit]);
 
       (*ThetaSSource[lev])[dit].setVal(1);
-      (*ThetaSSource[lev])[dit].minus((*m_scalarOld[m_porosity][lev])[dit]);
+      (*ThetaSSource[lev])[dit].minus((*m_scalarOld[ScalarVars::m_porosity][lev])[dit]);
       (*ThetaSSource[lev])[dit].mult((*m_scalarOld[m_compositionSolid][lev])[dit]);
 
       (*m_scalarNew[m_ThetaSSource][lev])[dit].setVal(0);
@@ -1466,15 +1466,15 @@ calculateThetaLSourceTerm(Vector<LevelData<FArrayBox>* > V_dThetadz_n, Vector<Le
 
       //Porosity source term
       (*m_scalarNew[m_ThetaPorositySource][lev])[dit].setVal(0);
-      (*m_scalarNew[m_ThetaPorositySource][lev])[dit] += (*m_scalarNew[m_porosity][lev])[dit];
-      (*m_scalarNew[m_ThetaPorositySource][lev])[dit] -= (*m_scalarOld[m_porosity][lev])[dit];
+      (*m_scalarNew[m_ThetaPorositySource][lev])[dit] += (*m_scalarNew[ScalarVars::m_porosity][lev])[dit];
+      (*m_scalarNew[m_ThetaPorositySource][lev])[dit] -= (*m_scalarOld[ScalarVars::m_porosity][lev])[dit];
       (*m_scalarNew[m_ThetaPorositySource][lev])[dit] /= m_dt;
       (*m_scalarNew[m_ThetaPorositySource][lev])[dit].mult((*averageThetaL[lev])[dit]);
       (*m_scalarNew[m_ThetaPorositySource][lev])[dit].mult(-1);
 
       //Put it all together, praying that all the signs are correct
       (*ThetaLSource[lev])[dit].setVal(0);
-      (*ThetaLSource[lev])[dit] += (*m_dScalar[m_bulkConcentration][lev])[dit];
+      (*ThetaLSource[lev])[dit] += (*m_dScalar[ScalarVars::m_bulkConcentration][lev])[dit];
       (*ThetaLSource[lev])[dit] += (*m_scalarNew[m_ThetaPorositySource][lev])[dit];
       (*ThetaLSource[lev])[dit] += (*m_scalarNew[m_ThetaSSource][lev])[dit];
 
@@ -1713,7 +1713,7 @@ getPressureVCcoefs(Vector<RefCountedPtr<LevelData<FArrayBox> > >& aCoef,
 
     //		//Turn FArrayBox into FluxBox for B coefficient
     //LevelData<FluxBox> *fluxBox = &(*bCoef[lev]);
-    CellToEdge(*m_scalarNew[m_permeability][lev], *fluxBox);
+    CellToEdge(*m_scalarNew[ScalarVars::m_permeability][lev], *fluxBox);
 
 
     // Multiply bCoef fluxbox by -1 so signs are correct
@@ -1743,7 +1743,7 @@ amrMushyLayer::getFluidAdvection(const int lev)
   m_fluidAdv[lev] = new LevelData<FluxBox>(m_amrGrids[lev], 1, m_ghostVect);
 
   //Set everything to zero
-  for (DataIterator dit = m_vectorNew[m_fluidVel][lev]->dataIterator(); dit.ok(); ++dit)
+  for (DataIterator dit = m_vectorNew[VectorVars::m_fluidVel][lev]->dataIterator(); dit.ok(); ++dit)
   {
     FluxBox& temp_advVel = (*m_fluidAdv[lev])[dit];
     for (int faceDir=0; faceDir < SpaceDim; faceDir++)
@@ -1757,16 +1757,16 @@ amrMushyLayer::getFluidAdvection(const int lev)
   }
 
   // Get velocities from the FArrayBox
-  m_vectorNew[m_fluidVel][lev]->exchange();
-  CellToEdge(*m_vectorNew[m_fluidVel][lev], *m_fluidAdv[lev]);
+  m_vectorNew[VectorVars::m_fluidVel][lev]->exchange();
+  CellToEdge(*m_vectorNew[VectorVars::m_fluidVel][lev], *m_fluidAdv[lev]);
 
   m_fluidAdv[lev]->exchange();
 
   //Do my own quadratic interpolation!!
 
-  for (DataIterator dit = m_vectorNew[m_fluidVel][lev]->dataIterator(); dit.ok(); ++dit)
+  for (DataIterator dit = m_vectorNew[VectorVars::m_fluidVel][lev]->dataIterator(); dit.ok(); ++dit)
   {
-    //			Box b =  (*m_vectorNew[m_fluidVel][lev])[dit].box();
+    //			Box b =  (*m_vectorNew[VectorVars::m_fluidVel][lev])[dit].box();
     Box b = m_amrGrids[lev][dit];
 
     FluxBox& edgeData  = (*m_fluidAdv[lev])[dit];
@@ -1780,9 +1780,9 @@ amrMushyLayer::getFluidAdvection(const int lev)
       for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
       {
         IntVect iv = bit();
-        Real y0 = (*m_vectorNew[m_fluidVel][lev])[dit](iv - BASISV(idir), idir);
-        Real y1 = (*m_vectorNew[m_fluidVel][lev])[dit](iv, idir);
-        Real y2 = (*m_vectorNew[m_fluidVel][lev])[dit](iv + BASISV(idir), idir);
+        Real y0 = (*m_vectorNew[VectorVars::m_fluidVel][lev])[dit](iv - BASISV(idir), idir);
+        Real y1 = (*m_vectorNew[VectorVars::m_fluidVel][lev])[dit](iv, idir);
+        Real y2 = (*m_vectorNew[VectorVars::m_fluidVel][lev])[dit](iv + BASISV(idir), idir);
 
         if (m_fluidVelInterpOrder == 2)
         {
@@ -1804,9 +1804,9 @@ amrMushyLayer::getFluidAdvection(const int lev)
       for (BoxIterator bit = BoxIterator(end); bit.ok(); ++bit)
       {
         IntVect iv = bit();
-        Real y0 = (*m_vectorNew[m_fluidVel][lev])[dit](iv - 2*BASISV(idir), idir);
-        Real y1 = (*m_vectorNew[m_fluidVel][lev])[dit](iv - BASISV(idir), idir);
-        Real y2 = (*m_vectorNew[m_fluidVel][lev])[dit](iv, idir);
+        Real y0 = (*m_vectorNew[VectorVars::m_fluidVel][lev])[dit](iv - 2*BASISV(idir), idir);
+        Real y1 = (*m_vectorNew[VectorVars::m_fluidVel][lev])[dit](iv - BASISV(idir), idir);
+        Real y2 = (*m_vectorNew[VectorVars::m_fluidVel][lev])[dit](iv, idir);
 
         if (m_fluidVelInterpOrder == 2)
         {
@@ -1831,13 +1831,13 @@ amrMushyLayer::getFluidAdvection(const int lev)
 
 
 
-  //	for (DataIterator dit = m_vectorNew[m_fluidVel][lev]->dataIterator(); dit.ok(); ++dit)
+  //	for (DataIterator dit = m_vectorNew[VectorVars::m_fluidVel][lev]->dataIterator(); dit.ok(); ++dit)
   //		{
   //
   //			FluxBox& advFlux = (*m_fluidAdv[lev])[dit];
-  //			FArrayBox& Ux = (*m_vectorNew[m_fluidVel][lev])[dit];
-  //			FArrayBox& Uz = (*m_vectorNew[m_fluidVel][lev])[dit];
-  //			Uz.copy((*m_vectorNew[m_fluidVel][lev])[dit], 1,0,1);
+  //			FArrayBox& Ux = (*m_vectorNew[VectorVars::m_fluidVel][lev])[dit];
+  //			FArrayBox& Uz = (*m_vectorNew[VectorVars::m_fluidVel][lev])[dit];
+  //			Uz.copy((*m_vectorNew[VectorVars::m_fluidVel][lev])[dit], 1,0,1);
   //				int temp=0;
   //		}
 

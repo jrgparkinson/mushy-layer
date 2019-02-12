@@ -141,7 +141,7 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
 
         for (int lev=startLev; lev<=finest_level; lev++)
         {
-          thisMLPtr->m_vectorNew[m_fluidVel]->copyTo(velComps, *amrS[lev],
+          thisMLPtr->m_vectorNew[VectorVars::m_fluidVel]->copyTo(velComps, *amrS[lev],
                                                      tempComps);
           thisMLPtr = thisMLPtr->getFinerLevel();
         }
@@ -203,7 +203,7 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
 
         for (int lev=startLev; lev<=finest_level; lev++)
         {
-          amrLapS[lev]->copyTo(tempComps,*(thisMLPtr->m_vectorNew[m_fluidVel]),
+          amrLapS[lev]->copyTo(tempComps,*(thisMLPtr->m_vectorNew[VectorVars::m_fluidVel]),
                                velComps);
           thisMLPtr = thisMLPtr->getFinerLevel();
         }
@@ -476,11 +476,11 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   {
     for (BoxIterator bit(m_grids[dit]); bit.ok(); ++bit)
     {
-      if ((*m_scalarNew[m_porosity])[dit](bit()) == 1.0)
+      if ((*m_scalarNew[ScalarVars::m_porosity])[dit](bit()) == 1.0)
       {
         liquidCells |= bit();
       }
-      else if ((*m_scalarNew[m_porosity])[dit](bit()) > marginalPorosityLimit)
+      else if ((*m_scalarNew[ScalarVars::m_porosity])[dit](bit()) > marginalPorosityLimit)
       {
         marginalCells |= bit();
       }
@@ -544,7 +544,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       IntVectSet saltyCells;
       tagCellsVar(saltyCells, salinityThreshold,
                   2, // tagging method - refine where the value is more than refinThreshold
-                  m_bulkConcentration,
+                  ScalarVars::m_bulkConcentration,
                   -1);
 
       // Only take the cells which have the porosity gradient
@@ -800,7 +800,7 @@ void AMRLevelMushyLayer::tagMushyCells(IntVectSet& localTags)
   {
     Box b = m_grids[dit];
 
-    FArrayBox& porosityFAB = (*m_scalarNew[m_porosity])[dit];
+    FArrayBox& porosityFAB = (*m_scalarNew[ScalarVars::m_porosity])[dit];
     for (BoxIterator bit(b); bit.ok(); ++bit)
     {
       IntVect iv = bit();
@@ -852,7 +852,7 @@ void AMRLevelMushyLayer::tagMushLiquidBoundary(IntVectSet& localTags)
     Box b = m_grids[dit];
     b.grow(-1); // shrink by 1 in all directions so we can search adjacent cells
 
-    FArrayBox& porosityFAB = (*m_scalarNew[m_porosity])[dit];
+    FArrayBox& porosityFAB = (*m_scalarNew[ScalarVars::m_porosity])[dit];
     for (BoxIterator bit(b); bit.ok(); ++bit)
     {
       IntVect iv = bit();
@@ -1442,7 +1442,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       // This deals with periodic BCs
       thisAmrVel.exchange();
 
-      //      amrLambda[lev] = &(*thisLevelData->m_scalarNew[m_lambda]);
+      //      amrLambda[lev] = &(*thisLevelData->m_scalarNew[ScalarVars::m_lambda]);
 
       if (thisLevelData->m_finer_level_ptr != NULL)
       {
@@ -1648,7 +1648,7 @@ void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
   for (int lev = 0; lev < numLevels; lev++)
   {
 
-    amrLambda[lev] = &(*thisLevelData->m_scalarNew[m_lambda]);
+    amrLambda[lev] = &(*thisLevelData->m_scalarNew[ScalarVars::m_lambda]);
 
     if (thisLevelData->m_finer_level_ptr != NULL)
     {
@@ -1749,9 +1749,9 @@ void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
 //      if (startLev<m_level) thisMLPtr = thisMLPtr->getCoarserLevel();
 //      for (int lev=startLev; lev<=finest_level; lev++)
 //      {
-//        thisMLPtr->m_vectorOld[m_fluidVel]->copyTo(velComps, *oldS[lev], tempComps);
+//        thisMLPtr->m_vectorOld[VectorVars::m_fluidVel]->copyTo(velComps, *oldS[lev], tempComps);
 //        // do this as initial guess?
-//        thisMLPtr->m_vectorOld[m_fluidVel]->copyTo(velComps, *newS[lev], tempComps);
+//        thisMLPtr->m_vectorOld[VectorVars::m_fluidVel]->copyTo(velComps, *newS[lev], tempComps);
 //        thisMLPtr = thisMLPtr->getFinerLevel();
 //      }
 //
@@ -1770,7 +1770,7 @@ void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
 //      thisMLPtr = this;
 //      for (int lev=m_level; lev <= finest_level; lev++)
 //      {
-//        newS[lev]->copyTo(tempComps, *thisMLPtr->m_vectorNew[m_fluidVel], velComps);
+//        newS[lev]->copyTo(tempComps, *thisMLPtr->m_vectorNew[VectorVars::m_fluidVel], velComps);
 //
 //        thisMLPtr = thisMLPtr->getFinerLevel();
 //      }

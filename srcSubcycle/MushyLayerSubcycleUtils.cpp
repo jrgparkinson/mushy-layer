@@ -29,95 +29,77 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ParmParse ppParams("parameters");
   ParmParse ppMG("amrmultigrid");
   ParmParse ppProjection("projection");
+  ParmParse ppInit("init");
 
-  Real cfl = 0.8;
-  ppMain.get("cfl",cfl);
+  MushyLayerOptions opt;
+
+  opt.cfl = 0.8;
+  ppMain.get("cfl",opt.cfl);
 
   // This is really the domain width, not length,
   // but changing it in the inputs files would be a right pain
   // at this point
-  Real domainWidth = -1;
-  ppMain.query("domain_length",domainWidth); // retained for backward compatability
-  ppMain.query("domain_width",domainWidth);
+  opt.domainWidth = -1;
+  ppMain.query("domain_length", opt.domainWidth); // retained for backward compatability
+  ppMain.query("domain_width", opt.domainWidth);
+
+  std::vector<int> num_cells; // (num_read_levels,1);
+  ppMain.getarr("num_cells",num_cells,0,SpaceDim);
 
   if (ppMain.contains("domain_height"))
   {
-    Real domainHeight;
-    ppMain.query("domain_height", domainHeight);
-
-    std::vector<int> num_cells; // (num_read_levels,1);
-    ppMain.getarr("num_cells",num_cells,0,SpaceDim);
-
-    domainWidth = domainHeight*num_cells[0]/num_cells[SpaceDim-1];
+    ppMain.query("domain_height", opt.domainHeight);
+    opt.domainWidth = opt.domainHeight*num_cells[0]/num_cells[SpaceDim-1];
 
   }
+  else
+  {
+    // compute domainHeight from domainWidth
+    opt.domainHeight = opt.domainWidth*num_cells[SpaceDim-1]/num_cells[0];
+  }
 
-  if (domainWidth <= 0)
+  if (opt.domainWidth <= 0)
   {
     MayDay::Error("No domain width specified, or domain width is invalid");
   }
 
-  Real refineThresh = 0.3;
-  ppMain.get ("refine_thresh",refineThresh);
 
-  int tagBufferSize = 4;
-  ppMain.get("tag_buffer_size",tagBufferSize);
 
-  bool useLimiting = true;
-  ppMain.get("use_limiting", useLimiting);
 
-  int verbosity = 1;
-  ppMain.query("verbosity", verbosity);
-
-  bool useSubcycling = true;
-  ppMain.query("use_subcycling", useSubcycling);
-
-  // 1st/2nd order interpolation for advection
-  Real CFinterpOrder_advection = 1;
-  ppMain.query("advectionInterpOrder", CFinterpOrder_advection);
+  opt.verbosity = 1;
+  ppMain.query("verbosity", opt.verbosity);
 
   // 1 for volume averaged, 0 for max
-  int steadyStateNormType = 1;
-  ppMain.query("steadyStateNormType", steadyStateNormType);
+  opt.steadyStateNormType = 1;
+  ppMain.query("steadyStateNormType", opt.steadyStateNormType);
 
-  Real fixedDt = -1;
-  ppMain.query("fixed_dt", fixedDt);
+  /**
+   * Timestepping
+   */
+  opt.fixedDt = -1;
+  ppMain.query("fixed_dt", opt.fixedDt);
 
-  Real max_dt_growth = 1.1;
-  ppMain.query("max_dt_growth", max_dt_growth);
+  opt.max_dt_growth = 1.1;
+  ppMain.query("max_dt_growth", opt.max_dt_growth);
 
-  // more new params
-  bool ignoreSolveFails = true;
-  ppMain.query("ignoreSolverFails", ignoreSolveFails);
+  opt.init_dt_scale = 0.1;
+  ppMain.query("init_dt_scale", opt.init_dt_scale);
 
-  int solverFailRestartMethod = 0;
-  ppMain.query("solverFailRestartMethod", solverFailRestartMethod);
+  opt.ignoreSolveFails = true;
+  ppMain.query("ignoreSolverFails", opt.ignoreSolveFails);
 
-  Real adv_vel_centering_growth = 1.01;
-  ppMain.query("adv_vel_centering_growth", adv_vel_centering_growth);
+  opt.solverFailRestartMethod = 0;
+  ppMain.query("solverFailRestartMethod", opt.solverFailRestartMethod);
 
-  Real initial_dt_multiplier = 0.1;
-  ppMain.query("initial_cfl", initial_dt_multiplier);
+  opt.adv_vel_centering_growth = 1.01;
+  ppMain.query("adv_vel_centering_growth", opt.adv_vel_centering_growth);
 
+  opt.advVelCentering = 0.1;
+  ppMain.query("init_advVel_centering", opt.advVelCentering);
 
+  opt.initial_dt_multiplier = 0.1;
+  ppMain.query("initial_cfl", opt.initial_dt_multiplier);
 
-  MushyLayerOptions opt;
-
-  opt.cfl=cfl;
-  opt.domainWidth=domainWidth;
-  opt.refineThresh=refineThresh;
-  opt.tagBufferSize=tagBufferSize;
-  opt.useLimiting=useLimiting;
-  opt.CFinterpOrder_advection=CFinterpOrder_advection;
-  opt.steadyStateNormType=steadyStateNormType;
-  opt.fixedDt=fixedDt;
-  opt.max_dt_growth=max_dt_growth;
-  opt.verbosity=verbosity;
-  opt.useSubcycling=useSubcycling;
-  opt.ignoreSolveFails=ignoreSolveFails;
-  opt.solverFailRestartMethod=solverFailRestartMethod;
-  opt.adv_vel_centering_growth=adv_vel_centering_growth;
-  opt.initial_dt_multiplier=initial_dt_multiplier;
 
   opt.computeDiagnostics = true;
   ppMain.query("computeDiagnostics", opt.computeDiagnostics);
@@ -125,28 +107,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.doEulerPart = true;
   ppMain.query("doEuler", opt.doEulerPart);
 
-  opt.doProjection=true;
-  ppMain.query("doProjection", opt.doProjection);
-
-  opt.doSyncOperations = true;
-  ppMain.query("doSyncOperations", opt.doSyncOperations);
-
-  opt.enforceAnalyticSoln = false;
-  ppMain.query("enforceAnalyticSoln", opt.enforceAnalyticSoln);
-  Real analyticSoln=-1;
-  ppMain.query("analyticSoln", analyticSoln);
-  if (analyticSoln > -1)
-  {
-    opt.enforceAnalyticSoln = true;
-  }
-
-  opt.maxDivUFace = 1e-8;
-  ppMain.query("maxDivUFace", opt.maxDivUFace);
 
 
-  int mgtype = MGmethod::MGTypeFAS;
-  ppMG.query("MGtype", mgtype);
-  opt.MGtype = MGmethod(mgtype);
+  opt.doScalarAdvectionDiffusion = true;
+  ppMain.query("doScalarAdvectionDiffusion", opt.doScalarAdvectionDiffusion);
 
   int advectionMethod =  velocityAdvectionTypes::m_porosityOutsideAdvection;
   ppMain.query("advectionMethod", advectionMethod);
@@ -154,6 +118,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.skipTrickySourceTerm = -1;
   ppMain.query("skipTrickySourceTime", opt.skipTrickySourceTerm);
+
+    opt.allowMulticompAdvection = true;
+    ppMain.query("allowMulticompAdvection", opt.allowMulticompAdvection);
+
 
   opt.scaleP_MAC = true;
   ppMain.query("scalePwithChi", opt.scaleP_MAC);
@@ -166,11 +134,42 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.explicitDarcyTerm = false;
   ppMain.query("explicitDarcyTerm", opt.explicitDarcyTerm);
 
-  opt.implicitAdvectionSolve = false;
-  ppMain.query("implicitAdvectionSolve", opt.implicitAdvectionSolve);
 
   opt.solidPorosity = 0.05;
   ppMain.query("solidPorosity", opt.solidPorosity);
+
+  /**
+   * Physics related options
+   */
+
+  opt.iter_plot_interval = -1;
+  ppMain.query("iter_plot_interval", opt.iter_plot_interval);
+
+  opt.lowerPorosityLimit = 1e-15;
+  ppMain.query("lowPorosityLimit", opt.lowerPorosityLimit);
+
+  /**
+   * AMR related options
+   */
+  opt.useSubcycling = true;
+  ppMain.query("use_subcycling", opt.useSubcycling);
+
+  // 1st/2nd order interpolation for advection
+  opt.CFinterpOrder_advection = 1;
+  ppMain.query("advectionInterpOrder", opt.CFinterpOrder_advection);
+
+
+  opt.refineThresh = 0.3;
+  ppMain.get ("refine_thresh", opt.refineThresh);
+
+  opt.tagBufferSize = 4;
+  ppMain.get("tag_buffer_size", opt.tagBufferSize);
+
+  opt.doProjection=true;
+  ppMain.query("doProjection", opt.doProjection);
+
+  opt.doSyncOperations = true;
+  ppMain.query("doSyncOperations", opt.doSyncOperations);
 
   opt.do_postRegrid_smoothing = false;
   ppMain.query("do_postRegrid_smoothing", opt.do_postRegrid_smoothing);
@@ -188,6 +187,19 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("reflux_concentration", opt.reflux_concentration);
   ppMain.query("reflux_lambda", opt.reflux_lambda);
 
+  opt.variable_eta_factor = 1.0;
+  ppMain.query("variable_eta_factor", opt.variable_eta_factor);
+  CH_assert(opt.variable_eta_factor >= 1); // This must be >= 1, else eta will increase when it should be decreasing (and vice-versa)
+
+  opt.compute_initial_VD_corr = true;
+  ppMain.query("initialize_VD_corr", opt.compute_initial_VD_corr);
+
+  /**
+   * Solver options
+   */
+  opt.useLimiting = true;
+  ppMain.get("use_limiting", opt.useLimiting);
+
   opt.viscous_solver_tol = 1e-10;
   ppMain.query("viscous_solver_tol", opt.viscous_solver_tol);
 
@@ -198,39 +210,75 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("viscous_num_smooth_up", opt.viscous_num_smooth_up);
 
 
-  opt.variable_eta_factor = 1.0;
-  ppMain.query("variable_eta_factor", opt.variable_eta_factor);
-  CH_assert(opt.variable_eta_factor >= 1); // This must be >= 1, else eta will increase when it should be decreasing (and vice-versa)
-
-  opt.iter_plot_interval = -1;
-  ppMain.query("iter_plot_interval", opt.iter_plot_interval);
-
-  opt.compute_initial_VD_corr = true;
-  ppMain.query("initialize_VD_corr", opt.compute_initial_VD_corr);
-
   opt.timeIntegrationOrder = 1;
   ppMain.query("time_integration_order", opt.timeIntegrationOrder);
 
   opt.verbosity_multigrid = 0;
   ppMG.query("multigrid", opt.verbosity_multigrid);
 
-  opt.lowerPorosityLimit = 1e-15;
-  ppMain.query("lowPorosityLimit", opt.lowerPorosityLimit);
+  opt.implicitAdvectionSolve = false;
+  ppMain.query("implicitAdvectionSolve", opt.implicitAdvectionSolve);
+
+  opt.maxDivUFace = 1e-8;
+  ppMain.query("maxDivUFace", opt.maxDivUFace);
+
+  int mgtype = MGmethod::MGTypeFAS;
+  ppMG.query("MGtype", mgtype);
+  opt.MGtype = MGmethod(mgtype);
+
+  /***
+   * Initialisation
+   */
+
+  opt.num_init_passes = 1;
+  ppMain.query("num_init_passes", opt.num_init_passes);
+
+  opt.restart_new_time = -1.0;
+  ppMain.query("restart_newTime", opt.restart_new_time);
+
+  opt.increaseDt = true;
+  ppMain.query("init_increase_dt", opt.increaseDt);
+
+  opt.init_add_subtract_grad_p = false;
+  ppMain.query("init_add_subtract_grad_p", opt.init_add_subtract_grad_p);
+
+  opt.init_compute_uDelu = true;
+     ppMain.query("init_compute_uDelu", opt.init_compute_uDelu);
+
+  /**
+   * Initial conditions options
+   */
+
+  opt.enforceAnalyticSoln = false;
+  ppMain.query("enforceAnalyticSoln", opt.enforceAnalyticSoln);
+  Real analyticSoln=-1;
+  ppMain.query("analyticSoln", analyticSoln);
+  if (analyticSoln > -1)
+  {
+    opt.enforceAnalyticSoln = true;
+  }
 
   opt.initialPerturbation = 0.0;
   ppMain.query("initialPerturbation", opt.initialPerturbation);
 
-  opt.delayedPerturbation = 0.0;
-  opt.perturbationTime = 0.0;
-  opt.perturbationWavenumber = 1.0;
-  opt.perturbationSin = false;
-  opt.fixedPorosity = -1.0;
 
+  opt.delayedPerturbation = 0.0;
   ppMain.query("delayedPerturbaation", opt.delayedPerturbation);
+
+  opt.perturbationTime = 0.0;
   ppMain.query("perturbationTime", opt.perturbationTime);
+
+  opt.perturbationWavenumber = 1.0;
   ppMain.query("perturbationWavenumber", opt.perturbationWavenumber);
+
+  opt.perturbationSin = false;
   ppMain.query("perturbationSin", opt.perturbationSin);
+
+  opt.fixedPorosity = -1.0;
   ppMain.query("fixed_porosity", opt.fixedPorosity);
+
+  opt.initVel = 0.0;
+  ppInit.query("initVel", opt.initVel);
 
   int porosityFunc = PorosityFunctions::constantLiquid;
   ppMain.query("porosity_function", porosityFunc);
@@ -238,6 +286,31 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.restartPerturbation = 0.0;
   ppMain.query("restart_perturbation", opt.restartPerturbation);
+
+  opt.radius = 0.1*opt.domainWidth;
+  ppMain.query("radius", opt.radius);
+
+  opt.initVelScale = 1e-3;
+  ppMain.query("initVelScale", opt.initVelScale);
+
+  opt.summerProfile = -1;
+  ppInit.query("summerProfile", opt.summerProfile);
+
+  opt.mushHeight = opt.domainHeight/2;
+  ppInit.query("summerProfileMushHeight", opt.mushHeight);
+
+  opt.linearGradient = false;
+  ppInit.query("linearGradient", opt.linearGradient);
+
+  opt.meltPondDepth = 0;
+  ppMain.query("meltPondDepth", opt.meltPondDepth);
+
+  // 0 is enthalpy
+  opt.restart_perturbation_var = ScalarVars::m_enthalpy;
+  ppMain.query("restart_perturbation_var", opt.restart_perturbation_var);
+
+  opt.horizAverageRestart = false;
+  ppMain.query("horizontallyAverageRestart", opt.horizAverageRestart);
 
   a_fact = RefCountedPtr<AMRLevelMushyLayerFactory> (new AMRLevelMushyLayerFactory(opt));
 

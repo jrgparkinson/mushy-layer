@@ -1888,8 +1888,6 @@ void Projector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
     pout() << "CCProjector::doSyncOperations" << endl;
   }
 
-
-
   AMRMultiGrid<LevelData<FArrayBox> >* dspSolver = new
       AMRMultiGrid<LevelData<FArrayBox> >;
 

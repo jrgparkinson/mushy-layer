@@ -64,8 +64,8 @@ calculateSolnDiffusion()
       }
 
       //Porosity = 1, H = S + theta
-      (*m_scalarNew[m_enthalpyAnalytic][lev])[dit].setVal(m_parameters.stefan);
-      (*m_scalarNew[m_enthalpyAnalytic][lev])[dit] += (*m_scalarNew[m_theta][lev])[dit];
+      (*m_scalarNew[ScalarVars::m_enthalpyAnalytic][lev])[dit].setVal(m_parameters.stefan);
+      (*m_scalarNew[ScalarVars::m_enthalpyAnalytic][lev])[dit] += (*m_scalarNew[m_theta][lev])[dit];
 
       //This doesn't really matter
       (*m_scalarNew[m_ThetaAnalytic][lev])[dit].setVal(0);
@@ -228,12 +228,12 @@ calculateSolnBm1()
       } //end loop over intvects in box
 
       //H = (1-phi)*S + theta
-      (*m_scalarNew[m_enthalpyAnalytic][lev])[dit].setVal(1);
-      (*m_scalarNew[m_enthalpyAnalytic][lev])[dit] -= (*m_scalarNew[m_solidFractionTrue][lev])[dit];
-      (*m_scalarNew[m_enthalpyAnalytic][lev])[dit].mult(m_parameters.stefan);
-      (*m_scalarNew[m_enthalpyAnalytic][lev])[dit] += (*m_scalarNew[m_thetaTrue][lev])[dit];
+      (*m_scalarNew[ScalarVars::m_enthalpyAnalytic][lev])[dit].setVal(1);
+      (*m_scalarNew[ScalarVars::m_enthalpyAnalytic][lev])[dit] -= (*m_scalarNew[m_solidFractionTrue][lev])[dit];
+      (*m_scalarNew[ScalarVars::m_enthalpyAnalytic][lev])[dit].mult(m_parameters.stefan);
+      (*m_scalarNew[ScalarVars::m_enthalpyAnalytic][lev])[dit] += (*m_scalarNew[m_thetaTrue][lev])[dit];
 
-      FArrayBox& thisH = (*m_scalarNew[m_enthalpyAnalytic][lev])[dit];
+      FArrayBox& thisH = (*m_scalarNew[ScalarVars::m_enthalpyAnalytic][lev])[dit];
 
       //Theta = 1
       (*m_scalarNew[m_ThetaAnalytic][lev])[dit].setVal(1);
@@ -274,20 +274,20 @@ void amrMushyLayer::enforceAnalyticSolution()
 //    activeLevelCopy(m_scalarNew[m_thetaTrue], m_scalarNew[m_theta]);
 //    activeLevelCopy(m_scalarNew[m_solidFractionTrue], m_scalarNew[m_solidFraction]);
 //    activeLevelCopy(m_scalarNew[m_ThetaLAnalytic], m_scalarNew[m_compositionLiquid]);
-//    activeLevelCopy(m_scalarNew[m_ThetaAnalytic], m_scalarNew[m_bulkConcentration]);
+//    activeLevelCopy(m_scalarNew[m_ThetaAnalytic], m_scalarNew[ScalarVars::m_bulkConcentration]);
 //
 //    int ilev = 0;
 //    for (DataIterator dit = m_amrGrids[ilev].dataIterator(); dit.ok(); ++dit)
 //    {
-//      (*m_scalarNew[m_porosity][ilev])[dit()].setVal(1);
-//      (*m_scalarNew[m_porosity][ilev])[dit()] -= (*m_scalarNew[m_solidFraction][ilev])[dit()];
+//      (*m_scalarNew[ScalarVars::m_porosity][ilev])[dit()].setVal(1);
+//      (*m_scalarNew[ScalarVars::m_porosity][ilev])[dit()] -= (*m_scalarNew[m_solidFraction][ilev])[dit()];
 //    }
 //
 //    calculateEnthalpy();
 //
 //    vector<int> ignore;
 //    //		ignore.push_back(m_theta);
-//    //		ignore.push_back(m_porosity);
+//    //		ignore.push_back(ScalarVars::m_porosity);
 //    //		ignore.push_back(m_compositionLiquid);
 //    updateEnthalpyVariables();
 //  }
@@ -311,8 +311,8 @@ void amrMushyLayer::enforceAnalyticSolution()
 //  {
 //    //Standard
 //
-//    activeLevelCopy(m_scalarNew[m_ThetaAnalytic], m_scalarNew[m_bulkConcentration]);
-//    activeLevelCopy(m_scalarNew[m_enthalpyAnalytic], m_scalarNew[m_HC]);
+//    activeLevelCopy(m_scalarNew[m_ThetaAnalytic], m_scalarNew[ScalarVars::m_bulkConcentration]);
+//    activeLevelCopy(m_scalarNew[ScalarVars::m_enthalpyAnalytic], m_scalarNew[m_HC]);
 //
 //    // Get porosity, theta, Theta_l, Theta_s
 //    vector<int> ignore;
@@ -324,7 +324,7 @@ void amrMushyLayer::enforceAnalyticSolution()
 
   //This is done at the start of timestep() anyway
   //Copy new to old
-  //	activeLevelCopy(m_scalarNew[m_enthalpy], m_scalarOld[m_enthalpy]);
+  //	activeLevelCopy(m_scalarNew[ScalarVars::m_enthalpy], m_scalarOld[ScalarVars::m_enthalpy]);
   //	activeLevelCopy(m_scalarNew[m_theta],  m_scalarOld[m_theta]);
   //	activeLevelCopy(m_scalarNew[m_solidFraction], m_scalarOld[m_solidFraction]);
   //	activeLevelCopy(m_scalarNew[m_compositionLiquid], m_scalarOld[m_compositionLiquid]);

@@ -40,17 +40,107 @@ enum PorosityFunctions
   hyperbolicTan,
 };
 
+/// Identifiers for different scalar variables
+/// Identifiers for vector variables
+  enum VectorVars {
+    m_fluidVel,
+    m_U_porosity,
+    m_Ustar,
+    m_advUstar,
+    m_advectionVel,
+    m_viscousSolveSrc,
+    m_UdelU,
+    m_advectionSrc,
+    m_fluidVelAnalytic,
+    m_fluidVelErr,
+    m_dUdt,
+    m_FsDiffusion,
+    m_FsFluid,
+    m_Fs,
+    m_freestreamCorrection,
+    m_UpreProjection,
+    m_advectionImplicitSrc,
+    m_MACcorrection,
+    CCcorrection,
+    m_advSrcLapU,
+    m_advUpreProjection,
+    m_bodyForce,
+    m_advVelCorr,
+
+    // Make sure this comes last!
+    m_numVectorVars
+  };
+
+  enum ScalarVars {
+    m_enthalpy,
+    m_bulkConcentration,
+    m_temperature,
+    m_porosity,
+    m_liquidConcentration,
+    m_solidConcentration,
+    m_pressure,
+    m_permeability,
+    m_lambda,
+    m_lambda_porosity,
+    m_enthalpySolidus,
+    m_enthalpyLiquidus,
+    m_enthalpyEutectic,
+    m_porosityAnalytic,
+    m_temperatureAnalytic,
+    m_saltEqnSrcGodunov,
+    m_saltEqnSrcFiniteDiff,
+    m_saltEqnOp,
+    m_Terr,
+    m_enthalpyOp,
+    m_enthalpySrc,
+    m_divUadv,
+    m_dHdt,
+    m_dSdt,
+    m_averageVerticalFlux,
+    m_soluteFluxAnalytic,
+    m_verticalFlux,
+    m_saltResidual,
+    m_divU,
+    m_averageHeatFlux,
+    m_streamfunction,
+    m_vorticity,
+    m_FsVertDiffusion,
+    m_FsVertFluid,
+    m_FsVertFrame,
+    m_divUcorr,
+    m_pi,
+    m_phi,
+    m_MACBC,
+    m_MACrhs,
+    m_CCrhs,
+
+
+    // Make sure this comes last!
+    m_numScalarVars
+
+  };
+
 
 //TODO: these should probably all be const's
 //TODO: add comments to these options so it's obvious what they do
-//TODO: collate more options in here rathet than having lots of parmparses in the main code, so it's obvious what all the options are
+//TODO: collate more options in here rather than having lots of parmparses in the main code, so it's obvious what all the options are
 struct MushyLayerOptions {
   /// Domain width
   Real domainWidth;
+  Real domainHeight;
   Real cfl;
   Real max_dt_growth;
+  Real init_dt_scale;
   Real fixedDt;
+
   Real initial_dt_multiplier;
+  int num_init_passes;
+  Real restart_new_time;
+  bool init_add_subtract_grad_p;
+  bool init_compute_uDelu;
+  bool increaseDt;
+
+  Real advVelCentering;
   Real adv_vel_centering_growth;
   int solverFailRestartMethod;
   bool ignoreSolveFails;
@@ -102,6 +192,7 @@ struct MushyLayerOptions {
   int iter_plot_interval;
 
   Real skipTrickySourceTerm;
+  bool allowMulticompAdvection;
 
   bool compute_initial_VD_corr;
 
@@ -111,6 +202,9 @@ struct MushyLayerOptions {
   Real lowerPorosityLimit;
   Real initialPerturbation;
 
+  bool doScalarAdvectionDiffusion;
+  Real initVel;
+
   Real delayedPerturbation = 0.0;
   Real perturbationTime = 0.0;
   Real perturbationWavenumber = 1.0;
@@ -119,6 +213,15 @@ struct MushyLayerOptions {
   PorosityFunctions porosityFunction;
 
   Real restartPerturbation;
+  Real radius;
+  Real initVelScale;
+
+  bool linearGradient;
+  Real mushHeight;
+  int summerProfile;
+  Real meltPondDepth;
+  bool horizAverageRestart;
+  int restart_perturbation_var;
 
   MGmethod MGtype;
 
