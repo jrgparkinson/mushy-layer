@@ -181,9 +181,32 @@ struct MushyLayerOptions {
   Real solidPorosity;
   Real advPorosityLimit;
   Real chiLimit;
+  Real ccVelPorosityLimit;
+  Real advVelsrcChiLimit;
+  Real uDelU_porosityLimit;
 
   bool useOldAdvVel;
   bool enforceAnalyticVel;
+  int lapVelNumSmooth;
+  Real lapVelSmoothScale;
+  int maxProjBaseLevel;
+  int lapVelBCOrder;
+  Real CCVelSrcTermCentering;
+
+  // u.grad(u) stuff
+  int uDeluMethod;
+  int uDelU_grow;
+
+  // Advection source term
+  bool advVelPressureSrc;
+  bool advVelDarcySrc;
+  bool advVelViscousSrc;
+  bool advVelBuoyancySrc;
+  bool advSrcAllowLaggedLapVel;
+
+  bool CCAdvSrc;
+  bool CCDarcySrc;
+  bool CCBuoyancySrc;
 
   bool do_postRegrid_smoothing;
   bool reflux_momentum;

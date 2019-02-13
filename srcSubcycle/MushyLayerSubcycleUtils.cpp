@@ -30,6 +30,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ParmParse ppMG("amrmultigrid");
   ParmParse ppProjection("projection");
   ParmParse ppInit("init");
+  ParmParse ppAdvsrc("advSrc");
 
   MushyLayerOptions opt;
 
@@ -119,8 +120,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.skipTrickySourceTerm = -1;
   ppMain.query("skipTrickySourceTime", opt.skipTrickySourceTerm);
 
-    opt.allowMulticompAdvection = true;
-    ppMain.query("allowMulticompAdvection", opt.allowMulticompAdvection);
+  opt.allowMulticompAdvection = true;
+  ppMain.query("allowMulticompAdvection", opt.allowMulticompAdvection);
 
 
   opt.scaleP_MAC = true;
@@ -134,21 +135,82 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.explicitDarcyTerm = false;
   ppMain.query("explicitDarcyTerm", opt.explicitDarcyTerm);
 
-
   opt.solidPorosity = 0.05;
   ppMain.query("solidPorosity", opt.solidPorosity);
 
   opt.advPorosityLimit = opt.solidPorosity;
-    ppMain.query("advPorosityLimit", opt.advPorosityLimit);
+  ppMain.query("advPorosityLimit", opt.advPorosityLimit);
 
-    opt.chiLimit = 0.0;
-       ppMain.query("porousAdvVelLimit", opt.chiLimit);
+  opt.chiLimit = 0.0;
+  ppMain.query("porousAdvVelLimit", opt.chiLimit);
+
+  opt.ccVelPorosityLimit = opt.solidPorosity;
+  ppMain.query("ccvel_porosity_cap", opt.ccVelPorosityLimit);
+
+  opt.advVelsrcChiLimit = opt.solidPorosity; //1e-10
+  ppMain.query("advVelSrcChiLimit", opt.advVelsrcChiLimit);
+
+  // by default make this tiny (so essentially turned off)
+  opt.uDelU_porosityLimit = 10*opt.lowerPorosityLimit; //1e-15;
+  ppMain.query("uDelu_porosity", opt.uDelU_porosityLimit);
+
+  opt.lapVelBCOrder = 0;
+  ppMain.query("lap_vel_bc_order", opt.lapVelBCOrder);
+
+  // Only do multiple projections on the base level
+  opt.maxProjBaseLevel = 1;
+  ppMain.query("maxProjections", opt.maxProjBaseLevel);
 
   opt.enforceAnalyticVel = false;
-    ppMain.query("analyticVel", opt.enforceAnalyticVel);
+  ppMain.query("analyticVel", opt.enforceAnalyticVel);
 
-    opt.useOldAdvVel = false;
-     ppMain.query("useOldAdvVelForTracing", opt.useOldAdvVel);
+  opt.useOldAdvVel = false;
+  ppMain.query("useOldAdvVelForTracing", opt.useOldAdvVel);
+
+  opt.lapVelNumSmooth = 0;
+  ppMain.query("lapVelNumSmooth", opt.lapVelNumSmooth);
+
+  opt.lapVelSmoothScale = 0.0;
+  ppMain.query("lapVelSmoothScale", opt.lapVelSmoothScale);
+
+  opt.CCVelSrcTermCentering = 0.5;
+  ppMain.query("vel_src_centering", opt.CCVelSrcTermCentering);
+
+  opt.advSrcAllowLaggedLapVel = false;
+  ppAdvsrc.query("allow_lagged_lap_vel", opt.advSrcAllowLaggedLapVel);
+
+
+  opt.advVelPressureSrc = false;
+  opt.advVelDarcySrc = true;
+  opt.advVelViscousSrc = true;
+  opt.advVelBuoyancySrc = true;
+
+  ppAdvsrc.query("pressure", opt.advVelPressureSrc);
+  ppAdvsrc.query("darcy", opt.advVelDarcySrc);
+  ppAdvsrc.query("viscous", opt.advVelViscousSrc);
+  ppAdvsrc.query("buoyancy", opt.advVelBuoyancySrc);
+
+
+  opt.uDeluMethod = 0;
+  ppMain.query("uDeluMethod", opt.uDeluMethod);
+
+  opt.uDelU_grow = 1;
+  ppMain.query("uDelU_grow", opt.uDelU_grow);
+
+  // Cell-centred velocity source term
+  ParmParse ppCCSrc("ccSrc");
+
+  opt.CCAdvSrc = true;
+  ppCCSrc.query("advection", opt.CCAdvSrc);
+
+  // This line must come after quering explicit Darcy Term
+  opt.CCDarcySrc = opt.explicitDarcyTerm;
+  ppCCSrc.query("darcy", opt.CCDarcySrc);
+
+  opt.CCBuoyancySrc = true;
+  ppCCSrc.query("buoyancy", opt.CCBuoyancySrc);
+
+
 
   /**
    * Physics related options
@@ -245,7 +307,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("nonlinearHCOpSuperOptimised", opt.nonlinearHCOpSuperOptimised);
 
   opt.smoothingCoeff = 0.0; //0.01;
-   ppProjection.query("pre_smoothing", opt.smoothingCoeff);
+  ppProjection.query("pre_smoothing", opt.smoothingCoeff);
 
   /***
    * Initialisation
@@ -264,7 +326,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("init_add_subtract_grad_p", opt.init_add_subtract_grad_p);
 
   opt.init_compute_uDelu = true;
-     ppMain.query("init_compute_uDelu", opt.init_compute_uDelu);
+  ppMain.query("init_compute_uDelu", opt.init_compute_uDelu);
 
   /**
    * Initial conditions options
