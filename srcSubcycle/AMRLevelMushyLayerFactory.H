@@ -14,7 +14,6 @@
 
 #include "AMRLevelFactory.H"
 
-#include "AdvectionFunctions.H"
 #include "AMRLevelMushyLayer.H"
 #include "mushyLayerOpt.h"
 

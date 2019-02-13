@@ -15,7 +15,6 @@
 
 #include "AMR.H"
 #include "AMRLevelMushyLayerFactory.H"
-#include "AdvectionFunctions.H"
 #include "DebugDump.H"
 #include "memtrack.H"
 #include "CH_Attach.H"

@@ -16,15 +16,11 @@
 
 #include "AMR.H"
 #include "AMRLevelMushyLayerFactory.H"
-#include "AdvectionFunctions.H"
 #include "memtrack.H"
 #include "parstream.H"
 
 #include "NamespaceHeader.H"
 
-///
-/**
- */
 
 
 ///

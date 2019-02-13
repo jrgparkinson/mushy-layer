@@ -27,7 +27,6 @@
 #include "RealVect.H"
 #include "LevelFluxRegister.H"
 #include "DisjointBoxLayout.H"
-#include "AdvectionFunctions.H"
 #include "BCFunc.H"
 #include "LevelTGA.H"
 #include "AMRPoissonOp.H"
