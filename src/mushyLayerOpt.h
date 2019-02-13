@@ -165,7 +165,10 @@ struct MushyLayerOptions {
 
   bool computeDiagnostics;
 
+  // Projection stuff
   bool doProjection;
+  bool useIncrementalPressure;
+  Real phiScale;
 
   bool doSyncOperations;
   bool enforceAnalyticSoln;
@@ -174,7 +177,9 @@ struct MushyLayerOptions {
   bool scaleP_MAC;
   bool scaleP_CC;
   bool explicitDarcyTerm;
+
   bool implicitAdvectionSolve;
+  bool usePhiForImplicitAdvectionSolve;
 
   bool multiCompUStarSolve;
 
@@ -184,18 +189,26 @@ struct MushyLayerOptions {
   Real ccVelPorosityLimit;
   Real advVelsrcChiLimit;
   Real uDelU_porosityLimit;
+  Real advVelChiLimit;
 
   bool useOldAdvVel;
   bool enforceAnalyticVel;
+  bool projectAnalyticVel;
+
   int lapVelNumSmooth;
   Real lapVelSmoothScale;
+
   int maxProjBaseLevel;
+  int maxNumMACProj;
+
   int lapVelBCOrder;
   Real CCVelSrcTermCentering;
+  bool legacyComputePredictVel;
 
   // u.grad(u) stuff
   int uDeluMethod;
   int uDelU_grow;
+  bool uDelUConservativeForm;
 
   // Advection source term
   bool advVelPressureSrc;

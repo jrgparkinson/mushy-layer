@@ -150,6 +150,13 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.advVelsrcChiLimit = opt.solidPorosity; //1e-10
   ppMain.query("advVelSrcChiLimit", opt.advVelsrcChiLimit);
 
+  opt.advVelChiLimit = min(pow(10,5)*opt.lowerPorosityLimit, pow(10,-10)) ; //was 1e-10
+  ppMain.query("advPorosityLimit", opt.advVelChiLimit);
+
+
+  opt.legacyComputePredictVel = false;
+  ppMain.query("legacy_predict_vel", opt.legacyComputePredictVel);
+
   // by default make this tiny (so essentially turned off)
   opt.uDelU_porosityLimit = 10*opt.lowerPorosityLimit; //1e-15;
   ppMain.query("uDelu_porosity", opt.uDelU_porosityLimit);
@@ -161,8 +168,14 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.maxProjBaseLevel = 1;
   ppMain.query("maxProjections", opt.maxProjBaseLevel);
 
+  opt.maxNumMACProj = 1;
+  ppMain.query("max_num_MAC_proj", opt.maxNumMACProj);
+
   opt.enforceAnalyticVel = false;
   ppMain.query("analyticVel", opt.enforceAnalyticVel);
+
+  opt.projectAnalyticVel = false;
+  ppMain.query("correctAnalyticVel", opt.projectAnalyticVel);
 
   opt.useOldAdvVel = false;
   ppMain.query("useOldAdvVelForTracing", opt.useOldAdvVel);
@@ -196,6 +209,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.uDelU_grow = 1;
   ppMain.query("uDelU_grow", opt.uDelU_grow);
+
+  opt.uDelUConservativeForm = false;
+  ppMain.query("uDelU_conservativeForm", opt.uDelUConservativeForm);
 
   // Cell-centred velocity source term
   ParmParse ppCCSrc("ccSrc");
@@ -241,6 +257,12 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.doProjection=true;
   ppMain.query("doProjection", opt.doProjection);
+
+  opt.useIncrementalPressure = false;
+  ppProjection.query("useIncrementalPressure", opt.useIncrementalPressure);
+
+  opt.phiScale = 1;
+  ppProjection.get("phiScale", opt.phiScale);
 
   opt.doSyncOperations = true;
   ppMain.query("doSyncOperations", opt.doSyncOperations);
@@ -292,6 +314,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.implicitAdvectionSolve = false;
   ppMain.query("implicitAdvectionSolve", opt.implicitAdvectionSolve);
+
+  opt.usePhiForImplicitAdvectionSolve = true;
+  ppMain.query("usePhiForImplicitAdvectionSolve", opt.usePhiForImplicitAdvectionSolve);
 
   opt.maxDivUFace = 1e-8;
   ppMain.query("maxDivUFace", opt.maxDivUFace);
