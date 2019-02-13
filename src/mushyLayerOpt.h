@@ -179,6 +179,11 @@ struct MushyLayerOptions {
   bool multiCompUStarSolve;
 
   Real solidPorosity;
+  Real advPorosityLimit;
+  Real chiLimit;
+
+  bool useOldAdvVel;
+  bool enforceAnalyticVel;
 
   bool do_postRegrid_smoothing;
   bool reflux_momentum;
@@ -198,6 +203,7 @@ struct MushyLayerOptions {
 
   Real skipTrickySourceTerm;
   bool allowMulticompAdvection;
+  Real smoothingCoeff;
 
   bool compute_initial_VD_corr;
 

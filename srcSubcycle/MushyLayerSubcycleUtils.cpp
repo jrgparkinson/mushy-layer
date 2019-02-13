@@ -138,6 +138,18 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.solidPorosity = 0.05;
   ppMain.query("solidPorosity", opt.solidPorosity);
 
+  opt.advPorosityLimit = opt.solidPorosity;
+    ppMain.query("advPorosityLimit", opt.advPorosityLimit);
+
+    opt.chiLimit = 0.0;
+       ppMain.query("porousAdvVelLimit", opt.chiLimit);
+
+  opt.enforceAnalyticVel = false;
+    ppMain.query("analyticVel", opt.enforceAnalyticVel);
+
+    opt.useOldAdvVel = false;
+     ppMain.query("useOldAdvVelForTracing", opt.useOldAdvVel);
+
   /**
    * Physics related options
    */
@@ -231,6 +243,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.nonlinearHCOpSuperOptimised = false;
   ppMain.query("nonlinearHCOpSuperOptimised", opt.nonlinearHCOpSuperOptimised);
+
+  opt.smoothingCoeff = 0.0; //0.01;
+   ppProjection.query("pre_smoothing", opt.smoothingCoeff);
 
   /***
    * Initialisation

@@ -20,7 +20,9 @@
 #include "LevelFluxRegister.H"
 #include "LevelDomainFluxRegister.h"
 
-#include "LevelAdvect.H"
+//#include "LevelAdvect.H"
+#include "PatchGodunov.H"
+#include "PiecewiseLinearFillPatch.H"
 #include "ProblemDomain.H"
 #include "IntVectSet.H"
 #include "Vector.H"
