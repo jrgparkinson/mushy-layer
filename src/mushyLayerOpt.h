@@ -125,6 +125,9 @@ enum PorosityFunctions
 //TODO: add comments to these options so it's obvious what they do
 //TODO: collate more options in here rather than having lots of parmparses in the main code, so it's obvious what all the options are
 struct MushyLayerOptions {
+
+  string output_dir;
+
   /// Domain width
   Real domainWidth;
   Real domainHeight;
@@ -269,6 +272,19 @@ struct MushyLayerOptions {
   Real meltPondDepth;
   bool horizAverageRestart;
   int restart_perturbation_var;
+
+  // Restart
+  Real refTemp;
+  Real refSalinity;
+  Real prevRefSalinity;
+  Real prevRefTemp;
+  Real dtReductionFactor;
+
+  // Porosity
+  Real fixedPorosityMaxChi;
+  Real FixedPorositySTD;
+  Real fixedPorosityFractionalInnerRadius;
+  Real fixedPorosityEndTime;
 
   MGmethod MGtype;
 

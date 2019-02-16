@@ -16,30 +16,12 @@ void AMRLevelMushyLayer::fillAdvVel(Real time, LevelData<FluxBox>& a_advVel)
     ProblemDomain crseDomain = amrMLcrse->m_problem_domain;
     DisjointBoxLayout crseGrids(amrMLcrse->m_grids);
 
-    //    bool secondOrderCorners = (CFinterpOrder_advection == 2);
     PiecewiseLinearFillPatchFace patcher(m_grids, crseGrids, 1,
                                          crseDomain, crseRefRatio,
                                          interpRadius);
-    //                                         secondOrderCorners);
 
     Real timeInterpCoeff = 0;
 
-    //    Real crseOldTime = amrMLcrse->time() - amrMLcrse->dt();
-    //    Real crseNewTime = amrMLcrse->time();
-    //
-    //    if (abs(time - crseOldTime) < TIME_EPS)
-    //    {
-    //      timeInterpCoeff = 0;
-    //    }
-    //    else if (abs(time - crseNewTime) < TIME_EPS)
-    //    {
-    //      timeInterpCoeff = 1;
-    //    }
-    //    else
-    //    {
-    //      // do linear interpolation in time
-    //      timeInterpCoeff = (time - crseOldTime)/(crseNewTime - crseOldTime);
-    //    }
 
     // As advection velocities are stored at the half time step, we can't
     // necessarilly interpolate at exactly the right point in time, so accept
@@ -56,7 +38,6 @@ void AMRLevelMushyLayer::fillAnalyticVel(FArrayBox& velDir, int dir, int comp, b
 {
   const Box& b = velDir.box();
 
-  ParmParse ppMain("main");
 
   for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
   {
@@ -104,11 +85,11 @@ void AMRLevelMushyLayer::fillAnalyticVel(FArrayBox& velDir, int dir, int comp, b
     Real magU = Uscale; //*0.15;
 
     int analyticVelType = m_parameters.physicalProblem;
+    ParmParse ppMain("main");
     ppMain.query("analyticVelType", analyticVelType);
 
     if (analyticVelType == -1)
     {
-      //      Real shift = 0;
 
       // This velocity should have zero divergence
       if (dir == 0)
@@ -198,16 +179,12 @@ void AMRLevelMushyLayer::fillAnalyticVel(LevelData<FArrayBox>& a_advVel)
 {
   DataIterator dit = m_grids.dataIterator();
 
-  ParmParse ppMain("main");
-  bool project = false;
-  ppMain.query("analyticVelNonDivergent", project);
-
   for (dit.reset(); dit.ok(); ++dit)
   {
     FArrayBox& vel = a_advVel[dit];
     for (int dir=0; dir < SpaceDim; dir++)
     {
-      fillAnalyticVel(vel, dir, dir, project);
+      fillAnalyticVel(vel, dir, dir, m_opt.projectAnalyticVel);
     }
   }
 }
@@ -216,16 +193,12 @@ void AMRLevelMushyLayer::fillAnalyticVel(LevelData<FluxBox>& a_advVel)
 {
   DataIterator dit = m_grids.dataIterator();
 
-  ParmParse ppMain("main");
-  bool project = false;
-  ppMain.query("analyticVelProject", project);
-
   for (dit.reset(); dit.ok(); ++dit)
   {
     for (int dir = 0; dir < SpaceDim; dir++)
     {
       FArrayBox& velDir = a_advVel[dit][dir];
-      fillAnalyticVel(velDir, dir, 0, project);
+      fillAnalyticVel(velDir, dir, 0, m_opt.projectAnalyticVel);
     }
   }
 
@@ -239,20 +212,13 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
   ParmParse pp("main");
 
-  Real stdev = 0.005;
-  Real maxChi = 1.05; // want to make this a bit more than 1, so we get porosity=1 region of finite size
-  pp.query("maxChi", maxChi);
-  pp.query("stdev", stdev);
 
-  Real fractionalInnerRadius = 0.2;
-  pp.query("innerRadius",fractionalInnerRadius);
-  Real innerRadius = fractionalInnerRadius*m_opt.domainWidth;
+  Real innerRadius = m_opt.fixedPorosityFractionalInnerRadius*m_opt.domainWidth;
 
   Real porosityTimescale = 1/m_parameters.darcy;
   pp.query("porosityTimescale", porosityTimescale);
 
-  Real porosityEndTime = -1;
-  pp.query("porosityEndTime", porosityEndTime);
+
 
   for (dit.reset(); dit.ok(); ++dit)
   {
@@ -311,7 +277,7 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
         //Real porosity = 1 + boundaryPorosity - 2*maxDistFromMiddle;
 
-        Real porosity = boundaryPorosity + maxChi*exp(-(xd*xd + yd*yd)/(stdev*m_opt.domainWidth));
+        Real porosity = boundaryPorosity + m_opt.fixedPorosityMaxChi*exp(-(xd*xd + yd*yd)/(m_opt.FixedPorositySTD*m_opt.domainWidth));
 
         Real maxPorosity = 1.0;
         porosity = min(porosity, maxPorosity);
@@ -333,7 +299,7 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
         //Real porosity = 1 + boundaryPorosity - 2*maxDistFromMiddle;
 
-        Real porosity = boundaryPorosity* (1-maxChi*exp(-(xd*xd + yd*yd)/(stdev*m_opt.domainWidth)) );
+        Real porosity = boundaryPorosity* (1-m_opt.fixedPorosityMaxChi*exp(-(xd*xd + yd*yd)/(m_opt.FixedPorositySTD*m_opt.domainWidth)) );
 
         Real maxPorosity = 1.0;
         porosity = min(porosity, maxPorosity);
@@ -352,9 +318,9 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
       else if (m_parameters.m_porosityFunction == ParamsPorosityFunctions::m_porosityTimeDependent)
       {
         Real time = m_time;
-        if (porosityEndTime >= 0 && m_time >= porosityEndTime)
+        if (m_opt.fixedPorosityEndTime >= 0 && m_time >= m_opt.fixedPorosityEndTime)
         {
-          time = porosityEndTime;
+          time = m_opt.fixedPorosityEndTime;
         }
         Real scale = min((1-m_parameters.bcValPorosityHi[1]), time/porosityTimescale);
         scale = time/porosityTimescale;

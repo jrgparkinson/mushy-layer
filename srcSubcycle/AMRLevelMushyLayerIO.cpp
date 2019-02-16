@@ -92,15 +92,8 @@ void AMRLevelMushyLayer::writeAMRHierarchy(string filename)
   a_time = m_time;
   a_levels = Interval(0, nlevels-1);
 
-  string output_dir = "";
-  ParmParse ppMain("main");
-  ppMain.query("output_folder", output_dir);
-//  string fullFilename = sprintf("%s/%s", output_dir, filename);
-
   char fullFilename[300];
-  sprintf(fullFilename, "%s/%s", output_dir.c_str(), filename.c_str());
-
-
+  sprintf(fullFilename, "%s/%s", m_opt.output_dir.c_str(), filename.c_str());
 
   WritePartialAMRHierarchyHDF5(/// file to send output to
                                fullFilename,
@@ -541,8 +534,6 @@ readCheckpointLevel(HDF5Handle& a_handle)
         {
           pout() << "       ... variable not found in checkpoint file, continuing anyway " << endl;
         }
-        // This is no longer an error - just read in what we can and deal with it
-        //      MayDay::Error("AMRLevelMushyLayer::readCheckpointLevel: file does not contain state data");
       }
       else if (s_verbosity >= 10)
       {
@@ -559,48 +550,17 @@ readCheckpointLevel(HDF5Handle& a_handle)
     }
   }
 
-//  LevelData<FluxBox> tempFluxBox(m_grids, 1);
-//
-//  if (s_verbosity >= 10)
-//  {
-//    pout() << "     reading in advVel" << endl;
-//  }
-//  dataStatus = read<FluxBox>(a_handle, tempFluxBox, "advVel", m_grids);
-//  tempFluxBox.copyTo(Interval(0,0), m_advVel, Interval(0,0));
-//  if (s_verbosity >= 10)
-//  {
-//    pout() << "       ... done " << endl;
-//  }
 
-  // Take care of changing dimensionless units if necessary
-  ParmParse pp("parameters");
-  ParmParse ppMain("main");
 
-  // Default reference temperature/salinity
-  Real refTemp = -23;
-  Real refSalinity = 230;
-
-  // Check to see if we've specified other reference values
-  pp.query("referenceTemperature", refTemp);
-  pp.query("referenceSalinity", refSalinity);
-
-  // Default reference values
-  Real prevRefTemp = refTemp;
-  Real prevRefSalinity = refSalinity;
-
-  // In case we've specified other reference values
-  pp.query("prevReferenceTemperature", prevRefTemp);
-  pp.query("prevReferenceSalinity", prevRefSalinity);
-
-  if (refTemp != prevRefTemp && refSalinity != prevRefSalinity)
+  if (m_opt.refTemp != m_opt.prevRefTemp && m_opt.refSalinity != m_opt.prevRefSalinity)
   {
     // Transform H and S fields
     // For now do this very crudely
 
     // The only case we'll currently handle - transform
     // from Katz to Wells units
-    if (refTemp == -3.5 && prevRefTemp == -23
-        && refSalinity == 35 && prevRefSalinity == 230)
+    if (m_opt.refTemp == -3.5 && m_opt.prevRefTemp == -23
+        && m_opt.refSalinity == 35 && m_opt.prevRefSalinity == 230)
     {
       // H = H - 1
       // S = S + 1
@@ -620,10 +580,9 @@ readCheckpointLevel(HDF5Handle& a_handle)
     }
   }
 
-  Real dtReductionFactor = 1.0;
-  ppMain.query("restart_dtReduction", dtReductionFactor);
-  m_dt = m_dt/dtReductionFactor;
-  pout() << "dt reduced by factor " << dtReductionFactor << " to " << m_dt << endl;
+
+  m_dt = m_dt/m_opt.dtReductionFactor;
+  pout() << "dt reduced by factor " << m_opt.dtReductionFactor << " to " << m_dt << endl;
 
   // Calculate diagnostic variables from (H, S)
   updateEnthalpyVariables();

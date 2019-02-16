@@ -37,6 +37,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.cfl = 0.8;
   ppMain.get("cfl",opt.cfl);
 
+  opt.output_dir = "";
+  ppMain.query("output_folder", opt.output_dir);
+
   // This is really the domain width, not length,
   // but changing it in the inputs files would be a right pain
   // at this point
@@ -63,8 +66,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   {
     MayDay::Error("No domain width specified, or domain width is invalid");
   }
-
-
 
 
   opt.verbosity = 1;
@@ -176,6 +177,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.projectAnalyticVel = false;
   ppMain.query("correctAnalyticVel", opt.projectAnalyticVel);
+
 
   opt.useOldAdvVel = false;
   ppMain.query("useOldAdvVelForTracing", opt.useOldAdvVel);
@@ -353,6 +355,27 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.init_compute_uDelu = true;
   ppMain.query("init_compute_uDelu", opt.init_compute_uDelu);
 
+  // Restarting
+  // Take care of changing dimensionless units if necessary
+  // Default reference temperature/salinity
+  opt.refTemp = -23;
+  opt.refSalinity = 230;
+
+  // Check to see if we've specified other reference values
+  ppParams.query("referenceTemperature", opt.refTemp);
+  ppParams.query("referenceSalinity", opt.refSalinity);
+
+  // Default reference values
+  opt.prevRefTemp = opt.refTemp;
+  opt.prevRefSalinity = opt.refSalinity;
+
+  // In case we've specified other reference values
+  ppParams.query("prevReferenceTemperature", opt.prevRefTemp);
+  ppParams.query("prevReferenceSalinity", opt.prevRefSalinity);
+
+  opt.dtReductionFactor = 1.0;
+  ppMain.query("restart_dtReduction", opt.dtReductionFactor);
+
   /**
    * Initial conditions options
    */
@@ -420,6 +443,22 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.horizAverageRestart = false;
   ppMain.query("horizontallyAverageRestart", opt.horizAverageRestart);
 
+  /**
+   * Other options
+   */
+
+  opt.FixedPorositySTD = 0.005;
+  opt.fixedPorosityMaxChi = 1.05; // want to make this a bit more than 1, so we get porosity=1 region of finite size
+  ppMain.query("maxChi", opt.fixedPorosityMaxChi);
+  ppMain.query("stdev", opt.FixedPorositySTD);
+
+  opt.fixedPorosityFractionalInnerRadius = 0.2;
+  ppMain.query("innerRadius", opt.fixedPorosityFractionalInnerRadius);
+
+  opt.fixedPorosityEndTime = -1;
+  ppMain.query("porosityEndTime", opt.fixedPorosityEndTime);
+
+
   a_fact = RefCountedPtr<AMRLevelMushyLayerFactory> (new AMRLevelMushyLayerFactory(opt));
 
 }
@@ -429,7 +468,7 @@ defineAMR(AMR&                                          a_amr,
           const ProblemDomain&                          a_prob_domain,
           const Vector<int>&                            a_refRat)
 {
-  pout() << "MushyLayerSubscyleUtils - defineAMR(..) - creating AMR object" << endl;
+//  pout() << "MushyLayerSubcycleUtils - defineAMR(..) - creating AMR object" << endl;
 
   ParmParse ppMain("main");
   int max_level = 0;
@@ -585,11 +624,8 @@ defineAMR(AMR&                                          a_amr,
   ppMain.get("verbosity",verbosity);
   CH_assert(verbosity >= 0);
 
-
   a_amr.verbosity(verbosity);
 
-  pout() << "MushyLayerSubscyleUtils - defineAMR(..) - finished setting up AMR" << endl;
-  //	 pout() << "AMR - set verbosity" << endl;
 
 }
 
