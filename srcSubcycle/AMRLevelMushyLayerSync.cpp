@@ -7,8 +7,6 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
 
   int finest_level = getFinestLevel();
 
-  ParmParse pp("main");
-
   // amr grid info for solvers
   Vector<DisjointBoxLayout> AmrGrids(finest_level + 1);
   Vector<int> AmrRefRatios(finest_level + 1);
@@ -219,26 +217,26 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
       for (levelDit.reset(); levelDit.ok(); ++levelDit)
       {
         levelVel[levelDit()].plus(levelCorr[levelDit()], 0,  dir, 1);
-//        (*amrMLptr->m_vectorNew[m_fluidRefluxCorr])[levelDit].plus(levelCorr[levelDit()], 0, dir, 1);
+        //        (*amrMLptr->m_vectorNew[m_fluidRefluxCorr])[levelDit].plus(levelCorr[levelDit()], 0, dir, 1);
       }
 
       // do average down
-//      bool doAvgDown = true;
-//      pp.query("reflux_average_down", doAvgDown);
-//      if (doAvgDown)
-//      {
-//        if (lev < finest_level)
-//        {
-//          AMRLevelMushyLayer& fineML = *(amrMLptr->getFinerLevel());
-//
-//          // quick sanity check
-//          CH_assert (fineML.m_level == lev+1);
-//
-//          CoarseAverage& avgDown = fineML.m_coarseAverageVector;
-//          LevelData<FArrayBox>& fineVel = *fineML.m_vectorNew[VectorVars::m_fluidVel];
-//          avgDown.averageToCoarse(levelVel, fineVel);
-//        }
-//      }
+      //      bool doAvgDown = true;
+      //      pp.query("reflux_average_down", doAvgDown);
+      //      if (doAvgDown)
+      //      {
+      //        if (lev < finest_level)
+      //        {
+      //          AMRLevelMushyLayer& fineML = *(amrMLptr->getFinerLevel());
+      //
+      //          // quick sanity check
+      //          CH_assert (fineML.m_level == lev+1);
+      //
+      //          CoarseAverage& avgDown = fineML.m_coarseAverageVector;
+      //          LevelData<FArrayBox>& fineVel = *fineML.m_vectorNew[VectorVars::m_fluidVel];
+      //          avgDown.averageToCoarse(levelVel, fineVel);
+      //        }
+      //      }
 
       amrMLptr = amrMLptr->getCoarserLevel();
     }
@@ -269,9 +267,11 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
 
 Real AMRLevelMushyLayer::maxAllowedEta()
 {
-  ParmParse ppMain("main");
   Real maxEta = 2*(1-m_computedCFL);
-  ppMain.query("max_eta", maxEta); // let user specify different max eta if they want
+  if (m_opt.maxEta > 0)
+  {
+    maxEta = m_opt.maxEta;
+  }
 
   if (m_projection.etaLambda() == 0)
   {
@@ -309,27 +309,24 @@ void AMRLevelMushyLayer::postTimeStep()
 {
   CH_TIME("AMRLevelMushyLayer::postTimeStep");
 
-if (s_verbosity >= 3)
-{
- pout() << "AMRLevelMushyLayer::postTimeStep - do sync operations on level " << m_level << endl;
-}
+  if (s_verbosity >= 3)
+  {
+    pout() << "AMRLevelMushyLayer::postTimeStep - do sync operations on level " << m_level << endl;
+  }
 
   // Get the advection velocity as a CC variable so we can write it out
   EdgeToCell(m_advVel, *m_vectorNew[VectorVars::m_advectionVel]);
-
-  ParmParse pp("main");
-
 
   if (m_level == 0)
   {
 
     // Check if the timestep failed
-      // in this case - replace with old data and reset time
-      // postTimestep is called from finest levels first, so once we reach level 0
-      // we are done with all other levels at this timestep
+    // in this case - replace with old data and reset time
+    // postTimestep is called from finest levels first, so once we reach level 0
+    // we are done with all other levels at this timestep
 
 
-     // Check every level to see if we failed
+    // Check every level to see if we failed
     bool timestepFailed = m_timestepFailed;
     AMRLevelMushyLayer* mlPtr = this;
     while(mlPtr)
@@ -357,22 +354,19 @@ if (s_verbosity >= 3)
       }
 
       // We now have the finest level
-      Real alpha = 0.1; // Some empirically chosen multiplier (must be < 1)
-      Real maxU =  mlPtr->getMaxVelocity();
-      Real minDt = alpha*m_initial_dt_multiplier*mlPtr->m_dx/maxU;
-
-      minDt = 1e-7; //0.001*m_domainHeight/m_parameters.rayleighComposition; // hard code this
-      pp.query("min_dt", minDt);
+//      Real alpha = 0.1; // Some empirically chosen multiplier (must be < 1)
+//      Real maxU =  mlPtr->getMaxVelocity();
+      //    m_opt.minDt = alpha*m_initial_dt_multiplier*mlPtr->m_dx/maxU;
 
       if (s_verbosity > 2)
       {
-        pout() << "Timestep failed min dt = " << minDt << endl;
+        pout() << "Timestep failed min dt = " << m_opt.minDt << endl;
       }
 
       // Check if we're going to make dt too small on the finest level, in
       // which case don't change dt anywhere else
       bool halveDt = true;
-      if (m_dt/2 < minDt)
+      if (m_dt/2 < m_opt.minDt)
       {
         halveDt = false;
         timestepFailed = false; // don't halve the timestep
@@ -507,15 +501,14 @@ if (s_verbosity >= 3)
             pout() << "Max(lambda-1) = " << maxLambda << endl;
           }
 
-//          m_diagnostics.addDiagnostic(m_diagnostics.m_lambda_err, m_time, maxLambda);
+          //          m_diagnostics.addDiagnostic(m_diagnostics.m_lambda_err, m_time, maxLambda);
 
           if (m_opt.variable_eta_factor != 1.0)
           {
             Real newEta = m_projection.etaLambda();
-            Real minEta = 0.99;
+
             Real maxEta = maxAllowedEta();
-            ParmParse ppProj("projection");
-            ppProj.query("eta", minEta);
+
 
             if (maxLambda > m_maxLambda)
             {
@@ -528,7 +521,7 @@ if (s_verbosity >= 3)
 
             m_maxLambda = maxLambda;
 
-            newEta = max(newEta, minEta);
+            newEta = max(newEta, m_opt.minEta);
             newEta = min(newEta, maxEta);
 
             if (s_verbosity >= 3)
@@ -628,9 +621,8 @@ if (s_verbosity >= 3)
 
       // Average down
       // do average down, starting from the second finest level
-      bool doAvgDown = true;
-      pp.query("reflux_average_down", doAvgDown);
-      if (doAvgDown)
+
+      if (m_opt.refluxAverageDown)
       {
         thisMLPtr = this;
         while (thisMLPtr->hasFinerLevel())
@@ -712,12 +704,11 @@ if (s_verbosity >= 3)
   {
     // in case this is the only level
     // Let's still compute freestream correction
-          // If we've coarsened a previous  mesh, we may have some lambda error left over
-          // which we need to sort out
-    int max_possible_level = 0;
-    pp.query("max_level", max_possible_level);
+    // If we've coarsened a previous  mesh, we may have some lambda error left over
+    // which we need to sort out
 
-    if (m_level == 0 && max_possible_level > 0)
+
+    if (m_level == 0 && m_opt.max_possible_level > 0)
     {
       // create boundary condition object and set physical BC's
       VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
@@ -725,15 +716,10 @@ if (s_verbosity >= 3)
       velBC.applyBCs(*m_vectorNew[VectorVars::m_fluidVel], m_grids, m_problem_domain,
                      m_dx, false); // not homogeneous
 
-
       Interval velComps = m_vectorNew[VectorVars::m_fluidVel]->interval();
       m_vectorNew[VectorVars::m_fluidVel]->exchange(velComps);
 
-
-      bool computeFreestream = true;
-      ParmParse ppMain("main");
-      ppMain.query("single_level_lambda_corr", computeFreestream);
-      if (computeFreestream)
+      if (m_opt.computeFreestreamCorrection)
       {
         Vector<LevelData<FArrayBox>* > compVel(1, NULL);
         Vector<LevelData<FArrayBox>* > compLambda(1, NULL);
@@ -758,9 +744,8 @@ if (s_verbosity >= 3)
   computeDiagnostics();
 
   // Could possibly do this in an AMR sense instead
-  bool computeVorticityStreamFunction = true;
-  pp.query("computeVorticity", computeVorticityStreamFunction);
-  if (computeVorticityStreamFunction)
+
+  if (m_opt.computeVorticityStreamFunction)
   {
     computeVorticityStreamfunction();
   }
@@ -1052,7 +1037,7 @@ Real AMRLevelMushyLayer::doHCreflux()
 
       thisMLPtr->m_fluxRegHC->reflux(levelRefluxRHS, refluxScale);
       // Don't think we should have been doing this setToZero.
-//      thisMLPtr->m_fluxRegHC->setToZero();
+      //      thisMLPtr->m_fluxRegHC->setToZero();
     }
 
     // initial guess for correction is RHS
@@ -1096,391 +1081,336 @@ Real AMRLevelMushyLayer::doHCreflux()
   RelaxSolver<LevelData<FArrayBox> > bottomSolver;
   bottomSolver.m_verbosity = m_opt.verbosity_multigrid;
 
-  // 0 - linear correction
-  // 1 - linear VC correction
-  // 2 - nonlinear correction
-  int refluxType = 2;
-  ParmParse pp("main");
-  pp.query("refluxType", refluxType);
-
-  Real refluxBetaSign = -1;
-  Real refluxCorrSign = 1;
-  pp.query("refluxBetaSign", refluxBetaSign);
-  pp.query("refluxCorrSign", refluxCorrSign);
-
   Real maxRefluxRHS = computeSum(HCRefluxRHS, refRat, m_dx, Interval(0, numComps-1), m_level);
 
   int numLevels = finest_level + 1;
 
-    // Need to define a two component VCAMRPoissonOp to solve for enthalpy-salinity corrections
+  // Need to define a two component VCAMRPoissonOp to solve for enthalpy-salinity corrections
 
-    AMRLevelMushyLayer* finestML = this;
-    while(finestML->hasFinerLevel())
+  AMRLevelMushyLayer* finestML = this;
+  while(finestML->hasFinerLevel())
+  {
+    finestML = finestML->getFinerLevel();
+  }
+  // This is a Helmholtz operator
+  Real alpha = 1.0;
+  Real beta = m_opt.refluxBetaSign*m_dt;
+
+  int Hcomp = 0;
+  int Ccomp = 1;
+
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > aCoef(finest_level+1);
+  Vector<RefCountedPtr<LevelData<FluxBox> > > bCoef(finest_level+1);
+  Vector<RefCountedPtr<LevelData<FluxBox> > > porosityFace(finest_level+1);
+
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > enthalpySolidus(finest_level+1),
+      enthalpyLiquidus(finest_level+1), enthalpyEutectic(finest_level+1), HC(finest_level+1);
+
+  // Not sure if we actually need a ghost vector or not
+  IntVect ivGhost = IntVect::Unit;
+
+  AMRLevelMushyLayer* amrML = this;
+
+  // Define these things over ALL levels
+  while(amrML->getCoarserLevel())
+  {
+    amrML = amrML->getCoarserLevel();
+  }
+
+  // Almost certain this will always be level 0
+  int baseLevel = amrML->level();
+
+  for (int lev=baseLevel; lev<= finest_level; lev++)
+  {
+    bCoef[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], numComps, ivGhost));
+    porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, ivGhost));
+    aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], numComps, ivGhost));
+
+    enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+    enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+    enthalpyEutectic[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+    HC[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], numComps, ivGhost));
+
+    amrML->fillHC(*HC[lev], m_time);
+    amrML->fillScalars(*enthalpySolidus[lev], m_time, m_enthalpySolidus, true, true);
+    amrML->fillScalars(*enthalpyLiquidus[lev], m_time, m_enthalpyLiquidus, true, true);
+    amrML->fillScalars(*enthalpyEutectic[lev], m_time, m_enthalpyEutectic, true, true);
+
+    amrML->fillScalarFace(*porosityFace[lev], m_time, m_porosity, true, true);
+
+    for (DataIterator dit = bCoef[lev]->dataIterator(); dit.ok(); ++dit)
     {
-      finestML = finestML->getFinerLevel();
-    }
-    // This is a Helmholtz operator
-    Real alpha = 1.0;
-    Real beta = refluxBetaSign*m_dt;
+      (*aCoef[lev])[dit].setVal(1.0);
+      (*bCoef[lev])[dit].setVal(1.0);
 
-    int Hcomp = 0;
-    int Ccomp = 1;
-
-    Vector<RefCountedPtr<LevelData<FArrayBox> > > aCoef(finest_level+1);
-    Vector<RefCountedPtr<LevelData<FluxBox> > > bCoef(finest_level+1);
-    Vector<RefCountedPtr<LevelData<FluxBox> > > porosityFace(finest_level+1);
-
-    Vector<RefCountedPtr<LevelData<FArrayBox> > > enthalpySolidus(finest_level+1),
-        enthalpyLiquidus(finest_level+1), enthalpyEutectic(finest_level+1), HC(finest_level+1);
-
-    // Not sure if we actually need a ghost vector or not
-    IntVect ivGhost = IntVect::Unit;
-
-    AMRLevelMushyLayer* amrML = this;
-
-    // Define these things over ALL levels
-    while(amrML->getCoarserLevel())
-    {
-      amrML = amrML->getCoarserLevel();
-    }
-
-    // Almost certain this will always be level 0
-    int baseLevel = amrML->level();
-
-    for (int lev=baseLevel; lev<= finest_level; lev++)
-    {
-      bCoef[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], numComps, ivGhost));
-      porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, ivGhost));
-      aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], numComps, ivGhost));
-
-      enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-      enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-      enthalpyEutectic[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-      HC[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], numComps, ivGhost));
-
-      amrML->fillHC(*HC[lev], m_time);
-      amrML->fillScalars(*enthalpySolidus[lev], m_time, m_enthalpySolidus, true, true);
-      amrML->fillScalars(*enthalpyLiquidus[lev], m_time, m_enthalpyLiquidus, true, true);
-      amrML->fillScalars(*enthalpyEutectic[lev], m_time, m_enthalpyEutectic, true, true);
-
-      amrML->fillScalarFace(*porosityFace[lev], m_time, m_porosity, true, true);
-
-      for (DataIterator dit = bCoef[lev]->dataIterator(); dit.ok(); ++dit)
+      // For linear reflux, we don't do this porosity stuff and just solve
+      // diffusion coefficient * Lap(correction) = Reflux RHS
+      if (m_opt.refluxMethod!=RefluxMethod::LinearReflux)
       {
-        (*aCoef[lev])[dit].setVal(1.0);
-        (*bCoef[lev])[dit].setVal(1.0);
-
-        // For reflux type 0, we don't do this porosity stuff and just solve
-        // diffusion coefficient * Lap(correction) = Reflux RHS
-        if (refluxType!=0)
-        {
 
 
-          // for salt solve
-          (*bCoef[lev])[dit].mult((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Ccomp);
+        // for salt solve
+        (*bCoef[lev])[dit].mult((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Ccomp);
 
-          // bCoef for heat solve
-          (*bCoef[lev])[dit].minus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
-          for (int dir=0; dir<SpaceDim; dir++)
-          {
-            (*bCoef[lev])[dit][dir].mult(m_parameters.heatConductivityRatio, Hcomp);
-          }
-          (*bCoef[lev])[dit].plus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
-
-        }
-
+        // bCoef for heat solve
+        (*bCoef[lev])[dit].minus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
         for (int dir=0; dir<SpaceDim; dir++)
         {
-          (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[ScalarVars::m_enthalpy], Hcomp);
-          (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[ScalarVars::m_bulkConcentration], Ccomp);
+          (*bCoef[lev])[dit][dir].mult(m_parameters.heatConductivityRatio, Hcomp);
         }
-
-
+        (*bCoef[lev])[dit].plus((*porosityFace[lev])[dit], (*porosityFace[lev])[dit].box(), 0, Hcomp);
 
       }
 
-      amrML = amrML->getFinerLevel();
-    } // end loop over levels
-
-    bool homogeneous = true;
-    //    BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC(homogeneous);
-
-    // Try a no flux BC
-    BCHolder refluxBC = m_physBCPtr->enthalpySalinityBC(homogeneous); //m_physBCPtr->noFluxBC();
-
-    ParmParse ppMultigrid("amrmultigrid");
-
-    AMRMultiGrid<LevelData<FArrayBox> > *diffusionSolver;
-
-    Vector< AMRLevelOp<LevelData<FArrayBox> >*  >  generic_ops;
-    Vector< LevelTGAHelmOp<LevelData<FArrayBox>, FluxBox >*  >  ops;
-
-    generic_ops.resize(finest_level+1);
-    ops.resize(finest_level+1);
+      for (int dir=0; dir<SpaceDim; dir++)
+      {
+        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[ScalarVars::m_enthalpy], Hcomp);
+        (*bCoef[lev])[dit][dir].mult(-m_scalarDiffusionCoeffs[ScalarVars::m_bulkConcentration], Ccomp);
+      }
 
 
-    if (refluxType== 0 || refluxType == 1)
-    {
-
-      VCAMRPoissonOp2Factory diffusiveOpFactory;
-      diffusiveOpFactory.define(lev0Dom, grids,
-                                refRat, AmrDx[0],
-                                refluxBC,
-                                alpha, aCoef,
-                                beta, bCoef);
-
-      AMRLevelOpFactory<LevelData<FArrayBox> >& castFact =
-          (AMRLevelOpFactory<LevelData<FArrayBox> >&) diffusiveOpFactory;
-
-      diffusionSolver = new AMRMultiGrid<LevelData<FArrayBox> >;
-      diffusionSolver->define(lev0Dom, castFact,
-                              &bottomSolver, numLevels);
 
     }
-    else
+
+    amrML = amrML->getFinerLevel();
+  } // end loop over levels
+
+  bool homogeneous = true;
+
+  // Try a no flux BC
+  BCHolder refluxBC = m_physBCPtr->enthalpySalinityBC(homogeneous);
+
+  AMRMultiGrid<LevelData<FArrayBox> > *diffusionSolver;
+
+  Vector< AMRLevelOp<LevelData<FArrayBox> >*  >  generic_ops;
+  Vector< LevelTGAHelmOp<LevelData<FArrayBox>, FluxBox >*  >  ops;
+
+  generic_ops.resize(finest_level+1);
+  ops.resize(finest_level+1);
+
+  if (m_opt.refluxMethod== RefluxMethod::LinearReflux || m_opt.refluxMethod == RefluxMethod::LinearVCReflux)
+  {
+
+    VCAMRPoissonOp2Factory diffusiveOpFactory;
+    diffusiveOpFactory.define(lev0Dom, grids,
+                              refRat, AmrDx[0],
+                              refluxBC,
+                              alpha, aCoef,
+                              beta, bCoef);
+
+    AMRLevelOpFactory<LevelData<FArrayBox> >& castFact =
+        (AMRLevelOpFactory<LevelData<FArrayBox> >&) diffusiveOpFactory;
+
+    diffusionSolver = new AMRMultiGrid<LevelData<FArrayBox> >;
+    diffusionSolver->define(lev0Dom, castFact,
+                            &bottomSolver, numLevels);
+
+  }
+  else if (m_opt.refluxMethod == RefluxMethod::NonlinearReflux)
+  {
+    // nonlinear reflux
+
+    //      MushyLayerParams* mlParamsPtr = &m_parameters;
+    BCHolder temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC(homogeneous);
+    //      BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC(homogeneous);
+    EdgeVelBCHolder porosityEdgeBC(m_physBCPtr->porosityFaceBC());
+
+
+
+    // Calculate modified diffusion coefficient
+    /*
+     * For heat equation:
+     * alpha = 1 (liquid); 0.25 (mush); 0 (eutectic); 1/cp (solid)
+     *
+     * For salt equation:
+     * alpha = 1 (liquid); 1 (mush); 0 (eutectic); 0 (solid)
+     */
+
+    for (int lev=m_level; lev<= finest_level; lev++)
     {
 
-      //      MushyLayerParams* mlParamsPtr = &m_parameters;
-      BCHolder temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC(homogeneous);
-      //      BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC(homogeneous);
-      EdgeVelBCHolder porosityEdgeBC(m_physBCPtr->porosityFaceBC());
-
-      int relaxMode = 1; // 1=GSRB, 4=jacobi
-      ppMultigrid.query("relaxMode", relaxMode);
-
-      // Calculate modified diffusion coefficient
-      /*
-       * For heat equation:
-       * alpha = 1 (liquid); 0.25 (mush); 0 (eutectic); 1/cp (solid)
-       *
-       * For salt equation:
-       * alpha = 1 (liquid); 1 (mush); 0 (eutectic); 0 (solid)
-       */
-
-      for (int lev=m_level; lev<= finest_level; lev++)
+      // First need bounding energies
+      for (DataIterator dit = HC[lev]->dataIterator(); dit.ok(); ++dit)
       {
 
-        // First need bounding energies
-        for (DataIterator dit = HC[lev]->dataIterator(); dit.ok(); ++dit)
-        {
+        FArrayBox& Hs = (*enthalpySolidus[lev])[dit];
+        FArrayBox& He = (*enthalpyEutectic[lev])[dit];
+        FArrayBox& Hl = (*enthalpyLiquidus[lev])[dit];
 
-          FArrayBox& Hs = (*enthalpySolidus[lev])[dit];
-          FArrayBox& He = (*enthalpyEutectic[lev])[dit];
-          FArrayBox& Hl = (*enthalpyLiquidus[lev])[dit];
+        FArrayBox& HCfab = (*HC[lev])[dit];
 
-          FArrayBox& HCfab = (*HC[lev])[dit];
+        Box region = HCfab.box();
+        region &= Hs.box();
 
-          Box region = HCfab.box();
-          region &= Hs.box();
-
-          FORT_CALCULATE_BOUNDING_ENERGY( CHF_CONST_FRA(HCfab),
-                                          CHF_FRA(Hs),
-                                          CHF_FRA(He),
-                                          CHF_FRA(Hl),
-                                          CHF_BOX(region),
-                                          CHF_CONST_REAL(m_parameters.compositionRatio),
-                                          CHF_CONST_REAL(m_parameters.waterDistributionCoeff),
-                                          CHF_CONST_REAL(m_parameters.specificHeatRatio),
-                                          CHF_CONST_REAL(m_parameters.stefan),
-                                          CHF_CONST_REAL(m_parameters.thetaEutectic),
-                                          CHF_CONST_REAL(m_parameters.ThetaEutectic));
+        FORT_CALCULATE_BOUNDING_ENERGY( CHF_CONST_FRA(HCfab),
+                                        CHF_FRA(Hs),
+                                        CHF_FRA(He),
+                                        CHF_FRA(Hl),
+                                        CHF_BOX(region),
+                                        CHF_CONST_REAL(m_parameters.compositionRatio),
+                                        CHF_CONST_REAL(m_parameters.waterDistributionCoeff),
+                                        CHF_CONST_REAL(m_parameters.specificHeatRatio),
+                                        CHF_CONST_REAL(m_parameters.stefan),
+                                        CHF_CONST_REAL(m_parameters.thetaEutectic),
+                                        CHF_CONST_REAL(m_parameters.ThetaEutectic));
 
 
-          // Update bCoef
-          FluxBox& thisBCoef = (*bCoef[lev])[dit];
+        // Update bCoef
+        FluxBox& thisBCoef = (*bCoef[lev])[dit];
 
 #if CH_SPACEDIM == 1
-          FORT_MODIFY_DIFFUSION_COEFFS1D
+        FORT_MODIFY_DIFFUSION_COEFFS1D
 #elif CH_SPACEDIM == 2
-          FORT_MODIFY_DIFFUSION_COEFFS2D
+        FORT_MODIFY_DIFFUSION_COEFFS2D
 #elif CH_SPACEDIM == 3
-          FORT_MODIFY_DIFFUSION_COEFFS3D
+        FORT_MODIFY_DIFFUSION_COEFFS3D
 #endif
-          (CHF_CONST_FRA(HCfab),
-           CHF_CONST_FRA(Hs),
-           CHF_CONST_FRA(He),
-           CHF_CONST_FRA(Hl),
+        (CHF_CONST_FRA(HCfab),
+         CHF_CONST_FRA(Hs),
+         CHF_CONST_FRA(He),
+         CHF_CONST_FRA(Hl),
 #if CH_SPACEDIM >= 1
-           CHF_FRA(thisBCoef[0]),
+         CHF_FRA(thisBCoef[0]),
 #endif
 #if CH_SPACEDIM >= 2
-           CHF_FRA(thisBCoef[1]),
+         CHF_FRA(thisBCoef[1]),
 #endif
 #if CH_SPACEDIM >= 3
-           CHF_FRA(thisBCoef[2]),
+         CHF_FRA(thisBCoef[2]),
 #endif
 #if CH_SPACEDIM >= 4
-           This_will_not_compile!
+         This_will_not_compile!
 #endif
-           CHF_BOX(region),
-           CHF_CONST_REAL(m_parameters.specificHeatRatio)
-          );
+         CHF_BOX(region),
+         CHF_CONST_REAL(m_parameters.specificHeatRatio)
+        );
 
-        } // end loop over grids
-
-      } // end loop over levels
-
-      VCAMRPoissonOp2Factory diffusiveOpFactory;
-      diffusiveOpFactory.define(lev0Dom, grids,
-                                refRat, AmrDx[0],
-                                refluxBC,
-                                alpha, aCoef,
-                                beta, bCoef);
-
-      AMRLevelOpFactory<LevelData<FArrayBox> >& castFact =
-          (AMRLevelOpFactory<LevelData<FArrayBox> >&) diffusiveOpFactory;
-
-      //      diffusionSolver = new AMRFASMultiGrid<LevelData<FArrayBox> >;
-      //      diffusionSolver->define(lev0Dom, castFact,
-      //                              &bottomSolver, numLevels);
-      diffusionSolver = new AMRMultiGrid<LevelData<FArrayBox> >;
-      diffusionSolver->define(lev0Dom, castFact,
-                              &bottomSolver, numLevels);
-
-
-    } // end loop over different reflux types
-
-
-    generic_ops = diffusionSolver->getAMROperators();
-
-    for (int ilev = 0; ilev < generic_ops.size(); ilev++)
-    {
-      ops[ilev] = dynamic_cast<LevelTGAHelmOp<LevelData<FArrayBox>,FluxBox>* >(generic_ops[ilev]);
-      if (ops[ilev]==NULL)
-      {
-        MayDay::Error("dynamic cast failed---is that operator really a TGAHelmOp?");
-      }
-    }
-
-    int mgverb=0;
-    Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
-    ppMultigrid.query("hang_eps", hang);
-    ppMultigrid.query("norm_thresh", normThresh);
-    ppMultigrid.query("tolerance", tolerance);
-    ppMultigrid.query("verbosity", mgverb);
-
-    diffusionSolver->m_verbosity = mgverb; // m_verbosity_multigrid;
-    diffusionSolver->m_eps = tolerance;
-    diffusionSolver->m_normThresh = normThresh;
-    diffusionSolver->m_hang = hang;
-
-//    Interval solverComps(0,numComps-1);
-
-    // now solve
-    diffusionSolver->solve(HCRefluxCorr, HCRefluxRHS,
-                           finest_level, m_level, false, // don't initialize to zero
-                           true);  // force homogeneous
-
-
-    // now increment scalars with reflux correction
-    // go from finest->coarsest so that we can also avgDown
-    // increment NS pointer to finest level
-    thisMLPtr = this;
-    while (!thisMLPtr->finestLevel())
-    {
-      thisMLPtr = thisMLPtr->getFinerLevel();
-    }
-    CH_assert(thisMLPtr->m_level == finest_level);
-
-
-    // Check if we're doing averaging down
-    bool doAvgDown = true;
-    pp.query("reflux_average_down", doAvgDown);
-
-    // Add correction to H-C fields
-    // Also recalculate fluxes
-    for (int lev = finest_level; lev >= m_level; lev--)
-    {
-      LevelData<FArrayBox>& levelCorr = *(HCRefluxCorr[lev]);
-      DataIterator levelDit = levelCorr.dataIterator();
-      for (levelDit.reset(); levelDit.ok(); ++levelDit)
-      {
-
-        //(*thisMLPtr->m_scalarNew[ScalarVars::m_enthalpy])[levelDit()].plus(levelCorr[levelDit()], 0, 0, 1);
-        //(*thisMLPtr->m_scalarNew[ScalarVars::m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], 1, 0, 1);
-
-        if (m_opt.reflux_enthalpy)
-        {
-        (*thisMLPtr->m_scalarNew[ScalarVars::m_enthalpy])[levelDit()].plus(levelCorr[levelDit()],refluxCorrSign, 0, 0, 1);
-        }
-
-        if (m_opt.reflux_concentration)
-        {
-        (*thisMLPtr->m_scalarNew[ScalarVars::m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], refluxCorrSign, 1, 0, 1);
-        }
-      }
-
-      // Compute other fields on the finest level
-      // for coarser levels, defer this until we've done averaging down
-      if (lev == finest_level || !doAvgDown)
-      {
-        thisMLPtr->updateEnthalpyVariables();
-      }
-
-      thisMLPtr = thisMLPtr->getCoarserLevel();
+      } // end loop over grids
 
     } // end loop over levels
 
+    VCAMRPoissonOp2Factory diffusiveOpFactory;
+    diffusiveOpFactory.define(lev0Dom, grids,
+                              refRat, AmrDx[0],
+                              refluxBC,
+                              alpha, aCoef,
+                              beta, bCoef);
+
+    AMRLevelOpFactory<LevelData<FArrayBox> >& castFact =
+        (AMRLevelOpFactory<LevelData<FArrayBox> >&) diffusiveOpFactory;
+
+    //      diffusionSolver = new AMRFASMultiGrid<LevelData<FArrayBox> >;
+    //      diffusionSolver->define(lev0Dom, castFact,
+    //                              &bottomSolver, numLevels);
+    diffusionSolver = new AMRMultiGrid<LevelData<FArrayBox> >;
+    diffusionSolver->define(lev0Dom, castFact,
+                            &bottomSolver, numLevels);
 
 
-    // Clean up
-    if (diffusionSolver != NULL)
+  } // end loop over different reflux types
+  else
+  {
+    MayDay::Error("Unknown reflux method");
+  }
+
+  generic_ops = diffusionSolver->getAMROperators();
+
+  for (int ilev = 0; ilev < generic_ops.size(); ilev++)
+  {
+    ops[ilev] = dynamic_cast<LevelTGAHelmOp<LevelData<FArrayBox>,FluxBox>* >(generic_ops[ilev]);
+    if (ops[ilev]==NULL)
     {
-      delete diffusionSolver;
-      diffusionSolver = NULL;
+      MayDay::Error("dynamic cast failed---is that operator really a TGAHelmOp?");
     }
+  }
+
+  diffusionSolver->m_verbosity = m_opt.AMRMultigridVerb;
+  diffusionSolver->m_eps = m_opt.AMRMultigridTolerance;
+  diffusionSolver->m_normThresh = m_opt.AMRMultigridNormThresh;
+  diffusionSolver->m_hang = m_opt.AMRMultigridHang;
+
+  //    Interval solverComps(0,numComps-1);
+
+  // now solve
+  diffusionSolver->solve(HCRefluxCorr, HCRefluxRHS,
+                         finest_level, m_level, false, // don't initialize to zero
+                         true);  // force homogeneous
 
 
-    // do average down
+  // now increment scalars with reflux correction
+  // go from finest->coarsest so that we can also avgDown
+  // increment NS pointer to finest level
+  thisMLPtr = this;
+  while (!thisMLPtr->finestLevel())
+  {
+    thisMLPtr = thisMLPtr->getFinerLevel();
+  }
+  CH_assert(thisMLPtr->m_level == finest_level);
 
-    if (doAvgDown)
+
+  // Check if we're doing averaging down
+//  bool m_opt.doAvgDown = true;
+//  pp.query("reflux_average_down", m_opt.doAvgDown);
+
+  // Add correction to H-C fields
+  // Also recalculate fluxes
+  for (int lev = finest_level; lev >= m_level; lev--)
+  {
+    LevelData<FArrayBox>& levelCorr = *(HCRefluxCorr[lev]);
+    DataIterator levelDit = levelCorr.dataIterator();
+    for (levelDit.reset(); levelDit.ok(); ++levelDit)
     {
-//      thisMLPtr = this;
-//      while (!thisMLPtr->finestLevel())
-//      {
-//        thisMLPtr = thisMLPtr->getFinerLevel();
-//      }
-//      thisMLPtr = thisMLPtr->getCoarserLevel();
-//      CH_assert(thisMLPtr->m_level == finest_level-1);
-//
-//      for (int lev = finest_level-1; lev >= m_level; lev--)
-//      {
-//        AMRLevelMushyLayer& fineML = *(thisMLPtr->getFinerLevel());
-//
-//        // quick sanity check
-//        CH_assert(fineML.m_level = lev + 1);
-//        CoarseAverage& scalAvgDown =  fineML.m_coarseAverageScalar;
-//
-//        scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[ScalarVars::m_enthalpy],
-//                                    *fineML.m_scalarNew[ScalarVars::m_enthalpy]);
-//        scalAvgDown.averageToCoarse(*thisMLPtr->m_scalarNew[ScalarVars::m_bulkConcentration],
-//                                    *fineML.m_scalarNew[ScalarVars::m_bulkConcentration]);
-//
-//        thisMLPtr->updateEnthalpyVariables();
-//
-//        thisMLPtr = thisMLPtr->getCoarserLevel();
-//      }
 
-    }
-    // clean up temporary scalar storage
-    for (int lev = 0; lev <= finest_level; lev++)
-    {
-      if (HCRefluxRHS[lev] != NULL)
+      //(*thisMLPtr->m_scalarNew[ScalarVars::m_enthalpy])[levelDit()].plus(levelCorr[levelDit()], 0, 0, 1);
+      //(*thisMLPtr->m_scalarNew[ScalarVars::m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], 1, 0, 1);
+
+      if (m_opt.reflux_enthalpy)
       {
-        delete HCRefluxRHS[lev];
-        HCRefluxRHS[lev] = NULL;
+        (*thisMLPtr->m_scalarNew[ScalarVars::m_enthalpy])[levelDit()].plus(levelCorr[levelDit()],m_opt.refluxCorrSign, 0, 0, 1);
       }
 
-      if (HCRefluxCorr[lev] != NULL)
+      if (m_opt.reflux_concentration)
       {
-        delete HCRefluxCorr[lev];
-        HCRefluxCorr[lev] = NULL;
+        (*thisMLPtr->m_scalarNew[ScalarVars::m_bulkConcentration])[levelDit()].plus(levelCorr[levelDit()], m_opt.refluxCorrSign, 1, 0, 1);
       }
-
     }
 
+    // Compute other fields on the finest level
+    // for coarser levels, defer this until we've done averaging down
+    if (lev == finest_level || !m_opt.refluxAverageDown)
+    {
+      thisMLPtr->updateEnthalpyVariables();
+    }
 
-    return maxRefluxRHS;
+    thisMLPtr = thisMLPtr->getCoarserLevel();
+
+  } // end loop over levels
+
+  // Clean up
+  if (diffusionSolver != NULL)
+  {
+    delete diffusionSolver;
+    diffusionSolver = NULL;
+  }
+
+  // clean up temporary scalar storage
+  for (int lev = 0; lev <= finest_level; lev++)
+  {
+    if (HCRefluxRHS[lev] != NULL)
+    {
+      delete HCRefluxRHS[lev];
+      HCRefluxRHS[lev] = NULL;
+    }
+
+    if (HCRefluxCorr[lev] != NULL)
+    {
+      delete HCRefluxCorr[lev];
+      HCRefluxCorr[lev] = NULL;
+    }
+
+  }
+
+  return maxRefluxRHS;
 
 }
 

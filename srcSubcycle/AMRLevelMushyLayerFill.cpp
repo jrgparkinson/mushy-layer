@@ -212,13 +212,10 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 
   ParmParse pp("main");
 
-
   Real innerRadius = m_opt.fixedPorosityFractionalInnerRadius*m_opt.domainWidth;
 
   Real porosityTimescale = 1/m_parameters.darcy;
   pp.query("porosityTimescale", porosityTimescale);
-
-
 
   for (dit.reset(); dit.ok(); ++dit)
   {
@@ -636,7 +633,6 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     pout() << "  AMRLevelMushyLayer::fillScalars - regularisation ops" << endl;
   }
 
-  ParmParse ppMain("main");
 
   doRegularisationOps(a_scal, a_var);
 
@@ -645,10 +641,8 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
     a_scal.exchange();
 
-    // Try a corner copier?
-    bool doCorners = true;
-    ppMain.query("scalarExchangeCorners", doCorners);
-    if (a_scal.ghostVect()[0] > 0 && doCorners)
+
+    if (a_scal.ghostVect()[0] > 0 && m_opt.scalarExchangeCorners)
     {
       if (s_verbosity >= 5)
       {
@@ -658,6 +652,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       CornerCopier cornerCopy(m_grids, m_grids, m_problem_domain, a_scal.ghostVect(), true);
       a_scal.exchange(a_scal.interval(), cornerCopy);
     }
+
 
   }
 
@@ -777,13 +772,10 @@ void AMRLevelMushyLayer::fillBuoyancy(LevelData<FArrayBox>& a_buoyancy,
                                       LevelData<FArrayBox>& a_liquidConc,
                                       LevelData<FArrayBox>& a_porosity)
 {
-  ParmParse ppMain("main");
-  Real zero_time = -1;
-  ppMain.query("turn_off_buoyancy_time", zero_time);
 
   for (DataIterator dit = a_buoyancy.dataIterator(); dit.ok(); ++dit)
   {
-    if (zero_time >= 0 && m_time > zero_time)
+    if (m_opt.buoyancy_zero_time >= 0 && m_time > m_opt.buoyancy_zero_time)
     {
       a_buoyancy[dit].setVal(0);
     }

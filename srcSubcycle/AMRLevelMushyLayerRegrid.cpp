@@ -437,14 +437,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   Real fixed_grid_time = -1.0;
   ppRegrid.query("fixed_grid_time", fixed_grid_time);
 
-  // Tagging based on inputs file
-  int taggingVar = -1; // m_temperature
-  int taggingVectorVar = -1;
-  int taggingMethod = 0; // 0 = undivided gradient, 1= absolute value
-
-  ppMain.query("taggingVar", taggingVar);
-  ppMain.query("refineMethod", taggingMethod);
-  ppMain.query("taggingVectorVar", taggingVectorVar);
 
   Real min_time = -1;
   ppRegrid.query("min_regrid_time", min_time);
@@ -501,7 +493,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       pout() << "AMRLevelMushyLayer::tagCells - tag velocity >  " << vel_thresh << endl;
     }
 
-    tagCellsVar(localTags, vel_thresh, 1, -1, m_fluidVel);
+    tagCellsVar(localTags, vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
   }
   else if ((ppRegrid.contains("plume_vel") || ppRegrid.contains("plume_salinity")))
   {
@@ -528,7 +520,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
 
       IntVectSet porosityGradientCells;
-      tagCellsVar(porosityGradientCells, m_opt.refineThresh, taggingMethod, m_porosity, -1);
+      tagCellsVar(porosityGradientCells, m_opt.refineThresh, m_porosity, -1, m_opt.taggingMethod);
 
       // Grow these cells to go further into the channel,
       // where the salinity is high and fluid velocities are large and negative
@@ -537,15 +529,13 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       // Tag regions of downflow
       tagCellsVar(downflowCells,
                   velThreshold, // refine thresh
-                  3, // tagging method - refine where value is less than refineThresh, i.e. downflow
                   -1, // don't consider a scalar field
-                  m_fluidVel, 1); // y component of velocity
+                  m_fluidVel, TaggingMethod::CompareLargerThanNegative, 1); // y component of velocity
 
       IntVectSet saltyCells;
       tagCellsVar(saltyCells, salinityThreshold,
-                  2, // tagging method - refine where the value is more than refinThreshold
                   ScalarVars::m_bulkConcentration,
-                  -1);
+                  -1, TaggingMethod::CompareLargerThan);
 
       // Only take the cells which have the porosity gradient
       // and either downflow or very salty
@@ -590,10 +580,8 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
         IntVectSet mushyCells;
         tagCellsVar(mushyCells,
                     m_opt.refineThresh, // refine thresh for gradients
-                    0, // refine around undivided gradient
-                    m_porosity, -1);
-
-
+                    m_porosity, -1,
+                    TaggingMethod::UndividedGradient);
 
         localTags = mushyCells;
 
@@ -604,21 +592,21 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
 
   }
-  else if (taggingVar > -1 || taggingVectorVar > -1)
+  else if (m_opt.taggingVar > -1 || m_opt.taggingVectorVar > -1)
   {
     if (s_verbosity >= 2)
     {
-      if (taggingVar > -1)
+      if (m_opt.taggingVar > -1)
       {
-        pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[taggingVar] << endl;
+        pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[m_opt.taggingVar] << endl;
       }
       else
       {
-        pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_vectorVarNames[taggingVectorVar] << endl;
+        pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_vectorVarNames[m_opt.taggingVectorVar] << endl;
       }
     }
 
-    tagCellsVar(localTags, m_opt.refineThresh, taggingMethod, taggingVar, taggingVectorVar );
+    tagCellsVar(localTags, m_opt.refineThresh, m_opt.taggingVar, m_opt.taggingVectorVar, m_opt.taggingMethod);
   }
   else
   {
@@ -907,9 +895,9 @@ void AMRLevelMushyLayer::tagCenterCells(IntVectSet& localTags, Real radius)
 
 
 void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
-                                     int taggingMethod,
                                      int taggingVar,
-                                     int taggingVectorVar, int comp)
+                                     int taggingVectorVar,
+                                     TaggingMethod taggingMethod,int comp)
 {
   const DisjointBoxLayout& levelDomain =
       m_scalarNew[0]->disjointBoxLayout();
@@ -990,7 +978,7 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
 
     FArrayBox taggingMetricFab(b, 1);
 
-    if (taggingMethod == 0)
+    if (taggingMethod == TaggingMethod::UndividedGradient)
     {
       // Calculated undivided gradient
       for (int dir = 0; dir < SpaceDim; ++dir)
@@ -1008,7 +996,7 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
       FORT_MAGNITUDEF(CHF_FRA1(taggingMetricFab, 0), CHF_CONST_FRA(gradFab),
                       CHF_BOX(b));
     }
-    else if (taggingMethod == 1)
+    else if (taggingMethod == TaggingMethod::Magnitude)
     {
       // Calculate magnitude
       FORT_MAGNITUDESIGN(CHF_FRA1(taggingMetricFab, 0), CHF_CONST_FRA(UFab),
@@ -1018,13 +1006,13 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
       //      taggingMetricFab.divide(m_level + 1);
 
     }
-    else if (taggingMethod == 2)
+    else if (taggingMethod == TaggingMethod::CompareLargerThan)
     {
       // Just compare the actual field
       taggingMetricFab.copy(UFab);
 
     }
-    else if (taggingMethod == 3)
+    else if (taggingMethod == TaggingMethod::CompareLargerThanNegative)
     {
       // Just compare the actual field, but make negative (so we refine where the field is negative).
       taggingMetricFab.copy(UFab);
@@ -1190,16 +1178,11 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
     scalarInterp.define(m_grids, 1, crseRefRat, m_problem_domain);
     vectorInterp.define(m_grids, SpaceDim, crseRefRat, m_problem_domain);
 
-    bool vectorHOinterp = false;
-    bool scalarHOinterp = true;
-    ParmParse ppMain("main");
-    ppMain.query("vectorHOinterp", vectorHOinterp);
-    ppMain.query("scalarHOinterp", scalarHOinterp);
 
     for (int scalarVar = 0; scalarVar < m_numScalarVars;
         scalarVar++)
     {
-      if (scalarHOinterp)
+      if (m_opt.scalarHOinterp)
       {
         scalarInterp4.interpToFine(*m_scalarNew[scalarVar],
                                    *(amrMushyLayerCoarserPtr->m_scalarNew[scalarVar]));
@@ -1220,7 +1203,7 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
         vectorVar++)
     {
 
-      if (vectorHOinterp)
+      if (m_opt.vectorHOinterp)
       {
         vectorInterp4.interpToFine(*m_vectorNew[vectorVar],
                                    *(amrMushyLayerCoarserPtr->m_vectorNew[vectorVar]));
@@ -1343,11 +1326,6 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     pout() << "AMRLevelMushyLayer::postRegrid (level " << m_level << ")" << endl;
   }
 
-  ParmParse ppMain("main");
-
-  bool makePlots = false;
-  ppMain.query("regrid_plots", makePlots);
-
   // If the new grids are no different to old grids, don't do anything
   // Need to check across all levels
 
@@ -1455,21 +1433,18 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     if (s_project_initial_vel)
     {
       // NB this doesn't calculate pressure, just corrects velocity
-      if (makePlots)
+      if (m_opt.makeRegridPlots)
       {
         writeAMRHierarchy("regrid1.hdf5");
       }
 
       level0Proj.initialVelocityProject(amrVel, amrPorosityFace, amrPorosity, homoBC);
-      if (makePlots)
+      if (m_opt.makeRegridPlots)
       {
         writeAMRHierarchy("regrid2.hdf5");
       }
     }
 
-    // Compute initial VD correction
-    // D this later now
-    //    level0Proj.doPostRegridOps(amrLambda,amrPorosityFace,m_dt,m_time);
 
     thisLevelData = this;
 
@@ -1496,32 +1471,25 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
     if (s_initialize_pressures)
     {
-      if (makePlots)
+      if (m_opt.makeRegridPlots)
       {
         writeAMRHierarchy("regrid3.hdf5");
       }
 
-      Real scale = 0.1;
-      ppMain.query("regrid_dt_scale", scale);
-      dtInit *= scale;
+      dtInit *= m_opt.regrid_dt_scale;
 
       initializeGlobalPressure(dtInit, false);
 
     }
 
-    if (makePlots)
+    if (m_opt.makeRegridPlots)
     {
       writeAMRHierarchy("regrid4.hdf5");
     }
     ParmParse ppMain("main");
 
-    bool initLambda = true;
-    ppMain.query("initLambda", initLambda);
-
-    if(initLambda)
+    if(m_opt.initLambda)
     {
-
-
       thisLevelData = this;
 
       for (int lev = 0; lev < numLevels; lev++)
@@ -1530,14 +1498,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
         thisLevelData = thisLevelData->getFinerLevel();
       }
 
-
       // Finally, let's try and compute the freestream preservation carefully (i.e. use subcycling)
-      bool useSubcycling = true;
-
-      ppMain.query("regrid_freestream_subcycle", useSubcycling);
-
-      bool advectAgain=false;
-      ppMain.query("regrid_advect_before_freestream", advectAgain);
 
       // Save dt for each level so it can be reset later
       Vector<Real> dtSave(numLevels, 1.0e8);
@@ -1551,7 +1512,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       }
 
 
-      if (advectAgain)
+      if (m_opt.regrid_advect_before_freestream)
       {
         if (s_verbosity > 2)
         {
@@ -1578,7 +1539,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
           }
 
-          if (useSubcycling)
+          if (m_opt.regrid_freestream_subcycle)
           {
             dtLev = dtLev/thisLevelData->m_ref_ratio;
           }
@@ -1589,7 +1550,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
       } // end if doing advection of lambda
 
-      if (makePlots)
+      if (m_opt.makeRegridPlots)
       {
         writeAMRHierarchy("regrid5.hdf5");
       }
@@ -1597,7 +1558,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       // Reflux Lambda to compute VD correction
       AMRRefluxLambda();
 
-      if (makePlots)
+      if (m_opt.makeRegridPlots)
       {
         writeAMRHierarchy("regrid6.hdf5");
       }
@@ -1611,7 +1572,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       level0Proj.doPostRegridOps(amrLambda,amrPorosityFace,dtInit,m_time,
                                  etaScale);
 
-      if (makePlots)
+      if (m_opt.makeRegridPlots)
       {
         writeAMRHierarchy("regrid7.hdf5");
       }
@@ -1625,7 +1586,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
         thisLevelData = thisLevelData->getFinerLevel();
       }
 
-      if (makePlots)
+      if (m_opt.makeRegridPlots)
       {
         writeAMRHierarchy("regrid8.hdf5");
       }

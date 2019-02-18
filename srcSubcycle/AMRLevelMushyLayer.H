@@ -20,7 +20,6 @@
 #include "LevelFluxRegister.H"
 #include "LevelDomainFluxRegister.h"
 
-//#include "LevelAdvect.H"
 #include "PatchGodunov.H"
 #include "PiecewiseLinearFillPatch.H"
 #include "ProblemDomain.H"
@@ -258,7 +257,7 @@ public:
   /// Add cells that specify criteria
   void tagCellsVar(IntVectSet& localTags, Real refineThresh,
                    int taggingVar, int vectorTaggingVar,
-                   int taggingMethod, int comp=-1);
+                   TaggingMethod taggingMethod, int comp=-1);
 
   /// Setup menagerie of data structures
   void levelSetup();

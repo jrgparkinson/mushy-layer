@@ -20,6 +20,33 @@ enum MGmethod {
   MGTypeFAS
 };
 
+enum TaggingMethod {
+  /// Tag where the undivided gradient of some field is bigger than some value
+  UndividedGradient,
+
+  /// Tag where the magnitude of some field is bigger than some values
+  Magnitude,
+
+  /// Tag where the value of some field is larger than some criteria
+  CompareLargerThan,
+
+  /// Tag where the value of some field multiplied by -1 is larger than some criteria.
+  /**
+   * Alternatively, can think of this as when some field is smaller than some criteria.
+   */
+  CompareLargerThanNegative
+};
+
+enum RefluxMethod {
+  /// 0 - linear correction
+  LinearReflux,
+
+  /// 1 - linear VC correction
+  LinearVCReflux,
+
+  /// 2 - nonlinear correction
+  NonlinearReflux
+};
 /// Options for handling advection velocities
 enum velocityAdvectionTypes
 {
@@ -137,6 +164,12 @@ struct MushyLayerOptions {
   Real fixedDt;
 
   Real initial_dt_multiplier;
+  Real minDt;
+
+  int max_possible_level;
+
+  bool computeVorticityStreamFunction;
+
   int num_init_passes;
   Real restart_new_time;
   bool init_add_subtract_grad_p;
@@ -232,11 +265,37 @@ struct MushyLayerOptions {
   bool reflux_concentration ;
   bool reflux_lambda ;
 
+  bool refluxAverageDown;
+  RefluxMethod refluxMethod;
+  Real refluxBetaSign;
+  Real refluxCorrSign;
+
   Real viscous_solver_tol;
   int viscous_num_smooth_down;
   int viscous_num_smooth_up;
 
+  int AMRMultigridRelaxMode;
+  int AMRMultigridVerb;
+  Real AMRMultigridTolerance;
+  Real AMRMultigridHang;
+  Real AMRMultigridNormThresh;
+
+  int taggingVar;
+  int taggingVectorVar;
+  TaggingMethod taggingMethod;
+
+  bool scalarHOinterp;
+  bool vectorHOinterp;
+
+  bool makeRegridPlots;
+  Real regrid_dt_scale;
+
+  bool initLambda;
   Real variable_eta_factor;
+  Real minEta;
+  bool computeFreestreamCorrection;
+  bool regrid_advect_before_freestream;
+  bool regrid_freestream_subcycle;
 
   int iter_plot_interval;
 
@@ -285,6 +344,11 @@ struct MushyLayerOptions {
   Real FixedPorositySTD;
   Real fixedPorosityFractionalInnerRadius;
   Real fixedPorosityEndTime;
+
+  bool scalarExchangeCorners;
+  Real buoyancy_zero_time;
+
+  Real maxEta;
 
   MGmethod MGtype;
 

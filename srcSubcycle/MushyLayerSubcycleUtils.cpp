@@ -27,7 +27,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ParmParse ppMain("main");
 
   ParmParse ppParams("parameters");
-  ParmParse ppMG("amrmultigrid");
+  ParmParse ppAMRMultigrid("amrmultigrid");
   ParmParse ppProjection("projection");
   ParmParse ppInit("init");
   ParmParse ppAdvsrc("advSrc");
@@ -285,12 +285,61 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("reflux_concentration", opt.reflux_concentration);
   ppMain.query("reflux_lambda", opt.reflux_lambda);
 
+  opt.refluxAverageDown = true;
+  ppMain.query("reflux_average_down", opt.refluxAverageDown);
+
+  int refluxType = 2;
+  ppMain.query("refluxType", refluxType);
+  opt.refluxMethod = RefluxMethod(refluxType);
+
+  opt.refluxBetaSign = -1;
+  opt.refluxCorrSign = 1;
+  ppMain.query("refluxBetaSign", opt.refluxBetaSign);
+  ppMain.query("refluxCorrSign", opt.refluxCorrSign);
+
   opt.variable_eta_factor = 1.0;
   ppMain.query("variable_eta_factor", opt.variable_eta_factor);
   CH_assert(opt.variable_eta_factor >= 1); // This must be >= 1, else eta will increase when it should be decreasing (and vice-versa)
 
+  opt.minEta = 0.99;
+  ppProjection.query("eta", opt.minEta);
+
+  opt.computeFreestreamCorrection = true;
+  ppMain.query("single_level_lambda_corr", opt.computeFreestreamCorrection);
+
   opt.compute_initial_VD_corr = true;
   ppMain.query("initialize_VD_corr", opt.compute_initial_VD_corr);
+
+  opt.taggingVar = -1; // m_temperature
+  opt.taggingVectorVar = -1;
+  int tagMethod = 0;
+
+  ppMain.query("taggingVar", opt.taggingVar);
+  ppMain.query("refineMethod", tagMethod);
+  ppMain.query("taggingVectorVar", opt.taggingVectorVar);
+
+  opt.taggingMethod = TaggingMethod(tagMethod);
+
+  opt.vectorHOinterp = false;
+  opt.scalarHOinterp = true;
+  ppMain.query("vectorHOinterp", opt.vectorHOinterp);
+  ppMain.query("scalarHOinterp", opt.scalarHOinterp);
+
+  opt.makeRegridPlots = false;
+  ppMain.query("regrid_plots", opt.makeRegridPlots);
+
+  opt.regrid_dt_scale = 0.1;
+  ppMain.query("regrid_dt_scale", opt.regrid_dt_scale);
+
+  opt.initLambda = true;
+  ppMain.query("initLambda", opt.initLambda);
+
+  opt.regrid_freestream_subcycle = true;
+  ppMain.query("regrid_freestream_subcycle", opt.regrid_freestream_subcycle);
+
+  opt.regrid_advect_before_freestream=false;
+  ppMain.query("regrid_advect_before_freestream", opt.regrid_advect_before_freestream);
+
 
   /**
    * Solver options
@@ -312,7 +361,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("time_integration_order", opt.timeIntegrationOrder);
 
   opt.verbosity_multigrid = 0;
-  ppMG.query("multigrid", opt.verbosity_multigrid);
+  ppAMRMultigrid.query("multigrid", opt.verbosity_multigrid);
 
   opt.implicitAdvectionSolve = false;
   ppMain.query("implicitAdvectionSolve", opt.implicitAdvectionSolve);
@@ -324,7 +373,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("maxDivUFace", opt.maxDivUFace);
 
   int mgtype = MGmethod::MGTypeFAS;
-  ppMG.query("MGtype", mgtype);
+  ppAMRMultigrid.query("MGtype", mgtype);
   opt.MGtype = MGmethod(mgtype);
 
   opt.multiCompUStarSolve = false;
@@ -335,6 +384,20 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.smoothingCoeff = 0.0; //0.01;
   ppProjection.query("pre_smoothing", opt.smoothingCoeff);
+
+  opt.AMRMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
+  ppAMRMultigrid.query("relaxMode", opt.AMRMultigridRelaxMode);
+
+  opt.AMRMultigridVerb=0;
+  opt.AMRMultigridTolerance=1e-10;
+  opt.AMRMultigridHang=1e-10,
+
+  ppAMRMultigrid.query("hang_eps", opt.AMRMultigridHang);
+  ppAMRMultigrid.query("tolerance", opt.AMRMultigridTolerance);
+  ppAMRMultigrid.query("verbosity", opt.AMRMultigridVerb);
+
+  opt.AMRMultigridNormThresh=1e-10;
+  ppAMRMultigrid.query("norm_thresh", opt.AMRMultigridNormThresh);
 
   /***
    * Initialisation
@@ -458,13 +521,31 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.fixedPorosityEndTime = -1;
   ppMain.query("porosityEndTime", opt.fixedPorosityEndTime);
 
+  // Try a corner copier?
+  opt.scalarExchangeCorners = true;
+  ppMain.query("scalarExchangeCorners", opt.scalarExchangeCorners);
+
+  opt.buoyancy_zero_time = -1;
+  ppMain.query("turn_off_buoyancy_time", opt.buoyancy_zero_time);
+
+  opt.maxEta = -1;
+  ppMain.query("max_eta", opt.maxEta); // let user specify different max eta if they want
+
+  opt.minDt = 1e-7;
+  ppMain.query("min_dt", opt.minDt);
+
+  opt.max_possible_level = 0;
+  ppMain.query("max_level", opt.max_possible_level);
+
+  opt.computeVorticityStreamFunction = true;
+  ppMain.query("computeVorticity", opt.computeVorticityStreamFunction);
 
   a_fact = RefCountedPtr<AMRLevelMushyLayerFactory> (new AMRLevelMushyLayerFactory(opt));
 
 }
 void
 defineAMR(AMR&                                          a_amr,
-          RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact,
+          RefCountedPtr<AMRLevelMushyLayerFactory>&     a_fact,
           const ProblemDomain&                          a_prob_domain,
           const Vector<int>&                            a_refRat)
 {
