@@ -52,7 +52,9 @@ $ cd execSubcycle
 $ ./mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex inputs
 ```
 
-where inputs a file in /execSubcycle/
+where inputs is a file in `/execSubcycle/`.
+
+For more details on how to setup your inputs file for the problem you're interested in, see `/docs/RunningTheMushyLayerCode.md/`.
 
 # Documentation
 Documentation can be generated using Doyxgen if it is installed. A default configuration file can be found in the `/docs/` directory, which can be run via:
