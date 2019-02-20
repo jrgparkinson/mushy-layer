@@ -36,7 +36,7 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
 
     if (amrMLcrse != NULL)
     {
-      define(amrMLcrse->m_opt);
+      define(amrMLcrse->m_opt, amrMLcrse->m_parameters);
     }
     else
     {
@@ -1135,7 +1135,7 @@ void AMRLevelMushyLayer::setAdvectionBCs()
 
 
 
-void AMRLevelMushyLayer::define(MushyLayerOptions a_opt)
+void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_params)
 {
   m_isDefined = true;
 
@@ -1160,7 +1160,8 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt)
   m_adv_vel_centering = 0.5;
   m_dtReduction = -1;
 
-  m_parameters.getParameters();
+//  m_parameters.getParameters();
+  m_parameters = a_params;
 
   m_physBCPtr = new PhysBCUtil(m_parameters, m_dx);
   m_physBCPtr->setAdvVel(&m_advVel);

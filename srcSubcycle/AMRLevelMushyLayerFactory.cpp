@@ -18,16 +18,17 @@
 
 
 AMRLevelMushyLayerFactory::
-AMRLevelMushyLayerFactory( MushyLayerOptions a_opt)
+AMRLevelMushyLayerFactory( MushyLayerOptions a_opt, MushyLayerParams a_params)
 {
   m_options = a_opt;
+  m_params = a_params;
 }
 
 // Virtual constructor
 AMRLevel* AMRLevelMushyLayerFactory::new_amrlevel() const
 {
   // Create a new AMRLevelAdvectDiffuse
-  AMRLevelMushyLayer* amrMLPtr = new AMRLevelMushyLayer(m_options);
+  AMRLevelMushyLayer* amrMLPtr = new AMRLevelMushyLayer(m_options, m_params);
 
   // Return it
   return (static_cast <AMRLevel*> (amrMLPtr));

@@ -193,13 +193,13 @@ public:
 }
 
   /// Full constructor. Arguments are same as in define()
-  AMRLevelMushyLayer(MushyLayerOptions a_opt)
+  AMRLevelMushyLayer(MushyLayerOptions a_opt, MushyLayerParams a_params)
   {
-    define(a_opt);
+    define(a_opt, a_params);
   }
 
   /// Defines this AMRLevelMushyLayer
-  void define(MushyLayerOptions a_opt);
+  void define(MushyLayerOptions a_opt, MushyLayerParams a_params);
 
   /// Destructor
   virtual ~AMRLevelMushyLayer();

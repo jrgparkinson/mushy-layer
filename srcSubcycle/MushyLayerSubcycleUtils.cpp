@@ -34,6 +34,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   MushyLayerOptions opt;
 
+  MushyLayerParams params;
+  params.getParameters();
+
   opt.cfl = 0.8;
   ppMain.get("cfl",opt.cfl);
 
@@ -264,7 +267,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppProjection.query("useIncrementalPressure", opt.useIncrementalPressure);
 
   opt.phiScale = 1;
-  ppProjection.get("phiScale", opt.phiScale);
+  ppProjection.query("phiScale", opt.phiScale);
 
   opt.doSyncOperations = true;
   ppMain.query("doSyncOperations", opt.doSyncOperations);
@@ -540,7 +543,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.computeVorticityStreamFunction = true;
   ppMain.query("computeVorticity", opt.computeVorticityStreamFunction);
 
-  a_fact = RefCountedPtr<AMRLevelMushyLayerFactory> (new AMRLevelMushyLayerFactory(opt));
+
+
+  a_fact = RefCountedPtr<AMRLevelMushyLayerFactory> (new AMRLevelMushyLayerFactory(opt, params));
 
 }
 void
