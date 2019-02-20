@@ -732,7 +732,7 @@ protected:
   void fillAnalyticVel(LevelData<FluxBox>& a_advVel);
 
   /// Fill the velocity with some analytically determined function
-  void fillAnalyticVel(FArrayBox& velDir, int dir, int comp, bool project);
+  void fillAnalyticVel (FArrayBox& velDir, int dir, int comp, bool project);
 
   /// Fill the velocity with some analytically determined function
   void fillAnalyticVel(LevelData<FArrayBox>& velDir);

@@ -155,26 +155,59 @@ struct MushyLayerOptions {
 
   string output_dir;
 
+  Real steadyStateCondition;
+  bool ignoreVelocitySteadyState;
+  bool ignoreBulkConcSteadyState;
+
   /// Domain width
   Real domainWidth;
   Real domainHeight;
   Real cfl;
+  bool forceUseUChiForCFL;
+  Real min_time;
   Real max_dt_growth;
   Real init_dt_scale;
   Real fixedDt;
 
   Real initial_dt_multiplier;
   Real minDt;
+  Real max_dt;
+  Real max_init_dt;
+  Real accelCFL;
+  bool printAccelDt;
+  bool useAccelDt;
+  bool useInitAccelDt;
 
   int max_possible_level;
 
   bool computeVorticityStreamFunction;
+
+  bool useFortranRegularisationFace;
+  bool useFortranRegularisation;
+
+  Real stokesDarcyForcingTimescale;
 
   int num_init_passes;
   Real restart_new_time;
   bool init_add_subtract_grad_p;
   bool init_compute_uDelu;
   bool increaseDt;
+
+  Real spongeHeight;
+  Real postTraceSmoothing;
+  bool skipNewLevelScalars;
+  bool skipSaltUpdate;
+  bool skipHCUpdate;
+  bool doDiffusionSrc;
+
+  bool noMultigrid;
+  int noMultigridIter;
+
+  Real rampBuoyancy;
+  Real initRaC;
+  Real initRaT;
+  Real maxRaC;
+  Real maxRaT;
 
   Real advVelCentering;
   Real adv_vel_centering_growth;
@@ -208,6 +241,7 @@ struct MushyLayerOptions {
 
   bool doSyncOperations;
   bool enforceAnalyticSoln;
+  bool useAnalyticSource;
 
   Real maxDivUFace;
   bool scaleP_MAC;
@@ -230,6 +264,7 @@ struct MushyLayerOptions {
   bool useOldAdvVel;
   bool enforceAnalyticVel;
   bool projectAnalyticVel;
+  int analyticVelType;
 
   int lapVelNumSmooth;
   Real lapVelSmoothScale;
@@ -314,11 +349,13 @@ struct MushyLayerOptions {
   bool doScalarAdvectionDiffusion;
   Real initVel;
 
+  Real perturbationPhaseShift;
   Real delayedPerturbation = 0.0;
   Real perturbationTime = 0.0;
   Real perturbationWavenumber = 1.0;
   bool perturbationSin = false;
   Real fixedPorosity = -1.0;
+  Real porosityTimescale;
   PorosityFunctions porosityFunction;
 
   Real restartPerturbation;

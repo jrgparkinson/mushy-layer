@@ -33,88 +33,74 @@ void AMRLevelMushyLayer::fillAdvVel(Real time, LevelData<FluxBox>& a_advVel)
   }
 
 }
-
-void AMRLevelMushyLayer::fillAnalyticVel(FArrayBox& velDir, int dir, int comp, bool project)
+void AMRLevelMushyLayer::fillAnalyticVel (FArrayBox& velDir, int dir, int comp, bool project)
 {
-  const Box& b = velDir.box();
-
-
-  for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
-  {
+  const Box& b = velDir.box ();
+  for (BoxIterator bit = BoxIterator (b); bit.ok (); ++bit) {
     Real x, y, offsetx, offsety;
-    IntVect iv = bit();
+    IntVect iv = bit ();
     RealVect loc, offset;
 
-    IndexType index = b.ixType();
-    if (dir == 0)
-    {
+    IndexType index = b.ixType ();
+    if (dir == 0) {
       offsety = 0.5;
-      offsetx = index.cellCentered() ? 0.5 : 0;
+      offsetx = index.cellCentered () ? 0.5 : 0;
     }
-    else
-    {
+    else {
       offsetx = 0.5;
-      offsety = index.cellCentered() ? 0.5 : 0;
+      offsety = index.cellCentered () ? 0.5 : 0;
     }
 
     offset[0] = offsetx;
     offset[1] = offsety;
 
-    ::getLocation(iv, loc, m_dx, offset);
+    ::getLocation (iv, loc, m_dx, offset);
 
     x = loc[0];
     y = loc[1];
 
-    Real freqx = (m_problem_domain.isPeriodic(0)) ? 2*M_PI/m_opt.domainWidth : M_PI/m_opt.domainWidth ;
+    Real freqx =
+        (m_problem_domain.isPeriodic (0)) ?
+            2 * M_PI / m_opt.domainWidth : M_PI / m_opt.domainWidth;
     //    Real freqy = (m_problem_domain.isPeriodic(1)) ? 2*M_PI/m_domainWidth : M_PI/m_domainWidth ;
 
     Real Uscale;
-    if (m_parameters.nonDimVel > 0)
-    {
-      Uscale = m_parameters.nonDimVel*100;
+    if (m_parameters.nonDimVel > 0) {
+      Uscale = m_parameters.nonDimVel * 100;
     }
-    else if(m_parameters.darcy > 0)
-    {
-      Uscale = max(m_parameters.rayleighTemp, m_parameters.rayleighComposition)*m_parameters.darcy;
+    else if (m_parameters.darcy > 0) {
+      Uscale = max (m_parameters.rayleighTemp,
+                    m_parameters.rayleighComposition) * m_parameters.darcy;
     }
-    else
-    {
-      Uscale = sqrt(max(m_parameters.rayleighTemp, m_parameters.rayleighComposition));
+    else {
+      Uscale = sqrt (
+          max (m_parameters.rayleighTemp, m_parameters.rayleighComposition));
     }
 
     Real magU = Uscale; //*0.15;
 
-    int analyticVelType = m_parameters.physicalProblem;
-    ParmParse ppMain("main");
-    ppMain.query("analyticVelType", analyticVelType);
-
-    if (analyticVelType == -1)
-    {
+    if (m_opt.analyticVelType == -1) {
 
       // This velocity should have zero divergence
-      if (dir == 0)
-      {
+      if (dir == 0) {
         //        velDir(iv, comp) = magU*sin(freqx*(x+shift))*sin(freqx*(x+shift))*sin(freqx*(y+shift))*cos(freqx*(y+shift));
-        velDir(iv, comp) = 0;
+        velDir (iv, comp) = 0;
       }
-      else
-      {
-        velDir(iv, comp) = magU*sin(freqx*x)*(m_domainHeight-y);
+      else {
+        velDir (iv, comp) = magU * sin (freqx * x) * (m_domainHeight - y);
       }
 
     }
-    else if(analyticVelType == PhysicalProblems::m_soluteFluxTest)
-    {
+    else if (m_opt.analyticVelType == PhysicalProblems::m_soluteFluxTest) {
 
-      if (dir == 0)
-      {
+      if (dir == 0) {
         //              y = y + m_dx/2;
-        velDir(iv, comp) = magU*(cos(freqx*x)+0.5*freqx*x)*exp(-freqx*y);
+        velDir (iv, comp) = magU * (cos (freqx * x) + 0.5 * freqx * x)
+                  * exp (-freqx * y);
       }
-      else
-      {
+      else {
         //              x = x + m_dx/2;
-        velDir(iv, comp) = magU*(sin(freqx*x))*sin(freqx*y);
+        velDir (iv, comp) = magU * (sin (freqx * x)) * sin (freqx * y);
 
         //              fab(iv) = -magU*cos(freq*x)*sin(freq*y);
 
@@ -122,58 +108,53 @@ void AMRLevelMushyLayer::fillAnalyticVel(FArrayBox& velDir, int dir, int comp, b
       }
 
     }
-    else if (analyticVelType == PhysicalProblems::m_mushyLayer)
-    {
-      if (project)
-      {
+    else if (m_opt.analyticVelType == PhysicalProblems::m_mushyLayer) {
+      if (project) {
         // This version is divergent, and needs to be projected
-        if (dir == 0)
-        {
+        if (dir == 0) {
           //              y = y + m_dx/2;
-          velDir(iv, comp) = -magU*sin(freqx*x)*sin(freqx*x)*cos(freqx*y);
+          velDir (iv, comp) = -magU * sin (freqx * x) * sin (freqx * x)
+                    * cos (freqx * y);
         }
-        else
-        {
+        else {
           //              x = x + m_dx/2;
-          velDir(iv, comp) = magU*cos(freqx*x)*sin(freqx*y)*sin(freqx*y);
+          velDir (iv, comp) = magU * cos (freqx * x) * sin (freqx * y)
+                    * sin (freqx * y);
         }
       }
-      else
-      {
-        Real shift = 0.5*m_dx;
+      else {
+        Real shift = 0.5 * m_dx;
         shift = 0;
         // This velocity should have zero divergence
-        if (dir == 0)
-        {
+        if (dir == 0) {
           //          velDir(iv, comp) = magU*sin(freqx*x)*cos(freqx*y);
           //          velDir(iv, comp) = magU*sin(freqx*x)*cos(freqx*y);
 
-          velDir(iv, comp) = magU*sin(freqx*(x+shift))*sin(freqx*(x+shift))*sin(freqx*(y+shift))*cos(freqx*(y+shift));
+          velDir (iv, comp) = magU * sin (freqx * (x + shift))
+          * sin (freqx * (x + shift)) * sin (freqx * (y + shift))
+          * cos (freqx * (y + shift));
         }
-        else
-        {
+        else {
 
-          velDir(iv, comp) = -magU*sin(freqx*(x+shift))*cos(freqx*(x+shift))*sin(freqx*(y+shift))*sin(freqx*(y+shift));
+          velDir (iv, comp) = -magU * sin (freqx * (x + shift))
+          * cos (freqx * (x + shift)) * sin (freqx * (y + shift))
+          * sin (freqx * (y + shift));
           //          velDir(iv, comp) = -magU*cos(freqx*x)*sin(freqx*y);
         }
       }
     }
-    else
-    {
-      if (dir == 0)
-      {
-        velDir(iv, comp) = -magU*sin(freqx*x)*cos(freqx*y);
+    else {
+      if (dir == 0) {
+        velDir (iv, comp) = -magU * sin (freqx * x) * cos (freqx * y);
       }
-      else
-      {
-        velDir(iv, comp) = magU*cos(freqx*x)*sin(freqx*y);
+      else {
+        velDir (iv, comp) = magU * cos (freqx * x) * sin (freqx * y);
 
       }
     }
 
   }
 }
-
 
 void AMRLevelMushyLayer::fillAnalyticVel(LevelData<FArrayBox>& a_advVel)
 {
@@ -210,12 +191,8 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 {
   DataIterator dit = a_porosity.dataIterator();
 
-  ParmParse pp("main");
 
   Real innerRadius = m_opt.fixedPorosityFractionalInnerRadius*m_opt.domainWidth;
-
-  Real porosityTimescale = 1/m_parameters.darcy;
-  pp.query("porosityTimescale", porosityTimescale);
 
   for (dit.reset(); dit.ok(); ++dit)
   {
@@ -319,8 +296,8 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
         {
           time = m_opt.fixedPorosityEndTime;
         }
-        Real scale = min((1-m_parameters.bcValPorosityHi[1]), time/porosityTimescale);
-        scale = time/porosityTimescale;
+        Real scale = min((1-m_parameters.bcValPorosityHi[1]), time/m_opt.porosityTimescale);
+        scale = time/m_opt.porosityTimescale;
 
         scale = min(scale, 4.0);
         //        Real scale = min(0.9,
@@ -457,7 +434,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     pout() << "AMRLevelMushyLayer::fillScalars - field: " << m_scalarVarNames[a_var] << ", level: " << m_level << endl;
   }
 
-//  const DisjointBoxLayout& levelGrids = m_grids;
+  //  const DisjointBoxLayout& levelGrids = m_grids;
 
   Interval scalComps = Interval(0,0); // only works with this for now
   CH_assert(a_scal.nComp() == 1);
@@ -509,8 +486,8 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     LevelData<FArrayBox>& newCrseScal = *(crseLevel.m_scalarNew[a_var]);
 
     const DisjointBoxLayout& crseGrids = oldCrseScal.getBoxes();
-//    const ProblemDomain& crseDomain = crseLevel.problemDomain();
-//    int nRefCrse = crseLevel.refRatio();
+    //    const ProblemDomain& crseDomain = crseLevel.problemDomain();
+    //    int nRefCrse = crseLevel.refRatio();
 
     Real crse_new_time = crseLevel.m_time;
     Real crse_dt = crseLevel.dt();
@@ -693,7 +670,7 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
     for (int idir=0; idir<SpaceDim; idir++)
     {
       a_advVel[dit][idir].mult(permeability_face[dit][idir]);
-//      a_advVel[dit][idir].divide(m_parameters.m_darcyCoeff);
+      //      a_advVel[dit][idir].divide(m_parameters.m_darcyCoeff);
     }
 
   }

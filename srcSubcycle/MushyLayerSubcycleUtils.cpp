@@ -40,8 +40,20 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.cfl = 0.8;
   ppMain.get("cfl",opt.cfl);
 
+  opt.min_time = 0;
+  ppMain.query("min_time", opt.min_time);
+
   opt.output_dir = "";
   ppMain.query("output_folder", opt.output_dir);
+
+  opt.steadyStateCondition = 1e-3;
+  ppMain.query("steady_state", opt.steadyStateCondition);
+
+  opt.ignoreVelocitySteadyState = !params.isDarcyBrinkman();
+    ppMain.query("ignoreVelocitySteadyState", opt.ignoreVelocitySteadyState);
+
+    opt.ignoreBulkConcSteadyState=false;
+    ppMain.query("ignoreBulkConcentrationSteadyState", opt.ignoreBulkConcSteadyState);
 
   // This is really the domain width, not length,
   // but changing it in the inputs files would be a right pain
@@ -181,6 +193,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.projectAnalyticVel = false;
   ppMain.query("correctAnalyticVel", opt.projectAnalyticVel);
 
+  opt.analyticVelType = params.physicalProblem;
+  ppMain.query ("analyticVelType", opt.analyticVelType);
+
+
 
   opt.useOldAdvVel = false;
   ppMain.query("useOldAdvVelForTracing", opt.useOldAdvVel);
@@ -231,10 +247,44 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.CCBuoyancySrc = true;
   ppCCSrc.query("buoyancy", opt.CCBuoyancySrc);
 
+  opt.spongeHeight = 0.0;
+  ppMain.query("spongeHeight", opt.spongeHeight);
 
+  opt.postTraceSmoothing = 0.0; // default is no smoothing
+  ppMain.query("postTraceSmoothing", opt.postTraceSmoothing);
 
-  /**
-   * Physics related options
+  opt.rampBuoyancy = 0.0;
+  ppParams.query("rampBuoyancy", opt.rampBuoyancy);
+
+  opt.maxRaC = 0.0;
+   opt.maxRaT = 0.0;
+
+   ppParams.query("maxRaT", opt.maxRaT);
+   ppParams.query("maxRaC", opt.maxRaC);
+
+   opt.initRaC = 0;
+   opt.initRaT = 0;
+   ppParams.query("initRaT", opt.initRaT);
+   ppParams.query("initRaC", opt.initRaC);
+
+   opt.skipNewLevelScalars = false;
+   ppMain.query("skipNewLevelScalars", opt.skipNewLevelScalars);
+
+   opt.skipSaltUpdate = false;
+   ppMain.query("skipSaltUpdate", opt.skipSaltUpdate);
+
+   // Option here to not update enthalpy and salinity
+   // (useful for debugging)
+   opt.skipHCUpdate = false;
+   ppMain.query("skipHCUpdate", opt.skipHCUpdate);
+
+   opt.doDiffusionSrc = true;
+   ppMain.query("diffusiveSrcForAdvection", opt.doDiffusionSrc);
+
+   ppMain.query("consider_u_chi_dt", opt.forceUseUChiForCFL);
+
+   /**
+    * Physics related options
    */
 
   opt.iter_plot_interval = -1;
@@ -402,6 +452,13 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.AMRMultigridNormThresh=1e-10;
   ppAMRMultigrid.query("norm_thresh", opt.AMRMultigridNormThresh);
 
+  opt.noMultigrid = false;
+  opt.noMultigridIter = 100;
+  ppMain.query("noMultigrid", opt.noMultigrid);
+  ppMain.query("noMultigridIter", opt.noMultigridIter);
+
+
+
   /***
    * Initialisation
    */
@@ -455,9 +512,14 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
     opt.enforceAnalyticSoln = true;
   }
 
+  opt.useAnalyticSource = false;
+   ppMain.query("analyticSourceTerm", opt.useAnalyticSource);
+
   opt.initialPerturbation = 0.0;
   ppMain.query("initialPerturbation", opt.initialPerturbation);
 
+  opt.perturbationPhaseShift = 0.0;
+  ppMain.query("perturbationPhaseShift", opt.perturbationPhaseShift);
 
   opt.delayedPerturbation = 0.0;
   ppMain.query("delayedPerturbaation", opt.delayedPerturbation);
@@ -473,6 +535,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.fixedPorosity = -1.0;
   ppMain.query("fixed_porosity", opt.fixedPorosity);
+
+  opt.porosityTimescale = 1/params.darcy;
+  ppMain.query("porosityTimescale", opt.porosityTimescale);
 
   opt.initVel = 0.0;
   ppInit.query("initVel", opt.initVel);
@@ -531,17 +596,47 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.buoyancy_zero_time = -1;
   ppMain.query("turn_off_buoyancy_time", opt.buoyancy_zero_time);
 
+
+
   opt.maxEta = -1;
   ppMain.query("max_eta", opt.maxEta); // let user specify different max eta if they want
 
   opt.minDt = 1e-7;
   ppMain.query("min_dt", opt.minDt);
 
+  opt.max_dt = -1;
+  ppMain.query("max_dt", opt.max_dt);
+
+  opt.printAccelDt = false;
+  ppMain.query("printAccelDt", opt.printAccelDt);
+
+  opt.useAccelDt = false;
+  ppMain.query("useAccelDt", opt.useAccelDt);
+
+  opt.useInitAccelDt = true;
+  ppMain.query("useInitAccelDt", opt.useInitAccelDt);
+
+  opt.accelCFL = -1;
+  ppMain.query("accelCFL", opt.accelCFL);
+
+  opt.max_init_dt = -1;
+  ppMain.query("max_init_dt", opt.max_init_dt);
+
   opt.max_possible_level = 0;
   ppMain.query("max_level", opt.max_possible_level);
 
   opt.computeVorticityStreamFunction = true;
   ppMain.query("computeVorticity", opt.computeVorticityStreamFunction);
+
+
+  opt.useFortranRegularisationFace = false;
+      ppMain.query("fortranRegularisationFace", opt.useFortranRegularisationFace);
+      opt.useFortranRegularisation = true;
+       ppMain.query("fortranRegularisation", opt.useFortranRegularisation);
+
+
+       opt.stokesDarcyForcingTimescale = 0.5;
+       ppParams.query("forcing_timescale", opt.stokesDarcyForcingTimescale);
 
 
 

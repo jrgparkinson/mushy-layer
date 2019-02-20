@@ -567,6 +567,8 @@ public:
 	string getVelocityScale() const;
 	string getTimescale() const;
 
+	bool isDarcyBrinkman();
+
 
 };
 

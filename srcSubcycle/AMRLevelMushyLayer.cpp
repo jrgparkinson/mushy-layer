@@ -151,10 +151,6 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
     return true;
   }
 
-  Real steadyStateCondition = 1e-3;
-  ParmParse ppMain("main");
-  ppMain.query("steady_state", steadyStateCondition);
-
   Real Tnorm = convergedToSteadyState(ScalarVars::m_enthalpy);
   Real Cnorm = convergedToSteadyState(ScalarVars::m_bulkConcentration);
   Real Unorm =  convergedToSteadyState(m_fluidVel, true);
@@ -198,18 +194,17 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   // 2) All fields have stalled (d/dt = constant) but metrics have converged
   bool hasConverged = false;
 
-  bool ignoreVelocity = !solvingFullDarcyBrinkman();
-  ppMain.query("ignoreVelocitySteadyState", ignoreVelocity);
+  bool velConverged = m_opt.ignoreVelocitySteadyState || Unorm < m_opt.steadyStateCondition;
+  bool velStalled = m_opt.ignoreVelocitySteadyState || Ustalled;
 
-  bool velConverged = ignoreVelocity || Unorm < steadyStateCondition;
-  bool velStalled = ignoreVelocity || Ustalled;
-
-
-  bool Tconverged = Tnorm < steadyStateCondition;
-  bool Cconverged = Cnorm < steadyStateCondition;
+  bool Tconverged = Tnorm < m_opt.steadyStateCondition;
+  bool Cconverged = Cnorm < m_opt.steadyStateCondition;
 
   // Override to let us converge without salinity having actually converged
-  ppMain.query("ignoreBulkConcentrationSteadyState", Cconverged);
+  if (m_opt.ignoreBulkConcSteadyState)
+  {
+    Cconverged = true;
+  }
 
   if (Tconverged
       && Cconverged
@@ -257,11 +252,10 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
     return false;
   }
 
-  Real min_time = 0;
-  ppMain.query("min_time", min_time);
-  if (hasConverged && m_time < min_time)
+
+  if (hasConverged && m_time < m_opt.min_time)
   {
-    pout() << "AMRLevelMushyLayer::convergedToSteadyState - converged but time < min_time (" << m_time << " < " << min_time << ")" << endl;
+    pout() << "AMRLevelMushyLayer::convergedToSteadyState - converged but time < min_time (" << m_time << " < " << m_opt.min_time << ")" << endl;
     return false;
   }
 
@@ -271,12 +265,7 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
 
 bool AMRLevelMushyLayer::solvingFullDarcyBrinkman()
 {
-  if (m_parameters.darcy > 1e-10)
-  {
-    return true;
-  }
-
-  return false;
+  return m_parameters.isDarcyBrinkman();
 }
 
 void AMRLevelMushyLayer::compute_d_dt(const int a_var, LevelData<FArrayBox>& diff, bool vector)
@@ -331,8 +320,6 @@ void AMRLevelMushyLayer::compute_d_dt(const int a_var, LevelData<FArrayBox>& dif
 Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
 {
 
-  ParmParse ppMain("main");
-
   LevelData<FArrayBox> diff;
   compute_d_dt(a_var, diff, vector);
 
@@ -358,13 +345,10 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
   max = Max(max, minAllowed);
 
   // Don't consider sponge region in steady state calculations.
-  //  ParmParse pp("main");
-  Real spongeHeight = 0.0;
-  ppMain.query("spongeHeight", spongeHeight);
 
   DataIterator dit(m_grids);
 
-  if (spongeHeight > 0)
+  if (m_opt.spongeHeight > 0)
   {
     for (dit.reset(); dit.ok(); ++dit)
     {
@@ -378,7 +362,7 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
         }
         else
         {
-          topCorner += round(m_numCells[1]*spongeHeight) * BASISV(dir);
+          topCorner += round(m_numCells[1]*m_opt.spongeHeight) * BASISV(dir);
         }
       }
 
@@ -420,16 +404,11 @@ void AMRLevelMushyLayer::horizontallySmooth(LevelData<FluxBox>& a_flux)
 {
   CH_TIME("AMRLevelMushyLayer::horizontallySmooth");
 
-  ParmParse ppMain("main");
   DataIterator dit = a_flux.dataIterator();
 
   int dir = 0; // horizontally averaging
 
-  Real alpha = 0.0; // default is no smoothing
-
-  ppMain.query("postTraceSmoothing", alpha);
-
-  if (alpha==0.0)
+  if (m_opt.postTraceSmoothing==0.0)
   {
     return;
   }
@@ -456,7 +435,7 @@ void AMRLevelMushyLayer::horizontallySmooth(LevelData<FluxBox>& a_flux)
           // this will prevent changing zero velocity cells, or including NaN type values
           if( abs(neighbour) < 1e100 ) //abs(vel(iv)) > 1e-15 &&
           {
-            vel(iv) = (1-alpha)*vel(iv)+alpha*neighbour;
+            vel(iv) = (1-m_opt.postTraceSmoothing)*vel(iv)+m_opt.postTraceSmoothing*neighbour;
           }
 
         }
@@ -519,9 +498,6 @@ Real AMRLevelMushyLayer::advance()
 {
 
 
-  ParmParse ppParams("parameters");
-  ParmParse ppMain("main");
-
   if (m_dtReduction > 0)
   {
     m_dtReduction = -1;
@@ -567,16 +543,11 @@ Real AMRLevelMushyLayer::advance()
       }
       amrMLptr->m_timestepFailed = false;
 
-
       // Check if we want to add a perturbation
       if (m_time < m_opt.perturbationTime && (m_time + m_dt) > m_opt.perturbationTime)
       {
-        //pout() << "Adding perturbation with wavenumber " << m_perturbationWavenumber << endl;
-        Real phaseShift = 0;
-        ppMain.query("perturbationPhaseShift", phaseShift);
-        addPerturbation(ScalarVars::m_enthalpy, m_opt.delayedPerturbation, m_opt.perturbationWavenumber, phaseShift);
+        addPerturbation(ScalarVars::m_enthalpy, m_opt.delayedPerturbation, m_opt.perturbationWavenumber, m_opt.perturbationPhaseShift);
       }
-
 
       amrMLptr = amrMLptr->getFinerLevel();
     }
@@ -595,38 +566,25 @@ Real AMRLevelMushyLayer::advance()
   // Reset BCs if they change with time
   m_parameters.setTime(m_time); // BCs are stored in m_parameters
   setAdvectionBCs(); // Reset BCs on advection physics objects
+
   // Elliptic operators get the BC from m_parameters when they're defined (later)
 
-
-  Real rampBuoyancy = 0.0;
-  ppParams.query("rampBuoyancy", rampBuoyancy);
-  Real maxRaC = 0.0;
-  Real maxRaT = 0.0;
-
-  ppParams.query("maxRaT", maxRaT);
-  ppParams.query("maxRaC", maxRaC);
-
-  Real initRaC = 0;
-  Real initRaT = 0;
-  ppParams.query("initRaT", initRaT);
-  ppParams.query("initRaC", initRaC);
-  if (rampBuoyancy > 0)
+  if (m_opt.rampBuoyancy > 0)
   {
     if (m_parameters.rayleighComposition == 0)
     {
-      m_parameters.rayleighComposition = initRaC;
+      m_parameters.rayleighComposition = m_opt.initRaC;
     }
     if (m_parameters.rayleighTemp == 0)
     {
-      m_parameters.rayleighTemp = initRaT;
+      m_parameters.rayleighTemp = m_opt.initRaT;
     }
 
+    m_parameters.rayleighComposition = m_parameters.rayleighComposition *m_opt.rampBuoyancy;
+    m_parameters.rayleighTemp = m_parameters.rayleighTemp *m_opt.rampBuoyancy;
 
-    m_parameters.rayleighComposition = m_parameters.rayleighComposition *rampBuoyancy;
-    m_parameters.rayleighTemp = m_parameters.rayleighTemp *rampBuoyancy;
-
-    m_parameters.rayleighComposition = min(maxRaC, m_parameters.rayleighComposition);
-    m_parameters.rayleighTemp = min(maxRaT, m_parameters.rayleighTemp);
+    m_parameters.rayleighComposition = min(m_opt.maxRaC, m_parameters.rayleighComposition);
+    m_parameters.rayleighTemp = min(m_opt.maxRaT, m_parameters.rayleighTemp);
 
     pout() << "RaC = " << m_parameters.rayleighComposition  << ", RaT = " <<  m_parameters.rayleighTemp  << endl;
   }
@@ -700,8 +658,6 @@ Real AMRLevelMushyLayer::advance()
     // This fills all the ghost cells of advectionSourceTerm
     computeAdvectionVelSourceTerm(advectionSourceTerm);
 
-    //    Real vel_centering = 0.5;
-    //    ppMain.query("adv_vel_centering", vel_centering);
     computeAdvectionVelocities(advectionSourceTerm, m_adv_vel_centering);
   }
   else
@@ -734,25 +690,19 @@ Real AMRLevelMushyLayer::advance()
     advectLambda(true);
   }
 
-  // Scalar advection diffusion
-  bool doScalarAdvectionDiffusion = true;
-  ppMain.query("doScalarAdvectionDiffusion", doScalarAdvectionDiffusion);
-
-  bool skipNewLevelScalars = false;
-  ppMain.query("skipNewLevelScalars", skipNewLevelScalars);
   if (m_newLevel && m_level > 0)
   {
-    if (skipNewLevelScalars)
+    if (m_opt.skipNewLevelScalars)
     {
       pout() << "First time step on a new level - skipping advection and diffusion" << endl;
-      doScalarAdvectionDiffusion = false;
+      m_opt.doScalarAdvectionDiffusion = false;
     }
     m_newLevel = false;
   }
 
   if (!(m_parameters.physicalProblem == PhysicalProblems::m_poiseuilleFlow ||
       m_parameters.physicalProblem == PhysicalProblems::m_soluteFluxTest ||
-      m_parameters.physicalProblem == PhysicalProblems::m_zeroPorosityTest) && doScalarAdvectionDiffusion)
+      m_parameters.physicalProblem == PhysicalProblems::m_zeroPorosityTest) && m_opt.doScalarAdvectionDiffusion)
   {
     // Computation of advection velocity is done
     // Now do advection and diffusion of scalar fields
@@ -979,7 +929,6 @@ void AMRLevelMushyLayer::advectLambda(bool doFRupdates)
     pout() << "AMRLevelMushyLayer::advectLambda" << endl;
   }
 
-  ParmParse ppMain("main");
 
   m_advVel.exchange();
 
@@ -1698,7 +1647,6 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   }
 
   int exitStatus = 0;
-  ParmParse ppMain("main");
   int numComp = a_src.nComp();
 
   LevelData<FArrayBox> full_src(m_grids, numComp, IntVect::Zero);
@@ -1713,22 +1661,15 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
   if (computeAdvectiveSrc)
   {
-    // Always do multi comp advection...
-    //    bool doMultiCompAdvection = true;
 
     computeScalarAdvectiveSrcHC(full_src, totalAdvectiveFlux, doFRupdates);
 
-
-    bool skipSalt = false;
-    ppMain.query("skipSaltUpdate", skipSalt);
-    if (skipSalt)
+    if (m_opt.skipSaltUpdate)
     {
       for (dit.reset(); dit.ok(); ++dit)
       {
         full_src[dit].setVal(0.0, 1);
       }
-      // this needs to be done before operators are defined - just set lewis=1e300 in inputs file
-      //      m_parameters.m_saltDiffusionCoeff = 0;
     }
 
   } // end if compute advective src
@@ -1736,12 +1677,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   full_src.copyTo(Interval(0,0), *m_scalarNew[ScalarVars::m_enthalpySrc], Interval(0,0));
   full_src.copyTo(Interval(1,1), *m_scalarNew[ScalarVars::m_saltEqnSrcGodunov], Interval(0,0));
 
-  // Option here to not update enthalpy and salinity
-  // (useful for debugging)
-  bool skipUpdate = false;
-
-  ppMain.query("skipHCUpdate", skipUpdate);
-  if (skipUpdate)
+  if (m_opt.skipHCUpdate)
   {
     pout() << "Skipping HC update" << endl;
     return 0;
@@ -1829,14 +1765,9 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   else
   {
 
-    if (ppMain.contains("noMultigrid"))
+    if (m_opt.noMultigrid)
     {
-
-
-      int num_iter=100;
-      ppMain.query("noMultigridIter", num_iter);
       a_phi_old.copyTo(a_phi_new);
-
 
       LevelData<FArrayBox> thisSrc(m_grids, 2, IntVect::Unit);
       full_src.copyTo(thisSrc);
@@ -1846,7 +1777,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
         thisSrc[dit].plus(a_phi_old[dit]);
       }
 
-      for (int i=0; i < num_iter; i++)
+      for (int i=0; i < m_opt.noMultigridIter; i++)
       {
 
         // Need to define solvers first and foremost
@@ -1983,8 +1914,6 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
   int numComp = 2;
 
   CH_assert(edgeScalTotal.nComp() == numComp);
-
-  ParmParse ppMain("main");
 
   IntVect ghostVect = IntVect::Unit;
   IntVect fluxGhostVect = edgeScalTotal.ghostVect();
@@ -2152,10 +2081,7 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
 
   // Set some analytic source term if needed
 
-
-  bool analyticSource = false;
-  ppMain.query("analyticSourceTerm", analyticSource);
-  if (analyticSource)
+  if (m_opt.useAnalyticSource)
   {
     for (DataIterator dit = edgeScalTotal.dataIterator(); dit.ok(); ++dit)
     {
@@ -2288,10 +2214,7 @@ void AMRLevelMushyLayer::computeScalarAdvectiveFluxMultiComp(LevelData<FluxBox>&
   vel.exchange();
 
   // Make diffusive source
-  bool doDiffusionSrc = true; // hard code this for now
-  ParmParse ppMain("main");
-  ppMain.query("diffusiveSrcForAdvection", doDiffusionSrc);
-  if (doDiffusionSrc)
+  if (m_opt.doDiffusionSrc)
   {
     // Get something like grad^2(T) or div(chi dot grad S_l)
     computeScalDiffusion(diffusiveSrc, a_old_time);
@@ -3514,13 +3437,16 @@ Real AMRLevelMushyLayer::getMaxVelocityForCFL()
 {
   Real maxAdvU = getMaxVelocity();
 
-  ParmParse ppMain("main");
-
   // If we're doing advection with u/chi as the advection velocity,
   // then we need to use it for our cfl condition
   bool considerUChi = (m_opt.advectionMethod == m_porosityInAdvection ||
       m_opt.advectionMethod == m_porosityOutsideAdvection ||  m_opt.advectionMethod == m_noPorosity);
-  ppMain.query("consider_u_chi_dt", considerUChi);
+
+  if (m_opt.forceUseUChiForCFL)
+  {
+    considerUChi = true;
+  }
+
   Real maxUChi = 0.0;
 
   if (considerUChi)
@@ -3558,10 +3484,6 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
     return 0;
   }
 
-  ParmParse ppMain("main");
-  Real max_dt = -1;
-  ppMain.query("max_dt", max_dt);
-
   Real maxAdvU = getMaxVelocityForCFL();
 
   Real newDT = cfl * m_dx  / maxAdvU;
@@ -3579,10 +3501,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 
   Real finest_dx = ml->m_dx;
 
-  //  Real maxTemp = ::computeMax(*m_scalarNew[ScalarVars::m_temperature], NULL, -1, Interval(0,0));
   Real maxPorosity = ::computeMax(*m_scalarNew[ScalarVars::m_porosity], NULL, -1, Interval(0,0));
-  //  Real maxUChi = ::computeMax(*m_vectorNew[VectorVars::m_U_porosity], NULL, -1, Interval(0,SpaceDim-1));
-  //   Real minPerm = ::computeMin(*m_scalarNew[ScalarVars::m_permeability], NULL, -1, Interval(0,0));
 
   Real maxUChi = computeMaxUChi();
 
@@ -3606,33 +3525,24 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 
   // Factor of 10 is fairly arbitrary
   Real accelCFL = cfl;
-  ppMain.query("accelCFL", accelCFL);
+  if (m_opt.accelCFL > 0)
+  {
+    accelCFL = m_opt.accelCFL;
+  }
   Real accelDt = sqrt(accelCFL*finest_dx/acceleration);
 
-  bool printAccelDt = false;
-  ppMain.query("printAccelDt", printAccelDt);
-  if (printAccelDt && s_verbosity >= 2)
+  if (m_opt.printAccelDt && s_verbosity >= 2)
   {
     pout() << "  Max dt computed from acceleration = " << accelDt << endl;
     pout() << "  Accleration terms: buoyancy = " << buoyancy_acceleration << ", viscous = " << viscous_acceleration << ", darcy = " << darcy_acceleration << endl;
 
-    //    Real accelCFL = accelDt*m_dt/m_dx;
-    //    if (accelCFL > 1.0)
-    //      {
-    //     pout() << "  WARNING - CFL computed due to advection terms  = " << accelCFL << endl;
-    //      }
   }
 
   // make sure we consider acceleration for determinig dt at time 0.
   // The initialisation may have generated a small initial velocity, with a corresponding CFL timestep,
   // which we want to override.
-  bool useAccelDt = false;
-  ppMain.query("useAccelDt", useAccelDt);
 
-  bool useInitAccelDt = true;
-  ppMain.query("useInitAccelDt", useInitAccelDt);
-
-  if (maxAdvU == 0 || (m_time == 0 && useInitAccelDt) || useAccelDt)
+  if (maxAdvU == 0 || (m_time == 0 && m_opt.useInitAccelDt) || m_opt.useAccelDt)
   {
     if (s_verbosity >= 4)
     {
@@ -3641,9 +3551,9 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
     newDT = min(newDT, accelDt);
   }
 
-  if (max_dt > 0)
+  if (m_opt.max_dt > 0)
   {
-    newDT = min(max_dt, newDT);
+    newDT = min(m_opt.max_dt, newDT);
   }
 
   return newDT;
@@ -3659,12 +3569,12 @@ Real AMRLevelMushyLayer::computeInitialDt()
 
   Real dt = computeDt(m_initial_dt_multiplier);
 
-  Real max_dt = 1e100;
-  ParmParse ppMain("main");
-  ppMain.query("max_dt", max_dt);
-  Real max_init_dt = max_dt*m_initial_dt_multiplier;
+  Real max_init_dt = m_opt.max_dt*m_initial_dt_multiplier;
 
-  ppMain.query("max_init_dt", max_init_dt);
+  if (m_opt.max_init_dt > 0)
+  {
+    max_init_dt = m_opt.max_init_dt;
+  }
 
   dt = min(dt, max_init_dt);
 
@@ -4090,17 +4000,13 @@ void AMRLevelMushyLayer::doRegularisationOps(LevelData<FluxBox>& a_scal, int a_v
   {
     DataIterator dit2 = a_scal.dataIterator();
 
-    ParmParse ppMain("main");
-    bool use_new_version = false;
-    ppMain.query("fortranRegularisationFace", use_new_version);
-
     for (dit2.reset(); dit2.ok(); ++dit2)
     {
       Box b = a_scal[dit2].box();
 
       for (int dir=0; dir<SpaceDim; dir++)
       {
-        if (use_new_version)
+        if (m_opt.useFortranRegularisationFace)
         {
           doRegularisationOpsNew(a_var, a_scal[dit2][dir]);
         }
@@ -4217,14 +4123,10 @@ void AMRLevelMushyLayer::doRegularisationOps(LevelData<FArrayBox>& a_scal,
   CH_TIME("AMRLevelMushyLayer::doRegularisationOps");
   DataIterator dit2 = a_scal.dataIterator();
 
-  ParmParse ppMain("main");
-  bool use_new_version = true;
-  ppMain.query("fortranRegularisation", use_new_version);
-
   for (dit2.reset(); dit2.ok(); ++dit2)
   {
 
-    if (use_new_version)
+    if (m_opt.useFortranRegularisation)
     {
       doRegularisationOpsNew(a_var, a_scal[dit2]);
     }
@@ -4379,11 +4281,8 @@ void AMRLevelMushyLayer::getScalarBCs(BCHolder& thisBC, int a_var, bool a_homoge
 
 void AMRLevelMushyLayer::stokesDarcyForcing(LevelData<FArrayBox>& T, Real time)
 {
-  Real timescale = 0.5;
-  ParmParse ppParameters("parameters");
-  ppParameters.query("forcing_timescale", timescale);
 
-  if (timescale > 0)
+  if (m_opt.stokesDarcyForcingTimescale > 0)
   {
 
     for (DataIterator dit=T.dataIterator(); dit.ok(); ++dit)
@@ -4400,10 +4299,10 @@ void AMRLevelMushyLayer::stokesDarcyForcing(LevelData<FArrayBox>& T, Real time)
 
 
         Real sinPart = sin(M_PI*loc[0]);
-        Real thisT = min(one,  (time/timescale)-sinPart);
+        Real thisT = min(one,  (time/m_opt.stokesDarcyForcingTimescale)-sinPart);
 
         Real powPart = pow(loc[0]-2.5,2);
-        thisT = exp(-powPart/(time/timescale) ) ;
+        thisT = exp(-powPart/(time/m_opt.stokesDarcyForcingTimescale) ) ;
         //			thisT = log(1+time/timescale)*exp(-pow(loc[0]-2.5,2)) ;
 
         //			thisT = 0.01;
