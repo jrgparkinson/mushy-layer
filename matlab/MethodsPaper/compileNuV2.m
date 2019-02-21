@@ -5,7 +5,7 @@ function compileNuV2(base_dir)
 if nargin == 0
     % 0.18 has higher order bcs
     % 0.17 has higher order advection
-    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.17/';
+    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.18/';
 end
 
 UniformPrefix = 'Uniform-convectionDB-';
@@ -23,7 +23,7 @@ Nu_field_name = 'Nusselt';
 folders = dir(base_dir);
 
 % Compile all data
-Nxs = [64, 128, 256, 512, 1024, 2048];
+Nxs = [32, 64, 128, 256, 512, 1024, 2048];
 
 field = '%10s';
 
