@@ -105,5 +105,5 @@ regrid.marginalPorosityLimit=0.99
 regrid.plume_salinity=-0.5
 regrid.plume_vel=10.0
 
-main.max_level=2
+main.max_level=1
 main.num_cells=64 64
