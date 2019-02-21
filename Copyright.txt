@@ -1,7 +1,8 @@
 This code is released under the same modified BSD licence as Chombo, 
-which is repeated below.
+which is repeated below. This is essentially the 2-Clause BSD, or 
+"FreeBSD", License.
 
-Copyright James Parkinson, 2018
+Copyright James Parkinson, 2019
 University of Oxford
 james.parkinson@physics.ox.ac.uk
 
