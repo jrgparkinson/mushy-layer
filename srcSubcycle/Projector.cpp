@@ -1151,9 +1151,9 @@ void Projector::checkDivergence(LevelData<FluxBox>& a_uEdge)
   int maxNumSmooth = 20;
   Real tol = 1e-11;
 
-  ParmParse pp("projection");
-  pp.query("maxNumSmooth", maxNumSmooth);
-  pp.query("minNumSmooth", minNumSmooth);
+  ParmParse ppProjection("projection");
+  ppProjection.query("maxNumSmooth", maxNumSmooth);
+  ppProjection.query("minNumSmooth", minNumSmooth);
 
   if (maxDivU < tol)
   {

@@ -191,6 +191,8 @@ struct MushyLayerOptions {
 
   Real stokesDarcyForcingTimescale;
 
+  bool viscousBCs;
+
   int num_init_passes;
   Real restart_new_time;
   bool init_add_subtract_grad_p;
@@ -217,6 +219,7 @@ struct MushyLayerOptions {
   Real adv_vel_centering_growth;
   int solverFailRestartMethod;
   bool ignoreSolveFails;
+  bool initiallyDoAutomaticRestart;
   int steadyStateNormType;
   Real CFinterpOrder_advection;
 
@@ -248,6 +251,7 @@ struct MushyLayerOptions {
   bool doSyncOperations;
   bool enforceAnalyticSoln;
   bool useAnalyticSource;
+  int analyticSolution;
 
   Real maxDivUFace;
   bool scaleP_MAC;
@@ -273,6 +277,7 @@ struct MushyLayerOptions {
   bool enforceAnalyticVel;
   bool projectAnalyticVel;
   int analyticVelType;
+  bool initAnalyticVel;
 
   int lapVelNumSmooth;
   Real lapVelSmoothScale;
@@ -382,12 +387,23 @@ struct MushyLayerOptions {
   bool initLambda;
   Real variable_eta_factor;
   Real minEta;
-  bool computeFreestreamCorrection;
+  bool computeFreestreamCorrectionSingleLevel;
   bool regrid_advect_before_freestream;
   bool regrid_freestream_subcycle;
   Real regrid_eta_scale;
 
+  /// default = 0: no smoothing
+  Real regrid_smoothing_coeff;
+
+  bool project_initial_vel;
+  bool initialize_pressures;
+  bool addSubtractGradP;
+
   int iter_plot_interval;
+
+  int customInitData;
+  bool writePressureInitFields;
+  bool initResetStates;
 
   Real skipTrickySourceTerm;
   bool allowMulticompAdvection;
@@ -396,7 +412,7 @@ struct MushyLayerOptions {
   bool compute_initial_VD_corr;
 
   int timeIntegrationOrder;
-  int verbosity_multigrid;
+  int AMRMultigrid_verbosity;
 
   Real lowerPorosityLimit;
   Real initialPerturbation;
@@ -413,6 +429,7 @@ struct MushyLayerOptions {
   Real porosityTimescale;
   PorosityFunctions porosityFunction;
 
+  int maxRestartWavenumbers;
   Real restartPerturbation;
   Real radius;
   Real initVelScale;
@@ -423,6 +440,8 @@ struct MushyLayerOptions {
   Real meltPondDepth;
   bool horizAverageRestart;
   int restart_perturbation_var;
+
+
 
   // Restart
   Real refTemp;

@@ -568,6 +568,7 @@ public:
 	string getTimescale() const;
 
 	bool isDarcyBrinkman();
+	bool isViscous();
 
 
 };

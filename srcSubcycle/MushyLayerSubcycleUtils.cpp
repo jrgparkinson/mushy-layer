@@ -132,14 +132,11 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.initial_dt_multiplier = 0.1;
   ppMain.query("initial_cfl", opt.initial_dt_multiplier);
 
-
   opt.computeDiagnostics = true;
   ppMain.query("computeDiagnostics", opt.computeDiagnostics);
 
   opt.doEulerPart = true;
   ppMain.query("doEuler", opt.doEulerPart);
-
-
 
   opt.doScalarAdvectionDiffusion = true;
   ppMain.query("doScalarAdvectionDiffusion", opt.doScalarAdvectionDiffusion);
@@ -216,6 +213,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.analyticVelType = params.physicalProblem;
   ppMain.query ("analyticVelType", opt.analyticVelType);
+
+  opt.initAnalyticVel=false;
+  ppMain.query("initAnalyticVel", opt.initAnalyticVel);
+
 
 
 
@@ -392,8 +393,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.minEta = 0.99;
   ppProjection.query("eta", opt.minEta);
 
-  opt.computeFreestreamCorrection = true;
-  ppMain.query("single_level_lambda_corr", opt.computeFreestreamCorrection);
+  opt.computeFreestreamCorrectionSingleLevel = false;
+  ppMain.query("single_level_lambda_corr", opt.computeFreestreamCorrectionSingleLevel);
 
   opt.compute_initial_VD_corr = true;
   ppMain.query("initialize_VD_corr", opt.compute_initial_VD_corr);
@@ -473,6 +474,36 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.regrid_eta_scale=1.0;
   ppMain.query("regrid_eta_scale", opt.regrid_eta_scale);
 
+  opt.regrid_smoothing_coeff = 0.05;
+  ppMain.query("regrid_smoothing_coeff", opt.regrid_smoothing_coeff);
+
+  //Initialization
+  if (params.isDarcyBrinkman())
+  {
+    opt.initialize_pressures = true;
+    opt.project_initial_vel = true;
+  }
+  else
+  {
+    opt.initialize_pressures = true;
+    opt.project_initial_vel = false;
+  }
+
+  ppMain.query("initialize_pressure", opt.initialize_pressures);
+  ppMain.query("project_initial_vel", opt.project_initial_vel);
+
+  opt.addSubtractGradP = true;
+  ppMain.query("addSubtractGradP", opt.addSubtractGradP);
+
+  opt.customInitData = -1;
+  ppMain.query("initData", opt.customInitData);
+
+  opt.writePressureInitFields = false;
+  ppMain.query("writePressureInitFields", opt.writePressureInitFields);
+
+  opt.initResetStates = true;
+  ppMain.query("init_resetStates", opt.initResetStates);
+
   /**
    * Solver options
    */
@@ -488,12 +519,26 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.viscous_num_smooth_up = 8;
   ppMain.query("viscous_num_smooth_up", opt.viscous_num_smooth_up);
 
-
   opt.timeIntegrationOrder = 1;
   ppMain.query("time_integration_order", opt.timeIntegrationOrder);
 
-  opt.verbosity_multigrid = 0;
-  ppAMRMultigrid.query("multigrid", opt.verbosity_multigrid);
+  int mgtype = MGmethod::MGTypeFAS;
+
+  opt.AMRMultigrid_verbosity = 0;
+  opt.AMRMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
+  opt.AMRMultigridVerb=0;
+  opt.AMRMultigridTolerance=1e-10;
+  opt.AMRMultigridHang=1e-10;
+  opt.AMRMultigridNormThresh=1e-10;
+  ppAMRMultigrid.query("multigrid", opt.AMRMultigrid_verbosity);
+  ppAMRMultigrid.query("relaxMode", opt.AMRMultigridRelaxMode);
+  ppAMRMultigrid.query("hang_eps", opt.AMRMultigridHang);
+  ppAMRMultigrid.query("tolerance", opt.AMRMultigridTolerance);
+  ppAMRMultigrid.query("norm_thresh", opt.AMRMultigridNormThresh);
+  ppAMRMultigrid.query("verbosity", opt.AMRMultigridVerb);
+  ppAMRMultigrid.query("MGtype", mgtype);
+  opt.MGtype = MGmethod(mgtype);
+
 
   opt.implicitAdvectionSolve = false;
   ppMain.query("implicitAdvectionSolve", opt.implicitAdvectionSolve);
@@ -504,10 +549,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.maxDivUFace = 1e-8;
   ppMain.query("maxDivUFace", opt.maxDivUFace);
 
-  int mgtype = MGmethod::MGTypeFAS;
-  ppAMRMultigrid.query("MGtype", mgtype);
-  opt.MGtype = MGmethod(mgtype);
-
   opt.multiCompUStarSolve = false;
   ppMain.query("multiCompUStarSolve", opt.multiCompUStarSolve);
 
@@ -516,20 +557,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.smoothingCoeff = 0.0; //0.01;
   ppProjection.query("pre_smoothing", opt.smoothingCoeff);
-
-  opt.AMRMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
-  ppAMRMultigrid.query("relaxMode", opt.AMRMultigridRelaxMode);
-
-  opt.AMRMultigridVerb=0;
-  opt.AMRMultigridTolerance=1e-10;
-  opt.AMRMultigridHang=1e-10,
-
-  ppAMRMultigrid.query("hang_eps", opt.AMRMultigridHang);
-  ppAMRMultigrid.query("tolerance", opt.AMRMultigridTolerance);
-  ppAMRMultigrid.query("verbosity", opt.AMRMultigridVerb);
-
-  opt.AMRMultigridNormThresh=1e-10;
-  ppAMRMultigrid.query("norm_thresh", opt.AMRMultigridNormThresh);
 
   opt.velMGNumSmooth=2;
   opt.velMGTolerance=1e-10;
@@ -652,15 +679,19 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.enforceAnalyticSoln = false;
   ppMain.query("enforceAnalyticSoln", opt.enforceAnalyticSoln);
-  Real analyticSoln=-1;
+  int analyticSoln = -1;
   ppMain.query("analyticSoln", analyticSoln);
   if (analyticSoln > -1)
   {
     opt.enforceAnalyticSoln = true;
   }
 
+  // Actual value of the analytic soln is by default the same as this physical problem
+  opt.analyticSolution = params.physicalProblem;
+  ppMain.query("analyticSoln", opt.analyticSolution);
+
   opt.useAnalyticSource = false;
-   ppMain.query("analyticSourceTerm", opt.useAnalyticSource);
+  ppMain.query("analyticSourceTerm", opt.useAnalyticSource);
 
   opt.initialPerturbation = 0.0;
   ppMain.query("initialPerturbation", opt.initialPerturbation);
@@ -679,6 +710,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.perturbationSin = false;
   ppMain.query("perturbationSin", opt.perturbationSin);
+
+  opt.maxRestartWavenumbers = 50;
+  ppMain.query("maxRestartWavenumber", opt.maxRestartWavenumbers);
 
   opt.fixedPorosity = -1.0;
   ppMain.query("fixed_porosity", opt.fixedPorosity);
@@ -720,6 +754,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.horizAverageRestart = false;
   ppMain.query("horizontallyAverageRestart", opt.horizAverageRestart);
+
+  ppMain.query("doAutomaticRestart",opt.initiallyDoAutomaticRestart);
+
 
   /**
    * Other options
@@ -784,6 +821,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.stokesDarcyForcingTimescale = 0.5;
   ppParams.query("forcing_timescale", opt.stokesDarcyForcingTimescale);
+
+  opt.viscousBCs = params.isViscous();
+    ppMain.query("viscousBCs", opt.viscousBCs);
 
 
 

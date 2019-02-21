@@ -820,14 +820,21 @@ void MushyLayerParams::parseBCVals(string a_name, RealVect& a_bcHolder, bool req
   }
 }
 
+bool MushyLayerParams::isViscous()
+{
+  return (m_viscosityCoeff > 0);
+}
+
 bool MushyLayerParams::isDarcyBrinkman()
 {
   if (darcy > 1e-10)
   {
     return true;
   }
-
-  return false;
+  else
+  {
+    return false;
+  }
 }
 
 void MushyLayerParams::setTime(Real a_time)

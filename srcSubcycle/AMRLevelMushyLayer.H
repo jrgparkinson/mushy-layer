@@ -439,8 +439,6 @@ public:
   void doPostRegridSmoothing(bool a_smoothVel=true,
                              bool a_smoothScalar=true);
 
-  /// Set coefficient for smoothing operations
-  void setSmoothingCoeff(Real a_coeff);
 
   /// Make sure zero porosity regions have no velocity (cell centred velocity)
   void setVelZero(LevelData<FArrayBox>& a_vel, Real a_limit=-1, int a_radius=0);

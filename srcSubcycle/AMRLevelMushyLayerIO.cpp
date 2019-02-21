@@ -849,7 +849,7 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
   // Need a bottom solver
 //  RelaxSolver<LevelData<FArrayBox> > bottomSolver;
   BiCGStabSolver<LevelData<FArrayBox> > bottomSolver;
-  bottomSolver.m_verbosity = m_opt.verbosity_multigrid;
+  bottomSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
 
   // And a multigrid solver
   AMRMultiGrid<LevelData<FArrayBox> > solver;
@@ -859,7 +859,7 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
   solver.define(lev0Dom, castFact,
                 &bottomSolver, nLevels);
 
-  solver.m_verbosity = m_opt.verbosity_multigrid;
+  solver.m_verbosity = m_opt.AMRMultigrid_verbosity;
 
   // We were spending a lot of time doing this solve
   // Fix these to try and make the solve quicker

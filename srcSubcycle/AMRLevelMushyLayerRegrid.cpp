@@ -1,9 +1,5 @@
 #include "AMRLevelMushyLayer.H"
 
-void AMRLevelMushyLayer::setSmoothingCoeff(Real a_coeff)
-{
-  s_regrid_smoothing_coeff = a_coeff;
-}
 
 void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothScalar)
 {
@@ -399,7 +395,7 @@ AMRLevelMushyLayer::defineRegridAMROp(AMRPoissonOpFactory& a_factory,
 
   // define coefficient
   Real nu = m_parameters.m_viscosityCoeff;  //m_parameters.prandtl;
-  Real mu = -s_regrid_smoothing_coeff*dtLBase*nu;
+  Real mu = -m_opt.regrid_smoothing_coeff*dtLBase*nu;
 
   // Would like to use extrap BC's, since they're probably the safest
 
@@ -1373,7 +1369,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
     thisLevelData = this;
 
-    VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
+    VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_opt.viscousBCs));
 
     for (int lev = 0; lev < numLevels; lev++)
     {
@@ -1397,7 +1393,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     }
 
     bool homoBC = false;
-    if (s_project_initial_vel)
+    if (m_opt.project_initial_vel)
     {
       // NB this doesn't calculate pressure, just corrects velocity
       if (m_opt.makeRegridPlots)
@@ -1436,7 +1432,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     int finest_level = numLevels-1;
     Real dtInit = computeDtInit(finest_level);
 
-    if (s_initialize_pressures)
+    if (m_opt.initialize_pressures)
     {
       if (m_opt.makeRegridPlots)
       {

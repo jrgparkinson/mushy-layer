@@ -89,9 +89,9 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
   }
 
-  EdgeVelBCHolder edgeVelBC(m_physBCPtr->edgeVelFuncBC(m_viscousBCs, velocityBCVals));
+  EdgeVelBCHolder edgeVelBC(m_physBCPtr->edgeVelFuncBC(m_opt.viscousBCs, velocityBCVals));
 
-  VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
+  VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_opt.viscousBCs));
   VelBCHolder velBCExtrap(m_physBCPtr->velExtrapBC());
 
   calculatePermeability();
@@ -145,7 +145,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   m_projection.gradPhi(gradPhi);
   bool alreadyHasPressure = false;
 
-  if (m_isViscous)
+  if (m_parameters.isViscous())
   {
     if (s_verbosity >= 5)
     {
@@ -337,7 +337,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
   LevelData<FArrayBox> porosityAv(m_grids, 1, ivGhost);
   RefCountedPtr<LevelData<FluxBox> > porosityFaceAvPtr = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(m_grids, 1, ivGhost));
 
-  EdgeVelBCHolder edgeVelBC(m_physBCPtr->advectionVelFuncBC(m_viscousBCs));
+  EdgeVelBCHolder edgeVelBC(m_physBCPtr->advectionVelFuncBC(m_opt.viscousBCs));
 
   LevelData<FArrayBox> velOldGrown(m_grids, SpaceDim, ivGhost);
   fillVectorField(velOldGrown, old_time, m_fluidVel, true);
@@ -684,7 +684,7 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
     uPreprojectionVar = m_advUpreProjection;
   }
 
-  VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
+  VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_opt.viscousBCs));
   RefCountedPtr<LevelData<FluxBox> > crsePressureScaleEdgePtr, pressureScaleEdgePtr;
   RefCountedPtr<LevelData<FArrayBox> > crsePressureScalePtr, pressureScalePtr;
   LevelData<FArrayBox> *crseVelPtr = NULL;
@@ -844,13 +844,13 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
         // this only works on level 0 - we don't have any CF boundaries
 
           m_projection.AdditionalLevelProject(*m_vectorNew[uvar], crseVelPtr,
-                                         new_time, a_dt,  m_isViscous);
+                                         new_time, a_dt,  m_parameters.isViscous());
       }
       else
       {
         m_projection.LevelProject(*m_vectorNew[uvar], crseVelPtr,
                                   new_time, a_dt, pressureScalePtr, crsePressureScalePtr, pressureScaleEdgePtr, crsePressureScaleEdgePtr,
-                                  m_isViscous);
+                                  m_parameters.isViscous());
       }
       // as things stand now, physical BC's are re-set in LevelProjection
 
@@ -921,7 +921,7 @@ void AMRLevelMushyLayer::computeLapVel(LevelData<FArrayBox>& a_lapVel,
 {
 
   // These are set in applyOpI anyway, but do it again here so we can see what happens
-  VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
+  VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_opt.viscousBCs));
   velBC.applyBCs(a_vel, a_vel.disjointBoxLayout(), m_problem_domain, m_dx, false);
 
   // Copy velocity to new data holder before taking laplacian to avoid changing
@@ -1186,7 +1186,7 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
 
   computeUstarSrc(src, advectionSourceTerm, src_time, a_MACprojection, compute_uDelU);
 
-  if (!m_isViscous)
+  if (!m_parameters.isViscous())
   {
     // explicit update.
     for (dit.reset(); dit.ok(); ++dit)
@@ -1477,7 +1477,7 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   }
 
   //Calculate Laplacian(U)
-  if (m_isViscous)
+  if (m_parameters.isViscous())
   {
     bool recomputeLapVel = true;
 
@@ -2291,7 +2291,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
   RefCountedPtr<LevelData<FluxBox> > crsePressureScaleEdgePtr, pressureScaleEdgePtrOneGhost;
   RefCountedPtr<LevelData<FArrayBox> > pressureScalePtr, crsePressureScalePtr;
 
-  EdgeVelBCHolder edgeVelBC(m_physBCPtr->advectionVelFuncBC(m_viscousBCs));
+  EdgeVelBCHolder edgeVelBC(m_physBCPtr->advectionVelFuncBC(m_opt.viscousBCs));
   edgeVelBC.applyBCs(a_advVel, m_grids, m_problem_domain, m_dx,
                      false); // inhomogeneous
   if (s_verbosity >= 6)

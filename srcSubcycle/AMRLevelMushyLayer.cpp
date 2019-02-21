@@ -3808,7 +3808,7 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
     // Changing U and U/chi to other BCs, as these ones were filling interior CF ghost cells
     if (1==0)
     {
-      if (m_isViscous)
+      if (m_parameters.isViscous())
       {
 
         // This BC fills all ghost cells, which is what we want
@@ -3828,7 +3828,7 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
     {
       for (int idir = 0; idir < SpaceDim; idir++)
       {
-        BCHolder viscousBC = m_physBCPtr->velFuncBC(idir, m_viscousBCs, Interval(idir, idir) );
+        BCHolder viscousBC = m_physBCPtr->velFuncBC(idir, m_opt.viscousBCs, Interval(idir, idir) );
 
         DataIterator dit = m_grids.dataIterator();
 
@@ -3944,7 +3944,7 @@ void AMRLevelMushyLayer::smoothScalarField(LevelData<FArrayBox>& a_phi, int a_va
                          &bottomSolver, numLevels);
 
 
-  diffusionSolver.m_verbosity = m_opt.verbosity_multigrid;
+  diffusionSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
   diffusionSolver.m_eps = m_opt.viscous_solver_tol;
   diffusionSolver.m_normThresh = m_opt.viscous_solver_tol;
   diffusionSolver.m_hang = m_opt.viscous_solver_tol;

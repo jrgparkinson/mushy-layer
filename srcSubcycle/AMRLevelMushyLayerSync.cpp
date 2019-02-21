@@ -177,11 +177,11 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
 
     AMRPoissonOpFactory viscousOpFactory;
     viscousOpFactory.define(baseDomain, AmrGrids, AmrRefRatios,
-                            AmrDx[0], m_physBCPtr->viscousRefluxBC(dir, m_viscousBCs), alpha,
+                            AmrDx[0], m_physBCPtr->viscousRefluxBC(dir, m_opt.viscousBCs), alpha,
                             beta);
 
     RelaxSolver<LevelData<FArrayBox> > bottomSolver;
-    bottomSolver.m_verbosity = m_opt.verbosity_multigrid;
+    bottomSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
 
     AMRMultiGrid<LevelData<FArrayBox> > viscousSolver;
     AMRLevelOpFactory<LevelData<FArrayBox> >& viscCastFact =
@@ -189,7 +189,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
     viscousSolver.define(baseDomain, viscCastFact,
                          &bottomSolver, numLevels);
 
-    viscousSolver.m_verbosity = m_opt.verbosity_multigrid;
+    viscousSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
 
     viscousSolver.m_eps = m_opt.viscous_solver_tol;
 
@@ -427,7 +427,7 @@ void AMRLevelMushyLayer::postTimeStep()
     AMRLevelMushyLayer* fineAMRMLPtr = getFinerLevel();
 
     // create boundary condition object
-    VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
+    VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_opt.viscousBCs));
 
     // first do refluxing and avgDown for conservation
     // do momentum refluxing first
@@ -711,7 +711,7 @@ void AMRLevelMushyLayer::postTimeStep()
     if (m_level == 0 && m_opt.max_possible_level > 0)
     {
       // create boundary condition object and set physical BC's
-      VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
+      VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_opt.viscousBCs));
 
       velBC.applyBCs(*m_vectorNew[VectorVars::m_fluidVel], m_grids, m_problem_domain,
                      m_dx, false); // not homogeneous
@@ -719,7 +719,7 @@ void AMRLevelMushyLayer::postTimeStep()
       Interval velComps = m_vectorNew[VectorVars::m_fluidVel]->interval();
       m_vectorNew[VectorVars::m_fluidVel]->exchange(velComps);
 
-      if (m_opt.computeFreestreamCorrection)
+      if (m_opt.computeFreestreamCorrectionSingleLevel)
       {
         Vector<LevelData<FArrayBox>* > compVel(1, NULL);
         Vector<LevelData<FArrayBox>* > compLambda(1, NULL);
@@ -1079,7 +1079,7 @@ Real AMRLevelMushyLayer::doHCreflux()
   getHierarchyAndGrids(hierarchy, grids, refRat, lev0Dom, lev0Dx);
 
   RelaxSolver<LevelData<FArrayBox> > bottomSolver;
-  bottomSolver.m_verbosity = m_opt.verbosity_multigrid;
+  bottomSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
 
   Real maxRefluxRHS = computeSum(HCRefluxRHS, refRat, m_dx, Interval(0, numComps-1), m_level);
 

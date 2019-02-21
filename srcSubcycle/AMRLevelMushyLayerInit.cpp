@@ -696,7 +696,7 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
     for (int idir = 0; idir < SpaceDim; idir++)
     {
 
-      BCHolder viscousBC = m_physBCPtr->velFuncBC(idir, m_viscousBCs);
+      BCHolder viscousBC = m_physBCPtr->velFuncBC(idir, m_opt.viscousBCs);
 
       RefCountedPtr<DarcyBrinkmanOpFactory> vcamrpop = RefCountedPtr<DarcyBrinkmanOpFactory>(new DarcyBrinkmanOpFactory());
       vcamrpop->define(lev0Dom, allGrids, refRat, lev0Dx, viscousBC,
@@ -784,7 +784,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     CH_TIME("AMRLevelMushyLayer::defineSolvers::defineViscousOp");
     for (int dir = 0; dir < SpaceDim; dir++)
     {
-      BCHolder viscousBCcomp = m_physBCPtr->velFuncBC(dir, m_viscousBCs);
+      BCHolder viscousBCcomp = m_physBCPtr->velFuncBC(dir, m_opt.viscousBCs);
 
       m_viscousOp[dir] = RefCountedPtr<AMRPoissonOp>(new AMRPoissonOp());
       m_viscousOp[dir]->define(m_grids, crseGridsPtr, m_dx, nRefCrse,
@@ -1050,10 +1050,6 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
 {
   m_isDefined = true;
 
-  ParmParse ppMain("main");
-  ParmParse ppParams("parameters");
-  ParmParse ppMG("amrmultigrid");
-
   m_opt = a_opt;
 
   // AMRLevel owns these
@@ -1107,40 +1103,17 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
 
   s_implicit_reflux = (m_parameters.prandtl > 0);
 
-
-
-
   // Use inviscid BCs if darcy term likely to dominate
   // This may need more care, particularly re:specific boundaries
-  m_isViscous = (m_parameters.m_viscosityCoeff > 0);
-  m_viscousBCs = m_isViscous;
-  ppMain.query("viscousBCs", m_viscousBCs);
+//  m_parameters.isViscous() = (m_parameters.m_viscosityCoeff > 0);
 
   // For mushy layer calculations, we want to try and kick off the instability if we've converged
-  m_doAutomaticRestart = false;
-  ppMain.query("doAutomaticRestart",m_doAutomaticRestart);
+  m_doAutomaticRestart = m_opt.initiallyDoAutomaticRestart;
+
 
   // Regridding stuff
-  // default: no smoothing
   m_regrid_smoothing_done = false; // standard initial value
-  s_regrid_smoothing_coeff = 0.05;
-  ppMain.query("regrid_smoothing_coeff", s_regrid_smoothing_coeff);
 
-
-  //Initialization
-  if (solvingFullDarcyBrinkman())
-  {
-    s_initialize_pressures = true;
-    s_project_initial_vel = true;
-    ppMain.query("initialize_pressure", s_initialize_pressures);
-  }
-  else
-  {
-    s_initialize_pressures = true;
-    s_project_initial_vel = false;
-  }
-
-  ppMain.query("project_initial_vel", s_project_initial_vel);
 
   // There isn't a nondimensional constant we can change to stop doing the U del (U/chi) bit, so have a switch here instead
   //  m_doEulerPart = false;
@@ -1148,10 +1121,11 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
   //  m_opt.doSyncOperations = true;
 
   // This can be changed during initialisation
-  m_addSubtractGradP = true;
-  ppMain.query("addSubtractGradP", m_addSubtractGradP);
+  m_addSubtractGradP = m_opt.addSubtractGradP;
+//  ppMain.query("addSubtractGradP", m_addSubtractGradP);
 
-  m_enforceGradP = (!m_opt.doProjection); //I don't think it makes sense to do projection *and* calculate grad(P)
+  //I don't think it makes sense to do projection *and* calculate grad(P)
+  m_enforceGradP = (!m_opt.doProjection);
 
   // Define which scalar fields we want flux registers for
   for (int var = 0; var < m_numScalarVars; var++)
@@ -2106,15 +2080,11 @@ void AMRLevelMushyLayer::initialData()
 
   }
 
-  ParmParse pp("main");
 
   // If we've specified some custom initial data, deal with it here
-  if (pp.contains("initData"))
+  if (m_opt.customInitData >= 0)
   {
-    int initData = -1;
-    pp.query("initData", initData);
-
-    switch(initData)
+    switch(m_opt.customInitData)
     {
       case 1:
         initialDataPorousHole();
@@ -2212,12 +2182,7 @@ void AMRLevelMushyLayer::initialData()
 
   calculateAnalyticSolns(m_opt.enforceAnalyticSoln);
 
-
-  ParmParse ppMain("main");
-  bool initAnalyticVel=false;
-  ppMain.query("initAnalyticVel", initAnalyticVel);
-
-  if (initAnalyticVel)
+  if (m_opt.initAnalyticVel)
   {
     fillAnalyticVel(m_advVel);
     //    fillAnalyticVel(*m_vectorNew[VectorVars::m_fluidVel]);
@@ -2243,13 +2208,10 @@ void AMRLevelMushyLayer::addPerturbation(int a_var, Real alpha, int waveNumber, 
 
   Real domainWidth = m_opt.domainWidth;
 
-  int numWavenumbers = 50;
-  ParmParse pp("main");
-  pp.query("maxRestartWavenumber", numWavenumbers);
 
   Vector<Real> rands1(m_numCells[0]);
   Vector<Real> rands2(m_numCells[1]);
-  Vector<Real> randsk(numWavenumbers);
+  Vector<Real> randsk(m_opt.maxRestartWavenumbers);
   for (int i = 0; i < m_numCells[0]; i++)
   {
     rands1[i] = ((double) rand()/ (RAND_MAX));
@@ -2258,7 +2220,7 @@ void AMRLevelMushyLayer::addPerturbation(int a_var, Real alpha, int waveNumber, 
   {
     rands2[i] = ((double) rand()/ (RAND_MAX));
   }
-  for (int i = 0; i < numWavenumbers; i++)
+  for (int i = 0; i < m_opt.maxRestartWavenumbers; i++)
   {
     randsk[i] = ((double) rand()/ (RAND_MAX));
   }
@@ -2298,11 +2260,11 @@ void AMRLevelMushyLayer::addPerturbation(int a_var, Real alpha, int waveNumber, 
       {
         // Sum of wavenumbers 1:50 in x direction
         // random in z direction, going to zero at top and bottom
-        for (int k=1; k<numWavenumbers; k++)
+        for (int k=1; k<m_opt.maxRestartWavenumbers; k++)
         {
           Real random = ((double) rand()/ (RAND_MAX));
 
-          Real thisPert = (alpha/numWavenumbers)*cos(M_PI*(k*x/domainWidth + randsk[k])); // x component
+          Real thisPert = (alpha/m_opt.maxRestartWavenumbers)*cos(M_PI*(k*x/domainWidth + randsk[k])); // x component
 
           thisPert = thisPert * random * sin(y*M_PI/m_domainHeight); // z component
           perturbation += thisPert;
@@ -2347,11 +2309,8 @@ void AMRLevelMushyLayer::calculateAnalyticSolns(bool enforceSolutions)
   LevelData<FArrayBox> enthalpyAnalytic(m_grids, 1, ivGhost);
   LevelData<FArrayBox> bulkCAnalytic(m_grids, 1, ivGhost);
 
-  int analyticSolution = m_parameters.physicalProblem;
-  ParmParse pp("main");
-  pp.query("analyticSoln", analyticSolution);
 
-  if (analyticSolution == PhysicalProblems::m_solidificationNoFlow)
+  if (m_opt.analyticSolution == PhysicalProblems::m_solidificationNoFlow)
   {
 
     LevelData<FArrayBox> CLanalytic(m_grids, 1, ivGhost);
@@ -2429,7 +2388,7 @@ void AMRLevelMushyLayer::calculateAnalyticSolns(bool enforceSolutions)
       updateEnthalpyVariables();
     }
   }
-  else if (analyticSolution == PhysicalProblems::m_poiseuilleFlow)
+  else if (m_opt.analyticSolution == PhysicalProblems::m_poiseuilleFlow)
   {
 
     for (DataIterator dit = m_vectorNew[VectorVars::m_fluidVel]->dataIterator(); dit.ok(); ++dit)
@@ -2478,7 +2437,7 @@ void AMRLevelMushyLayer::calculateAnalyticSolns(bool enforceSolutions)
 
     }
   }
-  else if (analyticSolution == PhysicalProblems::m_diffusion)
+  else if (m_opt.analyticSolution == PhysicalProblems::m_diffusion)
   {
     for (DataIterator dit = m_vectorNew[VectorVars::m_fluidVel]->dataIterator(); dit.ok(); ++dit)
     {
@@ -2495,7 +2454,7 @@ void AMRLevelMushyLayer::calculateAnalyticSolns(bool enforceSolutions)
       }
     }
   }
-  else if (analyticSolution == PhysicalProblems::m_mushyLayer)
+  else if (m_opt.analyticSolution == PhysicalProblems::m_mushyLayer)
   {
     // when we ask for an analytic solution here, just generate a rough chimney shape
 
@@ -2660,7 +2619,7 @@ void AMRLevelMushyLayer::postInitialize()
 
     thisLevelData = this;
 
-    VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_viscousBCs));
+    VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_opt.viscousBCs));
 
     for (int lev = 0; lev < numLevels; lev++)
     {
@@ -2682,7 +2641,7 @@ void AMRLevelMushyLayer::postInitialize()
     }
 
     bool homoBC = false;
-    if (s_project_initial_vel)
+    if (m_opt.project_initial_vel)
     {
       level0Proj.initialVelocityProject(amrVel, amrPorosityFace, amrPorosity, homoBC);
     }
@@ -2801,7 +2760,7 @@ void AMRLevelMushyLayer::postInitialize()
       }
     }
 
-    if (s_initialize_pressures)
+    if (m_opt.initialize_pressures)
     {
       if (s_verbosity >= 3)
       {
@@ -2970,20 +2929,6 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
   }
 }
 
-//bool AMRLevelMushyLayer::newLevelAdded()
-//{
-//  AMRLevelMushyLayer* thisMLPtr = this->getCoarsestLevel();
-//
-//  bool newLevel=false;
-//
-//  while (thisMLPtr)
-//  {
-//    newLevel = newLevel || thisMLPtr->m_newLevel;
-//    thisMLPtr = thisMLPtr->getFinerLevel();
-//  }
-//
-//  return newLevel;
-//}
 // -------------------------------------------------------------
 // this function manages the pressure initialization after
 // initialization and regridding
@@ -2993,7 +2938,6 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   {
     pout() << "AMRLevelMushyLayer::initializeGlobalPressure (level " << m_level << ")" << endl;
   }
-  ParmParse ppMain("main");
 
   setAdvVelCentering(m_opt.advVelCentering);
 
@@ -3114,11 +3058,7 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     fillAMRVelPorosity(temp2, amrPorosityFace, temp);
     fillAMRLambda(amrLambda);
 
-    //    thisMLPtr->m_projection.doPostRegridOps(amrLambda, amrPorosityFace, dtInit, m_time);
-
-    bool writePressureInitFields = false;
-    ppMain.query("writePressureInitFields", writePressureInitFields);
-    if (writePressureInitFields)
+    if (m_opt.writePressureInitFields)
     {
       char filename[300];
       sprintf(filename, "pressureInit.%d.hdf5", iter);
@@ -3131,9 +3071,7 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
 
       bool dontReplacePressure = true;
 
-      bool resetStates = true;
-      ppMain.query("init_resetStates", resetStates);
-      if (resetStates)
+      if (m_opt.initResetStates)
       {
         thisMLPtr->restartTimestepFromBackup(dontReplacePressure); // refill 'new' states
       }
@@ -3396,6 +3334,7 @@ void AMRLevelMushyLayer::createDataStructures()
 
 void AMRLevelMushyLayer::addMeltPond()
 {
+  // This is an old method which I haven't used for a while
 
   if (m_opt.meltPondDepth > 0)
   {
@@ -3437,8 +3376,6 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     m_doAutomaticRestart = false;
 
     addMeltPond();
-    ParmParse ppMain("main");
-
 
     if (m_opt.horizAverageRestart)
     {
@@ -3490,7 +3427,7 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
   // Should also initialise pressure if we're restarting
 
   if (a_restart
-      && s_initialize_pressures)
+      && m_opt.initialize_pressures)
   {
 
     // Get the pressure from the checkpoint file
