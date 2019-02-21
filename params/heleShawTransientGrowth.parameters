@@ -1,0 +1,82 @@
+
+main.verbosity=2
+main.output_folder=heleshaw
+
+bc.bulkConcentrationHiVal=-1 -1
+bc.bulkConcentrationLoVal=-1 -1
+bc.enthalpyHiVal=0 0.9
+bc.enthalpyLoVal=0.0 6.03
+bc.scalarHi=1 0 0
+bc.scalarLo=1 2 2
+bc.velHi=6 0 0
+bc.velLo=6 3 0
+
+main.cfl=0.2
+main.initial_cfl=2e-05
+
+main.ignoreSolverFails=false
+
+main.max_dt=0.1
+main.max_dt_growth=1.05
+
+main.max_step=10000
+main.max_time=10.0
+main.min_time=0.1
+main.dt_tolerance_factor=1.01
+
+main.domain_height=1.0
+main.num_cells=128 128
+main.periodic_bc=1 0 0
+main.max_grid_size=256
+
+main.plot_interval=-1
+main.plot_period=0.01
+main.plot_prefix=plt
+main.iter_plot_interval=-1
+main.iteration_plot_interval=-1
+main.checkpoint_interval=1000
+main.chk_prefix=chk
+main.debug=false # set to true to produce more output
+
+main.max_level=0
+main.block_factor=8
+main.use_subcycling=1
+main.ref_ratio=2 2 2
+main.refine_thresh=0.1
+main.regrid_interval=8 8 8
+main.tag_buffer_size=4
+main.fill_ratio=0.75
+main.grid_buffer_size=0 0 0
+
+main.time_integration_order=2
+
+main.use_limiting=true
+
+main.doEuler=0
+main.nondimensionalisation=0
+
+parameters.K=1
+parameters.compositionRatio=1.18
+parameters.darcy=0.0
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.heatConductivityRatio=1
+parameters.heleShaw=true
+parameters.initialComposition=30
+parameters.lewis=100
+parameters.liquidusSlope=-0.1
+parameters.nonDimReluctance=0.1
+parameters.nonDimVel=0.0
+parameters.permeabilityFunction=2
+parameters.prandtl=0
+parameters.problem_type=0
+parameters.rayleighComp=500
+parameters.rayleighTemp=25.0
+parameters.specificHeatRatio=1
+parameters.stefan=5.0
+parameters.theta_infinity=1.2
+parameters.waterDistributionCoeff=1e-5
+
+
+projection.eta=0.0
+
