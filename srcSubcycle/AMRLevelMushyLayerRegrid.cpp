@@ -1,5 +1,12 @@
 #include "AMRLevelMushyLayer.H"
 
+void AMRLevelMushyLayer::setSmoothingCoeff(Real a_coeff)
+{
+  // Need this so the setup_new_run program can set this coefficient
+
+  s_regrid_smoothing_coeff = a_coeff;
+}
+
 
 void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothScalar)
 {

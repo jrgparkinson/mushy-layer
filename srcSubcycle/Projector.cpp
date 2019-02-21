@@ -986,19 +986,6 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
   }
 
 
-//  if (s_multigrid_relaxation == 1)
-//  {
-//    s_multigrid_relaxation = 4;
-//  }
-//  else
-//  {
-//    s_multigrid_relaxation = 1;
-//  }
-//  pout() << "  Multigrid relaxation = " << s_multigrid_relaxation << endl;
-
-  // MAC rhs should have no ghost values
-  //  LevelData<FArrayBox> MacRHS(getBoxes(),1);
-
   Divergence::levelDivergenceMAC(MACrhs(), a_uEdge, m_dx);
 
   // report sum(rhs)
@@ -1013,7 +1000,6 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 
     // Compute sum over just the interior
     DisjointBoxLayout interiorGrids(MACrhs().disjointBoxLayout());
-//    interiorGrids.grow(-2);
 
     LevelData<FArrayBox> rhsInterior(interiorGrids, 1);
     MACrhs().copyTo(rhsInterior);

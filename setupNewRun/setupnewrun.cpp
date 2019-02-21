@@ -131,8 +131,6 @@ int main(int argc, char* argv[])
   int refinement = 1;
   Real dtReductionFactor = 10;
   Real smoothing = 0.0;
-  //int Ny;
-  //  Real H;
   pp.get("run_inputs",runInputs);
   pp.get("inFile" ,inFile);
   pp.get("outFile" ,outFile);
@@ -146,11 +144,22 @@ int main(int argc, char* argv[])
   pp.query("refinement", refinement);
   pp.query("box_size" ,box_size);
   pp.query("dt_reduction_factor" ,dtReductionFactor);
-  //  pp.get("Ny" ,Ny);
-  //  pp.get("H" ,H);
 
   Real newLev0Dx = -1;
   pp.query("newDx", newLev0Dx);
+
+  // For adding a melt pond
+  bool addMeltPond = false;
+  int meltPondDepth = 0;
+  Real meltPondSalinity = 0;
+  Real meltPondEnthalpy = 7.0;
+  pp.query("addMeltPond", addMeltPond);
+  if (addMeltPond)
+  {
+    pp.query("meltPondDepth", meltPondDepth);
+    pp.query("meltPondSalinity", meltPondSalinity);
+    pp.query("meltPondEnthalpy", meltPondEnthalpy);
+  }
 
   addExtraParams(runInputs, pp);
 
@@ -161,18 +170,11 @@ int main(int argc, char* argv[])
   HDF5HeaderData header;
   getAMRHierarchy(inFile, amrlevels, finest_level, header);
 
-  // Setup levels, including defining piecewise linear fill patch
-//  for (int level = 0; level <= finest_level; level++)
-//  {
-//    AMRLevelMushyLayer* ml = amrlevels[level];
-//    ml->levelSetup();
-//  }
 
   // Get parameters
   int block_factor;
   ParmParse ppMain("main");
   ppMain.get("block_factor", block_factor);
-
 
   // Make changes
 
@@ -327,7 +329,6 @@ int main(int argc, char* argv[])
     pp.query("smoothVel", smoothVel);
     pp.query("smoothScalar", smoothScalar);
 
-
     pout() << "Doing smoothing with coefficient " << smoothing << endl;
     // Only have to call this from the coarsest level
       AMRLevelMushyLayer* mlCoarsest = amrlevels[0];
@@ -347,6 +348,21 @@ int main(int argc, char* argv[])
 
   }
 
+  // Add melt pond if required
+  if (addMeltPond)
+  {
+    for (int level = 0; level <= finest_level; level++)
+    {
+      AMRLevelMushyLayer* ml = amrlevels[level];
+
+      bool rescaleSolution = false;
+      pp.query("rescaleSolution", rescaleSolution);
+
+      ml->addMeltPond(meltPondDepth, meltPondSalinity, meltPondEnthalpy, rescaleSolution);
+
+    }
+
+  }
   // Write new file
 
   HDF5Handle handleOut;

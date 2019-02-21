@@ -47,6 +47,7 @@ public:
 		Symmetry,
 		VelInflowPlume,
 		OutflowPressureGrad,
+		PressureHead,
 		NUM_PHYS_BC_TYPES
 	};
 

@@ -5,26 +5,13 @@
 void getAMRHierarchy(string inFile, Vector<AMRLevelMushyLayer*>& amrlevels, int& finest_level, HDF5HeaderData& header)
 {
   // Get variables for initializing amrlevelmushylayer objects
-//  Real cfl, domainWidth=0.0, refineThresh;
-//  int tagBufferSize;
-//  bool useLimiting;
+
   Vector<int> steps_since_regrid; //regrid_intervals,
   std::vector<int> regrid_intervals; // (num_read_levels,1);
 
   std::vector<bool> periodic;
 
   ParmParse ppMain("main");
-//  ppMain.get("cfl", cfl);
-
-//  ppMain.query("domain_width", domainWidth);
-//  if (domainWidth == 0.0)
-//  {
-//    ppMain.get("domain_length", domainWidth);
-//  }
-
-//  ppMain.get("refine_thresh", refineThresh);
-//  ppMain.get("tag_buffer_size", tagBufferSize);
-//  ppMain.get("use_limiting", useLimiting);
 
   int max_level = 0;
   ppMain.get("max_level",max_level);

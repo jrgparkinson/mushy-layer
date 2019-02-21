@@ -439,6 +439,11 @@ public:
   void doPostRegridSmoothing(bool a_smoothVel=true,
                              bool a_smoothScalar=true);
 
+  /// Set the coefficient for smoothing fields
+  void setSmoothingCoeff(Real a_coeff);
+
+  /// Add a melt pond at the top of the domain
+  void addMeltPond(int depth, Real salinity, Real enthalpy, bool rescaleExistingSolution=false);
 
   /// Make sure zero porosity regions have no velocity (cell centred velocity)
   void setVelZero(LevelData<FArrayBox>& a_vel, Real a_limit=-1, int a_radius=0);
@@ -796,7 +801,8 @@ protected:
   void addPerturbation(int a_var, Real alpha, int waveNumber = -1, Real phaseShift=0);
 
   /// Add a melt pond if we want
-  void  addMeltPond();
+  void addMeltPond();
+
 
   /// Define implicit solver for \f$ \mathbf{u}^* \f$ including timestepping
   void defineUstarSolver(Vector<RefCountedPtr<LevelBackwardEuler> >&  a_UstarBE,

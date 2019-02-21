@@ -181,7 +181,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
       Real maxPressure = ::computeNorm(m_projection.phi(), NULL, 1, m_dx, Interval(0,0), 0);
       // This is chosen empirically and may need some refinement
-      Real pressureCap = 1e3;
+      Real pressureCap = 1e50;
 
       // A better indicator of issues arising is that the pressure becomes negative
       // as we fix P = 0 on the bottom boundary, and it should increase up through the domain, use this condition instead

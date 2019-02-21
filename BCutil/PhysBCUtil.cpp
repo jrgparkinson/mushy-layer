@@ -993,6 +993,7 @@ public:
 
                 case PhysBCUtil::VelInflowOutflow :
                 case PhysBCUtil::OutflowNormal :
+                case PhysBCUtil::PressureHead :
                 {
                   // Normal component - zero gradient
                   if (idir == m_comp)
@@ -1341,6 +1342,7 @@ public:
                 case PhysBCUtil::VelInflowOutflow :
                 case PhysBCUtil::OutflowNormal :
                 case PhysBCUtil::OutflowPressureGrad :
+                case PhysBCUtil::PressureHead :
                 {
                   // normal component - no gradient
                   if (idir == m_comp)
@@ -1489,6 +1491,7 @@ public:
                 case PhysBCUtil::VelInflowOutflow:
                 case PhysBCUtil::VelInflowPlume:
                 case PhysBCUtil::OutflowPressureGrad :
+                case PhysBCUtil::PressureHead :
                 {
                   // not sure if this right or not
                   NeumBC(a_state, a_valid, a_dx,
@@ -1547,8 +1550,10 @@ public:
     {
       const Box& domainBox = a_domain.domainBox();
 
-      RefCountedPtr<ConstValueFunction>
-      zeroFunc(new ConstValueFunction(0.0, a_state.nComp()));
+      RefCountedPtr<ConstValueFunction> zeroFunc(new ConstValueFunction(0.0, a_state.nComp()));
+
+      RefCountedPtr<ConstValueFunction> pressureHead(new ConstValueFunction(m_params.pressureHead, a_state.nComp()));
+
 
       RefCountedPtr<InflowValueFunction> inflowFunc(new InflowValueFunction(0.0, a_state.nComp(),
                                                                             -m_params.inflowVelocity,
@@ -1616,6 +1621,17 @@ public:
 
                   break;
                 }
+
+                case PhysBCUtil::PressureHead :
+                {
+                  DiriBC(a_state, a_valid, a_dx,
+                                          a_homogeneous,
+                                          BCValueHolder(pressureHead),
+                                          idir, side, order);
+
+                  break;
+                }
+
 
                 case PhysBCUtil::VelInflowPlume:
                 {
@@ -2174,6 +2190,7 @@ public:
                 case PhysBCUtil::OutflowNormal :
                 case PhysBCUtil::VelInflowPlume :
                 case PhysBCUtil::OutflowPressureGrad :
+                case PhysBCUtil::PressureHead :
                 {
                   DiriBC(a_state, a_valid, a_dx,
                          a_homogeneous,
@@ -2264,6 +2281,7 @@ public:
                 case PhysBCUtil::noShear :
                 case PhysBCUtil::VelInflowPlume :
                 case PhysBCUtil::Symmetry :
+                case PhysBCUtil::PressureHead :
 //                case PhysBCUtil::Outflow :
                 {
                   int order = 2;// equivalent of HOExtrapBC. This is crucial to get projection right.

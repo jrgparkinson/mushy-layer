@@ -152,6 +152,8 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     m_outputScalarVars.push_back(ScalarVars::m_lambda);
     //    m_outputScalarVars.push_back(ScalarVars::m_lambda_porosity);
 
+    m_outputScalarVars.push_back(ScalarVars::m_pressure);
+
 
     if (m_opt.debug)
     {
@@ -3330,7 +3332,120 @@ void AMRLevelMushyLayer::createDataStructures()
 
 
 }
+void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bool rescaleExistingSolution)
+{
+  // This only works on level 0 for now, as we decide where to place the pond based on number
+  // of cells from the top of the domain. Should change this to do it based on distance at some point.
 
+  CH_assert(m_level==0);
+
+  // Basic option just replaces top cells with water.
+  // More advanced option will rescale existing solution to the remaining domain
+
+  if (rescaleExistingSolution)
+  {
+    // Rescale existing solute to the reduced number of cells
+    /**
+     * We just do a very simple linear rescaling for now, so the old domain
+     * 0 < z < h becomes 0 < z < h-dh, and new variables are denoted by a `, i.e. we need a mapping
+     * for H(0 < z < h) -> H`(0 < z < h-dh), and S->S`
+     * We assume that the boundary conditions on the
+     * new domain are the same as the old domain at the new extent, i.e.
+     *  H`(h-dh) = H(h), H`(h-dh) = S(h).
+     * then, H`(z) = H(z*(h-dh)/h) = H(z*(1-dh/h))
+     *
+     */
+
+    // First make a duplicate of the existing solution
+    IntVect ghost_vector = m_scalarNew[ScalarVars::m_enthalpy]->ghostVect();
+    LevelData<FArrayBox> old_enthalpy(m_grids, 1, ghost_vector);
+    LevelData<FArrayBox> old_bulk_conc(m_grids, 1, ghost_vector);
+
+    m_scalarNew[ScalarVars::m_enthalpy]->copyTo(old_enthalpy);
+    m_scalarNew[ScalarVars::m_bulkConcentration]->copyTo(old_bulk_conc);
+
+    // Work out how much we're squishing the old domain by
+    /**
+     * Stretching maps z->z`, via z` = z*stretching
+     */
+    Box domBox = m_problem_domain.domainBox();
+    int top_j = domBox.bigEnd(1);
+    int boxHeight = domBox.bigEnd(1)-domBox.smallEnd(1);
+    Real stretching = 1 - float(depth)/float(boxHeight);
+
+    // Don't allow use of ghost cells
+    int lowest_j = domBox.smallEnd(1);
+
+    Box shrunkBox(domBox);
+    shrunkBox.growHi(1, -depth);
+
+
+    // Now iterate over the new grid, and fill with values interpolate from old mesh
+    for (DataIterator dit = m_scalarNew[ScalarVars::m_enthalpy]->dataIterator(); dit.ok(); ++dit)
+    {
+      Box b = m_grids[dit];
+      b &= shrunkBox;
+
+      FArrayBox& newEnthalpy = (*m_scalarNew[ScalarVars::m_enthalpy])[dit];
+      FArrayBox& oldEnthalpy = old_enthalpy[dit];
+      FArrayBox& newBulkConc = (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit];
+      FArrayBox& oldBulkConc = old_bulk_conc[dit];
+
+      for (BoxIterator bit(b); bit.ok(); ++bit)
+      {
+
+        // Need to find the two cells to interpolate between, along with which fraction of each to take
+        IntVect iv = bit();
+        RealVect loc;
+        getLocation(iv, loc, m_dx);
+
+        Real z = loc[1];
+        Real z_new = z*stretching;
+
+        Real dz = z-z_new;
+        Real fractional_shift = dz/m_dx;
+
+        int num_cells_shift = floor(fractional_shift);
+        Real extra_shift = fractional_shift - num_cells_shift;
+
+        pout() << fractional_shift << ", " << extra_shift << endl;
+
+        int z_j = iv[1] + num_cells_shift+1;
+        int z_j_lower = iv[1] + num_cells_shift;
+
+        z_j = max(lowest_j, z_j);
+        z_j_lower = max(lowest_j, z_j_lower);
+
+        z_j = min(top_j, z_j);
+        z_j_lower = min(top_j, z_j_lower);
+
+        IntVect upper = IntVect(iv[0], z_j);
+        IntVect lower = IntVect(iv[0], z_j_lower);
+
+        newEnthalpy(iv) = oldEnthalpy(lower)*(1-extra_shift) + extra_shift*oldEnthalpy(upper);
+        newBulkConc(iv) = oldBulkConc(lower)*(1-extra_shift) + extra_shift*oldBulkConc(upper);
+
+      }
+    }
+
+  }
+
+  for (DataIterator dit = m_scalarNew[ScalarVars::m_enthalpy]->dataIterator(); dit.ok(); ++dit)
+  {
+    Box b = m_grids[dit];
+    Box domBox = m_problem_domain.domainBox();
+    int top_j = domBox.bigEnd(1);
+    for (BoxIterator bit(b); bit.ok(); ++bit)
+    {
+      IntVect iv = bit();
+      if (iv[1] > top_j-depth)
+      {
+        (*m_scalarNew[ScalarVars::m_enthalpy])[dit](iv) = enthalpy;
+        (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit](iv) = salinity;
+      }
+    }
+  }
+}
 
 void AMRLevelMushyLayer::addMeltPond()
 {
@@ -3338,23 +3453,7 @@ void AMRLevelMushyLayer::addMeltPond()
 
   if (m_opt.meltPondDepth > 0)
   {
-
-    for (DataIterator dit = m_scalarNew[ScalarVars::m_enthalpy]->dataIterator(); dit.ok(); ++dit)
-    {
-      Box b = m_grids[dit];
-      Box domBox = m_problem_domain.domainBox();
-      int top_j = domBox.bigEnd(1);
-      for (BoxIterator bit(b); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-        if (iv[1] > top_j-m_opt.meltPondDepth)
-        {
-          (*m_scalarNew[ScalarVars::m_enthalpy])[dit](iv) = m_parameters.bcValEnthalpyHi[1];
-          (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit](iv) = m_parameters.bcValBulkConcentrationHi[1];
-        }
-      }
-    }
-
+    addMeltPond(m_opt.meltPondDepth, m_parameters.bcValBulkConcentrationHi[1], m_parameters.bcValEnthalpyHi[1]);
   }
 
 }
@@ -3786,4 +3885,5 @@ Real AMRLevelMushyLayer::dx()
 {
   return m_dx;
 }
+
 

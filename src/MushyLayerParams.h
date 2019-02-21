@@ -371,6 +371,9 @@ public:
 	/// Inflow velocity, when required
 	Real inflowVelocity;
 
+	/// Pressure difference between top and bottom boundaries
+	Real pressureHead;
+
 	/// Specify start and end of an inflow plume
 	Vector<Real> plumeBounds;
 

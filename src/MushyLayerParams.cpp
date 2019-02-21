@@ -85,6 +85,7 @@ MushyLayerParams::MushyLayerParams() {
   permeabilityFunction = PermeabilityFunctions::m_kozenyCarman;
   m_porosityFunction = ParamsPorosityFunctions::m_porosityConstant;
   inflowVelocity = -999;
+  pressureHead = 0;
 
 
   thetaPlumeInflow = -999;
@@ -184,6 +185,8 @@ void MushyLayerParams::getParameters()
 
   pp.query("fixedTempDirection", fixedTempDirection);
   pp.query("inflowVelocity", inflowVelocity);
+
+  pp.query("pressureHead", pressureHead);
 
   pp.query("timeDependentBC", m_timeDependentBC);
 
