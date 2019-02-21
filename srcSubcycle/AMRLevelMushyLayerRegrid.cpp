@@ -426,28 +426,12 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   // Create tags based on criteria
   IntVectSet localTags;
 
-  ParmParse ppRegrid("regrid");
-  ParmParse ppMain("main");
-  bool tagMLboundary = false;
-  ppRegrid.query("tagMushLiquidBoundary", tagMLboundary);
-
-  bool tagDomainBoundary = false;
-  ppRegrid.query("tagDomainBoundary", tagDomainBoundary);
-
-  Real fixed_grid_time = -1.0;
-  ppRegrid.query("fixed_grid_time", fixed_grid_time);
-
-
-  Real min_time = -1;
-  ppRegrid.query("min_regrid_time", min_time);
-  if (min_time >= 0 && m_time < min_time)
+  if (m_opt.min_regrid_time >= 0 && m_time < m_opt.min_regrid_time)
   {
     a_tags = localTags;
-    pout() << "Not tagging any cells as current time (" << m_time << ") is less than " << min_time << endl;
+    pout() << "Not tagging any cells as current time (" << m_time << ") is less than " << m_opt.min_regrid_time << endl;
     return;
   }
-
-  Real vel_thresh;
 
   AMRLevelMushyLayer* ml = this;
   while(ml->getFinerLevel())
@@ -461,8 +445,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   IntVectSet liquidCells;
   IntVectSet mushyCells;
   IntVectSet marginalCells;
-  Real marginalPorosityLimit = 1.0;
-  ppRegrid.query("marginalPorosityLimit", marginalPorosityLimit);
 
   for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
   {
@@ -472,7 +454,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       {
         liquidCells |= bit();
       }
-      else if ((*m_scalarNew[ScalarVars::m_porosity])[dit](bit()) > marginalPorosityLimit)
+      else if ((*m_scalarNew[ScalarVars::m_porosity])[dit](bit()) > m_opt.taggingMarginalPorosityLimit)
       {
         marginalCells |= bit();
       }
@@ -484,18 +466,17 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
 
 
-  if (ppMain.contains("vel_refine_thresh"))
+  if (m_opt.tag_velocity)
   {
 
-    ppMain.get("vel_refine_thresh", vel_thresh);
     if (s_verbosity >= 2)
     {
-      pout() << "AMRLevelMushyLayer::tagCells - tag velocity >  " << vel_thresh << endl;
+      pout() << "AMRLevelMushyLayer::tagCells - tag velocity >  " << m_opt.vel_thresh << endl;
     }
 
-    tagCellsVar(localTags, vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
+    tagCellsVar(localTags, m_opt.vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
   }
-  else if ((ppRegrid.contains("plume_vel") || ppRegrid.contains("plume_salinity")))
+  else if (m_opt.tag_plume_mush)
   {
     // Trying to refine plumes
 
@@ -513,11 +494,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
       IntVectSet downflowCells;
       //    Real refineThresh = m_refineThresh;
-      Real salinityThreshold = -1.0 + log10(m_parameters.compositionRatio); // rough guess of salinity in channels
-      Real velThreshold = m_parameters.m_buoyancySCoeff/m_parameters.m_darcyCoeff; // rough guess of the velocity in the channels
-      ppRegrid.query("plume_vel", velThreshold); // think  this scales like da^3*ra
-      ppRegrid.query("plume_salinity", salinityThreshold);
-
 
       IntVectSet porosityGradientCells;
       tagCellsVar(porosityGradientCells, m_opt.refineThresh, m_porosity, -1, m_opt.taggingMethod);
@@ -528,12 +504,12 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
       // Tag regions of downflow
       tagCellsVar(downflowCells,
-                  velThreshold, // refine thresh
+                  m_opt.plumeVelThreshold, // refine thresh
                   -1, // don't consider a scalar field
                   m_fluidVel, TaggingMethod::CompareLargerThanNegative, 1); // y component of velocity
 
       IntVectSet saltyCells;
-      tagCellsVar(saltyCells, salinityThreshold,
+      tagCellsVar(saltyCells, m_opt.plumeSalinityThreshold,
                   ScalarVars::m_bulkConcentration,
                   -1, TaggingMethod::CompareLargerThan);
 
@@ -641,7 +617,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
 
 
-  if (tagMLboundary)
+  if (m_opt.tagMLboundary)
   {
     if (s_verbosity >= 2)
     {
@@ -657,7 +633,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     //    tagMushyCells(localTags);
   }
 
-  if (tagDomainBoundary)
+  if (m_opt.tagDomainBoundary)
   {
     if (s_verbosity >= 2)
     {
@@ -667,9 +643,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     tagBoundaryLayerCells(localTags);
   }
 
-  Real tagCenterOnly = 0;
-  ppRegrid.query("tagCenterOnly", tagCenterOnly);
-  if (tagCenterOnly > 0)
+  if (m_opt.tagCenterBoxSize > 0)
   {
     if (s_verbosity >= 2)
     {
@@ -678,12 +652,10 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
     localTags = IntVectSet();
 
-    Real regridTime = 0.0;
-    ppRegrid.query("initTime", regridTime);
-    if (m_time >= regridTime)
+    if (m_time >= m_opt.regridTime)
     {
 
-      tagCenterCells(localTags, tagCenterOnly);
+      tagCenterCells(localTags, m_opt.tagCenterBoxSize);
     }
   }
 
@@ -691,11 +663,11 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
   // New option - when regridding, move to specified gridfile
 
-  if (fixed_grid_time >= 0)
+  if (m_opt.fixed_grid_time >= 0)
   {
     // Define new intvect set
     localTags = IntVectSet();
-    if (m_time > fixed_grid_time)
+    if (m_time > m_opt.fixed_grid_time)
     {
       if (s_verbosity >= 2)
       {
@@ -735,15 +707,10 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   localTags &= localTagsBox;
 
 
-
-  bool testRegridCoarsening = false;
-  // NB this regrid.testRegridCoarsening
-  ppRegrid.query("testRegridCoarsening", testRegridCoarsening);
-
   // This is some code which will force any refined levels to coarsen again,
   // setting up a cycle of refine->coarsen->refine to artifically test how
   // the code handles such procedures (e.g. testing for memory leaks)
-  if (testRegridCoarsening)
+  if (m_opt.testRegridCoarsening)
   {
     if (s_verbosity >= 2)
     {
@@ -1486,7 +1453,6 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     {
       writeAMRHierarchy("regrid4.hdf5");
     }
-    ParmParse ppMain("main");
 
     if(m_opt.initLambda)
     {
@@ -1566,11 +1532,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       fillAMRVelPorosity(amrVel, amrPorosityFace, amrPorosity);
       fillAMRLambda(amrLambda);
 
-      Real etaScale=1.0;
-      ppMain.query("regrid_eta_scale", etaScale);
-
-      level0Proj.doPostRegridOps(amrLambda,amrPorosityFace,dtInit,m_time,
-                                 etaScale);
+      level0Proj.doPostRegridOps(amrLambda,amrPorosityFace,dtInit,m_time, m_opt.regrid_eta_scale);
 
       if (m_opt.makeRegridPlots)
       {

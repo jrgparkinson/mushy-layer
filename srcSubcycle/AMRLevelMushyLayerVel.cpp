@@ -1758,13 +1758,13 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
   AMRLevelMushyLayer* amrMLcrse;
   int srcGhost = src.ghostVect()[0];
 
-  ParmParse pp("ccSrc");
-
   bool pressureSrc = m_addSubtractGradP;
   bool advSrc = m_opt.CCAdvSrc;
 
-  // Need to retain this parmparse option as an override in case we want it
-  pp.query("pressure", pressureSrc);
+  if (m_opt.CCPressureSrcOverride)
+  {
+    pressureSrc = m_opt.CCPressureSrc;
+  }
 
   if (m_time <= m_opt.skipTrickySourceTerm)
   {

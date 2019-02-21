@@ -31,6 +31,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ParmParse ppProjection("projection");
   ParmParse ppInit("init");
   ParmParse ppAdvsrc("advSrc");
+  ParmParse ppRegrid("regrid");
+  ParmParse ppPatchGodunov("patchGodunov");
+  ParmParse ppVelMultigrid("VelocityMultigrid");
+  ParmParse HCMultigrid("HCMultigrid");
 
   MushyLayerOptions opt;
 
@@ -46,14 +50,25 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.output_dir = "";
   ppMain.query("output_folder", opt.output_dir);
 
+  opt.plotfile_prefix = "plt";
+  ppMain.query("plot_prefix", opt.plotfile_prefix);
+
+  opt.minimalOutput = false;
+  opt.debug = false;
+  ppMain.query("debug", opt.debug);
+  if (!opt.debug)
+  {
+    ppMain.query("minimalOutput", opt.minimalOutput);
+  }
+
   opt.steadyStateCondition = 1e-3;
   ppMain.query("steady_state", opt.steadyStateCondition);
 
   opt.ignoreVelocitySteadyState = !params.isDarcyBrinkman();
-    ppMain.query("ignoreVelocitySteadyState", opt.ignoreVelocitySteadyState);
+  ppMain.query("ignoreVelocitySteadyState", opt.ignoreVelocitySteadyState);
 
-    opt.ignoreBulkConcSteadyState=false;
-    ppMain.query("ignoreBulkConcentrationSteadyState", opt.ignoreBulkConcSteadyState);
+  opt.ignoreBulkConcSteadyState=false;
+  ppMain.query("ignoreBulkConcentrationSteadyState", opt.ignoreBulkConcSteadyState);
 
   // This is really the domain width, not length,
   // but changing it in the inputs files would be a right pain
@@ -147,6 +162,12 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.scaleP_CC = opt.scaleP_MAC;
   ppProjection.query("scaleCCPressure", opt.scaleP_CC);
+
+  opt.projection_verbosity = 0;
+  ppProjection.query("verbosity", opt.projection_verbosity);
+
+  opt.usePiAdvectionBCs = true;
+  ppProjection.query("usePiAdvectionBCs", opt.usePiAdvectionBCs);
 
   opt.explicitDarcyTerm = false;
   ppMain.query("explicitDarcyTerm", opt.explicitDarcyTerm);
@@ -244,6 +265,15 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.CCDarcySrc = opt.explicitDarcyTerm;
   ppCCSrc.query("darcy", opt.CCDarcySrc);
 
+  opt.CCPressureSrcOverride = false;
+  opt.CCPressureSrc = true;
+  if (ppCCSrc.contains("pressure"))
+  {
+    opt.CCPressureSrcOverride = true;
+    ppCCSrc.get("pressure", opt.CCPressureSrc);
+  }
+
+
   opt.CCBuoyancySrc = true;
   ppCCSrc.query("buoyancy", opt.CCBuoyancySrc);
 
@@ -319,6 +349,11 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.phiScale = 1;
   ppProjection.query("phiScale", opt.phiScale);
 
+  opt.scaleMACBCWithChi = false;
+  opt.MACBCscale = 1.0;
+  ppProjection.query("scaleMACBCWithChi", opt.scaleMACBCWithChi);
+  ppProjection.query("MACbcScale", opt.MACBCscale);
+
   opt.doSyncOperations = true;
   ppMain.query("doSyncOperations", opt.doSyncOperations);
 
@@ -373,6 +408,48 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.taggingMethod = TaggingMethod(tagMethod);
 
+  opt.tagMLboundary = false;
+  ppRegrid.query("tagMushLiquidBoundary", opt.tagMLboundary);
+
+  opt.tagDomainBoundary = false;
+  ppRegrid.query("tagDomainBoundary", opt.tagDomainBoundary);
+
+  opt.fixed_grid_time = -1.0;
+  ppRegrid.query("fixed_grid_time", opt.fixed_grid_time);
+
+  opt.min_regrid_time = -1;
+  ppRegrid.query("min_regrid_time", opt.min_regrid_time);
+
+  opt.tag_velocity=false;
+  if (ppMain.contains("vel_refine_thresh"))
+  {
+    opt.tag_velocity=true;
+    ppMain.get("vel_refine_thresh", opt.vel_thresh);
+  }
+
+  opt.tag_plume_mush = false;
+  if ((ppRegrid.contains("plume_vel") || ppRegrid.contains("plume_salinity")))
+  {
+    opt.tag_plume_mush = true;
+    opt.plumeSalinityThreshold = -1.0 + log10(params.compositionRatio); // rough guess of salinity in channels
+    opt.plumeVelThreshold = params.m_buoyancySCoeff/params.m_darcyCoeff; // rough guess of the velocity in the channels
+    ppRegrid.query("plume_vel", opt.plumeVelThreshold); // think  this scales like da^3*ra
+    ppRegrid.query("plume_salinity", opt.plumeSalinityThreshold);
+
+  }
+
+  opt.taggingMarginalPorosityLimit = 1.0;
+  ppRegrid.query("marginalPorosityLimit", opt.taggingMarginalPorosityLimit);
+
+  opt.regridTime = 0.0;
+  ppRegrid.query("initTime", opt.regridTime);
+
+  opt.tagCenterBoxSize = 0;
+  ppRegrid.query("tagCenterOnly", opt.tagCenterBoxSize);
+
+  opt.testRegridCoarsening = false;
+  ppRegrid.query("testRegridCoarsening", opt.testRegridCoarsening);
+
   opt.vectorHOinterp = false;
   opt.scalarHOinterp = true;
   ppMain.query("vectorHOinterp", opt.vectorHOinterp);
@@ -393,6 +470,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.regrid_advect_before_freestream=false;
   ppMain.query("regrid_advect_before_freestream", opt.regrid_advect_before_freestream);
 
+  opt.regrid_eta_scale=1.0;
+  ppMain.query("regrid_eta_scale", opt.regrid_eta_scale);
 
   /**
    * Solver options
@@ -452,12 +531,80 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.AMRMultigridNormThresh=1e-10;
   ppAMRMultigrid.query("norm_thresh", opt.AMRMultigridNormThresh);
 
+  opt.velMGNumSmooth=2;
+  opt.velMGTolerance=1e-10;
+  opt.velMGHang=1e-10;
+  opt.velMGNormThresh=1e-10;
+  opt.velMGNumMG=1;
+  opt.VelMGMaxIter=10;
+
+  ppVelMultigrid.query("num_smooth", opt.velMGNumSmooth);
+  ppVelMultigrid.query("tolerance",  opt.velMGTolerance);
+  ppVelMultigrid.query("hang_eps",   opt.velMGHang);
+  ppVelMultigrid.query("num_mg",     opt.velMGNumMG);
+  ppVelMultigrid.query("norm_thresh", opt.velMGNormThresh);
+  ppVelMultigrid.query("max_iter",  opt.VelMGMaxIter);
+
+  opt.HCMultigridNumSmoothUp=4;
+  opt.HCMultigridNumSmoothDown=1;
+  opt.HCMultigridNumMG=1;
+  opt.HCMultigridMaxIter=10;
+  opt.HCMultigridVerbosity=0;
+  opt.HCMultigridBottomSolveIterations=40;
+  opt.HCMultigridTolerance=1e-10;
+  opt.HCMultigridHang=1e-10;
+  opt.HCMultigridNormThresh=1e-10;
+  opt.HCMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
+  opt.HCMultigridUseRelaxBottomSolverForHC = true;
+
+  HCMultigrid.query("num_smooth_up", opt.HCMultigridNumSmoothUp);
+  HCMultigrid.query("num_mg", opt.HCMultigridNumMG);
+  HCMultigrid.query("hang_eps", opt.HCMultigridHang);
+  HCMultigrid.query("norm_thresh", opt.HCMultigridNormThresh);
+  HCMultigrid.query("tolerance", opt.HCMultigridTolerance);
+  HCMultigrid.query("max_iter", opt.HCMultigridMaxIter);
+  HCMultigrid.query("verbosity", opt.HCMultigridVerbosity);
+  HCMultigrid.query("numSmoothDown", opt.HCMultigridNumSmoothDown);
+  HCMultigrid.query("relaxMode", opt.HCMultigridRelaxMode);
+  HCMultigrid.query("bottomSolveIterations", opt.HCMultigridBottomSolveIterations);
+  HCMultigrid.query("useRelaxBottomSolver", opt.HCMultigridUseRelaxBottomSolverForHC);
+
   opt.noMultigrid = false;
   opt.noMultigridIter = 100;
   ppMain.query("noMultigrid", opt.noMultigrid);
   ppMain.query("noMultigridIter", opt.noMultigridIter);
 
+  // 1 -> PLM, 2 -> PPM
+  opt.velAdvNormalPredOrder = 1;
 
+  // Use 4th order slope computations
+  opt.velAdvUseFourthOrderSlopes = true;
+  opt.velAdvHigherOrderLimiter = false;
+
+  // No artificial viscosity
+  opt.velAdvUseArtVisc = false;
+  opt.velAdvArtVisc = -0.0;
+
+  ppPatchGodunov.query("velOrder", opt.velAdvNormalPredOrder);
+  ppPatchGodunov.query("velFourthOrderSlopes", opt.velAdvUseFourthOrderSlopes);
+  ppPatchGodunov.query("velUseArtVisc", opt.velAdvUseArtVisc);
+  ppPatchGodunov.query("velArtVisc", opt.velAdvArtVisc);
+  ppPatchGodunov.query("higherOrderLimiter", opt.velAdvHigherOrderLimiter);
+
+  opt.HCUseArtVisc = opt.velAdvUseArtVisc;
+  opt.HCArtVisc = opt.velAdvArtVisc;
+
+  // This speeds up convergence a little.
+  // The eutectic boundary causes issues with higher order methods.
+  opt.HCNormalPredOrder = 1;
+  opt.HCUseFourthOrderSlopes = false;
+
+  opt.HCHigherOrderLimiter = opt.velAdvHigherOrderLimiter;
+
+  ppPatchGodunov.query("HCOrder", opt.HCNormalPredOrder);
+  ppPatchGodunov.query("HCFourthOrderSlopes", opt.HCUseFourthOrderSlopes);
+  ppPatchGodunov.query("HCUseArtVisc", opt.HCUseArtVisc);
+  ppPatchGodunov.query("HCArtVisc", opt.HCArtVisc);
 
   /***
    * Initialisation
@@ -630,13 +777,13 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
 
   opt.useFortranRegularisationFace = false;
-      ppMain.query("fortranRegularisationFace", opt.useFortranRegularisationFace);
-      opt.useFortranRegularisation = true;
-       ppMain.query("fortranRegularisation", opt.useFortranRegularisation);
+  ppMain.query("fortranRegularisationFace", opt.useFortranRegularisationFace);
+  opt.useFortranRegularisation = true;
+  ppMain.query("fortranRegularisation", opt.useFortranRegularisation);
 
 
-       opt.stokesDarcyForcingTimescale = 0.5;
-       ppParams.query("forcing_timescale", opt.stokesDarcyForcingTimescale);
+  opt.stokesDarcyForcingTimescale = 0.5;
+  ppParams.query("forcing_timescale", opt.stokesDarcyForcingTimescale);
 
 
 

@@ -133,16 +133,7 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_vectorVarNames[VectorVars::m_advVelCorr] = string("Explicit advVel corr");
 
 
-  bool debug = false;
-  bool minimalOutput = false;
-  ParmParse pp("main");
-  pp.query("debug", debug);
-  if (!debug)
-  {
-    pp.query("minimalOutput", minimalOutput);
-  }
-
-  if (minimalOutput)
+  if (m_opt.minimalOutput)
   {
     m_outputScalarVars.push_back(ScalarVars::m_enthalpy);
     m_outputScalarVars.push_back(ScalarVars::m_bulkConcentration);
@@ -162,7 +153,7 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     //    m_outputScalarVars.push_back(ScalarVars::m_lambda_porosity);
 
 
-    if (debug)
+    if (m_opt.debug)
     {
 
 
@@ -204,7 +195,7 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
 
   }
 
-  if (minimalOutput)
+  if (m_opt.minimalOutput)
   {
     m_outputVectorVars.push_back(VectorVars::m_advectionVel);
   }
@@ -220,7 +211,7 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     m_outputVectorVars.push_back(VectorVars::m_Fs);
 
 
-    if (debug)
+    if (m_opt.debug)
     {
       m_outputVectorVars.push_back(VectorVars::m_FsDiffusion);
       m_outputVectorVars.push_back(VectorVars::m_FsFluid);
@@ -335,14 +326,6 @@ void AMRLevelMushyLayer::levelSetup()
 
   bool scaleFineFluxes = true;
 
-  int projectionVerbosity = 0;
-  ParmParse ppProjection("projection");
-  //  ParmParse ppProj("projector");
-  ppProjection.query("verbosity", projectionVerbosity);
-
-  bool usePiAdvectionBCs = true;
-  ppProjection.query("usePiAdvectionBCs", usePiAdvectionBCs);
-
   if (m_hasFiner)
   {
     fineProj = &(amrMLFinerPtr->m_projection);
@@ -447,13 +430,13 @@ void AMRLevelMushyLayer::levelSetup()
     Vector<Box> b = m_grids.boxArray();
     if (m_grids.boxArray().size() > 0)
     {
-      m_projection.verbosity(projectionVerbosity);
+      m_projection.verbosity(m_opt.projection_verbosity);
       m_projection.define(m_grids, crseGridsPtr, m_problem_domain, m_dx,
-                          fineProj, crsProj, nRefCrse, m_level, *m_physBCPtr, usePiAdvectionBCs);
+                          fineProj, crsProj, nRefCrse, m_level, *m_physBCPtr, m_opt.usePiAdvectionBCs);
 
-      m_projectionBackup.verbosity(projectionVerbosity);
+      m_projectionBackup.verbosity(m_opt.projection_verbosity);
       m_projectionBackup.define(m_grids, crseGridsPtr, m_problem_domain, m_dx,
-                                fineProjBackup, crsProjBackup, nRefCrse, m_level, *m_physBCPtr, usePiAdvectionBCs);
+                                fineProjBackup, crsProjBackup, nRefCrse, m_level, *m_physBCPtr, m_opt.usePiAdvectionBCs);
 
     }
     else
@@ -469,12 +452,12 @@ void AMRLevelMushyLayer::levelSetup()
     // on the coarsest level here
 
     m_projection.define(m_grids, crseGridsPtr, m_problem_domain, m_dx,
-                        fineProj, crsProj, m_ref_ratio, m_level, *m_physBCPtr, usePiAdvectionBCs);
-    m_projection.verbosity(projectionVerbosity);
+                        fineProj, crsProj, m_ref_ratio, m_level, *m_physBCPtr, m_opt.usePiAdvectionBCs);
+    m_projection.verbosity(m_opt.projection_verbosity);
 
     m_projectionBackup.define(m_grids, crseGridsPtr, m_problem_domain, m_dx,
-                              fineProj, crsProj, m_ref_ratio, m_level, *m_physBCPtr, usePiAdvectionBCs);
-    m_projectionBackup.verbosity(projectionVerbosity);
+                              fineProj, crsProj, m_ref_ratio, m_level, *m_physBCPtr, m_opt.usePiAdvectionBCs);
+    m_projectionBackup.verbosity(m_opt.projection_verbosity);
 
   }
 
@@ -514,14 +497,6 @@ void AMRLevelMushyLayer::levelSetup()
   // Collect all the BC stuff here
   setAdvectionBCs();
 
-  ParmParse ppPatchGodunov("patchGodunov");
-
-  // 1 -> PLM, 2 -> PPM
-  int normalPredOrder = 1;
-
-  // Use 4th order slope computations
-  bool useFourthOrderSlopes = true;
-
   // Don't do slope limiting. Not possible to do more than one of these at the same time
 
   // Primitive limiting stops 2nd order convergence?
@@ -530,76 +505,45 @@ void AMRLevelMushyLayer::levelSetup()
   bool useCharLimiting = false && m_opt.useLimiting;
   bool useFlattening = false; // Can't do this
 
-  bool higherOrderLimiter = false;
-
-  // No artificial viscosity
-  bool useArtVisc = false;
-  Real artVisc = -0.0;
-
-  ppPatchGodunov.query("velOrder", normalPredOrder);
-  ppPatchGodunov.query("velFourthOrderSlopes", useFourthOrderSlopes);
-  ppPatchGodunov.query("velUseArtVisc", useArtVisc);
-  ppPatchGodunov.query("velArtVisc", artVisc);
-  ppPatchGodunov.query("higherOrderLimiter", higherOrderLimiter);
-
   m_patchGodVelocity.define(m_problem_domain, m_dx, &m_advectionPhysicsVelocity,
-                            normalPredOrder, useFourthOrderSlopes, usePrimLimiting,
-                            useCharLimiting, useFlattening, useArtVisc, artVisc);
+                            m_opt.velAdvNormalPredOrder, m_opt.velAdvUseFourthOrderSlopes, usePrimLimiting,
+                            useCharLimiting, useFlattening, m_opt.velAdvUseArtVisc, m_opt.velAdvArtVisc);
 
   // Trying to fix issue with slopes at internal box boundaries
-  m_patchGodVelocity.highOrderLimiter(higherOrderLimiter);
+  m_patchGodVelocity.highOrderLimiter(m_opt.velAdvHigherOrderLimiter);
 
   // For scalars
-  int normalPredOrderHC = normalPredOrder;
-  bool useFourthOrderSlopesHC = useFourthOrderSlopes;
   bool usePrimLimitingHC = usePrimLimiting;
-
   bool useCharLimitingHC = useCharLimiting;
   bool useFlatteningHC = useFlattening;
-  bool useArtViscHC = useArtVisc;
-  Real artViscHC = artVisc;
-
-  // This speeds up convergence a little.
-  // The eutectic boundary causes issues with higher order methods.
-  normalPredOrderHC = 1;
-  useFourthOrderSlopesHC = false;
 
   // this is crucial for getting convergence.
   usePrimLimitingHC = m_opt.useLimiting;
 
-  // This doesn't make a difference
-  //  useArtViscHC = false;
-  //  artViscHC = 1.0;
-
-  ppPatchGodunov.query("HCOrder", normalPredOrderHC);
-  ppPatchGodunov.query("HCFourthOrderSlopes", useFourthOrderSlopesHC);
-  ppPatchGodunov.query("HCUseArtVisc", useArtVisc);
-  ppPatchGodunov.query("HCArtVisc", artVisc);
-
   m_patchGodHC.define(m_problem_domain, m_dx, &m_advPhysHC,
-                      normalPredOrderHC, useFourthOrderSlopesHC, usePrimLimitingHC,
-                      useCharLimitingHC, useFlatteningHC, useArtViscHC, artViscHC);
-  m_patchGodHC.highOrderLimiter(higherOrderLimiter);
+                      m_opt.HCNormalPredOrder, m_opt.HCUseFourthOrderSlopes, usePrimLimitingHC,
+                      useCharLimitingHC, useFlatteningHC, m_opt.HCUseArtVisc, m_opt.HCArtVisc);
+  m_patchGodHC.highOrderLimiter(m_opt.HCHigherOrderLimiter);
 
   m_patchGodTSl.define(m_problem_domain, m_dx, &m_advPhysTSl,
-                       normalPredOrderHC, useFourthOrderSlopesHC, usePrimLimitingHC,
-                       useCharLimitingHC, useFlatteningHC, useArtViscHC, artViscHC);
-  m_patchGodTSl.highOrderLimiter(higherOrderLimiter);
+                       m_opt.HCNormalPredOrder, m_opt.HCUseFourthOrderSlopes, usePrimLimitingHC,
+                       useCharLimitingHC, useFlatteningHC, m_opt.HCUseArtVisc,  m_opt.HCArtVisc);
+  m_patchGodTSl.highOrderLimiter(m_opt.HCHigherOrderLimiter);
 
   // Single component solve
   m_patchGodH.define(m_problem_domain, m_dx, &m_advPhysH,
-                     normalPredOrderHC, useFourthOrderSlopesHC, usePrimLimitingHC,
-                     useCharLimitingHC, useFlatteningHC, useArtViscHC, artViscHC);
+                     m_opt.HCNormalPredOrder, m_opt.HCUseFourthOrderSlopes, usePrimLimitingHC,
+                     useCharLimitingHC, useFlatteningHC, m_opt.HCUseArtVisc,  m_opt.HCArtVisc);
   m_patchGodC.define(m_problem_domain, m_dx, &m_advPhysC,
-                     normalPredOrderHC, useFourthOrderSlopesHC, usePrimLimitingHC,
-                     useCharLimitingHC, useFlatteningHC, useArtViscHC, artViscHC);
+                     m_opt.HCNormalPredOrder, m_opt.HCUseFourthOrderSlopes, usePrimLimitingHC,
+                     useCharLimitingHC, useFlatteningHC, m_opt.HCUseArtVisc,  m_opt.HCArtVisc);
 
   m_patchGodT.define(m_problem_domain, m_dx, &m_advPhysT,
-                     normalPredOrderHC, useFourthOrderSlopesHC, usePrimLimitingHC,
-                     useCharLimitingHC, useFlatteningHC, useArtViscHC, artViscHC);
+                     m_opt.HCNormalPredOrder, m_opt.HCUseFourthOrderSlopes, usePrimLimitingHC,
+                     useCharLimitingHC, useFlatteningHC, m_opt.HCUseArtVisc,  m_opt.HCArtVisc);
   m_patchGodSl.define(m_problem_domain, m_dx, &m_advPhysSl,
-                      normalPredOrderHC, useFourthOrderSlopesHC, usePrimLimitingHC,
-                      useCharLimitingHC, useFlatteningHC, useArtViscHC, artViscHC);
+                      m_opt.HCNormalPredOrder, m_opt.HCUseFourthOrderSlopes, usePrimLimitingHC,
+                      useCharLimitingHC, useFlatteningHC, m_opt.HCUseArtVisc,  m_opt.HCArtVisc);
 
 
   for (int var = 0; var < m_numScalarVars; var++)
@@ -618,13 +562,13 @@ void AMRLevelMushyLayer::levelSetup()
       m_patchGodScalars[var]->define(m_problem_domain,
                                      m_dx,
                                      &advectionPhysicsScalar,
-                                     normalPredOrder,
-                                     useFourthOrderSlopes,
+                                     m_opt.velAdvNormalPredOrder,
+                                     m_opt.velAdvUseFourthOrderSlopes,
                                      usePrimLimiting,
                                      useCharLimiting,
                                      useFlattening,
-                                     useArtVisc,
-                                     artVisc);
+                                     m_opt.velAdvUseArtVisc,
+                                     m_opt.velAdvArtVisc);
     }
   }
 
@@ -645,19 +589,6 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
   Real lev0Dx;
   IntVect ivGhost = IntVect::Unit;
   getHierarchyAndGrids(hierarchy, allGrids, refRat, lev0Dom, lev0Dx);
-
-  int numSmooth=2, numMG=1, maxIter=10, mgverb=0;
-  Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
-
-  ParmParse ppAmrmultigrid("VelocityMultigrid");
-  ppAmrmultigrid.query("num_smooth", numSmooth);
-  ppAmrmultigrid.query("num_mg", numMG);
-  ppAmrmultigrid.query("hang_eps", hang);
-  ppAmrmultigrid.query("norm_thresh", normThresh);
-  ppAmrmultigrid.query("tolerance", tolerance);
-  ppAmrmultigrid.query("max_iter", maxIter);
-  ppAmrmultigrid.query("verbosity", mgverb);
-
 
   Real old_time = m_time-m_dt;
 
@@ -776,8 +707,8 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
       s_uStarAMRMG[idir]->define(lev0Dom, *s_uStarOpFact[idir],
                                  &s_botSolverUStar, nlevels);
 
-      s_uStarAMRMG[idir]->setSolverParameters(numSmooth, numSmooth, numSmooth,
-                                              numMG, maxIter, tolerance, hang, normThresh);
+      s_uStarAMRMG[idir]->setSolverParameters(m_opt.velMGNumSmooth, m_opt.velMGNumSmooth, m_opt.velMGNumSmooth,
+                                              m_opt.velMGNumMG, m_opt.VelMGMaxIter, m_opt.velMGTolerance, m_opt.velMGHang, m_opt.velMGNormThresh);
     }
   }
 }
@@ -817,8 +748,6 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     pout() << "AMRLevelMushyLayer::defineSolvers" << endl;
   }
   CH_TIME("AMRLevelMushyLayer::defineSolvers");
-  //  Real old_time = m_time-m_dt;
-  //  Real new_time = m_time;
 
   //  bool a_homogeneous = false;
   Real alpha = 1.0;
@@ -826,25 +755,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
 
   IntVect ivGhost = m_numGhost * IntVect::Unit;
 
-  int numSmoothUp=4, numSmoothDown=1, numMG=1, maxIter=10, mgverb=0, bottomSolveIterations=40;
-  Real tolerance=1e-10, hang=1e-10, normThresh=1e-10;
-  int relaxMode = 1; // 1=GSRB, 4=jacobi
-  bool useRelaxBottomSolverForHC = true;
-
-  ParmParse ppAmrmultigrid("HCMultigrid");
-  ppAmrmultigrid.query("num_smooth_up", numSmoothUp);
-  ppAmrmultigrid.query("num_mg", numMG);
-  ppAmrmultigrid.query("hang_eps", hang);
-  ppAmrmultigrid.query("norm_thresh", normThresh);
-  ppAmrmultigrid.query("tolerance", tolerance);
-  ppAmrmultigrid.query("max_iter", maxIter);
-  ppAmrmultigrid.query("verbosity", mgverb);
-  ppAmrmultigrid.query("numSmoothDown", numSmoothDown);
-  ppAmrmultigrid.query("relaxMode", relaxMode);
-  ppAmrmultigrid.query("bottomSolveIterations", bottomSolveIterations);
-  ppAmrmultigrid.query("useRelaxBottomSolver", useRelaxBottomSolverForHC);
-
-  s_botSolverHC.m_imax = bottomSolveIterations;
+  s_botSolverHC.m_imax = m_opt.HCMultigridBottomSolveIterations;
 
   Vector<AMRLevelMushyLayer*> hierarchy;
   Vector<DisjointBoxLayout> grids;
@@ -865,8 +776,8 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     nRefCrse = coarserAMRLevel->m_ref_ratio;
   }
 
-  s_botSolverUStar.m_verbosity = max(mgverb - 2, 0);
-  s_botSolverHC.m_verbosity = max(mgverb - 2, 0);
+  s_botSolverUStar.m_verbosity = max(m_opt.HCMultigridVerbosity - 2, 0);
+  s_botSolverHC.m_verbosity = max(m_opt.HCMultigridVerbosity - 2, 0);
 
   {
 
@@ -893,9 +804,9 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
         s_uStarAMRMG[idir] =
             RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >(
                 new AMRMultiGrid<LevelData<FArrayBox> >());
-        s_uStarAMRMG[idir]->setSolverParameters(numSmoothUp, numSmoothUp, numSmoothUp,
-                                                numMG, maxIter, tolerance, hang, normThresh);
-        s_uStarAMRMG[idir]->m_verbosity = mgverb;
+        s_uStarAMRMG[idir]->setSolverParameters(m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumSmoothUp,
+                                                m_opt.HCMultigridNumMG, m_opt.HCMultigridMaxIter, m_opt.HCMultigridTolerance, m_opt.HCMultigridHang, m_opt.HCMultigridNormThresh);
+        s_uStarAMRMG[idir]->m_verbosity = m_opt.HCMultigridVerbosity;
       }
     }
   }
@@ -1035,7 +946,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
                alpha, aCoef, beta, bCoef,
                enthalpySolidus, enthalpyLiquidus, enthalpyEutectic,
                mlParamsPtr, temperature_Sl_BC,
-               relaxMode, porosityEdgeBC);
+               m_opt.HCMultigridRelaxMode, porosityEdgeBC);
 
   if (m_opt.nonlinearHCOpSuperOptimised)
   {
@@ -1057,7 +968,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     s_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
         new AMRFASMultiGrid<LevelData<FArrayBox> >());
 
-    if (useRelaxBottomSolverForHC)
+    if (m_opt.HCMultigridUseRelaxBottomSolverForHC)
     {
       s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverHC,
                                maxAMRlevels);
@@ -1069,9 +980,9 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
                                maxAMRlevels);
     }
 
-    s_multiCompFASMG->setSolverParameters(numSmoothDown, numSmoothUp, numSmoothUp, numMG,
-                                          maxIter, tolerance, hang, normThresh);
-    s_multiCompFASMG->m_verbosity = mgverb;
+    s_multiCompFASMG->setSolverParameters(m_opt.HCMultigridNumSmoothDown, m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumMG,
+                                          m_opt.HCMultigridMaxIter, m_opt.HCMultigridTolerance, m_opt.HCMultigridHang, m_opt.HCMultigridNormThresh);
+    s_multiCompFASMG->m_verbosity = m_opt.HCMultigridVerbosity;
 
 
 
@@ -1181,9 +1092,7 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
     diag_timescale = 1.0;
   }
 
-  Real convCrit = 1e-4;
-  ppMain.query("steady_state", convCrit);
-  m_diagnostics.define(diag_timescale, s_verbosity, convCrit/10);
+  m_diagnostics.define(diag_timescale, s_verbosity, m_opt.steadyStateCondition/10);
 
   if (s_verbosity > 5)
   {
@@ -1192,146 +1101,14 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
 
   /// Porosity for Darcy-Brinkman, permeability for Darcy
   m_pressureScaleVar = solvingFullDarcyBrinkman() ? m_porosity : m_permeability ;
-  ppMain.query("pressureScaleVar", m_pressureScaleVar);
+
+  // This shouldn't be an option.
+//  ppMain.query("pressureScaleVar", m_pressureScaleVar);
 
   s_implicit_reflux = (m_parameters.prandtl > 0);
 
-  m_parameters.m_nondimensionalisation = 0;
-  ppMain.query("nondimensionalisation", m_parameters.m_nondimensionalisation);
 
 
-  if (!solvingFullDarcyBrinkman() && m_parameters.m_nondimensionalisation != m_parameters.m_diffusiveTime_advectiveVel)
-  {
-    MayDay::Error("Need to choose diffusive timescale/advection velocity scale for solving Darcy flow.");
-  }
-
-  if (m_parameters.m_nondimensionalisation == m_parameters.m_darcyTime_advectiveVel)
-  {
-    if (m_level == 0)
-    {
-      pout() << "Darcy timescale, advective velocity scale" << endl;
-    }
-    // To avoid dividing by 0 when Da = Pr = 0
-    if (m_parameters.darcy == m_parameters.prandtl)
-    {
-      m_parameters.m_heatDiffusionCoeff = 1;
-    }
-    else
-    {
-      m_parameters.m_heatDiffusionCoeff = m_parameters.darcy/m_parameters.prandtl;
-    }
-    //    m_parameters.m_saltDiffusionCoeff = m_parameters.darcy/(m_parameters.prandtl*m_parameters.lewis);
-    m_parameters.m_saltDiffusionCoeff = m_parameters.m_heatDiffusionCoeff/m_parameters.lewis;
-    m_parameters.m_viscosityCoeff = m_parameters.darcy;
-
-    m_parameters.m_buoyancyTCoeff = m_parameters.rayleighTemp*m_parameters.darcy*m_parameters.darcy*m_parameters.prandtl;
-    m_parameters.m_buoyancySCoeff = m_parameters.rayleighComposition*m_parameters.darcy*m_parameters.darcy*m_parameters.prandtl;
-    m_parameters.m_darcyCoeff = 1.0;
-    m_parameters.m_advectionCoeff = 1.0;
-
-
-  }
-  else if (m_parameters.m_nondimensionalisation == m_parameters.m_diffusiveTime_advectiveVel)
-  {
-    if (m_level == 0)
-    {
-      pout() << "Diffusive timescale, advective velocity scale" << endl;
-    }
-    m_parameters.m_heatDiffusionCoeff = 1.0;
-    m_parameters.m_saltDiffusionCoeff = 1/m_parameters.lewis;
-    m_parameters.m_viscosityCoeff = m_parameters.prandtl;
-    m_parameters.m_buoyancyTCoeff = m_parameters.prandtl*m_parameters.rayleighTemp;
-    m_parameters.m_buoyancySCoeff = m_parameters.prandtl*m_parameters.rayleighComposition;
-    m_parameters.m_darcyCoeff = m_parameters.prandtl/m_parameters.darcy;
-    m_parameters.m_advectionCoeff = 1.0;
-
-    if (!solvingFullDarcyBrinkman())
-    {
-      m_parameters.m_buoyancyTCoeff = m_parameters.rayleighTemp;
-      m_parameters.m_buoyancySCoeff = m_parameters.rayleighComposition;
-    }
-  }
-  else if (m_parameters.m_nondimensionalisation == m_parameters.m_darcyTime_darcyVel)
-  {
-    if (m_level == 0)
-    {
-      pout() << "Darcy timescale, darcy velocity scale" << endl;
-    }
-
-    m_parameters.m_heatDiffusionCoeff = m_parameters.darcy/m_parameters.prandtl;
-    m_parameters.m_saltDiffusionCoeff = m_parameters.m_heatDiffusionCoeff/m_parameters.lewis;
-    m_parameters.m_viscosityCoeff = m_parameters.darcy;
-    m_parameters.m_buoyancyTCoeff = 1.0; //m_parameters.rayleighTemp*m_parameters.darcy*m_parameters.darcy*m_parameters.prandtl;
-    m_parameters.m_buoyancySCoeff = m_parameters.rayleighComposition/m_parameters.rayleighTemp; //m_parameters.rayleighComposition*m_parameters.darcy*m_parameters.darcy*m_parameters.prandtl;
-    m_parameters.m_darcyCoeff = 1.0;
-    m_parameters.m_advectionCoeff = m_parameters.rayleighTemp*m_parameters.darcy*m_parameters.darcy/m_parameters.prandtl;
-  }
-  else if (m_parameters.m_nondimensionalisation == m_parameters.m_advectiveTime_darcyVel)
-  {
-    if (m_level == 0)
-    {
-      pout() << "Advective timescale, darcy velocity scale" << endl;
-    }
-
-    m_parameters.m_heatDiffusionCoeff = 1/(m_parameters.darcy*m_parameters.rayleighTemp);///m_parameters.prandtl;
-    m_parameters.m_saltDiffusionCoeff = m_parameters.m_heatDiffusionCoeff/m_parameters.lewis;
-    m_parameters.m_viscosityCoeff = m_parameters.prandtl/(m_parameters.darcy*m_parameters.rayleighTemp);
-    m_parameters.m_buoyancyTCoeff = m_parameters.prandtl/(m_parameters.darcy*m_parameters.rayleighTemp); //m_parameters.rayleighTemp*m_parameters.darcy*m_parameters.darcy*m_parameters.prandtl;
-    m_parameters.m_buoyancySCoeff = m_parameters.m_buoyancyTCoeff*(m_parameters.rayleighComposition/m_parameters.rayleighTemp); //m_parameters.rayleighComposition*m_parameters.darcy*m_parameters.darcy*m_parameters.prandtl;
-    m_parameters.m_darcyCoeff = m_parameters.prandtl/(m_parameters.darcy*m_parameters.darcy*m_parameters.rayleighTemp);
-    m_parameters.m_advectionCoeff = 1.0;
-  }
-  else if (m_parameters.m_nondimensionalisation == m_parameters.m_buoyancyTime_advectiveVel)
-  {
-    if (m_level == 0)
-    {
-      pout() << "Buoyancy timescale, advective velocity scale" << endl;
-    }
-
-    Real R = m_parameters.rayleighComposition;
-    if (R == 0)
-    {
-      if (m_parameters.rayleighTemp == 0)
-      {
-        MayDay::Error("AMRLevelMushyLayer::define - Can't nondimensionalise with buoyancy timescale if RaT=RaC=0!!");
-      }
-      R = m_parameters.rayleighTemp;
-    }
-
-    m_parameters.m_heatDiffusionCoeff = 1/sqrt(R*m_parameters.prandtl);
-    m_parameters.m_saltDiffusionCoeff = m_parameters.m_heatDiffusionCoeff/m_parameters.lewis;
-
-    m_parameters.m_viscosityCoeff = sqrt(m_parameters.prandtl/R);
-
-    m_parameters.m_darcyCoeff = (1/m_parameters.darcy)*sqrt(m_parameters.prandtl/R);
-    m_parameters.m_advectionCoeff = 1.0;
-
-    // Avoid dividing by zero
-    if (m_parameters.rayleighComposition != 0)
-    {
-      m_parameters.m_buoyancySCoeff = 1;
-      m_parameters.m_buoyancyTCoeff = m_parameters.rayleighTemp/m_parameters.rayleighComposition;
-    }
-    else
-    {
-      m_parameters.m_buoyancySCoeff = 0;
-      m_parameters.m_buoyancyTCoeff = 1;
-    }
-
-  }
-  else
-  {
-    MayDay::Error("Unknown non dimensionalisation");
-  }
-
-  // Finally, option to manually set certain terms if we want (for testing purposes)
-  ppMain.query("heatDiffusionCoeff", m_parameters.m_heatDiffusionCoeff );
-  ppMain.query("saltDiffusionCoeff",  m_parameters.m_saltDiffusionCoeff);
-  ppMain.query("viscosityCoeff", m_parameters.m_viscosityCoeff );
-  ppMain.query("buoyancyTCoeff", m_parameters.m_buoyancyTCoeff );
-  ppMain.query("buoyancySCoeff", m_parameters.m_buoyancySCoeff);
-  ppMain.query("darcyCoeff",  m_parameters.m_darcyCoeff );
-  ppMain.query("advectionCoeff",  m_parameters.m_advectionCoeff );
 
   // Use inviscid BCs if darcy term likely to dominate
   // This may need more care, particularly re:specific boundaries

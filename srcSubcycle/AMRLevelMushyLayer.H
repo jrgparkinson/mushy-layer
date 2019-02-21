@@ -35,6 +35,7 @@
 #include "RelaxSolver.H"
 #include "AMRFASMultiGrid.H"
 #include "Gradient.H"
+#include "ParmParse.H"
 
 #include "computeSum.H"
 #include "computeNorm.H"

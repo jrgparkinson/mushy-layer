@@ -24,7 +24,7 @@
 #include "AMRMultiGrid.H"
 #include "AMRFASMultiGrid.H"
 
-#include "ParmParse.H"
+
 #include "SetValLevel.H"
 #include "BackwardEuler.H"
 #include "VCAMRPoissonOp2.H"
@@ -1004,15 +1004,9 @@ void AMRLevelMushyLayer::updateEnthalpyVariablesOld()
 }
 
 
-
-
 int AMRLevelMushyLayer::getMaxLevel()
 {
-  int maxLevel = -1;
-  ParmParse pp("main");
-  pp.get("max_level", maxLevel);
-
-  return maxLevel;
+  return m_opt.max_possible_level;
 }
 
 

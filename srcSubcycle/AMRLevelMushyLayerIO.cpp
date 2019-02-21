@@ -604,16 +604,6 @@ writePlotHeader(HDF5Handle& a_handle) const
     pout() << "AMRLevelMushyLayer::writePlotHeader" << endl;
   }
 
-  ParmParse pp("main");
-  bool writeChkFile = false;
-    pp.query("writePltAsChkFile", writeChkFile);
-
-    if (writeChkFile)
-    {
-      writeCheckpointHeader(a_handle);
-      return;
-    }
-
   // Setup the number of components -- include space for error
   HDF5HeaderData header;
   header.m_int["num_components"] = m_numOutputComps;
@@ -656,33 +646,6 @@ writePlotLevel(HDF5Handle& a_handle) const
     pout() << "AMRLevelMushyLayer::writePlotLevel (level " << m_level << ")" << endl;
   }
 
-  // Add some debugging options
-  bool writeBoxes = true;
-  bool writeScalars = true;
-  bool writeVectors = true;
-
-  ParmParse pp("main");
-  pp.query("writeBoxes", writeBoxes);
-  pp.query("writeScalars", writeScalars);
-  pp.query("writeVectors", writeVectors);
-
-  bool writeSeparateData = false;
-  pp.query("writePltFileDataSeperately", writeSeparateData);
-
-  bool writeChkFile = false;
-  pp.query("writePltAsChkFile", writeChkFile);
-
-  if (writeChkFile)
-  {
-    writeCheckpointLevel(a_handle);
-    return;
-  }
-
-
-  if (writeSeparateData && s_verbosity >= 5)
-    {
-    pout() << "Writing data separately " << endl;
-    }
 
   // Setup the level string
   char levelStr[20];
@@ -717,28 +680,18 @@ writePlotLevel(HDF5Handle& a_handle) const
   const DisjointBoxLayout& levelGrids = m_scalarNew[0]->getBoxes();
     if (s_verbosity >= 5) { pout() << "AMRLevelMushyLayer::writePlotLevel - got levelGrids" << endl; }
 
-    if (writeBoxes)
-    {
+
     write(a_handle,levelGrids);
-    }
+
 
   // Write the data for this level
   LevelData<FArrayBox> plotData(levelGrids, m_numOutputComps);
 
   // first copy data to plot data holder
-  if (writeScalars)
-  {
+
 
     for (int i=0; i < m_outputScalarVars.size(); i++)
     {
-
-      if (writeSeparateData)
-      {
-        int var = m_outputScalarVars[i];
-        write(a_handle,*m_scalarNew[var],m_scalarVarNames[var]);
-      }
-      else
-      {
         m_scalarNew[m_outputScalarVars[i]]->copyTo(m_scalarNew[i]->interval(), plotData,
                                                    Interval(i, i));
 
@@ -750,14 +703,9 @@ writePlotLevel(HDF5Handle& a_handle) const
             plotData[dit].plus(-1, i);
           }
         }
-      }
-
     }
 
-  }
 
-  if (writeVectors)
-  {
 
     Interval vecSrcComps(0, SpaceDim-1);
     for (int i = 0; i<m_outputVectorVars.size(); i++)
@@ -765,40 +713,13 @@ writePlotLevel(HDF5Handle& a_handle) const
       int startComp = m_outputScalarVars.size() + (i*SpaceDim);
       Interval destComps(startComp, startComp + SpaceDim-1);
 
-      if (writeSeparateData)
-      {
-          int var = m_outputVectorVars[i];
-          write(a_handle,*m_vectorNew[var],m_vectorVarNames[var]);
-      }
-      else
-      {
-
-
       m_vectorNew[m_outputVectorVars[i]]->copyTo(vecSrcComps, plotData, destComps);
-      }
+
     }
-  }
-
-//  plotData.exchange(plotData.interval());
-
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::writePlotLevel - made plotData" << endl;
-  }
 
 
-
-
-  if (s_verbosity >= 5) {  pout() << "AMRLevelMushyLayer::writePlotLevel - wrote levelGrids" << endl;}
-
-  if(!writeSeparateData)
-  {
   write(a_handle,plotData,"data");
-  }
 
-  if (s_verbosity >= 5) { pout() << "AMRLevelMushyLayer::writePlotLevel - data written" << endl; }
-
-//  write(a_handle, m_advVel, "advVel");
 
   if (s_verbosity >= 5)
   {
@@ -814,13 +735,10 @@ void AMRLevelMushyLayer::writePlotFile(int iter)
   {
     pout() << "AMRLevelMushyLayer::writePlotFile() " << endl;
   }
-  string  m_plotfile_prefix;
-  ParmParse pp("main");
-  pp.query("plot_prefix", m_plotfile_prefix);
 
   int m_cur_step = m_time/m_dt;
 
-  string iter_str = m_plotfile_prefix;
+  string iter_str = m_opt.plotfile_prefix;
 
   char suffix[100];
   sprintf(suffix,"%06dlev%diter%d.%dd.hdf5",m_cur_step,m_level,iter,SpaceDim);
@@ -876,15 +794,6 @@ void AMRLevelMushyLayer::getExtraPlotFields()
 
     Divergence::levelDivergenceMAC(*m_scalarNew[ScalarVars::m_divUcorr], m_projection.grad_eLambda(), m_dx);
 
-    bool scaleMACBCWithChi = false;
-    Real BCscale = 1.0;
-    ParmParse pp("projection");
-    pp.query("scaleMACBCWithChi", scaleMACBCWithChi);
-
-    pp.query("MACbcScale", BCscale);
-
-//    Real phiScale = m_projection.getPhiScale(m_dt);
-
     AMRLevelMushyLayer* coarsestML = this->getCoarsestLevel();
     Real coarsestDt = coarsestML->dt();
 
@@ -893,9 +802,7 @@ void AMRLevelMushyLayer::getExtraPlotFields()
       (*m_scalarNew[ScalarVars::m_MACBC])[dit].mult(0.5*m_dt);
 
 //      (*m_scalarNew[ScalarVars::m_CCrhs])[dit].mult(m_dt);
-
 //      (*m_scalarNew[ScalarVars::m_MACrhs])[dit].mult(phiScale);
-
 
 //      if (scaleMACBCWithChi)
 //      {

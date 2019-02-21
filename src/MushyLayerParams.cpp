@@ -137,6 +137,10 @@ void MushyLayerParams::getParameters()
   CH_TIME("MushyLayerParams::getParameters()");
 
   ParmParse pp("parameters");
+  ParmParse ppMain("main");
+
+  m_nondimensionalisation = 0;
+  ppMain.query("nondimensionalisation", m_nondimensionalisation);
 
   int phys_problem;
   pp.get("problem_type", phys_problem);
@@ -628,7 +632,128 @@ void MushyLayerParams::getParameters()
 
 
 
+  // Now sort out nondimensionalisation
+  if (!isDarcyBrinkman()
+      && m_nondimensionalisation != m_diffusiveTime_advectiveVel)
+  {
+    MayDay::Error("Need to choose diffusive timescale/advection velocity scale for solving Darcy flow.");
+  }
 
+  if (m_nondimensionalisation == m_darcyTime_advectiveVel)
+  {
+    pout() << "Darcy timescale, advective velocity scale" << endl;
+
+    // To avoid dividing by 0 when Da = Pr = 0
+    if (darcy == prandtl)
+    {
+      m_heatDiffusionCoeff = 1;
+    }
+    else
+    {
+      m_heatDiffusionCoeff = darcy/prandtl;
+    }
+    m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
+    m_viscosityCoeff = darcy;
+
+    m_buoyancyTCoeff = rayleighTemp*darcy*darcy*prandtl;
+    m_buoyancySCoeff = rayleighComposition*darcy*darcy*prandtl;
+    m_darcyCoeff = 1.0;
+    m_advectionCoeff = 1.0;
+
+
+  }
+  else if (m_nondimensionalisation == m_diffusiveTime_advectiveVel)
+  {
+    pout() << "Diffusive timescale, advective velocity scale" << endl;
+
+    m_heatDiffusionCoeff = 1.0;
+    m_saltDiffusionCoeff = 1/lewis;
+    m_viscosityCoeff = prandtl;
+    m_buoyancyTCoeff = prandtl*rayleighTemp;
+    m_buoyancySCoeff = prandtl*rayleighComposition;
+    m_darcyCoeff = prandtl/darcy;
+    m_advectionCoeff = 1.0;
+
+    if (!isDarcyBrinkman())
+    {
+      m_buoyancyTCoeff = rayleighTemp;
+      m_buoyancySCoeff = rayleighComposition;
+    }
+  }
+  else if (m_nondimensionalisation == m_darcyTime_darcyVel)
+  {
+
+    pout() << "Darcy timescale, darcy velocity scale" << endl;
+
+
+    m_heatDiffusionCoeff = darcy/prandtl;
+    m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
+    m_viscosityCoeff = darcy;
+    m_buoyancyTCoeff = 1.0; //rayleighTemp*darcy*darcy*prandtl;
+    m_buoyancySCoeff = rayleighComposition/rayleighTemp; //rayleighComposition*darcy*darcy*prandtl;
+    m_darcyCoeff = 1.0;
+    m_advectionCoeff = rayleighTemp*darcy*darcy/prandtl;
+  }
+  else if (m_nondimensionalisation == m_advectiveTime_darcyVel)
+  {
+    pout() << "Advective timescale, darcy velocity scale" << endl;
+
+    m_heatDiffusionCoeff = 1/(darcy*rayleighTemp);///prandtl;
+    m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
+    m_viscosityCoeff = prandtl/(darcy*rayleighTemp);
+    m_buoyancyTCoeff = prandtl/(darcy*rayleighTemp); //rayleighTemp*darcy*darcy*prandtl;
+    m_buoyancySCoeff = m_buoyancyTCoeff*(rayleighComposition/rayleighTemp); //rayleighComposition*darcy*darcy*prandtl;
+    m_darcyCoeff = prandtl/(darcy*darcy*rayleighTemp);
+    m_advectionCoeff = 1.0;
+  }
+  else if (m_nondimensionalisation == m_buoyancyTime_advectiveVel)
+  {
+    pout() << "Buoyancy timescale, advective velocity scale" << endl;
+
+    Real R = rayleighComposition;
+    if (R == 0)
+    {
+      if (rayleighTemp == 0)
+      {
+        MayDay::Error("MushyLayerParams - Can't nondimensionalise with buoyancy timescale if RaT=RaC=0!!");
+      }
+      R = rayleighTemp;
+    }
+
+    m_heatDiffusionCoeff = 1/sqrt(R*prandtl);
+    m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
+
+    m_viscosityCoeff = sqrt(prandtl/R);
+
+    m_darcyCoeff = (1/darcy)*sqrt(prandtl/R);
+    m_advectionCoeff = 1.0;
+
+    // Avoid dividing by zero
+    if (rayleighComposition != 0)
+    {
+      m_buoyancySCoeff = 1;
+      m_buoyancyTCoeff = rayleighTemp/rayleighComposition;
+    }
+    else
+    {
+      m_buoyancySCoeff = 0;
+      m_buoyancyTCoeff = 1;
+    }
+
+  }
+  else
+  {
+    MayDay::Error("Unknown non dimensionalisation");
+  }
+
+  // Finally, option to manually set certain terms if we want (for testing purposes)
+  ppMain.query("heatDiffusionCoeff", m_heatDiffusionCoeff );
+  ppMain.query("saltDiffusionCoeff",  m_saltDiffusionCoeff);
+  ppMain.query("viscosityCoeff", m_viscosityCoeff );
+  ppMain.query("buoyancyTCoeff", m_buoyancyTCoeff );
+  ppMain.query("buoyancySCoeff", m_buoyancySCoeff);
+  ppMain.query("darcyCoeff",  m_darcyCoeff );
+  ppMain.query("advectionCoeff",  m_advectionCoeff );
 
 
 

@@ -154,6 +154,10 @@ enum PorosityFunctions
 struct MushyLayerOptions {
 
   string output_dir;
+  string plotfile_prefix;
+
+  bool minimalOutput;
+  bool debug;
 
   Real steadyStateCondition;
   bool ignoreVelocitySteadyState;
@@ -238,6 +242,8 @@ struct MushyLayerOptions {
   bool doProjection;
   bool useIncrementalPressure;
   Real phiScale;
+  bool scaleMACBCWithChi;
+  Real MACBCscale;
 
   bool doSyncOperations;
   bool enforceAnalyticSoln;
@@ -247,6 +253,8 @@ struct MushyLayerOptions {
   bool scaleP_MAC;
   bool scaleP_CC;
   bool explicitDarcyTerm;
+  bool usePiAdvectionBCs;
+  int projection_verbosity;
 
   bool implicitAdvectionSolve;
   bool usePhiForImplicitAdvectionSolve;
@@ -291,6 +299,8 @@ struct MushyLayerOptions {
   bool CCAdvSrc;
   bool CCDarcySrc;
   bool CCBuoyancySrc;
+  bool CCPressureSrc;
+  bool CCPressureSrcOverride;
 
   bool do_postRegrid_smoothing;
   bool reflux_momentum;
@@ -315,9 +325,53 @@ struct MushyLayerOptions {
   Real AMRMultigridHang;
   Real AMRMultigridNormThresh;
 
+  int velMGNumSmooth;
+  Real velMGTolerance;
+  Real velMGHang;
+  int velMGNumMG;
+  Real velMGNormThresh;
+  int VelMGMaxIter;
+
+  int HCMultigridNumSmoothUp;
+  int HCMultigridNumSmoothDown;
+  int HCMultigridNumMG;
+  int HCMultigridMaxIter;
+  int HCMultigridVerbosity;
+  int HCMultigridBottomSolveIterations;
+  Real HCMultigridTolerance;
+  Real HCMultigridHang;
+  Real HCMultigridNormThresh;
+  int HCMultigridRelaxMode; // 1=GSRB, 4=jacobi
+  bool HCMultigridUseRelaxBottomSolverForHC;
+
+  int velAdvNormalPredOrder;
+  bool velAdvUseFourthOrderSlopes;
+  bool velAdvHigherOrderLimiter;
+  bool velAdvUseArtVisc;
+  Real velAdvArtVisc;
+  bool HCUseArtVisc;
+  Real HCArtVisc;
+  int HCNormalPredOrder;
+  bool HCUseFourthOrderSlopes;
+  bool HCHigherOrderLimiter;
+
   int taggingVar;
   int taggingVectorVar;
   TaggingMethod taggingMethod;
+  Real min_regrid_time;
+  Real fixed_grid_time;
+  bool tagDomainBoundary;
+  bool tagMLboundary;
+  bool tag_velocity;
+  Real vel_thresh;
+  bool tag_plume_mush;
+  Real plumeVelThreshold;
+  Real plumeSalinityThreshold;
+  Real taggingMarginalPorosityLimit;
+  Real regridTime;
+  // Tag cells in the centre of the domain to make a box of this size. Leave as 0 (default) to do nothing
+  int tagCenterBoxSize;
+  bool testRegridCoarsening;
 
   bool scalarHOinterp;
   bool vectorHOinterp;
@@ -331,6 +385,7 @@ struct MushyLayerOptions {
   bool computeFreestreamCorrection;
   bool regrid_advect_before_freestream;
   bool regrid_freestream_subcycle;
+  Real regrid_eta_scale;
 
   int iter_plot_interval;
 
