@@ -34,7 +34,7 @@ def create_refined_restart(argv):
     
     out_file = os.path.join(new_dir, 'restart.2d.hdf5')
 
-  
+
     new_inputs = {'inFile': prev_chk_file,
                   'run_inputs': old_inputs_loc,
                   'outFile': out_file,
