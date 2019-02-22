@@ -114,15 +114,40 @@ permeabilityLo
 ```
 
 # Dimensionless parameters
-main.nondimensionalisation=0
+`main.nondimensionalisation=0` choose nondimensionalisation, different options are:
+0. Diffusive timescale, advective velocity scale
+1. Darcy timescales, advective velocity scale
+2. Darcy timescale, darcy velocity scale
+3. Advective timescale, darcy velocity scale
+4. Buoyancy timescale, advective velocity scale
 
-parameters.problem_type=0 # 0 = mushy layer
+`parameters.problem_type=0` can specify different problem types, which can tell the code to solve some of the equations differently. Lots of the options aren't really used anymore (and maybe don't work). Ones which definitely should work are in bold.
+0. *mushyLayer*
+1. burgersSi
+2. burgersPeriodic
+3. poiseuilleFlow
+4. diffusion
+5. *solidificationNoFlow*
+6. cornerFlow
+7. sidewallHeating
+8. HRL
+9. rayleighBenard
+10. soluteFluxTest
+11. refluxTest
+12. zeroPorosityTest
+13. meltingIceBlock
+14. *convectionMixedPorous*
+15. vortexPair
 
-parameters.compositionRatio=1.18
-parameters.nonDimReluctance=0.1 # smaller means wider hele-shaw gap width
-parameters.rayleighComp=500
-parameters.rayleighTemp=25.0
-parameters.stefan=5.0
+`parameters.compositionRatio=1.18` composition ratio, should be >= 1.0.
+
+`parameters.nonDimReluctance=0.1` inverse of the dimensionless Hele-Shaw permeabilty. Smaller means wider hele-shaw gap width. 
+
+`parameters.rayleighComp=500` rayleigh number for compositional differences. When just solving Darcy's equation, this is the mushy layer number. Otherwise, it's the fluid rayleigh number.
+
+`arameters.rayleighTemp=25.0` rayleigh number for temperature.
+
+`parameters.stefan=5.0` stefan number
 
 parameters.K=1  # solid/liquid heat diffusivity ratio
 parameters.heatConductivityRatio=1
