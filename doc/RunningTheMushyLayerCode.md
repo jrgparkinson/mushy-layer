@@ -27,14 +27,16 @@ We do most of this in either `/mushy-layer/srcSubcycle/MushyLayerSubcycleUtils.c
 Most of these options/parameters can just be left at their default values. The inputs file at `/mushy-layer/examples/meltponds/inputsGrowSeaIce` illustrates the main options you may wish to change, which are described in more detail below under some roughly suitable headings.
 
 # General options
-`main.verbosity=2` verbosity
-*main.output_folder=.
-*main.plot_prefix=plt
-*main.plot_interval=-1  # step interval to produce plot files (-1 = don't use this option)
-*main.checkpoint_interval=1000
-*main.debug=false  # set to true to produce more output
-*main.plot_period=0.005  # time intervals to produce plot files
-*main.chk_prefix=chk
+`main.verbosity=2` larger verbosity means there will be more text output produced
+
+`main.output_folder=.` folder to save plot/checkpoint files to a period `.` means the directory from which the code was executed
+
+`main.plot_prefix=plt` prefix for plot files, which will then be like `plt001234.2d.hdf5`
+`main.chk_prefix=chk` prefix for checkpoint files
+`main.plot_interval=n`  produce plot files every `n` steps (-1 = don't use this option)
+`main.checkpoint_interval=n` produce checkpoints files every `n` steps
+`main.plot_period=0.005` time interval at which to write out plot files
+`main.debug=false`  set to true to write more fields to the plot files
 
 # Timestepping
 *main.cfl=0.1
