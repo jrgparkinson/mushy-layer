@@ -1,8 +1,10 @@
 ## Installing everything
 This is an attempt at listing the steps required to install Chombo on a unix system. It likely contains various holes where I forgot I had done something to get it working - please send any additions or corrections to [jamie.parkinson@gmail.com], thanks.
 
+To start with, you'll need to satisfy the prerequisites listed in `Chombo/doc/ChomboDesign.pdf`. In particular, you'll need Fortran compilers and C++ compilers that are sufficiently up to date.
+
 # Fortran
-gfortran works well on ubuntu, my installation looks like
+gfortran works well on Ubuntu, my installation looks like
 
 ```console
 parkinsonjl@atmlxlap005:~$ gfortran --version
@@ -10,7 +12,7 @@ GNU Fortran (Ubuntu 4.8.4-2ubuntu1~14.04.4) 4.8.4
 ```
 
 # C++ compiler
-Make sure you have a sufficient compiler version, as detailed in the ChomboDesign doc. Mine looks like
+Make sure you have a sufficient compiler version. Mine looks like
 
 ```console
 parkinsonjl@atmlxlap005:~$ mpicc --version
@@ -36,12 +38,11 @@ Once installed make sure you set the evironment variable
 
 Do this in your .bashrc or whatever gets called whenever you open a terminal so it's always there.
 
-
 # Chombo
 Chombo download instructions are available at [https://anag-repo.lbl.gov/chombo-3.2/access.html]. You need to register for an account, then you can get the code using svn:
 
 ```console
-$ svn --username username co https://anag-repo.lbl.gov/svn/Chombo/trunk/ /your/path/to/chombo/
+$ svn --username username co https://anag-repo.lbl.gov/svn/Chombo/trunk/   /your/path/to/chombo/
 ```
 
 Then you need to make a `/lib/mk/Make.defs.local` file for your system. I am using the following options:
