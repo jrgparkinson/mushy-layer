@@ -23,24 +23,24 @@ If you have any issues, please contact [james.parkinson@physics.ox.ac.uk].
 Cloning the repository from GitHub is straightforward:
 
 ```console
-$ git clone https://github.com/jrgparkinson/mushy-layer.git
+$ git clone https://github.com/jrgparkinson/mushy-layer.git mushy-layer
 ```
 
 To fetch and merge any changes to the library, use `git pull`.
 
 
 # Installation
-To compile the code, you must first have a working Chombo installation (see the ChomboInstallationGuide.md file in the docs folder). Define the path to your chombo library folder in the GNUMakefile (`/execSubcyle/GNUMakefile/`) then you should be able to compile by
+To compile the code, you must first have a working Chombo installation (see the ChomboInstallationGuide.md file in the docs folder). Define the path to your chombo library folder in the GNUMakefile (`/execSubcyle/GNUMakefile`) then you should be able to compile by
 
 ```console
-$ cd /execSubcycle/
+$ cd ~/mushy-layer/execSubcycle/
 $ make all
 ```
 
 You should also add an environment variable `MUSHY_LAYER_DIR` which points to `/path/to/mushy-layer/` for some of the python scripts to work. E.g.
 
 ```console
-EXPORT MUSHY_LAYER_DIR=/path/to/mushy-layer/
+export MUSHY_LAYER_DIR=/path/to/mushy-layer/
 ```
 
 
