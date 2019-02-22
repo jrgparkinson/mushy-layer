@@ -56,6 +56,8 @@ where inputs is a file in `/execSubcycle/`.
 
 For more details on how to setup your inputs file for the problem you're interested in, see `/docs/RunningTheMushyLayerCode.md/`.
 
+There are example problems, with input files, in the `/examples/` directory.
+
 # Documentation
 Documentation can be generated using Doyxgen if it is installed. A default configuration file can be found in the `/docs/` directory, which can be run via:
 
