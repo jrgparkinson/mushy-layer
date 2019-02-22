@@ -1,0 +1,75 @@
+
+bc.bulkConcentrationHiVal=-1 -1
+bc.bulkConcentrationLoVal=-1 -1
+bc.enthalpyHiVal=0.0 -0.5
+bc.enthalpyLoVal=0.0 6.5
+bc.scalarHi=1 0
+bc.scalarLo=1 2
+bc.velHi=0 0
+bc.velLo=0 3
+
+
+main.block_factor=1
+main.cfl=0.3
+main.checkpoint_interval=10000
+main.plot_period=0.002
+main.doEuler=0
+
+main.domain_height=0.4
+main.dt_tolerance_factor=1.01
+
+main.fill_ratio=0.75
+main.grid_buffer_size=1
+main.ignoreSolverFails=false
+main.initialPerturbation=0.05
+main.perturbationSin=true
+main.initial_cfl=0.1
+
+main.max_dt=1e-1
+main.max_dt_growth=1.01
+main.max_grid_size=128
+main.max_level=0
+main.max_step=99999
+main.max_time=2.0
+main.min_time=0.5
+main.num_cells=32 64
+main.output_folder=.
+main.periodic_bc=0 0 1
+
+main.ref_ratio=2 2 
+
+main.refine_thresh=0.1
+main.regrid_interval=4 4 8
+
+main.steadyStateNormType=0
+main.steady_state=1e-3
+
+main.tag_buffer_size=4
+
+main.time_integration_order=1
+main.use_limiting=true
+main.use_subcycling=0
+main.verbosity=2
+
+parameters.compositionRatio=6.0
+parameters.darcy=0.0
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.heatConductivityRatio=1
+parameters.heleShaw=false
+parameters.initialComposition=35
+parameters.lewis=200
+parameters.liquidusSlope=-0.1
+parameters.nonDimReluctance=0.1
+parameters.nonDimVel=1.0
+parameters.permeabilityFunction=1
+parameters.problem_type=0
+parameters.rayleighComp=200
+parameters.rayleighTemp=0.0
+parameters.specificHeatRatio=1
+parameters.stefan=5
+parameters.waterDistributionCoeff=1e-5
+projection.eta=0.0
+
+projection.useIncrementalPressure=1
+
