@@ -9,7 +9,8 @@ import socket
 
 def get_base_output_dir():
     #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
-    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDiffusiveTimescale/'
+    #base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDiffusiveTimescale/'
+    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestFinal/'
 
     if not os.path.exists(base_output_dir):
         os.makedirs(base_output_dir)

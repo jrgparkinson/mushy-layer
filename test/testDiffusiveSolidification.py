@@ -9,7 +9,7 @@ from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, rea
 # 1) Diffusive solidification problem
 #######################################
 
-def diffusive_solidification_resolution_specific_params(nz_coarse, ref_rat):
+def diffusive_solidification_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
     mushyLayerBaseDir = os.environ['MUSHY_LAYER_DIR']
     params_file = os.path.join(mushyLayerBaseDir,'params/convergenceTest/noFlowConvTest.parameters')
 
