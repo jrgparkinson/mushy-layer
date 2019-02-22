@@ -220,23 +220,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
         //        (*amrMLptr->m_vectorNew[m_fluidRefluxCorr])[levelDit].plus(levelCorr[levelDit()], 0, dir, 1);
       }
 
-      // do average down
-      //      bool doAvgDown = true;
-      //      pp.query("reflux_average_down", doAvgDown);
-      //      if (doAvgDown)
-      //      {
-      //        if (lev < finest_level)
-      //        {
-      //          AMRLevelMushyLayer& fineML = *(amrMLptr->getFinerLevel());
-      //
-      //          // quick sanity check
-      //          CH_assert (fineML.m_level == lev+1);
-      //
-      //          CoarseAverage& avgDown = fineML.m_coarseAverageVector;
-      //          LevelData<FArrayBox>& fineVel = *fineML.m_vectorNew[VectorVars::m_fluidVel];
-      //          avgDown.averageToCoarse(levelVel, fineVel);
-      //        }
-      //      }
+
 
       amrMLptr = amrMLptr->getCoarserLevel();
     }
@@ -1346,11 +1330,6 @@ Real AMRLevelMushyLayer::doHCreflux()
     thisMLPtr = thisMLPtr->getFinerLevel();
   }
   CH_assert(thisMLPtr->m_level == finest_level);
-
-
-  // Check if we're doing averaging down
-//  bool m_opt.doAvgDown = true;
-//  pp.query("reflux_average_down", m_opt.doAvgDown);
 
   // Add correction to H-C fields
   // Also recalculate fluxes
