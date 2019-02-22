@@ -28,15 +28,13 @@ bc.velLo=6 3 0
 # For restarting after creating a restart file with a melt pond:
 # Uncomment these lines to grow ice in the first place
 ################################################################
-main.restart_file=/home/parkinsonjl/mushy-layer/execSubcycle/heleshaw/restart.2d.hdf5
-main.plot_prefix=meltPlt
-main.chk_prefix=meltChk
-bc.enthalpyHiVal=0 6.02
-parameters.pressureHead=5
-bc.velHi=6 9 0 # pressure head top bc
-main.plot_period=0.00002
-
-# main.debug=true # for tesating
+#main.restart_file=/home/parkinsonjl/mushy-layer/execSubcycle/heleshaw/restart.2d.hdf5
+#main.plot_prefix=meltPlt
+#main.chk_prefix=meltChk
+#bc.enthalpyHiVal=0 6.02
+#parameters.pressureHead=5
+#bc.velHi=6 9 0 # pressure head top bc
+#main.plot_period=0.00002
 
 ####################################################################
 # Below should be the same before/after melt pond added
