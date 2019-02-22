@@ -27,7 +27,7 @@ We do most of this in either `/mushy-layer/srcSubcycle/MushyLayerSubcycleUtils.c
 Most of these options/parameters can just be left at their default values. The inputs file at `/mushy-layer/examples/meltponds/inputsGrowSeaIce` illustrates the main options you may wish to change, which are described in more detail below under some roughly suitable headings.
 
 # General options
-*main.verbosity=2
+`main.verbosity=2` verbosity
 *main.output_folder=.
 *main.plot_prefix=plt
 *main.plot_interval=-1  # step interval to produce plot files (-1 = don't use this option)
