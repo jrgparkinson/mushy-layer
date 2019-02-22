@@ -32,45 +32,87 @@ Most of these options/parameters can just be left at their default values. The i
 `main.output_folder=.` folder to save plot/checkpoint files to a period `.` means the directory from which the code was executed
 
 `main.plot_prefix=plt` prefix for plot files, which will then be like `plt001234.2d.hdf5`
+
 `main.chk_prefix=chk` prefix for checkpoint files
+
 `main.plot_interval=n`  produce plot files every `n` steps (-1 = don't use this option)
+
 `main.checkpoint_interval=n` produce checkpoints files every `n` steps
+
 `main.plot_period=0.005` time interval at which to write out plot files
+
 `main.debug=false`  set to true to write more fields to the plot files
 
 # Timestepping
-*main.cfl=0.1
-*main.initial_cfl=2e-05
+`main.cfl=0.1` max allowed CFL number
 
-*main.max_dt=0.1
-*main.max_dt_growth=1.05
+`main.initial_cfl=2e-05` start simulations with a smaller CFL number. The timestep  increases thereafter as determined by `main.max_dt_growth`
 
-*main.max_step=10000
-*main.max_time=10.0
-*main.min_time=0.1
-*main.dt_tolerance_factor=1.01
+`main.max_dt=0.1` max allowed timestep
+
+`main.max_dt_growth=1.05` max fractional increase in $\Delta t$ allowed from one timestep to the next
+
+`main.max_step=10000` stop simulations after this many timesteps
+
+`main.max_time=10.0` stop simulations once this time has been reached
+
+`main.min_time=0.1` ensure simulations run until at least this time (even if a steady state condition is reached)
+
+`main.dt_tolerance_factor=1.01` Set the factor by which the current dt must exceed the new (max) dt for time subcycling to occur (i.e., reduction of the current dt by powers of 2).
 
 # Domain setup
-*main.domain_height=1.0
-*main.num_cells=64 128
-*main.periodic_bc=1 0 0
-*main.max_grid_size=256
+`main.num_cells=Nx Ny Nz` e.g.  `main.num_cells=64 128` size of the grid on the coarsest mesh. Make sure each dimensions is a power of 2 unless you want the multigrid to be slow. Only need to specify 2 dimensions if the code is compiled for 2 dimensions. The final dimension is always the 'vertical' with respect to gravity.
+
+`main.domain_height=1.0` domain height (width is then calculated from the number of grid cells specified)
+
+`main.periodic_bc=1 0` whether to enforce periodic boundaries (1) or not (0) in each dimension
+
+`main.max_grid_size=256` split domain into boxes (for sending to different processors) of max size in any dimension given by this parameter.
 
 # Boundary conditions
-Boundary condition values:
-*bc.bulkConcentrationHiVal=-1 -1
-*bc.bulkConcentrationLoVal=-1 -1
-*bc.enthalpyHiVal=0 0.9
-*bc.enthalpyLoVal=0.0 6.03
+Boundary conditions are defined in two ways. Firstly we define the type of boundary condition to apply to each side, then we define the value to use (where needed) at each side. For scalars, options are:
 
-# Boundary conditions types. 
-For scalars: 0 = dirichlet, 1 = neumann, 2 = reflection
-For velocity: 0 = solid wall, 3 = inflow/outflow, 6 = reflection,  9 = pressure head
-See BCUtil/PhysBCUtil.(h/cpp) for more info/options
-bc.scalarHi=1 0 0
-bc.scalarLo=1 2 2
-bc.velHi=6 0 0
-bc.velLo=6 3 0
+0. Dirichlet
+1. Neumann
+2. Inflow/outflow
+
+For vectors, there are lots of options, some of the most important being
+
+0. Solid wall
+3. Inflow/outflow
+6. Reflection
+9. Pressure head
+
+See BCUtil/PhysBCUtil.h for a full list of possible options.
+
+We set boundary conditions on the 'high' side of the domain in each dimension, then the 'low' side of the domain in each dimension e.g.
+
+`bc.scalarHi=1 0`  scalar BCs are neumann on the right boundary, dirichlet on the top
+
+`bc.scalarLo=1 2` scalar BCs are neumann on the left boundary, inflow/outflow at the bottom
+
+`bc.velHi=6 0` 
+
+`bc.velLo=6 3`
+
+We then specify the values of the bulk concentration and enthalpy on each boundary in a similar way
+
+`bc.bulkConcentrationHiVal=-1 -1`
+
+`bc.bulkConcentrationLoVal=-1 -1`
+
+`bc.enthalpyHiVal=0 0.9`
+
+`bc.enthalpyLoVal=0.0 6.03`
+
+Boundary values for temperature, porosity, liquid salinity etc. are computed from the specified bulk concentration and enthalpy. If needed, they can be provided explicitly using e.g
+```
+bc.temperatureLo
+bc.porosityLo
+bc.liquidConcentrationLo
+permeabilityLo
+```
+
 # Dimensionless parameters
 main.nondimensionalisation=0
 

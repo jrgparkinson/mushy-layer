@@ -9,9 +9,12 @@ You should also add the directory (`/path/to/mushy-layer/test/`) to your PYTHONP
 
 Some of the error calculation is done using the Chombo compare utility located in `/path/to/chombo/lib/util/chomboCompare`. Make sure you have compiled this program, and make sure you have defined the environmental variable `CHOMBO_HOME=/path/to/chombo/`.
 
-Analysis of the output is done via matlab scripts located in `/mushy-layer/matlab/`. You should add this directory to your matlab path via your `startup.m` file in order to run the analysis.
+Analysis of the output is done via matlab scripts located in `/mushy-layer/matlab/`. You should add this directory to your matlab path via your `startup.m` file in order to run the analysis, e.g.
+```matlab
+addpath(genpath(['~/mushy-layer/matlab/']))
+```
 
-Finally, the python scripts assume that the slurm job queuing system is accessible. If it is not, you will have to run the batch files which it creates manually. Alternatively, open up the `test/SlurmTask.py` file and edit the `SlurmTask.write_slurm_file` and `SlurmTask.run_task` methods so that they work with your setup.
+Finally, the python scripts assume that the slurm job queuing system is accessible. If it is not, you will have to run the batch files which it creates manually. Alternatively, open up the `test/BatchJob.py` file and edit the `BatchJob.write_slurm_file(...)` and `BatchJob.run_task(...)` methods so that they work with your setup.
 
 # Running the problems
 There are five test problems, which can each be run individually by calling `python filename.py (options)`:
