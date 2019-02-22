@@ -1,0 +1,119 @@
+# Inputs for a) growing sea ice and b) restarting from a state with a melt pond added
+
+main.verbosity=2
+main.output_folder=.
+main.plot_prefix=plt
+main.plot_interval=-1  # step interval to produce plot files (-1 = don't use this option)
+main.debug=false  # set to true to produce more output
+main.plot_period=0.005  # time intervals to produce plot files
+main.chk_prefix=chk
+
+# Boundary condition values
+bc.bulkConcentrationHiVal=-1 -1
+bc.bulkConcentrationLoVal=-1 -1
+bc.enthalpyHiVal=0 0.9
+bc.enthalpyLoVal=0.0 6.03
+
+# Boundary conditions types. 
+# For scalars: 0 = dirichlet, 1 = neumann, 2 = reflection
+# For velocity: 0 = solid wall, 3 = inflow/outflow, 6 = reflection,  9 = pressure head
+# See BCUtil/PhysBCUtil.(h/cpp) for more info/options
+bc.scalarHi=1 0 0
+bc.scalarLo=1 2 2
+bc.velHi=6 0 0
+bc.velLo=6 3 0
+
+################################################################
+# For restarting after creating a restart file with a melt pond:
+# Uncomment these lines to grow ice in the first place
+################################################################
+main.restart_file=/home/parkinsonjl/mushy-layer/execSubcycle/heleshaw/restart.2d.hdf5
+main.plot_prefix=meltPlt
+main.chk_prefix=meltChk
+bc.enthalpyHiVal=0 6.02
+parameters.pressureHead=5
+bc.velHi=6 9 0 # pressure head top bc
+main.plot_period=0.00002
+
+####################################################################
+# Below should be the same before/after melt pond added
+#########################################################
+
+main.cfl=0.1
+main.initial_cfl=2e-05
+
+main.ignoreSolverFails=false
+
+main.max_dt=0.1
+main.max_dt_growth=1.05
+
+main.max_step=10000
+main.max_time=10.0
+main.min_time=0.1
+main.dt_tolerance_factor=1.01
+
+main.domain_height=1.0
+main.num_cells=64 128
+main.periodic_bc=1 0 0
+main.max_grid_size=256
+
+
+main.iter_plot_interval=-1
+main.iteration_plot_interval=-1
+main.checkpoint_interval=1000
+
+
+# AMR stuff (currently somewhat irrelevant as max_level=0)
+main.max_level=0
+main.block_factor=8
+main.use_subcycling=1
+main.ref_ratio=2 2 2
+main.refine_thresh=0.1
+main.regrid_interval=8 8 8
+main.tag_buffer_size=4
+main.fill_ratio=0.75
+main.grid_buffer_size=0 0 0
+
+main.time_integration_order=2
+
+main.use_limiting=true
+
+# Don't do u.grad(u) terms
+main.doEuler=0
+
+# Diffusive timescale, advective velocity scale
+main.nondimensionalisation=0
+
+# Solving for a proper mushy layer
+parameters.problem_type=0
+
+# Key parameters at the top
+parameters.compositionRatio=1.18
+parameters.nonDimReluctance=0.1 # smaller means wider hele-shaw gap width
+parameters.rayleighComp=500
+parameters.rayleighTemp=25.0
+parameters.stefan=5.0
+
+parameters.K=1  # solid/liquid heat diffusivity ratio
+parameters.heatConductivityRatio=1
+
+parameters.lewis=100
+parameters.darcy=0.0
+parameters.prandtl=0
+
+parameters.heleShaw=true
+parameters.nonDimVel=0.0
+parameters.permeabilityFunction=2  # 2 = carman-kozeny
+
+parameters.specificHeatRatio=1
+parameters.waterDistributionCoeff=1e-5
+
+# Specify phase diagram
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.initialComposition=30
+parameters.liquidusSlope=-0.1
+
+# No freestream correction
+projection.eta=0.0
+

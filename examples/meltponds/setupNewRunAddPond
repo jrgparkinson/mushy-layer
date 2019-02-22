@@ -2,7 +2,7 @@
 inFile="/home/parkinsonjl/mushy-layer/simulations/meltpond/chk004000.2d.hdf5"
 
 # Inputs used to create original checkpoint file
-run_inputs="/home/parkinsonjl/mushy-layer/simulations/meltpond/inputsHeleShaw"
+run_inputs="/home/parkinsonjl/mushy-layer/simulations/meltpond/inputsGrowSeaIce"
 
 # Where to save the new file
 outFile  = "/home/parkinsonjl/mushy-layer/simulations/meltpond/restart.2d.hdf5"
