@@ -107,7 +107,7 @@ def testPorousMushyHole(argv):
     uniform_prefix = 'Uniform-' + physicalProblem + '-'
 
     python_compare_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'run_chombo_compare.py')
-    chombo_compare_analyse ='python %s -f %s -a -v Porosity -e L2 -r True -n 7 \n \n' % (python_compare_file, dataFolder)
+    chombo_compare_analyse ='python %s -f %s -a -v Porosity -e L2 -r True -n 8 \n \n' % (python_compare_file, dataFolder)
 
     make_figures  = 'Fig7PorousHole(\'' + dataFolder + '\', \'' + dataFolder + '\')',
     analyse_in_matlab = 'analyseVariablePorosityTest(\'' + dataFolder + '\', [' + ','.join([str(a) for a in Nz_uniform]) + '],' \
