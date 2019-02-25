@@ -171,7 +171,7 @@ end
 end
 
 function f = plotPrefixAMR(N)
-f =  ['VariableMesh2SubcycleRefluxFreestream0.95-ref2-convectionDB-',num2str(N),'--0'];
+f =  ['VM-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-convectionDB-',num2str(N),'--0'];
 end
 
 function f = plotPrefixUniform(N)
