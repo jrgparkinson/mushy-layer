@@ -141,7 +141,6 @@ permeabilityLo
 
 `parameters.compositionRatio=1.18` composition ratio, should be >= 1.0.
 
-`parameters.nonDimReluctance=0.1` inverse of the dimensionless Hele-Shaw permeabilty. Smaller means wider hele-shaw gap width. 
 
 `parameters.rayleighComp=500` rayleigh number for compositional differences. When just solving Darcy's equation, this is the mushy layer number. Otherwise, it's the fluid rayleigh number.
 
@@ -149,36 +148,61 @@ permeabilityLo
 
 `parameters.stefan=5.0` stefan number
 
-parameters.K=1  # solid/liquid heat diffusivity ratio
-parameters.heatConductivityRatio=1
+`parameters.K=1` ratio of solid/liquid heat diffusivity
 
-parameters.lewis=100
-parameters.darcy=0.0
-parameters.prandtl=0
+`parameters.heatConductivityRatio=1` ratio of solid/liquid heat conductivity
 
-parameters.heleShaw=true
-parameters.nonDimVel=0.0
-parameters.permeabilityFunction=2  # 2 = carman-kozeny
+`parameters.specificHeatRatio=1` ratio of solid.liquid specific heat
 
-parameters.specificHeatRatio=1
-parameters.waterDistributionCoeff=1e-5
+`parameters.lewis=100` lewis number (liquid heat diffusivity/liquid salt diffusivity)
 
-Specify phase diagram:
-parameters.eutecticComposition=230
-parameters.eutecticTemp=-23
-parameters.initialComposition=30
-parameters.liquidusSlope=-0.1
+`parameters.darcy=0.0` darcy number. Set to 0 to solve Darcy's equation rather than Darcy-Brinkman
+
+`parameters.prandtl=0` prandtl number 
+
+`parameters.heleShaw=true` constrain permeabilities by a Hele-Shaw cell
+
+`parameters.nonDimReluctance=0.1` inverse of the dimensionless Hele-Shaw permeabilty. Smaller means wider hele-shaw gap width. 
+
+`parameters.nonDimVel=0.0` (dimensionless) frame advection velocity
+`parameters.permeabilityFunction=2` mathematical form of the permeability function. Options include:
+0. pureFluid (permeability=1)
+1. cubic (permeability=porosity^3)
+2.   kozeny-carman (permeability = porosity^3 / (1-porosity)^2
+3.   log function (permeability = - porosity^2 * log(1-porosity) )
+4.   spatially dependent permeability with a channel
+5.   permeability = porosity
+
+
+`parameters.waterDistributionCoeff=1e-5` water distribution coefficient
+
+##Phase diagram
+`parameters.eutecticComposition=230`
+
+`parameters.eutecticTemp=-23`
+
+`parameters.initialComposition=30`
+
+`parameters.liquidusSlope=-0.1`
 
 # AMR options
-main.max_level=0
-main.block_factor=8
-main.use_subcycling=1
-main.ref_ratio=2 2 2
-main.refine_thresh=0.1
-main.regrid_interval=8 8 8
-main.tag_buffer_size=4
-main.fill_ratio=0.75
-main.grid_buffer_size=0 0 0
-projection.eta=0.0 # No freestream correction, as only one level
+`main.max_level=0` max allowed level for AMR simulations.
 
+`main.block_factor=8` all boxes must be divisible by at least this length in all dimensions. 
+
+`main.use_subcycling=1` whether or not to use subcycling in time
+
+`main.ref_ratio=2 2 2` refinement ratios between successive levels 
+
+`main.refine_thresh=0.1` refinement threshold
+
+`main.regrid_interval=8 8 8`  regrid interval on each level 
+
+`main.tag_buffer_size=4` number of cells by which to grow the set of cells tagged for refinement, before creating the new grids
+
+`main.fill_ratio=0.75` should be between 0 and 1. A value of 1 means the grids generated on refined levels will be as tightly grouped as possible to the cells tagged for refinement. A smaller value means that Chombo will cover a larger area on refined levels with grid cells. 
+
+`main.grid_buffer_size=0 0 0` this is the 'padding' between grids on different levels of refinement
+
+`projection.eta=0.0` Freestream correction coefficient. Should be less than 1 for stability, but close to 1 for accuracy.
 
