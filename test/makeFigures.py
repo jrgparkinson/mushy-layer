@@ -23,7 +23,7 @@ def make_figures():
     figure_directory = base_output_dir
 
     no_flow_data = os.path.join(base_output_dir, 'NoFlow')
-    fixed_chill_data = os.path.join(base_output_dir, 'FixedChill-t1.0e-01-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
+    fixed_chill_data = os.path.join(base_output_dir, 'FixedChill-t5.0e-02-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
 
     fig_commands = ['Fig4NoFlow(\'' + no_flow_data + '\', \'' + figure_directory + 'Fig4BenchmarkNoFlow.eps\')',
                    'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')',

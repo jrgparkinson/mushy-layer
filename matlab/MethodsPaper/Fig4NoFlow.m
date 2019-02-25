@@ -27,8 +27,8 @@ dz = 4./gridRes;
 errUniformL1 = NaN*ones(length(gridRes), 1);
 errAMRL1 = NaN*ones(length(gridRes), 1);
 
-amrPrefix2lev = 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel2-ref2-noFlow-';
-amrPrefix1lev = 'AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-noFlow-';
+amrPrefix2lev = 'AMR-Subcycle-Reflux-Freestream0.99-MaxLevel2-ref2-noFlow-';
+amrPrefix1lev = 'AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref2-noFlow-';
 
 
 textFontSize = 16;
