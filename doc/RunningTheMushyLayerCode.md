@@ -123,21 +123,21 @@ permeabilityLo
 
 `parameters.problem_type=0` can specify different problem types, which can tell the code to solve some of the equations differently. Lots of the options aren't really used anymore (and maybe don't work). Ones which definitely should work are in bold.
 0. *mushyLayer*
-1. burgersSi
-2. burgersPeriodic
-3. poiseuilleFlow
+1. burgers equation
+2. burgers equation on a periodic domain
+3. poiseuille flow
 4. diffusion
 5. *solidificationNoFlow*
-6. cornerFlow
-7. sidewallHeating
-8. HRL
-9. rayleighBenard
-10. soluteFluxTest
-11. refluxTest
-12. zeroPorosityTest
-13. meltingIceBlock
+6. corner flow
+7. sidewall heating
+8. vertical heating (with Darcy's equation)
+9. rayleigh-benard (navier-stokes)
+10. a solute flux test
+11. a reflux test
+12. a test for solving with zero porosity
+13. simulating a melting ice block
 14. *convectionMixedPorous*
-15. vortexPair
+15. vortex pair (navier-stokes benchmark problem)
 
 `parameters.compositionRatio=1.18` composition ratio, should be >= 1.0.
 
@@ -176,7 +176,7 @@ permeabilityLo
 
 `parameters.waterDistributionCoeff=1e-5` water distribution coefficient
 
-##Phase diagram
+## Phase diagram
 `parameters.eutecticComposition=230`
 
 `parameters.eutecticTemp=-23`
