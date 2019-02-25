@@ -9,7 +9,7 @@ If you have any issues, please contact [james.parkinson@physics.ox.ac.uk].
 
 # Prerequisites
 ## Required
-* [Chombo](https://commons.lbl.gov/display/chombo/Chombo+-+Software+for+Adaptive+Solutions+of+Partial+Differential+Equations) installation ([how to download Chombo](https://anag-repo.lbl.gov/chombo-3.2/access.html)). You will need to configure Chombo with HDF5 support in order to write out data files.
+* [Chombo](https://commons.lbl.gov/display/chombo/Chombo+-+Software+for+Adaptive+Solutions+of+Partial+Differential+Equations) installation ([how to download Chombo](https://anag-repo.lbl.gov/chombo-3.2/access.html)). You will need to configure Chombo with HDF5 support in order to write out data files. As of 25 February 2019, the latest Chombo release (3.2) does not contain all the libraries required for this code. Instead, you will need to download the Chombo development trunk located at `https://anag-repo.lbl.gov/svn/Chombo/trunk/`. If you do not have access to the trunk, email [james.parkinson@physics.ox.ac.uk] for a copy of the source code.
 
 ## Optional
 * git. For downloading and updating code.
