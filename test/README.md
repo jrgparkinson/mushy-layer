@@ -9,12 +9,18 @@ You should also add the directory (`/path/to/mushy-layer/test/`) to your PYTHONP
 
 Some of the error calculation is done using the Chombo compare utility located in `/path/to/chombo/lib/util/chomboCompare`. Make sure you have compiled this program, and make sure you have defined the environmental variable `CHOMBO_HOME=/path/to/chombo/`.
 
-Analysis of the output is done via matlab scripts located in `/mushy-layer/matlab/`. You should add this directory to your matlab path via your `startup.m` file in order to run the analysis.
+Analysis of the output is done via matlab scripts located in `/mushy-layer/matlab/`. You should add this directory to your matlab path via your `startup.m` file in order to run the analysis, e.g.
+```matlab
+addpath(genpath(['~/mushy-layer/matlab/']))
+```
 
-Finally, the python scripts assume that the slurm job queuing system is accessible. If it is not, you will have to run the batch files which it creates manually. Alternatively, open up the `test/SlurmTask.py` file and edit the `SlurmTask.write_slurm_file` and `SlurmTask.run_task` methods so that they work with your setup.
+Finally, the python scripts assume that the slurm job queuing system is accessible. If it is not, you will have to run the batch files which it creates manually. Alternatively, open up the `test/BatchJob.py` file and edit the `BatchJob.write_slurm_file(...)` and `BatchJob.run_task(...)` methods so that they work with your setup.
 
 # Running the problems
-There are five test problems, which can each be run individually by calling `python filename.py (options)`:
+There are five test problems, which can each be run individually by 
+```console
+$ python filename.py [options]
+```
 
 * testDiffusiveSolidification.py
 * testUniformPorousConvection.py
@@ -24,10 +30,17 @@ There are five test problems, which can each be run individually by calling `pyt
 
 See the individual files for the options available.
 
-Alternatively you may run all five test problems via `python runMethodPaperTests.py`. There are a lot of individual simulations that need to be run. It is highly recommended that you do this on a machine with lots of cores available so that you can the simulations on different cores in parallel, in which case most jobs should finish in a few hours. The Nusselt number tests with large Rayleigh number on high resolution grids require longer (> 1 day).
+Alternatively you may run all five test problems via 
+
+```console
+$ python runMethodPaperTests.py
+```
+
+There are a lot of individual simulations that need to be run. It is highly recommended that you do this on a machine with lots of cores available so that you can the simulations on different cores in parallel, in which case most jobs should finish in a few hours. The Nusselt number tests with large Rayleigh number on high resolution grids require longer (> 1 day).
 
 The python scripts will create the relevant folders to hold the output, setup the parameter input files, submit jobs to run the simulations to the slurm queueing system, and also submit a job to run the relevant analysis code once all the jobs have finished. The output from analysis can be found in the sbatch.out file, so a typical directory structure might end up looking like
 
+```
 /baseOutputDir (specified by the user)
   /NoFlow
     runAnalysis.sh
@@ -40,3 +53,11 @@ The python scripts will create the relevant folders to hold the output, setup th
       chkfile.hdf5
   /FixedPorousHole
     ... same as above
+```
+ 
+# Figures
+Having run the test problems, you can generate the figures used in the Methods paper using
+```console
+$ python makeFigures.py
+```
+Some figures (e.g. convergence plots) will have already been created following completion of the test problems. These can be found in the same directory as the data produced during the test problems, e.g. `/path/to/baseOutputDir/PorousMushyHole/`.

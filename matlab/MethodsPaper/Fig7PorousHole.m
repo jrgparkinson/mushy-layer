@@ -16,10 +16,7 @@ close all;
 figureName =  fullfile(figureDirectory, 'Fig7PorousHoleFigure'); % thisFilename; %[dataFolderNu, 'benchmark2Convergence'];
 saveFigure = true;
 
-
-
 %highRes = getFinalPlotFile([dataFolderNu, plotPrefixUniform(gridRes(end)*2)]);
-
 
 h = figure();
 %h.Position = [200 200 1200 500];
@@ -286,22 +283,9 @@ yl = ylabel('$z$');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Porosity
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%psiUniform = max(psiUniform, 0);
-%psi = max(psi, 0);
-% Plot psi uniform because it's smoother
 axPorosity = axes;
-%Ncontours = min(10, round(max(max(psiUniform))/1.5e-5));
-%v =  linspace(4e-6,max(max(psiUniform)), Ncontours) ;
-
-%[Cpsi, hpsi] = contour(XUniform,YUniform,psiUniform, v); 
-%[Cpsi, hpsi] = contour(XUniform,YUniform,plot_T); 
-%pcolor(X,Y,porosity); 
-
+ 
 daspect([1 1 1]);
-
-cmap = flipud(plasma(100));
-cmap = flipud(viridis);
-%colormap(axPorosity,cmap);
 
 v = linspace(0.7, 1.0, 6);
 [Cchi, hChi] = contour(XUniform, YUniform, porosityUniform, v);
@@ -315,24 +299,11 @@ box on;
 
 cPorosity = colorbar(axPorosity,'Location', 'southoutside');
 
-%xl = xlabel('$x$');
-%yl = ylabel('$z$');
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Velocity
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 axVel = axes;
-
-%scale = 0.1;
-%qv = 1:2:length(XUniform);
-%quiver(XUniform(qv,qv),YUniform(qv,qv),Uuni(qv,qv)*scale,Vuni(qv,qv)*scale, ...
-%    'AutoScale','off', 'color', 'r', 'LineWidth', 1.0);
-
-% startx = 0.1:0.1:1;
-% starty = 0.5*ones(size(startx));
-% streamline(Xbig,Ybig,Ubig,Vbig,startx,starty)
-% 
 
 xlimits = [0.25 0.75];
 ylimits = [0.25,0.75];
