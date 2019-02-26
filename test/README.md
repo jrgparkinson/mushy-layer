@@ -4,6 +4,8 @@
 This directory contains python scripts for running various test problems which demonstrate the accuracy of the code. 
 
 # Setup
+These tests require the code in `mushy-layer/execSubcycle/` and `mushy-layer/setupNewRun/` to be built.
+
 Before running the test problems, you must first specify a directory to save the output to. This is done by the `getBaseOutputDir()` function in `mushyLayerRunUtils.py`. 
 You should also add the directory (`/path/to/mushy-layer/test/`) to your PYTHONPATH.
 
@@ -14,7 +16,7 @@ Analysis of the output is done via matlab scripts located in `/mushy-layer/matla
 addpath(genpath(['~/mushy-layer/matlab/']))
 ```
 
-Finally, the python scripts assume that the slurm job queuing system is accessible. If it is not, you will have to run the batch files which it creates manually. Alternatively, open up the `test/BatchJob.py` file and edit the `BatchJob.write_slurm_file(...)` and `BatchJob.run_task(...)` methods so that they work with your setup.
+The python scripts assume that the slurm job queuing system is accessible. If it is not, you will have to run the batch files which it creates manually. Alternatively, open up the `test/BatchJob.py` file and edit the `BatchJob.write_slurm_file(...)` and `BatchJob.run_task(...)` methods so that they work with your setup.
 
 # Running the problems
 There are five test problems, which can each be run individually by 

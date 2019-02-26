@@ -34,7 +34,7 @@ def uniform_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max
 def test_uniform_porous_convection(argv):
     # Default vals:
     cfl = 0.2
-    nz_uniform = 128
+    nz_uniform = -1 # 128
     nz_vm = 64
     chi = 0.4
     bc_accuracy = 1
@@ -87,7 +87,9 @@ def test_uniform_porous_convection(argv):
         amr_setup.append({'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [int(nz_uniform/2), nz_uniform, 2*nz_uniform]})
 
     if nz_vm > 0:
-        amr_setup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': [int(nz_vm / 2), nz_vm, 2*nz_vm]})
+
+        these_nzs = [nz_vm, 2*nz_vm, 4*nz_vm]
+        amr_setup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': these_nzs})
 
     num_procs = [1, 1, 1]
     # chi = 0.4
