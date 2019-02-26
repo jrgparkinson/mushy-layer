@@ -489,7 +489,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
 
 
-    // Place finest reoslution around channels
+    // Place finest resolution around channels
     if (m_level == finestLevel - 1)
     {
 
@@ -522,7 +522,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       // Combine downflow and salty
       downflowCells |= saltyCells;
 
-      // Then add the porosity gradient requirement
+      // Only take downflow cells which are also in the set of cells satisfying the porosity gradient condition
       downflowCells &= porosityGradientCells;
 
       if (s_verbosity >= 5)
