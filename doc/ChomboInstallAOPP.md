@@ -14,7 +14,7 @@ $ svn --username jparkinson co https://anag-repo.lbl.gov/svn/Chombo/trunk/ ~/Cho
 ```console
 $ cp ~/mushy-layer/doc/Make.defs.AOPP ~/Chombo/lib/mk/Make.defs.local
 ```
-4. Add the following to your ~/.login script 
+4. Add the following to your ~/.login script (note this is for csh/tcsh shells, if you're using a bash shell then you'll need to use [different commands](https://web.fe.up.pt/~jmcruz/etc/unix/sh-vs-csh.html) to set the environmental variables).
 ```bash
 module load chombo/3.2__hdf5v18
 setenv CH_TIMER "true"
