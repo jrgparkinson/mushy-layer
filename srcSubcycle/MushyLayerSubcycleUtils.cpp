@@ -135,6 +135,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.computeDiagnostics = true;
   ppMain.query("computeDiagnostics", opt.computeDiagnostics);
 
+  // Only relevant for darcy brinkman
   opt.doEulerPart = true;
   ppMain.query("doEuler", opt.doEulerPart);
 
@@ -705,7 +706,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.perturbationTime = 0.0;
   ppMain.query("perturbationTime", opt.perturbationTime);
 
-  opt.perturbationWavenumber = 1.0;
+  opt.perturbationWavenumber = 0.0;
   ppMain.query("perturbationWavenumber", opt.perturbationWavenumber);
 
   opt.perturbationSin = false;

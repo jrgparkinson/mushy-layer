@@ -1,13 +1,5 @@
 
-amrmultigrid.MGtype=1
-amrmultigrid.hang_eps=1.0e-10
-amrmultigrid.max_iter=40
-amrmultigrid.norm_thresh=1.0e-10
-amrmultigrid.num_mg=1
-amrmultigrid.num_smooth=2
-amrmultigrid.relaxMode=1
-amrmultigrid.tolerance=1.0e-10
-amrmultigrid.verbosity=0
+
 bc.bulkConcentrationHi=1 0
 bc.bulkConcentrationHiVal=-1 -1
 bc.bulkConcentrationLo=1 1 1
@@ -19,8 +11,7 @@ bc.scalarLo=1 1 0
 bc.velHi=0 0 0
 bc.velLo=0 0 0
 
-main.addSubtractGradP=1
-main.advectionMethod=1
+
 main.block_factor=8
 main.cfl=0.4
 
@@ -31,17 +22,12 @@ main.doProjection=1
 main.doVCreflux=0
 main.domain_height=1.0
 main.dt_tolerance_factor=1.01
-main.enforceAnalyticSoln=false
+
 main.fill_ratio=0.75
 main.grid_buffer_size=4
-main.ignoreSolverFails=true
-main.implicitAdvectionSolve=false
-main.initialPerturbation=0.05
+
 main.initial_cfl=0.01
-main.initialize_pressure=true
-main.iter_plot_interval=-1
-main.iteration_plot_interval=-1
-main.maxRestartWavenumber=1
+
 main.max_dt=1000.0
 main.max_dt_growth=1.0
 main.max_grid_size=32
@@ -67,21 +53,20 @@ main.regrid_interval=32 64 128
 main.restart_newTime=0.0
 main.restart_perturbation=0.0
 main.restart_wavenumber=8
-main.scalePwithChi=1
+
 main.solverFailRestartMethod=0
 main.steady_state=1e-10
-main.symmetric_domain=false
+
 main.tag_buffer_size=1 1 1
 main.useAccelDt=1
-main.usePhiForImplicitAdvectionSolve=false
+
 main.use_limiting=0
 main.use_subcycling=1
 main.verbosity=2
-main.viscous_solver_tol=1e-15
-mercurialRepository=-1
-num_proc=1
-parameters.K=1
+#main.viscous_solver_tol=1e-15
 
+
+parameters.K=1
 parameters.compositionRatio=2.0
 parameters.darcy=5e-4
 parameters.eutecticComposition=230
@@ -101,29 +86,21 @@ parameters.rayleighTemp=0.0
 parameters.specificHeatRatio=1
 parameters.stefan=5.0
 parameters.waterDistributionCoeff=1e-5
-patchGodunov.velArtVisc=10.0
-patchGodunov.velFourthOrderSlopes=0
-patchGodunov.velOrder=1
-patchGodunov.velUseArtVisc=0
-picardSolver.max_iter=8
-picardSolver.tol=1e-5
-projection.MACbcScale=-0.5
-projection.bottomSolveMaxIter=10
+
+
+#projection.MACbcScale=-0.5
+#projection.phiScale=1.0
 projection.eta=0.99
 projection.numSmoothDown=2
 projection.numSmoothUp=8
-projection.phiScale=1.0
-projection.relax_bottom_solver=false
-projection.usePiAdvectionBCs=true
-projection.verbosity=0
-projector.verbosity=0
+
+
 regrid.marginalPorosityLimit=0.99
 regrid.plume_salinity=-0.8
 regrid.plume_vel=10.0
-run_name=Uniform
+
 
 main.time_integration_order=2
 main.checkpoint_interval=100
 main.plot_period = 0.00005
-#main.plot_interval=1
-#main.plot_interval=100
+
