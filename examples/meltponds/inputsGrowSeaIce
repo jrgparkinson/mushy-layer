@@ -5,9 +5,12 @@ main.verbosity=2
 main.output_folder=.
 main.plot_prefix=plt
 main.plot_interval=-1  # step interval to produce plot files (-1 = don't use this option)
+main.checkpoint_interval=1000
 main.debug=false  # set to true to produce more output
 main.plot_period=0.005  # time intervals to produce plot files
 main.chk_prefix=chk
+main.ignoreSolverFails=false
+
 
 # Boundary condition values
 bc.bulkConcentrationHiVal=-1 -1
@@ -16,7 +19,7 @@ bc.enthalpyHiVal=0 0.9
 bc.enthalpyLoVal=0.0 6.03
 
 # Boundary conditions types. 
-# For scalars: 0 = dirichlet, 1 = neumann, 2 = reflection
+# For scalars: 0 = dirichlet, 1 = neumann, 2 = inflow/outflow
 # For velocity: 0 = solid wall, 3 = inflow/outflow, 6 = reflection,  9 = pressure head
 # See BCUtil/PhysBCUtil.(h/cpp) for more info/options
 bc.scalarHi=1 0 0
@@ -43,8 +46,6 @@ bc.velLo=6 3 0
 main.cfl=0.1
 main.initial_cfl=2e-05
 
-main.ignoreSolverFails=false
-
 main.max_dt=0.1
 main.max_dt_growth=1.05
 
@@ -52,6 +53,8 @@ main.max_step=10000
 main.max_time=10.0
 main.min_time=0.1
 main.dt_tolerance_factor=1.01
+main.time_integration_order=2
+
 
 main.domain_height=1.0
 main.num_cells=64 128
@@ -59,9 +62,8 @@ main.periodic_bc=1 0 0
 main.max_grid_size=256
 
 
-main.iter_plot_interval=-1
-main.iteration_plot_interval=-1
-main.checkpoint_interval=1000
+# main.iter_plot_interval=-1
+# main.iteration_plot_interval=-1
 
 
 # AMR stuff (currently somewhat irrelevant as max_level=0)
@@ -74,13 +76,7 @@ main.regrid_interval=8 8 8
 main.tag_buffer_size=4
 main.fill_ratio=0.75
 main.grid_buffer_size=0 0 0
-
-main.time_integration_order=2
-
-main.use_limiting=true
-
-# Don't do u.grad(u) terms
-main.doEuler=0
+projection.eta=0.0 # No freestream correction, as only one level
 
 # Diffusive timescale, advective velocity scale
 main.nondimensionalisation=0
@@ -115,6 +111,5 @@ parameters.eutecticTemp=-23
 parameters.initialComposition=30
 parameters.liquidusSlope=-0.1
 
-# No freestream correction
-projection.eta=0.0
+
 
