@@ -3,7 +3,7 @@ function Fig7PorousHole(dataFolder, figureDirectory)
 
 if nargin < 1
    % dataFolder = getDataDir('AMRConvergenceTest/MushyConvectionLiquid2-t0.5/');
-   base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
+   base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/';
    dataFolder = fullfile(base_dir, '/PorousMushyHole-t0.00015-hole0.04/');
 end
 

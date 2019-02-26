@@ -5,7 +5,7 @@ if nargin < 3
    % dataFolderNu = getDataDir('AMRConvergenceTest/ConvectionDB/chi0.4-Da0.01-Ra1e5/');
    % dataFolderVariablePorosity = getDataDir('AMRConvergenceTest/DBVariablePorosityGaussian1proc-t1.6-v2/');
     
-    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
+    base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/';
     dataFolderNu = fullfile(base_dir, '/ConvectionDB-cfl0.2/chi0.4-Da1.0e-02-Ra1.0e+05/');
     dataFolderVariablePorosity = fullfile(base_dir, '/FixedPorousHole-1proc/');
     
@@ -94,8 +94,10 @@ text(0.04, 0.92, '(b)', 'FontSize', textFontSize, 'Color', [0 0 0]);
 
 subplot(m, n, 3);
 
-AMRsol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, 'AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref2-DBVariablePorosity-32--0'));
-UniformFineSol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, 'Uniform-DBVariablePorosity-64--0'));
+AMRsol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, ...
+    'AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref2-DBVariablePorosity-32--0'));
+UniformFineSol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, ...
+    'Uniform-DBVariablePorosity-64--0'));
 
 makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
 
