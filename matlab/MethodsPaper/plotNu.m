@@ -28,12 +28,31 @@ if plotSingle
     %    [remoteBaseFolder, 'chi0.4-Da1.0e-06-Ra1.0e+08/', UniformPrefix, '128--0'], ...
     %    [remoteBaseFolder, 'chi0.4-Da1.0e-06-Ra1.0e+09/', UniformPrefix, '128--0']};
     
-    NuLeBars = 12.9;
-    NuLeBars = 3.17;
-    NuLeBars = 5.24;
-    NuLeBars = 3.07;
+    remoteBase = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.18/';
     
-    NuLeBars = [1.01 1.41 3.17 5.24 1.08 3.07 12.9];
+    res = '64';
+    
+    folders = {[remoteBase, 'chi0.4-Da1.0e-06-Ra1.0e+07/', AMRPrefix, res,'--0']...
+       [remoteBase, 'chi0.4-Da1.0e-06-Ra1.0e+08/', AMRPrefix, res, '--0'], ...
+       [remoteBase, 'chi0.4-Da1.0e-06-Ra1.0e+09/', AMRPrefix, res, '--0']};
+   
+     folders = {[remoteBase, 'chi0.4-Da1.0e-06-Ra1.0e+09/', UniformPrefix, '256','--0']...
+       [remoteBase, 'chi0.4-Da1.0e-06-Ra1.0e+09/', UniformPrefix, '512', '--0'], ...
+       [remoteBase, 'chi0.4-Da1.0e-06-Ra1.0e+09/', UniformPrefix, '1024', '--0']};
+   
+   base_folder = '/home/parkinsonjl/mushy-layer/execSubcycle/nu256/';
+   folders = {fullfile(base_folder, 'diagnostics.out.orig'), ...
+       fullfile(base_folder, 'diagnostics.out.vel2'), ...
+       fullfile(base_folder, 'diagnostics.out')};
+   
+   plot_style = {'--', '-', ':'};
+   
+    NuLeBars = 12.9;
+    %%NuLeBars = 3.17;
+    %NuLeBars = 5.24;
+    %NuLeBars = 3.07;
+    
+    %NuLeBars = [1.01 1.41 3.17 5.24 1.08 3.07 12.9];
     
     % folder = ['/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/', ...
     %    'ConvectionDB-cfl0.26/chi0.4-Da1.0e-06-Ra1.0e+09/Uniform-convectionDB-128--0/'];
@@ -47,33 +66,26 @@ if plotSingle
     
     hold on
     for i=1:length(folders)
-         d = getDiagnostics(fullfile(folders{i}, 'diagnostics.out'));
-        plot(d.time, d.Nusselt);
+        if strfind(folders{i}, 'diagnostics' )
+            d = getDiagnostics(folders{i});
+        else
+          
+        d = getDiagnostics(fullfile(folders{i}, 'diagnostics.out'));
+        end
+        plot(d.time, d.Nusselt, plot_style{i});
         
         leg{end+1} = folders{i}(end-10:end);
     end
     
     xlabel('t');
     ylabel('Nu');
+    title('Nu left/right average');
     box on;
     
-    % Recent average
-%     Nu = d.Nusselt;
-%     RecentNu = Nu(round(0.8*end):end);
-%     avNu = mean(RecentNu);
-%     maxNu = max(d.Nusselt);
-%     minNu = min(d.Nusselt);
-%     %title(['Average Nu = ', num2str(avNu), ', max Nu = ',num2str(maxNu),', min Nu = ', num2str(minNu)]);
-%     stdev = std(RecentNu);
-%     titleString = sprintf('Average Nu = %1.2f +/- %1.3f', avNu, stdev);
-%     %title(['Average Nu = ', num2str(avNu), ' +/- ', num2str(stdev)]);
-%     title(titleString);
     
  
     
-   % plot(d.time, d.time*0 + avNu, '--');
-   % plot(d.time, d.NusseltLeft);
-   % plot(d.time, d.NusseltRight);
+   
    xl = xlim;
    for Li = 1:length(NuLeBars)
     plot(xl, xl*0 + NuLeBars(Li), '--');
@@ -85,8 +97,27 @@ if plotSingle
     
     %ylim([avNu*0.9 avNu*1.05]);
     
-%     subplot(m, n, 2);
-%     hold on;
+    subplot(m, n, 2);
+    hold on;
+
+ hold on
+    for i=1:length(folders)
+         if strfind(folders{i}, 'diagnostics' )
+            d = getDiagnostics(folders{i});
+        else
+          
+        d = getDiagnostics(fullfile(folders{i}, 'diagnostics.out'));
+        end
+        plot(d.time, d.NusseltMiddle);
+        
+        leg{end+1} = folders{i}(end-10:end);
+    end
+    
+    xlabel('t');
+    ylabel('Nu');
+    title('Nu middle');
+    box on;
+    
 %     
 %     plot(d.time, d.MaxVHalf);
 %     plot(d.time, d.MaxUHalf);

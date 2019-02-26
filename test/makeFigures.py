@@ -8,28 +8,72 @@ from BatchJob import BatchJob
 # Make figures for methods paper
 ##########################################################################
 
+def no_flow_command():
+    figure_directory = get_base_output_dir()
+    no_flow_data = os.path.join(get_base_output_dir(), 'NoFlow')
+
+    cmd = 'Fig4NoFlow(\'' + no_flow_data + '\', \'' + figure_directory + 'Fig4BenchmarkNoFlow.eps\')'
+
+    return cmd
+
+def fixed_porous_command():
+    figure_directory = get_base_output_dir()
+    data_folder_nu = os.path.join(get_base_output_dir(), 'ConvectionDB-cfl0.2', 'chi0.4-Da1.0e-02-Ra1.0e+05')
+    data_folder_variable_porosity = os.path.join(get_base_output_dir(), 'FixedPorousHole-1proc')
+
+    cmd = 'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')'
+
+    return cmd
+
+def porous_hole_command():
+    figure_directory = get_base_output_dir()
+    porous_mushy_hole_folder = os.path.join(get_base_output_dir(), 'PorousMushyHole-t0.00015')
+
+    cmd = 'Fig7PorousHole(\'' + porous_mushy_hole_folder + '\', \'' + figure_directory + '\')'
+    return cmd
+
+def fixed_chill_command():
+    figure_directory = get_base_output_dir()
+    fixed_chill_data = os.path.join(get_base_output_dir(), 'FixedChill-t5.0e-02-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
+
+    cmd  ='Fig9FixedChill(\'' + fixed_chill_data + '\', [3000, 4000, 7000], \'' + figure_directory + '\')'
+
+    return cmd
+
+def fixed_chill_video_command():
+    # figure_directory = get_base_output_dir()
+    fixed_chill_data = os.path.join(get_base_output_dir(), 'FixedChill-t5.0e-02-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
+
+    cmd = 'Fig9MakeVideo(\'' + fixed_chill_data + '\')'
+
+    return cmd
+
 def make_figures():
 
     base_output_dir = get_base_output_dir()
-    matlab_command = get_matlab_base_command()
+    #matlab_command = get_matlab_base_command()
 
     print(Fore.GREEN + 'Make figures' + Style.RESET_ALL)
 
-    data_folder_nu = os.path.join(base_output_dir, 'ConvectionDB-cfl0.2','chi0.4-Da1.0e-02-Ra1.0e+05')
-    data_folder_variable_porosity = os.path.join(base_output_dir, 'FixedPorousHole-1proc')
+    #data_folder_nu = os.path.join(base_output_dir, 'ConvectionDB-cfl0.2','chi0.4-Da1.0e-02-Ra1.0e+05')
+    #data_folder_variable_porosity = os.path.join(base_output_dir, 'FixedPorousHole-1proc')
 
-    porous_mushy_hole_folder = os.path.join(base_output_dir, 'PorousMushyHole-t0.00015')
+    #porous_mushy_hole_folder = os.path.join(base_output_dir, 'PorousMushyHole-t0.00015')
 
-    figure_directory = base_output_dir
+    #no_flow_data = os.path.join(base_output_dir, 'NoFlow')
+    #fixed_chill_data = os.path.join(base_output_dir, 'FixedChill-t5.0e-02-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
 
-    no_flow_data = os.path.join(base_output_dir, 'NoFlow')
-    fixed_chill_data = os.path.join(base_output_dir, 'FixedChill-t5.0e-02-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
+    #fig_commands = ['Fig4NoFlow(\'' + no_flow_data + '\', \'' + figure_directory + 'Fig4BenchmarkNoFlow.eps\')',
+    #               'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')',
+    #               'Fig7PorousHole(\'' + porous_mushy_hole_folder + '\', \'' + figure_directory + '\')',
+    #               'Fig9FixedChill(\'' + fixed_chill_data + '\', [3000, 4000, 7000], \'' + figure_directory + '\')',
+    #               'Fig9MakeVideo(\'' + fixed_chill_data + '\')']
 
-    fig_commands = ['Fig4NoFlow(\'' + no_flow_data + '\', \'' + figure_directory + 'Fig4BenchmarkNoFlow.eps\')',
-                   'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')',
-                   'Fig7PorousHole(\'' + porous_mushy_hole_folder + '\', \'' + figure_directory + '\')',
-                   'Fig9FixedChill(\'' + fixed_chill_data + '\', [3000, 4000, 7000], \'' + figure_directory + '\')',
-                   'Fig9MakeVideo(\'' + fixed_chill_data + '\')']
+    fig_commands = [no_flow_command(),
+                    fixed_porous_command(),
+                    porous_hole_command(),
+                    fixed_chill_command(),
+                    fixed_chill_video_command()]
 
     full_matlab_command = ''
 
