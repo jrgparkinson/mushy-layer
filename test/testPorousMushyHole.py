@@ -6,6 +6,7 @@ import math
 
 from runAMRConvergenceTest import runTest
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs
+from makeFigures import porous_hole_command
 
 ##########################################################################
 # 3) Convection in a mushy layer with an initial porous hole
@@ -109,12 +110,13 @@ def testPorousMushyHole(argv):
     python_compare_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'run_chombo_compare.py')
     chombo_compare_analyse ='python %s -f %s -a -v Porosity -e L2 -r True -n 8 \n \n' % (python_compare_file, dataFolder)
 
-    make_figures  = 'Fig7PorousHole(\'' + dataFolder + '\', \'' + dataFolder + '\')',
-    analyse_in_matlab = 'analyseVariablePorosityTest(\'' + dataFolder + '\', [' + ','.join([str(a) for a in Nz_uniform]) + '],' \
-     'true, true, \'' + uniform_prefix + '\', \'Porosity\', \'L2\');'
+    # make_figures  = 'Fig7PorousHole(\'' + dataFolder + '\', \'' + dataFolder + '\')'
+    make_figures = porous_hole_command()
+    #analyse_in_matlab = 'analyseVariablePorosityTest(\'' + dataFolder + '\', [' + ','.join([str(a) for a in Nz_uniform]) + '],' \
+    # 'true, true, \'' + uniform_prefix + '\', \'Porosity\', \'L2\');'
 
     analysis_command = chombo_compare_analyse + '\n\n' + \
-                       matlab_command + ' " %s exit;"' % make_figures
+                       matlab_command + ' " %s; exit;"' % make_figures
 
     # Run
     extra_params = {'main.max_time':max_time,

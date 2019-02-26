@@ -4,6 +4,7 @@ from colorama import Fore, Style
 
 from runAMRConvergenceTest import runTest
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs
+from makeFigures import fixed_porous_command
 
 ##########################################################################
 # 3) Convection in a fixed porous medium with variable porosity
@@ -101,9 +102,11 @@ def test_fixed_porous_hole():
 
     # make_figures = 'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')'
 
+    # make_figures = 'analyseVariablePorosityTest(\'' + data_folder + '\', [' + ','.join([str(a) for a in nz_uniform]) + '], true, true, \'' + uniform_prefix + '\', \'xDarcyvelocity\', \'L2\')'
+    make_figures = fixed_porous_command()
+    
     analysis_command = chombo_compare_analyse + '\n\n' + \
-                       matlab_command + ' "analyseVariablePorosityTest(\'' + data_folder + '\', [' + ','.join([str(a) for a in nz_uniform]) + '], ' \
-    'true, true, \'' + uniform_prefix + '\', \'xDarcyvelocity\', \'L2\'); exit;"'
+                       matlab_command + ' "%s; exit;"' % make_figures
 
 
 
