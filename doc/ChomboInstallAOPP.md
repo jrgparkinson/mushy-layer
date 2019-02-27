@@ -44,3 +44,6 @@ $ ./amrGodunov2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex diffuse.inputs
 The output files produced are most easily opened using the [Visit software](https://wci.llnl.gov/simulation/computer-codes/visit), which is not currently installed on the AOPP servers (though it may be soon - I have asked for it).
 
 
+## Running code on AOPP servers
+There is an example SLURM batch script in `execSubcycle/slurmExample`.
+There is a batch script for building all the mushy layer code (with the relevant module dependencies) in `execSubcycle/buildMushyLayer.sh`, which can be modified for your needs.
