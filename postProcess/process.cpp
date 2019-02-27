@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
     const ProblemDomain oldLev0Domain = amrlevels[0]->problemDomain();
 
     // If we haven't loaded the advection velocity, calculate it
-    if (!amrlevels[0]->loadedAdvVel())
+    if (!amrlevels[0]->m_opt.load_advVel)
     {
 
       // Make sure we're using the eutectic point for nondimensionalisation when we compute velocities (else the calculation fails)

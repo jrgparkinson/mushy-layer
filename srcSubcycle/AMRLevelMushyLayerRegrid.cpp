@@ -1248,23 +1248,19 @@ void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, Probl
   Interval scalInterval(0,0);
   Interval vectInterval(0, SpaceDim-1);
 
-  // Need things to interpolate from old grids to new
-//  FourthOrderFineInterp scalarInterp, vectorInterp;
-//  scalarInterp.define(a_grids, 1, ref_ratio, a_domain);
-//  vectorInterp.define(a_grids, SpaceDim, ref_ratio, a_domain);
-
   FineInterp scalarInterp, vectorInterp;
   scalarInterp.define(a_grids, 1, ref_ratio, a_domain);
   vectorInterp.define(a_grids, SpaceDim, ref_ratio, a_domain);
 
-  //  prevAdvVel.define(m_grids, 1, advectionGhost);
+//  prevAdvVel.define(m_grids, 1, advectionGhost);
   previousScal = RefCountedPtr<LevelData<FArrayBox> >(
       new LevelData<FArrayBox>(m_grids, 1, ivGhost));
   previousVect = RefCountedPtr<LevelData<FArrayBox> >(
       new LevelData<FArrayBox>(m_grids, SpaceDim, ivGhost));
 
-  //  m_advVel.copyTo(scalInterval, prevAdvVel, scalInterval);
-  //  m_advVel.define(newGrids, 1, advectionGhost); // reshape
+  // FineInterp doesn't handle fluxboxes, so can't refine advection velocity for now
+//    m_advVel.copyTo(scalInterval, prevAdvVel, scalInterval);
+//    m_advVel.define(newGrids, 1, advectionGhost); // reshape
   //  prevAdvVel.copyTo(scalInterval,m_advVel, scalInterval); // copy back
 
   for (int scalarVar = 0; scalarVar < m_numScalarVars; scalarVar++)

@@ -163,15 +163,13 @@ int main(int argc, char* argv[])
 
   addExtraParams(runInputs, pp);
 
-
   // Get the AMR hierarchy
   Vector<AMRLevelMushyLayer*> amrlevels;
   int finest_level;
   HDF5HeaderData header;
   getAMRHierarchy(inFile, amrlevels, finest_level, header);
 
-
-  // Get parameters
+  // Get extra parameters needed here
   int block_factor;
   ParmParse ppMain("main");
   ppMain.get("block_factor", block_factor);

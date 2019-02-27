@@ -221,6 +221,7 @@ struct MushyLayerOptions {
   bool ignoreSolveFails;
   bool initiallyDoAutomaticRestart;
   int steadyStateNormType;
+  bool load_advVel;
   Real CFinterpOrder_advection;
 
 

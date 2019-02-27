@@ -122,7 +122,6 @@ public:
     m_isViscous = false;
 
     m_newLevel=false;
-    m_loaded_advVel=false;
 
 //    m_computeDiagnostics = true;
 //    m_steadyStateNormType = -1;
@@ -362,9 +361,6 @@ public:
 
   /// Things to do after initialization
   virtual void postInitialize();
-
-  /// Return whether we've loaded the advection velocity
-  bool loadedAdvVel() { return m_loaded_advVel; }
 
 #ifdef CH_USE_HDF5
   /// Write checkpoint header
@@ -1307,8 +1303,6 @@ protected:
   /// Factor reduce \f$ \Delta t \f$ by after a failed timestep
   int m_dtReduction;
 
-  /// If we've been able to load the advection velocity from a checkpoint file
-  bool m_loaded_advVel;
 
   /// Fixed \f$ Delta t \f$
   /**

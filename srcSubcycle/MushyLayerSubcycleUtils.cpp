@@ -41,8 +41,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   MushyLayerParams params;
   params.getParameters();
 
-  opt.cfl = 0.8;
-  ppMain.get("cfl",opt.cfl);
+  opt.cfl = 0.5;
+  ppMain.query("cfl",opt.cfl);
 
   opt.min_time = 0;
   ppMain.query("min_time", opt.min_time);
@@ -104,6 +104,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   // 1 for volume averaged, 0 for max
   opt.steadyStateNormType = 1;
   ppMain.query("steadyStateNormType", opt.steadyStateNormType);
+
+  // For use when restarting.
+  opt.load_advVel = false;
+  ppMain.query("load_advVel", opt.load_advVel);
 
   /**
    * Timestepping
@@ -339,10 +343,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
 
   opt.refineThresh = 0.3;
-  ppMain.get ("refine_thresh", opt.refineThresh);
+  ppMain.query("refine_thresh", opt.refineThresh);
 
   opt.tagBufferSize = 4;
-  ppMain.get("tag_buffer_size", opt.tagBufferSize);
+  ppMain.query("tag_buffer_size", opt.tagBufferSize);
 
   opt.doProjection=true;
   ppMain.query("doProjection", opt.doProjection);
@@ -511,7 +515,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
    * Solver options
    */
   opt.useLimiting = true;
-  ppMain.get("use_limiting", opt.useLimiting);
+  ppMain.query("use_limiting", opt.useLimiting);
 
   opt.viscous_solver_tol = 1e-10;
   ppMain.query("viscous_solver_tol", opt.viscous_solver_tol);
@@ -857,8 +861,15 @@ defineAMR(AMR&                                          a_amr,
   ppMain.get("max_level",max_level);
 
   int num_read_levels = Max(max_level,1);
-  std::vector<int> regrid_intervals; // (num_read_levels,1);
-  ppMain.getarr("regrid_interval",regrid_intervals,0,num_read_levels);
+  std::vector<int> regrid_intervals;
+  if (max_level > 0)
+  {
+    ppMain.getarr("regrid_interval",regrid_intervals,0,num_read_levels);
+  }
+  else
+  {
+    regrid_intervals.push_back(-1);
+  }
 
   if (max_level > 0)
   {
@@ -892,16 +903,16 @@ defineAMR(AMR&                                          a_amr,
   }
 
   int block_factor = 1;
-  ppMain.get("block_factor",block_factor);
+  ppMain.query("block_factor",block_factor);
 
-  int max_grid_size = 32;
-  ppMain.get("max_grid_size",max_grid_size);
+  int max_grid_size = 128;
+  ppMain.query("max_grid_size",max_grid_size);
 
   Real fill_ratio = 0.75;
-  ppMain.get("fill_ratio",fill_ratio);
+  ppMain.query("fill_ratio",fill_ratio);
 
   int checkpoint_interval = 0;
-  ppMain.get("checkpoint_interval",checkpoint_interval);
+  ppMain.query("checkpoint_interval",checkpoint_interval);
 
   int plot_interval = 0;
   ppMain.query("plot_interval",plot_interval);
@@ -910,17 +921,16 @@ defineAMR(AMR&                                          a_amr,
   ppMain.query("plot_period", plot_period);
 
   Real max_dt_growth = 1.1;
-  ppMain.get("max_dt_growth",max_dt_growth);
+  ppMain.query("max_dt_growth",max_dt_growth);
 
   Real fixed_dt = -1.0;
   ppMain.query("fixed_dt", fixed_dt);
 
   Real dt_tolerance_factor = 1.1;
-  ppMain.get("dt_tolerance_factor",dt_tolerance_factor);
+  ppMain.query("dt_tolerance_factor",dt_tolerance_factor);
   AMR amr;
   a_amr.define(max_level, a_refRat,
                a_prob_domain,&(*a_fact));
-
 
 
   // set grid generation parameters
@@ -929,8 +939,8 @@ defineAMR(AMR&                                          a_amr,
   a_amr.fillRatio(fill_ratio);
 
   // the hyperbolic codes use a grid buffer of 1
-  int gridBufferSize;
-  ppMain.get("grid_buffer_size",gridBufferSize);
+  int gridBufferSize = 1;
+  ppMain.query("grid_buffer_size",gridBufferSize);
   a_amr.gridBufferSize(gridBufferSize);
 
   // set output parameters
@@ -946,7 +956,6 @@ defineAMR(AMR&                                          a_amr,
 
   std::string output_folder = "";
   ppMain.query("output_folder", output_folder);
-
 
 
   if (fixed_dt > 0)
@@ -1002,8 +1011,8 @@ defineAMR(AMR&                                          a_amr,
   }
 #endif
 
-  int verbosity;
-  ppMain.get("verbosity",verbosity);
+  int verbosity = 1;
+  ppMain.query("verbosity",verbosity);
   CH_assert(verbosity >= 0);
 
   a_amr.verbosity(verbosity);

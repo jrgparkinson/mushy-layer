@@ -50,7 +50,7 @@ def testHeleShawFixedChill(argv):
     except getopt.GetoptError as err:
         print(str(err))
         print(
-            'testPorousMushyHole.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio> -A<do amr> -P<true(1)/false(0) do plot files> -N<non dimensional reluctance>')
+            'testHeleShawFixedChill.py -t<max time> -R<Compositional Rayleigh Number> -D<Darcy number> -C<Composition Ratio> -A<do amr> -P<true(1)/false(0) do plot files> -N<non dimensional reluctance>')
 
         sys.exit(2)
 

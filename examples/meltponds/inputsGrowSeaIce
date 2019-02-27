@@ -112,4 +112,5 @@ parameters.initialComposition=30
 parameters.liquidusSlope=-0.1
 
 
+main.use_limiting=true
 
