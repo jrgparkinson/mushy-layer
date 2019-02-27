@@ -102,11 +102,9 @@ UniformFineSol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, ...
 makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
 
 
- axErr = gca;
-% axErr.Position =  [0.76 axBottom 0.2 axHeight];
-% 
-% 
-% text(axErr.XLim(2)-0.5, axErr.YLim(1)+0.3, '(c)', 'FontSize', textFontSize);
+axErr = gca;
+
+ 
 text(0.04, 0.92, '(c)', 'FontSize', textFontSize, 'Color', [0 0 0]);
 
 set(h,'Units','Inches');
