@@ -161,13 +161,15 @@ class BatchJob:
                 exec_dir = os.path.dirname(self.exec_file)
                 print('Exec dir: %s' % exec_dir)
 
+                buil_mush_command = os.path.join(exec_dir, 'buildMushyLayer.sh')
+
                 custom_cmd = 'hs=$HOSTNAME \n' \
                              'if [[ $hs == *"gyre"* ]]; then \n' \
-                             ' buildmush; \n cd %s ; \n' \
+                             ' %s; \n cd %s ; \n' \
                              ' %s \n' \
                              'else\n' \
                              ' %s\n' \
-                             'fi\n' % (self.folder, legacy_run_str, run_str)
+                             'fi\n' % (buil_mush_command, self.folder, legacy_run_str, run_str)
 
                 commands_to_execute.append(custom_cmd)
 
