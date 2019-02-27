@@ -547,21 +547,10 @@ readCheckpointLevel(HDF5Handle& a_handle)
   }
 
   // Try and read the advection velocity
-  try
+  if (m_opt.load_advVel)
   {
     dataStatus = read<FluxBox>(a_handle, m_advVel,"advVel", m_grids);
-    if (dataStatus == 0)
-    {
-      m_loaded_advVel = true;
-    }
-//    pout() << "Reading in advection velocity, data status = " << dataStatus << endl;
   }
-  catch(...)
-  {
-    pout() << "Could not read in advection velocity" << endl;
-  }
-
-
 
   if (m_opt.refTemp != m_opt.prevRefTemp && m_opt.refSalinity != m_opt.prevRefSalinity)
   {
