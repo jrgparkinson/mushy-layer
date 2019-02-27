@@ -16,6 +16,8 @@ for file_i = 1:length(files)
         fname = strrep(full_fname, '.2d.hdf5', '');
         %fprintf('   > fname: %s \n', fname);
         
+        fprintf('Doing regex match on filename "%s" \n', fname);
+       
         % Get final number - frame
         matchStr = regexp(fname,'\d+$','match');
         

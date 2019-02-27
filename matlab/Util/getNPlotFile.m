@@ -21,7 +21,7 @@ end
 dim = 2;
 subcycled = true;
 
-fprintf('Looking for frames in %s with prefix %s \n', output_dir, plot_prefix);
+fprintf('Looking for frames in %s with prefix "%s" \n', output_dir, plot_prefix);
 
 [actual_plot_prefix, frames] = getFrames(output_dir, plot_prefix);
 
