@@ -83,34 +83,33 @@ int main(int argc, char* argv[])
   // Else, search for files in the directory
   Vector<string> fileNames;
 
-    pout() << "Finding files..." << endl;
+  pout() << "Finding files..." << endl;
 
-    // Get all the files in the directory with the correct prefix
-    DIR           *dirp;
-    struct dirent *directory;
+  // Get all the files in the directory with the correct prefix
+  DIR           *dirp;
+  struct dirent *directory;
 
-    dirp = opendir(inFolder.c_str());
-    if (dirp)
+  dirp = opendir(inFolder.c_str());
+  if (dirp)
+  {
+    while ((directory = readdir(dirp)) != NULL)
     {
-      while ((directory = readdir(dirp)) != NULL)
+      string thisFilename = directory->d_name;
+      if (thisFilename.find(prefix.c_str()) != std::string::npos)
       {
-        string thisFilename = directory->d_name;
-        if (thisFilename.find(prefix.c_str()) != std::string::npos)
-        {
-          fileNames.push_back(thisFilename);
-          //        printf("%s\n", thisFilename.c_str());
-        }
-
+        fileNames.push_back(thisFilename);
+        //        printf("%s\n", thisFilename.c_str());
       }
 
-      closedir(dirp);
     }
 
-    // Try and sort files
+    closedir(dirp);
+  }
 
-    fileNames.sort();
-    //std::sort (fileNames.begin(), fileNames.end(), fileNames);
+  // Try and sort files
 
+  fileNames.sort();
+  //std::sort (fileNames.begin(), fileNames.end(), fileNames);
 
   // All the things we're going to measure
   int numFiles = fileNames.size();
@@ -147,15 +146,35 @@ int main(int argc, char* argv[])
     HDF5HeaderData header;
     getAMRHierarchy(chkFile, amrlevels, finest_level, header);
 
-
     time[file_i] = amrlevels[0]->time();
 
     const ProblemDomain oldLev0Domain = amrlevels[0]->problemDomain();
 
-    // Analyse this file....
+    // Make sure we're using the eutectic point for nondimensionalisation when we compute velocities (else the calculation fails)
+    for (int lev = finest_level; lev >=0; lev--)
+    {
+      amrlevels[lev]->setDimensionlessReferenceEutectic();
+    }
 
-    // Let's try calculating the solute flux
+    // Init pressure
+    for (int lev = finest_level; lev >=0; lev--)
+    {
+      amrlevels[lev]->postInitialize();
+    }
 
+    // Initialise velocities
+    for (int lev = 0; lev<=finest_level; lev++)
+    {
+    amrlevels[lev]->computeAllVelocities(false);
+    }
+
+    // Now shift to the nondimensionalisation relative to the initial point for computing diagnostics
+    for (int lev = finest_level; lev >=0; lev--)
+    {
+      amrlevels[lev]->setDimensionlessReferenceInitial();
+    }
+
+    // Compute diagnostics
     for (int lev = finest_level; lev >=0 ; lev--)
     {
       // Make sure we're set up to compute diagnostics

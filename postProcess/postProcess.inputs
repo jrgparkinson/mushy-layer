@@ -1,0 +1,16 @@
+#/home/parkinsonjl/mnt/sharedStorage/optimalStates-restructured/Le200/CR26.000/RaC80/pts192-steady/chkpts192-038190.2d.hdf5
+in_folder=/home/parkinsonjl/mnt/sharedStorage/optimalStates-restructured/Le200/CR26.000/RaC80/pts192-steady/
+out_file=/home/parkinsonjl/mnt/sharedStorage/optimalStates-restructured/Le200/CR26.000/RaC80/pts192-steady/cpp_diagnostics.out
+
+#parameters.bottomBulkConc=0.0
+#parameters.bottomEnthalpy=5.5
+#parameters.compositionRatio=25.0
+#parameters.prevReferenceSalinity=230
+#parameters.prevReferenceTemperature=-23
+
+#parameters.referenceSalinity=35
+#parameters.referenceTemperature=-3.5
+
+#parameters.topBulkConc=0.0
+#parameters.topEnthalpy=-1.5
+prefix=chkpts192-

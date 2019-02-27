@@ -308,6 +308,9 @@ void AMRLevelMushyLayer::levelSetup()
     pout() << "AMRLevelMushyLayer::levelSetup (level " << m_level << ")" << endl;
   }
 
+  // In case these have changed
+  defineIBCs();
+
   m_physBCPtr->Dx(m_dx);
 
   AMRLevelMushyLayer* amrMLCoarserPtr = getCoarserLevel();
@@ -1045,8 +1048,15 @@ void AMRLevelMushyLayer::setAdvectionBCs()
   delete Sl_IBC;
 }
 
-
-
+void
+AMRLevelMushyLayer::defineIBCs ()
+{
+  for (int var = 0; var < m_numScalarVars; var++) {
+    if (m_makeFluxRegForScalarVar[var]) {
+      m_scalarIBC[var] = getScalarIBCs (var);
+    }
+  }
+}
 
 void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_params)
 {
@@ -1159,13 +1169,7 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
   m_makeFluxRegForVectorVar[VectorVars::m_fluidVel] = true;
   m_makeFluxRegForVectorVar[VectorVars::m_U_porosity] = true;
 
-  for (int var=0; var<m_numScalarVars; var++)
-  {
-    if (m_makeFluxRegForScalarVar[var])
-    {
-      m_scalarIBC[var] = getScalarIBCs(var);
-    }
-  }
+  defineIBCs ();
 
 
 

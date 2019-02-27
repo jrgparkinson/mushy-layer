@@ -1384,9 +1384,6 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
 
     DisjointBoxLayout dbl = a_phi.disjointBoxLayout();
 
-
-
-
     for (DataIterator dit = a_phi.dataIterator(); dit.ok(); ++dit)
     {
 
@@ -1395,12 +1392,12 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
 
       // To stop double counting of interior faces
       // think this was actually causing us to not calculated fluxes at the top of boxes
-      if (box.hiVect()[1] < domBox.hiVect()[1])
-      {
-        box.growDir(idir, Side::Hi, -1);
-      }
+//      if (box.hiVect()[1] < domBox.hiVect()[1])
+//      {
+//        box.growDir(idir, Side::Hi, -1);
+//      }
 
-
+      box.growDir(idir, Side::Hi, -1);
 
       for (BoxIterator bit(box); bit.ok(); ++bit)
       {
@@ -1408,7 +1405,8 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
         int y_i = iv[SpaceDim-1];
         IntVect ivUp = iv + BASISV(idir);
 
-        averaged[y_i-y_init] += fluxDir(iv, comp)*m_dx/m_opt.domainWidth;
+        //averaged[y_i-y_init] += fluxDir(iv, comp)*m_dx/m_opt.domainWidth;
+        averaged[y_i-y_init] += fluxDir(ivUp, comp)*m_dx/m_opt.domainWidth;
       }
     }
 

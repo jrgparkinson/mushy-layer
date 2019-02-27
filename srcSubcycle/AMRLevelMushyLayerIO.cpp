@@ -959,3 +959,87 @@ void AMRLevelMushyLayer::computeVorticity()
 
 }
 
+
+void AMRLevelMushyLayer::setDimensionlessReferenceEutectic()
+{
+  // Don't need to do anything if the reference point is already the eutectic
+  if (m_opt.refSalinity == m_parameters.eutecticComposition)
+  {
+    return;
+  }
+
+  // Assume that, in this case, the current reference point is the initial
+  // H = H + 1
+  // S = S - 1
+  pout() << "Converting Wells to Katz units (H=H+1; S=S-1)" << endl;
+
+  for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
+  {
+    (*m_scalarNew[ScalarVars::m_enthalpy])[dit].plus(1.0);
+    (*m_scalarOld[ScalarVars::m_enthalpy])[dit].plus(1.0);
+    (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit].plus(-1.0);
+    (*m_scalarOld[ScalarVars::m_bulkConcentration])[dit].plus(-1.0);
+  }
+
+  // Also need to convert BCs
+  for (int dir=0; dir < SpaceDim; dir++)
+  {
+    m_parameters.bcValBulkConcentrationHi[dir] = m_parameters.bcValBulkConcentrationHi[dir] -1;
+    m_parameters.bcValBulkConcentrationLo[dir] = m_parameters.bcValBulkConcentrationLo[dir] -1;
+
+    m_parameters.bcValEnthalpyHi[dir] = m_parameters.bcValEnthalpyHi[dir] + 1;
+    m_parameters.bcValEnthalpyLo[dir] = m_parameters.bcValEnthalpyLo[dir] + 1;
+  }
+
+  m_parameters.computeDerivedBCs();
+
+  // We're now using the the eutectic
+  m_opt.refTemp = m_parameters.eutecticTemp;
+  m_opt.refSalinity = m_parameters.eutecticComposition;
+
+  // Call level setup to remake BC object
+  this->levelSetup();
+
+}
+
+void AMRLevelMushyLayer::setDimensionlessReferenceInitial()
+{
+
+  // Don't need to do anything if the reference point is already the initial composition
+  if (m_opt.refSalinity == m_parameters.initialComposition)
+  {
+    return;
+  }
+
+  // Assume that, in this case, we are ready to transform
+  // H = H - 1
+  // S = S + 1
+  pout() << "Converting Katz to Wells units (H=H-1; S=S+1)" << endl;
+
+  for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
+  {
+    (*m_scalarNew[ScalarVars::m_enthalpy])[dit].plus(-1.0);
+    (*m_scalarOld[ScalarVars::m_enthalpy])[dit].plus(-1.0);
+    (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit].plus(1.0);
+    (*m_scalarOld[ScalarVars::m_bulkConcentration])[dit].plus(1.0);
+  }
+
+  // Also need to convert BCs
+  for (int dir=0; dir < SpaceDim; dir++)
+  {
+
+    m_parameters.bcValBulkConcentrationHi[dir] = m_parameters.bcValBulkConcentrationHi[dir] + 1;
+    m_parameters.bcValBulkConcentrationLo[dir] = m_parameters.bcValBulkConcentrationLo[dir] + 1;
+
+    m_parameters.bcValEnthalpyHi[dir] = m_parameters.bcValEnthalpyHi[dir] - 1;
+    m_parameters.bcValEnthalpyLo[dir] = m_parameters.bcValEnthalpyLo[dir] - 1;
+  }
+  m_parameters.computeDerivedBCs();
+
+  m_opt.refTemp = m_parameters.eutecticTemp - m_parameters.liquidusSlope*(m_parameters.eutecticComposition-m_parameters.initialComposition);
+  m_opt.refSalinity = m_parameters.initialComposition;
+
+  // Call level setup to remake BC object
+  this->levelSetup();
+
+}

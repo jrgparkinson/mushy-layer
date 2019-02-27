@@ -396,6 +396,12 @@ public:
   /// Write AMR hierarchy to file
   void writeAMRHierarchy(string filename);
 
+  /// Set reference point for nondimensionalisation to be the initial temperature/salinity
+  void setDimensionlessReferenceInitial();
+
+  /// Set reference point for nondimensionalisation to be the eutectic temperature/salinity
+  void setDimensionlessReferenceEutectic();
+
   /// Returns the dt computed earlier for this level
   virtual Real computeDt();
 
@@ -970,6 +976,8 @@ protected:
 
   /// Set BCs on advection physics classes
   void setAdvectionBCs();
+  void
+  defineIBCs ();
 
   /// Advection velocity
   LevelData<FluxBox>   m_advVel,
