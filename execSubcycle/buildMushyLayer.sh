@@ -14,14 +14,14 @@ module unload gcc/5.2.0
 module load gcc/4.8.3
 
 #cd ~/mushy-layer/execSubcycle/
-cd MUSHY_LAYER_DIR/execSubcycle/
+cd $MUSHY_LAYER_DIR/execSubcycle/
 make all
 
-cd MUSHY_LAYER_DIR/setupNewRun/
+cd $MUSHY_LAYER_DIR/setupNewRun/
 # make clean
 make all
 
-cd MUSHY_LAYER_DIR/postProcess/
+cd $MUSHY_LAYER_DIR/postProcess/
 make all
 
 module unload gcc/4.8.3
