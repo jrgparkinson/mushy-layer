@@ -117,3 +117,4 @@ parameters.liquidusSlope=-0.1
 # No freestream correction
 projection.eta=0.0
 
+main.use_limiting=true
