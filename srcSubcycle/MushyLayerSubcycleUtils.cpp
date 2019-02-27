@@ -609,7 +609,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   // Use 4th order slope computations
   opt.velAdvUseFourthOrderSlopes = true;
-  opt.velAdvHigherOrderLimiter = false;
+
 
   // No artificial viscosity
   opt.velAdvUseArtVisc = false;
@@ -619,6 +619,17 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppPatchGodunov.query("velFourthOrderSlopes", opt.velAdvUseFourthOrderSlopes);
   ppPatchGodunov.query("velUseArtVisc", opt.velAdvUseArtVisc);
   ppPatchGodunov.query("velArtVisc", opt.velAdvArtVisc);
+
+  // There is a bug in Chombo at the moment which means we have to use the limiter if we're
+  // doing 2nd order slopes
+  if (opt.velAdvNormalPredOrder == 2)
+  {
+    opt.velAdvHigherOrderLimiter = true;
+  }
+  else
+  {
+    opt.velAdvHigherOrderLimiter = false;
+  }
   ppPatchGodunov.query("higherOrderLimiter", opt.velAdvHigherOrderLimiter);
 
   opt.HCUseArtVisc = opt.velAdvUseArtVisc;
