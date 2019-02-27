@@ -70,9 +70,13 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
             if not gridFile:
                 gridFile = mushyLayerBaseDir + '/grids/middle/' + str(nz_coarse) + 'x' + str(nz_coarse)
 
-            # Always turn off slope limiting for convergence tests
-            params['main.use_limiting'] = 'false'
-            params['main.debug'] = 'false'  # also turn off debug to save disk space
+            # Turn slope limiting off unless we've requested it
+            if 'main.use_limiting' not in params:
+                params['main.use_limiting'] = 'false'
+
+            # also turn off debug to save disk space, unless we've explicitly asked for it
+            if 'main.debug' not in params:
+                params['main.debug'] = 'false'
 
             # Any extra params we may have
             for k, v in extra_params.iteritems():
