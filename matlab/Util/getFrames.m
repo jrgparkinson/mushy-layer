@@ -16,15 +16,19 @@ for file_i = 1:length(files)
         fname = strrep(full_fname, '.2d.hdf5', '');
         %fprintf('   > fname: %s \n', fname);
         
-        fprintf('Doing regex match on filename "%s" \n', fname);
+       % fprintf('Doing regex match on filename "%s" \n', fname);
        
         % Get final number - frame
         matchStr = regexp(fname,'\d+$','match');
         
-        thisframe = str2num(matchStr{1});
+        if length(matchStr) > 0
         
-        frames(end+1) = thisframe;
-        actual_plot_prefix = strrep(fname, matchStr{1}, '');
+            thisframe = str2num(matchStr{1});
+
+            frames(end+1) = thisframe;
+            actual_plot_prefix = strrep(fname, matchStr{1}, '');
+        
+        end
 
     
     end
