@@ -132,6 +132,53 @@ MushyLayerParams::MushyLayerParams() {
 MushyLayerParams::~MushyLayerParams() {
 }
 
+void
+MushyLayerParams::computeDerivedBCs ()
+{
+  // Now do defaults for the other boundary values
+  for (int dir = 0; dir < SpaceDim; dir++) {
+    ::computeBoundingEnergy (bcValEnthalpyHi[dir],
+                             bcValBulkConcentrationHi[dir], bcValSolidusHi[dir],
+                             bcValLiquidusHi[dir], bcValEutecticHi[dir],
+                             specificHeatRatio, stefan, compositionRatio,
+                             waterDistributionCoeff, thetaEutectic,
+                             ThetaEutectic);
+    ::computeEnthalpyVars (bcValEnthalpyHi[dir], bcValBulkConcentrationHi[dir],
+                           bcValPorosityHi[dir], bcValTemperatureHi[dir],
+                           bcValLiquidConcentrationHi[dir],
+                           bcValSolidConcentrationHi[dir], bcValSolidusHi[dir],
+                           bcValLiquidusHi[dir], bcValEutecticHi[dir],
+                           specificHeatRatio, stefan, compositionRatio,
+                           waterDistributionCoeff, thetaEutectic,
+                           ThetaEutectic);
+    ::computeBoundingEnergy (bcValEnthalpyLo[dir],
+                             bcValBulkConcentrationLo[dir], bcValSolidusLo[dir],
+                             bcValLiquidusLo[dir], bcValEutecticLo[dir],
+                             specificHeatRatio, stefan, compositionRatio,
+                             waterDistributionCoeff, thetaEutectic,
+                             ThetaEutectic);
+    ::computeEnthalpyVars (bcValEnthalpyLo[dir], bcValBulkConcentrationLo[dir],
+                           bcValPorosityLo[dir], bcValTemperatureLo[dir],
+                           bcValLiquidConcentrationLo[dir],
+                           bcValSolidConcentrationLo[dir], bcValSolidusLo[dir],
+                           bcValLiquidusLo[dir], bcValEutecticLo[dir],
+                           specificHeatRatio, stefan, compositionRatio,
+                           waterDistributionCoeff, thetaEutectic,
+                           ThetaEutectic);
+    bcValPermeabilityHi[dir] = calculatePermeability (bcValPorosityHi[dir]);
+    bcValPermeabilityLo[dir] = calculatePermeability (bcValPorosityLo[dir]);
+    if (dir == SpaceDim - 1) {
+      bool useTop = (bcValEnthalpyHi[dir] > bcValEnthalpyLo[dir]);
+      if (useTop) {
+        Hinitial = bcValEnthalpyHi[dir];
+      }
+      else {
+        Hinitial = bcValEnthalpyLo[dir];
+        ;
+      }
+    }
+  }
+}
 
 void MushyLayerParams::getParameters()
 {
@@ -494,90 +541,10 @@ void MushyLayerParams::getParameters()
 
 
   // Now do defaults for the other boundary values
-  for (int dir=0; dir<SpaceDim; dir++)
-  {
-
-    // Do this for every direction
-//    Real solidus,liquidus,eutectic, ThetaS;
-
-    ::computeBoundingEnergy(bcValEnthalpyHi[dir], bcValBulkConcentrationHi[dir], bcValSolidusHi[dir], bcValLiquidusHi[dir], bcValEutecticHi[dir],
-                            specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff,
-                            thetaEutectic, ThetaEutectic);
-
-
-
-    ::computeEnthalpyVars(bcValEnthalpyHi[dir], bcValBulkConcentrationHi[dir], bcValPorosityHi[dir], bcValTemperatureHi[dir], bcValLiquidConcentrationHi[dir], bcValSolidConcentrationHi[dir],
-                          bcValSolidusHi[dir], bcValLiquidusHi[dir], bcValEutecticHi[dir],
-                          specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff,
-                          thetaEutectic, ThetaEutectic);
-
-
-
-    ::computeBoundingEnergy(bcValEnthalpyLo[dir], bcValBulkConcentrationLo[dir], bcValSolidusLo[dir], bcValLiquidusLo[dir], bcValEutecticLo[dir],
-                            specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff,
-                            thetaEutectic, ThetaEutectic);
-
-    ::computeEnthalpyVars(bcValEnthalpyLo[dir], bcValBulkConcentrationLo[dir], bcValPorosityLo[dir], bcValTemperatureLo[dir], bcValLiquidConcentrationLo[dir], bcValSolidConcentrationLo[dir],
-                          bcValSolidusLo[dir], bcValLiquidusLo[dir], bcValEutecticLo[dir],
-                          specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff,
-                          thetaEutectic, ThetaEutectic);
-
-
-    bcValPermeabilityHi[dir] = calculatePermeability(bcValPorosityHi[dir]);
-    bcValPermeabilityLo[dir] =  calculatePermeability(bcValPorosityLo[dir]);
-
-
-    if (dir == SpaceDim - 1)
-    {
-
-
-      bool useTop = (bcValEnthalpyHi[dir] > bcValEnthalpyLo[dir]);
-
-      if (useTop)
-      {
-        Hinitial = bcValEnthalpyHi[dir];
-        //        ThetaLInitial = bcValLiquidConcentrationHi[dir];
-        //        ThetaSInitial = bcValSolidConcentrationHi[dir];;
-        //        thetaInitial =  bcValTemperatureHi[dir];;
-
-      }
-      else
-      {
-        Hinitial = bcValEnthalpyLo[dir];;
-        //              ThetaLInitial = ThetaLBottom;
-        //              ThetaSInitial = ThetaSBottom;
-        //              thetaInitial = thetaBottom;
-      }
-
-
-    }
-    //    else
-    //    {
-    //      // Neumann on the sides by default
-    //      bcValEnthalpyHi[dir] = 0;
-    //      bcValEnthalpyLo[dir]  = 0;
-    //      bcValBulkConcentrationHi[dir]  = 0;
-    //      bcValBulkConcentrationLo[dir]  = 0;
-    //      bcValTemperatureHi[dir]  =0;
-    //      bcValTemperatureLo[dir]  =0;
-    //      bcValLiquidConcentrationLo[dir]  = 0;
-    //      bcValLiquidConcentrationHi[dir]  = 0;
-    //      bcValPorosityLo[dir]  = 0;
-    //      bcValPorosityHi[dir]  = 0;
-    //      bcValPermeabilityLo[dir]  = 0;
-    //      bcValPermeabilityHi[dir]  = 0;
-    //    }
-
-
-    //    bcValVelLo[dir] = 0.0;
-    //    bcValVelHi[dir] = 0.0;
-  }
-
-
+  computeDerivedBCs();
 
 
   // Now BC values
-
 
   parseBCVals("liquidConcentrationLoVal", bcValLiquidConcentrationLo);
   parseBCVals("liquidConcentrationHiVal", bcValLiquidConcentrationHi);

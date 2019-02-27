@@ -572,8 +572,8 @@ public:
 
 	bool isDarcyBrinkman();
 	bool isViscous();
-
-
+  void
+  computeDerivedBCs ();
 };
 
 #endif /* SRC_MUSHYLAYERPARAMS_H_ */

@@ -122,6 +122,7 @@ public:
     m_isViscous = false;
 
     m_newLevel=false;
+    m_loaded_advVel=false;
 
 //    m_computeDiagnostics = true;
 //    m_steadyStateNormType = -1;
@@ -362,6 +363,9 @@ public:
   /// Things to do after initialization
   virtual void postInitialize();
 
+  /// Return whether we've loaded the advection velocity
+  bool loadedAdvVel() { return m_loaded_advVel; }
+
 #ifdef CH_USE_HDF5
   /// Write checkpoint header
   virtual void writeCheckpointHeader(HDF5Handle& a_handle) const;
@@ -395,6 +399,12 @@ public:
 
   /// Write AMR hierarchy to file
   void writeAMRHierarchy(string filename);
+
+  /// Set reference point for nondimensionalisation to be the initial temperature/salinity
+  void setDimensionlessReferenceInitial();
+
+  /// Set reference point for nondimensionalisation to be the eutectic temperature/salinity
+  void setDimensionlessReferenceEutectic();
 
   /// Returns the dt computed earlier for this level
   virtual Real computeDt();
@@ -970,6 +980,8 @@ protected:
 
   /// Set BCs on advection physics classes
   void setAdvectionBCs();
+  void
+  defineIBCs ();
 
   /// Advection velocity
   LevelData<FluxBox>   m_advVel,
@@ -1294,6 +1306,9 @@ protected:
 
   /// Factor reduce \f$ \Delta t \f$ by after a failed timestep
   int m_dtReduction;
+
+  /// If we've been able to load the advection velocity from a checkpoint file
+  bool m_loaded_advVel;
 
   /// Fixed \f$ Delta t \f$
   /**

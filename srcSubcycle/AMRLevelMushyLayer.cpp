@@ -1352,13 +1352,11 @@ void AMRLevelMushyLayer::horizontallyAverage(Vector<Real>& globalAveraged, Level
 void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FluxBox>& a_phi,
                                              Vector<Real>& globalAveraged)
 {
-  //  a_phi.exchange();
   Box domBox = m_problem_domain.domainBox();
 
   IntVect smallEnd =domBox.smallEnd();
   int y_init = smallEnd[1];
 
-  //  int nGhost = a_phi.ghostVect()[0];
   int idir = SpaceDim-1;
 
   // +2 because for N cells we have N+1 faces
@@ -1384,9 +1382,6 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
 
     DisjointBoxLayout dbl = a_phi.disjointBoxLayout();
 
-
-
-
     for (DataIterator dit = a_phi.dataIterator(); dit.ok(); ++dit)
     {
 
@@ -1401,14 +1396,29 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
       }
 
 
-
       for (BoxIterator bit(box); bit.ok(); ++bit)
       {
         IntVect iv = bit();
         int y_i = iv[SpaceDim-1];
         IntVect ivUp = iv + BASISV(idir);
 
-        averaged[y_i-y_init] += fluxDir(iv, comp)*m_dx/m_opt.domainWidth;
+        IntVect ivFluxBox;
+
+        // This is a bit of a hack, but basically works.
+
+        if (fluxDir.box().contains(ivUp))
+        {
+
+          ivFluxBox = ivUp;
+        }
+        else
+        {
+          ivFluxBox = iv;
+        }
+
+        //averaged[y_i-y_init] += fluxDir(iv, comp)*m_dx/m_opt.domainWidth;
+        averaged[y_i-y_init] += fluxDir(ivFluxBox, comp)*m_dx/m_opt.domainWidth;
+
       }
     }
 
