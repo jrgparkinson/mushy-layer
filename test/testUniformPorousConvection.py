@@ -34,7 +34,7 @@ def uniform_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max
 def test_uniform_porous_convection(argv):
     # Default vals:
     cfl = 0.2
-    nz_uniform = -1 # 128
+    nz_uniform = 128 # 128
     nz_vm = 64
     chi = 0.4
     bc_accuracy = 1
