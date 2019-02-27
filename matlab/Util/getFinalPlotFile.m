@@ -12,6 +12,7 @@ if exist(output_dir, 'dir') ~= 7
     fprintf('   %s \n', output_dir);
 end
 
+
 plotFile = getNPlotFile(output_dir,plot_prefix, -1);
 
 
