@@ -1004,6 +1004,9 @@ void AMRLevelMushyLayer::setDimensionlessReferenceEutectic()
 
   m_parameters.computeDerivedBCs();
 
+  // Add new to convert dimensionless parameters
+  m_parameters.compositionRatio = m_parameters.compositionRatio + 1;
+
   // We're now using the the eutectic
   m_opt.refTemp = m_parameters.eutecticTemp;
   m_opt.refSalinity = m_parameters.eutecticComposition;
@@ -1046,6 +1049,9 @@ void AMRLevelMushyLayer::setDimensionlessReferenceInitial()
     m_parameters.bcValEnthalpyLo[dir] = m_parameters.bcValEnthalpyLo[dir] - 1;
   }
   m_parameters.computeDerivedBCs();
+
+  // Add new to convert dimensionless parameters
+  m_parameters.compositionRatio = m_parameters.compositionRatio - 1;
 
   m_opt.refTemp = m_parameters.eutecticTemp - m_parameters.liquidusSlope*(m_parameters.eutecticComposition-m_parameters.initialComposition);
   m_opt.refSalinity = m_parameters.initialComposition;
