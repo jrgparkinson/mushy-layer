@@ -163,11 +163,11 @@ class BatchJob:
 
                 custom_cmd = 'hs=$HOSTNAME \n' \
                              'if [[ $hs == *"gyre"* ]]; then \n' \
-                             ' cd %s; make all; cd %s ; \n' \
+                             ' buildmush; \n cd %s ; \n' \
                              ' %s \n' \
                              'else\n' \
                              ' %s\n' \
-                             'fi\n' % (exec_dir, self.folder, legacy_run_str, run_str)
+                             'fi\n' % (self.folder, legacy_run_str, run_str)
 
                 commands_to_execute.append(custom_cmd)
 
