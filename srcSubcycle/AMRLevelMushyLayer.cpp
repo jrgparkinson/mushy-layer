@@ -1352,13 +1352,11 @@ void AMRLevelMushyLayer::horizontallyAverage(Vector<Real>& globalAveraged, Level
 void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FluxBox>& a_phi,
                                              Vector<Real>& globalAveraged)
 {
-  //  a_phi.exchange();
   Box domBox = m_problem_domain.domainBox();
 
   IntVect smallEnd =domBox.smallEnd();
   int y_init = smallEnd[1];
 
-  //  int nGhost = a_phi.ghostVect()[0];
   int idir = SpaceDim-1;
 
   // +2 because for N cells we have N+1 faces
@@ -1392,12 +1390,11 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
 
       // To stop double counting of interior faces
       // think this was actually causing us to not calculated fluxes at the top of boxes
-//      if (box.hiVect()[1] < domBox.hiVect()[1])
-//      {
-//        box.growDir(idir, Side::Hi, -1);
-//      }
+      if (box.hiVect()[1] < domBox.hiVect()[1])
+      {
+        box.growDir(idir, Side::Hi, -1);
+      }
 
-      box.growDir(idir, Side::Hi, -1);
 
       for (BoxIterator bit(box); bit.ok(); ++bit)
       {
@@ -1405,8 +1402,23 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
         int y_i = iv[SpaceDim-1];
         IntVect ivUp = iv + BASISV(idir);
 
+        IntVect ivFluxBox;
+
+        // This is a bit of a hack, but basically works.
+
+        if (fluxDir.box().contains(ivUp))
+        {
+
+          ivFluxBox = ivUp;
+        }
+        else
+        {
+          ivFluxBox = iv;
+        }
+
         //averaged[y_i-y_init] += fluxDir(iv, comp)*m_dx/m_opt.domainWidth;
-        averaged[y_i-y_init] += fluxDir(ivUp, comp)*m_dx/m_opt.domainWidth;
+        averaged[y_i-y_init] += fluxDir(ivFluxBox, comp)*m_dx/m_opt.domainWidth;
+
       }
     }
 

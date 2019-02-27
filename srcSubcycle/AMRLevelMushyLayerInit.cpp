@@ -1085,6 +1085,9 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
   m_physBCPtr = new PhysBCUtil(m_parameters, m_dx);
   m_physBCPtr->setAdvVel(&m_advVel);
 
+  // For use when restarting.
+  m_loaded_advVel = false;
+
   Real diag_timescale = 0;
   if (m_parameters.nonDimVel != 0)
   {

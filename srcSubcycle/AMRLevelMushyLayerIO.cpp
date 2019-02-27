@@ -247,10 +247,6 @@ writeCheckpointLevel(HDF5Handle& a_handle) const
   header.writeToFile(a_handle);
 
   // Write the data for this level
-  if (s_verbosity >= 3)
-    {
-      pout() << "AMRLevelMushyLayer::writeCheckpointLevel - write dbl" << endl;
-    }
   write(a_handle,m_scalarNew[0]->boxLayout());
 
   //  Vector<string> scalarVarNames, vectorVarNames;
@@ -283,9 +279,9 @@ writeCheckpointLevel(HDF5Handle& a_handle) const
   }
 
   if (s_verbosity >= 3)
-    {
-      pout() << "AMRLevelMushyLayer::writeCheckpointLevel - write adv vel" << endl;
-    }
+  {
+    pout() << "AMRLevelMushyLayer::writeCheckpointLevel - write adv vel" << endl;
+  }
 
   write(a_handle, m_advVel, "advVel");
 
@@ -548,6 +544,21 @@ readCheckpointLevel(HDF5Handle& a_handle)
         pout() << "       ... skipping " << endl;
       }
     }
+  }
+
+  // Try and read the advection velocity
+  try
+  {
+    dataStatus = read<FluxBox>(a_handle, m_advVel,"advVel", m_grids);
+    if (dataStatus == 0)
+    {
+      m_loaded_advVel = true;
+    }
+//    pout() << "Reading in advection velocity, data status = " << dataStatus << endl;
+  }
+  catch(...)
+  {
+    pout() << "Could not read in advection velocity" << endl;
   }
 
 

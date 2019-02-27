@@ -150,22 +150,28 @@ int main(int argc, char* argv[])
 
     const ProblemDomain oldLev0Domain = amrlevels[0]->problemDomain();
 
-    // Make sure we're using the eutectic point for nondimensionalisation when we compute velocities (else the calculation fails)
-    for (int lev = finest_level; lev >=0; lev--)
+    // If we haven't loaded the advection velocity, calculate it
+    if (!amrlevels[0]->loadedAdvVel())
     {
-      amrlevels[lev]->setDimensionlessReferenceEutectic();
-    }
 
-    // Init pressure
-    for (int lev = finest_level; lev >=0; lev--)
-    {
-      amrlevels[lev]->postInitialize();
-    }
+      // Make sure we're using the eutectic point for nondimensionalisation when we compute velocities (else the calculation fails)
+      for (int lev = finest_level; lev >=0; lev--)
+      {
+        amrlevels[lev]->setDimensionlessReferenceEutectic();
+      }
 
-    // Initialise velocities
-    for (int lev = 0; lev<=finest_level; lev++)
-    {
-    amrlevels[lev]->computeAllVelocities(false);
+      // Init pressure
+      for (int lev = finest_level; lev >=0; lev--)
+      {
+        amrlevels[lev]->postInitialize();
+      }
+
+      // Initialise velocities
+      for (int lev = 0; lev<=finest_level; lev++)
+      {
+      amrlevels[lev]->computeAllVelocities(false);
+      }
+
     }
 
     // Now shift to the nondimensionalisation relative to the initial point for computing diagnostics
