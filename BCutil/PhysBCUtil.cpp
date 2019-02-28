@@ -1552,7 +1552,7 @@ public:
 
       RefCountedPtr<ConstValueFunction> zeroFunc(new ConstValueFunction(0.0, a_state.nComp()));
 
-      RefCountedPtr<ConstValueFunction> pressureHead(new ConstValueFunction(m_params.pressureHead, a_state.nComp()));
+
 
 
       RefCountedPtr<InflowValueFunction> inflowFunc(new InflowValueFunction(0.0, a_state.nComp(),
@@ -1624,6 +1624,19 @@ public:
 
                 case PhysBCUtil::PressureHead :
                 {
+                  Real pressureVal = 0.0;
+
+                  if (side == Side::Lo)
+                  {
+                    pressureVal = m_params.bcValPressureLo[idir];
+                  }
+                  else
+                  {
+                    pressureVal = m_params.bcValPressureHi[idir];
+                  }
+
+                  RefCountedPtr<ConstValueFunction> pressureHead(new ConstValueFunction(pressureVal, a_state.nComp()));
+
                   DiriBC(a_state, a_valid, a_dx,
                                           a_homogeneous,
                                           BCValueHolder(pressureHead),

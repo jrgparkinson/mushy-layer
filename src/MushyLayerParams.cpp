@@ -79,7 +79,6 @@ MushyLayerParams::MushyLayerParams() {
   ThetaSInitial = -999;
   Hinitial = -999 ;
 
-
   fixedTempDirection = -999;
   heleShaw = false;
   permeabilityFunction = PermeabilityFunctions::m_kozenyCarman;
@@ -101,7 +100,6 @@ MushyLayerParams::MushyLayerParams() {
 
   nonDimReluctance = -999.0;
   width = -999.0;
-
 
   referenceTemperature = -999;
   referenceSalinity = -999;
@@ -233,7 +231,7 @@ void MushyLayerParams::getParameters()
   pp.query("fixedTempDirection", fixedTempDirection);
   pp.query("inflowVelocity", inflowVelocity);
 
-  pp.query("pressureHead", pressureHead);
+
 
   pp.query("timeDependentBC", m_timeDependentBC);
 
@@ -528,6 +526,26 @@ void MushyLayerParams::getParameters()
   parseBCVals("bulkConcentrationHiVal", bcValBulkConcentrationHi, required);
 
 
+  for (int dir=0; dir < SpaceDim; dir++)
+  {
+    bcValPressureHi[dir] = 0.0;
+    bcValPressureLo[dir] = 0.0;
+  }
+
+  // Legacy option
+  if (pp.contains("pressureHead"))
+  {
+    pp.query("pressureHead", pressureHead);
+    bcValPressureHi[SpaceDim-1] = pressureHead;
+    bcValPressureLo[SpaceDim-1] = 0.0;
+  }
+
+  parseBCVals("bcValPressureHi", bcValPressureHi);
+  parseBCVals("bcValPressureLo", bcValPressureLo);
+
+
+
+
   // For the plume
   ::computeBoundingEnergy(HPlumeInflow, ThetaPlumeInflow, HSolidusPlume, HLiquidusPlume, HEutecticPlume,
                           specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff,
@@ -571,31 +589,9 @@ void MushyLayerParams::getParameters()
 
 
   }
-  else if (physicalProblem == m_mushyLayer
-      //          && nonDimVel > 0 // I think we want outflow for all mushy layer simulations
-  )
+  else if (physicalProblem == m_mushyLayer )
   {
 
-    /*
-    // Generally solid walls, with a few exceptions:
-    if (darcy > 0 && reynolds > 0)
-    {
-      bcVelLo[1] = PhysBCUtil::Outflow;
-    }
-    else
-    {
-      // Darcy flow
-      bcVelLo[1] =  PhysBCUtil::OutflowNormal;
-    }
-
-    // Scalar BCs - dirichlet at top, inflow/outflow at bottom
-    bcBulkConcentrationLo[1] = PhysBCUtil::InflowOutflow;
-    bcBulkConcentrationHi[1] = PhysBCUtil::Dirichlet;
-    bcEnthalpyLo[1] = PhysBCUtil::Dirichlet;
-    bcEnthalpyHi[1] = PhysBCUtil::Dirichlet;
-
-    bcScalarLo[1] = PhysBCUtil::InflowOutflow;
-     */
 
 
   }
@@ -774,10 +770,7 @@ void MushyLayerParams::parseBCVals(string a_name, RealVect& a_bcHolder, bool req
 
     for (int idir=0; idir<SpaceDim; idir++)
     {
-      //      if (temp[idir] !=-1)
-      //      {
       a_bcHolder[idir] = temp[idir];
-      //      }
     }
   }
   else

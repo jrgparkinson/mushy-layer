@@ -491,7 +491,18 @@ public:
 	bcValSolidConcentrationLo,
 
 	/// Solid concentration BCs on hi-side boundaries
-	bcValSolidConcentrationHi;
+	bcValSolidConcentrationHi,
+
+	/// Pressure BCs on hi/lo sides.
+	/**
+	 * Note that the type of pressure bc is determine from the
+	 * type of velocity bc specified, as the two are coupled.
+	 * The values specified here are only used for enforcing a pressure head
+	 */
+	bcValPressureHi,
+	bcValPressureLo;
+
+
 
 	/// First or second order BCs
 	int m_BCAccuracy;
