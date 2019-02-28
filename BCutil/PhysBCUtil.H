@@ -70,7 +70,12 @@ public:
 	   * Enforce dirichlet BCs everywhere, but with a different value for
 	   * inflow vs outflow regions
 	   */
-	  OnlyInflow
+	  OnlyInflow,
+	  /// Robin
+	  /**
+	   * Not implemented yet
+	   */
+	  Robin
 	};
 
 	/// Physical parameters for the system
@@ -79,15 +84,8 @@ public:
 	/// "virtual" constructor
 	virtual PhysBCUtil* newPhysBCUtil() const;
 
-	/// returns pre-projection velocity BC
-	/// returns velocity BC for viscous source
-//	virtual Tuple<BCHolder, SpaceDim> viscousVelFuncBC() const;
-
 	/// returns velocity BC for tracing (inviscid)
 	virtual Tuple<BCHolder, SpaceDim> tracingVelFuncBC() const;
-
-	/// added by petermc, 20 nov 2007
-//	virtual BCHolder tracingSolveFuncBC(int a_idir) const;
 
 	/// returns edge-centered vel BC for edge-ctrd vel (single component)
 	virtual Tuple<BCHolder, SpaceDim> advectionVelFuncBC(bool a_isViscous) const;
@@ -112,9 +110,6 @@ public:
 
 	/// BC holder for velocity \f$ \mathbf{u} \f$ - extrapolation
 	virtual Tuple<BCHolder, SpaceDim> velExtrapBC(Interval ghostInterval=Interval(0,0)) const;
-
-	/// Fills interior ghost cells of vector field by extrapolation
-//	virtual Tuple<BCHolder, SpaceDim> velExtrapInterior(int n_ghost=1) const;
 
 	/// returns single-component BC for viscous refluxing solves
 	virtual BCHolder viscousRefluxBC(int a_dir, bool a_isViscous=false) const;
@@ -144,14 +139,6 @@ public:
 	/// returns current time
 	Real Time() const;
 
-	///
-//	int loBC(int a_dir) const;
-//
-//	///
-//	int hiBC(int a_dir) const;
-//	///
-//	int getBC(int a_dir, const Side::LoHiSide& a_side) const;
-
 	/// Set pointer to advection velocity
 	void setAdvVel(LevelData<FluxBox>* a_advVel);
 
@@ -160,7 +147,6 @@ public:
 
 	/// BC holder for pressure \f$ P \f$
 	virtual BCHolder LevelPressureFuncBC() const;
-//	virtual BCHolder LevelPressureFuncBCNonsubcycle(Vector<RefCountedPtr<LevelData<FArrayBox> > > a_theta) const;
 
 	/// BC holder for synchronisation correction
 	/**
