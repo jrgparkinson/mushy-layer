@@ -436,10 +436,10 @@ void Projector::define(const DisjointBoxLayout& a_grids,
   // set physical boundary condition object
   setPhysBC(a_physBC);
 
-  if (!pp_init)
-  {
+//  if (!pp_init)
+//  {
     variableSetUp();
-  }
+//  }
 
   CH_assert (a_level > -1);
   m_level = a_level;
@@ -1128,6 +1128,9 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 
 void Projector::checkDivergence(LevelData<FluxBox>& a_uEdge)
 {
+  // Skip this function for now
+  return;
+
   LevelData<FArrayBox> DivU(getBoxes(),1);
   Divergence::levelDivergenceMAC(DivU, a_uEdge, m_dx);
 
