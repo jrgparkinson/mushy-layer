@@ -662,15 +662,13 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
 
     FArrayBox& fabVelz = a_advVel[dit][SpaceDim-1]; // for debugging
 
-    //      fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.rayleighTemp);
-    //      fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.rayleighComposition);
     fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.m_buoyancyTCoeff);
     fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.m_buoyancySCoeff);
 
     for (int idir=0; idir<SpaceDim; idir++)
     {
       a_advVel[dit][idir].mult(permeability_face[dit][idir]);
-      //      a_advVel[dit][idir].divide(m_parameters.m_darcyCoeff);
+      //TODO: add viscosity in here
     }
 
   }

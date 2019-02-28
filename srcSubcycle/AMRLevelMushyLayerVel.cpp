@@ -1540,6 +1540,8 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
       darcy[dit].mult(porosity[dit],
                       darcy[dit].box(), 0, dir);
 
+      //TODO: add viscosity in here
+
 
     }
 
@@ -1836,9 +1838,6 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
   for (dit.reset(); dit.ok(); ++dit)
   {
 
-    //    fillBuoyancy(buoyancy_src[dit], temperature_centred[dit], liquidConcentration_centred[dit],
-    //                 porosity_centred[dit],  (*m_vectorNew[VectorVars::m_bodyForce])[dit]);
-
 
     darcy_src[dit].copy(U_old[dit]);
 
@@ -1846,6 +1845,7 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
     {
       darcy_src[dit].mult(porosity_centred[dit], 0, dir, 1);
       darcy_src[dit].divide(permeability_centred[dit], darcy_src[dit].box(), 0, dir, 1);
+      //todo: add viscosity in here
     }
     darcy_src[dit].mult(m_parameters.m_darcyCoeff);
 
