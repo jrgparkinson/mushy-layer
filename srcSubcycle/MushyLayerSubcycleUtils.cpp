@@ -319,7 +319,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
    ppMain.query("consider_u_chi_dt", opt.forceUseUChiForCFL);
 
-
+   opt.skipUnsafeCFL=false;
+   ppMain.query("skip_unsafe_cfl", opt.skipUnsafeCFL);
 
    /**
     * Physics related options

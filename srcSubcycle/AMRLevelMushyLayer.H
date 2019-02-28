@@ -94,70 +94,36 @@ public:
     m_isDefined = false;
     m_addSubtractGradP = true;
 
-//    m_opt.doEulerPart =true;
     m_domainWidth = -1.0;
     m_domainHeight = -1.0;
 
     m_dx = -1.0;
-    m_fixedDt = -1.0;
     m_hasFiner = false;
     m_hasCoarser = false;
-    m_iter_plot_interval = -1;
     m_max_dt_growth = 1.0;
-//    m_MGtype = -1;
     m_numGhost = 0;
     m_numGhostAdvection = 0;
-//    m_cfl = 0;
     m_computedCFL = 0;
     m_timestepFailed = false;
     m_timestepReduced = false;
     m_useLimiting = false;
-//    m_opt.useSubcycling = false;
-//    m_timeIntegrationOrder = 1;
-//    m_tagBufferSize = 1;
-//    m_refineThresh = 1;
-//    m_scaleP_MAC = true;
-//    m_scaleP_CC = true;
-    m_physBCPtr = NULL; //new PhysBCUtil();
-    m_isViscous = false;
+
+    m_physBCPtr = NULL;
 
     m_newLevel=false;
 
-//    m_computeDiagnostics = true;
-//    m_steadyStateNormType = -1;
-//    m_doSyncOperations = true;
-//    CFinterpOrder_advection = 1;
-//    s_compute_initial_VD_corr = false;
 
-//    m_doProjection = true;
     m_enforceGradP = false;
     m_dtReduction = 0.0;
 
-//    m_enforceAnalyticSoln = false;
     m_numOutputComps = 0;
-    m_verbosity_multigrid = 0;
-    m_ignoreSolverFails = true;
     m_newGrids_different = false;
     m_regrid_smoothing_done = false;
-    m_solverFailRestartMethod = 0;
     m_adv_vel_centering = 0.5;
     m_adv_vel_centering_growth = 1.01;
 
-    s_do_postRegrid_smoothing = true;
     s_regrid_smoothing_coeff = 0.5;
-    s_reflux_momentum = true;
-    s_reflux_normal_momentum = false;
-    s_viscous_num_smooth_down = 0;
-    s_viscous_num_smooth_up = 0;
-    s_viscous_solver_tol = 1e-15;
     s_implicit_reflux = true;
-    s_initialize_pressures = true;
-//    s_regrid_init_pressure = true;
-    //    s_reflux_scal = true;
-    s_reflux_enthalpy = true;
-    s_reflux_lambda = true;
-    s_reflux_concentration = true;
-    s_project_initial_vel = true;
 
     AMREnthalpySum_new = 0;
     AMREnthalpySum_old = 0;
@@ -166,30 +132,8 @@ public:
     m_pressureScaleVar = -1;
 
     m_doAutomaticRestart = false;
-//    m_lowerPorosityLimit = 1e-15;
-//    m_implicitAdvectionSolve = false;
-//    m_solidPorosity = -1;
-
-//    m_advectionMethod = m_porosityInAdvection;
-
-//    m_maxDivUFace=5e-14;
-//    m_skipTrickySourceTerm=-1;
-
-//    explicitDarcyTerm = false;
-    m_viscousBCs = true;
-
-//    m_initialPerturbation = 0.0;
-//    m_delayedPerturbation = 0.0;
-//    m_perturbationTime = 0.0;
-//    m_restartPerturbation = 0.0;
-//    m_perturbationWavenumber = 1;
-//    m_fixedPorosity = -1.0;
-//    m_perturbationSin = false;
-
-//    m_porosityFunction = -1;
 
     m_maxLambda=0.0;
-//    m_variable_eta_factor = 1.0;
 
 }
 
@@ -1018,15 +962,6 @@ protected:
   /// Frame velocity (cell centred). Don't think we need this.
   LevelData<FArrayBox> m_frameVel;
 
-  /// Cap on porosity
-//  Real m_lowerPorosityLimit;
-
-  /// Below this porosity we artifically enforce U=0
-  /**
-   * Default value is 0.05, based on the 'Law of fives' (Golden et al, Science, 1998)
-   */
-//  Real m_solidPorosity;
-
   /// List of scalar vars to write out to HDF5 files
   Vector<int> m_outputScalarVars,
 
@@ -1041,7 +976,6 @@ protected:
 
   /// Number of component we write out to HDF5 files
   int m_numOutputComps;
-
 
   /// What to do when restarting after a failed timestep
   enum solverRestart {
@@ -1060,20 +994,6 @@ protected:
    * We may decide to increase \f$ \eta \f$ if we're not decreasing lambda quickly enough
    */
   Real m_maxLambda;
-
-  /// Option to automatically increase/decrease \f$ \eta \f$
-  /**
-   * Default value is 1.0, i.e. don't change eta
-   */
-//  Real m_variable_eta_factor;
-
-  /// either first or second order interpolation at CF boundaries for
-  /// advection problems
-//  int CFinterpOrder_advection;
-
-  /// normType: 0 = max, 1 = volume averaged
-  /// switched to 1 because we weren't converging due to single grid cells
-//  int m_steadyStateNormType;
 
   /// Scalar fields at new time
   Vector<RefCountedPtr<LevelData<FArrayBox> > > m_scalarNew;
@@ -1135,7 +1055,6 @@ protected:
 
   /// Operator for computing components of \f$ \nabla^2 \mathbf{u} \f$
   RefCountedPtr<AMRPoissonOp> m_viscousOp[SpaceDim];
-//  RefCountedPtr<NewPoissonOp4> m_viscousOpHO[SpaceDim];
 
   /// Is object defined
   bool m_isDefined;
@@ -1145,11 +1064,7 @@ protected:
    * This is so we can easily pass all the options around,
    * and don't have to keep going into parmparse
    */
-
   MushyLayerOptions m_opt;
-
-  /// CFL number - to control timestep
-//  Real                 m_cfl;
 
   /// The CFL number we're currently running at
   /**
@@ -1167,12 +1082,6 @@ protected:
   //  int                  m_numCells[SpaceDim];
   IntVect               m_numCells;
 
-  /// Refinement threshold
-//  Real                 m_refineThresh;
-
-  /// Tag buffer size
-//  int                  m_tagBufferSize;
-
   /// Maxmimum fractional growth in \f$ \Delta t \f$ between timesteps
   Real 				 m_max_dt_growth;
 
@@ -1182,32 +1091,11 @@ protected:
   /// Cell spacing
   Real                 m_dx;
 
-  /// Object to do advection physics for velocity
-//  RefCountedPtr<AdvectPhysics> m_advPhysVelocity;
-
   /// Diffusion coefficients for different scalar fields
   Real m_scalarDiffusionCoeffs[m_numScalarVars];
 
-  /// Whether or not to do subcycling
-//  bool m_opt.useSubcycling;
-
-  /// So we can set multigrid verbosity off
-  int m_verbosity_multigrid;
-
   /// Physical parameters
   MushyLayerParams m_parameters;
-
-  /// Whether or not to include the inertial terms \f$ \mathbf{u} \cdot \nabla \mathbf{u} \f$
-//  bool m_doEulerPart;
-
-  /// Should we projection the velocity?
-//  bool m_doProjection;
-
-  /// Max allowed \f$ \nabla \cdot \mathbf{U} \f$ on cell faces
-//  Real m_maxDivUFace;
-
-  /// Do synchronisation operations for velocity?
-//  bool m_doSyncOperations;
 
   /// Should we enforce some analytic \f$ \nabla P \f$
   /**
@@ -1221,65 +1109,12 @@ protected:
    */
   bool m_addSubtractGradP;
 
-
-
-  /// Enforce analytic solution as initial conditions?
-//  bool m_enforceAnalyticSoln;
-
-  /// Is problem viscous?
-  bool m_isViscous;
-
-  /// Whether or not to use viscous BCs
-  /**
-   * May want these even if there isn't a viscous term in the governing equations.
-   */
-  bool m_viscousBCs;
-
-
-  /// Treat darcy term in mom equation explicitly
-//  bool explicitDarcyTerm;
-
-  /// Should we calculate pressure like \f$ \chi \nabla P \f$?
-//  bool m_scaleP_MAC;
-
-  /// Whether to scale pressure during CC projection
-//  bool m_scaleP_CC;
-
   /// Which field scales the pressure
   /**
    * We either have  \f$ \chi \nabla P \f$ or  \f$ \Pi \nabla P \f$
    */
   int m_pressureScaleVar;
 
-  /// Solve implicitly for advection velocities
-  /**
-   * Default option is to instead solve explicitly.
-   */
-//  bool m_implicitAdvectionSolve;
-
-  /// How to handle velocity advection
-  /**
-   * Options:
-   * m_porosityInAdvection:
-   *    solve d(u/porosity)/dt + (u/porosity).grad(u/porosity) = S/porosity (-(u/porosity^2)dporosity/dt)
-   *    (assume d(porosity)/dt = 0)
-   * m_porosityOutsideAdvection (DEFAULT):
-   *    solve du/dt + (u/porosity).grad(u) = S + (u.grad(porosity)/porosity^2)u
-   * m_noPorosity:
-   *    solve du/dt + u.grad(u) = S
-   */
-//  int m_advectionMethod;
-
-
-
-
-
-  /// Skip some velocity source terms
-  /**
-   * When restarting and changing parameters, it can be useful to skip some source terms
-   * in the velocity calculation for some period of time to stop simulations blowing up
-   */
-//  Real m_skipTrickySourceTerm;
 
   /// Pointer to physics boundary condition object
   PhysBCUtil* m_physBCPtr;
@@ -1299,19 +1134,11 @@ protected:
   /// For averaging vectors to coarse grids
   CoarseAverage m_coarseAverageVector;
 
-
   /// For reducing the timestep after a failed timestep
   bool m_timestepReduced;
 
   /// Factor reduce \f$ \Delta t \f$ by after a failed timestep
   int m_dtReduction;
-
-
-  /// Fixed \f$ Delta t \f$
-  /**
-   * Used if > 0 in place of a variable timestep
-   */
-  Real m_fixedDt;
 
   /// Has this timestep failed?
   bool m_timestepFailed;
@@ -1327,15 +1154,6 @@ protected:
 
   /// Rate at which we grow m_adv_vel_centering each timestep
   Real m_adv_vel_centering_growth;
-
-  /// Option to ignore solver fails
-  /**
-   * Default is to restart the timestep with a reduced \f$ \Delta t\f$
-   */
-  bool m_ignoreSolverFails;
-
-  /// What to do when restarting after a solver fail
-  int m_solverFailRestartMethod;
 
   /// For doing quadratic interpolation at coarse fine boundaries (for scalars)
   QuadCFInterp m_quadCFInterpScalar,
@@ -1442,18 +1260,6 @@ protected:
   /// Does a finer AMRLevelMushyLayer pointer exist?
   bool m_hasFiner;
 
-  /// Should we initialise the pressure?
-  bool s_initialize_pressures;
-
-  /// Initialize pressure after regridding?
-//  bool s_regrid_init_pressure;
-
-  /// Should we project the initial velocity?
-  bool s_project_initial_vel;
-
-  /// Should we calculate the initial volume discrepancy correction?
-//  bool s_compute_initial_VD_corr;
-
   /// Grids on this level
   DisjointBoxLayout m_grids;
 
@@ -1466,77 +1272,8 @@ protected:
   /// Coefficient for post regrid smoothing
   Real s_regrid_smoothing_coeff;
 
-  /// Do smoothing after regridding?
-  bool s_do_postRegrid_smoothing;
-
   /// Do reflux implicitly?
   bool s_implicit_reflux;
-
-  /// Reflux momentum?
-  bool s_reflux_momentum;
-
-  /// Reflux normal component of momentum?
-  bool s_reflux_normal_momentum;
-
-  /// Reflux scalar fields?
-  //  bool s_reflux_scal;
-  /// Turn enthalpy refluxing on
-  bool s_reflux_enthalpy;
-
-  /// Turn concentration refluxing on
-  bool s_reflux_concentration;
-
-  /// Turn lambda refluxing on
-  /**
-   * This is necessary for computing the freestream preservation correction
-   */
-  bool s_reflux_lambda;
-
-  /// Viscous solver tolerance
-  Real s_viscous_solver_tol;
-
-  /// Number of down smooths for viscous solves
-  int s_viscous_num_smooth_down;
-
-  /// Number of up smooths for viscous solves
-  int s_viscous_num_smooth_up;
-
-  /// Time integration accuracy
-  /**
-   * 1 = backward euler
-   * 2 = TGA
-   */
-//  int m_timeIntegrationOrder;
-
-  /// Plot interval for picard iterations
-  /**
-   * 1 means don't make any plots
-   */
-  int m_iter_plot_interval;
-
-  /// Size of initial perturbation
-//  Real m_initialPerturbation;
-
-  /// Time to introduce additional perturbation (if relevant)
-//  Real m_perturbationTime;
-
-  /// Size of additional perturbation
-//  Real m_delayedPerturbation;
-
-  /// Size of perturbation to add on restart
-//  Real m_restartPerturbation;
-
-  /// Wavenumber of perturbation
-//  Real m_perturbationWavenumber;
-
-  /// Whether perturbation should be a sin function (true) or cosine func
-//  bool m_perturbationSin;
-
-  /// Value determines the fixed porosity for various test problems
-//  Real m_fixedPorosity;
-
-  /// Porosity function to use for various test problems where we enforce the porosity
-//  int m_porosityFunction;
 
 private:
 

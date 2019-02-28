@@ -167,6 +167,7 @@ struct MushyLayerOptions {
   Real domainWidth;
   Real domainHeight;
   Real cfl;
+  bool skipUnsafeCFL;
   bool forceUseUChiForCFL;
   Real min_time;
   Real max_dt_growth;

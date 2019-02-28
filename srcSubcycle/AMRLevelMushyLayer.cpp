@@ -645,8 +645,6 @@ Real AMRLevelMushyLayer::advance()
 
   calculatePermeability(); //make sure this is up to date
 
-
-
   LevelData<FArrayBox> zeroSrc(m_grids, 1, ivGhost);
   setValLevel(zeroSrc, 0.0);
 
@@ -4357,11 +4355,18 @@ bool AMRLevelMushyLayer::currentCFLIsSafe(bool printWarning)
     if (printWarning)
     {
       pout() << "WARNING: new max(U) = " << maxAdvU << " means that CFL = " << newCFL << " which may be unstable" << endl;
-      //      pout() << "Therefore, we will be skipping fluid advection during this timestep" << endl;
+
     }
-    //    return false;
-    //always return true for now
-    return true;
+
+    if (m_opt.skipUnsafeCFL)
+    {
+      pout() << "Therefore, we will be skipping fluid advection during this timestep" << endl;
+      return false;
+    }
+    else
+    {
+      return true;
+    }
   }
 
   return true;
