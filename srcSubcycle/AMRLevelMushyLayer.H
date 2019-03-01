@@ -682,6 +682,8 @@ protected:
   /// Get maximum level allowed in AMR hierarchy
   int getMaxLevel();
 
+  void computeViscosity();
+
   /// Fill advection velocity ghost cells
   void fillAdvVel(Real time, LevelData<FluxBox>& a_advVel);
 

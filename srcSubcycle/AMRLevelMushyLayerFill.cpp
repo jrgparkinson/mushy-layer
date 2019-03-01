@@ -1,6 +1,46 @@
 #include "AMRLevelMushyLayer.H"
 
 
+void AMRLevelMushyLayer::computeViscosity()
+{
+  LevelData<FArrayBox>& a_viscosity = *m_scalarNew[m_viscosity];
+  const LevelData<FArrayBox>& a_liquid_concentration = *m_scalarNew[m_liquidConcentration];
+
+  switch(m_parameters.m_viscosityFunction)
+  {
+    case ViscosityFunction::linearViscosity:
+
+      // Viscosity varies linearly with increasing solute concentration from 1.0 to max_viscosity
+
+      for (DataIterator dit = a_viscosity.dataIterator(); dit.ok(); ++dit)
+      {
+        FArrayBox& viscosity = a_viscosity[dit];
+
+        // Liquid concentration is between -composition ratio and 0
+        viscosity.copy(a_liquid_concentration[dit]);
+
+        // This will make viscosity between 0 and 1.0
+        viscosity.plus(m_parameters.compositionRatio);
+        viscosity.mult(1.0/m_parameters.compositionRatio);
+
+        // This makes viscosity between 1.0 and max_viscosity
+        viscosity.mult(m_parameters.max_viscosity-1.0);
+        viscosity.plus(1.0);
+
+      }
+
+      break;
+
+    default:
+
+      // Default is uniform viscosity = 1
+      setValLevel(a_viscosity, 1.0);
+
+      break;
+  }
+
+}
+
 void AMRLevelMushyLayer::fillAdvVel(Real time, LevelData<FluxBox>& a_advVel)
 {
   // Fill interior ghost cells
@@ -649,12 +689,15 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
 
 
 
+
   LevelData<FluxBox> permeability_face(m_grids, 1, ghost);
   LevelData<FluxBox> T_face(m_grids, 1, ghost);
   LevelData<FluxBox> C_face(m_grids, 1, ghost);
-  fillScalarFace(permeability_face, time, m_permeability,        true, false);
-  fillScalarFace(T_face,            time, m_temperature,         true, false);
-  fillScalarFace(C_face,            time, m_liquidConcentration, true, false);
+  LevelData<FluxBox> viscosity_face(m_grids, 1, ghost);
+  fillScalarFace(permeability_face, time, ScalarVars::m_permeability,          true, false);
+  fillScalarFace(T_face,            time, ScalarVars::m_temperature,           true, false);
+  fillScalarFace(C_face,            time, ScalarVars::m_liquidConcentration,   true, false);
+  fillScalarFace(viscosity_face,    time, ScalarVars::m_viscosity,             true, false);
 
   for (dit.reset(); dit.ok(); ++dit)
   {
@@ -668,7 +711,11 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
     for (int idir=0; idir<SpaceDim; idir++)
     {
       a_advVel[dit][idir].mult(permeability_face[dit][idir]);
-      //TODO: add viscosity in here
+
+      if (m_parameters.m_viscosityFunction != ViscosityFunction::uniformViscosity)
+      {
+        a_advVel[dit][idir].divide(viscosity_face[dit][idir]);
+      }
     }
 
   }

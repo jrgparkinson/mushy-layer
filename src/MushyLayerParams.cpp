@@ -83,6 +83,8 @@ MushyLayerParams::MushyLayerParams() {
   heleShaw = false;
   permeabilityFunction = PermeabilityFunctions::m_kozenyCarman;
   m_porosityFunction = ParamsPorosityFunctions::m_porosityConstant;
+  m_viscosityFunction = ViscosityFunction::uniformViscosity;
+  max_viscosity = 1.0;
   inflowVelocity = -999;
   pressureHead = 0;
 
@@ -199,6 +201,11 @@ void MushyLayerParams::getParameters()
   int poros_func = m_porosityFunction;
   pp.query("porosityFunction", poros_func);
   m_porosityFunction = ParamsPorosityFunctions(poros_func);
+
+  int viscous_func = m_viscosityFunction;
+  pp.query("viscosity_function", viscous_func);
+  m_viscosityFunction = ViscosityFunction(viscous_func);
+  pp.query("max_viscosity", max_viscosity);
 
   pp.query("heleShaw", heleShaw);
 

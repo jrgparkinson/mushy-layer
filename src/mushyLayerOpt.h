@@ -107,6 +107,7 @@ enum PorosityFunctions
     m_solidConcentration,
     m_pressure,
     m_permeability,
+    m_viscosity,
     m_lambda,
     m_lambda_porosity,
     m_enthalpySolidus,

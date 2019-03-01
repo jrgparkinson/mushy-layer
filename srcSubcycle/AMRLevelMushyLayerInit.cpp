@@ -69,6 +69,7 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_scalarVarNames[ScalarVars::m_solidConcentration] = string("Solid concentration");
   m_scalarVarNames[ScalarVars::m_pressure] = string("Pressure");
   m_scalarVarNames[ScalarVars::m_permeability] = string("Permeability");
+  m_scalarVarNames[ScalarVars::m_viscosity] = string("Viscosity");
   m_scalarVarNames[ScalarVars::m_lambda] = string("lambda");
   m_scalarVarNames[ScalarVars::m_lambda_porosity] = string("lambda_porosity");
   m_scalarVarNames[ScalarVars::m_enthalpySolidus] = string("Enthalpy solidus");
@@ -153,6 +154,11 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     //    m_outputScalarVars.push_back(ScalarVars::m_lambda_porosity);
 
     m_outputScalarVars.push_back(ScalarVars::m_pressure);
+
+    if (m_parameters.m_viscosityFunction != ViscosityFunction::uniformViscosity)
+    {
+      m_outputScalarVars.push_back(ScalarVars::m_viscosity);
+    }
 
 
     if (m_opt.debug)

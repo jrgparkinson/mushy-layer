@@ -4272,6 +4272,10 @@ void AMRLevelMushyLayer::getScalarBCs(BCHolder& thisBC, int a_var, bool a_homoge
     thisBC = m_physBCPtr->lambdaBC(a_homogeneous,
                                    true); // true - scale with porosity
   }
+  else if (a_var == ScalarVars::m_viscosity)
+  {
+    thisBC = m_physBCPtr->extrapFuncBC();
+  }
   else
   {
     pout() << "WARNING No BCs for " << m_scalarVarNames[a_var] << endl;
@@ -4376,6 +4380,8 @@ void AMRLevelMushyLayer::set_compute_diagnostics(bool compute_diags)
 {
   m_opt.computeDiagnostics = true;
 }
+
+
 
 
 /*******/

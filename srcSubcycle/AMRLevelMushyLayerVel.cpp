@@ -95,6 +95,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   VelBCHolder velBCExtrap(m_physBCPtr->velExtrapBC());
 
   calculatePermeability();
+  computeViscosity();
 
   // if a coarser level exists, will need coarse-level data for proj
   if (m_level > 0)

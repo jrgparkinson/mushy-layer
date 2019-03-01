@@ -26,6 +26,12 @@ enum ParamsPorosityFunctions {
   m_porosityTimeDependent,
 };
 
+/// How does the fluid viscosity depend on the solute concentration (if at all)?
+enum ViscosityFunction {
+  uniformViscosity,
+  linearViscosity,
+};
+
 
 /// Different possible permeability functions
 enum PermeabilityFunctions {
@@ -544,6 +550,10 @@ public:
 
 	/// For cases where want to impose a porosity, e.g. for benchmarking
 	ParamsPorosityFunctions m_porosityFunction;
+
+	/// For when we want the fluid viscosity to depend on the solute concentration
+	ViscosityFunction m_viscosityFunction;
+	Real max_viscosity;
 
 	/// Get all parameters from the inputs file
 	void getParameters();
