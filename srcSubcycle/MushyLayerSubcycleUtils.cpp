@@ -816,7 +816,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.horizAverageRestart = false;
   ppMain.query("horizontallyAverageRestart", opt.horizAverageRestart);
 
-  ppMain.query("doAutomaticRestart",opt.initiallyDoAutomaticRestart);
+//  ppMain.query("doAutomaticRestart",opt.initiallyDoAutomaticRestart);
 
 
   /**
