@@ -846,8 +846,11 @@ struct MushyLayerOptions {
 
 //  Real skipTrickySourceTerm;
 
+  /// Advect both enthalpy and bulk concentration at the same time (slightly more efficient)
   bool allowMulticompAdvection;
-  Real smoothingCoeff;
+
+
+//  Real smoothingCoeff;
 
   bool compute_initial_VD_corr;
 

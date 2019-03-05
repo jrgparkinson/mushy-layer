@@ -51,8 +51,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   old_options.push_back(string("main.analyticSourceTerm"));
   old_options.push_back(string("parameters.forcing_timescale"));
 
+  old_options.push_back(string("projection.pre_smoothing"));
 
-old_options.push_back(string("main.skipTrickySourceTime"));
+  old_options.push_back(string("main.skipTrickySourceTime"));
   old_options.push_back(string("main.iter_plot_interval"));
 
   for (int i=0; i< old_options.size(); i++)
@@ -602,8 +603,8 @@ old_options.push_back(string("main.skipTrickySourceTime"));
   opt.nonlinearHCOpSuperOptimised = false;
   ppMain.query("nonlinearHCOpSuperOptimised", opt.nonlinearHCOpSuperOptimised);
 
-  opt.smoothingCoeff = 0.0; //0.01;
-  ppProjection.query("pre_smoothing", opt.smoothingCoeff);
+//  opt.smoothingCoeff = 0.0; //0.01;
+//  ppProjection.query("pre_smoothing", opt.smoothingCoeff);
 
   opt.velMGNumSmooth=2;
   opt.velMGTolerance=1e-10;

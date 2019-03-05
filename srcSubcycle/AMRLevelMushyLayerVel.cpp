@@ -213,23 +213,23 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   // Do some smoothing
   int nghost = a_advVel.ghostVect()[0];
 
-  for (DataIterator dit = a_advVel.dataIterator(); dit.ok(); ++dit)
-  {
-    for (int dir=0; dir<SpaceDim; dir++)
-    {
-      FArrayBox& velDir = a_advVel[dit][dir];
-      Box b = velDir.box();
-      b.grow(-(nghost+2));
-
-      for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-        Real lapU = -4*velDir(iv) +
-            velDir(iv+BASISV(0)) + velDir(iv-BASISV(0)) + velDir(iv+BASISV(1)) + velDir(iv-BASISV(1));
-
-        velDir(iv) = velDir(iv) - m_opt.smoothingCoeff*lapU;
-      }
-    }
+//  for (DataIterator dit = a_advVel.dataIterator(); dit.ok(); ++dit)
+//  {
+//    for (int dir=0; dir<SpaceDim; dir++)
+//    {
+//      FArrayBox& velDir = a_advVel[dit][dir];
+//      Box b = velDir.box();
+//      b.grow(-(nghost+2));
+//
+//      for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
+//      {
+//        IntVect iv = bit();
+//        Real lapU = -4*velDir(iv) +
+//            velDir(iv+BASISV(0)) + velDir(iv-BASISV(0)) + velDir(iv+BASISV(1)) + velDir(iv-BASISV(1));
+//
+//        velDir(iv) = velDir(iv) - m_opt.smoothingCoeff*lapU;
+//      }
+//    }
 
   }
 
