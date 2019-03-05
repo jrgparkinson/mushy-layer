@@ -286,8 +286,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.spongeHeight = 0.0;
   ppMain.query("spongeHeight", opt.spongeHeight);
 
-  opt.postTraceSmoothing = 0.0; // default is no smoothing
-  ppMain.query("postTraceSmoothing", opt.postTraceSmoothing);
+//  opt.postTraceSmoothing = 0.0; // default is no smoothing
+//  ppMain.query("postTraceSmoothing", opt.postTraceSmoothing);
 
   opt.rampBuoyancy = 0.0;
   ppParams.query("rampBuoyancy", opt.rampBuoyancy);

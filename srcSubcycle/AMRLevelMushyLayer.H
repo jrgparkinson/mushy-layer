@@ -92,7 +92,7 @@ public:
   AMRLevelMushyLayer()
 {
     m_isDefined = false;
-    m_addSubtractGradP = true;
+    m_usePrevPressureForUStar = true;
 
     m_domainWidth = -1.0;
     m_domainHeight = -1.0;
@@ -907,7 +907,7 @@ protected:
   void correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel, Real a_dt);
 
   /// Smoot flux in x-direction
-  void horizontallySmooth(LevelData<FluxBox>& a_flux);
+//  void horizontallySmooth(LevelData<FluxBox>& a_flux);
   /// Compute and apply volume discrepancy correction (edge centred velocity)
 //  void computeVolumeDiscrepancyCorrection(LevelData<FluxBox>& a_advVel);
 

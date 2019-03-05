@@ -310,8 +310,10 @@ struct MushyLayerOptions {
 
 //  bool increaseDt;
 
+  /// Distance from the bottom of the domain that a sponge region will extend
   Real spongeHeight;
-  Real postTraceSmoothing;
+
+//  Real postTraceSmoothing;
   bool skipNewLevelScalars;
   bool skipSaltUpdate;
   bool skipHCUpdate;

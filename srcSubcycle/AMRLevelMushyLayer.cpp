@@ -400,50 +400,46 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
 
 
 
-void AMRLevelMushyLayer::horizontallySmooth(LevelData<FluxBox>& a_flux)
-{
-  CH_TIME("AMRLevelMushyLayer::horizontallySmooth");
-
-  DataIterator dit = a_flux.dataIterator();
-
-  int dir = 0; // horizontally averaging
-
-  if (m_opt.postTraceSmoothing==0.0)
-  {
-    return;
-  }
-
-  // todo - Future: write post trace smoothing in fortran. We currently don't use this though so not high priority.
-  for (dit.reset(); dit.ok(); ++dit)
-  {
-    for (int velDir=0; velDir < SpaceDim; velDir++)
-    {
-      FArrayBox& vel = a_flux[dit][velDir];
-      Box b = vel.box();
-
-      for (BoxIterator bit(b); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-        IntVect ivUp = iv+BASISV(dir);
-
-        if (b.contains(ivUp))
-        {
-
-          Real neighbour = vel(ivUp);
-
-          // Make sure we don't change the velocity if the neighboroung value is much larger
-          // this will prevent changing zero velocity cells, or including NaN type values
-          if( abs(neighbour) < 1e100 ) //abs(vel(iv)) > 1e-15 &&
-          {
-            vel(iv) = (1-m_opt.postTraceSmoothing)*vel(iv)+m_opt.postTraceSmoothing*neighbour;
-          }
-
-        }
-      }
-    }
-
-  }
-}
+//void AMRLevelMushyLayer::horizontallySmooth(LevelData<FluxBox>& a_flux)
+//{
+//  CH_TIME("AMRLevelMushyLayer::horizontallySmooth");
+//
+//  DataIterator dit = a_flux.dataIterator();
+//
+//  int dir = 0; // horizontally averaging
+//
+//
+//
+//  for (dit.reset(); dit.ok(); ++dit)
+//  {
+//    for (int velDir=0; velDir < SpaceDim; velDir++)
+//    {
+//      FArrayBox& vel = a_flux[dit][velDir];
+//      Box b = vel.box();
+//
+//      for (BoxIterator bit(b); bit.ok(); ++bit)
+//      {
+//        IntVect iv = bit();
+//        IntVect ivUp = iv+BASISV(dir);
+//
+//        if (b.contains(ivUp))
+//        {
+//
+//          Real neighbour = vel(ivUp);
+//
+//          // Make sure we don't change the velocity if the neighboroung value is much larger
+//          // this will prevent changing zero velocity cells, or including NaN type values
+//          if( abs(neighbour) < 1e100 ) //abs(vel(iv)) > 1e-15 &&
+//          {
+//            vel(iv) = (1-m_opt.postTraceSmoothing)*vel(iv)+m_opt.postTraceSmoothing*neighbour;
+//          }
+//
+//        }
+//      }
+//    }
+//
+//  }
+//}
 
 
 void AMRLevelMushyLayer::copyNewToOldStates()
@@ -626,11 +622,11 @@ Real AMRLevelMushyLayer::advance()
   copyNewToOldStates();
 
   //Gradually ramp up temperature forcing
-  if (m_parameters.physicalProblem == PhysicalProblems::m_poiseuilleFlow)
-  {
-    stokesDarcyForcing(*m_scalarNew[ScalarVars::m_temperature], new_time);
-    stokesDarcyForcing(*m_scalarOld[ScalarVars::m_temperature], old_time);
-  }
+//  if (m_parameters.physicalProblem == PhysicalProblems::m_poiseuilleFlow)
+//  {
+//    stokesDarcyForcing(*m_scalarNew[ScalarVars::m_temperature], new_time);
+//    stokesDarcyForcing(*m_scalarOld[ScalarVars::m_temperature], old_time);
+//  }
 
   // Some useful things to have around
   DataIterator dit(m_grids);

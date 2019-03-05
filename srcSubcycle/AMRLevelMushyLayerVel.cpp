@@ -536,7 +536,7 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
       m_advVel.exchange();
 
-      horizontallySmooth(m_advVel);
+//      horizontallySmooth(m_advVel);
 
       m_advVel.exchange();
 
@@ -2305,7 +2305,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
     pressureScaleEdgePtrOneGhost = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(m_grids, 1, IntVect::Unit));
     fillScalarFace(*pressureScaleEdgePtrOneGhost, half_time, m_pressureScaleVar, true);
 
-    horizontallySmooth(*pressureScaleEdgePtrOneGhost);
+//    horizontallySmooth(*pressureScaleEdgePtrOneGhost);
 
     pressureScalePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(m_grids,1,IntVect::Unit));
     fillScalars(*pressureScalePtr, half_time, m_pressureScaleVar, true);

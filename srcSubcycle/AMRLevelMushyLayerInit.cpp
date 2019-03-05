@@ -1948,7 +1948,6 @@ void AMRLevelMushyLayer::initialDataPoiseuille()
       for (int dir=0; dir <SpaceDim; dir++)
       {
         stokesDarcyInit(x, y, dir, m_parameters);
-
       }
 
 
@@ -2157,28 +2156,25 @@ void AMRLevelMushyLayer::initialData()
 
       default:
         initialDataDefault();
-        //          case MushyLayerParams::m_:
-        //            initialData(x, y, valNew, scalarVar, -1);
-        //            break;
     }
 
   }
   addMeltPond();
 
-  if(m_parameters.physicalProblem == PhysicalProblems::m_poiseuilleFlow)
-  {
-    stokesDarcyForcing(*m_scalarNew[ScalarVars::m_temperature], 0);
-  }
-  else if (m_parameters.physicalProblem == PhysicalProblems::m_cornerFlow)
-  {
-    // Don't do anything
-  }
-  else
-  {
+//  if(m_parameters.physicalProblem == PhysicalProblems::m_poiseuilleFlow)
+//  {
+//    stokesDarcyForcing(*m_scalarNew[ScalarVars::m_temperature], 0);
+//  }
+//  else if (m_parameters.physicalProblem == PhysicalProblems::m_cornerFlow)
+//  {
+//    // Don't do anything
+//  }
+//  else
+//  {
     updateEnthalpyVariables();
     copyNewToOldStates();
     updateEnthalpyVariables();
-  }
+//  }
 
   calculatePermeability(); //make sure this is up to date
 
@@ -2187,21 +2183,15 @@ void AMRLevelMushyLayer::initialData()
   CellToEdge(*m_vectorNew[VectorVars::m_fluidVel], m_advVel);
   CellToEdge(*m_vectorNew[VectorVars::m_fluidVel], m_advVelOld);
   CellToEdge(*m_vectorNew[VectorVars::m_fluidVel], m_advVelNew);
-  //  calculateTimeIndependentVelocity(0);
-  //  calculateTimeIndAdvectionVel(0, m_advVel);
 
   m_advVel.exchange();
   m_frameAdvVel.exchange();
-  //  m_frameVel.exchange();
 
   calculateAnalyticSolns(m_opt.enforceAnalyticSoln);
 
   if (m_opt.initAnalyticVel)
   {
     fillAnalyticVel(m_advVel);
-    //    fillAnalyticVel(*m_vectorNew[VectorVars::m_fluidVel]);
-
-    // I think this is the most consistent way to do things
 
     EdgeToCell(m_advVel, *m_vectorNew[VectorVars::m_fluidVel]);
   }
