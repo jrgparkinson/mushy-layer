@@ -3474,7 +3474,7 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
   if (a_restart)
   {
     // Turn this off so we can do continuation easier
-    m_doAutomaticRestart = false;
+//    m_doAutomaticRestart = false;
 
     // This will add a meltpond if m_opt.meltPondDepth is > 0
     addMeltPond();
