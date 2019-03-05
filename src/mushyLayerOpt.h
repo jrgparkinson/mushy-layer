@@ -284,7 +284,7 @@ struct MushyLayerOptions {
   bool useFortranRegularisation;
 
 
-  Real stokesDarcyForcingTimescale;
+//  Real stokesDarcyForcingTimescale;
 
   bool viscousBCs;
 

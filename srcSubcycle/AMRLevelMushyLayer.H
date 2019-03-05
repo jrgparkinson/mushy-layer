@@ -869,7 +869,7 @@ protected:
   int convertBCType(const int a_implicitBC);
 
   /// Forcing term for darcy-brinkman test
-  void stokesDarcyForcing(LevelData<FArrayBox>& T, Real time);
+//  void stokesDarcyForcing(LevelData<FArrayBox>& T, Real time);
 
   /// Check the simulation hasn't crashed
   bool crashed();

@@ -838,8 +838,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("fortranRegularisation", opt.useFortranRegularisation);
 
 
-  opt.stokesDarcyForcingTimescale = 0.5;
-  ppParams.query("forcing_timescale", opt.stokesDarcyForcingTimescale);
+//  opt.stokesDarcyForcingTimescale = 0.5;
+//  ppParams.query("forcing_timescale", opt.stokesDarcyForcingTimescale);
 
   opt.viscousBCs = params.isViscous();
     ppMain.query("viscousBCs", opt.viscousBCs);

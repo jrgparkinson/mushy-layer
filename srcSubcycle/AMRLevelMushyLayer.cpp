@@ -4281,42 +4281,42 @@ void AMRLevelMushyLayer::getScalarBCs(BCHolder& thisBC, int a_var, bool a_homoge
   }
 }
 
-void AMRLevelMushyLayer::stokesDarcyForcing(LevelData<FArrayBox>& T, Real time)
-{
-
-  if (m_opt.stokesDarcyForcingTimescale > 0)
-  {
-
-    for (DataIterator dit=T.dataIterator(); dit.ok(); ++dit)
-    {
-      Box b = T[dit].box();
-      for (BoxIterator bit(b); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-        RealVect loc;
-        getLocation(iv, loc, m_dx);
-
-        Real one = 1.0;
-        Real zero = 0.0;
-
-
-        Real sinPart = sin(M_PI*loc[0]);
-        Real thisT = min(one,  (time/m_opt.stokesDarcyForcingTimescale)-sinPart);
-
-        Real powPart = pow(loc[0]-2.5,2);
-        thisT = exp(-powPart/(time/m_opt.stokesDarcyForcingTimescale) ) ;
-        //			thisT = log(1+time/timescale)*exp(-pow(loc[0]-2.5,2)) ;
-
-        //			thisT = 0.01;
-
-        thisT = max(zero, thisT);
-        thisT = min(one, thisT);
-        T[dit](iv) = thisT;
-      }
-    }
-  }
-
-}
+//void AMRLevelMushyLayer::stokesDarcyForcing(LevelData<FArrayBox>& T, Real time)
+//{
+//
+//  if (m_opt.stokesDarcyForcingTimescale > 0)
+//  {
+//
+//    for (DataIterator dit=T.dataIterator(); dit.ok(); ++dit)
+//    {
+//      Box b = T[dit].box();
+//      for (BoxIterator bit(b); bit.ok(); ++bit)
+//      {
+//        IntVect iv = bit();
+//        RealVect loc;
+//        getLocation(iv, loc, m_dx);
+//
+//        Real one = 1.0;
+//        Real zero = 0.0;
+//
+//
+//        Real sinPart = sin(M_PI*loc[0]);
+//        Real thisT = min(one,  (time/m_opt.stokesDarcyForcingTimescale)-sinPart);
+//
+//        Real powPart = pow(loc[0]-2.5,2);
+//        thisT = exp(-powPart/(time/m_opt.stokesDarcyForcingTimescale) ) ;
+//        //			thisT = log(1+time/timescale)*exp(-pow(loc[0]-2.5,2)) ;
+//
+//        //			thisT = 0.01;
+//
+//        thisT = max(zero, thisT);
+//        thisT = min(one, thisT);
+//        T[dit](iv) = thisT;
+//      }
+//    }
+//  }
+//
+//}
 
 bool AMRLevelMushyLayer::crashed()
 {
