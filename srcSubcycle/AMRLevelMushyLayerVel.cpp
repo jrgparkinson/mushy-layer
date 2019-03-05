@@ -1480,38 +1480,38 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   //Calculate Laplacian(U)
   if (m_parameters.isViscous())
   {
-    bool recomputeLapVel = true;
+//    bool recomputeLapVel = true;
 
-    if (m_level > 0 && m_opt.advSrcAllowLaggedLapVel)
-    {
-      amrMushyLayerCoarserPtr = getCoarserLevel();
-      Real crseOldTime = amrMushyLayerCoarserPtr->time() - amrMushyLayerCoarserPtr->dt();
-      Real thisOldTime = m_time-m_dt ;
+//    if (m_level > 0 && m_opt.advSrcAllowLaggedLapVel)
+//    {
+//      amrMushyLayerCoarserPtr = getCoarserLevel();
+//      Real crseOldTime = amrMushyLayerCoarserPtr->time() - amrMushyLayerCoarserPtr->dt();
+//      Real thisOldTime = m_time-m_dt ;
+//
+//      // Don't recompute lap(u) if this is the second subcycled step - issues with CF BCs
+//      if (abs(thisOldTime- crseOldTime) > TIME_EPS)
+//      {
+//        recomputeLapVel = false;
+//        pout() << "Using old lap(U) in advection vel source term" << endl;
+//      }
+//    }
 
-      // Don't recompute lap(u) if this is the second subcycled step - issues with CF BCs
-      if (abs(thisOldTime- crseOldTime) > TIME_EPS)
-      {
-        recomputeLapVel = false;
-        pout() << "Using old lap(U) in advection vel source term" << endl;
-      }
-    }
-
-    if (recomputeLapVel)
-    {
+//    if (recomputeLapVel)
+//    {
       computeLapVel(viscous, velOld, crseVelPtr);
       for (dit.reset(); dit.ok(); ++dit)
       {
         (*m_vectorNew[VectorVars::m_advSrcLapU])[dit].copy(viscous[dit]);
       }
 
-    }
-    else
-    {
-      for (dit.reset(); dit.ok(); ++dit)
-      {
-        viscous[dit].copy((*m_vectorNew[VectorVars::m_advSrcLapU])[dit]);
-      }
-    }
+//    }
+//    else
+//    {
+//      for (dit.reset(); dit.ok(); ++dit)
+//      {
+//        viscous[dit].copy((*m_vectorNew[VectorVars::m_advSrcLapU])[dit]);
+//      }
+//    }
 
   }
   else

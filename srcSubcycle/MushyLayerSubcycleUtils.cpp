@@ -235,8 +235,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.CCVelSrcTermCentering = 0.5;
   ppMain.query("vel_src_centering", opt.CCVelSrcTermCentering);
 
-  opt.advSrcAllowLaggedLapVel = false;
-  ppAdvsrc.query("allow_lagged_lap_vel", opt.advSrcAllowLaggedLapVel);
+//  opt.advSrcAllowLaggedLapVel = false;
+//  ppAdvsrc.query("allow_lagged_lap_vel", opt.advSrcAllowLaggedLapVel);
 
 
   opt.advVelPressureSrc = false;

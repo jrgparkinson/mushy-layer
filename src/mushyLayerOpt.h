@@ -517,11 +517,21 @@ struct MushyLayerOptions {
   bool uDelUConservativeForm;
 
   // Advection source term
+
+  /// Whether or not to include pressure in the advection velocity source term
   bool advVelPressureSrc;
+
+  /// Whether or not to include the Darcy term in the advection velocity source
   bool advVelDarcySrc;
+
+  /// Whether or not to include the viscous term in the advection velocity source
   bool advVelViscousSrc;
+
+  /// Whether or not to include buoyancy in the advection velocity source term
   bool advVelBuoyancySrc;
-  bool advSrcAllowLaggedLapVel;
+
+
+//  bool advSrcAllowLaggedLapVel;
 
   bool CCAdvSrc;
 //  bool CCDarcySrc;
