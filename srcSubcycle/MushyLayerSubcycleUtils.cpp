@@ -56,6 +56,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   old_options.push_back(string("main.skipTrickySourceTime"));
   old_options.push_back(string("main.iter_plot_interval"));
 
+
   for (int i=0; i< old_options.size(); i++)
   {
     string option = old_options[i];
@@ -572,13 +573,13 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   int mgtype = MGmethod::MGTypeFAS;
 
-  opt.AMRMultigrid_verbosity = 0;
+//  opt.AMRMultigrid_verbosity = 0;
 //  opt.AMRMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
   opt.AMRMultigridVerb=0;
   opt.AMRMultigridTolerance=1e-10;
   opt.AMRMultigridHang=1e-10;
   opt.AMRMultigridNormThresh=1e-10;
-  ppAMRMultigrid.query("multigrid", opt.AMRMultigrid_verbosity);
+//  ppAMRMultigrid.query("multigrid", opt.AMRMultigrid_verbosity);
 //  ppAMRMultigrid.query("relaxMode", opt.AMRMultigridRelaxMode);
   ppAMRMultigrid.query("hang_eps", opt.AMRMultigridHang);
   ppAMRMultigrid.query("tolerance", opt.AMRMultigridTolerance);
@@ -790,8 +791,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.restartPerturbation = 0.0;
   ppMain.query("restart_perturbation", opt.restartPerturbation);
 
-  opt.radius = 0.1*opt.domainWidth;
-  ppMain.query("radius", opt.radius);
+  opt.porousHoleRadius = 0.1*opt.domainWidth;
+  ppMain.query("radius", opt.porousHoleRadius);
 
   opt.initVelScale = 1e-3;
   ppMain.query("initVelScale", opt.initVelScale);
@@ -842,8 +843,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
 
 
-  opt.maxEta = -1;
-  ppMain.query("max_eta", opt.maxEta); // let user specify different max eta if they want
+//  opt.maxEta = -1;
+//  ppMain.query("max_eta", opt.maxEta); // let user specify different max eta if they want
 
   opt.minDt = 1e-7;
   ppMain.query("min_dt", opt.minDt);

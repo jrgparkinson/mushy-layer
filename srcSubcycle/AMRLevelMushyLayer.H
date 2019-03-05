@@ -130,7 +130,7 @@ public:
     AMRSaltSum_old = 0;
     m_pressureScaleVar = -1;
 
-    m_doAutomaticRestart = false;
+//    m_doAutomaticRestart = false;
 
     m_maxLambda=0.0;
 
@@ -412,6 +412,7 @@ public:
   /// Compute lambda/porosity
   void computeLambdaPorosity();
 
+  /// Set whether or not to compute diagnostics
   void set_compute_diagnostics(bool compute_diags);
 
 protected:
@@ -586,7 +587,7 @@ protected:
                        Real src_time,
                        bool a_MACprojection = false, bool compute_uDelU=true);
 
-  /// Compute \f$ \mathbf{u} \cdot \nabla \left\( \mathbf{U}/\chi \right\)
+  /// Compute \f$ \mathbf{u} \cdot \nabla \left( \mathbf{U}/\chi \right) \f$
   void computeUDelU(LevelData<FArrayBox>& U_adv_src, const LevelData<FArrayBox>& advectionSourceTerm, Real a_oldTime, Real a_dt);
 
   /// Check CFL based on latest velocity is safe to use for explicit updates
@@ -600,8 +601,7 @@ protected:
                     bool a_macProjection = false);
 
   /// Trace the advection velocity forward in time
-  void
-  traceAdvectionVel(LevelData<FluxBox>& a_advVel,
+  void traceAdvectionVel(LevelData<FluxBox>& a_advVel,
                     LevelData<FArrayBox>& a_old_vel,
                     LevelData<FArrayBox>& U_chi,
                     const LevelData<FArrayBox>& a_viscousSource,
@@ -624,8 +624,7 @@ protected:
   /**
    * Should work for multiple components
    */
-  void
-  computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeScal,
+  void computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeScal,
                              LevelData<FArrayBox>& a_old_scal,
                              LevelData<FluxBox>& a_adv_vel,
                              LevelData<FluxBox>& a_inflowOutflowVel,
@@ -676,11 +675,14 @@ protected:
 
   /// Calculate advection velocity for momentum equations which are time independent
   void calculateTimeIndAdvectionVel(Real a_time, LevelData<FluxBox>& a_advVel);
+
+  /// Fill unprojected darcy velocity, \f$ \mathbf{U}^* = (\Pi/\nu) * (Ra_T \theta - Ra_C \Theta_l) \f$
   void fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advVel, Real time);
 
   /// Get maximum level allowed in AMR hierarchy
   int getMaxLevel();
 
+  /// Compute the viscosity given the current liquid concentration
   void computeViscosity();
 
   /// Fill advection velocity ghost cells
@@ -867,7 +869,7 @@ protected:
   /// Convert implicit BCs
   int convertBCType(const int a_implicitBC);
 
-  /// Forcing term for darcy-brinkman test
+  // Forcing term for darcy-brinkman test
 //  void stokesDarcyForcing(LevelData<FArrayBox>& T, Real time);
 
   /// Check the simulation hasn't crashed
@@ -886,9 +888,9 @@ protected:
 
   /// Operations to keep variables bounded correctly.
   void doRegularisationOps(int a_var, FArrayBox& a_state);
+
+  /// New version of doRegularisationOps() which uses fortran routines
   void doRegularisationOpsNew(int a_var, FArrayBox& a_state);
-
-
 
   /// Reset all flux registers
   void setFluxRegistersZero();
@@ -896,7 +898,7 @@ protected:
   /// Copy new data to old data holders
   void copyNewToOldStates();
 
-  /// Copy old data to new data holders
+  // Copy old data to new data holders
 //  void copyOldToNewStates();
 
   /// Compute advection velocity
@@ -905,9 +907,9 @@ protected:
   /// Correct velocity (projection + volume discrepancy)
   void correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel, Real a_dt);
 
-  /// Smoot flux in x-direction
+  // Smooth flux in x-direction
 //  void horizontallySmooth(LevelData<FluxBox>& a_flux);
-  /// Compute and apply volume discrepancy correction (edge centred velocity)
+  // Compute and apply volume discrepancy correction (edge centred velocity)
 //  void computeVolumeDiscrepancyCorrection(LevelData<FluxBox>& a_advVel);
 
   /// Compute initial \f$ \Delta t \f$
@@ -924,8 +926,9 @@ protected:
 
   /// Set BCs on advection physics classes
   void setAdvectionBCs();
-  void
-  defineIBCs ();
+
+  /// Define initial and boundary conditions for advection problems
+  void defineIBCs ();
 
   /// Advection velocity
   LevelData<FluxBox>   m_advVel,
@@ -980,15 +983,17 @@ protected:
 
   /// What to do when restarting after a failed timestep
   enum solverRestart {
+    /// Restart and set dt = dt/2
     m_restartHalveDt,
+    /// Restart and return solution to it's state before this timestep
     m_restartResetData
   };
 
-  /// Whether or not to restart with a small perturbation after reaching steady state
+  // Whether or not to restart with a small perturbation after reaching steady state
   /*
    * Useful because the instability often isn't actually kicked off
    */
-  bool m_doAutomaticRestart;
+//  bool m_doAutomaticRestart;
 
   /// Store max value of \f$ \lambda-1 \f$ from previous timestep
   /**
@@ -1164,13 +1169,16 @@ protected:
   /// For doing quadratic interpolation at coarse fine boundaries (for vectors)
   m_quadCFInterpVector;
 
-  /// Scalar fill patch for one ghost cell
+  /// For filling one ghost cell around the edge of a set of boxes on a level
   PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarOne;
 
+  /// For filling two ghost cells around the edge of a set of boxes on a level
   PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarTwo;
+
+  /// For filling three ghost cells around the edge of a set of boxes on a level
   PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarThree;
 
-  /// Scalar fill patch for four ghost cells
+  /// For filling four ghost cells around the edge of a set of boxes on a level
   PiecewiseLinearFillPatch m_piecewiseLinearFillPatchScalarFour;
 
   /// Number of ghost cells for standard calculations

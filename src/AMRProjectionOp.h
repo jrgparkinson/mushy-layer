@@ -87,7 +87,7 @@ public:
   //! \param a_coarsedx The grid spacing at the coarsest level.
   //! \param a_bc The boundary condition imposed on the solution.
   //! \param a_ghostVect The ghost stencil to use in the created coefficient data.
-  //! \param a_averagin_type The method to use for averaging cell to face centred variables
+  //! \param a_averaging_type The method to use for averaging cell to face centred variables
   void define(const ProblemDomain&                           a_coarseDomain,
               const Vector<DisjointBoxLayout>&               a_grids,
               const Vector<int>&                             a_refRatios,

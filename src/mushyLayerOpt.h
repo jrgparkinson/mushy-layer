@@ -353,17 +353,52 @@ struct MushyLayerOptions {
   /// Max RaT when we're changing the buoyancy force at each timestep
   Real maxRaT;
 
+  /// At which time to compute advection velocities during initialisation
+  /**
+   * Default is 0.1, i.e. at time 0 + 0.1*dt
+   */
   Real initAdvVelCentering;
 
+  /// When computing the advection velocity during multiple initialisation steps,
+  /// grow MushyLayerOptions::initAdvVelCentering by this factor with each iteration
   Real adv_vel_centering_growth;
-  int solverFailRestartMethod;
+
+  /// Whether or not we want to ignore solvers failing
+  /**
+   * If false, we'll try and do some thing about the situation as dictated by
+   * MushyLayerOptions::solverFailRestartMethod
+   */
   bool ignoreSolveFails;
-  bool initiallyDoAutomaticRestart;
+
+  /// What to do if a solver fails and we're not ignoring the problem
+  int solverFailRestartMethod;
+
+
+//  bool initiallyDoAutomaticRestart;
+
+  /// When testing for steady state can consider different norms of the solution
+  /**
+   * 0 -> compute the max value
+   * 1 -> compute the L1 norm of the solution (i.e. some of absolute values)
+   * 2 -> compute the L2 norm of the solution (i.e. some of values squared)
+   */
   int steadyStateNormType;
+
+  /// Whether we want to try and load the advection velocity from a restart file
+  /**
+   * Turned off by default, as this won't always work with some of the restart files we generate
+   * (e.g. after refinement/adding new cells).
+   * This is only really useful for when we want to do post processing without recomputing velocity fields.
+   */
   bool load_advVel;
-  Real CFinterpOrder_advection;
 
+  /// Whether to do 1st order (set to 1) or 2nd order (set to 2) interpolation at coarse-fine boundaries
+  int CFinterpOrder_advection;
 
+  /// Whether we want to try and do some dodgy stuff to make the enthalpy-bulk concentration nonlinear solver quicker
+  /**
+   * Turned off by default, use with extreme caution.
+   */
   bool nonlinearHCOpSuperOptimised;
 
   /// Whether or not to do subcycling
@@ -852,58 +887,133 @@ struct MushyLayerOptions {
 
 //  Real smoothingCoeff;
 
+  /// Whether or not to compute the volume discrepancy correction at the start of a simulation
   bool compute_initial_VD_corr;
 
+  /// Order of accuracy for time integration (1 = backward euler, 2 = TGA)
   int timeIntegrationOrder;
-  int AMRMultigrid_verbosity;
 
+  /// How much output multigrid operators should print
+//  int AMRMultigrid_verbosity;
+
+
+  /// We don't let the porosity go below this value
   Real lowerPorosityLimit;
+
+  /// Size of the initial perturbation (default = 0.0)
   Real initialPerturbation;
 
+  /// Whether or not we should do advection and diffusion of scalars (enthalpy, bulk concentration)
   bool doScalarAdvectionDiffusion;
+
+  /// Size of initial velocity if required
   Real initVel;
 
+  /// Phase shift for sinusoidal perturbations
   Real perturbationPhaseShift;
+
+  /// Size of perturbation to add at time MushyLayerOptions::perturbationTime
   Real delayedPerturbation = 0.0;
+
+  /// Specific time at which to introduce a perturbation
   Real perturbationTime = 0.0;
-  Real perturbationWavenumber = 1.0;
+
+  /// Wavenumber of sinusoidal perturbations (default = 0.0, i.e. just a uniform value)
+  Real perturbationWavenumber;
+
+  /// If true, sinusoidal perturbations take the form of a sin wave. Otherwise a cosine wave.
+  /**
+   * E.g, perturbation \f$ = \alpha \sin (2 \pi N x / L) \f$
+   * where \f$\alpha\f$ is MushyLayerOptions::initialPerturbation,
+   * \f$ N \f$ is MushyLayerOptions::perturbationWavenumber,
+   * and \f$ L \f$ is the domain width
+   */
   bool perturbationSin = false;
+
+  /// Porosity value to set if we're using a fixed porosity.
+  /**
+   * If < 0, use some functional form for the porosity as defined by MushyLayerOptions::porosityFunction
+   */
   Real fixedPorosity = -1.0;
+
+  /// Timescale for porosity variations if enforcing a fixed porosity
   Real porosityTimescale;
+
+  /// Functional form to use for the porosity if using a fixed porosity (rather than a porosity computed from the solution).
   PorosityFunctions porosityFunction;
 
+  /// When restarting, if MushyLayerOptions::restartPerturbation > 0.0 then add a perturbation which if the sum of waves with wavenumbers from 1->maxRestartWavenumber
   int maxRestartWavenumbers;
+
+  /// Size of perturbation to add when restarting a simulation
   Real restartPerturbation;
-  Real radius;
+
+
+  /// Create a porous hole of this radius during initialisation
+  Real porousHoleRadius;
+
+  /// Velocity scale for the initial conditions
   Real initVelScale;
 
+
+  /// Whether to initialise with a linear enthalpy gradient in the vertical direction
   bool linearGradient;
+
+  /// Approximate depth of mushy layer to create as part of an initial condition approximating some sea ice
   Real mushHeight;
+
+  /// Different options for initialising data that looks a bit like year old sea ice
+  /**
+   * See AMRLevelMushyLayer::initialDataMushyLayer() for more details
+   */
   int summerProfile;
+
+  /// Depth of melt pond to add
   Real meltPondDepth;
+
+  /// Whether or not to horizontally average all fields before restarting
   bool horizAverageRestart;
+
+  /// When restarting, add a perturbation to this variable
   int restart_perturbation_var;
 
-
-
   // Restart
+
+  /// Reference temperature for nondimensionalisation
   Real refTemp;
+
+  /// Reference salinity for nondimensionalisation
   Real refSalinity;
+
+  /// Previous reference salinity for nondimensionalisation (if restarting and different from the new value)
   Real prevRefSalinity;
+
+  /// Previous reference temperature for nondimensionalisation (if restarting and different from the new value)
   Real prevRefTemp;
+
+  /// Facotr by which to reduce dt after restarting: \f$ dt = dt / dtReductionFactor \f$
   Real dtReductionFactor;
 
-  // Porosity
+  /// Fixed porosity maximum value
   Real fixedPorosityMaxChi;
+
+  /// Standard deviation of the gaussian used to create a fixed porosity field
   Real FixedPorositySTD;
+
+  /// For a fixed porosity which varies linearly from some constant value inside the domain to the edge, this is the radius of the inner region
   Real fixedPorosityFractionalInnerRadius;
+
+  /// If using a time dependent enforced porosity, stop changing it after this time has passed
   Real fixedPorosityEndTime;
 
+  /// Whether to exchange corner cells by default for scalar fields
   bool scalarExchangeCorners;
+
+  /// Set buoyancy forces to zero after this time
   Real buoyancy_zero_time;
 
   /// If this is set to greater than 0,
-  Real maxEta;
+//  Real maxEta;
 
   /// Whether to use linear or FAS geometric multigrid
   /**

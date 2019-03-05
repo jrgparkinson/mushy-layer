@@ -238,13 +238,13 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   // Trying adding a small perturbation and keep going
   // Only do this once though
   Real maxVel = ::computeNorm(*m_vectorNew[VectorVars::m_advectionVel], NULL, -1, m_dx, Interval(0, SpaceDim-1), 0);
-  if (hasConverged && m_doAutomaticRestart && abs(maxVel) < 1e-3)
-  {
-    pout() << "Max Vel = " << maxVel << ". Trying to restart with a small perturbation to kick off instability" << endl;
-    addPerturbation(ScalarVars::m_enthalpy, 1e-3);
-    hasConverged = false;
-    m_doAutomaticRestart = false;
-  }
+//  if (hasConverged && m_doAutomaticRestart && abs(maxVel) < 1e-3)
+//  {
+//    pout() << "Max Vel = " << maxVel << ". Trying to restart with a small perturbation to kick off instability" << endl;
+//    addPerturbation(ScalarVars::m_enthalpy, 1e-3);
+//    hasConverged = false;
+//    m_doAutomaticRestart = false;
+//  }
 
   if (hasConverged && m_dt < 1e-10)
   {
@@ -3945,7 +3945,7 @@ void AMRLevelMushyLayer::smoothScalarField(LevelData<FArrayBox>& a_phi, int a_va
                          &bottomSolver, numLevels);
 
 
-  diffusionSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
+  diffusionSolver.m_verbosity = m_opt.AMRMultigridVerb;
   diffusionSolver.m_eps = m_opt.viscous_solver_tol;
   diffusionSolver.m_normThresh = m_opt.viscous_solver_tol;
   diffusionSolver.m_hang = m_opt.viscous_solver_tol;

@@ -289,7 +289,7 @@ void AMRLevelMushyLayer::defineCFInterp()
     m_quadCFInterpVector.define(m_grids, crseGridsPtr, m_dx, nRefCrse, SpaceDim,
                                 m_problem_domain);
 
-    ///  PiecewiseLinearFillPatch
+
     //    AMRLevelMushyLayer* crseML = getCoarserLevel();
     const ProblemDomain& crseDomain = mlCrse->problemDomain();
 
@@ -1128,7 +1128,7 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
 //  m_parameters.isViscous() = (m_parameters.m_viscosityCoeff > 0);
 
   // For mushy layer calculations, we want to try and kick off the instability if we've converged
-  m_doAutomaticRestart = m_opt.initiallyDoAutomaticRestart;
+//  m_doAutomaticRestart = m_opt.initiallyDoAutomaticRestart;
 
 
   // Regridding stuff
@@ -1743,11 +1743,11 @@ void AMRLevelMushyLayer::initialDataPorousHole()
       Real distanceFactor = 0;
       if (SpaceDim == 2)
       {
-        distanceFactor = exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2))/(pow(m_opt.radius,2)));
+        distanceFactor = exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2))/(pow(m_opt.porousHoleRadius,2)));
       }
       else if(SpaceDim == 3)
       {
-        distanceFactor = exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2) + pow(loc[2]-cz, 2))/(pow(m_opt.radius,2)));
+        distanceFactor = exp(- ( pow(loc[0]-cx,2) + pow(loc[1]-cy, 2) + pow(loc[2]-cz, 2))/(pow(m_opt.porousHoleRadius,2)));
       }
       (*m_scalarNew[ScalarVars::m_enthalpy])[dit](iv) = HTop + (HBottom-HTop)*distanceFactor;
       (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit](iv) = ThetaTop + (ThetaBottom-ThetaTop)*distanceFactor;

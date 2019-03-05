@@ -95,25 +95,25 @@ void AMRLevelMushyLayer::writeAMRHierarchy(string filename)
   char fullFilename[300];
   sprintf(fullFilename, "%s/%s", m_opt.output_dir.c_str(), filename.c_str());
 
-  WritePartialAMRHierarchyHDF5(/// file to send output to
+  WritePartialAMRHierarchyHDF5(// file to send output to
                                fullFilename,
-                               /// grids at each level
+                               // grids at each level
                                a_vectGrids,
-                               /// data indexed by level
+                               // data indexed by level
                                 a_vectData,
-                               /// names of variables in <i>a_vectData</i>
+                               // names of variables in <i>a_vectData</i>
                                a_vectNames,
-                               /// domain at base level given by <i>a_levels</i>.begin()
+                               // domain at base level given by <i>a_levels</i>.begin()
                                a_baseDomain.domainBox(),
-                               /// grid spacing at base level
+                               // grid spacing at base level
                                a_baseDx,
-                               /// time step at base level
+                               // time step at base level
                                a_dt,
-                               /// time
+                               // time
                                a_time,
-                               /// refinement ratios between adjacent levels, starting with <i>a_refRatio</i>[0], the refinement ratio between levels 0 and 1; Vector length at least <i>a_numLevels</i>-1
+                               // refinement ratios between adjacent levels, starting with <i>a_refRatio</i>[0], the refinement ratio between levels 0 and 1; Vector length at least <i>a_numLevels</i>-1
                                a_vectRatio,
-                               /// indices of levels to write out
+                               // indices of levels to write out
                                a_levels);
 }
 
@@ -849,7 +849,7 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
   // Need a bottom solver
 //  RelaxSolver<LevelData<FArrayBox> > bottomSolver;
   BiCGStabSolver<LevelData<FArrayBox> > bottomSolver;
-  bottomSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
+  bottomSolver.m_verbosity = m_opt.AMRMultigridVerb;
 
   // And a multigrid solver
   AMRMultiGrid<LevelData<FArrayBox> > solver;
@@ -859,7 +859,7 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
   solver.define(lev0Dom, castFact,
                 &bottomSolver, nLevels);
 
-  solver.m_verbosity = m_opt.AMRMultigrid_verbosity;
+  solver.m_verbosity = m_opt.AMRMultigridVerb;
 
   // We were spending a lot of time doing this solve
   // Fix these to try and make the solve quicker

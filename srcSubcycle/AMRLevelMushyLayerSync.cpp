@@ -181,7 +181,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
                             beta);
 
     RelaxSolver<LevelData<FArrayBox> > bottomSolver;
-    bottomSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
+    bottomSolver.m_verbosity = m_opt.AMRMultigridVerb;
 
     AMRMultiGrid<LevelData<FArrayBox> > viscousSolver;
     AMRLevelOpFactory<LevelData<FArrayBox> >& viscCastFact =
@@ -189,7 +189,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
     viscousSolver.define(baseDomain, viscCastFact,
                          &bottomSolver, numLevels);
 
-    viscousSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
+    viscousSolver.m_verbosity = m_opt.AMRMultigridVerb;
 
     viscousSolver.m_eps = m_opt.viscous_solver_tol;
 
@@ -249,21 +249,21 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
   }
 }
 
-Real AMRLevelMushyLayer::maxAllowedEta()
-{
-  Real maxEta = 2*(1-m_computedCFL);
-  if (m_opt.maxEta > 0)
-  {
-    maxEta = m_opt.maxEta;
-  }
-
-  if (m_projection.etaLambda() == 0)
-  {
-    maxEta = 0;
-  }
-
-  return maxEta;
-}
+//Real AMRLevelMushyLayer::maxAllowedEta()
+//{
+//  Real maxEta = 2*(1-m_computedCFL);
+//  if (m_opt.maxEta > 0)
+//  {
+//    maxEta = m_opt.maxEta;
+//  }
+//
+//  if (m_projection.etaLambda() == 0)
+//  {
+//    maxEta = 0;
+//  }
+//
+//  return maxEta;
+//}
 
 void AMRLevelMushyLayer::setAdvVelCentering(Real a_fraction)
 {
@@ -1063,7 +1063,7 @@ Real AMRLevelMushyLayer::doHCreflux()
   getHierarchyAndGrids(hierarchy, grids, refRat, lev0Dom, lev0Dx);
 
   RelaxSolver<LevelData<FArrayBox> > bottomSolver;
-  bottomSolver.m_verbosity = m_opt.AMRMultigrid_verbosity;
+  bottomSolver.m_verbosity = m_opt.AMRMultigridVerb;
 
   Real maxRefluxRHS = computeSum(HCRefluxRHS, refRat, m_dx, Interval(0, numComps-1), m_level);
 
