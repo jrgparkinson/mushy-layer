@@ -1759,50 +1759,50 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   else
   {
 
-    if (m_opt.noMultigrid)
-    {
-      a_phi_old.copyTo(a_phi_new);
-
-      LevelData<FArrayBox> thisSrc(m_grids, 2, IntVect::Unit);
-      full_src.copyTo(thisSrc);
-      for (DataIterator dit = thisSrc.dataIterator(); dit.ok(); ++dit)
-      {
-        thisSrc[dit].mult(m_dt);
-        thisSrc[dit].plus(a_phi_old[dit]);
-      }
-
-      for (int i=0; i < m_opt.noMultigridIter; i++)
-      {
-
-        // Need to define solvers first and foremost
-        //        defineSolvers(m_time);
-
-        // Try replacing with single level relax solver
-        RefCountedPtr<AMRNonLinearMultiCompOp> amrpop = RefCountedPtr<AMRNonLinearMultiCompOp>(
-            (AMRNonLinearMultiCompOp*) m_HCOpFact->AMRnewOp(m_problem_domain));
-
-        // Solving (1-dt Op) HC^{n+1} = HC^{n}
-        amrpop->setAlphaAndBeta(1.0, -m_dt);
-
-        LevelData<FArrayBox> a_res(m_grids, 2, IntVect::Unit);
-
-        amrpop->relax(a_phi_new, thisSrc, 1000);
-
-        amrpop->residual(a_res, a_phi_new, thisSrc, false);
-        Real maxRes = ::computeNorm(a_res, NULL, 1, m_dx, Interval(0, 1), 0);
-        pout() << "  Max residual = " << maxRes << endl;
-
-        if (maxRes < 1e-10)
-        {
-          pout() << "   Converged " << endl;
-          break;
-
-        }
-
-      }
-    }
-    else
-    {
+//    if (m_opt.noMultigrid)
+//    {
+//      a_phi_old.copyTo(a_phi_new);
+//
+//      LevelData<FArrayBox> thisSrc(m_grids, 2, IntVect::Unit);
+//      full_src.copyTo(thisSrc);
+//      for (DataIterator dit = thisSrc.dataIterator(); dit.ok(); ++dit)
+//      {
+//        thisSrc[dit].mult(m_dt);
+//        thisSrc[dit].plus(a_phi_old[dit]);
+//      }
+//
+//      for (int i=0; i < m_opt.noMultigridIter; i++)
+//      {
+//
+//        // Need to define solvers first and foremost
+//        //        defineSolvers(m_time);
+//
+//        // Try replacing with single level relax solver
+//        RefCountedPtr<AMRNonLinearMultiCompOp> amrpop = RefCountedPtr<AMRNonLinearMultiCompOp>(
+//            (AMRNonLinearMultiCompOp*) m_HCOpFact->AMRnewOp(m_problem_domain));
+//
+//        // Solving (1-dt Op) HC^{n+1} = HC^{n}
+//        amrpop->setAlphaAndBeta(1.0, -m_dt);
+//
+//        LevelData<FArrayBox> a_res(m_grids, 2, IntVect::Unit);
+//
+//        amrpop->relax(a_phi_new, thisSrc, 1000);
+//
+//        amrpop->residual(a_res, a_phi_new, thisSrc, false);
+//        Real maxRes = ::computeNorm(a_res, NULL, 1, m_dx, Interval(0, 1), 0);
+//        pout() << "  Max residual = " << maxRes << endl;
+//
+//        if (maxRes < 1e-10)
+//        {
+//          pout() << "   Converged " << endl;
+//          break;
+//
+//        }
+//
+//      }
+//    }
+//    else
+//    {
 
       m_enthalpySalinityBE->updateSoln(a_phi_new,
                                        a_phi_old, full_src, finerFRPtr, coarserFRPtr,
@@ -1810,7 +1810,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
                                        tCoarserNew, m_dt, m_level, false); //false - don't zero phi
 
       baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*m_enthalpySalinityBE));
-    }
+//    }
 
   }
 

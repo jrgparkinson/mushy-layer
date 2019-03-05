@@ -604,10 +604,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   HCMultigrid.query("bottomSolveIterations", opt.HCMultigridBottomSolveIterations);
   HCMultigrid.query("useRelaxBottomSolver", opt.HCMultigridUseRelaxBottomSolverForHC);
 
-  opt.noMultigrid = false;
-  opt.noMultigridIter = 100;
-  ppMain.query("noMultigrid", opt.noMultigrid);
-  ppMain.query("noMultigridIter", opt.noMultigridIter);
+//  opt.noMultigrid = false;
+//  opt.noMultigridIter = 100;
+//  ppMain.query("noMultigrid", opt.noMultigrid);
+//  ppMain.query("noMultigridIter", opt.noMultigridIter);
 
   // 1 -> PLM, 2 -> PPM
   opt.velAdvNormalPredOrder = 1;

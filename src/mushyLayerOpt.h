@@ -315,12 +315,25 @@ struct MushyLayerOptions {
 
 //  Real postTraceSmoothing;
 //  bool skipNewLevelScalars;
+
+  /// Turn on to set the advective source term in the salt equation to 0
   bool skipSaltUpdate;
+
+  /// Turn on to stop evolving the enthalpy and bulk concentration fields
   bool skipHCUpdate;
+
+  /// Use a diffusive source term to compute the advective terms more accurately
+  /**
+   * When computing things like \f$ \mathbf{U} \cdot \nabla T \f$, we upwind temperature
+   * to cell faces. As the temperature also obeys diffuses, we can add a diffusive source term
+   * to estimate the upwinded temperatures more accurately. Similarly for other advected and diffused
+   * quantities.
+   */
   bool doDiffusionSrc;
 
-  bool noMultigrid;
-  int noMultigridIter;
+
+//  bool noMultigrid;
+//  int noMultigridIter;
 
   Real rampBuoyancy;
   Real initRaC;
