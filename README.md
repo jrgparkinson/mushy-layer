@@ -59,12 +59,14 @@ For more details on how to setup your inputs file for the problem you're interes
 There are example problems, with input files, in the `/examples/` directory.
 
 # Documentation
-Documentation can be generated using Doyxgen if it is installed. A default configuration file can be found in the `/docs/` directory, which can be run via:
+Documentation can be generated using [Doyxgen](http://www.doxygen.nl/) if it is installed. A default configuration file can be found in the `/docs/` directory, which can be run via:
 
 ```console
 $ cd /docs/
 $ doxygen
 ```
+
+You can also find a reasonably up to date version of the documentation online at [https://jrgparkinson.github.io/mushy-layer/doc/html/index.html], if you do not want to compile it yourself. The Classes section is particularly useful.
 
 # Extra utilities
 This repository contains various other pieces of code for running simulations. 
