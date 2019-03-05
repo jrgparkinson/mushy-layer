@@ -713,12 +713,12 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
       vcamrpop->define(lev0Dom, allGrids, refRat, lev0Dx, viscousBC,
                        0.0, aCoef, -1.0, bCoef, cCoef); // Note that we should set m_dt*etc in bCoef, not beta!
 
-      s_uStarOpFact[idir] = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcamrpop); // m_UstarVCAMRPOp[idir]);
+      m_uStarOpFact[idir] = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcamrpop); // m_UstarVCAMRPOp[idir]);
 
-      s_uStarAMRMG[idir]->define(lev0Dom, *s_uStarOpFact[idir],
+      m_uStarAMRMG[idir]->define(lev0Dom, *m_uStarOpFact[idir],
                                  &s_botSolverUStar, nlevels);
 
-      s_uStarAMRMG[idir]->setSolverParameters(m_opt.velMGNumSmooth, m_opt.velMGNumSmooth, m_opt.velMGNumSmooth,
+      m_uStarAMRMG[idir]->setSolverParameters(m_opt.velMGNumSmooth, m_opt.velMGNumSmooth, m_opt.velMGNumSmooth,
                                               m_opt.velMGNumMG, m_opt.VelMGMaxIter, m_opt.velMGTolerance, m_opt.velMGHang, m_opt.velMGNormThresh);
     }
   }
@@ -744,8 +744,8 @@ void AMRLevelMushyLayer::defineUstarSolver(     Vector<RefCountedPtr<LevelBackwa
   for (int idir = 0; idir < SpaceDim; idir++)
   {
     // Now define Backward Euler for timestepping
-    UstarBE[idir] = RefCountedPtr<LevelBackwardEuler> (new LevelBackwardEuler(allGrids, refRat, lev0Dom, s_uStarOpFact[idir], s_uStarAMRMG[idir]));
-    UstarTGA[idir] = RefCountedPtr<LevelTGA> (new LevelTGA(allGrids, refRat, lev0Dom, s_uStarOpFact[idir], s_uStarAMRMG[idir]));
+    UstarBE[idir] = RefCountedPtr<LevelBackwardEuler> (new LevelBackwardEuler(allGrids, refRat, lev0Dom, m_uStarOpFact[idir], m_uStarAMRMG[idir]));
+    UstarTGA[idir] = RefCountedPtr<LevelTGA> (new LevelTGA(allGrids, refRat, lev0Dom, m_uStarOpFact[idir], m_uStarAMRMG[idir]));
   }
 
 }
@@ -810,14 +810,14 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     for (int idir = 0; idir < SpaceDim; idir++)
     {
       // I think we only have to define this once
-      if (s_uStarAMRMG[idir] == NULL)
+      if (m_uStarAMRMG[idir] == NULL)
       {
-        s_uStarAMRMG[idir] =
+        m_uStarAMRMG[idir] =
             RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >(
                 new AMRMultiGrid<LevelData<FArrayBox> >());
-        s_uStarAMRMG[idir]->setSolverParameters(m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumSmoothUp,
+        m_uStarAMRMG[idir]->setSolverParameters(m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumSmoothUp,
                                                 m_opt.HCMultigridNumMG, m_opt.HCMultigridMaxIter, m_opt.HCMultigridTolerance, m_opt.HCMultigridHang, m_opt.HCMultigridNormThresh);
-        s_uStarAMRMG[idir]->m_verbosity = m_opt.HCMultigridVerbosity;
+        m_uStarAMRMG[idir]->m_verbosity = m_opt.HCMultigridVerbosity;
       }
     }
   }
@@ -964,7 +964,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     HCop->setSuperOptimised(true);
   }
 
-  HCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(HCop);
+  m_HCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(HCop);
 
   int maxAMRlevels = hierarchy.size();
 
@@ -976,36 +976,36 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
   {
     //FAS multigrid
 
-    s_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
+    m_multiCompFASMG = RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >(
         new AMRFASMultiGrid<LevelData<FArrayBox> >());
 
     if (m_opt.HCMultigridUseRelaxBottomSolverForHC)
     {
-      s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverHC,
+      m_multiCompFASMG->define(lev0Dom, *m_HCOpFact, &s_botSolverHC,
                                maxAMRlevels);
     }
     else
     {
       // Borrow the BiCGStab bottom solver from U star
-      s_multiCompFASMG->define(lev0Dom, *HCOpFact, &s_botSolverUStar,
+      m_multiCompFASMG->define(lev0Dom, *m_HCOpFact, &s_botSolverUStar,
                                maxAMRlevels);
     }
 
-    s_multiCompFASMG->setSolverParameters(m_opt.HCMultigridNumSmoothDown, m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumMG,
+    m_multiCompFASMG->setSolverParameters(m_opt.HCMultigridNumSmoothDown, m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumSmoothUp, m_opt.HCMultigridNumMG,
                                           m_opt.HCMultigridMaxIter, m_opt.HCMultigridTolerance, m_opt.HCMultigridHang, m_opt.HCMultigridNormThresh);
-    s_multiCompFASMG->m_verbosity = m_opt.HCMultigridVerbosity;
+    m_multiCompFASMG->m_verbosity = m_opt.HCMultigridVerbosity;
 
 
 
     // Not doing TGA yet
-    s_enthalpySalinityTGA = RefCountedPtr<LevelTGA>(
-        new LevelTGA(grids, refRat, lev0Dom, HCOpFact,
-                     s_multiCompFASMG));
+    m_enthalpySalinityTGA = RefCountedPtr<LevelTGA>(
+        new LevelTGA(grids, refRat, lev0Dom, m_HCOpFact,
+                     m_multiCompFASMG));
 
 
-    s_enthalpySalinityBE = RefCountedPtr<LevelBackwardEuler>(
-        new LevelBackwardEuler(grids, refRat, lev0Dom, HCOpFact,
-                               s_multiCompFASMG));
+    m_enthalpySalinityBE = RefCountedPtr<LevelBackwardEuler>(
+        new LevelBackwardEuler(grids, refRat, lev0Dom, m_HCOpFact,
+                               m_multiCompFASMG));
 
   }
   else

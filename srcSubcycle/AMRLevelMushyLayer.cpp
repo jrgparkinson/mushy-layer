@@ -1276,7 +1276,7 @@ AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
   CH_assert(diffusiveSrc.nComp() == numComp);
 
   RefCountedPtr<AMRNonLinearMultiCompOp> amrpop = RefCountedPtr<AMRNonLinearMultiCompOp>(
-      (AMRNonLinearMultiCompOp*) HCOpFact->AMRnewOp(m_problem_domain));
+      (AMRNonLinearMultiCompOp*) m_HCOpFact->AMRnewOp(m_problem_domain));
 
   LevelData<FArrayBox> HC(m_grids, 2, IntVect::Unit);
   LevelData<FArrayBox> *crseHC = NULL;
@@ -1753,12 +1753,12 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     //       MayDay::Error("multiCompAdvectDiffuse - TGA not implemented yet");
     //exitStatus = TGAUpdateScalar(a_var, a_src, converged);
 
-    s_enthalpySalinityTGA->updateSoln(a_phi_new,
+    m_enthalpySalinityTGA->updateSoln(a_phi_new,
                                       a_phi_old, full_src, finerFRPtr, coarserFRPtr,
                                       coarserDataOldPtr, coarserDataNewPtr, old_time, tCoarserOld,
                                       tCoarserNew, m_dt, m_level, false); //false - don't zero phi
 
-    baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*s_enthalpySalinityTGA));
+    baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*m_enthalpySalinityTGA));
   }
   else
   {
@@ -1783,7 +1783,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
         // Try replacing with single level relax solver
         RefCountedPtr<AMRNonLinearMultiCompOp> amrpop = RefCountedPtr<AMRNonLinearMultiCompOp>(
-            (AMRNonLinearMultiCompOp*) HCOpFact->AMRnewOp(m_problem_domain));
+            (AMRNonLinearMultiCompOp*) m_HCOpFact->AMRnewOp(m_problem_domain));
 
         // Solving (1-dt Op) HC^{n+1} = HC^{n}
         amrpop->setAlphaAndBeta(1.0, -m_dt);
@@ -1808,12 +1808,12 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     else
     {
 
-      s_enthalpySalinityBE->updateSoln(a_phi_new,
+      m_enthalpySalinityBE->updateSoln(a_phi_new,
                                        a_phi_old, full_src, finerFRPtr, coarserFRPtr,
                                        coarserDataOldPtr, coarserDataNewPtr, old_time, tCoarserOld,
                                        tCoarserNew, m_dt, m_level, false); //false - don't zero phi
 
-      baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*s_enthalpySalinityBE));
+      baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*m_enthalpySalinityBE));
     }
 
   }
@@ -2991,7 +2991,7 @@ void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
 
   // Get diffusive salt and heat fluxes
   RefCountedPtr<AMRNonLinearMultiCompOp> HCOp = RefCountedPtr<AMRNonLinearMultiCompOp>(
-      (AMRNonLinearMultiCompOp*)this->HCOpFact->AMRnewOp(m_problem_domain));
+      (AMRNonLinearMultiCompOp*)this->m_HCOpFact->AMRnewOp(m_problem_domain));
 
 
   LevelData<FArrayBox> HC(m_grids, numComp, fluxGhost + IntVect::Unit); // Need one more ghost cell than the flux

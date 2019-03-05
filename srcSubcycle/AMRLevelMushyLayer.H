@@ -1028,22 +1028,22 @@ protected:
   Vector<string> m_vectorVarNames;
 
   /// TGA integrators (2nd order in time)
-  RefCountedPtr<LevelTGA> s_enthalpySalinityTGA;
+  RefCountedPtr<LevelTGA> m_enthalpySalinityTGA;
 
   /// Backward Euler integrators (1st order in time)
-  RefCountedPtr<LevelBackwardEuler> s_enthalpySalinityBE;
+  RefCountedPtr<LevelBackwardEuler> m_enthalpySalinityBE;
 
   /// AMRMultigrid operators for each scalar
-  RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >      s_diffuseAMRMG[m_numScalarVars];
+  RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >      m_diffuseAMRMG[m_numScalarVars];
 
   /// FASAMRMultigrid operators for each scalar
-  RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >      s_diffuseAMRFASMG[m_numScalarVars];
+  RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >      m_diffuseAMRFASMG[m_numScalarVars];
 
   /// Multicomponent FAS Multigrid solver (for enthalpy-bulk concentration solves)
-  RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >   s_multiCompFASMG;
+  RefCountedPtr<AMRFASMultiGrid<LevelData<FArrayBox> > >   m_multiCompFASMG;
 
   /// Operator factories for scalar vars
-  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > HCOpFact;
+  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > m_HCOpFact;
 
   /// bottom solver for velocity solve multigrid
   static BiCGStabSolver<LevelData<FArrayBox> >  s_botSolverUStar;
@@ -1052,10 +1052,10 @@ protected:
   static RelaxSolver<LevelData<FArrayBox> > s_botSolverHC;
 
   /// AMRMultigrid solver for unprojected velocity, \f$ \mathbf{u}^* \f$
-  RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >      s_uStarAMRMG[SpaceDim];
+  RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >      m_uStarAMRMG[SpaceDim];
 
   /// Operator factory for unprojected velocity, \f$ \mathbf{u}^* \f$
-  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > s_uStarOpFact[SpaceDim];
+  RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > m_uStarOpFact[SpaceDim];
 
   /// Operator for computing components of \f$ \nabla^2 \mathbf{u} \f$
   RefCountedPtr<AMRPoissonOp> m_viscousOp[SpaceDim];
