@@ -2108,8 +2108,8 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
           if (m_opt.reflux_normal_momentum)
           {
             m_vectorFluxRegisters[reflux_var]->incrementCoarse(
-                momentumFlux[dit][dir], fluxMult, dit(), velComps,
-                velComps, dir);
+                momentumFlux[dit][dir], fluxMult, dit(),
+                velComps, velComps, dir);
           } else {
             // if we're not refluxing normal momentum component,
             // then do this component by component

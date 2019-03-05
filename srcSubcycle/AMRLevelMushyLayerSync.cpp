@@ -1193,10 +1193,7 @@ Real AMRLevelMushyLayer::doHCreflux()
   else if (m_opt.refluxMethod == RefluxMethod::NonlinearReflux)
   {
     // nonlinear reflux
-
-    //      MushyLayerParams* mlParamsPtr = &m_parameters;
     BCHolder temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC(homogeneous);
-    //      BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC(homogeneous);
     EdgeVelBCHolder porosityEdgeBC(m_physBCPtr->porosityFaceBC());
 
 
@@ -1283,9 +1280,6 @@ Real AMRLevelMushyLayer::doHCreflux()
     AMRLevelOpFactory<LevelData<FArrayBox> >& castFact =
         (AMRLevelOpFactory<LevelData<FArrayBox> >&) diffusiveOpFactory;
 
-    //      diffusionSolver = new AMRFASMultiGrid<LevelData<FArrayBox> >;
-    //      diffusionSolver->define(lev0Dom, castFact,
-    //                              &bottomSolver, numLevels);
     diffusionSolver = new AMRMultiGrid<LevelData<FArrayBox> >;
     diffusionSolver->define(lev0Dom, castFact,
                             &bottomSolver, numLevels);
@@ -1313,11 +1307,10 @@ Real AMRLevelMushyLayer::doHCreflux()
   diffusionSolver->m_normThresh = m_opt.AMRMultigridNormThresh;
   diffusionSolver->m_hang = m_opt.AMRMultigridHang;
 
-  //    Interval solverComps(0,numComps-1);
-
-  // now solve
+  // solve
   diffusionSolver->solve(HCRefluxCorr, HCRefluxRHS,
-                         finest_level, m_level, false, // don't initialize to zero
+                         finest_level, m_level,
+                         false, // don't initialize to zero
                          true);  // force homogeneous
 
 

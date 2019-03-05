@@ -531,13 +531,13 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   int mgtype = MGmethod::MGTypeFAS;
 
   opt.AMRMultigrid_verbosity = 0;
-  opt.AMRMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
+//  opt.AMRMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
   opt.AMRMultigridVerb=0;
   opt.AMRMultigridTolerance=1e-10;
   opt.AMRMultigridHang=1e-10;
   opt.AMRMultigridNormThresh=1e-10;
   ppAMRMultigrid.query("multigrid", opt.AMRMultigrid_verbosity);
-  ppAMRMultigrid.query("relaxMode", opt.AMRMultigridRelaxMode);
+//  ppAMRMultigrid.query("relaxMode", opt.AMRMultigridRelaxMode);
   ppAMRMultigrid.query("hang_eps", opt.AMRMultigridHang);
   ppAMRMultigrid.query("tolerance", opt.AMRMultigridTolerance);
   ppAMRMultigrid.query("norm_thresh", opt.AMRMultigridNormThresh);

@@ -43,14 +43,15 @@ enum TaggingMethod {
   CompareLargerThanNegative
 };
 
+/// Methods for doing implicit refluxing - i.e. what sort of equation to we solve for the correction
 enum RefluxMethod {
-  /// 0 - linear correction
+  /// linear correction
   LinearReflux,
 
-  /// 1 - linear VC correction
+  /// linear variable-coefficient correction
   LinearVCReflux,
 
-  /// 2 - nonlinear correction
+  /// nonlinear correction
   NonlinearReflux
 };
 
@@ -533,64 +534,183 @@ struct MushyLayerOptions {
 
 //  bool advSrcAllowLaggedLapVel;
 
+  /// Whether or not to include \f$ \mathbf{U} \cdot \nabla \mathbf{U}/\chi \f$ in the cell centred velocity source term
   bool CCAdvSrc;
-//  bool CCDarcySrc;
+
+  /// Whether or not to include buoyancy in the cell centred velocity source term
   bool CCBuoyancySrc;
+
+  /// Whether or not to include pressure in the cell centred velocity source term
+  /**
+   * Only matters if MushylayerOptions::CCPressureSrcOverride is turned on
+   */
   bool CCPressureSrc;
+
+  /// Turn to make sure we use MushyLayerOptions::CCPressureSrc to decide whether or not to include pressure
+  /**
+   * Otherwise, we will use AMRLevelMushyLayer::m_usePrevPressureForUStar.
+   * This is turned on by default if MushyLayerOptions::CCPressureSrc is defined through the inputs file
+   */
   bool CCPressureSrcOverride;
 
+  /// Whether or not to do some smoothing after regridding
   bool do_postRegrid_smoothing;
+
+  /// Whether or not to reflux momentum
   bool reflux_momentum;
+
+  /// Whether or not to just reflux momentum in the normal direction
   bool reflux_normal_momentum;
 
+  /// Whether or not to reflux the enthalpy field
   bool reflux_enthalpy ;
+
+  /// Whether or not to reflux the bulk concentration field
   bool reflux_concentration ;
+
+  /// Whether or not to reflux lambda
+  /**
+   * If you don't do this, you won't be able to calculate the freestream preservation correction.
+   */
   bool reflux_lambda ;
 
+  /// Whether or not to average down from fine levels to coarser levels after refluxing
+  /**
+   * As the solution will have changed following refluxing, doing this ensures consistency between levels
+   */
   bool refluxAverageDown;
+
+  /// Method to use for implicit refluxing
   RefluxMethod refluxMethod;
+
+  /// Coefficient of the laplacian operator during implicit reflux solves
+  /**
+   * This might have to change depending on the operator being used, so left as an option.
+   */
   Real refluxBetaSign;
+
+  /// Whether to add (+1) or subtract (-1) the correction
+  /**
+   * This might need to be changed depending on the operator being used, so left as an option.
+   */
   Real refluxCorrSign;
 
+  /// Solver tolerance for the viscous solver, which we use for smoothing scalar fields and doing momentum reflux
   Real viscous_solver_tol;
+
+  /// Viscous solver - number of smoothing steps during a down sweep
   int viscous_num_smooth_down;
+
+  /// Viscous solver - number of smoothing steps during an up sweep
   int viscous_num_smooth_up;
 
-  int AMRMultigridRelaxMode;
+
+//  int AMRMultigridRelaxMode;
+
+  /// Verbosity for the enthalpy-bulk concentration reflux solver
   int AMRMultigridVerb;
+
+  /// Solver tolerance
   Real AMRMultigridTolerance;
+
+  /// Solver hang condition
   Real AMRMultigridHang;
+
+  /// If residual norm is less than this absolute value, solver decides we've converged
   Real AMRMultigridNormThresh;
 
+  /// Multigrid for implicit cell centred \f$ \mathbf{U}^* \f$ solve - num smoothing steps
   int velMGNumSmooth;
+
+  /// Solver tolerance
   Real velMGTolerance;
+
+  /// Solver tolerance
   Real velMGHang;
+
+  /// Number of V-cycles to perform
   int velMGNumMG;
+
+  /// Residual norm condition for convergence
   Real velMGNormThresh;
+
+  /// Max number of multigrid iterations
   int VelMGMaxIter;
 
+  /// Multigrid for the coupled enthalpy-bulk concentration solve: number of smooths on each up sweep
   int HCMultigridNumSmoothUp;
+
+  /// Number of smooths on each down sweep
   int HCMultigridNumSmoothDown;
+
+  /// Number of V-cycles to do
   int HCMultigridNumMG;
+
+  /// Max number of multigrid iterations
   int HCMultigridMaxIter;
+
+  /// How much output to print
   int HCMultigridVerbosity;
+
+  /// Number of iterations of the bottom solver
   int HCMultigridBottomSolveIterations;
+
+  /// Solver tolerance
   Real HCMultigridTolerance;
+
+  /// Hang condition
   Real HCMultigridHang;
+
+  /// Condition on the norm of the residual for convergence
   Real HCMultigridNormThresh;
-  int HCMultigridRelaxMode; // 1=GSRB, 4=jacobi
+
+  /// How to do relaxation
+  /**
+   * See AMRPoissonOp::relax in Chombo for the various options.
+   * In particular, 1 = Gauss-Seidel Red-Black, 4 = Jacobi
+   */
+  int HCMultigridRelaxMode;
+
+  /// Whether to use a relaxation scheme as the bottom solve
+  /**
+   * We use this here as it treats the nonlinearity more sensibly than linear solvers like BiCGStab
+   */
   bool HCMultigridUseRelaxBottomSolverForHC;
 
+
+  /// Order of the normal predictor for velocity advection solves
   int velAdvNormalPredOrder;
+
+  /// Whether to use 4th order slopes for velocity advection solves
   bool velAdvUseFourthOrderSlopes;
+
+  /// Whether to use a higher order flux limiter for velocity advection solves
   bool velAdvHigherOrderLimiter;
+
+  /// Whether to use artifical viscosity for velocity advection solves
   bool velAdvUseArtVisc;
+
+  /// Value of artifical viscosity to use for velocity advection solves
+  /**
+   * Only used if MushylayerOptions::velAdvUseArtVisc is turned on
+   */
   Real velAdvArtVisc;
+
+  /// Whether to use artificial viscosity for enthalpy-bulk concentration advection
   bool HCUseArtVisc;
+
+  /// Value of artificial viscosity to use for enthalpy-bulk concentration advection
   Real HCArtVisc;
+
+  /// Order of the normal predictor for enthalpy-bulk concentration advection
   int HCNormalPredOrder;
+
+  /// Whether to use 4th order slopes for enthalpy-bulk concentration advection
   bool HCUseFourthOrderSlopes;
+
+  /// Whether to use a higher order flux limiter for enthalpy-bulk concentration advection
   bool HCHigherOrderLimiter;
+
 
   int taggingVar;
   int taggingVectorVar;
