@@ -48,7 +48,7 @@ extern "C"
 
 }
 
-/// Constant value BC
+/// Constant value boundary condition function
 /**
  * Returns a single scalar value, independent of side or position along side,
  * which can be different for different components.
@@ -1428,8 +1428,7 @@ public:
 
 
 
-/// Boundary conditions for pressure \f$P\f$ (subcycled version)
-//class BasicPressureBCFunctionSubcycled: public BCFunction
+/// Boundary conditions for the streamfunction \f$\psif$
 class StreamFunctionBC: public AbstractScalarBCFunction
 {
 public:
@@ -1526,7 +1525,6 @@ public:
 };
 
 /// Boundary conditions for pressure \f$P\f$ (subcycled version)
-//class BasicPressureBCFunctionSubcycled: public BCFunction
 class BasicPressureBCFunctionSubcycled: public AbstractScalarBCFunction
 {
 public:
@@ -1680,7 +1678,7 @@ public:
 
 
 // ---------------------------------------------------------------
-/// BC object for edge centered porosity
+/// Boundary condition for face centered porosity and permeability
 class BasicPorosityPermeabilityFaceBCFunction: public AbstractFaceBCFunction
 {
 public:
@@ -2051,9 +2049,9 @@ public:
   }
 };
 
-/// Boundary condition for reflux correction
+/// Boundary condition for no normal flux
 /**
- * Sets correction = 0 on all boundaries
+ * Sets normal flux = 0 on all boundaries
  */
 class NoFluxBCFunction: public BCFunction
 {
@@ -2339,7 +2337,7 @@ public:
 };
 
 // ---------------------------------------------------------------
-/// Extrap Boundary condition
+/// Extrapolation boundary condition
 /**
  * Extrapolation on all sides
  */
