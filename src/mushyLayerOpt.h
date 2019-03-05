@@ -274,9 +274,15 @@ struct MushyLayerOptions {
   /// Turn on to compute the vorticity/streamfunction as a diagnostic
   bool computeVorticityStreamFunction;
 
-
+  /// Turn on to use fortran routines for regularising the solution on cell faces (i.e. ensuring porosity is not 0)
+  /**
+   * Turned off by default as doesn't work yet.
+   */
   bool useFortranRegularisationFace;
+
+  /// Turn on using fortran routines for regularising the solution on cell centres (i.e. ensuring porosity is not 0)
   bool useFortranRegularisation;
+
 
   Real stokesDarcyForcingTimescale;
 
