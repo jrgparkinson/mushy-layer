@@ -244,7 +244,7 @@ public:
 };
 
 
-/// Abstract scalar BC object
+/// Abstract boundary condition for cell centres
 class AbstractScalarBCFunction: public BCFunction
 {
 public:
@@ -300,7 +300,7 @@ public:
 };
 
 
-/// Note  - sets the same value along an entire boundary
+/// Abstract boundary condition for cell faces
 class AbstractFaceBCFunction: public BCFunction
 {
 public:
@@ -497,9 +497,10 @@ public:
 
 
 
-/// Scalar BC function which holds values at the top, bottom, and in the plume
+/// Boundary condition function for fields which are advected and diffused
 /**
  * All these fields have the same type of conditions at each boundary, but just different values.
+ * This boundary condition can also handle a plume inflow, if required.
  */
 class AdvectDiffuseScalarBC: public AbstractScalarBCFunction
 {
@@ -643,7 +644,7 @@ public:
 
 
 
-/// Apply extrapolation BCs to a flux component
+/// Apply extrapolation boundary conditions to a flux component
 /**
  * Extrapolation BCs for the specified component of a flux box.
  */
@@ -1806,7 +1807,7 @@ public:
 
 
 
-/// Boundary conditions for \f$\Pi\f$ (permeability)
+/// Boundary conditions for porosity, \f$ \chi \f$, and permeability \f$\Pi\f$
 class BasicPorosityPermeabilityBCFunction: public AdvectDiffuseScalarBC
 {
 
