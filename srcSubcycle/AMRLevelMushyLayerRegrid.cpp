@@ -655,7 +655,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
     localTags = IntVectSet();
 
-    if (m_time >= m_opt.regridTime)
+    if (m_time >= m_opt.tagCenterBoxRegridTime)
     {
 
       tagCenterCells(localTags, m_opt.tagCenterBoxSize);

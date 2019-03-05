@@ -26,6 +26,7 @@ enum MGmethod {
   MGTypeFAS
 };
 
+/// Strategy for tagging cells
 enum TaggingMethod {
   /// Tag where the undivided gradient of some field is bigger than some value
   UndividedGradient,
@@ -712,32 +713,81 @@ struct MushyLayerOptions {
   bool HCHigherOrderLimiter;
 
 
+  /// Scalar variable to use for working out where to do refinement
   int taggingVar;
+
+  /// Vector variable to use for working out where to do refinement
   int taggingVectorVar;
+
+  /// Strategy for tagging cells. See ::TaggingMethod for the options.
   TaggingMethod taggingMethod;
+
+  /// Don't start regridding until time > min_regrid_time
   Real min_regrid_time;
+
+  /// If this is > 0, then when time > fixed_grid_time we will switch to the grid specified by 'main.regrid_gridfile'
   Real fixed_grid_time;
+
+  /// Whether we should tag the domain boundary for refinement
   bool tagDomainBoundary;
+
+  /// Whether we should tag the mush-liquid boundary for refinement
   bool tagMLboundary;
+
+  /// Whether we should tag cells where the fluid velocity (magnitude) is greater than MushyLayerOptions::vel_thresh
   bool tag_velocity;
+
+  /// If MushyLayerOptions::tag_velocity is true, specify the velocity magnitude criteria here
   Real vel_thresh;
+
+  /// Refine mushy regions on level 1, the refine around plumes according to some empirical criteria
+  /**
+   * Specifically, identify plumes as regions where either
+   * a) the downwards velocity is greater than MushyLayerOptions::plumeVelThreshold, and
+   * b) the bulk concentration is greater than MushyLayerOptions::plumeSalinityThreshold
+   */
   bool tag_plume_mush;
+
+  /// Velocity theshold value for identifying plumes
   Real plumeVelThreshold;
+
+  /// Salinity threshold value for identifying plumes
   Real plumeSalinityThreshold;
+
+  /// If less than 1, use this limit to identify cells with taggingMarginalPorosityLimit < porosity < 1.0
+  /**
+   * These cells are then not considered part of the mushy layer for tagging purposes, but also not liquid.
+   */
   Real taggingMarginalPorosityLimit;
-  Real regridTime;
-  // Tag cells in the centre of the domain to make a box of this size. Leave as 0 (default) to do nothing
+
+  /// Tag cells in the centre of the domain to make a box of this size. Leave as 0 (default) to do nothing
   int tagCenterBoxSize;
+
+  /// If MushyLayerOptions::tagCenterBoxSize > 0, then regrid once time > tagCenterBoxRegridTime
+  Real tagCenterBoxRegridTime;
+
+  /// For testing: if turned on, refined levels will only exist for one regrid cycle before being removed
+  /**
+   * This let's us test levels being created then destroyed in a controlled manner
+   */
   bool testRegridCoarsening;
 
+  /// Whether to do higher order interpolationg for scalars to fill new cells following regridding
   bool scalarHOinterp;
+
+  /// Whether to do higher order interpolation for vectors to fill new cells following regridding
   bool vectorHOinterp;
 
+  /// Whether or not to produce lots of plot files during regridding
+  /**
+   * Useful for debugging
+   */
   bool makeRegridPlots;
+
+  /// Factor by which to scale dt for re-initialising pressure following regridding
   Real regrid_dt_scale;
 
   bool initLambda;
-//  Real variable_eta_factor;
   Real minEta;
   bool computeFreestreamCorrectionSingleLevel;
   bool regrid_advect_before_freestream;

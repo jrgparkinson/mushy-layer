@@ -448,8 +448,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.taggingMarginalPorosityLimit = 1.0;
   ppRegrid.query("marginalPorosityLimit", opt.taggingMarginalPorosityLimit);
 
-  opt.regridTime = 0.0;
-  ppRegrid.query("initTime", opt.regridTime);
+  opt.tagCenterBoxRegridTime = 0.0;
+  ppRegrid.query("initTime", opt.tagCenterBoxRegridTime);
 
   opt.tagCenterBoxSize = 0;
   ppRegrid.query("tagCenterOnly", opt.tagCenterBoxSize);
