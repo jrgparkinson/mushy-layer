@@ -364,43 +364,43 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
       pout() << "AMRLevelMushyLayer::computeAdvectionVelocities - doing advection of velocities" << endl;
     }
 
-    if (m_opt.implicitAdvectionSolve)
-    {
-
-      bool doFRupdates = false;
-      bool doProjection = false; // don't do CC projection
-      bool compute_uDelU = true;
-
-      // do full timestep - this should now give the same velocity as the later solve?
-      advectionSourceTerm.exchange();
-      computeCCvelocity(advectionSourceTerm, old_time, m_dt, doFRupdates, doProjection,
-                        compute_uDelU, m_opt.usePhiForImplicitAdvectionSolve);
-
-      m_vectorNew[VectorVars::m_viscousSolveSrc]->copyTo(*m_vectorNew[VectorVars::m_advectionImplicitSrc]);
-
-      // New version:
-      if (m_opt.usePhiForImplicitAdvectionSolve)
-      {
-        fillVectorField(*m_vectorNew[VectorVars::m_advUpreProjection], vel_time, m_advUpreProjection, false, true);
-
-      }
-      else
-      {
-        for (DataIterator dit = m_vectorNew[VectorVars::m_advUpreProjection]->dataIterator(); dit.ok(); ++dit)
-        {
-          (*m_vectorNew[VectorVars::m_advUpreProjection])[dit].copy((*m_vectorNew[VectorVars::m_UpreProjection])[dit]);
-        }
-        fillVectorField(*m_vectorNew[VectorVars::m_advUpreProjection], vel_time, m_UpreProjection, false, true);
-
-      }
-
-
-      CellToEdge(*m_vectorNew[VectorVars::m_advUpreProjection], m_advVel);
-
-
-    }
-    else
-    {
+//    if (m_opt.implicitAdvectionSolve)
+//    {
+//
+//      bool doFRupdates = false;
+//      bool doProjection = false; // don't do CC projection
+//      bool compute_uDelU = true;
+//
+//      // do full timestep - this should now give the same velocity as the later solve?
+//      advectionSourceTerm.exchange();
+//      computeCCvelocity(advectionSourceTerm, old_time, m_dt, doFRupdates, doProjection,
+//                        compute_uDelU, m_opt.usePhiForImplicitAdvectionSolve);
+//
+//      m_vectorNew[VectorVars::m_viscousSolveSrc]->copyTo(*m_vectorNew[VectorVars::m_advectionImplicitSrc]);
+//
+//      // New version:
+//      if (m_opt.usePhiForImplicitAdvectionSolve)
+//      {
+//        fillVectorField(*m_vectorNew[VectorVars::m_advUpreProjection], vel_time, m_advUpreProjection, false, true);
+//
+//      }
+//      else
+//      {
+//        for (DataIterator dit = m_vectorNew[VectorVars::m_advUpreProjection]->dataIterator(); dit.ok(); ++dit)
+//        {
+//          (*m_vectorNew[VectorVars::m_advUpreProjection])[dit].copy((*m_vectorNew[VectorVars::m_UpreProjection])[dit]);
+//        }
+//        fillVectorField(*m_vectorNew[VectorVars::m_advUpreProjection], vel_time, m_UpreProjection, false, true);
+//
+//      }
+//
+//
+//      CellToEdge(*m_vectorNew[VectorVars::m_advUpreProjection], m_advVel);
+//
+//
+//    }
+//    else
+//    {
       if (s_verbosity >= 5)
       {
         pout() << "AMRLevelMushyLayer::computeAdvectionVelocities() - explicit tracing scheme" << endl;
@@ -541,17 +541,17 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
       m_advVel.exchange();
 
 
-    } // end if implicit/explicit solve
+//    } // end if implicit/explicit solve
 
     setVelZero(m_advVel, m_opt.advPorosityLimit);
 
     //m_advVel contains predicted face centred velocity at half time step
     //Now need to project it and do lambda corrections etc
     Real project_dt = 2*half_dt; // this usually just works out at m_dt, for time centred advection velocities
-    if (m_opt.implicitAdvectionSolve)
-    {
-      project_dt = m_dt;
-    }
+//    if (m_opt.implicitAdvectionSolve)
+//    {
+//      project_dt = m_dt;
+//    }
 
     correctEdgeCentredVelocity(m_advVel, project_dt);
 

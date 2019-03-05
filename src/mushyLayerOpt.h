@@ -407,7 +407,7 @@ struct MushyLayerOptions {
 
   /// Define the analytic solution to apply.
   /**
-   * By default, analyticSolution = params.physicalProblem
+   * By default, analyticSolution = MushyLayerParams::physicalProblem
    */
   int analyticSolution;
 
@@ -432,27 +432,70 @@ struct MushyLayerOptions {
 
 
 //  bool explicitDarcyTerm;
+
+  /// Use the cell centred pressure \f$ \pi \f$ as the boundary condition when solving for the face centred pressure \f$ \phi \f$
+  /**
+   * Default is true.
+   */
   bool usePiAdvectionBCs;
+
+  /// How much output the projection object should generate
   int projection_verbosity;
 
-  bool implicitAdvectionSolve;
-  bool usePhiForImplicitAdvectionSolve;
 
+//  bool implicitAdvectionSolve;
+//  bool usePhiForImplicitAdvectionSolve;
+
+  /// Solve for all velocity componenents at once. Not currently implemented.
   bool multiCompUStarSolve;
 
+  /// Porosity below which we enforce zero velocity.
+  /**
+   * This needs to be greater than 0
+   */
   Real solidPorosity;
+
+  /// Porosity below which we ensure advection velocities are 0
   Real advPorosityLimit;
+
+  /// If > 0, use Darcy's equation to compute velocities in cells with porosity less than this value
   Real chiLimit;
+
+  /// Porosity below which we ensure cell-centred velocities are 0
   Real ccVelPorosityLimit;
+
+  /// Porosity below which we ensure that the src term for computing advection velocities is 0
   Real advVelsrcChiLimit;
+
+  /// Porosity below which we ensure that the \f$ \mathbf{U} \cdot \nabla \mathbf{U} \f$ part of the cell-centred source term is 0
   Real uDelU_porosityLimit;
+
+  /// Porosity below which we ensure that velocities are zero when computing \f$ \mathbf{U} \cdot \nabla \mathbf{U} \f$
   Real advVelChiLimit;
 
+  /// Use advection velocity from previous timestep for tracing advection velocities
+  /**
+   * Default is false, in which case we average the cell centred velocities from the previous
+   * timestep to cell faces and use these (as they are calculated at a later time, they should be
+   * more accurate).
+   */
   bool useOldAdvVel;
+
+  /// Whether to enforce an analytic velocity field
   bool enforceAnalyticVel;
+
+  /// Whether to project the enforced analytic velocity field
+  /**
+   * Useful for testing if the projection works as expected
+   */
   bool projectAnalyticVel;
+
+  /// If enforcing an analytic velocity, decide what to use
   int analyticVelType;
+
+  /// Whether or not to initialise the velocity to an analytically specified value
   bool initAnalyticVel;
+
 
   int lapVelNumSmooth;
   Real lapVelSmoothScale;

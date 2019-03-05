@@ -777,7 +777,8 @@ Real AMRLevelMushyLayer::advance()
     }
 
     bool doFRupdates = true;
-    bool compute_uDelU = !m_opt.implicitAdvectionSolve && doAdvectiveSrc;
+//    bool compute_uDelU = !m_opt.implicitAdvectionSolve && doAdvectiveSrc;
+    bool compute_uDelU = doAdvectiveSrc;
     bool doProjection = true;
     computeCCvelocity(advectionSourceTerm, m_time-m_dt, m_dt, doFRupdates, doProjection, compute_uDelU);
   }

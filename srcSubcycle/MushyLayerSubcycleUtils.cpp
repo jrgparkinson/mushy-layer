@@ -548,11 +548,11 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.MGtype = MGmethod(mgtype);
 
 
-  opt.implicitAdvectionSolve = false;
-  ppMain.query("implicitAdvectionSolve", opt.implicitAdvectionSolve);
+//  opt.implicitAdvectionSolve = false;
+//  ppMain.query("implicitAdvectionSolve", opt.implicitAdvectionSolve);
 
-  opt.usePhiForImplicitAdvectionSolve = true;
-  ppMain.query("usePhiForImplicitAdvectionSolve", opt.usePhiForImplicitAdvectionSolve);
+//  opt.usePhiForImplicitAdvectionSolve = true;
+//  ppMain.query("usePhiForImplicitAdvectionSolve", opt.usePhiForImplicitAdvectionSolve);
 
   opt.maxDivUFace = 1e-8;
   ppMain.query("maxDivUFace", opt.maxDivUFace);
