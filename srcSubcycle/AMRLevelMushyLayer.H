@@ -1111,7 +1111,7 @@ protected:
   /**
    * We then subtract off \f$ \nabla P \f$  before actually doing the projection
    */
-  bool m_addSubtractGradP;
+  bool m_usePrevPressureForUStar;
 
   /// Which field scales the pressure
   /**

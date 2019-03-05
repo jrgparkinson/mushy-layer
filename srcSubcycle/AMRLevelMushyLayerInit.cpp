@@ -1141,7 +1141,7 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
   //  m_opt.doSyncOperations = true;
 
   // This can be changed during initialisation
-  m_addSubtractGradP = m_opt.addSubtractGradP;
+  m_usePrevPressureForUStar = m_opt.addSubtractGradP;
 //  ppMain.query("addSubtractGradP", m_addSubtractGradP);
 
   //I don't think it makes sense to do projection *and* calculate grad(P)
@@ -2998,15 +2998,15 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   }
 
   thisMLPtr = this;
-  bool orig_add_subtract_grad_p = thisMLPtr->m_addSubtractGradP;
+  bool orig_add_subtract_grad_p = thisMLPtr->m_usePrevPressureForUStar;
 
   for (int lev = m_level; lev <= finest_level; lev++)
   {
 
     // Option to turn off adding/subtracting grad(p) for initialisation
-    if (!m_opt.init_add_subtract_grad_p)
+    if (!m_opt.init_use_prev_pressure_for_Ustar)
     {
-      thisMLPtr->m_addSubtractGradP=false;
+      thisMLPtr->m_usePrevPressureForUStar=false;
     }
 
     thisMLPtr = thisMLPtr->getFinerLevel();
@@ -3021,10 +3021,10 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   for (int iter = 0; iter < m_opt.num_init_passes; iter++)
   {
     // Set dt for this init step
-    if (m_opt.increaseDt)
-    {
+//    if (m_opt.increaseDt)
+//    {
       dtInit = min(dtInit*2, max_dtInit);
-    }
+//    }
     thisMLPtr = this;
     for (int lev = m_level; lev <= finest_level; lev++)
     {
@@ -3111,7 +3111,7 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   for (int lev = lbase; lev <= finest_level; lev++)
   {
     // turns this back on
-    thisMLPtr->m_addSubtractGradP=orig_add_subtract_grad_p;
+    thisMLPtr->m_usePrevPressureForUStar=orig_add_subtract_grad_p;
 
     thisMLPtr->getExtraPlotFields();
     thisMLPtr->m_projection.unscaledPi(*thisMLPtr->m_scalarNew[ScalarVars::m_pressure], m_dt);

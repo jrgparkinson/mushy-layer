@@ -283,16 +283,32 @@ struct MushyLayerOptions {
   /// Turn on using fortran routines for regularising the solution on cell centres (i.e. ensuring porosity is not 0)
   bool useFortranRegularisation;
 
-
 //  Real stokesDarcyForcingTimescale;
 
+  /// Whether or not we want to use viscous boundary conditions
   bool viscousBCs;
 
+  /// Number of loops of the pressure initialisation routine
   int num_init_passes;
+
+  /// If >= 0, and we're restarting, set the simulation time to this
   Real restart_new_time;
-  bool init_add_subtract_grad_p;
+
+  /// Whether to use previous estimates of the pressure to compute the initial cell centred \f$ \mathbf{U}^* \f$
+  /**
+   * Turned off by default
+   */
+  bool init_use_prev_pressure_for_Ustar;
+
+
+  /// Whether to compute \f$ \mathbf{U} \cdot \nabla \mathbf{U}/\chi \f$ terms during initialisation
+  /**
+   * Turned on by default
+   */
   bool init_compute_uDelu;
-  bool increaseDt;
+
+
+//  bool increaseDt;
 
   Real spongeHeight;
   Real postTraceSmoothing;

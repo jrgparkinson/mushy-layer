@@ -662,11 +662,12 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.restart_new_time = -1.0;
   ppMain.query("restart_newTime", opt.restart_new_time);
 
-  opt.increaseDt = true;
-  ppMain.query("init_increase_dt", opt.increaseDt);
+//  opt.increaseDt = true;
+//  ppMain.query("init_increase_dt", opt.increaseDt);
 
-  opt.init_add_subtract_grad_p = false;
-  ppMain.query("init_add_subtract_grad_p", opt.init_add_subtract_grad_p);
+  opt.init_use_prev_pressure_for_Ustar = false;
+  ppMain.query("init_add_subtract_grad_p", opt.init_use_prev_pressure_for_Ustar); // legacy option
+  ppMain.query("init_use_prev_pressure_for_Ustar", opt.init_use_prev_pressure_for_Ustar);
 
   opt.init_compute_uDelu = true;
   ppMain.query("init_compute_uDelu", opt.init_compute_uDelu);

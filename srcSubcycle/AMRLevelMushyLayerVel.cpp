@@ -735,7 +735,7 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
     crseVelPtr = new LevelData<FArrayBox>(crseGrids, SpaceDim);
     // coarse velocity BC data is interpolated in time
 
-    if (m_addSubtractGradP)
+    if (m_usePrevPressureForUStar)
     {
       // Coarse BC is the full projected velocity
       // we subtract off grad(P) inside the level project function
@@ -776,7 +776,7 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
 //    {
 
   // Before we project, remove grad(P)]
-    if (m_addSubtractGradP)
+    if (m_usePrevPressureForUStar)
     {
       LevelData<FArrayBox> gradP(m_grids, SpaceDim);
       LevelData<FArrayBox> pressureScale(m_grids, 1);
@@ -1279,7 +1279,7 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
 
         int uvar = m_fluidVel;
 
-        if (!m_addSubtractGradP)
+        if (!m_usePrevPressureForUStar)
         {
           uvar = m_Ustar;
         }
@@ -1761,7 +1761,7 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
   AMRLevelMushyLayer* amrMLcrse;
   int srcGhost = src.ghostVect()[0];
 
-  bool pressureSrc = m_addSubtractGradP;
+  bool pressureSrc = m_usePrevPressureForUStar;
   bool advSrc = m_opt.CCAdvSrc;
 
   if (m_opt.CCPressureSrcOverride)
@@ -1868,7 +1868,7 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
       src[dit] -= U_adv_src[dit];
     }
 
-    if (m_addSubtractGradP || pressureSrc)
+    if (m_usePrevPressureForUStar || pressureSrc)
     {
       src[dit] -= P_src[dit];
     }
