@@ -15,7 +15,6 @@
 #include "Divergence.H"
 #include "AMRPoissonOp.H"
 #include "VCAMRPoissonOp2.H"
-//#include "MyVCAMRPoissonOp2CC.H"
 #include "AMRProjectionOp.h"
 #include "RelaxSolver.H"
 #include "CoarseAverageEdge.H"

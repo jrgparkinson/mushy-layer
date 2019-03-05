@@ -165,6 +165,7 @@ public:
   }
 };
 
+/// Computes values for the pressure at boundaries to enforce inflow
 class PressureInflowValueFunction: public BCValueFunction
 {
 public:
@@ -728,8 +729,11 @@ class BasicECVelBCFunction: public AbstractFaceBCFunction
 public:
   /// Is there non-zero viscosity?
   bool m_isViscous;
+
   /// Currently unused
   Interval m_interval;
+
+  /// Velocity values to enforce on the domain boundaries
   LevelData<FluxBox>* m_velBCvals;
 
   /// Full constructor

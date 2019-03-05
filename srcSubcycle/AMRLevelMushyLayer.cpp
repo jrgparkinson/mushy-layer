@@ -730,16 +730,12 @@ Real AMRLevelMushyLayer::advance()
     exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, doFRUpdates, doAdvectiveSrc);
 
     bool solverFailed = (exitStatus == 2 || exitStatus == 4 || exitStatus == 6);
-    //    bool solveSuccess = !solverFailed;
 
-    //    if (solveSuccess)
-    //    {
     // Get back the answer if solver was a success
     HC_new.copyTo(Interval(0,0), *m_scalarNew[ScalarVars::m_enthalpy], Interval(0,0));
     HC_new.copyTo(Interval(1,1), *m_scalarNew[ScalarVars::m_bulkConcentration], Interval(0,0));
 
     updateEnthalpyVariables();
-    //    }
 
     if (solverFailed)
     {
@@ -3569,7 +3565,7 @@ Real AMRLevelMushyLayer::computeInitialDt()
     pout() << "AMRlevelMushyLayer::computeInitialDt" << endl;
   }
 
-  Real dt = computeDt(m_initial_dt_multiplier);
+  Real dt = computeDt(m_initial_dt_multiplier*m_opt.cfl);
 
   Real max_init_dt = m_opt.max_dt*m_initial_dt_multiplier;
 

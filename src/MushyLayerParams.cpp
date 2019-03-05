@@ -13,12 +13,22 @@
 //This is for printing out variable names, because c++ doesn't do reflection
 #define SHOW(a) pout() << #a << ": " << (a) << std::endl
 
+/// Darcy timescale
 string MushyLayerParams::s_DARCY_TIMESCALE = "Darcy";
+
+/// Diffusive timescale
 string MushyLayerParams::s_DIFFUSIVE_TIMESCALE = "Diffusive";
+
+/// Buoyancy timescale
 string MushyLayerParams::s_BUOYANCY_TIMESCALE = "Buoyancy";
+
+/// Advective timescale
 string MushyLayerParams::s_ADVECTIVE_TIMESCALE = "Advective";
 
+/// Advective velocity scale
 string MushyLayerParams::s_ADVECTIVE_VELOCITY_SCALE = "Advective";
+
+/// Darcy velocity scale
 string MushyLayerParams::s_DARCY_VELOCITY_SCALE = "Darcy";
 
 MushyLayerParams::MushyLayerParams() {

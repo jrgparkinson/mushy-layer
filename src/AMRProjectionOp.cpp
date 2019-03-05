@@ -221,6 +221,7 @@ define(const ProblemDomain& a_coarseDomain,
 }
 //-----------------------------------------------------------------------
 
+
 MGLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::MGnewOp(const ProblemDomain& a_indexSpace,
                                                                   int                  a_depth,
                                                                   bool                 a_homoOnly)

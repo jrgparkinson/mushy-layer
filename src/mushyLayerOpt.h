@@ -11,6 +11,12 @@
 #ifndef SRC_MUSHYLAYEROPT_H_
 #define SRC_MUSHYLAYEROPT_H_
 
+// Comment below ensures that enums doxygen generates documentation for enums declared in this file
+/*!
+@file
+Contains immunity flag definitions
+*/
+
 /// Different multigrid methods
 enum MGmethod {
   /// Normal linear multigrid
@@ -47,27 +53,47 @@ enum RefluxMethod {
   /// 2 - nonlinear correction
   NonlinearReflux
 };
-/// Options for handling advection velocities
+
+/// Options for handling advection velocities, where S is the source term
 enum velocityAdvectionTypes
 {
+  /// solve \f$ \frac{\partial (\mathbf{u}/\chi)}{\partial t} + (u/porosity) \cdot \nabla (u/porosity) = S/porosity (-(u/porosity^2)dporosity/dt) \f$
   m_porosityInAdvection,
+
+  /// solve du/dt + (u/porosity).grad(u) = S + (u.grad(porosity)/porosity^2)u
   m_porosityOutsideAdvection,
+
+  /// solve du/dt + u.grad(u) = S
   m_noPorosity
+
 };
 
 
+/// Different options for enforcing a fixed porosity
 enum PorosityFunctions
 {
+  ///  Porosity = 1.0 everywhere
   constantLiquid,
+
+  /// Porosity varies linearly with x, \f$ \chi = 0.1 + 0.9 x \f$
   linear,
+
+  /// Porosity looks like a gaussian, \f$ \chi =  0.1 + 0.9 exp(-100 (x-0.5)^2) \f$
   gaussian,
+
+  /// Gaussian with some sinuosoidal variation, \f$ \chi = (exp(-(x-0.5)^2))*(0.5 + 0.1 sin(2 \pi y)) \f$
   gaussianSinusoidal,
+
+  /// Porosity = 0.1
   constantSmall,
+
+  /// Porosity varies with the y-direction cubed, \f$ \chi = 0.01 + (y-0.01)^3 \f$
   cubic,
+
+  /// \f$ \chi = 0.5 ( (1-tanh(20 y)) + (1-x)) \f$
   hyperbolicTan,
 };
 
-/// Identifiers for different scalar variables
 /// Identifiers for vector variables
   enum VectorVars {
     m_fluidVel,
@@ -94,10 +120,12 @@ enum PorosityFunctions
     m_bodyForce,
     m_advVelCorr,
 
+    /// Number of vector variables
     // Make sure this comes last!
     m_numVectorVars
   };
 
+  /// Identifiers for different scalar variables
   enum ScalarVars {
     m_enthalpy,
     m_bulkConcentration,
@@ -142,7 +170,7 @@ enum PorosityFunctions
     m_MACrhs,
     m_CCrhs,
 
-
+    /// Number of scalars variables
     // Make sure this comes last!
     m_numScalarVars
 
@@ -152,41 +180,100 @@ enum PorosityFunctions
 //TODO: these should probably all be const's
 //TODO: add comments to these options so it's obvious what they do
 //TODO: collate more options in here rather than having lots of parmparses in the main code, so it's obvious what all the options are
+/// Contains most of the options for running the code, and how to handle the equations
 struct MushyLayerOptions {
 
+    /// Output directory for plot and checkpoint files
   string output_dir;
+
+  /// Prefix for plot files
   string plotfile_prefix;
 
+  /// Turn on to only produce a minimal ammount of output
   bool minimalOutput;
+
+  /// Turn on to produce lots of output
   bool debug;
 
+  /// Maximum value by which the solution may have changed for us to have reached steady state
   Real steadyStateCondition;
+
+  /// Turn on to ignore changes in velocity when deciding if we've reached steady state
   bool ignoreVelocitySteadyState;
+
+  /// Turn on to ignore changes in bulk concentration when deciding if we've reached steady state
   bool ignoreBulkConcSteadyState;
 
   /// Domain width
   Real domainWidth;
+
+  /// Domain height
   Real domainHeight;
+
+  /// Maximum allowed CFL number
   Real cfl;
+
+  /// TODO: remove this
   bool skipUnsafeCFL;
+
+  /// Force the code to compute a CFL condition based on the size of \f$\mathbf{U}/\chi\f$, rather than \f$ \mathbf{U} \f$
   bool forceUseUChiForCFL;
+
+  /// Minimum time to run simulations for (even if the steady state condition has been met)
   Real min_time;
+
+  /// Maximum allowed fractional increase in dt from one timestep to the next
   Real max_dt_growth;
+
+  /// Multiply the dt computed during initialisation procedures by this factor before using it
+  /**
+   * Useful for using a smaller dt initially for stability
+   * TODO: can probably remove this, it's just a duplicate of initial_dt_multiplier really
+   */
   Real init_dt_scale;
+
+  /// Enforce a fixed timestep  (if > 0)
   Real fixedDt;
 
+  /// Scale initial dt's by this factor
   Real initial_dt_multiplier;
+
+  /// Minimum dt allowed
   Real minDt;
+
+  /// Maximum dt allowed
   Real max_dt;
+
+  /// Maximum initial dt allowed
   Real max_init_dt;
+
+  /// CFL number for acceleration. Only used if useAccelDt = true
+  /**
+   * When velocities are changing rapidly due to a large acceleration, the timestep
+   * computed based on the current velocities may not be a appropriate. Instead,
+   * we should estimate the new velocities given the acceleration:
+   *
+   * \f$ \Delta t = \sqrt{accelCFL \Delta x / acceleration} \f$
+   *
+   * In that case, we use this CFl number.
+   */
   Real accelCFL;
+
+  /// Turn on to print some diagnostics about the dt computed according to acceleration considerations
   bool printAccelDt;
+
+  /// Use the timesteps computed according to the cfl condition applied to accelerations
   bool useAccelDt;
+
+  /// For the first timestep, use dt computed according to the cfl condition applied to accelerations
   bool useInitAccelDt;
 
+  /// Maximum level allowed in this AMR hierarchy
   int max_possible_level;
 
+  /// Turn on to compute the vorticity/streamfunction as a diagnostic
   bool computeVorticityStreamFunction;
+
 
   bool useFortranRegularisationFace;
   bool useFortranRegularisation;
@@ -462,10 +549,17 @@ struct MushyLayerOptions {
   bool scalarExchangeCorners;
   Real buoyancy_zero_time;
 
+  /// If this is set to greater than 0,
   Real maxEta;
 
+  /// Whether to use linear or FAS geometric multigrid
+  /**
+   * Should really be FAS as we're solving nonlinear problems, but leaving the option
+   * here to change back to linear multigrid.
+   */
   MGmethod MGtype;
 
+  /// Specify how to treat the \f$ \mathbf{U} \cdot \nabla \left( \mathbf{U}/\chi \right) \f$ term
   velocityAdvectionTypes advectionMethod;
 
 };

@@ -179,14 +179,18 @@ public:
                        Real correctScale = 1.0);
 
 
-  /// Refactored this so we can use for an implicit MAC solve
+  /// Get the boundary condition on internal (coarse-fine) boundaries
   void getCFBC(LevelData<FArrayBox>& crseVelPtr, LevelData<FArrayBox>* a_crseVelPtr,
                LevelData<FArrayBox>* a_crsePorosityPtr, Real a_dt);
 
 
-  /// Set the pressure scale pointer
+  /// Set pointer to the pressure scaling factor (cell centred)
   void setPressureScalePtr(RefCountedPtr<LevelData<FArrayBox> > a_pressureScalePtr);
 
+  /// Set pointer to the pressure scaling factor (face centred)
+  /***
+   * E.g. either porosity or permeability depending on whether we're solving Darcy-Brinkman or Darcy
+   */
   void setPressureScaleEdgePtr(RefCountedPtr<LevelData<FluxBox> > a_pressureScaleEdgePtr);
 
   /// Refactored to use in implicit MAC solve

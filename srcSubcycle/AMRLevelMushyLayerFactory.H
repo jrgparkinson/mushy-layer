@@ -44,7 +44,10 @@ public:
 
 protected:
 
+  /// Options for how to solve the equations and run the code
   MushyLayerOptions m_options;
+
+  /// Physical parameters for the system
   MushyLayerParams m_params;
 
 private:

@@ -80,14 +80,20 @@ protected:
   /// Problem domain on this level
   ProblemDomain m_probDomain;
 
-  /// Fluxes at the top and bottom of the domain in each direction
-  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_fluxHi, m_fluxLo;
+  /// Fluxes at the bottom of the domain in each direction
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_fluxHi,
+
+  /// Fluxes at the top of the domain in each direction
+  m_fluxLo;
 
   /// Grids on this level
   DisjointBoxLayout m_grids;
 
-  /// Coarser and finer domain flux registers (if they exist)
-  LevelDomainFluxRegister *m_fineFR, *m_coarseFR;
+  /// Coarser  domain flux registers (if they exist)
+  LevelDomainFluxRegister *m_fineFR,
+
+  /// Finer  domain flux registers (if they exist)
+  *m_coarseFR;
 
   /// Whether object is defined
   bool m_defined;

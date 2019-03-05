@@ -305,7 +305,7 @@ public:
   /// true if we're running in FAS mode (much quicker for nonlinear problems)
   bool m_FAS;
 
-  /// Do some dodgy stuff here
+  /// Do some dodgy stuff here to try and make the code quicker. Turned off by default.
   bool m_superOptimised;
 
 
@@ -433,6 +433,7 @@ public:
   /// Set the boundary conditions m_bc
   void setBC(BCHolder& a_bc);
 
+  /// Set whether or not to turn on the 'super optimised' flag which does some dodgy stuff to try and speed up calculations (and is turned off by default).
   void setSuperOptimised(bool a_val);
 
   /// Type of coefficient averaging

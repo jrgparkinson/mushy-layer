@@ -3486,8 +3486,13 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     // Turn this off so we can do continuation easier
     m_doAutomaticRestart = false;
 
+    // This will add a meltpond if m_opt.meltPondDepth is > 0
     addMeltPond();
 
+    // if we've asked to horizontally average the solution before restarting, do it here
+    // only need to do enthalpy and bulk salinity (assuming we're solving Darcy's equation).
+    // this won't work with Darcy-Brinkman at the moment as we don't average velocity yet.
+    // For Darcy-Brinkman we should actually probably just set U=0
     if (m_opt.horizAverageRestart)
     {
       horizontallyAverage(*m_scalarNew[ScalarVars::m_enthalpy], *m_scalarNew[ScalarVars::m_enthalpy]);

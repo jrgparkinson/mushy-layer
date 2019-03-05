@@ -530,13 +530,13 @@ protected:
   /// Average vertical fluxes in the horizontal direction
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FluxBox>& a_phi, Vector<Real>& averageVector);
 
-  /// Average vertical fluxes in the horizontal direction
+  /// Average cell centred fields in the horizontal direction
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FArrayBox>& a_phi);
 
-  /// Average vertical fluxes in the horizontal direction
+  /// Average cell centred fields in the horizontal direction
   void horizontallyAverage(Vector<Real>& averageVector, LevelData<FArrayBox>& a_phi);
 
-  /// Average vertical fluxes in the horizontal direction
+  /// Average cell centred values in the horizontal direction
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FArrayBox>& a_phi,
                            Vector<Real>& globalAveraged);
 
@@ -1045,9 +1045,11 @@ protected:
   /// Operator factories for scalar vars
   RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > > HCOpFact;
 
-  /// bottom solvers for multigrid
-  static BiCGStabSolver<LevelData<FArrayBox> >                    s_botSolverUStar;
-  static RelaxSolver<LevelData<FArrayBox> >                    s_botSolverHC;
+  /// bottom solver for velocity solve multigrid
+  static BiCGStabSolver<LevelData<FArrayBox> >  s_botSolverUStar;
+
+  /// Bottom solve for enthalpy-bulk concentration multigrid
+  static RelaxSolver<LevelData<FArrayBox> > s_botSolverHC;
 
   /// AMRMultigrid solver for unprojected velocity, \f$ \mathbf{u}^* \f$
   RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >      s_uStarAMRMG[SpaceDim];

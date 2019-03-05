@@ -506,6 +506,8 @@ public:
 	 * The values specified here are only used for enforcing a pressure head
 	 */
 	bcValPressureHi,
+
+	/// Pressure BC on the low side of the domain in each direction (x, y, z)
 	bcValPressureLo;
 
 
@@ -553,6 +555,11 @@ public:
 
 	/// For when we want the fluid viscosity to depend on the solute concentration
 	ViscosityFunction m_viscosityFunction;
+
+	/// Maximum dimensionless viscosity the fluid can have
+	/**
+	 * Only used when m_viscosityFunction is not = 0
+	 */
 	Real max_viscosity;
 
 	/// Get all parameters from the inputs file
@@ -588,13 +595,20 @@ public:
 	/// Write out the key parameters to hdf5 file, so that solution can be reconstructed
 	void writeToHDF5(HDF5HeaderData& a_header) const;
 
+	/// Returns a string indicating the velocity scale used for nondimensionalisation
 	string getVelocityScale() const;
+
+	/// Returns a string indicating the time scale used for nondimensionalisation
 	string getTimescale() const;
 
+	/// Returns whether or not we're solving the Darcy-Brinkman equation
 	bool isDarcyBrinkman();
+
+	/// Returns whether or not the problem we're solving contains viscous terms
 	bool isViscous();
-  void
-  computeDerivedBCs ();
+
+	/// Compute boundary conditions for fields which can be found from the enthalpy and salinity via the phase diagram
+  void computeDerivedBCs ();
 };
 
 #endif /* SRC_MUSHYLAYERPARAMS_H_ */

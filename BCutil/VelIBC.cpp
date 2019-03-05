@@ -131,6 +131,8 @@ void VelIBC::setBdrySlopes(FArrayBox&       a_dW,
 {
   CH_assert(m_isDefined == true);
 
+
+
   // In periodic case, this doesn't do anything
 //  if (!m_domain.isPeriodic(a_dir))
 //    {
