@@ -497,8 +497,8 @@ struct MushyLayerOptions {
   bool initAnalyticVel;
 
 
-  int lapVelNumSmooth;
-  Real lapVelSmoothScale;
+//  int lapVelNumSmooth;
+//  Real lapVelSmoothScale;
 
   int maxProjBaseLevel;
   int maxNumMACProj;

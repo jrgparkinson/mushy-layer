@@ -975,31 +975,31 @@ void AMRLevelMushyLayer::computeLapVel(LevelData<FArrayBox>& a_lapVel,
       }
     }
 
-    for (int i=0; i < m_opt.lapVelNumSmooth; i++)
-    {
-      for (DataIterator dit = a_lapVel.dataIterator(); dit.ok(); ++dit)
-      {
-        Box b = a_lapVel[dit].box();
-        b &= domBox;
-
-        FArrayBox& thisLap = a_lapVel[dit];
-
-        for (int dir=0; dir<SpaceDim; dir++)
-        {
-
-        for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
-        {
-          IntVect iv = bit();
-
-          thisLap(iv, dir) = (1-m_opt.lapVelSmoothScale)*thisLap(iv, dir) + (m_opt.lapVelSmoothScale/4)*(thisLap(iv+BASISV(0), dir) +
-              thisLap(iv-BASISV(0), dir) +
-              thisLap(iv+BASISV(1), dir) +
-              thisLap(iv-BASISV(1), dir));
-        }
-        }
-
-      }
-    }
+//    for (int i=0; i < m_opt.lapVelNumSmooth; i++)
+//    {
+//      for (DataIterator dit = a_lapVel.dataIterator(); dit.ok(); ++dit)
+//      {
+//        Box b = a_lapVel[dit].box();
+//        b &= domBox;
+//
+//        FArrayBox& thisLap = a_lapVel[dit];
+//
+//        for (int dir=0; dir<SpaceDim; dir++)
+//        {
+//
+//        for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
+//        {
+//          IntVect iv = bit();
+//
+//          thisLap(iv, dir) = (1-m_opt.lapVelSmoothScale)*thisLap(iv, dir) + (m_opt.lapVelSmoothScale/4)*(thisLap(iv+BASISV(0), dir) +
+//              thisLap(iv-BASISV(0), dir) +
+//              thisLap(iv+BASISV(1), dir) +
+//              thisLap(iv-BASISV(1), dir));
+//        }
+//        }
+//
+//      }
+//    }
   }
   // may need to extend lapVel to cover ghost cells as well
   {

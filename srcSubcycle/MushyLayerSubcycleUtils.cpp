@@ -228,11 +228,11 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.useOldAdvVel = false;
   ppMain.query("useOldAdvVelForTracing", opt.useOldAdvVel);
 
-  opt.lapVelNumSmooth = 0;
-  ppMain.query("lapVelNumSmooth", opt.lapVelNumSmooth);
-
-  opt.lapVelSmoothScale = 0.0;
-  ppMain.query("lapVelSmoothScale", opt.lapVelSmoothScale);
+//  opt.lapVelNumSmooth = 0;
+//  ppMain.query("lapVelNumSmooth", opt.lapVelNumSmooth);
+//
+//  opt.lapVelSmoothScale = 0.0;
+//  ppMain.query("lapVelSmoothScale", opt.lapVelSmoothScale);
 
   opt.CCVelSrcTermCentering = 0.5;
   ppMain.query("vel_src_centering", opt.CCVelSrcTermCentering);
