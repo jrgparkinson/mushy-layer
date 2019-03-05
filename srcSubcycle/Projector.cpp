@@ -1179,8 +1179,6 @@ Real Projector::getPhiScale(Real a_dt)
 //Real CCProjector::getScale(const char* param, Real a_dt)
 Real Projector::getScale(Real a_scale, Real a_dt)
 {
-
-
   Real newScale = a_scale;
 
   if (newScale < 0)

@@ -2074,31 +2074,30 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
   }
 
   // Set some analytic source term if needed
-
-  if (m_opt.useAnalyticSource)
-  {
-    for (DataIterator dit = edgeScalTotal.dataIterator(); dit.ok(); ++dit)
-    {
-      FluxBox& thisFlux = edgeScalTotal[dit];
-
-      for (BoxIterator bit = BoxIterator(thisFlux.box()); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-        RealVect loc;
-        getLocation(iv, loc, m_dx);
-
-        // Horizontal
-        thisFlux[0](iv, 0) =  0; // H comp
-        thisFlux[0](iv, 1) = 0.0; // C comp
-
-        // Vertical
-        //          thisFlux[1](iv, 0) =  -m_parameters.nonDimVel*loc[1]*loc[1]; // H comp
-        thisFlux[1](iv, 0) =  -m_parameters.nonDimVel*loc[1]; // H comp
-        thisFlux[1](iv, 1) = 0.0; // C comp
-      }
-
-    }
-  }
+//  if (m_opt.useAnalyticSource)
+//  {
+//    for (DataIterator dit = edgeScalTotal.dataIterator(); dit.ok(); ++dit)
+//    {
+//      FluxBox& thisFlux = edgeScalTotal[dit];
+//
+//      for (BoxIterator bit = BoxIterator(thisFlux.box()); bit.ok(); ++bit)
+//      {
+//        IntVect iv = bit();
+//        RealVect loc;
+//        getLocation(iv, loc, m_dx);
+//
+//        // Horizontal
+//        thisFlux[0](iv, 0) =  0; // H comp
+//        thisFlux[0](iv, 1) = 0.0; // C comp
+//
+//        // Vertical
+//        //          thisFlux[1](iv, 0) =  -m_parameters.nonDimVel*loc[1]*loc[1]; // H comp
+//        thisFlux[1](iv, 0) =  -m_parameters.nonDimVel*loc[1]; // H comp
+//        thisFlux[1](iv, 1) = 0.0; // C comp
+//      }
+//
+//    }
+//  }
 
 
 }

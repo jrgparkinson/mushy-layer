@@ -190,7 +190,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
       if (minPressure > 0 && maxPressure < pressureCap)
       {
 
-        Real phiScale = m_projection.getScale(m_opt.phiScale, m_dt);
+        Real phiScale = m_projection.getPhiScale(m_dt);
 
         // Apply last calculated MAC correction
         m_projection.setPressureScaleEdgePtr(pressureScaleEdgePtr);

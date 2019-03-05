@@ -130,8 +130,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.adv_vel_centering_growth = 1.01;
   ppMain.query("adv_vel_centering_growth", opt.adv_vel_centering_growth);
 
-  opt.advVelCentering = 0.1;
-  ppMain.query("init_advVel_centering", opt.advVelCentering);
+  opt.initAdvVelCentering = 0.1;
+  ppMain.query("init_advVel_centering", opt.initAdvVelCentering);
 
   opt.initial_dt_multiplier = 0.1;
   ppMain.query("initial_cfl", opt.initial_dt_multiplier);
@@ -355,13 +355,13 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.useIncrementalPressure = false;
   ppProjection.query("useIncrementalPressure", opt.useIncrementalPressure);
 
-  opt.phiScale = 1;
-  ppProjection.query("phiScale", opt.phiScale);
+//  opt.phiScale = 1;
+//  ppProjection.query("phiScale", opt.phiScale);
 
-  opt.scaleMACBCWithChi = false;
-  opt.MACBCscale = 1.0;
-  ppProjection.query("scaleMACBCWithChi", opt.scaleMACBCWithChi);
-  ppProjection.query("MACbcScale", opt.MACBCscale);
+//  opt.scaleMACBCWithChi = false;
+//  opt.MACBCscale = 1.0;
+//  ppProjection.query("scaleMACBCWithChi", opt.scaleMACBCWithChi);
+//  ppProjection.query("MACbcScale", opt.MACBCscale);
 
   opt.doSyncOperations = true;
   ppMain.query("doSyncOperations", opt.doSyncOperations);
@@ -710,8 +710,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.analyticSolution = params.physicalProblem;
   ppMain.query("analyticSoln", opt.analyticSolution);
 
-  opt.useAnalyticSource = false;
-  ppMain.query("analyticSourceTerm", opt.useAnalyticSource);
+//  opt.useAnalyticSource = false;
+//  ppMain.query("analyticSourceTerm", opt.useAnalyticSource);
 
   opt.initialPerturbation = 0.0;
   ppMain.query("initialPerturbation", opt.initialPerturbation);

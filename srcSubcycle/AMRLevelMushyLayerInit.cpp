@@ -2943,7 +2943,7 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     pout() << "AMRLevelMushyLayer::initializeGlobalPressure (level " << m_level << ")" << endl;
   }
 
-  setAdvVelCentering(m_opt.advVelCentering);
+  setAdvVelCentering(m_opt.initAdvVelCentering);
 
   // index through levels to find out what finest level is
   AMRLevelMushyLayer* thisMLPtr = this;

@@ -335,13 +335,23 @@ struct MushyLayerOptions {
 //  bool noMultigrid;
 //  int noMultigridIter;
 
+  /// Fractional increase in the buoyancy force with each timestep
   Real rampBuoyancy;
+
+  /// Initial RaC when we're changing the buoyancy force at each timestep
   Real initRaC;
+
+  /// Initial RaT when we're changing the buoyancy force at each timestep
   Real initRaT;
+
+  /// Max RaC when we're changing the buoyancy force at each timestep
   Real maxRaC;
+
+  /// Max RaT when we're changing the buoyancy force at each timestep
   Real maxRaT;
 
-  Real advVelCentering;
+  Real initAdvVelCentering;
+
   Real adv_vel_centering_growth;
   int solverFailRestartMethod;
   bool ignoreSolveFails;
@@ -355,34 +365,71 @@ struct MushyLayerOptions {
 
   /// Whether or not to do subcycling
   bool useSubcycling;
+
+  /// How much text output to produce on a scale of 0 -> infinity
   int verbosity;
+
   /// Use slope limiting in advection calculations?
   bool useLimiting;
 
-  /// Tag buffer size
+  /// Number of cells to add around tagged cells before computing new meshes
   int tagBufferSize;
+
   /// Refinement threshold
   Real refineThresh;
 
   bool doEulerPart;
 
+  /// Whether or not to compute diagnostics ad hoc
   bool computeDiagnostics;
 
   // Projection stuff
-  bool doProjection;
-  bool useIncrementalPressure;
-  Real phiScale;
-  bool scaleMACBCWithChi;
-  Real MACBCscale;
 
+  /// Whether or not to do projection.
+  bool doProjection;
+
+  /// Whether or not to use the previous pressure when solving Darcy's equation
+  /**
+   * If true, we then only solve for a small extra pressure correction which is usually a lot quicker
+   */
+  bool useIncrementalPressure;
+
+//  Real phiScale;
+//  bool scaleMACBCWithChi;
+//  Real MACBCscale;
+
+  /// Whether or not to do synchronisation operations over multiple levels have reached the same time
   bool doSyncOperations;
+
+  /// Whether or not to enforce an analytic solution at the start of the simulation
   bool enforceAnalyticSoln;
-  bool useAnalyticSource;
+
+  /// Define the analytic solution to apply.
+  /**
+   * By default, analyticSolution = params.physicalProblem
+   */
   int analyticSolution;
 
+//  bool useAnalyticSource;
+
+  /// Try and make sure the maximum divergence of the face centred velocity is less than this
   Real maxDivUFace;
+
+  /// Whether or not the MAC (face-centred) projection should solve for a pressure that is scaled by the porosity or permeability
+  /**
+   * If scaled, we solve something like \f$ \nabla \cdot \chi \nabla \phi = \nabla \cdot \mathbf{U}^* \f$,
+   * else we'll solve \f$ \nabla^2 \phi = \nabla \cdot \mathbf{U}^* \f$.
+   */
   bool scaleP_MAC;
+
+  /// Whether or not the CC (cell-centred) projection should solve for a pressure that is scaled by the porosity
+  /**
+   * If scaled, we solve something like \f$ \nabla \cdot \chi \nabla \pi = \nabla \cdot \mathbf{U}^* \f$,
+   * else we'll solve \f$ \nabla^2 \pi = \nabla \cdot \mathbf{U}^* \f$.
+   */
   bool scaleP_CC;
+
+
   bool explicitDarcyTerm;
   bool usePiAdvectionBCs;
   int projection_verbosity;
