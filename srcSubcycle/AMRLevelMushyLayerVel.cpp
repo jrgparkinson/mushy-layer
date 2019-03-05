@@ -230,8 +230,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 //        velDir(iv) = velDir(iv) - m_opt.smoothingCoeff*lapU;
 //      }
 //    }
-
-  }
+//  }
 
   // Allow multiple projections
   // This doesn't actually really help
