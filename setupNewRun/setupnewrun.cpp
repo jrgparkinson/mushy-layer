@@ -119,9 +119,9 @@ int main(int argc, char* argv[])
   pout() << "Initializing..." << endl;
 
   // declare variable to store hierarchy
-  string    inFile;
-  string    outFile;
-  string    runInputs ;
+  string    previousRestartFile;
+  string    newRestartFile;
+  string    previousInputsFile ;
   int changeLeft = 0;
   int changeRight = 0;
   int changeTop = 0;
@@ -131,9 +131,9 @@ int main(int argc, char* argv[])
   int refinement = 1;
   Real dtReductionFactor = 10;
   Real smoothing = 0.0;
-  pp.get("run_inputs",runInputs);
-  pp.get("inFile" ,inFile);
-  pp.get("outFile" ,outFile);
+  pp.get("run_inputs",previousInputsFile);
+  pp.get("inFile" ,previousRestartFile);
+  pp.get("outFile" ,newRestartFile);
   pp.query("deltaNxLeft" ,changeLeft);
   pp.query("deltaNxRight" ,changeRight);
   pp.query("deltaNzBottom" ,changeBottom);
@@ -161,13 +161,13 @@ int main(int argc, char* argv[])
     pp.query("meltPondEnthalpy", meltPondEnthalpy);
   }
 
-  addExtraParams(runInputs, pp);
+  addExtraParams(previousInputsFile, pp);
 
   // Get the AMR hierarchy
   Vector<AMRLevelMushyLayer*> amrlevels;
   int finest_level;
   HDF5HeaderData header;
-  getAMRHierarchy(inFile, amrlevels, finest_level, header);
+  getAMRHierarchy(previousRestartFile, amrlevels, finest_level, header);
 
   // Get extra parameters needed here
   int block_factor;
@@ -178,8 +178,6 @@ int main(int argc, char* argv[])
 
   // E.g. change domain size
   const ProblemDomain oldLev0Domain = amrlevels[0]->problemDomain();
-
-  int dir = 0;
 
   // Define new boxes if we want to change the domain width or
   // enforce a certain box_size
@@ -199,23 +197,19 @@ int main(int argc, char* argv[])
 
     ProblemDomain newDomain(oldLev0Domain);
 
-
     // Grow/shrink domain
-    //    newDomain.grow(dir, deltaNx);
     newDomain.growLo(0, changeLeft);
     newDomain.growHi(0, changeRight);
 
     newDomain.growLo(1, changeBottom);
     newDomain.growHi(1, changeTop);
 
+    // This code doesn't work in 3D, so make sure we fail if we try to run in 3D.
+    CH_assert(SpaceDim == 2);
 
     for (int level = 0; level <= finest_level; level++)
     {
       AMRLevelMushyLayer* ml = amrlevels[level];
-
-      Box oldDomain = amrlevels[level]->problemDomain().domainBox();
-
-      const DisjointBoxLayout curDBL = ml->grids();
 
       pout() << "Processing level " << level << "..." << endl;
 
@@ -224,37 +218,28 @@ int main(int argc, char* argv[])
 
       pout() << "  Creating data holders..." << endl;
 
-
-
       // Define new grids with specified box_size
       if (box_size > 0)
       {
         getBoxes(outBoxes, newDomain.domainBox(), block_factor, box_size);
-
-        //        outBoxes = DisjointBoxLayout(outBoxes, outProcs);
-        //makeGrids(outBoxes, newDomain);
       }
       else
       {
-        // adjust current grids to fit new domain;
-
         MayDay::Error("Need to know box size!");
-
       }
 
+      // Split boxes onto processors
       LoadBalance(outProcs,outBoxes);
+      DisjointBoxLayout outGrids(outBoxes, outProcs, newDomain);
 
-      DisjointBoxLayout outGrids(outBoxes,outProcs,newDomain);
 
-      // Need to copy all data on this level to the new grids
-      // scalar vars, vector vars and m_advVel are written out
-
-      // could  maybe just used regrid here?
+      // Copy data to new grids and fill extra cells
       pout() << "Reshaping data for new grids" << endl;
       ml->reshapeData(outGrids, newDomain);
       pout() << "Finished reshaping data for new grids" << endl;
 
-      // Ready for next level
+      // Turn the new problem domain for this level into the new problem domain for the next level
+      // by refining it
       newDomain.refine(ml->refRatio());
     }
 
@@ -309,7 +294,10 @@ int main(int argc, char* argv[])
 
   // Shift data if asked
   if (xShift != 0)
-  {   
+  {
+    // Shifting in the x-direction only for now
+    int dir = 0;
+
     for (int level = 0; level <= finest_level; level++)
     {
       pout() << "Shifting data on level: " << level << endl;
@@ -361,18 +349,34 @@ int main(int argc, char* argv[])
     }
 
   }
+
+  // might have changed dx
+  if (newLev0Dx > 0)
+  {
+    amrlevels[0]->dx(newLev0Dx);
+    Real prevDx = newLev0Dx;
+    for (int level = 1; level <= finest_level; ++level)
+    {
+      Real levDx = prevDx/amrlevels[level]->refRatio();
+      amrlevels[level]->dx(levDx);
+
+      prevDx = levDx;
+    }
+  }
+
+
+  ////////////////////////////////////
   // Write new file
+  /////////////////////////////////////
 
   HDF5Handle handleOut;
   {
     CH_TIME("AMR::writeCheckpointFile.openFile");
-    handleOut.open(outFile.c_str(), HDF5Handle::CREATE);
+    handleOut.open(newRestartFile.c_str(), HDF5Handle::CREATE);
   }
 
-  // Reset iteration and time
 
-  // write amr data
-  //  HDF5HeaderData header;
+  // Reset iteration and time
   //  header.m_int ["max_level"]  = max_level;
   //  header.m_int ["num_levels"] = finest_level + 1;
   header.m_int ["iteration"]  = 0;
@@ -400,49 +404,21 @@ int main(int argc, char* argv[])
            );
 
 
-  //
-  //  for (int level = 0; level < regrid_intervals.size(); ++level)
-  //  {
-  //    char headername[100];
-  //    sprintf(headername, "regrid_interval_%d", level);
-  //    header.m_int[headername] = regrid_intervals[level];
-  //  }
-  //
-  //  for (int level = 0; level < max_level; ++level)
-  //  {
-  //    char headername[100];
-  //    sprintf(headername, "steps_since_regrid_%d", level);
-  //    header.m_int[headername] = steps_since_regrid[level];
-  //  }
-
-  // should steps since regrid be in the checkpoint file?
   {
     CH_TIME("writeHeader");
     header.writeToFile(handleOut);
   }
 
-  // write physics class data
+  // Write new dt
   Real lev0dt = amrlevels[0]->dt();
-  amrlevels[0]->dt(lev0dt/dtReductionFactor); // need this
+  amrlevels[0]->dt(lev0dt/dtReductionFactor);
 
-  // might have changed dx
-  if (newLev0Dx > 0)
-  {
-    amrlevels[0]->dx(newLev0Dx);
-    Real prevDx = newLev0Dx;
-    for (int level = 1; level <= finest_level; ++level)
-    {
-      Real levDx = prevDx/amrlevels[level]->refRatio();
-      amrlevels[level]->dx(levDx);
 
-      prevDx = levDx;
-    }
-  }
-
+  // Write header containing details about the fields in this data file
   pout() << " Write checkpoint header" << endl;
   amrlevels[0]->writeCheckpointHeader(handleOut);
 
-
+  // Write out the data on each level
   for (int level = 0; level <= finest_level; ++level)
   {
     pout() << " Write checkpoint data for level: " << level << endl;
@@ -450,7 +426,6 @@ int main(int argc, char* argv[])
   }
 
   handleOut.close();
-
 
 
 #ifdef CH_MPI
