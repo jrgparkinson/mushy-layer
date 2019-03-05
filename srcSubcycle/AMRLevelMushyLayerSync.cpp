@@ -703,18 +703,18 @@ void AMRLevelMushyLayer::postTimeStep()
       Interval velComps = m_vectorNew[VectorVars::m_fluidVel]->interval();
       m_vectorNew[VectorVars::m_fluidVel]->exchange(velComps);
 
-      if (m_opt.computeFreestreamCorrectionSingleLevel)
-      {
-        Vector<LevelData<FArrayBox>* > compVel(1, NULL);
-        Vector<LevelData<FArrayBox>* > compLambda(1, NULL);
-        Vector<RefCountedPtr<LevelData<FluxBox> > > compPorosityFace(1);
-        Vector<RefCountedPtr<LevelData<FArrayBox> > > compPorosity(1);
-
-        fillAMRLambda(compLambda);
-        fillAMRVelPorosity(compVel, compPorosityFace,compPorosity);
-
-        m_projection.doSyncOperations(compVel, compLambda, compPorosityFace, compPorosity, m_time, m_dt);
-      }
+//      if (m_opt.computeFreestreamCorrectionSingleLevel)
+//      {
+//        Vector<LevelData<FArrayBox>* > compVel(1, NULL);
+//        Vector<LevelData<FArrayBox>* > compLambda(1, NULL);
+//        Vector<RefCountedPtr<LevelData<FluxBox> > > compPorosityFace(1);
+//        Vector<RefCountedPtr<LevelData<FArrayBox> > > compPorosity(1);
+//
+//        fillAMRLambda(compLambda);
+//        fillAMRVelPorosity(compVel, compPorosityFace,compPorosity);
+//
+//        m_projection.doSyncOperations(compVel, compLambda, compPorosityFace, compPorosity, m_time, m_dt);
+//      }
 
     } // end if level = 0
 

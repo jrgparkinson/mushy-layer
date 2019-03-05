@@ -1141,7 +1141,7 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
   //  m_opt.doSyncOperations = true;
 
   // This can be changed during initialisation
-  m_usePrevPressureForUStar = m_opt.addSubtractGradP;
+  m_usePrevPressureForUStar = m_opt.usePrevPressureForUStar;
 //  ppMain.query("addSubtractGradP", m_addSubtractGradP);
 
   //I don't think it makes sense to do projection *and* calculate grad(P)

@@ -1469,13 +1469,13 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   bool darcySrc = m_opt.advVelDarcySrc ;
   bool viscousSrc = m_opt.advVelViscousSrc;
 
-  if (m_time <= m_opt.skipTrickySourceTerm)
-  {
-    pout() << "AMRLevelMushyLayer::computeAdvectionVelSourceTerm - time = " << m_time << " < " << m_opt.skipTrickySourceTerm;
-    pout() << ", skipping darcy and viscous src terms";
-    darcySrc = false;
-    viscousSrc = false;
-  }
+//  if (m_time <= m_opt.skipTrickySourceTerm)
+//  {
+//    pout() << "AMRLevelMushyLayer::computeAdvectionVelSourceTerm - time = " << m_time << " < " << m_opt.skipTrickySourceTerm;
+//    pout() << ", skipping darcy and viscous src terms";
+//    darcySrc = false;
+//    viscousSrc = false;
+//  }
 
   //Calculate Laplacian(U)
   if (m_parameters.isViscous())
@@ -1769,12 +1769,12 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
     pressureSrc = m_opt.CCPressureSrc;
   }
 
-  if (m_time <= m_opt.skipTrickySourceTerm)
-  {
-    pout() << "AMRLevelMushyLayer::computeUstarSrc - time = " << m_time << " < " << m_opt.skipTrickySourceTerm;
-    pout() << ", skipping advection src term";
-    advSrc = false;
-  }
+//  if (m_time <= m_opt.skipTrickySourceTerm)
+//  {
+//    pout() << "AMRLevelMushyLayer::computeUstarSrc - time = " << m_time << " < " << m_opt.skipTrickySourceTerm;
+//    pout() << ", skipping advection src term";
+//    advSrc = false;
+//  }
 
   Real oldTime = m_time - m_dt;
 

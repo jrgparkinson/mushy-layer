@@ -24,6 +24,47 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 {
   CH_TIME("getAMRFactory");
 
+  // First, check for deprecated options
+  // These are no longer read in, but used to be, so the user might be expecting some behaviour
+  // which they won't get - we better warn them about this.
+
+  ParmParse pp;
+  Vector<string> old_options;
+  old_options.push_back(string("main.explicitDarcyTerm"));
+  old_options.push_back(string("main.lapVelNumSmooth"));
+  old_options.push_back(string("main.lapVelSmoothScale"));
+  old_options.push_back(string("advSrc.allow_lagged_lap_vel"));
+  old_options.push_back(string("ccSrc.darcy"));
+
+  old_options.push_back(string("main.postTraceSmoothing"));
+  old_options.push_back(string("main.skipNewLevelScalars"));
+
+  old_options.push_back(string("main.variable_eta_factor"));
+  old_options.push_back(string("main.single_level_lambda_corr"));
+  old_options.push_back(string("amrmultigrid.relaxMode"));
+  old_options.push_back(string("main.implicitAdvectionSolve"));
+
+  old_options.push_back(string("main.usePhiForImplicitAdvectionSolve"));
+  old_options.push_back(string("main.noMultigrid"));
+  old_options.push_back(string("main.noMultigridIter"));
+  old_options.push_back(string("main.init_increase_dt"));
+  old_options.push_back(string("main.analyticSourceTerm"));
+  old_options.push_back(string("parameters.forcing_timescale"));
+
+
+old_options.push_back(string("main.skipTrickySourceTime"));
+  old_options.push_back(string("main.iter_plot_interval"));
+
+  for (int i=0; i< old_options.size(); i++)
+  {
+    string option = old_options[i];
+    if (pp.contains(option))
+    {
+      string warning_msg = "Warning, using deprecated option: " + option;
+      MayDay::Warning(warning_msg.c_str());
+    }
+  }
+
   ParmParse ppMain("main");
 
   ParmParse ppParams("parameters");
@@ -31,6 +72,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ParmParse ppProjection("projection");
   ParmParse ppInit("init");
   ParmParse ppAdvsrc("advSrc");
+  ParmParse ppCCSrc("ccSrc");
   ParmParse ppRegrid("regrid");
   ParmParse ppPatchGodunov("patchGodunov");
   ParmParse ppVelMultigrid("VelocityMultigrid");
@@ -150,8 +192,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("advectionMethod", advectionMethod);
   opt.advectionMethod = velocityAdvectionTypes(advectionMethod);
 
-  opt.skipTrickySourceTerm = -1;
-  ppMain.query("skipTrickySourceTime", opt.skipTrickySourceTerm);
+//  opt.skipTrickySourceTerm = -1;
+//  ppMain.query("skipTrickySourceTime", opt.skipTrickySourceTerm);
 
   opt.allowMulticompAdvection = true;
   ppMain.query("allowMulticompAdvection", opt.allowMulticompAdvection);
@@ -260,7 +302,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("uDelU_conservativeForm", opt.uDelUConservativeForm);
 
   // Cell-centred velocity source term
-  ParmParse ppCCSrc("ccSrc");
 
   opt.CCAdvSrc = true;
   ppCCSrc.query("advection", opt.CCAdvSrc);
@@ -324,8 +365,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
     * Physics related options
    */
 
-  opt.iter_plot_interval = -1;
-  ppMain.query("iter_plot_interval", opt.iter_plot_interval);
+//  opt.iter_plot_interval = -1;
+//  ppMain.query("iter_plot_interval", opt.iter_plot_interval);
 
   opt.lowerPorosityLimit = 1e-15;
   ppMain.query("lowPorosityLimit", opt.lowerPorosityLimit);
@@ -396,11 +437,11 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 //  ppMain.query("variable_eta_factor", opt.variable_eta_factor);
 //  CH_assert(opt.variable_eta_factor >= 1); // This must be >= 1, else eta will increase when it should be decreasing (and vice-versa)
 
-  opt.minEta = 0.99;
-  ppProjection.query("eta", opt.minEta);
+//  opt.minEta = 0.99;
+//  ppProjection.query("eta", opt.minEta);
 
-  opt.computeFreestreamCorrectionSingleLevel = false;
-  ppMain.query("single_level_lambda_corr", opt.computeFreestreamCorrectionSingleLevel);
+//  opt.computeFreestreamCorrectionSingleLevel = false;
+//  ppMain.query("single_level_lambda_corr", opt.computeFreestreamCorrectionSingleLevel);
 
   opt.compute_initial_VD_corr = true;
   ppMain.query("initialize_VD_corr", opt.compute_initial_VD_corr);
@@ -468,8 +509,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.regrid_dt_scale = 0.1;
   ppMain.query("regrid_dt_scale", opt.regrid_dt_scale);
 
-  opt.initLambda = true;
-  ppMain.query("initLambda", opt.initLambda);
+  opt.initLambdaPostRegrid = true;
+  ppMain.query("initLambda", opt.initLambdaPostRegrid);
 
   opt.regrid_freestream_subcycle = true;
   ppMain.query("regrid_freestream_subcycle", opt.regrid_freestream_subcycle);
@@ -498,8 +539,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("initialize_pressure", opt.initialize_pressures);
   ppMain.query("project_initial_vel", opt.project_initial_vel);
 
-  opt.addSubtractGradP = true;
-  ppMain.query("addSubtractGradP", opt.addSubtractGradP);
+  opt.usePrevPressureForUStar = true;
+  ppMain.query("addSubtractGradP", opt.usePrevPressureForUStar);
 
   opt.customInitData = -1;
   ppMain.query("initData", opt.customInitData);

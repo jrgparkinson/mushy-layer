@@ -554,8 +554,7 @@ struct MushyLayerOptions {
    */
   bool CCPressureSrcOverride;
 
-  /// Whether or not to do some smoothing after regridding
-  bool do_postRegrid_smoothing;
+
 
   /// Whether or not to reflux momentum
   bool reflux_momentum;
@@ -787,27 +786,66 @@ struct MushyLayerOptions {
   /// Factor by which to scale dt for re-initialising pressure following regridding
   Real regrid_dt_scale;
 
-  bool initLambda;
-  Real minEta;
-  bool computeFreestreamCorrectionSingleLevel;
+  /// Whether or not to recalculate lambda after regridding
+  bool initLambdaPostRegrid;
+
+//  Real minEta;
+//  bool computeFreestreamCorrectionSingleLevel;
+
+  /// Whether or not to advect lambda after regridding, in order to recompute the freestream correction
   bool regrid_advect_before_freestream;
+
+  /// Whether or not to do subcycling when advecting lambda after regridding
+  /**
+   * Only used if MushyLayerOptions::regrid_advect_before_freestream is true
+   */
   bool regrid_freestream_subcycle;
+
+  /// Option to scale \f$ \eta \f$ before recomputing the freestream correction after regridding
+  /**
+   * Default value = 1.0.
+   */
   Real regrid_eta_scale;
 
-  /// default = 0: no smoothing
+  /// Whether or not to do some smoothing after regridding
+   bool do_postRegrid_smoothing;
+
+  /// Coefficient to determine how aggressively to do smoothing (if MushyLayerOptions::do_postRegrid_smoothing = true)
   Real regrid_smoothing_coeff;
 
+/// Whether or not to project the initial velocity field
+  /**
+   * Projecting ensures it is divergence free
+   */
   bool project_initial_vel;
+
+  /// Whether or not to initialize pressures
   bool initialize_pressures;
-  bool addSubtractGradP;
 
-  int iter_plot_interval;
+  /// Set the initial value for AMRLevelMushyLayer::m_usePrevPressureForUStar
+  /**
+   * Determines if we should use the previous \f$ \nabla P \f$ to calculate \f$ \mathbf{u}^* \f$
+   */
+  bool usePrevPressureForUStar;
 
+
+//  int iter_plot_interval;
+
+  /// Some custom options for initial data
   int customInitData;
+
+  /// Whether to write out plotfiles during pressure initialisation
+  /**
+   * Useful for debugging
+   */
   bool writePressureInitFields;
+
+  /// When initialising pressure via multiple iterations, decide whether or not to reset the other fields between iterations
   bool initResetStates;
 
-  Real skipTrickySourceTerm;
+
+//  Real skipTrickySourceTerm;
+
   bool allowMulticompAdvection;
   Real smoothingCoeff;
 

@@ -596,9 +596,10 @@ Real AMRLevelMushyLayer::advance()
 #endif
 
 
-  Real old_time = m_time;
+//  Real old_time = m_time;
+//  Real half_time = new_time - m_dt / 2;
   Real new_time = m_time + m_dt;
-  //  Real half_time = new_time - m_dt / 2;
+
 
   m_time = new_time;
 

@@ -1453,7 +1453,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       writeAMRHierarchy("regrid4.hdf5");
     }
 
-    if(m_opt.initLambda)
+    if(m_opt.initLambdaPostRegrid)
     {
       thisLevelData = this;
 
