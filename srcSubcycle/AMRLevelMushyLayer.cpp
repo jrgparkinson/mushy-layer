@@ -684,15 +684,15 @@ Real AMRLevelMushyLayer::advance()
     advectLambda(true);
   }
 
-  if (m_newLevel && m_level > 0)
-  {
-    if (m_opt.skipNewLevelScalars)
-    {
-      pout() << "First time step on a new level - skipping advection and diffusion" << endl;
-      m_opt.doScalarAdvectionDiffusion = false;
-    }
-    m_newLevel = false;
-  }
+//  if (m_newLevel && m_level > 0)
+//  {
+//    if (m_opt.skipNewLevelScalars)
+//    {
+//      pout() << "First time step on a new level - skipping advection and diffusion" << endl;
+//      m_opt.doScalarAdvectionDiffusion = false;
+//    }
+//    m_newLevel = false;
+//  }
 
   if (!(m_parameters.physicalProblem == PhysicalProblems::m_poiseuilleFlow ||
       m_parameters.physicalProblem == PhysicalProblems::m_soluteFluxTest ||

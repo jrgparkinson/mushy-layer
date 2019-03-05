@@ -12,7 +12,7 @@ void AMRLevelMushyLayer::setDefaults()
   // Need to make sure these are initialised,
   // else  Some conditional statements will depends on uninitialised value(s)
   m_newGrids_different = false;
-  m_newLevel=false;
+//  m_newLevel=false;
 //  m_opt.perturbationTime = 0.0;
 }
 

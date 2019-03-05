@@ -110,8 +110,7 @@ public:
 
     m_physBCPtr = NULL;
 
-    m_newLevel=false;
-
+//    m_newLevel=false;
 
     m_enforceGradP = false;
     m_dtReduction = 0.0;
@@ -1148,7 +1147,7 @@ protected:
   bool m_timestepFailed;
 
   /// If this level has only just been added due to regridding
-  bool m_newLevel;
+//  bool m_newLevel;
 
   /// The advection velocity is calculated at old_time + m_adv_vel_centering*dt
   /**

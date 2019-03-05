@@ -293,7 +293,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppParams.query("rampBuoyancy", opt.rampBuoyancy);
 
   opt.maxRaC = 0.0;
-   opt.maxRaT = 0.0;
+  opt.maxRaT = 0.0;
 
    ppParams.query("maxRaT", opt.maxRaT);
    ppParams.query("maxRaC", opt.maxRaC);
@@ -303,8 +303,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
    ppParams.query("initRaT", opt.initRaT);
    ppParams.query("initRaC", opt.initRaC);
 
-   opt.skipNewLevelScalars = false;
-   ppMain.query("skipNewLevelScalars", opt.skipNewLevelScalars);
+//   opt.skipNewLevelScalars = false;
+//   ppMain.query("skipNewLevelScalars", opt.skipNewLevelScalars);
 
    opt.skipSaltUpdate = false;
    ppMain.query("skipSaltUpdate", opt.skipSaltUpdate);
@@ -394,9 +394,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("refluxBetaSign", opt.refluxBetaSign);
   ppMain.query("refluxCorrSign", opt.refluxCorrSign);
 
-  opt.variable_eta_factor = 1.0;
-  ppMain.query("variable_eta_factor", opt.variable_eta_factor);
-  CH_assert(opt.variable_eta_factor >= 1); // This must be >= 1, else eta will increase when it should be decreasing (and vice-versa)
+//  opt.variable_eta_factor = 1.0;
+//  ppMain.query("variable_eta_factor", opt.variable_eta_factor);
+//  CH_assert(opt.variable_eta_factor >= 1); // This must be >= 1, else eta will increase when it should be decreasing (and vice-versa)
 
   opt.minEta = 0.99;
   ppProjection.query("eta", opt.minEta);

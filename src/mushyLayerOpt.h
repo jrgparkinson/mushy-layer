@@ -314,7 +314,7 @@ struct MushyLayerOptions {
   Real spongeHeight;
 
 //  Real postTraceSmoothing;
-  bool skipNewLevelScalars;
+//  bool skipNewLevelScalars;
   bool skipSaltUpdate;
   bool skipHCUpdate;
   bool doDiffusionSrc;
@@ -499,7 +499,7 @@ struct MushyLayerOptions {
   Real regrid_dt_scale;
 
   bool initLambda;
-  Real variable_eta_factor;
+//  Real variable_eta_factor;
   Real minEta;
   bool computeFreestreamCorrectionSingleLevel;
   bool regrid_advect_before_freestream;

@@ -1043,14 +1043,14 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
   }
 
   // Check if old grids existed
-  if (m_grids.size() == 0)
-  {
-    if (s_verbosity >= 2)
-    {
-      pout() << "AMRLevelMushyLayer::regrid - this is a new level" << endl;
-    }
-    m_newLevel = true;
-  }
+//  if (m_grids.size() == 0)
+//  {
+//    if (s_verbosity >= 2)
+//    {
+//      pout() << "AMRLevelMushyLayer::regrid - this is a new level" << endl;
+//    }
+//    m_newLevel = true;
+//  }
 
   if (m_newGrids_different)
   {
@@ -1328,28 +1328,28 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
   {
     AMRLevelMushyLayer* thisLevelData = this;
 
-    Real newLevelAdded = false;
+//    Real newLevelAdded = false;
     // determine if new level added
 
-    thisLevelData = this;
-    while (thisLevelData)
-    {
-      newLevelAdded = newLevelAdded || thisLevelData->m_newLevel;
-      thisLevelData = thisLevelData->getFinerLevel();
-    }
+//    thisLevelData = this;
+//    while (thisLevelData)
+//    {
+//      newLevelAdded = newLevelAdded || thisLevelData->m_newLevel;
+//      thisLevelData = thisLevelData->getFinerLevel();
+//    }
 
-    if (newLevelAdded && m_opt.variable_eta_factor != 1.0)
-    {
-      // From stabilty analysis, believe this is the maximum stable eta allowed
-
-      Real maxEta = maxAllowedEta();
-      setEta(maxEta);
-
-      if (s_verbosity >= 3)
-      {
-        pout() << "New level added, set eta = " << maxEta << endl;
-      }
-    }
+//    if (newLevelAdded && m_opt.variable_eta_factor != 1.0)
+//    {
+//      // From stabilty analysis, believe this is the maximum stable eta allowed
+//
+//      Real maxEta = maxAllowedEta();
+//      setEta(maxEta);
+//
+//      if (s_verbosity >= 3)
+//      {
+//        pout() << "New level added, set eta = " << maxEta << endl;
+//      }
+//    }
 
     thisLevelData = this;
     while (thisLevelData->hasFinerLevel())
