@@ -618,7 +618,7 @@ protected:
                                   LevelData<FluxBox>& a_grad_eLambda,
                                   LevelData<FluxBox>& a_gradPhi,
                                   LevelData<FluxBox>& porosityFace,
-                                  Real a_old_time, Real a_dt, bool legacyCompute = false);
+                                  Real a_old_time, Real a_dt);
 
   /// Compute the advective flux given the scalar field, advection velocity and source term specified
   /**

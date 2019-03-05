@@ -193,8 +193,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("advPorosityLimit", opt.advVelChiLimit);
 
 
-  opt.legacyComputePredictVel = false;
-  ppMain.query("legacy_predict_vel", opt.legacyComputePredictVel);
 
   // by default make this tiny (so essentially turned off)
   opt.uDelU_porosityLimit = 10*opt.lowerPorosityLimit; //1e-15;

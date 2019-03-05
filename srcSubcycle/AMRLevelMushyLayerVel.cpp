@@ -1027,7 +1027,7 @@ void AMRLevelMushyLayer::computePredictedVelocities(
     const LevelData<FArrayBox>& a_viscousSource, PatchGodunov& a_patchGodVelocity,
     LevelData<FluxBox>& a_grad_eLambda, LevelData<FluxBox>& a_gradPhi,
     LevelData<FluxBox>& porosityFace,
-    Real a_old_time, Real a_dt, bool legacyCompute)
+    Real a_old_time, Real a_dt)
 {
 
   // Get AdvectionPhysics object within the PatchGodunov object
@@ -2004,8 +2004,7 @@ void AMRLevelMushyLayer::predictVelocities(LevelData<FArrayBox>& a_uDelU,
     // This should U_chi_advected - if we've only advected U, then it should divide by chi before returning
     computePredictedVelocities(U_chi_advected, traceVel, advectionVelocity,
                                UtoAdvect_old, a_src, m_patchGodVelocity,
-                               grad_eLambda, gradPhi, pressureScale, old_time, a_dt,
-                               m_opt.legacyComputePredictVel);
+                               grad_eLambda, gradPhi, pressureScale, old_time, a_dt);
 
     U_chi_advected.exchange();
 

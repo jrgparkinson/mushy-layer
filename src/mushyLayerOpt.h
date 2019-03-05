@@ -496,16 +496,20 @@ struct MushyLayerOptions {
   /// Whether or not to initialise the velocity to an analytically specified value
   bool initAnalyticVel;
 
-
 //  int lapVelNumSmooth;
 //  Real lapVelSmoothScale;
 
+  /// Maximum number of projections to do on levle 0
   int maxProjBaseLevel;
+
+  /// Maximum number of MAC (face cented) projections to do
   int maxNumMACProj;
 
+  /// Accuracy for boundary conditions applied to laplacian(velocity) in the advection velocity source term
   int lapVelBCOrder;
+
+  /// Where to compute the CC velocity source term (default = 0.5 i.e. halfway through the timestep)
   Real CCVelSrcTermCentering;
-  bool legacyComputePredictVel;
 
   // u.grad(u) stuff
   int uDeluMethod;
