@@ -657,12 +657,12 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
         // do this or darcy as a source term
 
         // this is what multiplies the U term (darcy's law)
-        if (m_opt.explicitDarcyTerm)
-        {
-          (*cCoef[relativeLev])[dit].setVal(0.0);
-        }
-        else
-        {
+//        if (m_opt.explicitDarcyTerm)
+//        {
+//          (*cCoef[relativeLev])[dit].setVal(0.0);
+//        }
+//        else
+//        {
           for (int comp_i = 0; comp_i < num_comp; comp_i++)
           {
             (*cCoef[relativeLev])[dit].copy(porosity[dit], 0, comp_i);
@@ -670,7 +670,7 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
           }
 
           (*cCoef[relativeLev])[dit].mult(m_parameters.m_darcyCoeff);
-        }
+//        }
 
         //                                                      (*cCoef[relativeLev])[dit].setVal(0.0); // testing
 

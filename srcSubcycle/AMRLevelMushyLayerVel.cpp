@@ -1873,10 +1873,10 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
       src[dit] -= P_src[dit];
     }
 
-    if (m_opt.explicitDarcyTerm || m_opt.CCDarcySrc)
-    {
-      src[dit] -= darcy_src[dit];
-    }
+//    if (m_opt.explicitDarcyTerm || m_opt.CCDarcySrc)
+//    {
+//      src[dit] -= darcy_src[dit];
+//    }
 
   }
 

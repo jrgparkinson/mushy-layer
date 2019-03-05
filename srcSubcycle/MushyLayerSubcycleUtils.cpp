@@ -171,8 +171,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.usePiAdvectionBCs = true;
   ppProjection.query("usePiAdvectionBCs", opt.usePiAdvectionBCs);
 
-  opt.explicitDarcyTerm = false;
-  ppMain.query("explicitDarcyTerm", opt.explicitDarcyTerm);
+//  opt.explicitDarcyTerm = false;
+//  ppMain.query("explicitDarcyTerm", opt.explicitDarcyTerm);
 
   opt.solidPorosity = 0.05;
   ppMain.query("solidPorosity", opt.solidPorosity);
@@ -268,8 +268,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppCCSrc.query("advection", opt.CCAdvSrc);
 
   // This line must come after quering explicit Darcy Term
-  opt.CCDarcySrc = opt.explicitDarcyTerm;
-  ppCCSrc.query("darcy", opt.CCDarcySrc);
+//  opt.CCDarcySrc = opt.explicitDarcyTerm;
+//  ppCCSrc.query("darcy", opt.CCDarcySrc);
 
   opt.CCPressureSrcOverride = false;
   opt.CCPressureSrc = true;

@@ -253,9 +253,10 @@ struct MushyLayerOptions {
    * computed based on the current velocities may not be a appropriate. Instead,
    * we should estimate the new velocities given the acceleration:
    *
-   * \f$ \Delta t = \sqrt{accelCFL \Delta x / acceleration} \f$
+   * \f$ \Delta t = \sqrt{\sigma  \Delta x / a} \f$,
    *
-   * In that case, we use this CFl number.
+   * where \f$ \sigma \f$ is the cfl number and \f$ a\f$ is the maximum acceleration.
+   *
    */
   Real accelCFL;
 
@@ -430,7 +431,7 @@ struct MushyLayerOptions {
   bool scaleP_CC;
 
 
-  bool explicitDarcyTerm;
+//  bool explicitDarcyTerm;
   bool usePiAdvectionBCs;
   int projection_verbosity;
 
@@ -476,7 +477,7 @@ struct MushyLayerOptions {
   bool advSrcAllowLaggedLapVel;
 
   bool CCAdvSrc;
-  bool CCDarcySrc;
+//  bool CCDarcySrc;
   bool CCBuoyancySrc;
   bool CCPressureSrc;
   bool CCPressureSrcOverride;
