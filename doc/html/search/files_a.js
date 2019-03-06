@@ -17,5 +17,6 @@ var searchData=
   ['multigrid_2eh',['MultiGrid.H',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/MultiGrid_8H.html',1,'']]],
   ['multilevellinearop_2eh',['MultilevelLinearOp.H',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/MultilevelLinearOp_8H.html',1,'']]],
   ['multilevellinearopi_2eh',['MultilevelLinearOpI.H',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/MultilevelLinearOpI_8H.html',1,'']]],
-  ['mushylayeropt_2eh',['mushyLayerOpt.h',['../mushy_layer_opt_8h.html',1,'']]]
+  ['mushylayeropt_2eh',['mushyLayerOpt.h',['../mushy_layer_opt_8h.html',1,'']]],
+  ['mushylayerparams_2eh',['MushyLayerParams.h',['../_mushy_layer_params_8h.html',1,'']]]
 ];

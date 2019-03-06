@@ -125,3 +125,9 @@
 \form#124:$ \nabla^2 p = \nabla \cdot \mathbf{u} $
 \form#125:$ \nabla \cdot \chi \nabla p = \nabla \cdot \mathbf{u} $
 \form#126:$ \eta_\lambda $
+\form#127:$ \pi = \chi^3 $
+\form#128:$ \Pi = \frac{\chi^3}{(1-\chi)^2} $
+\form#129:$ \Pi = - \chi^2 \log (1-\chi) $
+\form#130:$ \Pi = -exp(-(x-0.5)^2/\alpha) $
+\form#131:$\alpha=0.02$
+\form#132:$ \pi = \chi $

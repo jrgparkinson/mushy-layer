@@ -76,7 +76,6 @@ var searchData=
   ['domacsync',['doMacSync',['../class_projector.html#a986abfcc70e7d6aa3ac621f862f6a4bf',1,'Projector']]],
   ['domain',['domain',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classImageIterator.html#a299a783354c1a9508d47efee2e6bcef0',1,'ImageIterator']]],
   ['domainbox',['domainBox',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classProblemDomain.html#ad300c96ef3b37c2eaeb67cafe2ffa9ee',1,'ProblemDomain']]],
-  ['domainextrapbcfunction',['DomainExtrapBCFunction',['../class_domain_extrap_b_c_function.html#a55a5528b06fed1fb88b785cf7d87fecc',1,'DomainExtrapBCFunction::DomainExtrapBCFunction()'],['../class_domain_extrap_b_c_function.html#ad083a3d037a1a95e4f9dbcca09510379',1,'DomainExtrapBCFunction::DomainExtrapBCFunction(bool a_isDefined, MushyLayerParams a_params)']]],
   ['domainnodebc',['DomainNodeBC',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classDomainNodeBC.html#afe6453398478c4652d8a85b264e1d3ce',1,'DomainNodeBC::DomainNodeBC()'],['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classDomainNodeBC.html#ae3b7f6fc0d77c1c79d7e73ff02c63d23',1,'DomainNodeBC::DomainNodeBC(const DomainNodeBC &amp;)']]],
   ['domomentumreflux',['doMomentumReflux',['../class_a_m_r_level_mushy_layer.html#a74d98dd94e04f4732f7ac6b71e7b484c',1,'AMRLevelMushyLayer']]],
   ['dopostregridops',['doPostRegridOps',['../class_projector.html#ac94969d447d694e5a6e6fd4ddf23dacb',1,'Projector']]],

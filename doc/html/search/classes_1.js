@@ -26,7 +26,6 @@ var searchData=
   ['basicgradpressurebcfunction',['BasicGradPressureBCFunction',['../class_basic_grad_pressure_b_c_function.html',1,'']]],
   ['basicporositypermeabilitybcfunction',['BasicPorosityPermeabilityBCFunction',['../class_basic_porosity_permeability_b_c_function.html',1,'']]],
   ['basicporositypermeabilityfacebcfunction',['BasicPorosityPermeabilityFaceBCFunction',['../class_basic_porosity_permeability_face_b_c_function.html',1,'']]],
-  ['basicpressurebcfunctionsubcycled',['BasicPressureBCFunctionSubcycled',['../class_basic_pressure_b_c_function_subcycled.html',1,'']]],
   ['basicrefluxcorrbcfunction',['BasicRefluxCorrBCFunction',['../class_basic_reflux_corr_b_c_function.html',1,'']]],
   ['bcfunction',['BCFunction',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBCFunction.html',1,'']]],
   ['bcfuncwrapper',['BCFuncWrapper',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBCFuncWrapper.html',1,'']]],

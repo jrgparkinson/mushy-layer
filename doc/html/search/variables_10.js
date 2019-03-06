@@ -22,7 +22,7 @@ var searchData=
   ['thetainterface',['thetaInterface',['../class_mushy_layer_params.html#a4f5bbe8dd1098ccc6bac03fce6b6bfa0',1,'MushyLayerParams']]],
   ['thetalinitial',['ThetaLInitial',['../class_mushy_layer_params.html#a3781f0d56c7054c5f28a7004324a0891',1,'MushyLayerParams']]],
   ['thetalplumeinflow',['ThetaLPlumeInflow',['../class_mushy_layer_params.html#ab0d16dc81fb443313e427b11ff37a83d',1,'MushyLayerParams']]],
-  ['thetaplumeinflow',['ThetaPlumeInflow',['../class_mushy_layer_params.html#a20062da3b7047b0f9fc5a3f5d320499c',1,'MushyLayerParams::ThetaPlumeInflow()'],['../class_mushy_layer_params.html#abd2acb1163b9a8660abea009ecbc2a09',1,'MushyLayerParams::thetaPlumeInflow()']]],
+  ['thetaplumeinflow',['thetaPlumeInflow',['../class_mushy_layer_params.html#abd2acb1163b9a8660abea009ecbc2a09',1,'MushyLayerParams::thetaPlumeInflow()'],['../class_mushy_layer_params.html#a20062da3b7047b0f9fc5a3f5d320499c',1,'MushyLayerParams::ThetaPlumeInflow()']]],
   ['thetasinitial',['ThetaSInitial',['../class_mushy_layer_params.html#a71937d2796fc2c061fc8b4781355fd00',1,'MushyLayerParams']]],
   ['thetasplumeinflow',['ThetaSPlumeInflow',['../class_mushy_layer_params.html#a70175dbbe59391b96e645b6177299f46',1,'MushyLayerParams']]],
   ['timeintegrationorder',['timeIntegrationOrder',['../struct_mushy_layer_options.html#a49077940c621196e64ed753633096164',1,'MushyLayerOptions']]],

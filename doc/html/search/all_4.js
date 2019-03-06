@@ -46,7 +46,7 @@ var searchData=
   ['extrapfuncbc',['extrapFuncBC',['../class_phys_b_c_util.html#a22628a8b9351997d1c753147765b7279',1,'PhysBCUtil']]],
   ['extrapolatevalue',['extrapolateValue',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classNWOQuadCFInterp.html#afc63df7f59477e3096ac84e3152710b0',1,'NWOQuadCFInterp']]],
   ['extrapolationbcfunction',['ExtrapolationBCFunction',['../class_extrapolation_b_c_function.html',1,'ExtrapolationBCFunction'],['../class_extrapolation_b_c_function.html#ab6747f91f0d3ee6d32634cae85f62dd8',1,'ExtrapolationBCFunction::ExtrapolationBCFunction()']]],
-  ['extrapolationfuncbc',['extrapolationFuncBC',['../class_phys_b_c_util.html#a096c38e7c08e42f095456519d34bba4e',1,'PhysBCUtil']]],
+  ['extrapolationfuncbc',['extrapolationFuncBC',['../class_phys_b_c_util.html#a5a0432d535d47d6bc1abfb5383da5b85',1,'PhysBCUtil']]],
   ['extrapvelfuncbc',['extrapVelFuncBC',['../class_phys_b_c_util.html#a991faecb8d7faaa3981eb4080ff1d21a',1,'PhysBCUtil']]],
   ['extrapvelfuncinterior',['extrapVelFuncInterior',['../class_phys_b_c_util.html#a25fcb4a8892a70b42eca416dfa01be63',1,'PhysBCUtil']]]
 ];

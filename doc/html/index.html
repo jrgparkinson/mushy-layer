@@ -113,8 +113,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>For more details on how to setup your inputs file for the problem you're interested in, see <code>/docs/RunningTheMushyLayerCode.md/</code>.</p>
 <p>There are example problems, with input files, in the <code>/examples/</code> directory.</p>
 <h1>Documentation</h1>
-<p>Documentation can be generated using Doyxgen if it is installed. A default configuration file can be found in the <code>/docs/</code> directory, which can be run via:</p>
+<p>Documentation can be generated using <a href="http://www.doxygen.nl/">Doyxgen</a> if it is installed. A default configuration file can be found in the <code>/docs/</code> directory, which can be run via:</p>
 <p>```console $ cd /docs/ $ doxygen ```</p>
+<p>You can also find a reasonably up to date version of the documentation online at [<a href="https://jrgparkinson.github.io/mushy-layer/doc/html/index.html">https://jrgparkinson.github.io/mushy-layer/doc/html/index.html</a>], if you do not want to compile it yourself. The Classes section is particularly useful.</p>
 <h1>Extra utilities</h1>
 <p>This repository contains various other pieces of code for running simulations.</p>
 <p><code>/setupNewRun/</code> takes a checkpoint file and creates a new file with the same data on a domain with a different width, which is useful for computing optimal states. <code>/postProcess/</code> loads checkpoint files and computes various diagnostics that were not run during the simulations. <code>/VisitPatch/</code> describes a small patch for the VISIT software to allow you to open checkpoint files as well as plot files. <code>/params/</code> contains input files for different types of simulations. They may not all work, sorry. <code>/grids/</code> contains gridfiles which can be loaded via <code>main.gridfile=/path/to/gridfile</code> in an inputs file, and sets a fixed variable mesh (i.e. not adaptive) for simulations. <code>/mk/</code> contains some custom Makefile options for compiling on some of the machines in AOPP at the University of Oxford.</p>
@@ -186,7 +187,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Mar 5 2019 19:20:20 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Mar 6 2019 17:39:08 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
