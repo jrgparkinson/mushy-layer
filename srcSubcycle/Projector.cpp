@@ -40,6 +40,7 @@ bool Projector::m_applySyncCorrection = true;
 bool Projector::s_applyVDCorrection = true;
 bool Projector::m_doQuadInterp = true;
 Real Projector::m_etaLambda = 0.9;
+bool Projector::m_adaptSolverParamsDivU = false;
 
 #if defined(CH_USE_DOUBLE)
 Real Projector::s_solver_tolerance = 1.0e-15; // pmc, 18 oct 2007:  was -10
@@ -53,6 +54,7 @@ int  Projector::s_num_smooth_up = 4;
 int  Projector::s_num_smooth_down = 2;
 int  Projector::s_num_precond_smooth = 4;
 int  Projector::s_numMG = 1;
+int   Projector::s_iterMax = 20;
 bool  Projector::s_relax_bottom_solver = false;
 bool Projector::s_constantLambdaScaling = false;
 Real Projector::s_lambda_timestep = 0.0;
@@ -535,6 +537,10 @@ void Projector::variableSetUp()
   ppProjection.query("doQuadInterp", tempBool);
   m_doQuadInterp = (tempBool == 1);
 
+  tempBool = (int) m_adaptSolverParamsDivU;
+  ppProjection.query("adaptSolverParamsDivU", tempBool);
+  m_adaptSolverParamsDivU = (tempBool == 1);
+
   m_scalePressureWithPorosity = false;
   ppProjection.query("scalePressureWithPorosity", m_scalePressureWithPorosity);
 
@@ -553,6 +559,7 @@ void Projector::variableSetUp()
   ppProjection.query("numSmoothDown", s_num_smooth_down);
   ppProjection.query("numPrecondSmooth", s_num_precond_smooth);
   ppProjection.query("numMG", s_numMG);
+  ppProjection.query("maxIter", s_iterMax);
   ppProjection.query("relax_bottom_solver", s_relax_bottom_solver);
   ppProjection.query("bottomSolveMaxIter", s_bottomSolveMaxIter);
   ppProjection.query("solverHang", s_solver_hang);
@@ -1127,47 +1134,60 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 
 void Projector::checkDivergence(LevelData<FluxBox>& a_uEdge)
 {
-  // Skip this function for now
-  return;
+  if (!m_adaptSolverParamsDivU)
+  {
+    return;
+  }
+
 
   LevelData<FArrayBox> DivU(getBoxes(),1);
   Divergence::levelDivergenceMAC(DivU, a_uEdge, m_dx);
 
   Real maxDivU = ::computeNorm(DivU, NULL, 1, m_dx, Interval(0,0), 0);
 
-  int minNumSmooth = 2;
-  int maxNumSmooth = 20;
+//  int minNumSmooth = 2;
+//  int maxNumSmooth = 20;
   Real tol = 1e-11;
 
   ParmParse ppProjection("projection");
-  ppProjection.query("maxNumSmooth", maxNumSmooth);
-  ppProjection.query("minNumSmooth", minNumSmooth);
+//  ppProjection.query("maxNumSmooth", maxNumSmooth);
+//  ppProjection.query("minNumSmooth", minNumSmooth);
   ppProjection.query("divergence_tolerance", tol);
 
-  if (maxDivU < tol)
-  {
-    // We might be able to reduce the number of smoothings
-    if (s_num_smooth_down > minNumSmooth || s_num_smooth_up > minNumSmooth)
-    {
-      s_num_smooth_down = max(s_num_smooth_down-2, minNumSmooth);
-      s_num_smooth_up = max(s_num_smooth_up-2, minNumSmooth);
+  // If maxDivU < tol, increase solver tolerance
+  // Increase/decrease s_solver_tolerance to get max(div(u)) = tolerance
+  s_solver_tolerance = s_solver_tolerance * tol/maxDivU;
 
-      pout() << "  max(div U)  = " << maxDivU << " < " << tol << ", decreasing number of smoothing steps to " <<
-          s_num_smooth_down << " (down) " << s_num_smooth_up << " (up) "<< endl;
-    }
-
-  }
-  else
+  if (s_verbosity >= 2)
   {
-    // Increasing the number of smoothings may help
-    if (s_num_smooth_down < maxNumSmooth || s_num_smooth_up < maxNumSmooth)
-    {
-      s_num_smooth_down = min(s_num_smooth_down+2, maxNumSmooth);
-      s_num_smooth_up = min(s_num_smooth_up+2, maxNumSmooth);
-      pout() << "  max(div U)  = " << maxDivU << " > " << tol << ", increasing number of smoothing steps to " <<
-          s_num_smooth_down << " (down) " << s_num_smooth_up << " (up) " << endl;
-    }
+    pout() << "  Projector::checkDivergence - Setting solver tolerance = " << s_solver_tolerance << endl;
   }
+
+//  if (maxDivU < tol)
+//  {
+//    this->s_solver_tolerance = s_solver_tolerance/10;
+////    // We might be able to reduce the number of smoothings
+////    if (s_num_smooth_down > minNumSmooth || s_num_smooth_up > minNumSmooth)
+////    {
+////      s_num_smooth_down = max(s_num_smooth_down-2, minNumSmooth);
+////      s_num_smooth_up = max(s_num_smooth_up-2, minNumSmooth);
+////
+////      pout() << "  max(div U)  = " << maxDivU << " < " << tol << ", decreasing number of smoothing steps to " <<
+////          s_num_smooth_down << " (down) " << s_num_smooth_up << " (up) "<< endl;
+////    }
+//
+//  }
+//  else
+//  {
+//    // Increasing the number of smoothings may help
+////    if (s_num_smooth_down < maxNumSmooth || s_num_smooth_up < maxNumSmooth)
+////    {
+////      s_num_smooth_down = min(s_num_smooth_down+2, maxNumSmooth);
+////      s_num_smooth_up = min(s_num_smooth_up+2, maxNumSmooth);
+////      pout() << "  max(div U)  = " << maxDivU << " > " << tol << ", increasing number of smoothing steps to " <<
+////          s_num_smooth_down << " (down) " << s_num_smooth_up << " (up) " << endl;
+////    }
+//  }
 
 }
 
@@ -3025,7 +3045,7 @@ void Projector::defineMultiGrid(AMRMultiGrid<LevelData<FArrayBox> >& a_solver,
   a_solver.m_pre = s_num_smooth_down; // smoothings before avging
   a_solver.m_post = s_num_smooth_up; // smoothings after avging
   a_solver.m_numMG = s_numMG;
-  //a_solver.m_iterMax = 20;
+  a_solver.m_iterMax = s_iterMax;
 
 }
 
@@ -3247,6 +3267,7 @@ void Projector::setSolverParameters()
   m_solverMGlevel.m_post = s_num_smooth_up; // smoothings after avging
   m_solverMGlevel.m_bottom = s_num_precond_smooth; // smoothing before bottom solve
   m_solverMGlevel.m_numMG = s_numMG;
+  m_solverMGlevel.m_iterMax = s_iterMax;
   m_solverMGlevel.m_hang = s_solver_hang;
 
 //  if (s_solver_tolerance > 0)

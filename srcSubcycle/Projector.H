@@ -672,7 +672,11 @@ private:
   /// number of smoothings in preconditioner for projection
   static int s_num_precond_smooth;
 
+  /// Number of V-cycles per multigrid iterations
   static int s_numMG;
+
+  /// Number of multigrid iterations
+  static int s_iterMax;
 
   /// Whether to use relax solver for bottom solve
   /**
@@ -701,6 +705,14 @@ private:
 
   /// if false, VD correction is set to zero once it's computed
   static bool s_applyVDCorrection;
+
+  /// If true, change the solver tolerance to try and keep div(u) below a certain level
+  /**
+   * The issue here is that the solver only removes a certain ammount of the divergence, so
+   * if the divergence of the unprojected velocity is large, the divergence of the projected velocity
+   * may not be as small as we want.
+   */
+  static bool m_adaptSolverParamsDivU;
 
   /// is this the finest extant level?
   bool m_finest_level;
