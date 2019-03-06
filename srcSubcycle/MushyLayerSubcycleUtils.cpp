@@ -1191,7 +1191,6 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain, string
 void
 setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
 {
-  //  pout() << "setupAMRForAMRRun" << endl;
 
   ParmParse ppMain("main");
 

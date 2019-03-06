@@ -16,45 +16,133 @@
 #include "RealVect.H"
 #include "CH_HDF5.H"
 
+// Comment below ensures that enums doxygen generates documentation for enums declared in this file
+/*!
+@file
+Contains immunity flag definitions
+*/
 
 /// Different options for enforced porosity
 enum ParamsPorosityFunctions {
+  /// Sets porosity to it's boundary value on the bottom of the domain, i.e. MushyLayerParams::bcValPorosityLo[0]
   m_porosityConstant,
+
+  /// Porosity varies linearly from the middle to the boundary.
+  /**
+   * Porosity = 1.0 in the middle, and takes the value given by MushyLayerParams::bcValPorosityLo[0] on all sides.
+   * There is a box in the middle of width MushyLayerOptions::fixedPorosityFractionalInnerRadius*domain width which
+   * is all at porosity = 1.0.
+   */
   m_porosityLinear,
+
+  /// Gaussian profile.
+  /**
+   * \f$ \chi =  \chi_b + \chi_{max} \exp\left[-((x-x_c)^2 + (y-y_c)^2)/(s L) \right]\f$
+   *
+   * where \f$ \chi_b \f$ is the porosity enforced at the bottom boundary,
+   *
+   * \f$ \chi_{max} \f$ is given by MushyLayerOptions::fixedPorosityMaxChi,
+   *
+   * \f$ (x_c, y_c)\f$ is the centre of the domain.
+   *
+   * \f$ s \f$, the standard deviation for the gaussian, is given by MushyLayerOptions::FixedPorositySTD
+   *
+   * \f$ L \f$, the domain width, is given by MushyLayerOptions::domainWidth
+   *
+   *
+   *    */
   m_porosityGaussian,
+
+  /// Gaussian profile but with highest porosity at the edge of the domain, rather than in the middle
+  /**
+   * \f$ \chi =  \chi_b \left\{ 1 - \chi_{max} \exp\left[-((x-x_c)^2 + (y-y_c)^2)/(s L) \right] \right\} \f$
+   *
+   * where all the variables are defined as the same way as in m_porosityGaussian
+   */
   m_porosityEdge,
+
+  /// Porosity which varies with time
+  /**
+   * \f$ \chi = 1- 0.3 \alpha (y/H)^2  \sin [\pi x / (2 L)] \f$
+   *
+   * where \f$ \alpha = \min(4.0, t / \tau) \f$, with the timescale \f$ \tau \f$ defined by MushyLayerOptions::porosityTimescale
+   *
+   * \f$ H \f$ is the domain height,
+   *
+   * \f$ L \f$ is the domain width
+   */
   m_porosityTimeDependent,
 };
 
 /// How does the fluid viscosity depend on the solute concentration (if at all)?
 enum ViscosityFunction {
+  /// Uniform viscosity, \f$ \mu = 1.0 \f$ everywhere
   uniformViscosity,
+
+  /// Viscosity varies linearly with liquid concentration, from 1 to \f$ \mu_{max} \f$
+  /**
+   * \f$ \mu = 1 + (\mu_{max} - 1)(\Theta_l + \mathcal{C})/\mathcal{C} \f$
+   *
+   * where \f$\mu_{max} \f$ is defined by MushyLayerParams::max_viscosity
+   */
   linearViscosity,
 };
 
 
 /// Different possible permeability functions
 enum PermeabilityFunctions {
+  /// Permeability = 1.0
   m_pureFluid,
+
+  /// Cubic permeability function: \f$ \pi = \chi^3 \f$
   m_cubicPermeability,
+
+  /// Kozeny-Carman function: \f$ \Pi = \frac{\chi^3}{(1-\chi)^2} \f$
   m_kozenyCarman,
+
+  /// Logarithmic function: \f$ \Pi = - \chi^2 \log (1-\chi) \f$
   m_logPermeability,
+
+  /// Permeability varies in space. Currently \f$ \Pi = -exp(-(x-0.5)^2/\alpha) \f$ where \f$\alpha=0.02\f$ is some scale.
   m_permeabilityXSquared,
+
+  /// Permeability = porosity, i.e. \f$ \pi = \chi \f$
   m_porosityPermeability
 };
 
-/// Different physical problems
+/// Different physical problems. Most of these, labelled (Old) should be considered fragile.
 enum PhysicalProblems {
+  /// Mushy layer - coupled fluid flow, heat, and salt transfer
   m_mushyLayer,
+
+  /// (Old) Burgers equation
   m_burgersSin,
+
+  /// (Old) Burgers equation
   m_burgersPeriodic,
+
+  /// (Old) Poiseuille flow
   m_poiseuilleFlow,
+
+  /// (Old) diffusion (no flow flow)
   m_diffusion,
+
+  /// Solidification with out flow - useful benchmark problem
   m_solidificationNoFlow,
+
+  /// (Old) corner flow
   m_cornerFlow,
+
+  /// (Old) Heating at the sidewalls, with a fixed porosity
   m_sidewallHeating,
+
+  /// (Old) Horton-Rogers-Lapwood problem: heating at the top and bottom in a fixed porous medium
   m_HRL,
+
+  /// (Old) Rayleigh-Benard convection (pure fluid - no porosity effects)
   m_rayleighBenard,
+
+  /// (Old)
   m_soluteFluxTest,
   m_refluxTest,
   m_zeroPorosityTest,

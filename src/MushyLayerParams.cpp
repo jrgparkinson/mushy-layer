@@ -681,11 +681,11 @@ void MushyLayerParams::getParameters()
   {
     pout() << "Advective timescale, darcy velocity scale" << endl;
 
-    m_heatDiffusionCoeff = 1/(darcy*rayleighTemp);///prandtl;
+    m_heatDiffusionCoeff = 1/(darcy*rayleighTemp);
     m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
     m_viscosityCoeff = prandtl/(darcy*rayleighTemp);
-    m_buoyancyTCoeff = prandtl/(darcy*rayleighTemp); //rayleighTemp*darcy*darcy*prandtl;
-    m_buoyancySCoeff = m_buoyancyTCoeff*(rayleighComposition/rayleighTemp); //rayleighComposition*darcy*darcy*prandtl;
+    m_buoyancyTCoeff = prandtl/(darcy*rayleighTemp);
+    m_buoyancySCoeff = m_buoyancyTCoeff*(rayleighComposition/rayleighTemp);
     m_darcyCoeff = prandtl/(darcy*darcy*rayleighTemp);
     m_advectionCoeff = 1.0;
   }

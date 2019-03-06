@@ -258,8 +258,6 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
         Real xDistFromMiddle = abs(x-m_opt.domainWidth/2);
         Real yDistFromMiddle = abs(y-m_opt.domainWidth/2);
 
-
-
         Real gradient = (1-boundaryPorosity)/(0.5*m_opt.domainWidth - innerRadius);
 
         Real maxDistFromMiddle = max(xDistFromMiddle, yDistFromMiddle);
@@ -336,8 +334,8 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
         {
           time = m_opt.fixedPorosityEndTime;
         }
-        Real scale = min((1-m_parameters.bcValPorosityHi[1]), time/m_opt.porosityTimescale);
-        scale = time/m_opt.porosityTimescale;
+//        Real scale = min((1-m_parameters.bcValPorosityHi[1]), time/m_opt.porosityTimescale);
+        Real scale = time/m_opt.porosityTimescale;
 
         scale = min(scale, 4.0);
         //        Real scale = min(0.9,

@@ -24,14 +24,12 @@
 #include "AMRMultiGrid.H"
 #include "AMRFASMultiGrid.H"
 
-
 #include "SetValLevel.H"
 #include "BackwardEuler.H"
 #include "VCAMRPoissonOp2.H"
 #include "Divergence.H"
 #include "ExtrapFillPatch.H"
 #include "PhysIBC.H"
-
 
 #include "EnthalpyVariablesF_F.H"
 #include "utils_F.H"
@@ -237,7 +235,7 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   // If we've converged, it may be that we just haven't kicked off the instability yet
   // Trying adding a small perturbation and keep going
   // Only do this once though
-  Real maxVel = ::computeNorm(*m_vectorNew[VectorVars::m_advectionVel], NULL, -1, m_dx, Interval(0, SpaceDim-1), 0);
+//  Real maxVel = ::computeNorm(*m_vectorNew[VectorVars::m_advectionVel], NULL, -1, m_dx, Interval(0, SpaceDim-1), 0);
 //  if (hasConverged && m_doAutomaticRestart && abs(maxVel) < 1e-3)
 //  {
 //    pout() << "Max Vel = " << maxVel << ". Trying to restart with a small perturbation to kick off instability" << endl;
@@ -493,20 +491,27 @@ void AMRLevelMushyLayer::copyNewToOldStates()
 Real AMRLevelMushyLayer::advance()
 {
 
+  ///////////////////////////////////////////////////////////////
+  // This method advances the solution by one timestep on a level.
+  // Before solving the equations, we need to set some things up...
+  ///////////////////////////////////////////////////////////////
 
+  // If a timestep fails, we sometimes try reducing the timestep by setting m_dtReduction to some factor > 0
+  // If we've just reduced the timestep, set this < 0 to ensure we don't do it again
   if (m_dtReduction > 0)
   {
     m_dtReduction = -1;
   }
 
-
+  // Get the coarser level, so we can work out later if this is in fact the coarsest level
   AMRLevelMushyLayer *amrMLcrse = NULL;
   if (m_level > 0)
   {
     amrMLcrse = getCoarserLevel();
   }
 
-  // Do some things on only the coarse level
+  // Do some setup operations on only the coarsest level
+  // If the coarser level pointer is null, it means that this is the coarsest level
   if (amrMLcrse == NULL)
   {
     // 1) set all levels reflux registers to zero
@@ -550,7 +555,7 @@ Real AMRLevelMushyLayer::advance()
 
   }
 
-  if (s_verbosity >= 1) // && m_level == 0
+  if (s_verbosity >= 1)
   {
     // Let's determine the CFL number we're running at
     Real maxAdvU = getMaxVelocityForCFL();
@@ -559,12 +564,11 @@ Real AMRLevelMushyLayer::advance()
     pout() << " AMRLevelMushyLayer::advance (level = "<< m_level << ", time=" << m_time << ", dt = " << m_dt << ", CFL=" << m_computedCFL << ")" << endl;
   }
 
-  // Reset BCs if they change with time
+  // Reset BCs in case they change with time
   m_parameters.setTime(m_time); // BCs are stored in m_parameters
   setAdvectionBCs(); // Reset BCs on advection physics objects
 
   // Elliptic operators get the BC from m_parameters when they're defined (later)
-
   if (m_opt.rampBuoyancy > 0)
   {
     if (m_parameters.rayleighComposition == 0)
@@ -585,7 +589,8 @@ Real AMRLevelMushyLayer::advance()
     pout() << "RaC = " << m_parameters.rayleighComposition  << ", RaT = " <<  m_parameters.rayleighTemp  << endl;
   }
 
-  // Updates 'new' variables
+  // Compute temperature, porosity, liquid concentration and sold concentration
+  // from the enthalpy and bulk concentration to ensure they're consistent with each other
   updateEnthalpyVariables();
 
 #ifdef CH_MPI
@@ -595,22 +600,20 @@ Real AMRLevelMushyLayer::advance()
   }
 #endif
 
+  // Increment time by dt, so m_time represent the time at the end of this timestep,
+  // and m_time-m_dt is the time at the start of this timestep
 
 //  Real old_time = m_time;
 //  Real half_time = new_time - m_dt / 2;
   Real new_time = m_time + m_dt;
-
-
   m_time = new_time;
 
 
-
-  // Move 'new' variables to 'old' variables
-  // do this after we've incremented m_time for consistency with coarser levels
-
-  // Make sure we fill ghost cells before computing d(porosity)/dt
+  // Compute d(porosity)/dt from the old timestep in case we need it at some point
+  // First create data structures
   LevelData<FArrayBox> oldPorosity(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
   LevelData<FArrayBox> newPorosity(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
+  // Now fill them with data, making sure we fill ghost cells
   fillScalars(oldPorosity, m_time-m_dt, m_porosity, true, true);
   fillScalars(newPorosity, m_time, m_porosity, true, true);
 
@@ -620,6 +623,10 @@ Real AMRLevelMushyLayer::advance()
     m_dPorosity_dt[dit].minus(oldPorosity[dit]);
     m_dPorosity_dt[dit].divide(m_dt);
   }
+
+  // The 'new' variables have been calculated at the end of the previous timestep,
+  // i.e. at the start of this timestep. So move them from new->old.
+  // do this after we've incremented m_time for consistency with coarser levels
   copyNewToOldStates();
 
   //Gradually ramp up temperature forcing
