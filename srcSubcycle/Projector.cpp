@@ -1158,6 +1158,9 @@ void Projector::checkDivergence(LevelData<FluxBox>& a_uEdge)
   // Increase/decrease s_solver_tolerance to get max(div(u)) = tolerance
   s_solver_tolerance = s_solver_tolerance * tol/maxDivU;
 
+  // It's ridiculous to set this < 1e-15
+  s_solver_tolerance = max(s_solver_tolerance, 1e-15);
+
   if (s_verbosity >= 2)
   {
     pout() << "  Projector::checkDivergence - Setting solver tolerance = " << s_solver_tolerance << endl;
