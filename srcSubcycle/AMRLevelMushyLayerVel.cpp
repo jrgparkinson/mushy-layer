@@ -166,14 +166,13 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
     // Darcy velocity
     // Just doing Darcy. U^* = permeability * (RaT * theta - RaC*Theta)
-
     fillUnprojectedDarcyVelocity(a_advVel, time);
 
     // Subtract best guess at pressure by default for non-AMR sims
-    bool useIncrementalPressure = (getMaxLevel() == 0) && !m_opt.useIncrementalPressure;
+    bool useIncrementalPressure = (getMaxLevel() == 0) && m_opt.useIncrementalPressure;
 
     // Don't do this on refined levels as it messes up the CF boundary condition
-    if (useIncrementalPressure && m_level == 0)
+    if (useIncrementalPressure)
     {
       // Before doing this, check that the pressure isn't getting too big
       // Only use incremental pressure if max (pressure) < 10^3
@@ -211,7 +210,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
                      false); // inhomogeneous
 
   // Do some smoothing
-  int nghost = a_advVel.ghostVect()[0];
+//  int nghost = a_advVel.ghostVect()[0];
 
 //  for (DataIterator dit = a_advVel.dataIterator(); dit.ok(); ++dit)
 //  {
