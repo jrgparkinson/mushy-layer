@@ -144,10 +144,20 @@ enum PhysicalProblems {
 
   /// (Old)
   m_soluteFluxTest,
+
+  /// (Old)
   m_refluxTest,
+
+  /// (Old)
   m_zeroPorosityTest,
+
+  /// (Old) Initialise with a block of ice and melt it
   m_meltingIceBlock,
+
+  /// Convection in a porous material with fixed porosity
   m_convectionMixedPorous,
+
+  /// (Old) Vortex merger benchmark problem
   m_vortexPair,
 };
 
@@ -158,14 +168,15 @@ enum PhysicalProblems {
  */
 class MushyLayerParams {
 public:
+        /// Default constructor
 	MushyLayerParams();
+
+	/// Default destructor
 	virtual ~MushyLayerParams();
 
-	// So many parameters
 
-	PhysicalProblems
 	/// Benchmark problem to solve
-        physicalProblem;
+	PhysicalProblems physicalProblem;
 
 	Real
 	/// Viscosity, \f$ \eta \f$, used in rayleigh number calculations
@@ -198,10 +209,10 @@ public:
 	/// Temperature at the eutectic point
 	eutecticTemp,
 
-	/// Temperature at the bottom of the domain
+	// Temperature at the bottom of the domain
 //	bottomTemp,
 
-	/// Temperature at the top of the domain
+	// Temperature at the top of the domain
 //	topTemp,
 
 	/// Bulk concentration at the eutectic point
@@ -696,7 +707,7 @@ public:
 	bool isViscous();
 
 	/// Compute boundary conditions for fields which can be found from the enthalpy and salinity via the phase diagram
-  void computeDerivedBCs ();
+	void computeDerivedBCs ();
 };
 
 #endif /* SRC_MUSHYLAYERPARAMS_H_ */
