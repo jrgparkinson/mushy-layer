@@ -131,3 +131,17 @@
 \form#130:$ \Pi = -exp(-(x-0.5)^2/\alpha) $
 \form#131:$\alpha=0.02$
 \form#132:$ \pi = \chi $
+\form#133:$ \chi = \chi_b + \chi_{max}*exp(-((x-x_c)^2 + (y-y_c)^2)/(s*L));$
+\form#134:$ \chi_b $
+\form#135:$ \chi_{max} $
+\form#136:$ (x_c, y_c)$
+\form#137:$ s $
+\form#138:$ \chi = \chi_b + \chi_{max} \exp\left[-((x-x_c)^2 + (y-y_c)^2)/(s L) \right]$
+\form#139:$ \chi = \chi_b \left\{ 1 - \chi_{max} \exp\left[-((x-x_c)^2 + (y-y_c)^2)/(s L) \right] \right\} $
+\form#140:$ \chi = 1- 0.3 \alpha (y/H)^2 \sin [\pi x / (2 L)] $
+\form#141:$ \alpha = min(4.0, t / \tau) $
+\form#142:$ \tau $
+\form#143:$ H $
+\form#144:$ \alpha = \min(4.0, t / \tau) $
+\form#145:$ \mu = 1.0 $
+\form#146:$ \mu = 1 + (\mu_{max} - 1)(\Theta_l + \mathcal{C})/\mathcal{C} $
