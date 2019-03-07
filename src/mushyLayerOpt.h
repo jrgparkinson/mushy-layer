@@ -109,13 +109,13 @@ enum PorosityFunctions
 
     /// Unprojected face centred fluid velocity, as used for advection, which has been averaged to cell centres
     /**
-     * \f$ \text{Av}^{F \to C} \mathbf{U}_f \f$
+     * \f$ {Av}^{F \to C} \mathbf{U}_f \f$
      */
     m_advUstar,
 
     /// Face centred fluid velocity, as used for advection, which has been averaged to cell centres
     /**
-     * \f$ \text{Av}^{F \to C} \mathbf{U}_{AD} \f$
+     * \f$ {Av}^{F \to C} \mathbf{U}_{AD} \f$
      */
     m_advectionVel,
     m_viscousSolveSrc,
