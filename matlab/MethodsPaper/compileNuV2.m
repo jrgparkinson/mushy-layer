@@ -1,10 +1,8 @@
-% Compile all
+% Compile nusselt numbers for simulations in base_dir (and subdirectories)
 
 function compileNuV2(base_dir)
 
 if nargin == 0
-    % 0.18 has higher order bcs
-    % 0.17 has higher order advection
     base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.18/';
 end
 
@@ -15,10 +13,6 @@ prefix = UniformPrefix;
 
 close all;
 Nu_field_name = 'Nusselt';
-%Nu_field_name = 'NusseltMiddle';
-%Nu_field_name = 'NusseltLeft';
-
-%base_dir = getDataDir(['AMRConvergenceTest/ConvectionDB/']);
 
 folders = dir(base_dir);
 

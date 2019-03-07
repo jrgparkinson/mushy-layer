@@ -57,9 +57,12 @@ The python scripts will create the relevant folders to hold the output, setup th
     ... same as above
 ```
  
-# Figures
-Having run the test problems, you can generate the figures used in the Methods paper using
+# Figures and analysis
+Having run the test problems, most of the figures should already be created, usually in the same directory as the data for each test problem resides in. You can (re)generate the figures used in the Methods paper using
 ```console
 $ python makeFigures.py
 ```
-Some figures (e.g. convergence plots) will have already been created following completion of the test problems. These can be found in the same directory as the data produced during the test problems, e.g. `/path/to/baseOutputDir/PorousMushyHole/`.
+Use the matlab script `compileNuV2(base_dir)` to compile all the nusselt numbers, e.g.
+```matlab
+>>compileNuV2('/path/to/TestDir/ConvectionDB-CFL0.1')
+```

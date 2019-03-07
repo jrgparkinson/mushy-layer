@@ -8,6 +8,7 @@ from runAMRConvergenceTest import runTest
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name
 from MushyLayerRunSimple import MushyLayerRunSimple
 from BatchJob import BatchJob
+from makeFigures import fixed_chill_command
 
 ##########################################################################
 # 3) Convection in a mushy layer with an initial porous hole
@@ -83,9 +84,6 @@ def testHeleShawFixedChill(argv):
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
 
-    # No analysis needed for this problem - just plotting
-    analysis_command = '' # matlab_command + ' "Fig9FixedChill(\'' + dataFolder + '\', [3000, 4800, 17000]); exit;"'
-
 
     singleRun = True
 
@@ -129,6 +127,7 @@ def testHeleShawFixedChill(argv):
         #fine_res_folder = 'Uniform-' + physicalProblem + '-' + str(Nz_uniform[-1]) + '--0'
 
         #analysis_command = '' # No analysis yet. Eventually should collate run times, make some plots, and maybe compute differences between solutions
+        analysis_command = get_matlab_base_command() + '%s; exit;' % fixed_chill_command()
 
         runTest(dataFolder, physicalProblem, hele_shaw_resolution_specific_params,
                 AMRSetup, num_procs, analysis_command, extra_params, 0, params_file)
