@@ -5,7 +5,7 @@ from colorama import Fore, Style
 import getopt
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name, get_mushy_layer_dir
 from MushyLayerRunSimple import MushyLayerRunSimple
 from BatchJob import BatchJob
 from makeFigures import fixed_chill_command
@@ -15,7 +15,7 @@ from makeFigures import fixed_chill_command
 ##########################################################################
 
 def hele_shaw_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
-    mushyLayerBaseDir = os.environ['MUSHY_LAYER_DIR']
+    mushyLayerBaseDir = get_mushy_layer_dir()
 
     params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
 

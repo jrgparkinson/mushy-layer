@@ -5,7 +5,7 @@ import getopt
 import math
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
 from makeFigures import porous_hole_command
 
 ##########################################################################
@@ -14,7 +14,7 @@ from makeFigures import porous_hole_command
 
 
 def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
-    mushyLayerBaseDir = os.environ['MUSHY_LAYER_DIR']
+    mushyLayerBaseDir = get_mushy_layer_dir()
     params_file = os.path.join(mushyLayerBaseDir,'params/convergenceTest/porousMushyHole.parameters')
 
     params = read_inputs(params_file)
@@ -107,7 +107,7 @@ def testPorousMushyHole(argv):
     # figureName = os.path.join(dataFolder, 'noFlow.pdf')
     uniform_prefix = 'Uniform-' + physicalProblem + '-'
 
-    python_compare_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'run_chombo_compare.py')
+    python_compare_file = os.path.join(get_mushy_layer_dir(), 'test', 'run_chombo_compare.py')
     chombo_compare_analyse ='python %s -f %s -a -v Porosity -e L2 -r True -n 8 \n \n' % (python_compare_file, dataFolder)
 
     # make_figures  = 'Fig7PorousHole(\'' + dataFolder + '\', \'' + dataFolder + '\')'

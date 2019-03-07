@@ -41,6 +41,18 @@ def get_current_vcs_revision():
 
     return repo_version
 
+def get_mushy_layer_dir():
+
+    #if 'MUSHY_LAYER_DIR' in os
+    this_file_path = os.path.realpath(__file__)
+    par_dir = os.path.dirname(this_file_path)
+    mushy_layer_dir = os.path.dirname(par_dir)
+
+    #dir = os.environ['MUSHY_LAYER_DIR']
+    #dir = '/home/parkinsonj/mushy-layer/'
+
+    return mushy_layer_dir
+
 
 def get_executable(base_name, dim=2):
     """ Given some program name, and assuming compilation options (mpiCC, gfortran, OPT, MPI etc.)
@@ -64,7 +76,7 @@ def get_executable_name(exec_dir='', exec_name='mushyLayer2d'):
      Independent of the architecture (i.e. will find for different C++ compilers, fortran versions etc.) """
 
     if not exec_dir:
-        mushy_layer_dir = os.environ['MUSHY_LAYER_DIR'] # previously: os.path.dirname(os.path.dirname(__file__))
+        mushy_layer_dir = get_mushy_layer_dir() # previously: os.path.dirname(os.path.dirname(__file__))
         exec_dir = os.path.join(mushy_layer_dir, 'execSubcycle')
 
     # Get files in exec dir starting with mushyLayer2d and ending with ex
