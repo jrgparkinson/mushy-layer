@@ -96,12 +96,27 @@ enum PorosityFunctions
   hyperbolicTan,
 };
 
-/// Identifiers for vector variables
+/// Cell centred vector field
   enum VectorVars {
+    /// Cell centred fluid velocity, \f$ \mathbf{U} \f$
     m_fluidVel,
+
+    /// Fluid velocity divided by porosity, \f$ \mathbf{U}/\chi \f$
     m_U_porosity,
+
+    /// Unprojected cell centred fluid velocity, \f$ \mathbf{U}^* \f$
     m_Ustar,
+
+    /// Unprojected face centred fluid velocity, as used for advection, which has been averaged to cell centres
+    /**
+     * \f$ \text{Av}^{F \to C} \mathbf{U}_f \f$
+     */
     m_advUstar,
+
+    /// Face centred fluid velocity, as used for advection, which has been averaged to cell centres
+    /**
+     * \f$ \text{Av}^{F \to C} \mathbf{U}_{AD} \f$
+     */
     m_advectionVel,
     m_viscousSolveSrc,
     m_UdelU,
