@@ -50,7 +50,7 @@ main.max_dt=0.1
 main.max_dt_growth=1.05
 
 main.max_step=10000
-main.max_time=10.0
+main.max_time=0.1
 main.min_time=0.1
 main.dt_tolerance_factor=1.01
 main.time_integration_order=2
@@ -111,6 +111,8 @@ parameters.eutecticTemp=-23
 parameters.initialComposition=30
 parameters.liquidusSlope=-0.1
 
+# Use pressure from previous step
+projection.useIncrementalPressure=1
 
 main.use_limiting=true
 

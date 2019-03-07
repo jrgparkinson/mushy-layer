@@ -77,6 +77,8 @@ MushyLayerParams::MushyLayerParams() {
   nonDimHeleShawCooling = -999 ;
   timescale = -999 ;
 
+  body_force = 0.0;
+
   thetaEutectic = -999 ;
   thetaInf = -999 ;
   thetaInitialLiquidus = -999 ;
@@ -415,6 +417,9 @@ void MushyLayerParams::getParameters()
 
   pp.query("BCAccuracy", m_BCAccuracy);
   pp.query("pressureBCAccuracy", m_pressureBCAccuracy);
+
+  body_force = 0.0;
+  pp.query("body_force", body_force);
 
   // Default nondimensionalisation is about eutectic
   referenceTemperature = eutecticTemp;

@@ -383,6 +383,13 @@ public:
 	  m_advectionCoeff;
 
 
+	/// Constant body force, which we add to the buoyancy
+	  /**
+	   * Buoyancy \f$ = \chi  (Ra_T  \theta - Ra_c*\Theta_l) \mathbf{k} + \mathbf{F}_B \f$
+	   *
+	   * where \f$ \mathbf{F}_B \f$ is the buoyancy force
+	   */
+	Real body_force;
 
 	/// Dimensionless frame advection velocity
 	Real nonDimVel,

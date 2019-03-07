@@ -676,7 +676,12 @@ protected:
   /// Calculate advection velocity for momentum equations which are time independent
   void calculateTimeIndAdvectionVel(Real a_time, LevelData<FluxBox>& a_advVel);
 
-  /// Fill unprojected darcy velocity, \f$ \mathbf{U}^* = (\Pi/\nu) * (Ra_T \theta - Ra_C \Theta_l) \f$
+  /// Fill unprojected darcy velocity.
+  /**
+   * \f$ \mathbf{U}^* = (\Pi/\nu) * (Ra_T \theta - Ra_C \Theta_l + \mathbf{F}_B) \f$
+   *
+   * where \f$ \mathbf{F}_B \f$ is a body force (=0 by default)
+   */
   void fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advVel, Real time);
 
   /// Get maximum level allowed in AMR hierarchy

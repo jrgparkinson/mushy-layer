@@ -1,13 +1,13 @@
 # Original checkpoint file
-inFile="/home/parkinsonjl/mushy-layer/simulations/meltpond/chk004000.2d.hdf5"
+inFile="/home/parkinsonjl/mushy-layer/examples/meltponds/chk005000.2d.hdf5"
 
 # Inputs used to create original checkpoint file
-run_inputs="/home/parkinsonjl/mushy-layer/simulations/meltpond/inputsGrowSeaIce"
+run_inputs="/home/parkinsonjl/mushy-layer/examples/meltponds/inputsGrowSeaIce"
 
 # Where to save the new file
-outFile  = "/home/parkinsonjl/mushy-layer/simulations/meltpond/restart.2d.hdf5"
+outFile  = "/home/parkinsonjl/mushy-layer/examples/meltponds/restart.2d.hdf5"
 
-# Add a melt pond with depth 8 pixels, bulk saliinity -1.0, enthalpy 6.02, and rescale the old solution
+# Add a melt pond with depth 8 pixels, bulk salinity -1.0, enthalpy 6.02, and rescale the old solution
 addMeltPond = true
 meltPondDepth = 8
 meltPondSalinity = -1.0

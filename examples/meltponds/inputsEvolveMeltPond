@@ -31,8 +31,8 @@ main.restart_file=/home/parkinsonjl/mushy-layer/execSubcycle/heleshaw/restart.2d
 main.plot_prefix=meltPlt
 main.chk_prefix=meltChk
 bc.enthalpyHiVal=0 6.02
-parameters.pressureHead=5
-bc.velHi=6 9 0 # pressure head top bc
+parameters.body_force=-5
+bc.velHi=6 3 0 # pressure head top bc
 main.plot_period=0.00002
 
 ####################################################################
@@ -116,5 +116,9 @@ parameters.liquidusSlope=-0.1
 
 # No freestream correction
 projection.eta=0.0
+
+# Use pressure from previous step
+projection.useIncrementalPressure=1
+
 
 main.use_limiting=true

@@ -2082,11 +2082,9 @@ void AMRLevelMushyLayer::initialData()
     (*m_vectorOld[VectorVars::m_fluidVel])[dit].setVal(0.0);
     (*m_dVector[VectorVars::m_fluidVel])[dit].setVal(0.0);
 
-    (*m_vectorNew[VectorVars::m_bodyForce])[dit].setVal(0.0);
-    (*m_vectorOld[VectorVars::m_bodyForce])[dit].setVal(0.0);
-    (*m_dVector[VectorVars::m_bodyForce])[dit].setVal(0.0);
-
-
+    (*m_vectorNew[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
+    (*m_vectorOld[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
+    (*m_dVector[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
 
     m_advVel[dit].setVal(0.0);
 
