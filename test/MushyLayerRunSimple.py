@@ -5,7 +5,7 @@ from os import listdir
 from os.path import isfile, join, exists
 import socket
 
-from mushyLayerRunUtils import read_inputs, write_inputs, get_current_vcs_revision
+from mushyLayerRunUtils import read_inputs, write_inputs, get_current_vcs_revision, get_mushy_layer_dir
 
 """ 
 This class basically just makes the output directory and dumps an input file into it
@@ -28,7 +28,7 @@ class MushyLayerRunSimple:
 
         self.base_output_dir = base_output_dir
 
-        mushy_layer_dir = os.environ['MUSHY_LAYER_DIR']
+        mushy_layer_dir = get_mushy_layer_dir()
         print('Mushy layer dir: %s' % mushy_layer_dir)
         self.exec_dir = os.path.join(mushy_layer_dir, 'execSubcycle')
 

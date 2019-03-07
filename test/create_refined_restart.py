@@ -2,7 +2,7 @@ import getopt
 import sys
 import os
 from mushyLayerRunUtils import read_inputs, get_final_chk_file, write_inputs,\
-    get_executable
+    get_executable, get_mushy_layer_dir
 
 def create_refined_restart(argv):
     # Default vals:
@@ -45,7 +45,7 @@ def create_refined_restart(argv):
     write_inputs(new_inputs_loc, new_inputs)
     
     # Run refine code
-    exec_file = os.path.join(os.environ['MUSHY_LAYER_DIR'],
+    exec_file = os.path.join(get_mushy_layer_dir(),
                                   'setupNewRun', get_executable('setupnewrun'))
    
     cmd = 'cd %s; %s %s' % (new_dir, exec_file, new_inputs_loc)

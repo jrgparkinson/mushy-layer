@@ -3,7 +3,7 @@ import os, sys
 from colorama import Fore, Style
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
 from makeFigures import fixed_porous_command
 
 ##########################################################################
@@ -11,7 +11,7 @@ from makeFigures import fixed_porous_command
 ##########################################################################
 
 def fixed_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
-    mushy_layer_base_dir = os.environ['MUSHY_LAYER_DIR']
+    mushy_layer_base_dir = get_mushy_layer_dir()
 
     integration_time = 2e-4
     nx_coarse = nz_coarse
@@ -97,7 +97,7 @@ def test_fixed_porous_hole():
 
     uniform_prefix = 'Uniform-DBVariablePorosity-'
 
-    python_compare_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'run_chombo_compare.py')
+    python_compare_file = os.path.join(get_mushy_layer_dir(), 'test', 'run_chombo_compare.py')
     chombo_compare_analyse ='python %s -f %s -a -v \'xDarcy velocity\' -e L2 -r True -n 6 \n \n' % (python_compare_file, data_folder)
 
     # make_figures = 'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')'

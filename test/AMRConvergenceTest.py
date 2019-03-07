@@ -3,7 +3,7 @@ import os
 from colorama import Fore
 from MushyLayerRunSimple import MushyLayerRunSimple
 from mushyLayerRunUtils import get_restart_file, get_executable_name,\
-    get_final_chk_file
+    get_final_chk_file, get_mushy_layer_dir
 from BatchJob import BatchJob
 
 
@@ -77,7 +77,7 @@ def amr_convergence_test(params, full_output_dir, physicalProblem, nzs,
         s = BatchJob('', p['concise_run_name'], '', num_proc)
         
         if restart_from_low_res:
-            python_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'test', 'create_refined_restart.py')
+            python_file = os.path.join(get_mushy_layer_dir(), 'test', 'create_refined_restart.py')
             new_dir = full_path
             
             if prev_job_id > -1:
