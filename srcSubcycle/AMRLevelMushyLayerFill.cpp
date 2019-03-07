@@ -695,7 +695,7 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
   fillScalarFace(C_face,            time, ScalarVars::m_liquidConcentration,   true, false);
   fillScalarFace(viscosity_face,    time, ScalarVars::m_viscosity,             true, false);
 
-  int gravityDir = SpaceDim-1;
+//  int gravityDir = SpaceDim-1;
 
   for (dit.reset(); dit.ok(); ++dit)
   {
@@ -707,7 +707,7 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
     fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.m_buoyancySCoeff);
 
     // Add the body force
-    FArrayBox& bodyForce = (*m_vectorNew[VectorVars::m_bodyForce])[dit];
+//    FArrayBox& bodyForce = (*m_vectorNew[VectorVars::m_bodyForce])[dit];
 //    fabVelz.plus(bodyForce, 1, gravityDir, gravityDir, 1);
     fabVelz.plus(m_parameters.body_force);
 

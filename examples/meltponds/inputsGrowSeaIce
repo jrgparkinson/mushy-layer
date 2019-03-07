@@ -62,10 +62,6 @@ main.periodic_bc=1 0 0
 main.max_grid_size=256
 
 
-# main.iter_plot_interval=-1
-# main.iteration_plot_interval=-1
-
-
 # AMR stuff (currently somewhat irrelevant as max_level=0)
 main.max_level=0
 main.block_factor=8

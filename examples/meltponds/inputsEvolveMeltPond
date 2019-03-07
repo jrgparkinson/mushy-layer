@@ -31,9 +31,9 @@ main.restart_file=/home/parkinsonjl/mushy-layer/examples/meltponds/restart.2d.hd
 main.plot_prefix=meltPlt
 main.chk_prefix=meltChk
 bc.enthalpyHiVal=0 6.02
-parameters.body_force=-5
+parameters.body_force=-2000
 bc.velHi=6 3 0 # pressure head top bc
-main.plot_period=0.00002
+main.plot_period=0.00005
 
 ####################################################################
 # Below should be the same before/after melt pond added
@@ -58,7 +58,6 @@ main.periodic_bc=1 0 0
 main.max_grid_size=256
 
 
-main.iter_plot_interval=-1
 main.iteration_plot_interval=-1
 main.checkpoint_interval=1000
 
