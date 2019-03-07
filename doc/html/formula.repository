@@ -145,3 +145,5 @@
 \form#144:$ \alpha = \min(4.0, t / \tau) $
 \form#145:$ \mu = 1.0 $
 \form#146:$ \mu = 1 + (\mu_{max} - 1)(\Theta_l + \mathcal{C})/\mathcal{C} $
+\form#147:$ \mu_{max} $
+\form#148:$\mu_{max} $

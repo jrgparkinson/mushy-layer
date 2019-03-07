@@ -72,6 +72,7 @@ var searchData=
   ['fourthorderslopes',['fourthOrderSlopes',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classGodunovUtilities.html#af25c8e140d2046e6ddf39b5016e0e6b4',1,'GodunovUtilities']]],
   ['free',['free',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classArena.html#a4c2ef5bf5a3db305cf05075ae24a8156',1,'Arena::free()'],['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBArena.html#a1dfa152369c1930e9ecca379034aba78',1,'BArena::free()'],['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classCArena.html#ad3b5efb05a6b4733f1e3679bea40481c',1,'CArena::free()']]],
   ['freemem',['freeMem',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classRefCountedPtr.html#a7afd4763a769fb1c93b9d5bbe72a5a36',1,'RefCountedPtr']]],
+  ['freestreamcorrbcfunction',['FreestreamCorrBCFunction',['../class_freestream_corr_b_c_function.html#a172724d0d72e728a531a314bdf487eff',1,'FreestreamCorrBCFunction::FreestreamCorrBCFunction()'],['../class_freestream_corr_b_c_function.html#a6ef77a0c95d316d78af7a43d01f18fce',1,'FreestreamCorrBCFunction::FreestreamCorrBCFunction(bool a_isDefined, MushyLayerParams a_params)']]],
   ['freestreamcorrfuncbc',['FreestreamCorrFuncBC',['../class_phys_b_c_util.html#abee97d7d7bf3037aca0e1792a81a558d',1,'PhysBCUtil']]],
   ['front',['front',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classVector.html#a252cf9a5a931445f5227728515001b2e',1,'Vector']]]
 ];

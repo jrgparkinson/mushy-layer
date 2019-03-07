@@ -73,7 +73,7 @@ var searchData=
   ['nodes',['nodes',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classTreeIntVectSetIterator.html#a86dde0933d2c357b7a3221a305816d1d',1,'TreeIntVectSetIterator']]],
   ['nodesetoperations_2eh',['NodeSetOperations.H',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/NodeSetOperations_8H.html',1,'']]],
   ['nofluxbc',['noFluxBC',['../class_phys_b_c_util.html#a5959fe1d9dfdb154fea3b6c1f6fba434',1,'PhysBCUtil']]],
-  ['nofluxbcfunction',['NoFluxBCFunction',['../class_no_flux_b_c_function.html',1,'']]],
+  ['nofluxbcfunction',['NoFluxBCFunction',['../class_no_flux_b_c_function.html',1,'NoFluxBCFunction'],['../class_no_flux_b_c_function.html#a6243d50e9672fb6869a40bdb1f335cf3',1,'NoFluxBCFunction::NoFluxBCFunction()'],['../class_no_flux_b_c_function.html#a966de8831cfb254ff72d255f060c3d43',1,'NoFluxBCFunction::NoFluxBCFunction(bool a_isDefined, MushyLayerParams a_params)']]],
   ['nondimensionalisations',['nondimensionalisations',['../class_mushy_layer_params.html#a9de94ba9465c51de9b37fc946622bee8',1,'MushyLayerParams']]],
   ['nondimheleshawcooling',['nonDimHeleShawCooling',['../class_mushy_layer_params.html#aa62c3b14e58be4912cacb2120068960a',1,'MushyLayerParams']]],
   ['nondimreluctance',['nonDimReluctance',['../class_mushy_layer_params.html#a157dde93ce7d9c83740fb9fc7fc0aadd',1,'MushyLayerParams']]],

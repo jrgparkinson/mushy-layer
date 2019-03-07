@@ -91,6 +91,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">BasicGradPressureBCFunction Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Boundary condition for the pressure gradient.  
+ <a href="class_basic_grad_pressure_b_c_function.html#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for BasicGradPressureBCFunction:</div>
 <div class="dyncontent">
@@ -103,12 +106,18 @@ Inheritance diagram for BasicGradPressureBCFunction:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9fdaecc77127f56537ffd51838d334ad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9fdaecc77127f56537ffd51838d334ad"></a>
-Full constructor&#160;</td><td class="memItemRight" valign="bottom"><b>BasicGradPressureBCFunction</b> (bool a_isDefined, <a class="el" href="class_mushy_layer_params.html">MushyLayerParams</a> a_params)</td></tr>
-<tr class="separator:a9fdaecc77127f56537ffd51838d334ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86ae189411af5f0ad7c87376e1d91e22"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a86ae189411af5f0ad7c87376e1d91e22"></a>
-Apply virtual BC void&#160;</td><td class="memItemRight" valign="bottom"><b>operator()</b> (<a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classFArrayBox.html">FArrayBox</a> &amp;a_state, const <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBox.html">Box</a> &amp;a_valid, const <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classProblemDomain.html">ProblemDomain</a> &amp;a_domain, <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/CHArray_8H.html#a445a5f0e2a34c9d97d69a3c2d1957907">Real</a> a_dx, bool a_homogeneous)</td></tr>
-<tr class="separator:a86ae189411af5f0ad7c87376e1d91e22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26372a752dd51acbaa659039b70980e4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a26372a752dd51acbaa659039b70980e4"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_basic_grad_pressure_b_c_function.html#a26372a752dd51acbaa659039b70980e4">BasicGradPressureBCFunction</a> ()</td></tr>
+<tr class="memdesc:a26372a752dd51acbaa659039b70980e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br/></td></tr>
+<tr class="separator:a26372a752dd51acbaa659039b70980e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6c3e1cbb5fa5fc028d678ab12f133e6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6c3e1cbb5fa5fc028d678ab12f133e6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_basic_grad_pressure_b_c_function.html#ae6c3e1cbb5fa5fc028d678ab12f133e6">BasicGradPressureBCFunction</a> (bool a_isDefined, <a class="el" href="class_mushy_layer_params.html">MushyLayerParams</a> a_params)</td></tr>
+<tr class="memdesc:ae6c3e1cbb5fa5fc028d678ab12f133e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Full constructor. <br/></td></tr>
+<tr class="separator:ae6c3e1cbb5fa5fc028d678ab12f133e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96a8f342fb3f7cfffe2998ec22f07bc9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a96a8f342fb3f7cfffe2998ec22f07bc9"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_basic_grad_pressure_b_c_function.html#a96a8f342fb3f7cfffe2998ec22f07bc9">operator()</a> (<a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classFArrayBox.html">FArrayBox</a> &amp;a_state, const <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBox.html">Box</a> &amp;a_valid, const <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classProblemDomain.html">ProblemDomain</a> &amp;a_domain, <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/CHArray_8H.html#a445a5f0e2a34c9d97d69a3c2d1957907">Real</a> a_dx, bool a_homogeneous)</td></tr>
+<tr class="memdesc:a96a8f342fb3f7cfffe2998ec22f07bc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply BC. <br/></td></tr>
+<tr class="separator:a96a8f342fb3f7cfffe2998ec22f07bc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classBCFunction"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classBCFunction')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBCFunction.html">BCFunction</a></td></tr>
 <tr class="memitem:a8757ad5cbe970e0f5b736b00b6753a36 inherit pub_methods_classBCFunction"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8757ad5cbe970e0f5b736b00b6753a36"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBCFunction.html#a8757ad5cbe970e0f5b736b00b6753a36">operator()</a> (<a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classFArrayBox.html">FArrayBox</a> &amp;a_state, const <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBox.html">Box</a> &amp;a_valid, const <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classProblemDomain.html">ProblemDomain</a> &amp;a_domain, <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/CHArray_8H.html#a445a5f0e2a34c9d97d69a3c2d1957907">Real</a> a_dx, const <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classDataIndex.html">DataIndex</a> &amp;a_index, bool a_homogeneous)</td></tr>
@@ -125,23 +134,25 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="elRef" doxygen
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a723c5e78ed60c57eebb8ff4851c41d6d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a723c5e78ed60c57eebb8ff4851c41d6d"></a>
-Is object defined bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_isDefined</b></td></tr>
-<tr class="separator:a723c5e78ed60c57eebb8ff4851c41d6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74fbe5600c8f4d8a279256967d0f7840"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a74fbe5600c8f4d8a279256967d0f7840"></a>
-Physical parameters for the <br class="typebreak"/>
-problem <a class="el" href="class_mushy_layer_params.html">MushyLayerParams</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_params</b></td></tr>
-<tr class="separator:a74fbe5600c8f4d8a279256967d0f7840"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab06c724ad26290b8b8fd7fb332890d0f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab06c724ad26290b8b8fd7fb332890d0f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_basic_grad_pressure_b_c_function.html#ab06c724ad26290b8b8fd7fb332890d0f">m_isDefined</a></td></tr>
+<tr class="memdesc:ab06c724ad26290b8b8fd7fb332890d0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is object defined? <br/></td></tr>
+<tr class="separator:ab06c724ad26290b8b8fd7fb332890d0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a803f06865c3dcb81d220f4410b569113"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a803f06865c3dcb81d220f4410b569113"></a>
+<a class="el" href="class_mushy_layer_params.html">MushyLayerParams</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_basic_grad_pressure_b_c_function.html#a803f06865c3dcb81d220f4410b569113">m_params</a></td></tr>
+<tr class="memdesc:a803f06865c3dcb81d220f4410b569113"><td class="mdescLeft">&#160;</td><td class="mdescRight">Physical parameters for the problem. <br/></td></tr>
+<tr class="separator:a803f06865c3dcb81d220f4410b569113"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Extrapolation on all sides </p>
+<div class="textblock"><p>Boundary condition for the pressure gradient. </p>
+<p>Extrapolation on all sides </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/parkinsonjl/mushy-layer/BCutil/PhysBCUtil.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 6 2019 18:22:06 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 7 2019 12:37:19 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
