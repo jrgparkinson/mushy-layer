@@ -1429,7 +1429,7 @@ public:
 
 
 
-/// Boundary conditions for the streamfunction \f$\psif$
+/// Boundary conditions for the streamfunction \f$ \psi \f$
 class StreamFunctionBC: public AbstractScalarBCFunction
 {
 public:
@@ -1525,7 +1525,7 @@ public:
   }
 };
 
-/// Boundary conditions for pressure \f$P\f$ (subcycled version)
+/// Boundary conditions for pressure \f$ P \f$ (subcycled version)
 class BasicPressureBCFunctionSubcycled: public AbstractScalarBCFunction
 {
 public:
@@ -1846,7 +1846,7 @@ public:
                   bool                 a_homogeneous)
   {
 
-    /// assuming we only have one component to fill here
+    // assuming we only have one component to fill here
     CH_assert(a_state.nComp() == 1);
 
     if (!m_isDefined)
@@ -2411,16 +2411,22 @@ public:
 
 
 /// Apply extrapolation boundary condition on all sides
+/**
+ *
+ */
 class BasicExtrapBCFunction: public BCFunction
 {
 public:
 
   /// Is object defined?
   bool m_isDefined;
+
   /// Physical parameters for the problem
   MushyLayerParams m_params;
+
   /// Number of ghost cells to fill
   Interval m_ghost;
+
   /// Component of velocity to apply BCs to
   int m_comp;
 
@@ -2472,17 +2478,17 @@ public:
 
               // First expand box in case we're doing outer ghost cells
               // Expand once for Interval(0,x), twice for interval(1,x) etc.
-                              grownBox.grow(m_ghost.begin());
+              grownBox.grow(m_ghost.begin());
 
 
-                              //Grow the box by one cell in the direction perpendicular to the direction we are extrapolating in,
-                                            //So that we fill enough ghost cells to be able to correctly calculate face values
+              //Grow the box by one cell in the direction perpendicular to the direction we are extrapolating in,
+              //So that we fill enough ghost cells to be able to correctly calculate face values
 
-                for (int i=0; i<SpaceDim; i++)
+              for (int i=0; i<SpaceDim; i++)
+              {
+                if (i != idir)
                 {
-                  if (i != idir)
-                  {
-                    grownBox.grow(i, 1);
+                  grownBox.grow(i, 1);
                   }
                 }
 
