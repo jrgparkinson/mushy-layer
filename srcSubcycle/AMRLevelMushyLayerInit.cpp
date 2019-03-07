@@ -3324,7 +3324,7 @@ void AMRLevelMushyLayer::createDataStructures()
     m_advVelNew[dit].setVal(0.0);
 
 
-    (*m_vectorNew[VectorVars::m_bodyForce])[dit].setVal(0.0);
+    (*m_vectorNew[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
   }
 
   fillFrameVelocity();

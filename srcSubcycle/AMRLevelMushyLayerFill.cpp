@@ -708,7 +708,8 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
 
     // Add the body force
     FArrayBox& bodyForce = (*m_vectorNew[VectorVars::m_bodyForce])[dit];
-    fabVelz.plus(bodyForce, 1, gravityDir, gravityDir, 1);
+//    fabVelz.plus(bodyForce, 1, gravityDir, gravityDir, 1);
+    fabVelz.plus(m_parameters.body_force);
 
     for (int idir=0; idir<SpaceDim; idir++)
     {
