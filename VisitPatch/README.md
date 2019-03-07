@@ -51,6 +51,12 @@ if (m_isCheckpointFile)
 ```
 * Do the same for `GetVectorVar(...)`. I haven't tested this yet though, so probably doesn't work.
 
+* Having made the changes you'll need to build the new code:
+```console
+$ cd /path/to/visit/src/databases/Chombo/
+$ make
+```
+
 
 ## Running Visit from file browsers
 For convenience, you may wish to be able to open `.hdf5` files by double clicking in a file browser. 
