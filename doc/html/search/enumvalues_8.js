@@ -1,6 +1,8 @@
 var searchData=
 [
+  ['m_5fadvectionvel',['m_advectionVel',['../mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520a86e65099848dee1fdd6ed56753f2841b',1,'mushyLayerOpt.h']]],
   ['m_5fadvectivetime_5fdarcyvel',['m_advectiveTime_darcyVel',['../class_mushy_layer_params.html#a9de94ba9465c51de9b37fc946622bee8ae83bbc932e7440f2a95c09628e7b9451',1,'MushyLayerParams']]],
+  ['m_5fadvustar',['m_advUstar',['../mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520ad6649dc770bf43bd56aa13dfcdac3ab7',1,'mushyLayerOpt.h']]],
   ['m_5fbuoyancytime_5fadvectivevel',['m_buoyancyTime_advectiveVel',['../class_mushy_layer_params.html#a9de94ba9465c51de9b37fc946622bee8a53a77635db4cc741e10e7d2ddaaa3236',1,'MushyLayerParams']]],
   ['m_5fburgersperiodic',['m_burgersPeriodic',['../_mushy_layer_params_8h.html#a9d2eece4e74f7ad0ebcd5759116a94a4af8eb87315d758bce6ed3106505b91dcf',1,'MushyLayerParams.h']]],
   ['m_5fburgerssin',['m_burgersSin',['../_mushy_layer_params_8h.html#a9d2eece4e74f7ad0ebcd5759116a94a4aa5cea8a8008a4eceb156e3b5b0145408',1,'MushyLayerParams.h']]],
@@ -11,6 +13,7 @@ var searchData=
   ['m_5fdarcytime_5fdarcyvel',['m_darcyTime_darcyVel',['../class_mushy_layer_params.html#a9de94ba9465c51de9b37fc946622bee8aaadfdd616da7cb4dbaab31e60d5d12e7',1,'MushyLayerParams']]],
   ['m_5fdiffusion',['m_diffusion',['../_mushy_layer_params_8h.html#a9d2eece4e74f7ad0ebcd5759116a94a4ab04dd14d206f22b973a2c698bf52334c',1,'MushyLayerParams.h']]],
   ['m_5fdiffusivetime_5fadvectivevel',['m_diffusiveTime_advectiveVel',['../class_mushy_layer_params.html#a9de94ba9465c51de9b37fc946622bee8a0a6a16ab5fc194f854e89368f43c7c19',1,'MushyLayerParams']]],
+  ['m_5ffluidvel',['m_fluidVel',['../mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520acf6d7a2aa6c1a2f3364026a389b3b685',1,'mushyLayerOpt.h']]],
   ['m_5fhrl',['m_HRL',['../_mushy_layer_params_8h.html#a9d2eece4e74f7ad0ebcd5759116a94a4ab6b2a613265ae51f03d61e00fc5e76ad',1,'MushyLayerParams.h']]],
   ['m_5fkozenycarman',['m_kozenyCarman',['../_mushy_layer_params_8h.html#a41f47972c3b8df9c133931b4b9b73584a6588b2a4fb62ed00ac323e5e38ea527c',1,'MushyLayerParams.h']]],
   ['m_5flogpermeability',['m_logPermeability',['../_mushy_layer_params_8h.html#a41f47972c3b8df9c133931b4b9b73584a67f7074781d8837124aedbe92a4e2ed1',1,'MushyLayerParams.h']]],
@@ -38,6 +41,8 @@ var searchData=
   ['m_5fsidewallheating',['m_sidewallHeating',['../_mushy_layer_params_8h.html#a9d2eece4e74f7ad0ebcd5759116a94a4afc7b10a110929a3d66393295918af78a',1,'MushyLayerParams.h']]],
   ['m_5fsolidificationnoflow',['m_solidificationNoFlow',['../_mushy_layer_params_8h.html#a9d2eece4e74f7ad0ebcd5759116a94a4abb1ae1e6491f214cec1c73c159c4e594',1,'MushyLayerParams.h']]],
   ['m_5fsolutefluxtest',['m_soluteFluxTest',['../_mushy_layer_params_8h.html#a9d2eece4e74f7ad0ebcd5759116a94a4a447a131f500ffd9879ce176315a85b30',1,'MushyLayerParams.h']]],
+  ['m_5fu_5fporosity',['m_U_porosity',['../mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520a20cf6f7f84174b72c0c38bca9b6a3923',1,'mushyLayerOpt.h']]],
+  ['m_5fustar',['m_Ustar',['../mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520afa0ca2559f0ecde5d29f20153811d6ec',1,'mushyLayerOpt.h']]],
   ['m_5fvortexpair',['m_vortexPair',['../_mushy_layer_params_8h.html#a9d2eece4e74f7ad0ebcd5759116a94a4a723bb9649aad0522aefdbd155f4ee2ae',1,'MushyLayerParams.h']]],
   ['m_5fzeroporositytest',['m_zeroPorosityTest',['../_mushy_layer_params_8h.html#a9d2eece4e74f7ad0ebcd5759116a94a4a4323c46e942f878072b1a9680673ba2c',1,'MushyLayerParams.h']]],
   ['magnitude',['Magnitude',['../mushy_layer_opt_8h.html#ab82ea28e90e93c3551db99693337d71ca336a41a665e98d8d074a17e9c8acef80',1,'mushyLayerOpt.h']]],

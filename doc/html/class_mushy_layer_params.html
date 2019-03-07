@@ -372,6 +372,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/CHArray_8H.html#a445a5f0e2a34c9d97d69a3c2d1957907">Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mushy_layer_params.html#ab92ff3374f9423afb3757c46e6ca4ea2">m_advectionCoeff</a></td></tr>
 <tr class="memdesc:ab92ff3374f9423afb3757c46e6ca4ea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coefficient for advection terms. <br/></td></tr>
 <tr class="separator:ab92ff3374f9423afb3757c46e6ca4ea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa6da58ee2a066966d6745040c03bc3c"><td class="memItemLeft" align="right" valign="top"><a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/CHArray_8H.html#a445a5f0e2a34c9d97d69a3c2d1957907">Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mushy_layer_params.html#afa6da58ee2a066966d6745040c03bc3c">body_force</a></td></tr>
+<tr class="memdesc:afa6da58ee2a066966d6745040c03bc3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant body force, which we add to the buoyancy.  <a href="#afa6da58ee2a066966d6745040c03bc3c">More...</a><br/></td></tr>
+<tr class="separator:afa6da58ee2a066966d6745040c03bc3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad39ae54e74b73aa8ec86df8186b6fa6d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad39ae54e74b73aa8ec86df8186b6fa6d"></a>
 <a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/CHArray_8H.html#a445a5f0e2a34c9d97d69a3c2d1957907">Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mushy_layer_params.html#ad39ae54e74b73aa8ec86df8186b6fa6d">nonDimVel</a></td></tr>
 <tr class="memdesc:ad39ae54e74b73aa8ec86df8186b6fa6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dimensionless frame advection velocity. <br/></td></tr>
@@ -784,6 +787,22 @@ static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 
 </div>
 </div>
+<a class="anchor" id="afa6da58ee2a066966d6745040c03bc3c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="elRef" doxygen="/home/parkinsonjl/chombofork/lib/chombo.tag:http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2//" href="http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/CHArray_8H.html#a445a5f0e2a34c9d97d69a3c2d1957907">Real</a> MushyLayerParams::body_force</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constant body force, which we add to the buoyancy. </p>
+<p>Buoyancy <img class="formulaInl" alt="$ = \chi (Ra_T \theta - Ra_c*\Theta_l) \mathbf{k} + \mathbf{F}_B $" src="form_151.png"/></p>
+<p>where <img class="formulaInl" alt="$ \mathbf{F}_B $" src="form_152.png"/> is the buoyancy force </p>
+
+</div>
+</div>
 <a class="anchor" id="a1cc8074618d57c994ce1771cba4a973c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -977,7 +996,7 @@ static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2019 12:37:20 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 7 2019 16:38:13 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

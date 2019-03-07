@@ -141,12 +141,12 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:af4a9a40836c85b07e8dae4e26a7efb38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Different options for enforcing a fixed porosity.  <a href="mushy_layer_opt_8h.html#af4a9a40836c85b07e8dae4e26a7efb38">More...</a><br/></td></tr>
 <tr class="separator:af4a9a40836c85b07e8dae4e26a7efb38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad67b5b87e24a070e739a68078dcb7520"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520">VectorVars</a> { <br/>
-&#160;&#160;<b>m_fluidVel</b>, 
-<b>m_U_porosity</b>, 
-<b>m_Ustar</b>, 
-<b>m_advUstar</b>, 
+&#160;&#160;<a class="el" href="mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520acf6d7a2aa6c1a2f3364026a389b3b685">m_fluidVel</a>, 
+<a class="el" href="mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520a20cf6f7f84174b72c0c38bca9b6a3923">m_U_porosity</a>, 
+<a class="el" href="mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520afa0ca2559f0ecde5d29f20153811d6ec">m_Ustar</a>, 
+<a class="el" href="mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520ad6649dc770bf43bd56aa13dfcdac3ab7">m_advUstar</a>, 
 <br/>
-&#160;&#160;<b>m_advectionVel</b>, 
+&#160;&#160;<a class="el" href="mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520a86e65099848dee1fdd6ed56753f2841b">m_advectionVel</a>, 
 <b>m_viscousSolveSrc</b>, 
 <b>m_UdelU</b>, 
 <b>m_advectionSrc</b>, 
@@ -172,7 +172,7 @@ Enumerations</h2></td></tr>
 <a class="el" href="mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520a0bc95e626dcdeae398d6bb728b28578f">m_numVectorVars</a>
 <br/>
  }</td></tr>
-<tr class="memdesc:ad67b5b87e24a070e739a68078dcb7520"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identifiers for vector variables.  <a href="mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520">More...</a><br/></td></tr>
+<tr class="memdesc:ad67b5b87e24a070e739a68078dcb7520"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cell centred vector field.  <a href="mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520">More...</a><br/></td></tr>
 <tr class="separator:ad67b5b87e24a070e739a68078dcb7520"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcada9fb65a998951da882b5c10191fe"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mushy_layer_opt_8h.html#afcada9fb65a998951da882b5c10191fe">ScalarVars</a> { <br/>
 &#160;&#160;<b>m_enthalpy</b>, 
@@ -378,9 +378,26 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Identifiers for vector variables. </p>
+<p>Cell centred vector field. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="ad67b5b87e24a070e739a68078dcb7520a0bc95e626dcdeae398d6bb728b28578f"></a>m_numVectorVars</em>&#160;</td><td class="fielddoc">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="ad67b5b87e24a070e739a68078dcb7520acf6d7a2aa6c1a2f3364026a389b3b685"></a>m_fluidVel</em>&#160;</td><td class="fielddoc">
+<p>Cell centred fluid velocity, <img class="formulaInl" alt="$ \mathbf{U} $" src="form_37.png"/>. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ad67b5b87e24a070e739a68078dcb7520a20cf6f7f84174b72c0c38bca9b6a3923"></a>m_U_porosity</em>&#160;</td><td class="fielddoc">
+<p>Fluid velocity divided by porosity, <img class="formulaInl" alt="$ \mathbf{U}/\chi $" src="form_97.png"/>. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ad67b5b87e24a070e739a68078dcb7520afa0ca2559f0ecde5d29f20153811d6ec"></a>m_Ustar</em>&#160;</td><td class="fielddoc">
+<p>Unprojected cell centred fluid velocity, <img class="formulaInl" alt="$ \mathbf{U}^* $" src="form_41.png"/>. </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ad67b5b87e24a070e739a68078dcb7520ad6649dc770bf43bd56aa13dfcdac3ab7"></a>m_advUstar</em>&#160;</td><td class="fielddoc">
+<p>Unprojected face centred fluid velocity, as used for advection, which has been averaged to cell centres. </p>
+<p><img class="formulaInl" alt="$ {Av}^{F \to C} \mathbf{U}_f $" src="form_149.png"/> </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ad67b5b87e24a070e739a68078dcb7520a86e65099848dee1fdd6ed56753f2841b"></a>m_advectionVel</em>&#160;</td><td class="fielddoc">
+<p>Face centred fluid velocity, as used for advection, which has been averaged to cell centres. </p>
+<p><img class="formulaInl" alt="$ {Av}^{F \to C} \mathbf{U}_{AD} $" src="form_150.png"/> </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="ad67b5b87e24a070e739a68078dcb7520a0bc95e626dcdeae398d6bb728b28578f"></a>m_numVectorVars</em>&#160;</td><td class="fielddoc">
 <p>Number of vector variables. </p>
 </td></tr>
 </table>
@@ -415,7 +432,7 @@ Enumerations</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2019 12:37:17 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 7 2019 16:38:10 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
