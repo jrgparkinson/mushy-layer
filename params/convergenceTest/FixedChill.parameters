@@ -42,7 +42,6 @@ main.output_folder=/network/group/aopp/oceans/AW002_PARKINSON_MUSH/fixedChillAMR
 main.periodic_bc=0 0 0
 
 main.plot_prefix=plt
-main.postTraceSmoothing=0.0
 main.printAccelDt=0
 main.project_initial_vel=true
 main.ref_ratio=4 2 2
