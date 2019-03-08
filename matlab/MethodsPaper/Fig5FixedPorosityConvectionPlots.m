@@ -6,7 +6,7 @@ if nargin < 3
    % dataFolderVariablePorosity = getDataDir('AMRConvergenceTest/DBVariablePorosityGaussian1proc-t1.6-v2/');
     
     base_dir = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/';
-    dataFolderNu = fullfile(base_dir, '/ConvectionDB-cfl0.2/chi0.4-Da1.0e-02-Ra1.0e+05/');
+    dataFolderNu = fullfile(base_dir, '/ConvectionDB-cfl0.1/chi0.4-Da1.0e-02-Ra1.0e+05/');
     dataFolderVariablePorosity = fullfile(base_dir, '/FixedPorousHole-1proc/');
     
     %thisFilename = mfilename('fullpath');

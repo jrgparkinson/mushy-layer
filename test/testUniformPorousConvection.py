@@ -31,9 +31,13 @@ def uniform_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max
 
     return nx_coarse, params, gridFile
 
+def get_default_cfl():
+    cfl = 0.1
+    return cfl
+
 def test_uniform_porous_convection(argv):
     # Default vals:
-    cfl = 0.1
+    cfl = get_default_cfl()
     nz_uniform = 128 # 128
     nz_vm = 64
     chi = 0.4
