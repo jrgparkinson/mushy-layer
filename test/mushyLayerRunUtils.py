@@ -355,4 +355,33 @@ def array_to_string(array):
 
 
 
+def check_exec_exists(exec_dir, exec_name):
+    base_name = os.path.join(exec_dir, exec_name)
+    exec_name = get_executable(base_name, 2)
+
+    # If executable exists, we're all good
+    if os.path.exists(exec_name):
+        return True
+
+    # If executable doesn't exist, warn the user and ask if they want us to try and build it
+    print('Error - executable does not exist: %s' % exec_name)
+    response = raw_input('Try and build this executable? (y/n) ')
+
+    if response == 'y':
+        cmd = 'cd %s; make all; cd -;' % exec_dir
+        os.system(cmd)
+
+        if os.path.exists(exec_name):
+            return True
+
+        else:
+            print('Unable to build the executable, please try yourself manually before running the test problems.')
+            return False
+
+
+
+    print('Please build the executable yourself before running the test problems.')
+
+    return False
+
 

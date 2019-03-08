@@ -6,7 +6,7 @@ amrmultigrid.max_iter=15
 amrmultigrid.norm_thresh=1.0e-10
 amrmultigrid.num_mg=1
 amrmultigrid.num_smooth=16
-amrmultigrid.relaxMode=1
+
 amrmultigrid.tolerance=1.0e-10
 amrmultigrid.verbosity=0
 bc.bulkConcentrationHiVal=0.01 0.01
@@ -39,14 +39,14 @@ main.doVCreflux=0
 main.domain_length=1.0
 main.dt_tolerance_factor=1.01
 main.enforceAnalyticSoln=false
-main.explicitDarcyTerm=false
+
 main.fill_ratio=0.75
 main.grid_buffer_size=2
 main.ignoreBulkConcentrationSteadyState=true
 main.ignoreSolverFails=true
 main.initial_cfl=0.1
 main.initialize_pressure=true
-main.iter_plot_interval=-1
+
 main.iteration_plot_interval=-1
 main.max_dt=1e-1
 main.max_dt_growth=1.05
@@ -118,11 +118,11 @@ projector.verbosity=0
 run_name=Uniform
 main.stdev=0.002
 
-main.implicitAdvectionSolve = false
+
 projection.usePiAdvectionBCs=true
 projection.phiScale=1.0 
 projection.MACbcScale=-0.5 #0.4
-main.usePhiForImplicitAdvectionSolve=false
+
 
 regrid.tagDomainBoundary=false
 
