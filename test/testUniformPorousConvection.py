@@ -5,7 +5,7 @@ from colorama import Fore, Style
 import getopt
 from runAMRConvergenceTest import runTest
 from BatchJob import BatchJob
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir, check_exec_exists
 
 
 ######################################
@@ -44,7 +44,6 @@ def test_uniform_porous_convection(argv):
     fixed_da = -1.0
     fixed_ra = -1.0
 
-
     try:
         opts, args = getopt.getopt(argv, "n:v:c:p:b:u:a:d:r:")
     except getopt.GetoptError as err:
@@ -56,17 +55,17 @@ def test_uniform_porous_convection(argv):
     for opt, arg in opts:
         if opt in "-n":
             nz_uniform = int(arg)
-        elif opt in ("-c"):
+        elif opt in "-c":
             cfl = float(arg)
-        elif opt in ("-v"):
+        elif opt in "-v":
             nz_vm = int(arg)
-        elif opt in ("-p"):
+        elif opt in "-p":
             chi = float(arg)
-        elif opt in ("-b"):
+        elif opt in "-b":
             bc_accuracy = int(arg)
-        elif opt in ("-u"):
+        elif opt in "-u":
             u_del_u_method = int(arg)
-        elif opt in ("-a"):
+        elif opt in "-a":
             advection_method = int(arg)
         elif opt in "-d":
             fixed_da = float(arg)
@@ -75,6 +74,13 @@ def test_uniform_porous_convection(argv):
 
     base_output_dir = get_base_output_dir()
     matlab_command = get_matlab_base_command()
+
+    # Check we have the executables needed to run this test
+    success = check_exec_exists(os.path.join(get_mushy_layer_dir(), 'execSubcycle'), 'mushyLayer')
+    success = success and check_exec_exists(os.path.join(get_mushy_layer_dir(), 'setupNewRun'), 'setupnewrun')
+
+    if not success:
+        sys.exit(-1)
 
     print(Fore.GREEN + 'Setup tests for convection in a fixed uniform porous medium' + Style.RESET_ALL)
     physical_problem = 'convectionDB'
