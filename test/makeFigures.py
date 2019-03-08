@@ -2,6 +2,7 @@
 import os
 from colorama import Fore, Style
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
+from testUniformPorousConvection import get_default_cfl
 from BatchJob import BatchJob
 
 ##########################################################################
@@ -18,7 +19,9 @@ def no_flow_command():
 
 def fixed_porous_command():
     figure_directory = get_base_output_dir()
-    data_folder_nu = os.path.join(get_base_output_dir(), 'ConvectionDB-cfl0.2', 'chi0.4-Da1.0e-02-Ra1.0e+05')
+
+    cfl = get_default_cfl()
+    data_folder_nu = os.path.join(get_base_output_dir(), 'ConvectionDB-cfl%s' % cfl, 'chi0.4-Da1.0e-02-Ra1.0e+05')
     data_folder_variable_porosity = os.path.join(get_base_output_dir(), 'FixedPorousHole-1proc')
 
     cmd = 'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')'
