@@ -29,7 +29,7 @@ main.grid_buffer_size=4
 main.initial_cfl=0.01
 
 main.max_dt=1000.0
-main.max_dt_growth=1.0
+main.max_dt_growth=1.01
 main.max_grid_size=32
 main.max_init_dt=1e-2
 main.max_level=2
