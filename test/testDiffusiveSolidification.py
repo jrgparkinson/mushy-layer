@@ -49,7 +49,7 @@ def testDiffusiveSolidification():
 
     # Setup up the post processing command
     dataFolder = os.path.join(base_output_dir, 'NoFlow')
-    figureName = os.path.join(dataFolder, 'noFlow.pdf')
+    figureName = os.path.join(base_output_dir, 'Fig4NoFlow.pdf')
     analysis_command = matlab_command + ' "Fig4NoFlow(\'' + dataFolder + '\', \'' + figureName + '\'); exit;"'
 
     # Run

@@ -112,7 +112,8 @@ def test_fixed_porous_hole():
 
     # Run
     extra_params = {}
-    runTest(data_folder, physical_problem, fixed_porous_resolution_specific_params, amr_setup, num_procs, analysis_command, extra_params)
+    runTest(data_folder, physical_problem, fixed_porous_resolution_specific_params,
+            amr_setup, num_procs, analysis_command, extra_params)
 
 def main(argv):
     test_fixed_porous_hole()

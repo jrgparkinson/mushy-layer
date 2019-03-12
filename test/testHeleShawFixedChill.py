@@ -77,6 +77,8 @@ def testHeleShawFixedChill(argv):
     base_output_dir = get_base_output_dir()
     matlab_command = get_matlab_base_command()
 
+    analysis_command = get_matlab_base_command() + '%s; exit;' % fixed_chill_command()
+
     print(Fore.GREEN + 'Setup tests for fixed chill in a Hele-Shaw cell' + Style.RESET_ALL)
     physicalProblem = 'FixedChill'
     folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f-Rel%1.1e" % (extra_params['main.max_time'], extra_params['parameters.rayleighComp'], extra_params['parameters.darcy'], extra_params['parameters.compositionRatio'], extra_params['parameters.nonDimReluctance'])
@@ -94,9 +96,9 @@ def testHeleShawFixedChill(argv):
 
         allowRestarts = False
         s = BatchJob('', defaultParams['concise_run_name'], '', num_proc)
+        s.set_post_process(analysis_command)
         ml_run = MushyLayerRunSimple(base_output_dir, num_proc, defaultParams, s, allowRestarts, get_executable_name())
         ml_run.single_run(folderName)
-
 
     else:
 
@@ -118,16 +120,7 @@ def testHeleShawFixedChill(argv):
             AMRSetup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
             AMRSetup.append({'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': Nz_uniform})
 
-
         num_procs = [1]  # Needs to be as long as the longest Nzs
-
-        # Setup up the post processing command
-
-        # figureName = os.path.join(dataFolder, 'noFlow.pdf')
-        #fine_res_folder = 'Uniform-' + physicalProblem + '-' + str(Nz_uniform[-1]) + '--0'
-
-        #analysis_command = '' # No analysis yet. Eventually should collate run times, make some plots, and maybe compute differences between solutions
-        analysis_command = get_matlab_base_command() + '%s; exit;' % fixed_chill_command()
 
         runTest(dataFolder, physicalProblem, hele_shaw_resolution_specific_params,
                 AMRSetup, num_procs, analysis_command, extra_params, 0, params_file)
