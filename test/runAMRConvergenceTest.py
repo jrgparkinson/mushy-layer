@@ -203,6 +203,7 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
         job_ids = job_ids + these_job_ids
 
     # Once all these runs have been submitted, submit the analysis job
+    print('analysis command: %s' % analysis_command)
     if analysis_command:
         runAnalysisName = 'runAnalysis.sh'
 

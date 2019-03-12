@@ -13,19 +13,16 @@ if nargin < 1
     % Local
     baseDir = '/home/parkinsonjl/mnt/sharedStorage/'; 
     
-    output_dir = [baseDir, 'TestDiffusiveTimescale/FixedChill-t1.0e-01-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0/'];
+    output_dir = [baseDir, 'TestRelease/FixedChill-t2.0e-02-Ra1e+06-Da1.0e-04-C2.00-Rel1.0e-04-useThis/'];
     
 end
 
 if nargin < 2
-    frames = [-1]; % just process the last frame by default
-    frames = [3000, 4800, 17000]; % Testing
-    frames = [3000, 4000, 7000]; % Testing
-    %frames = [2286, 3872, 4574]; % Testing
+    frames = [900, 1300, 2000];
 end
 
 if nargin < 3
-    figure_output_dir = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/';
+    figure_output_dir = '/home/parkinsonjl/mnt/sharedStorage/TestRelease/';
 end
 
 
@@ -36,7 +33,10 @@ end
 
 function processSpecificFolder(output_dir, frames, figure_output_dir)
 
-
+if exist(output_dir, 'dir') ~= 7
+    fprintf('Output folder does not exist: %s', output_dir);
+    return;
+end
 
 savePNG = true;
 
@@ -102,8 +102,6 @@ for frame_i=1:length(frames)
     options.maxSearchFrame = 100000;
     thisFrame = frames(frame_i);
     
-   
-    
     textLabels = {'(a)', '(b)', '(c)'};
     options.subPlotLabel = textLabels{frame_i};
     
@@ -132,6 +130,8 @@ end
 if savePNG
     print(h,[filename, '.png'],'-dpng','-r800')
 end
+
+%print(h,[filename, '.tiff'],'-dtiff','-r800')
 
 % this is abot 40MB
 %print(h,[filename, '.eps'],'-depsc','-r50')
