@@ -77,8 +77,6 @@ def testHeleShawFixedChill(argv):
     base_output_dir = get_base_output_dir()
     matlab_command = get_matlab_base_command()
 
-    analysis_command = get_matlab_base_command() + ' "%s; exit;"' % fixed_chill_command()
-
     print(Fore.GREEN + 'Setup tests for fixed chill in a Hele-Shaw cell' + Style.RESET_ALL)
     physicalProblem = 'FixedChill'
     folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f-Rel%1.1e" % (extra_params['main.max_time'], extra_params['parameters.rayleighComp'], extra_params['parameters.darcy'], extra_params['parameters.compositionRatio'], extra_params['parameters.nonDimReluctance'])
@@ -86,6 +84,7 @@ def testHeleShawFixedChill(argv):
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
 
+    analysis_command = get_matlab_base_command() + ' "%s; exit;"' % fixed_chill_command(folderName)
 
     singleRun = True
 

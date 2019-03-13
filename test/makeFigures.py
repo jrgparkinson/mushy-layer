@@ -28,24 +28,24 @@ def fixed_porous_command():
 
     return cmd
 
-def porous_hole_command():
+def porous_hole_command(folder_name='PorousMushyHole-t0.00015'):
     figure_directory = get_base_output_dir()
-    porous_mushy_hole_folder = os.path.join(get_base_output_dir(), 'PorousMushyHole-t0.00015')
+    porous_mushy_hole_folder = os.path.join(get_base_output_dir(), folder_name)
 
     cmd = 'Fig7PorousHole(\'' + porous_mushy_hole_folder + '\', \'' + figure_directory + '\')'
     return cmd
 
-def fixed_chill_command():
+def fixed_chill_command(folder_name='FixedChill-t2.0e-02-Ra1e+06-Da1.0e-04-C2.00-Rel1.0e-04-0'):
     figure_directory = get_base_output_dir()
-    fixed_chill_data = os.path.join(get_base_output_dir(), 'FixedChill-t5.0e-02-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
+    fixed_chill_data = os.path.join(get_base_output_dir(), folder_name)
 
-    cmd  ='Fig9FixedChill(\'' + fixed_chill_data + '\', [3000, 4000, 7000], \'' + figure_directory + '\')'
+    cmd  ='Fig9FixedChill(\'' + fixed_chill_data + '\', [900, 1300, 2000], \'' + figure_directory + '\')'
 
     return cmd
 
-def fixed_chill_video_command():
+def fixed_chill_video_command(folder_name='FixedChill-t2.0e-02-Ra1e+06-Da1.0e-04-C2.00-Rel1.0e-04-0'):
     # figure_directory = get_base_output_dir()
-    fixed_chill_data = os.path.join(get_base_output_dir(), 'FixedChill-t5.0e-02-Ra1e+06-Da5.0e-04-C2.00-Rel1.0e-04-0')
+    fixed_chill_data = os.path.join(get_base_output_dir(), folder_name)
 
     cmd = 'Fig9MakeVideo(\'' + fixed_chill_data + '\')'
 
