@@ -39,7 +39,7 @@ def fixed_chill_command(folder_name='FixedChill-t2.0e-02-Ra1e+06-Da1.0e-04-C2.00
     figure_directory = get_base_output_dir()
     fixed_chill_data = os.path.join(get_base_output_dir(), folder_name)
 
-    cmd  ='Fig9FixedChill(\'' + fixed_chill_data + '\', [900, 1300, 2000], \'' + figure_directory + '\')'
+    cmd  ='Fig9FixedChill(\'' + fixed_chill_data + '\', [900, 1600, 2750], \'' + figure_directory + '\')'
 
     return cmd
 
