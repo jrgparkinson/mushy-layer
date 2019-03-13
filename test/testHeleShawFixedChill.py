@@ -84,7 +84,7 @@ def testHeleShawFixedChill(argv):
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
 
-    analysis_command = get_matlab_base_command() + ' "%s; exit;"' % fixed_chill_command(folderName)
+    analysis_command = get_matlab_base_command() + ' "%s; exit;"' % fixed_chill_command(folderName + '-0')
 
     singleRun = True
 
