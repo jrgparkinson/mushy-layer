@@ -5,7 +5,7 @@ from colorama import Fore, Style
 import getopt
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name, get_mushy_layer_dir
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name, get_mushy_layer_dir, add_params
 from MushyLayerRunSimple import MushyLayerRunSimple
 from BatchJob import BatchJob
 from makeFigures import fixed_chill_command
@@ -92,6 +92,9 @@ def testHeleShawFixedChill(argv):
 
         num_proc = 1
         defaultParams['concise_run_name'] = folderName
+
+        # Overwrite default params with any extra params we've specified
+        defaultParams = add_params(defaultParams, extra_params)
 
         allowRestarts = False
         s = BatchJob('', defaultParams['concise_run_name'], '', num_proc)
