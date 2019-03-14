@@ -134,7 +134,7 @@ class BatchJob:
                          '#SBATCH --ntasks-per-socket=' + str(int(self.tasks_per_socket)) + '        # How many tasks on each CPU or socket (not sure what this really means)' + '\n',
                          '#SBATCH --distribution=cyclic:cyclic # Distribute tasks cyclically on nodes and sockets' + '\n',
                          '# Memory usage (MB)' + '\n', '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
-                         '#SBATCH --output=' + os.path.join(self.folder, 'sbatch.out') + '   # Standard output and error log' + '\n']
+                         '#SBATCH --output=' + os.path.join(self.folder, 'sbatch%j.out') + '   # Standard output and error log' + '\n']
 
 
         # The commands to execute will look the same regardless of whether you're using SLURM or not
