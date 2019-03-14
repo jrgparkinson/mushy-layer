@@ -2959,19 +2959,19 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
     int depth_i = 0;
     Real depth = -1.0;
-    for (int i = averagedPorosity.size()-1; i >= 0 ; i--)
+//    for (int i = averagedPorosity.size()-1; i >= 0 ; i--)
+    for (int i = 0; i < averagedPorosity.size() ; i++)
     {
       depth_i++;
-      if (averagedPorosity[i] > 0.999)
+      if (averagedPorosity[i] < 0.999)
       {
-        depth = depth_i*m_dx;
+        depth = (averagedPorosity.size()-depth_i)*m_dx;
         break;
       }
 
     }
 
     m_diagnostics.addDiagnostic(DiagnosticNames::diag_mushDepth, m_time, depth);
-
   }
 
   // Now lets work out some chimney geometry:
