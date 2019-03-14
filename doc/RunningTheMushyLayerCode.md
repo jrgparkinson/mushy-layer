@@ -1,10 +1,10 @@
-## Running the Mushy Layer code
-# Introduction
+# Running the Mushy Layer code
+## Introduction
 This document explains how to use the mushy layer code for various physical applications. 
 
 It assumes you already have a compiled version of the code which you can run.
 
-# Basics
+## Basics
 There are over a hundred options used in the code, which are stored on the `AMRLevelMushyLayer` class in one of two places:
 
 1. The member variable `AMRLevelMushyLayer.m_parameters` which is a `MushyLayerParams` object. This is where most physical parameters (e.g. Rayleigh number, Lewis number) are stored.
@@ -26,7 +26,7 @@ We do most of this in either `/mushy-layer/srcSubcycle/MushyLayerSubcycleUtils.c
 
 Most of these options/parameters can just be left at their default values. The inputs file at `/mushy-layer/examples/meltponds/inputsGrowSeaIce` illustrates the main options you may wish to change, which are described in more detail below under some roughly suitable headings.
 
-# General options
+## General options
 `main.verbosity=2` larger verbosity means there will be more text output produced
 
 `main.output_folder=.` folder to save plot/checkpoint files to a period `.` means the directory from which the code was executed
@@ -43,7 +43,7 @@ Most of these options/parameters can just be left at their default values. The i
 
 `main.debug=false`  set to true to write more fields to the plot files
 
-# Timestepping
+## Timestepping
 `main.cfl=0.1` max allowed CFL number
 
 `main.initial_cfl=2e-05` start simulations with a smaller CFL number. The timestep  increases thereafter as determined by `main.max_dt_growth`
@@ -60,7 +60,7 @@ Most of these options/parameters can just be left at their default values. The i
 
 `main.dt_tolerance_factor=1.01` Set the factor by which the current dt must exceed the new (max) dt for time subcycling to occur (i.e., reduction of the current dt by powers of 2).
 
-# Domain setup
+## Domain setup
 `main.num_cells=Nx Ny Nz` e.g.  `main.num_cells=64 128` size of the grid on the coarsest mesh. Make sure each dimensions is a power of 2 unless you want the multigrid to be slow. Only need to specify 2 dimensions if the code is compiled for 2 dimensions. The final dimension is always the 'vertical' with respect to gravity.
 
 `main.domain_height=1.0` domain height (width is then calculated from the number of grid cells specified)
@@ -69,7 +69,7 @@ Most of these options/parameters can just be left at their default values. The i
 
 `main.max_grid_size=256` split domain into boxes (for sending to different processors) of max size in any dimension given by this parameter.
 
-# Boundary conditions
+## Boundary conditions
 Boundary conditions are defined in two ways. Firstly we define the type of boundary condition to apply to each side, then we define the value to use (where needed) at each side. For scalars, options are:
 
 0. Dirichlet
@@ -114,7 +114,7 @@ bc.liquidConcentrationLo
 permeabilityLo
 ```
 
-# Dimensionless parameters
+## Dimensionless parameters
 `main.nondimensionalisation=0` choose nondimensionalisation, different options are:
 0. Diffusive timescale, advective velocity scale
 1. Darcy timescales, advective velocity scale
@@ -186,7 +186,7 @@ permeabilityLo
 
 `parameters.liquidusSlope=-0.1`
 
-# AMR options
+## AMR options
 `main.max_level=0` max allowed level for AMR simulations.
 
 `main.block_factor=8` all boxes must be divisible by at least this length in all dimensions. 
@@ -208,7 +208,7 @@ permeabilityLo
 `projection.eta=0.0` Freestream correction coefficient. Should be less than 1 for stability, but close to 1 for accuracy.
 
 
-# Projection
+## Projection
 The projection solver has some tolerance specified by `projection.solverTol`. If the unprojected velocity has some divergence $d$, then the projected velocity will have some divergence of order $d \times $`projection.solverTol`. In reality, we care more about the absolute value of the final divergence than how much it is has been reduced. Therefore we introduce an option to adapt the solver tolerance to achieve a particular final divergence:
 
 `projection.adaptSolverParamsDivU = 1`  turns on this option (set 0, or don't set at all, to not use this option)
