@@ -581,6 +581,8 @@ readCheckpointLevel(HDF5Handle& a_handle)
   }
 
 
+
+
   m_dt = m_dt/m_opt.dtReductionFactor;
   pout() << "dt reduced by factor " << m_opt.dtReductionFactor << " to " << m_dt << endl;
 
@@ -592,6 +594,9 @@ readCheckpointLevel(HDF5Handle& a_handle)
 
   // Set up data structures
   levelSetup();
+
+  // Copy pressure to phi
+  m_scalarNew[m_pressure]->copyTo(m_projection.phi());
 }
 
 /*******/

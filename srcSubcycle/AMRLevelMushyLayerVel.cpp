@@ -197,6 +197,34 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
         m_projection.applyMacCorrection(a_advVel,
                                         NULL,
                                         phiScale);
+
+        // Fill bottom boundary with 0th order extrapolation from interior
+        // as these cells aren't filled by the pressure correction
+        int dir = SpaceDim-1;
+        for (DataIterator dit = a_advVel.dataIterator(); dit.ok(); ++dit)
+        {
+          FArrayBox& v = a_advVel[dit][1];
+
+          Box b = v.box();
+
+          // Check box is on bottom domain edge:
+          Box temp(b);
+          temp.shift(1, -1);
+          if (! m_problem_domain.contains(temp))
+          {
+
+            int boxheight = (b.bigEnd() - b.smallEnd())[1];
+            b.growDir(dir, Side::Hi, -(boxheight-1));
+
+            for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
+            {
+              IntVect iv = bit();
+              IntVect ivInterior = iv + BASISV(dir);
+              v(iv) = v(ivInterior);
+            }
+          }
+        }
+
         alreadyHasPressure = true;
       }
 
@@ -209,27 +237,6 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
                      m_problem_domain, m_dx,
                      false); // inhomogeneous
 
-  // Do some smoothing
-//  int nghost = a_advVel.ghostVect()[0];
-
-//  for (DataIterator dit = a_advVel.dataIterator(); dit.ok(); ++dit)
-//  {
-//    for (int dir=0; dir<SpaceDim; dir++)
-//    {
-//      FArrayBox& velDir = a_advVel[dit][dir];
-//      Box b = velDir.box();
-//      b.grow(-(nghost+2));
-//
-//      for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
-//      {
-//        IntVect iv = bit();
-//        Real lapU = -4*velDir(iv) +
-//            velDir(iv+BASISV(0)) + velDir(iv-BASISV(0)) + velDir(iv+BASISV(1)) + velDir(iv-BASISV(1));
-//
-//        velDir(iv) = velDir(iv) - m_opt.smoothingCoeff*lapU;
-//      }
-//    }
-//  }
 
   // Allow multiple projections
   // This doesn't actually really help

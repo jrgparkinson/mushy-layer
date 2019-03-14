@@ -40,6 +40,13 @@ enum DiagnosticNames{
   diag_soluteFluxSponge,
   diag_heatFluxBottom,
   diag_heatFluxTop,
+
+  diag_Fs10,
+  diag_Fs20,
+  diag_Fs30,
+  diag_Fs40,
+  diag_Fs50,
+
   diag_dUdt,
   diag_dSdt,
   diag_dTdt,
@@ -61,6 +68,9 @@ enum DiagnosticNames{
   diag_saltFluxAbsMismatch,
   diag_heatFluxRelMismatch,
   diag_saltFluxRelMismatch,
+  diag_mushyAverageBulkConc,
+  diag_mushyAveragePorosity,
+  diag_mushyVol,
 
   diag_maxLambda,
   diag_sumLambda,

@@ -1195,8 +1195,9 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
   ParmParse ppMain("main");
 
   // make new blank diagnostics file
-  std::ofstream diagnosticsFile ("diagnostics.out");
-  diagnosticsFile.close();
+  // this isn't necessary
+//  std::ofstream diagnosticsFile ("diagnostics.csv");
+//  diagnosticsFile.close();
 
   // Check
   Vector<Vector<Box> > fixedGrids;

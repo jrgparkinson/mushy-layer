@@ -2678,6 +2678,8 @@ void AMRLevelMushyLayer::computeDiagnostics()
     averageVerticalFlux.copyTo(Interval(0, 0), *m_scalarNew[ScalarVars::m_averageHeatFlux], Interval(0,0));
     averageVerticalFlux.copyTo(Interval(1, 1), *m_scalarNew[ScalarVars::m_averageVerticalFlux], Interval(0,0));
 
+
+
     // Also want solute flux at each point in space written out
     int soluteComp = 1;
     for (DataIterator dit = totalFlux.dataIterator(); dit.ok(); ++dit)
@@ -2736,6 +2738,29 @@ void AMRLevelMushyLayer::computeDiagnostics()
         ml = ml->getFinerLevel();
 
       }
+
+      // Get horizontally averaged salt flux at different levels in the domain
+      // 10%, 20% and 30% above the bottom
+
+      Vector<Real> averageVertFs;
+      horizontallyAverage(averageVertFs, *m_scalarNew[ScalarVars::m_averageVerticalFlux]);
+//      LevelData<FArrayBox>& averageVertFs = *m_scalarNew[ScalarVars::m_averageVerticalFlux];
+      int j_top = m_problem_domain.domainBox().bigEnd()[SpaceDim-1];
+      int j_bottom = m_problem_domain.domainBox().smallEnd()[SpaceDim-1];
+      int domHeight = j_top-j_bottom;
+      int j_10 = j_bottom + int(0.1*domHeight);
+      int j_20 = j_bottom + int(0.2*domHeight);
+      int j_30 = j_bottom + int(0.3*domHeight);
+      int j_40 = j_bottom + int(0.4*domHeight);
+      int j_50 = j_bottom + int(0.5*domHeight);
+
+
+      m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs10, m_time, averageVertFs[j_10]);
+      m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs20, m_time, averageVertFs[j_20]);
+      m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs30, m_time, averageVertFs[j_30]);
+      m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs40, m_time, averageVertFs[j_40]);
+      m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs50, m_time, averageVertFs[j_50]);
+
 
       // Another diagnostic - average vertical solute flux across the whole domain
       //    Real domainSize = m_domainWidth*m_domainHeight;
@@ -2973,6 +2998,42 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
     m_diagnostics.addDiagnostic(DiagnosticNames::diag_mushDepth, m_time, depth);
   }
+
+  if (calcDiagnostics
+        && m_diagnostics.diagnosticIsIncluded(DiagnosticNames::diag_mushyAverageBulkConc))
+    {
+    Real mushAvBulkC = 0.0;
+    Real mushAvPorosity = 0.0;
+    Real mushVol = 0.0;
+    int numMushyCells = 0;
+
+    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+    {
+      FArrayBox& porosity = (*m_scalarNew[ScalarVars::m_porosity])[dit];
+      FArrayBox& bulkConc = (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit];
+
+      for (BoxIterator bit = BoxIterator(m_grids[dit]); bit.ok(); ++bit)
+      {
+        IntVect iv = bit();
+
+        if (porosity(iv) < 1.0)
+        {
+          numMushyCells++;
+          mushAvBulkC += bulkConc(iv);
+          mushAvPorosity += porosity(iv);
+        }
+      }
+    }
+    mushAvBulkC = mushAvBulkC / numMushyCells;
+    mushAvPorosity = mushAvPorosity / numMushyCells;
+    mushVol = numMushyCells*m_dx*m_dx;
+
+    m_diagnostics.addDiagnostic(DiagnosticNames::diag_mushyAverageBulkConc, m_time, mushAvBulkC);
+    m_diagnostics.addDiagnostic(DiagnosticNames::diag_mushyAveragePorosity, m_time, mushAvPorosity);
+    m_diagnostics.addDiagnostic(DiagnosticNames::diag_mushyVol, m_time, mushVol);
+
+
+    }
 
   // Now lets work out some chimney geometry:
   // - how big
@@ -4387,5 +4448,6 @@ void AMRLevelMushyLayer::set_compute_diagnostics(bool compute_diags)
 /*******/
 
 #include "NamespaceFooter.H"
+
 
 

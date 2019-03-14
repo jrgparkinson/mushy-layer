@@ -3639,6 +3639,14 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
       diagsToPrint.push_back(DiagnosticNames::diag_HorizAvSalinity60);
       diagsToPrint.push_back(DiagnosticNames::diag_avSalinity);
       diagsToPrint.push_back(DiagnosticNames::diag_mushDepth);
+      diagsToPrint.push_back(DiagnosticNames::diag_mushyAverageBulkConc);
+      diagsToPrint.push_back(DiagnosticNames::diag_mushyAveragePorosity);
+      diagsToPrint.push_back(DiagnosticNames::diag_mushyVol);
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs10);
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs20);
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs30); // diag_Fs40
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs40);
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs50);
 
       break;
 
