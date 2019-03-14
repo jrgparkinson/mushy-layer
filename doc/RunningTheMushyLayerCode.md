@@ -79,7 +79,8 @@ Boundary conditions are defined in two ways. Firstly we define the type of bound
 For vectors, there are lots of options, some of the most important being
 
 0. Solid wall
-3. Inflow/outflow
+2. Inflow/outflow - pressure = 0, velocity determined by the projection
+3. Inflow/outflow with purely normal flow enforced (a bit dodgy)
 6. Reflection
 9. Pressure head
 
@@ -93,7 +94,7 @@ We set boundary conditions on the 'high' side of the domain in each dimension, t
 
 `bc.velHi=6 0` 
 
-`bc.velLo=6 3`
+`bc.velLo=6 2`
 
 We then specify the values of the bulk concentration and enthalpy on each boundary in a similar way
 
@@ -144,7 +145,7 @@ permeabilityLo
 
 `parameters.rayleighComp=500` rayleigh number for compositional differences. When just solving Darcy's equation, this is the mushy layer number. Otherwise, it's the fluid rayleigh number.
 
-`arameters.rayleighTemp=25.0` rayleigh number for temperature.
+`parameters.rayleighTemp=25.0` rayleigh number for temperature.
 
 `parameters.stefan=5.0` stefan number
 
@@ -205,4 +206,22 @@ permeabilityLo
 `main.grid_buffer_size=0 0 0` this is the 'padding' between grids on different levels of refinement
 
 `projection.eta=0.0` Freestream correction coefficient. Should be less than 1 for stability, but close to 1 for accuracy.
+
+
+# Projection
+The projection solver has some tolerance specified by `projection.solverTol`. If the unprojected velocity has some divergence $d$, then the projected velocity will have some divergence of order $d \times $`projection.solverTol`. In reality, we care more about the absolute value of the final divergence than how much it is has been reduced. Therefore we introduce an option to adapt the solver tolerance to achieve a particular final divergence:
+
+`projection.adaptSolverParamsDivU = 1`  turns on this option (set 0, or don't set at all, to not use this option)
+`projection.divergence_tolerance = 1e-9`  absolute divergence we wish to aim for
+
+If you are struggling to achieve this final divergence, you can try increasing either the number of multigrid smooths or number of multigrid iterations:
+
+`projection.numSmoothUp=64`
+`projection.maxIter=40`
+
+Additionally, you can try using the pressure from the previous timestep to remove a significant ammount of the divergence before projection:
+
+`projection.useIncrementalPressure=true`
+
+i.e. after computing the unprojected velocity $\mathbf{U}^*$, then subtract off the old pressure gradient to find $\mathbf{U}^* - \chi \nabla p$ before projecting this to find a (hopefully) small extra pressure correction. This can significantly speed up the solve.
 
