@@ -104,15 +104,14 @@ Divergence::levelDivergenceMAC(LevelData<FArrayBox>& a_div,
                       CHF_CONST_REAL(a_dx),
                       CHF_INT(dir));
 
-      FArrayBox divDir(a_div[dit].box(), 1);
-      divDir.setVal(0.0);
-
-      FORT_DIVERGENCE(CHF_CONST_FRA1(uEdgeDir,comp),
-                      CHF_FRA1(divDir, comp),
-                      CHF_BOX(cellBox),
-                      CHF_CONST_REAL(a_dx),
-                      CHF_INT(dir));
-
+//      FArrayBox divDir(a_div[dit].box(), 1);
+//      divDir.setVal(0.0);
+//
+//      FORT_DIVERGENCE(CHF_CONST_FRA1(uEdgeDir,comp),
+//                      CHF_FRA1(divDir, comp),
+//                      CHF_BOX(cellBox),
+//                      CHF_CONST_REAL(a_dx),
+//                      CHF_INT(dir));
 
 
 
