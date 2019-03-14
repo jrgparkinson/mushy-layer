@@ -6,6 +6,13 @@ import sys
 import subprocess
 import socket
 
+def add_params(defaultParams, extra_params):
+    """ Add params from extra_params to defaultParams """
+
+    for k, v in extra_params.iteritems():
+        defaultParams[k] = v
+
+    return defaultParams
 
 def get_base_output_dir():
     #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
