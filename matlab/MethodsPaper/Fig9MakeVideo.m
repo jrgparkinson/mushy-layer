@@ -123,7 +123,7 @@ try
         fprintf('Setting figure position: [%d %d %d %d]\n', figPos(1), figPos(2), figPos(3), figPos(4));
            
         % Make sure we specify the paper position
-        paperPos =  [0 0 figPos(3)/100 figPos(4)/100];
+        paperPos =  [0 0 figPos(3) figPos(4)];
         set(h, 'PaperUnits', 'inches', 'PaperPosition', paperPos);
         h.InvertHardcopy = 'off';
         h.Color = 'white';
