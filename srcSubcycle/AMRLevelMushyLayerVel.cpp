@@ -97,12 +97,11 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   calculatePermeability();
   computeViscosity();
 
-  // if a coarser level exists, will need coarse-level data for proj
+  // if a coarser level exists, will need coarse-level data for the projection boundary conditions
   if (m_level > 0)
   {
     const DisjointBoxLayout& crseGrids = amrMLcrse->m_grids;
     crsePressurePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(crseGrids, 1));
-    // coarse velocity BC data is interpolated in time
 
     amrMLcrse->fillScalars(*crsePressurePtr, time, ScalarVars::m_pressure, true);
 
@@ -281,7 +280,9 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   fillAdvVel(time, a_advVel);
   a_advVel.exchange();
 
+  /// Need to fill both new and old states for interpolation in time
   m_projection.getPhi(*m_scalarNew[ScalarVars::m_pressure]);
+  m_projection.getPhi(*m_scalarOld[ScalarVars::m_pressure]);
 
   // Test - overwrite with analytic advection velocity
 //  bool m_opt.enforceAnalyticVel = (m_parameters.physicalProblem == PhysicalProblems::m_soluteFluxTest  );
