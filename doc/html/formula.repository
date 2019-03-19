@@ -152,3 +152,24 @@
 \form#151:$ = \chi (Ra_T \theta - Ra_c*\Theta_l) \mathbf{k} + \mathbf{F}_B $
 \form#152:$ \mathbf{F}_B $
 \form#153:$ \mathbf{U}^* = (\Pi/\nu) * (Ra_T \theta - Ra_C \Theta_l + \mathbf{F}_B) $
+\form#154:$ \mathbf{U} \cdot \nabla \left( \mathbf{U} / \chi \right)$
+\form#155:$ \Theta_s $
+\form#156:$ \nu $
+\form#157:$ \lambda / \chi $
+\form#158:$ H_S $
+\form#159:$ H_L $
+\form#160:$ H_E $
+\form#161:$ \chi_{analytic} $
+\form#162:$ \theta_{analytic} $
+\form#163:$ - \nabla \cdot \left( \mathbf{U} \Theta_l \right) - V \frac{\partial \Theta}{\partial z} $
+\form#164:$ \theta_{analytic} - \theta $
+\form#165:$ - \nabla \cdot \left( \mathbf{U} \theta \right) - V \frac{\partial H}{\partial z} $
+\form#166:$ \mathbf{U}_{AD} $
+\form#167:$ \frac{\partial H}{\partial t} $
+\form#168:$ \frac{\partial \Theta}{\partial t} $
+\form#169:$ \int_0^L \mathbf{F}_s \cdot \mathbf{z} dx $
+\form#170:$ \mathbf{F}_s \cdot \mathbf{z} $
+\form#171:$ \nabla \cdot \mathbf{U} $
+\form#172:$ \int_0^L \mathbf{F}_H \cdot \mathbf{z} dx $
+\form#173:$ \omega $
+\form#174:$ \nabla \cdot \mathbf{U}_f $
