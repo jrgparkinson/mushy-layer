@@ -86,7 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h1>Prerequisites</h1>
 <h2>Required</h2>
 <ul>
-<li><a href="https://commons.lbl.gov/display/chombo/Chombo+-+Software+for+Adaptive+Solutions+of+Partial+Differential+Equations">Chombo</a> installation (<a href="https://anag-repo.lbl.gov/chombo-3.2/access.html">how to download Chombo</a>). You will need to configure Chombo with HDF5 support in order to write out data files. As of 25 February 2019, the latest Chombo release (3.2) does not contain all the libraries required for this code. Instead, you will need to download the Chombo development trunk located at <code><a href="https://anag-repo.lbl.gov/svn/Chombo/trunk/">https://anag-repo.lbl.gov/svn/Chombo/trunk/</a></code>. If you do not have access to the trunk, email [<a href="#" onclick="location.href='mai'+'lto:'+'jam'+'es'+'.pa'+'rk'+'ins'+'on'+'@ph'+'ys'+'ics'+'.o'+'x.a'+'c.'+'uk'; return false;">james<span style="display: none;">.nosp@m.</span>.par<span style="display: none;">.nosp@m.</span>kinso<span style="display: none;">.nosp@m.</span>n@ph<span style="display: none;">.nosp@m.</span>ysics<span style="display: none;">.nosp@m.</span>.ox.<span style="display: none;">.nosp@m.</span>ac.uk</a>] for a copy of the source code.</li>
+<li><a href="https://commons.lbl.gov/display/chombo/Chombo+-+Software+for+Adaptive+Solutions+of+Partial+Differential+Equations">Chombo</a> installation (<a href="https://anag-repo.lbl.gov/chombo-3.2/access.html">how to download Chombo</a>). You will need to configure Chombo with HDF5 support in order to write out data files. This code requires Chombo version 3.2, patch 6 or above. Earlier versions of Chombo do not include the <code>AMRFASMultigrid</code> functionality, required for solving nonlinear elliptic equations.</li>
 </ul>
 <h2>Optional</h2>
 <ul>
@@ -187,7 +187,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2019 16:38:15 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 19 2019 19:25:31 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

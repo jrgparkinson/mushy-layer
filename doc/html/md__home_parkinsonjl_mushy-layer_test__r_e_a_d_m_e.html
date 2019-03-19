@@ -102,12 +102,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>There are a lot of individual simulations that need to be run. It is highly recommended that you do this on a machine with lots of cores available so that you can the simulations on different cores in parallel, in which case most jobs should finish in a few hours. The Nusselt number tests with large Rayleigh number on high resolution grids require longer (&gt; 1 day).</p>
 <p>The python scripts will create the relevant folders to hold the output, setup the parameter input files, submit jobs to run the simulations to the slurm queueing system, and also submit a job to run the relevant analysis code once all the jobs have finished. The output from analysis can be found in the sbatch.out file, so a typical directory structure might end up looking like</p>
 <p>``` /baseOutputDir (specified by the user) /NoFlow runAnalysis.sh sbatch.out - output from the analysis Various folders containing different simulations, each containing: run.sh pout.0 time.table.0 pltfiles.hdf5 chkfile.hdf5 /FixedPorousHole ... same as above ```</p>
-<h1>Figures</h1>
-<p>Having run the test problems, you can generate the figures used in the Methods paper using ```console $ python makeFigures.py ``<code> Some figures (e.g. convergence plots) will have already been created following completion of the test problems. These can be found in the same directory as the data produced during the test problems, e.g.</code>/path/to/baseOutputDir/PorousMushyHole/`. </p>
+<h1>Figures and analysis</h1>
+<p>Having run the test problems, most of the figures should already be created, usually in the same directory as the data for each test problem resides in. You can (re)generate the figures used in the Methods paper using ```console $ python makeFigures.py ``<code> Use the matlab script</code>compileNuV2(base_dir)<code>to compile all the nusselt numbers, e.g. </code>``matlab &gt;&gt;compileNuV2('/path/to/TestDir/ConvectionDB-CFL0.1') ``` </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 7 2019 16:38:10 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 19 2019 19:25:23 for Mushy Layer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
