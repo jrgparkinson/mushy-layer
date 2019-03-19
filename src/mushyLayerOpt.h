@@ -118,8 +118,14 @@ enum PorosityFunctions
      * \f$ {Av}^{F \to C} \mathbf{U}_{AD} \f$
      */
     m_advectionVel,
+
+    ///
     m_viscousSolveSrc,
+
+    /// Inertial term \f$ \mathbf{U} \cdot \nabla \left( \mathbf{U} / \chi \right)\f$
     m_UdelU,
+
+    /// Source term for the velocity advection
     m_advectionSrc,
     m_fluidVelAnalytic,
     m_fluidVelErr,
@@ -144,47 +150,130 @@ enum PorosityFunctions
 
   /// Identifiers for different scalar variables
   enum ScalarVars {
+    /// Enthalpy \f$ H \f$
     m_enthalpy,
+
+    /// Bulk concentration \f$ \Theta \f$
     m_bulkConcentration,
+
+    /// Temperature, \f$ \theta \f$
     m_temperature,
+
+    /// Porosity \f$ \chi \f$
     m_porosity,
+
+    /// Liquid concentration \f$ \Theta_l \f$
     m_liquidConcentration,
+
+    /// Solid concentration \f$ \Theta_s \f$
     m_solidConcentration,
+
+    /// Pressure used in the face centred projection \f$ \phi \f$
     m_pressure,
+
+    /// Permeability \f$ \Pi \f$
     m_permeability,
+
+    /// Viscosity \f$ \nu \f$
     m_viscosity,
+
+    /// Auxillary field lambda \f$ \lambda \f$ for computing the freestream correction
     m_lambda,
+
+    /// \f$ \lambda / \chi \f$
     m_lambda_porosity,
+
+    /// Solidus phase boundary, \f$ H_S \f$
     m_enthalpySolidus,
+
+    /// Liquidus phase boundary, \f$ H_L \f$
     m_enthalpyLiquidus,
+
+    /// Eutectic phase boundary, \f$ H_E \f$
     m_enthalpyEutectic,
+
+    /// Some analytically calculated porosity field \f$ \chi_{analytic} \f$
     m_porosityAnalytic,
+
+    /// Some analytically calculated temperature field \f$ \theta_{analytic} \f$
     m_temperatureAnalytic,
+
+    /// Explicit source term for the bulk concentration update
+    /**
+     * \f$ - \nabla \cdot \left( \mathbf{U} \Theta_l \right) - V \frac{\partial \Theta}{\partial z} \f$
+     */
     m_saltEqnSrcGodunov,
-    m_saltEqnSrcFiniteDiff,
-    m_saltEqnOp,
+
+    /// Computes \f$ \theta_{analytic} - \theta \f$ if required
     m_Terr,
-    m_enthalpyOp,
+
+    /// Explicit source term for the enthalpy update
+    /**
+     * \f$ - \nabla \cdot \left( \mathbf{U} \theta \right) - V \frac{\partial H}{\partial z} \f$
+     */
     m_enthalpySrc,
+
+    /// Level divergence of the advection velocities \f$ \mathbf{U}_{AD} \f$
     m_divUadv,
+
+    /// Rate of change of enthalpy with time \f$ \frac{\partial H}{\partial t} \f$
     m_dHdt,
+
+    /// Rate of change of bulk concentration with time \f$ \frac{\partial \Theta}{\partial t} \f$
     m_dSdt,
+
+    /// Horizontally averaged vertical solute flux
+    /**
+     * \f$  \int_0^L \mathbf{F}_s \cdot \mathbf{z} dx \f$
+     */
     m_averageVerticalFlux,
+
+    /// Analytic solute flux for test problems
     m_soluteFluxAnalytic,
+
+    /// Vertical component of the solute flux \f$ \mathbf{F}_s \cdot \mathbf{z} \f$
     m_verticalFlux,
-    m_saltResidual,
+
+    /// Level divergence of the cell centred velocity field \f$ \nabla \cdot \mathbf{U} \f$
     m_divU,
+
+    /// Horizontally averaged vertical heat flux
+    /**
+     * \f$  \int_0^L \mathbf{F}_H \cdot \mathbf{z} dx \f$
+     */
     m_averageHeatFlux,
+
+    /// Streamfunction \f$ \psi \f$ (if calculated ad hoc during post processing)
     m_streamfunction,
+
+    /// Vorticity \f$ \omega \f$ (if calculated ad hoc during post processing)
     m_vorticity,
+
+    ///
     m_FsVertDiffusion,
+
+    ///
     m_FsVertFluid,
+
+    ///
     m_FsVertFrame,
+
+    ///
     m_divUcorr,
+
+    /// Pressure calculated in face-centred projection \f$ \pi \f$
     m_pi,
+
+    /// Pressure calculated in cell-centred projection \f$ \phi \f$
     m_phi,
+
+    /// Coarse-fine boundary condition used in the face-centred projection
     m_MACBC,
+
+    /// Right hand side for the face-centred projection solve, \f$ \nabla \cdot \mathbf{U}_f \f$
     m_MACrhs,
+
+    /// Right hand side for the face-centred projection solve, \f$ \nabla \cdot \mathbf{U} \f$
     m_CCrhs,
 
     /// Number of scalars variables

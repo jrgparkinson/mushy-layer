@@ -78,10 +78,8 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_scalarVarNames[ScalarVars::m_temperatureAnalytic] = string("T analytic");
   m_scalarVarNames[ScalarVars::m_porosityAnalytic] = string("Porosity analytic");
   m_scalarVarNames[ScalarVars::m_saltEqnSrcGodunov] = string("Salt src term godunov");
-  m_scalarVarNames[ScalarVars::m_saltEqnSrcFiniteDiff] = string("Salt src term finite");
-  m_scalarVarNames[ScalarVars::m_saltEqnOp] = string("Salt op");
+
   m_scalarVarNames[ScalarVars::m_Terr] = string("T err");
-  m_scalarVarNames[ScalarVars::m_enthalpyOp] = string("H opp");
   m_scalarVarNames[ScalarVars::m_enthalpySrc] = string("H src");
   m_scalarVarNames[ScalarVars::m_divUadv] = string("div U face");
   m_scalarVarNames[ScalarVars::m_dHdt] = string("dHdt");
@@ -89,7 +87,6 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_scalarVarNames[ScalarVars::m_averageVerticalFlux] = string("average vertical solute flux");
   m_scalarVarNames[ScalarVars::m_soluteFluxAnalytic] = string("analytic vertical solute flux");
   m_scalarVarNames[ScalarVars::m_verticalFlux] = string("vertical solute flux");
-  m_scalarVarNames[ScalarVars::m_saltResidual] = string("salt residual");
   m_scalarVarNames[ScalarVars::m_divU] = string("div U cell");
   m_scalarVarNames[ScalarVars::m_averageHeatFlux] = string("average vertical heat flux");
   m_scalarVarNames[ScalarVars::m_streamfunction] = string("streamfunction");
@@ -175,7 +172,6 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
         m_outputScalarVars.push_back(ScalarVars::m_Terr);
       }
 
-      m_outputScalarVars.push_back(ScalarVars::m_enthalpyOp);
       m_outputScalarVars.push_back(ScalarVars::m_enthalpySrc);
       m_outputScalarVars.push_back(ScalarVars::m_divUadv);
       m_outputScalarVars.push_back(ScalarVars::m_dHdt);
@@ -183,7 +179,6 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
       m_outputScalarVars.push_back(ScalarVars::m_dSdt);
       m_outputScalarVars.push_back(ScalarVars::m_soluteFluxAnalytic);
       m_outputScalarVars.push_back(ScalarVars::m_verticalFlux);
-      m_outputScalarVars.push_back(ScalarVars::m_saltResidual);
       m_outputScalarVars.push_back(ScalarVars::m_divU);
       m_outputScalarVars.push_back(ScalarVars::m_averageHeatFlux);
 
