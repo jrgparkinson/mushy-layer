@@ -274,7 +274,10 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   fillAdvVel(time, a_advVel);
   a_advVel.exchange();
 
+  // Need to fill both new and old states for interpolation in time
   m_projection.getPhi(*m_scalarNew[ScalarVars::m_pressure]);
+  m_projection.getPhi(*m_scalarOld[ScalarVars::m_pressure]);
+
 
   // Test - overwrite with analytic advection velocity
 //  bool m_opt.enforceAnalyticVel = (m_parameters.physicalProblem == PhysicalProblems::m_soluteFluxTest  );
