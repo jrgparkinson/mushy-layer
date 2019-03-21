@@ -4085,7 +4085,7 @@ void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
   {
 
     Real maxVal = 1.0;
-    Real minVal = lowerPorosityLimit;
+    Real minVal = m_opt.lowerPorosityLimit;
 
     FORT_SETMINMAXVAL( CHF_FRA(a_state),
                        CHF_BOX(region),
