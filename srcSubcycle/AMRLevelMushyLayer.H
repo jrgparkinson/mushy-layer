@@ -108,6 +108,8 @@ public:
     m_timestepReduced = false;
     m_useLimiting = false;
 
+    m_prev_diag_output = 0.0;
+
     m_physBCPtr = NULL;
 
 //    m_newLevel=false;
@@ -1109,6 +1111,9 @@ protected:
 
   /// Physical parameters
   MushyLayerParams m_parameters;
+
+  /// Time when we last produced diagnostics output
+  Real m_prev_diag_output;
 
   /// Should we enforce some analytic \f$ \nabla P \f$
   /**

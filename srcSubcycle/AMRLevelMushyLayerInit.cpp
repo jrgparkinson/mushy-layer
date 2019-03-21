@@ -12,6 +12,7 @@ void AMRLevelMushyLayer::setDefaults()
   // Need to make sure these are initialised,
   // else  Some conditional statements will depends on uninitialised value(s)
   m_newGrids_different = false;
+  m_prev_diag_output = m_time;
 //  m_newLevel=false;
 //  m_opt.perturbationTime = 0.0;
 }
@@ -1141,6 +1142,7 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
 
   //I don't think it makes sense to do projection *and* calculate grad(P)
   m_enforceGradP = (!m_opt.doProjection);
+
 
   // Define which scalar fields we want flux registers for
   for (int var = 0; var < m_numScalarVars; var++)

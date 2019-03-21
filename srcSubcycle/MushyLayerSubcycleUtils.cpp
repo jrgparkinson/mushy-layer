@@ -553,6 +553,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.initResetStates = true;
   ppMain.query("init_resetStates", opt.initResetStates);
 
+  opt.diagnostics_period = -1;
+  ppMain.query("diagnostics_period", opt.diagnostics_period);
+
   /**
    * Solver options
    */
@@ -1195,9 +1198,9 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
   ParmParse ppMain("main");
 
   // make new blank diagnostics file
-  // this isn't necessary
-//  std::ofstream diagnosticsFile ("diagnostics.csv");
-//  diagnosticsFile.close();
+  // overwrites existing file if one exists
+  std::ofstream diagnosticsFile ("diagnostics.csv");
+  diagnosticsFile.close();
 
   // Check
   Vector<Vector<Box> > fixedGrids;

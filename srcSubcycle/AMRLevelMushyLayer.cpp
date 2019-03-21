@@ -155,17 +155,29 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
 
   if (m_opt.computeDiagnostics)
   {
-    m_diagnostics.addDiagnostic(DiagnosticNames::diag_dTdt, m_time, Tnorm);
-    m_diagnostics.addDiagnostic(DiagnosticNames::diag_dSdt, m_time, Cnorm);
-    m_diagnostics.addDiagnostic(DiagnosticNames::diag_dUdt, m_time, Unorm);
+    // If a diagnostic period has been declared, check this time has passed since we last produced diagnostics
+      if (m_opt.diagnostics_period > 0 &&
+          m_time - m_prev_diag_output < m_opt.diagnostics_period)
+      {
+        // do nothing
+      }
+      else
+      {
 
-    // Can print diagnostics now if on processor 0
-    bool printDiagnostics = (m_level == 0 && procID() ==0 ); // only print results on proc 0
-    if (printDiagnostics)
-    {
-      m_diagnostics.addDiagnostic(DiagnosticNames::diag_dt, m_time, m_dt);
-      m_diagnostics.printDiagnostics(m_time);
-    }
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dTdt, m_time, Tnorm);
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dSdt, m_time, Cnorm);
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dUdt, m_time, Unorm);
+
+        // Can print diagnostics now if on processor 0
+        bool printDiagnostics = (m_level == 0 && procID() ==0 ); // only print results on proc 0
+        if (printDiagnostics)
+        {
+          m_diagnostics.addDiagnostic(DiagnosticNames::diag_dt, m_time, m_dt);
+          m_diagnostics.printDiagnostics(m_time);
+        }
+
+        m_prev_diag_output = m_time;
+      }
   }
 
   // Stop worrying about this for now
@@ -2345,6 +2357,26 @@ void AMRLevelMushyLayer::computeDiagnostics()
     return;
   }
 
+  // Only compute diagnostics on level 0
+  if (m_level > 0)
+  {
+    return;
+  }
+
+  // If a diagnostic period has been declared, check this time has passed since we last produced diagnostics
+  if (m_opt.diagnostics_period > 0 &&
+      m_time - m_prev_diag_output < m_opt.diagnostics_period)
+  {
+    return;
+  }
+//  else
+//  {
+//    pout() << "time - prev diag time = " << m_time - m_prev_diag_output << " < diag period (" <<  m_opt.diagnostics_period << ")" << endl;
+//  }
+
+
+
+
   CH_TIME("AMRLevelMushyLayer::computeDiagnostics");
 
   bool calcDiagnostics = (m_level == 0); // do this on all processors!
@@ -2976,15 +3008,12 @@ void AMRLevelMushyLayer::computeDiagnostics()
   }
 
   // Work out mushy layer depth
-  if (calcDiagnostics
-      && m_diagnostics.diagnosticIsIncluded(DiagnosticNames::diag_mushDepth))
-  {
+
     Vector<Real> averagedPorosity;
     horizontallyAverage(averagedPorosity, *m_scalarNew[ScalarVars::m_porosity]);
 
     int depth_i = 0;
     Real depth = -1.0;
-//    for (int i = averagedPorosity.size()-1; i >= 0 ; i--)
     for (int i = 0; i < averagedPorosity.size() ; i++)
     {
       depth_i++;
@@ -2996,6 +3025,9 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
     }
 
+  if (calcDiagnostics
+          && m_diagnostics.diagnosticIsIncluded(DiagnosticNames::diag_mushDepth))
+    {
     m_diagnostics.addDiagnostic(DiagnosticNames::diag_mushDepth, m_time, depth);
   }
 
@@ -3007,6 +3039,8 @@ void AMRLevelMushyLayer::computeDiagnostics()
     Real mushVol = 0.0;
     int numMushyCells = 0;
 
+    int lo_j = m_problem_domain.domainBox().smallEnd()[1];
+
     for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
     {
       FArrayBox& porosity = (*m_scalarNew[ScalarVars::m_porosity])[dit];
@@ -3016,7 +3050,10 @@ void AMRLevelMushyLayer::computeDiagnostics()
       {
         IntVect iv = bit();
 
-        if (porosity(iv) < 1.0)
+        bool is_sea_ice = (iv[1] - lo_j) > depth_i;
+
+//        if (porosity(iv) < 1.0)
+        if (is_sea_ice)
         {
           numMushyCells++;
           mushAvBulkC += bulkConc(iv);
@@ -4146,7 +4183,7 @@ void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
   {
 
     Real maxVal = 1.0;
-    Real minVal = m_lowerPorosityLimit; //m_lowerPorosityLimit;
+    Real minVal = m_opt.lowerPorosityLimit; //m_lowerPorosityLimit;
 
     FORT_SETMINMAXVAL( CHF_FRA(a_state),
                        CHF_BOX(region),

@@ -970,6 +970,9 @@ struct MushyLayerOptions {
 
 //  int iter_plot_interval;
 
+  /// Time period between successive diagnostic reports
+  Real diagnostics_period;
+
   /// Some custom options for initial data
   int customInitData;
 
