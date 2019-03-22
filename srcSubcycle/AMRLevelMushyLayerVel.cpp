@@ -370,55 +370,12 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
       pout() << "AMRLevelMushyLayer::computeAdvectionVelocities - doing advection of velocities" << endl;
     }
 
-//    if (m_opt.implicitAdvectionSolve)
-//    {
-//
-//      bool doFRupdates = false;
-//      bool doProjection = false; // don't do CC projection
-//      bool compute_uDelU = true;
-//
-//      // do full timestep - this should now give the same velocity as the later solve?
-//      advectionSourceTerm.exchange();
-//      computeCCvelocity(advectionSourceTerm, old_time, m_dt, doFRupdates, doProjection,
-//                        compute_uDelU, m_opt.usePhiForImplicitAdvectionSolve);
-//
-//      m_vectorNew[VectorVars::m_viscousSolveSrc]->copyTo(*m_vectorNew[VectorVars::m_advectionImplicitSrc]);
-//
-//      // New version:
-//      if (m_opt.usePhiForImplicitAdvectionSolve)
-//      {
-//        fillVectorField(*m_vectorNew[VectorVars::m_advUpreProjection], vel_time, m_advUpreProjection, false, true);
-//
-//      }
-//      else
-//      {
-//        for (DataIterator dit = m_vectorNew[VectorVars::m_advUpreProjection]->dataIterator(); dit.ok(); ++dit)
-//        {
-//          (*m_vectorNew[VectorVars::m_advUpreProjection])[dit].copy((*m_vectorNew[VectorVars::m_UpreProjection])[dit]);
-//        }
-//        fillVectorField(*m_vectorNew[VectorVars::m_advUpreProjection], vel_time, m_UpreProjection, false, true);
-//
-//      }
-//
-//
-//      CellToEdge(*m_vectorNew[VectorVars::m_advUpreProjection], m_advVel);
-//
-//
-//    }
-//    else
-//    {
       if (s_verbosity >= 5)
       {
         pout() << "AMRLevelMushyLayer::computeAdvectionVelocities() - explicit tracing scheme" << endl;
       }
 
-      // Explicit advection solve (tracing)
-//      int saveAdvectionMethod = m_advectionMethod;
 
-      // Option to do a different method here
-//      int velPredMethod = m_advectionMethod;
-//      ppMain.query("velPredictionMethod", velPredMethod);
-//      m_advectionMethod = velPredMethod; //m_noPorosity;
 
       fillScalarFace(*porosityFaceAvPtr, vel_time, m_porosity, true);
       fillScalars(porosityAv, vel_time, m_porosity, true);
@@ -457,10 +414,6 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
           for (int dir = 0; dir < SpaceDim; dir++)
           {
             U_to_advect[dit].divide( porosityGrown[dit], porosityGrown[dit].box(), 0, dir, 1);
-
-            // Also need to scale source term
-            // this has already been done in computeAdvectionVelSourceTerm
-//            advectionSourceTerm[dit].divide( porosityGrown[dit], porosityGrown[dit].box(), 0, dir, 1);
           }
 
         }

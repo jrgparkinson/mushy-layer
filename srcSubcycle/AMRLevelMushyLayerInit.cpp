@@ -2913,14 +2913,28 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
 
   if (solvingFullDarcyBrinkman())
   {
+    // Just initialising so don't advect/diffuse any scalars here
 
     IntVect ivGhost = m_numGhostAdvection*IntVect::Unit;
     LevelData<FArrayBox> advectionSourceTerm(m_grids, SpaceDim, ivGhost);
+
     computeAdvectionVelSourceTerm(advectionSourceTerm);
 
+    if (!m_opt.doEulerPart)
+    {
+      // Compute unprojected cell centred velocity (don't need to project it though)
+
+      computeCCvelocity(advectionSourceTerm, m_time, m_dt,
+                        false, // don't do flux register updates
+                        false, // don't do projection
+                        false, // don't compute u.del(u)
+                        false); // not a mac projection
+
+      m_vectorNew[m_UpreProjection]->copyTo(*m_vectorOld[m_UpreProjection]);
+    }
 
     computeAdvectionVelocities(advectionSourceTerm);
-    // Just initialising so don't advect/diffuse any scalars here
+
   }
   else
   {
