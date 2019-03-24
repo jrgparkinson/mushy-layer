@@ -131,6 +131,12 @@ int main(int argc, char* argv[])
   int refinement = 1;
   Real dtReductionFactor = 10;
   Real smoothing = 0.0;
+  bool reset_time = true;
+  bool reset_step_count = true;
+
+  pp.query("reset_time", reset_time);
+  pp.query("reset_step_count", reset_step_count);
+
   pp.get("run_inputs",previousInputsFile);
   pp.get("inFile" ,previousRestartFile);
   pp.get("outFile" ,newRestartFile);
@@ -379,8 +385,15 @@ int main(int argc, char* argv[])
   // Reset iteration and time
   //  header.m_int ["max_level"]  = max_level;
   //  header.m_int ["num_levels"] = finest_level + 1;
+  if (reset_step_count)
+    {
   header.m_int ["iteration"]  = 0;
+    }
+
+  if (reset_time)
+  {
   header.m_real["time"]       = 0.0;
+  }
 
   // Set periodicity info
   // Get the periodicity info -- this is more complicated than it really
