@@ -1199,8 +1199,9 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
 
   // make new blank diagnostics file
   // overwrites existing file if one exists
-  std::ofstream diagnosticsFile ("diagnostics.csv");
-  diagnosticsFile.close();
+  // Stop doing this - in danger of deleting data
+//  std::ofstream diagnosticsFile ("diagnostics.csv");
+//  diagnosticsFile.close();
 
   // Check
   Vector<Vector<Box> > fixedGrids;
