@@ -195,6 +195,20 @@ def construct_run_name(params):
     return run_name
 
 
+def isfloat(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+    
+def isint(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+    
 def read_inputs(inputs_file):
     """ Load up an inputs file and parse it into a dictionary """
 
@@ -214,12 +228,23 @@ def read_inputs(inputs_file):
         # Remove anything after a #
         line = re.sub('#[^\n]*[\n]', '', line)
 
-        parts = line.split('=')
-        if len(parts) > 1:
-            key = parts[0].strip()
-            val = parts[1].strip()
-            params[key] = val
+        parts = re.findall('^([^=]*)=(.*)$', line)
 
+        # parts = line.split('=')
+        # if len(parts) > 1:
+        if parts:
+            match = parts[0]
+            key = match[0].strip()
+            val = match[1].strip()
+
+            # Convert to float/int as appropriate
+            if isint(val):
+                val = int(val)
+            elif isfloat(val):
+                val = float(val)
+
+            params[key] = val
+            
     # print(params)
     return params
 
@@ -338,13 +363,13 @@ def is_power_of_two(n):
         return False
 
 
-def string_to_array(string):
+def string_to_array(string, conversion = lambda x:int(x)):
 
     if isinstance(string, list):
         return string
 
     parts = string.split(' ')
-    array = [int(i) for i in parts]
+    array = [conversion(i) for i in parts]
     return array
 
 
