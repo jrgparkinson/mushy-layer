@@ -3328,12 +3328,16 @@ void AMRLevelMushyLayer::createDataStructures()
         new LevelData<FArrayBox>(m_grids, SpaceDim, ghost));
   }
 
+  // When created, all our variables will have some bogus value 10^300
+  // Leave most of our variables like this, so we that if we don't initialise memory in the algorithm we find out
+  // There are a few exception though, which we want to set to 0 initially, do this here:
   for (DataIterator dit = m_advVel.dataIterator(); dit.ok(); ++dit)
   {
     m_advVel[dit].setVal(0.0);
     m_advVelOld[dit].setVal(0.0);
     m_advVelNew[dit].setVal(0.0);
 
+    (*m_scalarNew[ScalarVars::m_streamfunction])[dit].setVal(0.0);
 
     (*m_vectorNew[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
   }
