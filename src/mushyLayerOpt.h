@@ -536,6 +536,12 @@ struct MushyLayerOptions {
    */
   bool useIncrementalPressure;
 
+  /// Whether or not to solve for an incremental pressure change on fine levels, rather than the full pressure
+  /**
+   * This may not work fully yet...
+   */
+  bool useIncrementalPressureRefinedLevels;
+
 //  Real phiScale;
 //  bool scaleMACBCWithChi;
 //  Real MACBCscale;
@@ -886,6 +892,9 @@ struct MushyLayerOptions {
    */
   bool tag_plume_mush;
 
+  /// Just refine around channels
+  bool tag_channels;
+
   /// Velocity theshold value for identifying plumes
   Real plumeVelThreshold;
 
@@ -960,6 +969,12 @@ struct MushyLayerOptions {
 
   /// Whether or not to initialize pressures
   bool initialize_pressures;
+
+  /// Whether or not to initialize pressure after regridding
+  bool regrid_init_pressure;
+
+  /// Whether to do bi-linear interpolation when regridding
+  bool regrid_linear_interp;
 
   /// Set the initial value for AMRLevelMushyLayer::m_usePrevPressureForUStar
   /**

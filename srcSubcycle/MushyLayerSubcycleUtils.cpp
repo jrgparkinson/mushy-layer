@@ -396,6 +396,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.useIncrementalPressure = false;
   ppProjection.query("useIncrementalPressure", opt.useIncrementalPressure);
 
+  opt.useIncrementalPressureRefinedLevels = false;
+  ppProjection.query("useIncrementalPressureRefinedLevels", opt.useIncrementalPressureRefinedLevels);
 //  opt.phiScale = 1;
 //  ppProjection.query("phiScale", opt.phiScale);
 
@@ -488,6 +490,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   }
 
+  opt.tag_channels = false;
+  ppRegrid.query("tag_channels", opt.tag_channels);
+
   opt.taggingMarginalPorosityLimit = 1.0;
   ppRegrid.query("marginalPorosityLimit", opt.taggingMarginalPorosityLimit);
 
@@ -538,8 +543,14 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
     opt.project_initial_vel = false;
   }
 
+  opt.regrid_init_pressure = true;
+  ppMain.query("regrid_init_pressure", opt.regrid_init_pressure);
+
   ppMain.query("initialize_pressure", opt.initialize_pressures);
   ppMain.query("project_initial_vel", opt.project_initial_vel);
+
+  opt.regrid_linear_interp = true;
+  ppMain.query("regrid_linear_interp", opt.regrid_linear_interp);
 
   opt.usePrevPressureForUStar = true;
   ppMain.query("addSubtractGradP", opt.usePrevPressureForUStar);
