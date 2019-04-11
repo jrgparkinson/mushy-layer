@@ -545,6 +545,9 @@ protected:
   /// Compute average value of some scalar field over the liquid region of the domain
   Real averageOverLiquidRegion(int a_var);
 
+  /// Compute mushy layer depth
+  Real computeMushDepth();
+
   /// Calculate advective + diffusive flux
   void getTotalFlux(LevelData<FluxBox>& totalFlux);
 

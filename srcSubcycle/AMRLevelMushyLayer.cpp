@@ -3009,25 +3009,12 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
   // Work out mushy layer depth
 
-    Vector<Real> averagedPorosity;
-    horizontallyAverage(averagedPorosity, *m_scalarNew[ScalarVars::m_porosity]);
 
-    int depth_i = 0;
-    Real depth = -1.0;
-    for (int i = 0; i < averagedPorosity.size() ; i++)
-    {
-      depth_i++;
-      if (averagedPorosity[i] < 0.999)
-      {
-        depth = (averagedPorosity.size()-depth_i)*m_dx;
-        break;
-      }
-
-    }
+  Real depth = computeMushDepth();
 
   if (calcDiagnostics
           && m_diagnostics.diagnosticIsIncluded(DiagnosticNames::diag_mushDepth))
-    {
+  {
     m_diagnostics.addDiagnostic(DiagnosticNames::diag_mushDepth, m_time, depth);
   }
 
@@ -3039,7 +3026,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
     Real mushVol = 0.0;
     int numMushyCells = 0;
 
-    int lo_j = m_problem_domain.domainBox().smallEnd()[1];
+//    int lo_j = m_problem_domain.domainBox().smallEnd()[1];
 
     for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
     {
@@ -3050,7 +3037,11 @@ void AMRLevelMushyLayer::computeDiagnostics()
       {
         IntVect iv = bit();
 
-        bool is_sea_ice = (iv[1] - lo_j) > depth_i;
+        RealVect loc;
+         ::getLocation(iv, loc, m_dx);
+
+//        bool is_sea_ice = (iv[1] - lo_j) > depth_i;
+         bool is_sea_ice = loc[1] > (m_domainHeight-depth);
 
 //        if (porosity(iv) < 1.0)
         if (is_sea_ice)
@@ -3082,6 +3073,27 @@ void AMRLevelMushyLayer::computeDiagnostics()
   }
 
 
+}
+
+Real AMRLevelMushyLayer::computeMushDepth()
+{
+  Vector<Real> averagedPorosity;
+  horizontallyAverage(averagedPorosity, *m_scalarNew[ScalarVars::m_porosity]);
+
+  int depth_i = 0;
+  Real depth = -1.0;
+  for (int i = 0; i < averagedPorosity.size() ; i++)
+  {
+    depth_i++;
+    if (averagedPorosity[i] < 0.999)
+    {
+      depth = (averagedPorosity.size()-depth_i)*m_dx;
+      break;
+    }
+
+  }
+
+  return depth;
 }
 
 void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
