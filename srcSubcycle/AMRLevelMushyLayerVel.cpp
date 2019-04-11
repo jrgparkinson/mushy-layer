@@ -168,7 +168,13 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     fillUnprojectedDarcyVelocity(a_advVel, time);
 
     // Subtract best guess at pressure by default for non-AMR sims
-    bool useIncrementalPressure = (getMaxLevel() == 0) && m_opt.useIncrementalPressure;
+//    bool useIncrementalPressure = (getMaxLevel() == 0) && m_opt.useIncrementalPressure;
+    bool useIncrementalPressure = (m_level == 0) && m_opt.useIncrementalPressure;
+
+    if (m_level > 0 && m_opt.useIncrementalPressureRefinedLevels)
+    {
+      useIncrementalPressure = true;
+    }
 
     // Don't do this on refined levels as it messes up the CF boundary condition
     if (useIncrementalPressure)
@@ -196,6 +202,34 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
         m_projection.applyMacCorrection(a_advVel,
                                         NULL,
                                         phiScale);
+
+        // If we're on refined levels, and we've subtracted off the old pressure, then the
+        // boundary condition on coarse fine interface is no longer the full pressure,
+        // but is the pressure minus what we've just subtracted off - make that change here
+        //todo - cf boundary condition for pressure with incremental update
+        if (m_level > 0)
+        {
+          LevelData<FArrayBox> coarsenedPressure(crsePressurePtr->disjointBoxLayout(), 1, crsePressurePtr->ghostVect());
+
+          setValLevel(coarsenedPressure, 0.0);
+
+          // Make coarsened pressure
+
+          AMRLevelMushyLayer* crseML = getCoarserLevel();
+
+//          crseML->m_coarseAverageScalar.averageToCoarse(
+//                    coarsenedPressure,
+//                    m_projection.phi());
+
+          m_coarseAverageScalar.averageToCoarse(
+                              coarsenedPressure,
+                              m_projection.phi());
+
+          for (DataIterator dit = crsePressurePtr->dataIterator(); dit.ok(); ++dit)
+          {
+            (*crsePressurePtr)[dit].minus(coarsenedPressure[dit]);
+          }
+        }
 
         // Fill bottom boundary with 0th order extrapolation from interior
         // as these cells aren't filled by the pressure correction
