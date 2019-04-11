@@ -386,13 +386,13 @@ int main(int argc, char* argv[])
   //  header.m_int ["max_level"]  = max_level;
   //  header.m_int ["num_levels"] = finest_level + 1;
   if (reset_step_count)
-    {
-  header.m_int ["iteration"]  = 0;
-    }
+  {
+    header.m_int ["iteration"]  = 0;
+  }
 
   if (reset_time)
   {
-  header.m_real["time"]       = 0.0;
+    header.m_real["time"]       = 0.0;
   }
 
   // Set periodicity info
