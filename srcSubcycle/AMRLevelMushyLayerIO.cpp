@@ -524,25 +524,16 @@ readCheckpointLevel(HDF5Handle& a_handle)
     {
       dataStatus =  read<FArrayBox>(a_handle, tempVector,m_vectorVarNames[var], m_grids);
       tempVector.copyTo(Interval(0, SpaceDim-1), *m_vectorNew[var], Interval(0, SpaceDim-1) );
-      if (dataStatus != 0)
-      {
-        if (s_verbosity >= 10)
-        {
-          pout() << "       ... variable not found in checkpoint file, continuing anyway " << endl;
-        }
-      }
-      else if (s_verbosity >= 10)
-      {
-        pout() << "       ... done " << endl;
-      }
+//      if (dataStatus != 0)
+//      {
+        //pout() << "       ... variable not found in checkpoint file, continuing anyway " << endl;
+//     }
+
 
     }
     else
     {
-      if (s_verbosity >= 10)
-      {
-        pout() << "       ... skipping " << endl;
-      }
+     // do nothing
     }
   }
 
