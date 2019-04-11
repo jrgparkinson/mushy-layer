@@ -1396,29 +1396,6 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
   {
     AMRLevelMushyLayer* thisLevelData = this;
 
-//    Real newLevelAdded = false;
-    // determine if new level added
-
-//    thisLevelData = this;
-//    while (thisLevelData)
-//    {
-//      newLevelAdded = newLevelAdded || thisLevelData->m_newLevel;
-//      thisLevelData = thisLevelData->getFinerLevel();
-//    }
-
-//    if (newLevelAdded && m_opt.variable_eta_factor != 1.0)
-//    {
-//      // From stabilty analysis, believe this is the maximum stable eta allowed
-//
-//      Real maxEta = maxAllowedEta();
-//      setEta(maxEta);
-//
-//      if (s_verbosity >= 3)
-//      {
-//        pout() << "New level added, set eta = " << maxEta << endl;
-//      }
-//    }
-
     thisLevelData = this;
     while (thisLevelData->hasFinerLevel())
     {
@@ -1503,7 +1480,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     int finest_level = numLevels-1;
     Real dtInit = computeDtInit(finest_level);
 
-    if (m_opt.initialize_pressures)
+    if (m_opt.regrid_init_pressure)
     {
       if (m_opt.makeRegridPlots)
       {
@@ -1512,7 +1489,22 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
       dtInit *= m_opt.regrid_dt_scale;
 
-      initializeGlobalPressure(dtInit, false);
+      if (solvingFullDarcyBrinkman())
+      {
+        initializeGlobalPressure(dtInit, false);
+      }
+      else
+      {
+        // Should do some initialisation here?
+        thisLevelData = this;
+
+        for (int lev = 0; lev < numLevels; lev++)
+        {
+          initTimeIndependentPressure(thisLevelData);
+          thisLevelData = thisLevelData->getFinerLevel();
+        }
+
+      }
 
     }
 
@@ -1623,6 +1615,18 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     } // end if initialising lambda correction
 
   } // end if level 0 and doing projection
+
+  // Check div(u)
+//  thisLevelData = this;
+//  while (thisLevelData)
+//  {
+//    thisLevelData->calculateTimeIndAdvectionVel(m_time, thisLevelData->m_advVel);
+//    Divergence::levelDivergenceMAC(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv],thisLevelData->m_advVel, m_dx);
+//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], NULL, 1, thisLevelData->dx(), Interval(0,0));
+//    pout() << "PostRegrid(level " << thisLevelData->level() << ") -- max(div(u)) = " << maxDivU <<  endl;
+//
+//    thisLevelData = thisLevelData->getFinerLevel();
+//  }
 
 }
 
