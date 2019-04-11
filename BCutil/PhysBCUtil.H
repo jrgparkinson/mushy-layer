@@ -75,7 +75,12 @@ public:
 	  /**
 	   * Not implemented yet
 	   */
-	  Robin
+	  Robin,
+	  /// Variable flux
+	  /**
+	   * Flux which varies along the boundary
+	   */
+	  VariableFlux
 	};
 
 	/// Physical parameters for the system
