@@ -92,6 +92,8 @@ def testHeleShawFixedChill(argv):
 
         num_proc = 1
         defaultParams['concise_run_name'] = folderName
+        
+        defaultParams = add_params(defaultParams, extra_params)
 
         allowRestarts = False
         s = BatchJob('', defaultParams['concise_run_name'], '', num_proc)
