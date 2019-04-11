@@ -41,6 +41,15 @@ void ConstantNeumBC(FArrayBox&      a_state,
             Real			a_dx,
             int a_comp = 0);
 
+void VariableFluxBC(FArrayBox&      a_state,
+            const Box&      a_valid,
+            bool            a_homogeneous,
+            Real                        a_value,
+            int             a_dir,
+            Side::LoHiSide  a_side,
+            Real                        a_dx,
+            int a_comp = 0);
+
 void ExtrapBC(FArrayBox&      a_state,
             const Box&      a_valid,
             int             a_dir,
