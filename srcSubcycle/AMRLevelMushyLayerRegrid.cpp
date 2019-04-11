@@ -1312,8 +1312,14 @@ void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, Probl
 //    m_scalarNew[scalarVar]->copyTo(scalInterval, *previousScal, scalInterval);
     fillScalars(*previousScal, m_time, scalarVar, true, true);
     m_scalarNew[scalarVar]->define(a_grids, 1, ivGhost); //reshape
-    //    previousScal->copyTo(scalInterval, *m_scalarNew[scalarVar], scalInterval); // copy back
-    scalarInterp.interpToFine(*m_scalarNew[scalarVar], *previousScal);
+    if (m_opt.regrid_linear_interp)
+    {
+      scalarInterp.interpToFine(*m_scalarNew[scalarVar], *previousScal);
+    }
+    else
+    {
+      scalarInterp.pwcinterpToFine(*m_scalarNew[scalarVar], *previousScal);
+    }
   }
 
   for (int vectorVar = 0; vectorVar < m_numVectorVars; vectorVar++)
