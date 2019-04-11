@@ -479,6 +479,50 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
     tagCellsVar(localTags, m_opt.vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
   }
+  else if (m_opt.tag_channels)
+  {
+    Real porosity_limit = 0.5;
+    Real vel_limit = 0.5;
+    Real y_limit =  m_domainHeight - computeMushDepth();
+
+    DataIterator dit = m_grids.dataIterator();
+    for (dit.begin(); dit.ok(); ++dit)
+    {
+      const Box& b = m_grids[dit()];
+
+      FArrayBox& porosity = (*m_scalarNew[m_porosity])[dit];
+      FArrayBox& velocity = (*m_vectorNew[m_fluidVel])[dit];
+
+      for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
+      {
+        IntVect iv = bit();
+        RealVect loc;
+        ::getLocation(iv, loc, m_dx);
+
+        if (loc[1] > y_limit
+            && (porosity(iv) > porosity_limit
+            || abs(velocity(iv, 1)) > vel_limit ))
+        {
+          localTags |= iv;
+        }
+      }
+    }
+
+    // Shrink the regrow tags invertical direction to get rid of individual odd cells
+//    int grow_dist = 5;
+//    localTags.grow(1, -grow_dist);
+//    localTags.grow(1, grow_dist);
+
+    // Only keep tags which overlap with the same tags shifted up by shift_dist cells
+    int shift_dist = 5;
+    IntVectSet shiftedTags = localTags;
+    shiftedTags.shift(IntVect(0, shift_dist));
+
+    localTags &= shiftedTags;
+
+    localTags.grow(1, shift_dist);
+
+  }
   else if (m_opt.tag_plume_mush)
   {
     // Trying to refine plumes
