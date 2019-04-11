@@ -3558,15 +3558,31 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     LevelData<FArrayBox>& phi = m_projection.phi();
     m_scalarNew[ScalarVars::m_pressure]->copyTo(pi);
     m_scalarNew[ScalarVars::m_pressure]->copyTo(phi);
-    for (DataIterator dit = pi.dataIterator(); dit.ok(); ++dit)
+
+    // Fill pressure BCs
+    this->fillScalars(pi, m_time, m_pressure, false, false);
+    this->fillScalars(phi, m_time, m_pressure, false, false);
+
+    if (solvingFullDarcyBrinkman())
     {
-      pi[dit].divide(m_dt);
+      for (DataIterator dit = pi.dataIterator(); dit.ok(); ++dit)
+      {
+        pi[dit].divide(m_dt);
+      }
     }
 
-    if (!solvingFullDarcyBrinkman())
+    if(m_opt.initialize_pressures)
     {
-      AMRLevelMushyLayer* lev = this->getCoarsestLevel();
-      initTimeIndependentPressure(lev);
+      if (solvingFullDarcyBrinkman())
+      {
+        initializeGlobalPressure(m_dt,
+                                 false); // not initialising, but restarting
+      }
+      else
+      {
+        AMRLevelMushyLayer* lev = this->getCoarsestLevel();
+        initTimeIndependentPressure(lev);
+      }
     }
 
 
