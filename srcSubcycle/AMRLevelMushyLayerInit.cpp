@@ -13,8 +13,7 @@ void AMRLevelMushyLayer::setDefaults()
   // else  Some conditional statements will depends on uninitialised value(s)
   m_newGrids_different = false;
   m_prev_diag_output = m_time;
-//  m_newLevel=false;
-//  m_opt.perturbationTime = 0.0;
+
 }
 
 
@@ -2860,8 +2859,8 @@ void AMRLevelMushyLayer::postInitialize()
 void AMRLevelMushyLayer::initTimeIndependentPressure(AMRLevelMushyLayer* lev)
 {
   Real maxDivU = 1e10;
-  int i = 1;
-  int maxNumIter = 20;
+  int i = 0;
+  int maxNumIter = m_opt.num_init_passes;
 
   while(maxDivU > 1e-10 && i < maxNumIter)
   {
@@ -2951,6 +2950,9 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   {
     pout() << "AMRLevelMushyLayer::initializeGlobalPressure (level " << m_level << ")" << endl;
   }
+
+  // This function is only for darcy-brinkman - throw an error if that's not the case
+  CH_assert(solvingFullDarcyBrinkman());
 
   setAdvVelCentering(m_opt.initAdvVelCentering);
 
@@ -3044,10 +3046,7 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
       thisMLPtr->initializeLevelPressure(cur_time, dtInit); // advance current new states by a small dt
 
       bool doLambdaReflux = true;
-      //      if (iter == s_num_init_passes-1)
-      //      {
-      //        doLambdaReflux = true;
-      //      }
+
 
       // Also advect lambda to see how this behaves
       thisMLPtr->advectLambda(doLambdaReflux);
@@ -3300,8 +3299,6 @@ void AMRLevelMushyLayer::createDataStructures()
         new LevelData<FArrayBox>(m_grids, 1, ivGhost));
     m_scalarOld[scalarVar] = RefCountedPtr<LevelData<FArrayBox> >(
         new LevelData<FArrayBox>(m_grids, 1, ivGhost));
-    //    m_dScalar[scalarVar] = RefCountedPtr<LevelData<FArrayBox> >(
-    //        new LevelData<FArrayBox>(m_grids, 1, ivGhost));
     m_scalarRestart[scalarVar] = RefCountedPtr<LevelData<FArrayBox> >(
         new LevelData<FArrayBox>(m_grids, 1, ivGhost));
   }
@@ -3545,8 +3542,7 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
 
   // Should also initialise pressure if we're restarting
 
-  if (a_restart
-      && m_opt.initialize_pressures)
+  if (a_restart)
   {
 
     // Get the pressure from the checkpoint file
@@ -3584,8 +3580,6 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
         initTimeIndependentPressure(lev);
       }
     }
-
-
 
     // Only do this on level 0 to ensure all other levels are setup
     if (m_level == 0)
