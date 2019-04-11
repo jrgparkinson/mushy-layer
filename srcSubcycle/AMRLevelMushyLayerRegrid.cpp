@@ -1320,8 +1320,14 @@ void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, Probl
   {
     m_vectorNew[vectorVar]->copyTo(vectInterval, *previousVect, vectInterval);
     m_vectorNew[vectorVar]->define(a_grids, SpaceDim, ivGhost); //reshape
-    //    previousVect->copyTo(vectInterval, *m_vectorNew[vectorVar], vectInterval); // copy back
-    vectorInterp.interpToFine(*m_vectorNew[vectorVar], *previousVect);
+    if (m_opt.regrid_linear_interp)
+    {
+      vectorInterp.interpToFine(*m_vectorNew[vectorVar], *previousVect);
+    }
+    else
+    {
+      vectorInterp.pwcinterpToFine(*m_vectorNew[vectorVar], *previousVect);
+    }
   }
 
   //  ProblemDomain oldDomain = m_problem_domain;
@@ -1335,6 +1341,18 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
   {
     pout() << "AMRLevelMushyLayer::postRegrid (level " << m_level << ")" << endl;
   }
+
+  // Check div(u)
+//  AMRLevelMushyLayer* thisLevelData = this;
+//  while (thisLevelData)
+//  {
+//    thisLevelData->calculateTimeIndAdvectionVel(m_time, thisLevelData->m_advVel);
+//    Divergence::levelDivergenceMAC(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv],thisLevelData->m_advVel, m_dx);
+//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], NULL, 1, thisLevelData->dx(), Interval(0,0));
+//    pout() << "PostRegrid(level " << thisLevelData->level() << ") -- max(div(u)) = " << maxDivU <<  endl;
+//
+//    thisLevelData = thisLevelData->getFinerLevel();
+//  }
 
   // If the new grids are no different to old grids, don't do anything
   // Need to check across all levels
