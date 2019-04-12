@@ -483,7 +483,8 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   {
     Real porosity_limit = 0.5;
     Real vel_limit = 0.5;
-    Real y_limit =  m_domainHeight - computeMushDepth();
+    Real porosity_criteria = 0.9; // how low the horizontally averaged porosity must be for us to decide we're in a mushy layer
+    Real y_limit =  m_domainHeight - computeMushDepth(porosity_criteria);
 
     DataIterator dit = m_grids.dataIterator();
     for (dit.begin(); dit.ok(); ++dit)
@@ -521,6 +522,12 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     localTags &= shiftedTags;
 
     localTags.grow(1, shift_dist);
+
+    // Grow further downwards
+    // Can only do this by shifting down then growing in both directions
+    int growLo = 4;
+    localTags.shift(IntVect(0, -growLo));
+    localTags.grow(1, growLo);
 
   }
   else if (m_opt.tag_plume_mush)
@@ -1500,7 +1507,8 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
         for (int lev = 0; lev < numLevels; lev++)
         {
-          initTimeIndependentPressure(thisLevelData);
+          int num_passes = 1;
+          initTimeIndependentPressure(thisLevelData, num_passes);
           thisLevelData = thisLevelData->getFinerLevel();
         }
 

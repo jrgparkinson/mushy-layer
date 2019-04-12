@@ -546,7 +546,11 @@ protected:
   Real averageOverLiquidRegion(int a_var);
 
   /// Compute mushy layer depth
-  Real computeMushDepth();
+  /**
+   * Compute horizontally averaged porosity, then determine that the mushy layer starts
+   * at the minimum height where the porosity is < a_porosity_criteria.
+   */
+  Real computeMushDepth(Real a_porosity_criteria = 0.99);
 
   /// Calculate advective + diffusive flux
   void getTotalFlux(LevelData<FluxBox>& totalFlux);

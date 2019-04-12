@@ -3075,7 +3075,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
 }
 
-Real AMRLevelMushyLayer::computeMushDepth()
+Real AMRLevelMushyLayer::computeMushDepth(Real a_porosity_criteria)
 {
   Vector<Real> averagedPorosity;
   horizontallyAverage(averagedPorosity, *m_scalarNew[ScalarVars::m_porosity]);
@@ -3085,7 +3085,7 @@ Real AMRLevelMushyLayer::computeMushDepth()
   for (int i = 0; i < averagedPorosity.size() ; i++)
   {
     depth_i++;
-    if (averagedPorosity[i] < 0.999)
+    if (averagedPorosity[i] < a_porosity_criteria)
     {
       depth = (averagedPorosity.size()-depth_i)*m_dx;
       break;
