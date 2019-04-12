@@ -614,6 +614,49 @@ public:
                 diriVal = m_customHiBCVal[idir][comp];
               }
 
+              if (bcType == PhysBCUtil::FixedTemperature)
+              {
+                CH_assert(a_state.nComp() == 2);
+                // This is a special case
+
+                // Need to compute bcVals = porosity*stefan + fixed temperature on this side
+//                FArrayBox bcVals(a_state.box(), 1);
+//                computePorosity(bcVals, a_state, m_params);
+
+                CH_TIME("BCFunctions::FixedTempBC");
+                  int isign = sign(side);
+
+                  Box toRegion = adjCellBox(a_valid, idir, side, 1);
+                  toRegion &= a_state.box();
+
+                  for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+                  {
+                    IntVect ivto = bit();
+                    IntVect iv_interior = ivto - isign*BASISV(idir);
+
+                    // Assume first order BCs
+                    // Assume a_state contains enthalpy and bulk concentration components
+                    Real enthalpy = a_state(iv_interior, 0);
+                    Real bulk_concentration = a_state(iv_interior, 1);
+                    Real bcVal = m_params.computePorosity(enthalpy, bulk_concentration)*m_params.stefan + diriVal;
+
+                    if (a_homogeneous)
+                    {
+                      bcVal = 0;
+                    }
+
+                    a_state(ivto, comp) = 2*bcVal - a_state(iv_interior, comp);
+
+                  }
+
+
+
+
+
+              }
+              else
+              {
+
               applyCorrectScalarBC(a_state,
                                    m_advVel,
                                    a_valid,
@@ -629,6 +672,8 @@ public:
                                    m_params.plumeBounds,
                                    m_dx,
                                    comp);
+
+              }
 
 
 
