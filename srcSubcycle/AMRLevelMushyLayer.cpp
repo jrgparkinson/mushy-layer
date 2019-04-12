@@ -961,11 +961,19 @@ void AMRLevelMushyLayer::updateEnthalpyVariables()
 
   CH_TIME("AMRLevelMushyLayer::updateEnthalpyVariables");
 
-  // Apply BCs
-  fillScalars(*m_scalarNew[ScalarVars::m_bulkConcentration], m_time, ScalarVars::m_bulkConcentration);
-  fillScalars(*m_scalarNew[ScalarVars::m_enthalpy], m_time, m_enthalpy);
+  // Apply BCs?
+//  fillScalars(*m_scalarNew[ScalarVars::m_bulkConcentration], m_time, ScalarVars::m_bulkConcentration);
+//  fillScalars(*m_scalarNew[ScalarVars::m_enthalpy], m_time, m_enthalpy);
 
-  ::updateEnthalpyVariables(*m_scalarNew[ScalarVars::m_enthalpy], *m_scalarNew[ScalarVars::m_bulkConcentration],
+  LevelData<FArrayBox> HC(m_grids, 2, IntVect::Unit);
+  fillHC(HC, m_time);
+
+//  ::updateEnthalpyVariables(*m_scalarNew[ScalarVars::m_enthalpy], *m_scalarNew[ScalarVars::m_bulkConcentration],
+//                            *m_scalarNew[ScalarVars::m_temperature], *m_scalarNew[ScalarVars::m_liquidConcentration], *m_scalarNew[ScalarVars::m_solidConcentration],
+//                            *m_scalarNew[ScalarVars::m_porosity],
+//                            *m_scalarNew[ScalarVars::m_enthalpySolidus],*m_scalarNew[ScalarVars::m_enthalpyLiquidus],*m_scalarNew[ScalarVars::m_enthalpyEutectic],
+//                            m_parameters);
+  ::updateEnthalpyVariables(HC,
                             *m_scalarNew[ScalarVars::m_temperature], *m_scalarNew[ScalarVars::m_liquidConcentration], *m_scalarNew[ScalarVars::m_solidConcentration],
                             *m_scalarNew[ScalarVars::m_porosity],
                             *m_scalarNew[ScalarVars::m_enthalpySolidus],*m_scalarNew[ScalarVars::m_enthalpyLiquidus],*m_scalarNew[ScalarVars::m_enthalpyEutectic],
@@ -1851,7 +1859,8 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     residual = baseLevBE->finalResidual();
     int num_iter =  baseLevBE->numMGiterations();
 
-    pout() << "  HC solve finished with exit status " << exitStatus << ", solver residual = " << residual << ", num MG iterations = " << num_iter << endl;
+    //           MAC Projection (level
+    pout() << "  HC solve       (level " << m_level << "): exit status " << exitStatus << ", solver residual = " << residual << ", num MG iterations = " << num_iter << endl;
 
   }
 #endif
@@ -4347,15 +4356,19 @@ void AMRLevelMushyLayer::getScalarBCs(BCHolder& thisBC, int a_var, bool a_homoge
   }
   else if(a_var == ScalarVars::m_enthalpySolidus)
   {
-    thisBC = m_physBCPtr->BasicSolidusBC(a_homogeneous, &m_totalAdvVel);
+//    thisBC = m_physBCPtr->BasicSolidusBC(a_homogeneous, &m_totalAdvVel);
+    thisBC = m_physBCPtr->noFluxBC();
   }
   else if(a_var == ScalarVars::m_enthalpyEutectic)
   {
-    thisBC = m_physBCPtr->BasicEutecticBC(a_homogeneous, &m_totalAdvVel);
+//    thisBC = m_physBCPtr->BasicEutecticBC(a_homogeneous, &m_totalAdvVel);
+    thisBC = m_physBCPtr->noFluxBC();
   }
   else if(a_var == ScalarVars::m_enthalpyLiquidus)
   {
-    thisBC = m_physBCPtr->BasicLiquidusBC(a_homogeneous, &m_totalAdvVel);
+//    thisBC = m_physBCPtr->BasicLiquidusBC(a_homogeneous, &m_totalAdvVel);
+//    thisBC = m_physBCPtr->extrapFuncBC();
+    thisBC = m_physBCPtr->noFluxBC();
   }
   else if (a_var == ScalarVars::m_porosity)
   {

@@ -753,7 +753,7 @@ protected:
 
   /// Should include correct exchange calls
   void fillMultiComp(LevelData<FArrayBox>& a_phi, Real a_time, int scal1, int scal2,
-                     bool doInterior = true, bool quadInterp = true);
+                     bool doInterior = true, bool quadInterp = true, bool apply_bcs=true);
 
   /// Compile \f$ \lambda \f$ across the entire AMR hierarchy
   void fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda);
@@ -791,7 +791,10 @@ protected:
   void computeInitAdvectionVel();
 
   /// Initialise phi (pressure for Darcy equation)
-  void initTimeIndependentPressure(AMRLevelMushyLayer* lev);
+  /**
+   * By default a_max_num_iter = -1, meaning we use the globally defined value in m_opt.num_init_passes
+   */
+  void initTimeIndependentPressure(AMRLevelMushyLayer* lev, int a_max_num_iter=-1);
 
   /// Flag if a new level has been added
 //  bool newLevelAdded();
@@ -835,7 +838,7 @@ protected:
   /// Fill ghost cells of scalar field
   void fillScalars(LevelData<FArrayBox>& a_scal,
                    Real a_time, const int a_var,
-                   bool doInterior = false, bool quadInterp = false);
+                   bool doInterior = false, bool quadInterp = false, int a_comp=0, bool apply_bcs=true);
 
   /// Helper function
   void fillBuoyancy(LevelData<FArrayBox>& a_buoyancy, Real a_time, bool quadInterp);
@@ -895,16 +898,16 @@ protected:
    * Liquid concentration \f$ -1 <= \Theta_l <= 0 \f$
    */
   void doRegularisationOps(LevelData<FArrayBox>& a_scal,
-                           int a_var);
+                           int a_var, int a_comp = 0);
 
   /// Operations to keep variables bounded correctly.
-  void doRegularisationOps(LevelData<FluxBox>& a_scal, int a_var);
+  void doRegularisationOps(LevelData<FluxBox>& a_scal, int a_var, int a_comp=0);
 
   /// Operations to keep variables bounded correctly.
-  void doRegularisationOps(int a_var, FArrayBox& a_state);
+  void doRegularisationOps(int a_var, FArrayBox& a_state, int a_comp=0);
 
   /// New version of doRegularisationOps() which uses fortran routines
-  void doRegularisationOpsNew(int a_var, FArrayBox& a_state);
+  void doRegularisationOpsNew(int a_var, FArrayBox& a_state, int a_comp=0);
 
   /// Reset all flux registers
   void setFluxRegistersZero();

@@ -849,8 +849,8 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, IntVect::Zero));
     //    porosity[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
 
-    enthalpy[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-    bulkConcentration[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+//    enthalpy[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+//    bulkConcentration[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
 
     enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
     enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
@@ -2857,11 +2857,17 @@ void AMRLevelMushyLayer::postInitialize()
 
 }
 
-void AMRLevelMushyLayer::initTimeIndependentPressure(AMRLevelMushyLayer* lev)
+void AMRLevelMushyLayer::initTimeIndependentPressure(AMRLevelMushyLayer* lev, int a_max_num_iter)
 {
   Real maxDivU = 1e10;
   int i = 0;
   int maxNumIter = m_opt.num_init_passes;
+
+  // Possible for the argument to override the default number of passes
+  if (a_max_num_iter >= 0)
+  {
+    maxNumIter = a_max_num_iter;
+  }
 
   while(maxDivU > 1e-10 && i < maxNumIter)
   {
@@ -2869,7 +2875,7 @@ void AMRLevelMushyLayer::initTimeIndependentPressure(AMRLevelMushyLayer* lev)
 
     Divergence::levelDivergenceMAC(*lev->m_scalarNew[ScalarVars::m_divUadv], lev->m_advVel, m_dx);
     maxDivU = ::computeNorm(*lev->m_scalarNew[ScalarVars::m_divUadv], NULL, 1, lev->m_dx, Interval(0,0), 0);
-    pout() << "Pressure init " << i << ", max(div U) = " << maxDivU << endl;
+    pout() << "  Pressure init " << i << ", max(div U) = " << maxDivU << endl;
 
     i = i + 1;
   }
@@ -3651,7 +3657,9 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
       diagsToPrint.push_back(DiagnosticNames::diag_L0FsVertFrame);
       diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxTop);
       diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxBottom);
-      diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxSponge);
+      diagsToPrint.push_back(DiagnosticNames::diag_saltFluxAbsMismatch);
+      diagsToPrint.push_back(DiagnosticNames::diag_heatFluxAbsMismatch);
+//      diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxSponge);
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxBottom);
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxTop);
       diagsToPrint.push_back(DiagnosticNames::diag_dUdt);
