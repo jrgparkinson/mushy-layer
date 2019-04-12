@@ -873,14 +873,13 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
 
       amrML->fillScalarFace(*porosityFace[lev], a_time, ScalarVars::m_porosity, true, secondOrder);
 
-      //      amrML->fillScalars(*porosity[lev], m_time-m_dt/2, m_porosity, true, secondOrder);
-
-      amrML->fillScalars(*enthalpy[lev], a_time, ScalarVars::m_enthalpy, true , secondOrder);
-      amrML->fillScalars(*bulkConcentration[lev], a_time, ScalarVars::m_bulkConcentration, true, secondOrder);
+//      amrML->fillScalars(*enthalpy[lev], a_time, ScalarVars::m_enthalpy, true , secondOrder);
+//      amrML->fillScalars(*bulkConcentration[lev], a_time, ScalarVars::m_bulkConcentration, true, secondOrder);
 
       amrML->fillScalars(*enthalpySolidus[lev],a_time, ScalarVars::m_enthalpySolidus, true, secondOrder);
       amrML->fillScalars(*enthalpyLiquidus[lev], a_time, ScalarVars::m_enthalpyLiquidus, true, secondOrder);
       amrML->fillScalars(*enthalpyEutectic[lev],a_time, ScalarVars::m_enthalpyEutectic, true ,secondOrder);
+
     }
 
     amrML = amrML->getFinerLevel();
@@ -946,6 +945,8 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
   BCHolder temperature_Sl_BC; // = m_physBCPtr->BasicthetaFuncBC();
   temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC();
   BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC();
+
+
 
   AMRNonLinearMultiCompOpFactory* HCop = new AMRNonLinearMultiCompOpFactory();
   HCop->define(lev0Dom, grids, refRat, lev0Dx, HC_BC,

@@ -879,7 +879,6 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
   solver.solve(amrPsi, amrVorticity, m_level,
                m_level, false); // don't initialize to zero
 
-
 }
 
 void AMRLevelMushyLayer::computeVorticity()
