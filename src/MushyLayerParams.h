@@ -704,6 +704,9 @@ public:
 	/// Returns a string indicating the velocity scale used for nondimensionalisation
 	string getVelocityScale() const;
 
+	/// Utility function to compute porosity given a single enthalpy/bulk concentration value
+	Real computePorosity(Real H, Real C);
+
 	/// Returns a string indicating the time scale used for nondimensionalisation
 	string getTimescale() const;
 

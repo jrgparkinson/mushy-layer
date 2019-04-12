@@ -1077,6 +1077,18 @@ string MushyLayerParams::getTimescale() const
 
 }
 
+// Utility function
+Real MushyLayerParams::computePorosity(Real H, Real C)
+{
+  CH_TIME("MushyLayerParams::computePorosity");
+
+  Real porosity = ::computePorosity(H, C, compositionRatio,  specificHeatRatio,
+                                  stefan,  waterDistributionCoeff,  specificHeatRatio,
+                                  thetaEutectic,  ThetaEutectic);
+
+  return porosity;
+}
+
 string MushyLayerParams::getVelocityScale() const
 {
   switch (m_nondimensionalisation)
