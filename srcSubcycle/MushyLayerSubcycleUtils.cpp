@@ -618,6 +618,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.nonlinearHCOpSuperOptimised = false;
   ppMain.query("nonlinearHCOpSuperOptimised", opt.nonlinearHCOpSuperOptimised);
 
+  opt.apply_diagnostic_bcs = true;
+  ppMain.query("apply_diagnostic_bcs", opt.apply_diagnostic_bcs);
+
 //  opt.smoothingCoeff = 0.0; //0.01;
 //  ppProjection.query("pre_smoothing", opt.smoothingCoeff);
 

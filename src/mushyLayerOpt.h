@@ -505,6 +505,12 @@ struct MushyLayerOptions {
    */
   bool nonlinearHCOpSuperOptimised;
 
+  /// Whether to apply BCs to temperature, porosity etc. explicitly during multigrid solves
+  /**
+   * If false, use BC comptued from enthalpy/bulk concentration
+   */
+  bool apply_diagnostic_bcs;
+
   /// Whether or not to do subcycling
   bool useSubcycling;
 

@@ -952,7 +952,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
                alpha, aCoef, beta, bCoef,
                enthalpySolidus, enthalpyLiquidus, enthalpyEutectic,
                mlParamsPtr, temperature_Sl_BC,
-               m_opt.HCMultigridRelaxMode, porosityEdgeBC);
+               m_opt.HCMultigridRelaxMode, porosityEdgeBC, m_opt.apply_diagnostic_bcs);
 
   if (m_opt.nonlinearHCOpSuperOptimised)
   {
