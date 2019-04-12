@@ -302,7 +302,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     Divergence::levelDivergenceMAC(*m_scalarNew[ScalarVars::m_divUadv], a_advVel, m_dx);
     maxDivU = ::computeNorm(*m_scalarNew[ScalarVars::m_divUadv], NULL, 1, m_dx, Interval(0,0), 0);
     Real minPressure = ::computeMin(m_projection.phi(), NULL, 1, Interval(0,0));
-    pout() << "  MAC Projection (level "<< m_level << "), exit status = " << exitStatus
+    pout() << "  MAC Projection (level "<< m_level << "): exit status = " << exitStatus
         << ", max(div u) = " << maxDivU << ", min pressure = " << minPressure << endl;
 
 
