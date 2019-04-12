@@ -414,7 +414,7 @@ public:
               BCHolder  a_derivedVarBC,
               int a_relaxMode,
               EdgeVelBCHolder a_porosityEdgeBC,
-              bool a_apply_bcs_to_diagnostic_var=true);
+              bool a_apply_bcs_to_diagnostic_var = true);
 
 
   /// New MGLevelOp

@@ -4106,7 +4106,7 @@ void AMRLevelMushyLayer::smoothScalarField(LevelData<FArrayBox>& a_phi, int a_va
 
 }
 
-void AMRLevelMushyLayer::doRegularisationOps(LevelData<FluxBox>& a_scal, int a_var)
+void AMRLevelMushyLayer::doRegularisationOps(LevelData<FluxBox>& a_scal, int a_var, int a_comp)
 {
   if (a_var == m_porosity || a_var == m_permeability || a_var == m_bulkConcentration)
   {
@@ -4120,11 +4120,11 @@ void AMRLevelMushyLayer::doRegularisationOps(LevelData<FluxBox>& a_scal, int a_v
       {
         if (m_opt.useFortranRegularisationFace)
         {
-          doRegularisationOpsNew(a_var, a_scal[dit2][dir]);
+          doRegularisationOpsNew(a_var, a_scal[dit2][dir], a_comp);
         }
         else
         {
-          doRegularisationOps(a_var, a_scal[dit2][dir]);
+          doRegularisationOps(a_var, a_scal[dit2][dir], a_comp);
         }
       }
     }
@@ -4132,7 +4132,7 @@ void AMRLevelMushyLayer::doRegularisationOps(LevelData<FluxBox>& a_scal, int a_v
 
 }
 
-void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
+void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state, int a_comp)
 {
   CH_TIME("AMRLevelMushyLayer::doRegularisationOpsOld");
 
@@ -4144,8 +4144,8 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
     for (BoxIterator bit(b); bit.ok(); ++bit)
     {
       IntVect iv = bit();
-      a_state(iv) = max(m_opt.lowerPorosityLimit, a_state(iv));
-      a_state(iv) = min(1.0, a_state(iv));
+      a_state(iv, a_comp) = max(m_opt.lowerPorosityLimit, a_state(iv));
+      a_state(iv, a_comp) = min(1.0, a_state(iv));
     }
 
   }
@@ -4158,7 +4158,7 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
     {
       IntVect iv = bit();
 
-      a_state(iv) = max(minPermeability, a_state(iv));
+      a_state(iv,a_comp) = max(minPermeability, a_state(iv));
     }
 
   }
@@ -4176,8 +4176,8 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
     {
       IntVect iv = bit();
 
-      a_state(iv) = max(minVal, a_state(iv));
-      a_state(iv) = min(maxVal, a_state(iv));
+      a_state(iv, a_comp) = max(minVal, a_state(iv));
+      a_state(iv, a_comp) = min(maxVal, a_state(iv));
     }
 
 
@@ -4186,7 +4186,7 @@ void AMRLevelMushyLayer::doRegularisationOps(int a_var, FArrayBox& a_state)
 
 }
 
-void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
+void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state, int a_comp)
 {
   CH_TIME("AMRLevelMushyLayer::doRegularisationOpsNew");
   Box region = a_state.box();
@@ -4200,7 +4200,8 @@ void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
     FORT_SETMINMAXVAL( CHF_FRA(a_state),
                        CHF_BOX(region),
                        CHF_CONST_REAL(minVal),
-                       CHF_CONST_REAL(maxVal));
+                       CHF_CONST_REAL(maxVal),
+                       CHF_INT(a_comp));
   }
   else if (a_var == ScalarVars::m_permeability)
   {
@@ -4209,7 +4210,8 @@ void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
 
     FORT_SETMINVAL( CHF_FRA(a_state),
                     CHF_BOX(region),
-                    CHF_CONST_REAL(minPermeability));
+                    CHF_CONST_REAL(minPermeability),
+                    CHF_INT(a_comp));
 
   }
   else if (a_var == ScalarVars::m_bulkConcentration)
@@ -4222,7 +4224,8 @@ void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
     FORT_SETMINMAXVAL( CHF_FRA(a_state),
                        CHF_BOX(region),
                        CHF_CONST_REAL(minVal),
-                       CHF_CONST_REAL(maxVal));
+                       CHF_CONST_REAL(maxVal),
+                       CHF_INT(a_comp));
 
   }
 
@@ -4230,7 +4233,8 @@ void AMRLevelMushyLayer::doRegularisationOpsNew(int a_var, FArrayBox& a_state)
 }
 
 void AMRLevelMushyLayer::doRegularisationOps(LevelData<FArrayBox>& a_scal,
-                                             int a_var)
+                                             int a_var,
+                                             int a_comp)
 {
   CH_TIME("AMRLevelMushyLayer::doRegularisationOps");
   DataIterator dit2 = a_scal.dataIterator();
@@ -4240,11 +4244,11 @@ void AMRLevelMushyLayer::doRegularisationOps(LevelData<FArrayBox>& a_scal,
 
     if (m_opt.useFortranRegularisation)
     {
-      doRegularisationOpsNew(a_var, a_scal[dit2]);
+      doRegularisationOpsNew(a_var, a_scal[dit2], a_comp);
     }
     else
     {
-      doRegularisationOps(a_var, a_scal[dit2]);
+      doRegularisationOps(a_var, a_scal[dit2], a_comp);
     }
 
   }
