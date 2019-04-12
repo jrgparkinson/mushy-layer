@@ -80,7 +80,13 @@ public:
 	  /**
 	   * Flux which varies along the boundary
 	   */
-	  VariableFlux
+	  VariableFlux,
+	  /// Fixed temperature
+	  /**
+	   * This is a special case for the heat equation, where we apply BCs to enthalpy
+	   * and need to compute the boundary from the interior porosity and specified temperature
+	   */
+	  FixedTemperature
 	};
 
 	/// Physical parameters for the system
