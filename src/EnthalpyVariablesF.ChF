@@ -647,7 +647,13 @@ C     -----------------------------------------------------------------
       Ccomp = 1
       
       CHF_MULTIDO[region; i; j; k]
-        H_s(CHF_IX[i;j;k],0) = specificHeatRatio*((-HC(CHF_IX[i;j;k],Ccomp)-compositionRatio)/waterDistributionCoeff);
+C       Bulk concentration should never physically be less than -composition ratio, but ghost cells might end up like this - stop this messing up the algorithm
+C        print *, "C: ", HC(CHF_IX[i;j;k],Ccomp), " "
+        if (HC(CHF_IX[i;j;k],Ccomp) .lt. -compositionRatio) then
+          H_s(CHF_IX[i;j;k],0) = 0.0
+        else
+          H_s(CHF_IX[i;j;k],0) = specificHeatRatio*((-HC(CHF_IX[i;j;k],Ccomp)-compositionRatio)/waterDistributionCoeff);
+        endif
         
         if (H_s(CHF_IX[i;j;k],0) .lt. 0.0) then
           H_s(CHF_IX[i;j;k],0) = 0.0
