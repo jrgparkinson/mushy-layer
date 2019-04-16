@@ -237,6 +237,36 @@ void computeEnthalpyVars(const Real H, const Real C, Real& porosity, Real& theta
   }
 }
 
+Real computeTemperature(Real H, Real C, Real compositionRatio, Real specificHeatRatio,
+                               Real stefan, Real waterDistributionCoeff, Real heatCapacityRatio,
+                               Real thetaEutectic, Real ThetaEutectic)
+{
+  Real H_e, H_s, H_l, theta;
+
+  ::computeBoundingEnergy(H, C, H_s, H_l, H_e, heatCapacityRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+
+  if (H <= H_s)
+  {
+    theta = H/specificHeatRatio;
+  }
+  else if (H > H_s && H <= H_e)
+  {
+    theta = thetaEutectic;
+  }
+  else if (H > H_e && H < H_l)
+  {
+    Real porosity = computePorosityMushyLayer( H,  C,  compositionRatio,  specificHeatRatio,
+                                               stefan,  waterDistributionCoeff);
+    theta = - (C + compositionRatio*(1-porosity)) / (porosity + waterDistributionCoeff*(1-porosity));
+  }
+  else
+  {
+    theta = H - stefan;
+  }
+
+  return theta;
+
+}
 
 Real computePorosity(Real H, Real C, Real compositionRatio, Real specificHeatRatio,
                                Real stefan, Real waterDistributionCoeff, Real heatCapacityRatio,
@@ -259,11 +289,8 @@ Real computePorosity(Real H, Real C, Real compositionRatio, Real specificHeatRat
   else if (H > H_e && H < H_l)
   {
 
-
     porosity = computePorosityMushyLayer( H,  C,  compositionRatio,  specificHeatRatio,
                                           stefan,  waterDistributionCoeff);
-
-
 
   }
   else

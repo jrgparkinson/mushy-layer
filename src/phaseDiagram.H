@@ -59,6 +59,10 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& enthalpy, LevelData<FArrayBox
 Real computePorosity(Real H, Real C, Real compositionRatio, Real specificHeatRatio,
                                Real stefan, Real waterDistributionCoeff, Real heatCapacityRatio,
                                Real thetaEutectic, Real ThetaEutectic);
+/// Compute the temperature \f$ \theta \f$ given enthalpy, bulk concentration, and physical parameters
+Real computeTemperature(Real H, Real C, Real compositionRatio, Real specificHeatRatio,
+                               Real stefan, Real waterDistributionCoeff, Real heatCapacityRatio,
+                               Real thetaEutectic, Real ThetaEutectic);
 
 /// Compute the porosity \f$ \chi\f$ within a mushy layer
 Real computePorosityMushyLayer(Real H, Real a_C, Real compositionRatio, Real specificHeatRatio,
