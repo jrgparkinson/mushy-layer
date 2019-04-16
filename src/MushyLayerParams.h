@@ -707,6 +707,15 @@ public:
 	/// Utility function to compute porosity given a single enthalpy/bulk concentration value
 	Real computePorosity(Real H, Real C);
 
+	Real compute_dHdT(Real H, Real C);
+
+	/// Utility function to compute temperature given a single enthalpy/bulk concentration value
+	Real computeTemperature(Real H, Real C);
+
+	/// Compute everything from enthalpy and bulk concentration
+	//todo - implement
+	void computeDiagnosticVars(Real H, Real C, Real T, Real porosity, Real Cl, Real Cs);
+
 	/// Returns a string indicating the time scale used for nondimensionalisation
 	string getTimescale() const;
 

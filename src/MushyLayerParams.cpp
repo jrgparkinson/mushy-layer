@@ -1089,6 +1089,61 @@ Real MushyLayerParams::computePorosity(Real H, Real C)
   return porosity;
 }
 
+Real MushyLayerParams::compute_dHdT(Real H, Real C)
+{
+  Real H_e, H_s, H_l, dHdT;
+
+  ::computeBoundingEnergy(H_e, C, H_s, H_l, H_e, specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+
+  if (H <= H_s)
+    {
+      dHdT = 1/specificHeatRatio;
+    }
+    else if (H > H_s && H <= H_e)
+    {
+      dHdT = 0;
+    }
+    else if (H > H_e && H < H_l)
+    {
+      Real porosity = computePorosityMushyLayer( H,  C,  compositionRatio,  specificHeatRatio,
+                                                 stefan,  waterDistributionCoeff);
+//      theta = - (C + compositionRatio*(1-porosity)) / (porosity + waterDistributionCoeff*(1-porosity));
+      Real A = compositionRatio*(specificHeatRatio-1) - stefan;
+      Real B = H + compositionRatio*(1-2*specificHeatRatio) - C*(specificHeatRatio-1);
+      Real Cc = specificHeatRatio*(compositionRatio + C);
+
+
+      dHdT = pow(porosity,2) * (C+compositionRatio)*(-2*A)/(1 + B/sqrt(pow(B,2) - 4*A*Cc));
+    }
+    else
+    {
+      dHdT = 1;
+    }
+
+  return dHdT;
+
+}
+
+Real MushyLayerParams::computeTemperature(Real H, Real C)
+{
+  CH_TIME("MushyLayerParams::computeTemperature");
+
+  Real temperature = ::computeTemperature(H, C, compositionRatio,  specificHeatRatio,
+                                  stefan,  waterDistributionCoeff,  specificHeatRatio,
+                                  thetaEutectic,  ThetaEutectic);
+
+  return temperature;
+}
+
+void MushyLayerParams::computeDiagnosticVars(Real H, Real C, Real T, Real porosity, Real Cl, Real Cs)
+{
+  Real H_s, H_l, H_e;
+  ::computeBoundingEnergy(H, C, H_s, H_l, H_e,
+                          specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+  ::computeEnthalpyVars(H, C, porosity, T, Cl, Cs, H_s, H_l, H_e,
+                        specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+}
+
 string MushyLayerParams::getVelocityScale() const
 {
   switch (m_nondimensionalisation)
