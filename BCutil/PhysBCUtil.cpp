@@ -372,61 +372,61 @@ public:
   }
 
   /// Apply dirichlet BCs (edge centred), allow different value at different locations
-   void DiriEdgeVariableBC(FArrayBox&           a_state,
-                   const Box&           a_valid,
-                   Real                 a_dx,
-                   bool                 a_homogeneous,
-                   BCValueHolder        a_value,
-                   int                  a_idir,
-                   Side::LoHiSide       a_side)
-   {
+  void DiriEdgeVariableBC(FArrayBox&           a_state,
+                          const Box&           a_valid,
+                          Real                 a_dx,
+                          bool                 a_homogeneous,
+                          BCValueHolder        a_value,
+                          int                  a_idir,
+                          Side::LoHiSide       a_side)
+  {
 
-     // a_state is FACE-centered on face idir;
-     // a_valid is CELL-centered.
-     Interval a_interval = a_state.interval();
-     Box toRegion(a_valid);
-     toRegion.surroundingNodes(a_idir);
-     int coord = toRegion.sideEnd(a_side)[a_idir];
-     toRegion.setRange(a_idir, coord);
+    // a_state is FACE-centered on face idir;
+    // a_valid is CELL-centered.
+    Interval a_interval = a_state.interval();
+    Box toRegion(a_valid);
+    toRegion.surroundingNodes(a_idir);
+    int coord = toRegion.sideEnd(a_side)[a_idir];
+    toRegion.setRange(a_idir, coord);
 
-     int isign = sign(a_side);
-     RealVect facePos;
+    int isign = sign(a_side);
+    RealVect facePos;
 
-     toRegion &= a_state.box();
+    toRegion &= a_state.box();
 
-     Box fromRegion = toRegion;
-     fromRegion.shift(a_idir, -isign);
+    Box fromRegion = toRegion;
+    fromRegion.shift(a_idir, -isign);
 
-     a_state.copy(a_state, fromRegion, 0, toRegion, 0, a_state.nComp());
+    a_state.copy(a_state, fromRegion, 0, toRegion, 0, a_state.nComp());
 
-     if (!a_homogeneous)
-     {
-       Real* value = new Real[a_state.nComp()];
+    if (!a_homogeneous)
+    {
+      Real* value = new Real[a_state.nComp()];
 
-       for (BoxIterator bit(toRegion); bit.ok(); ++bit)
-       {
-         const IntVect& ivTo = bit();
-         IntVect ivClose = ivTo - isign*BASISV(a_idir);
-         IntVect ivFar = ivTo - 2*isign*BASISV(a_idir);
-
-
-         getDomainFacePosition(facePos, ivClose, a_dx, a_idir, a_side);
-
-         a_value(facePos.dataPtr(), &a_idir, &a_side, value);
-         for (int icomp = a_interval.begin(); icomp <= a_interval.end(); icomp++)
-         {
-
-           //Enforce the exact value on the boundary face
-           a_state(ivTo, icomp) = value[icomp];
-
-         }
-       }
-
-       delete[] value;
-     }
+      for (BoxIterator bit(toRegion); bit.ok(); ++bit)
+      {
+        const IntVect& ivTo = bit();
+        IntVect ivClose = ivTo - isign*BASISV(a_idir);
+        IntVect ivFar = ivTo - 2*isign*BASISV(a_idir);
 
 
-   }
+        getDomainFacePosition(facePos, ivClose, a_dx, a_idir, a_side);
+
+        a_value(facePos.dataPtr(), &a_idir, &a_side, value);
+        for (int icomp = a_interval.begin(); icomp <= a_interval.end(); icomp++)
+        {
+
+          //Enforce the exact value on the boundary face
+          a_state(ivTo, icomp) = value[icomp];
+
+        }
+      }
+
+      delete[] value;
+    }
+
+
+  }
 
   /// Apply neumann BCs (edge centred)
   virtual void NeumEdgeBC(FArrayBox&      a_state,
@@ -579,7 +579,7 @@ public:
             //Iterate over components
             for (int comp = m_interval.begin(); comp <= m_interval.end(); comp++)
             {
-              Real diriVal;
+              Real boundaryValue;
 
 
               int bcType;
@@ -596,7 +596,7 @@ public:
                   bcType = m_params.bcTypeScalarLo[idir] ;
                 }
 
-                diriVal = m_customLoBCVal[idir][comp];
+                boundaryValue = m_customLoBCVal[idir][comp];
 
               }
               else
@@ -611,67 +611,162 @@ public:
                   bcType = m_params.bcTypeScalarHi[idir];
                 }
 
-                diriVal = m_customHiBCVal[idir][comp];
+                boundaryValue = m_customHiBCVal[idir][comp];
               }
 
-              if (bcType == PhysBCUtil::FixedTemperature)
+              if (bcType == PhysBCUtil::FixedTemperature || bcType == PhysBCUtil::TemperatureFlux)
               {
                 CH_assert(a_state.nComp() == 2);
                 // This is a special case
 
-                // Need to compute bcVals = porosity*stefan + fixed temperature on this side
-//                FArrayBox bcVals(a_state.box(), 1);
-//                computePorosity(bcVals, a_state, m_params);
+                int Hcomp = 0;
+                int Ccomp = 1;
+
 
                 CH_TIME("BCFunctions::FixedTempBC");
-                  int isign = sign(side);
+                int isign = sign(side);
 
-                  Box toRegion = adjCellBox(a_valid, idir, side, 1);
-                  toRegion &= a_state.box();
+                Box toRegion = adjCellBox(a_valid, idir, side, 1);
+                toRegion &= a_state.box();
 
-                  for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+                for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+                {
+                  IntVect ivto = bit();
+                  IntVect iv_interior = ivto - isign*BASISV(idir);
+
+                  // Assume first order BCs
+                  // Assume a_state contains enthalpy and bulk concentration components
+                  Real enthalpy = a_state(iv_interior, Hcomp);
+                  Real bulk_concentration = a_state(iv_interior, Ccomp);
+                  Real porosity =  m_params.computePorosity(enthalpy, bulk_concentration);
+
+                  // Compute temperature on the boundary
+                  Real boundary_temperature_value;
+                  Real bcVal;
+                  if (bcType == PhysBCUtil::FixedTemperature)
                   {
-                    IntVect ivto = bit();
-                    IntVect iv_interior = ivto - isign*BASISV(idir);
+                    boundary_temperature_value = boundaryValue;
+                    if (comp == Hcomp)
+                    {
+                      bcVal = porosity*m_params.stefan + boundary_temperature_value;
+                    }
+                    else
+                    {
+                      // This is only true in a mushy layer!!
+                      // need to think a bit more carefully about what the bulk concentration boundary condition
+                      // should be given a fixed temperature/temperature flux
+                      MayDay::Error("Can't apply temperature bcs to bulk concentration yet");
+                      bcVal = porosity*boundary_temperature_value + m_params.compositionRatio*(1-porosity);
+                    }
 
-                    // Assume first order BCs
-                    // Assume a_state contains enthalpy and bulk concentration components
-                    Real enthalpy = a_state(iv_interior, 0);
-                    Real bulk_concentration = a_state(iv_interior, 1);
-                    Real bcVal = m_params.computePorosity(enthalpy, bulk_concentration)*m_params.stefan + diriVal;
-
+                    // enforce dirichlet condition
                     if (a_homogeneous)
                     {
                       bcVal = 0;
                     }
 
+                    // Set boundary value as required
+                    // This could be more accurate for flux BCs, maybe fix later
                     a_state(ivto, comp) = 2*bcVal - a_state(iv_interior, comp);
 
+
                   }
+                  else if (bcType == PhysBCUtil::TemperatureFlux)
+                  {
+                    if (comp == Hcomp)
+                    {
+                      //todo: give this some more thought for dealing with the transition across the eutectic
+                      // might need to some picard iterations in here
+                      //                        bcVal = enthalpy + (m_dx/2)*boundaryValue*m_params.compute_dHdT(enthalpy, bulk_concentration);
+
+                      Real z = m_dx*(iv_interior[1] + 0.5);
+                      if (z < 0.75 || a_homogeneous)
+                      {
+                        // no flux below z = some value (0.75) for now
+//                        bcVal = 0.0;
+
+                        // No flux boundaries are easy:
+                        a_state(ivto, comp) = a_state(iv_interior, comp);
+                      }
+                      else
+                      {
+                        // some fixed temperature flux "boundaryValue" above some specified z value
+
+                        Real boundary_porosity = porosity;
+
+                        bcVal =  boundary_porosity*m_params.stefan + boundary_temperature_value;
+                        Real interior_temperature = m_params.computeTemperature(enthalpy, bulk_concentration);
+
+                        boundary_temperature_value = interior_temperature + (m_dx/2)*boundaryValue;
+                        bcVal =  boundary_porosity*m_params.stefan + boundary_temperature_value;
+
+                        // Compute ghost value for temperature given current estimate of the ghost enthalpy
+                        Real ghost_temp = m_params.computeTemperature(bcVal, bulk_concentration);
+
+                        // If residual = 0, then  our enforced boundary temperature will satisfy the flux condition
+                        Real residual = m_dx*boundaryValue - (ghost_temp - interior_temperature);
+
+//                        for (int i=0; i < 10; i++)
+                        while (residual > 1e-2)
+                        {
+
+                          // Update boundary temperature value given the residual
+                          boundary_temperature_value = boundary_temperature_value + residual;
+
+                          // Compute new boundary enthalpy
+                          bcVal =  boundary_porosity*m_params.stefan + boundary_temperature_value;
+
+                          // Compute new boundary porosity and temperature, given the new enthalpy
+                          boundary_porosity = (m_params.computePorosity(bcVal, bulk_concentration) + porosity)/2;
+                          ghost_temp = m_params.computeTemperature(bcVal, bulk_concentration);
+
+                          // Recompute residual
+                          residual = m_dx*boundaryValue - (ghost_temp - interior_temperature);
+
+                        }
+
+                        // Since we have determined what the enthalpy should be in the ghost cell to enforce the flux condition
+                        // on temperature, just enforce this value
+                        a_state(ivto, comp) = bcVal;
+
+                      } // end if greater than/less than some z value
+                    }
+                    else
+                    {
+
+                      MayDay::Error("Can't apply temperature bcs to bulk concentration yet");
+
+                    }
 
 
 
 
+
+                  } // end if temperature flux condition
+
+
+
+                } // end loop over box
 
               }
               else
               {
 
-              applyCorrectScalarBC(a_state,
-                                   m_advVel,
-                                   a_valid,
-                                   a_homogeneous,
-                                   diriVal,
-                                   m_plumeVal[comp],
-                                   0,
-                                   idir,
-                                   side,
-                                   a_dx,
-                                   order,
-                                   bcType,
-                                   m_params.plumeBounds,
-                                   m_dx,
-                                   comp);
+                applyCorrectScalarBC(a_state,
+                                     m_advVel,
+                                     a_valid,
+                                     a_homogeneous,
+                                     boundaryValue,
+                                     m_plumeVal[comp],
+                                     0,
+                                     idir,
+                                     side,
+                                     a_dx,
+                                     order,
+                                     bcType,
+                                     m_params.plumeBounds,
+                                     m_dx,
+                                     comp);
 
               }
 
@@ -789,11 +884,11 @@ public:
                        const Interval& a_interval,
                        MushyLayerParams a_params,
                        LevelData<FluxBox>* a_velocityBCVals = NULL) : AbstractFaceBCFunction(a_isHomogeneous,
-                                                                           a_comp,
-                                                                           a_params),
-                                                                           m_isViscous(a_isViscous),
-                                                                           m_interval(a_interval),
-                                                                           m_velBCvals(a_velocityBCVals)
+                                                                                             a_comp,
+                                                                                             a_params),
+                                                                                             m_isViscous(a_isViscous),
+                                                                                             m_interval(a_interval),
+                                                                                             m_velBCvals(a_velocityBCVals)
   {
   }
 
@@ -921,11 +1016,11 @@ public:
                     //                                                 idir, side);
 
                     DiriEdgeVariableBC(a_state, a_valid, a_dx,
-                               a_homogeneous,
-                               BCValueHolder(inflowBCValueFunc),
-                               idir, side);
+                                       a_homogeneous,
+                                       BCValueHolder(inflowBCValueFunc),
+                                       idir, side);
 
-//                    int temp=0;
+                    //                    int temp=0;
                   }
                   else
                   {
@@ -979,7 +1074,7 @@ public:
                   // Need to find the correct dataiterator
                   DataIterator dit = m_velBCvals->dataIterator();
 
-//                  FluxBox* velBCVals = NULL;
+                  //                  FluxBox* velBCVals = NULL;
                   FArrayBox* velBCValComp = NULL;
 
                   Box domBox2(domainBox);
@@ -998,12 +1093,12 @@ public:
 
                     IntVect se = velBox.smallEnd();
                     IntVect be = velBox.bigEnd();
-//                    pout() << velBox.smallEnd() << " - " << velBox.bigEnd() << endl;
-//                    pout() << stateBox.smallEnd() << " - " << stateBox.bigEnd() << endl;
+                    //                    pout() << velBox.smallEnd() << " - " << velBox.bigEnd() << endl;
+                    //                    pout() << stateBox.smallEnd() << " - " << stateBox.bigEnd() << endl;
 
                     if (velBox == stateBox || stateBox.contains(velBox))
                     {
-//                      velBCVals = &(*m_velBCvals)[dit];
+                      //                      velBCVals = &(*m_velBCvals)[dit];
                       velBCValComp = &(*m_velBCvals)[dit][m_comp];
                     }
 
@@ -1171,22 +1266,22 @@ public:
         if (m_order == 0)
         {
 
-        FORT_EXTRAPOLATIONBC(CHF_FRA(a_state),
-                       CHF_BOX(a_valid),
-                       CHF_BOX(loBox),
-                       CHF_BOX(hiBox),
-                       CHF_INT(idir),
-                       CHF_INT(nComp));
+          FORT_EXTRAPOLATIONBC(CHF_FRA(a_state),
+                               CHF_BOX(a_valid),
+                               CHF_BOX(loBox),
+                               CHF_BOX(hiBox),
+                               CHF_INT(idir),
+                               CHF_INT(nComp));
 
         }
         else if (m_order == 1)
         {
           FORT_EXTRAPOLATIONBC1(CHF_FRA(a_state),
-                                 CHF_BOX(a_valid),
-                                 CHF_BOX(loBox),
-                                 CHF_BOX(hiBox),
-                                 CHF_INT(idir),
-                                 CHF_INT(nComp));
+                                CHF_BOX(a_valid),
+                                CHF_BOX(loBox),
+                                CHF_BOX(hiBox),
+                                CHF_INT(idir),
+                                CHF_INT(nComp));
         }
       } // end loop over all directions
       //      }
@@ -1254,7 +1349,7 @@ public:
       bcValueFunc(new ConstValueFunction(m_params.inflowVelocity, aliasStateFab.nComp()));
 
       int order = m_params.m_BCAccuracy;
-//      order = 1;
+      //      order = 1;
 
       // loop over directions
       for (int idir = 0; idir < SpaceDim; idir++)
@@ -1337,10 +1432,10 @@ public:
                   if (idir == m_comp)
                   {
 
-//                    DiriBC(aliasStateFab, a_valid, a_dx,
-//                           a_homogeneous,
-//                           BCValueHolder(zeroFunc),
-//                           idir, side, order);
+                    //                    DiriBC(aliasStateFab, a_valid, a_dx,
+                    //                           a_homogeneous,
+                    //                           BCValueHolder(zeroFunc),
+                    //                           idir, side, order);
 
                     order = 1;
                     OnlyInflowBC(aliasStateFab,
@@ -1646,7 +1741,7 @@ public:
                 case PhysBCUtil::OutflowPressureGrad :
                 {
                   // Fix as first order for stability ?
-//                  int order = 1;
+                      //                  int order = 1;
                   DiriBC(a_state, a_valid, a_dx,
                          a_homogeneous,
                          BCValueHolder(zeroFunc),
@@ -1657,7 +1752,7 @@ public:
                 }
                 case PhysBCUtil::VelInflowOutflow:
                 {
-//                  int order = 1;
+                  //                  int order = 1;
                   PressureInflowOutflow(a_state, a_valid, a_dx,
                                         a_homogeneous,
                                         m_advVel, // advection velocity
@@ -1686,9 +1781,9 @@ public:
                   RefCountedPtr<ConstValueFunction> pressureHead(new ConstValueFunction(pressureVal, a_state.nComp()));
 
                   DiriBC(a_state, a_valid, a_dx,
-                                          a_homogeneous,
-                                          BCValueHolder(pressureHead),
-                                          idir, side, order);
+                         a_homogeneous,
+                         BCValueHolder(pressureHead),
+                         idir, side, order);
 
                   break;
                 }
@@ -1969,7 +2064,7 @@ public:
                      side);
             }
             //            if (idir == 0)
-            //            {
+              //            {
             //              //x direction
             //              NeumBC(a_state,
             //                     a_valid,
@@ -2229,13 +2324,13 @@ public:
               int bctype = m_params.getVelBCType(idir, side);
               switch(bctype)
               {
-//                case PhysBCUtil::Inflow :
-//                case PhysBCUtil::Outflow :
-//                case PhysBCUtil::VelInflowOutflow :
-//                case PhysBCUtil::OutflowNormal :
+                //                case PhysBCUtil::Inflow :
+                //                case PhysBCUtil::Outflow :
+                //                case PhysBCUtil::VelInflowOutflow :
+                //                case PhysBCUtil::OutflowNormal :
                 case PhysBCUtil::SolidWall :
                 case PhysBCUtil::noShear :
-//                case PhysBCUtil::VelInflowPlume :
+                  //                case PhysBCUtil::VelInflowPlume :
                 case PhysBCUtil::Symmetry :
                 {
                   NeumBC(a_state, a_valid, a_dx,
@@ -2343,7 +2438,7 @@ public:
                 case PhysBCUtil::VelInflowPlume :
                 case PhysBCUtil::Symmetry :
                 case PhysBCUtil::PressureHead :
-//                case PhysBCUtil::Outflow :
+                  //                case PhysBCUtil::Outflow :
                 {
                   int order = 2;// equivalent of HOExtrapBC. This is crucial to get projection right.
                   ExtraBC(a_state, a_valid,
@@ -2534,8 +2629,8 @@ public:
                 if (i != idir)
                 {
                   grownBox.grow(i, 1);
-                  }
                 }
+              }
 
 
 
@@ -2547,7 +2642,7 @@ public:
                 //										idir, side, order);
                 for (int comp=0; comp<a_state.nComp(); comp++)
                 {
-                ExtrapBC(  a_state, grownBox,  idir,   side, order, comp);
+                  ExtrapBC(  a_state, grownBox,  idir,   side, order, comp);
                 }
 
                 // Grow box in the direction we're extrapolating in so we can fill more ghost cells
@@ -2666,7 +2761,7 @@ PhysBCUtil::velExtrapBC(Interval ghostInterval) const
   Tuple<BCHolder, SpaceDim> bcVec;
   for (int idir=0; idir<SpaceDim; idir++)
   {
-//    Interval intvl(idir, idir);
+    //    Interval intvl(idir, idir);
 
     bcVec[idir] = extrapVelFuncBC(idir, ghostInterval);
   }
@@ -2690,7 +2785,7 @@ PhysBCUtil::velExtrapBC(Interval ghostInterval) const
 
 BCHolder PhysBCUtil::viscousRefluxBC(int a_dir, bool a_isViscous) const
 {
-//  bool isViscous = true;
+  //  bool isViscous = true;
   bool isHomogeneous = true;
   Interval intvl(0, 0); // 13 nov 2007:  not sure about this
   return basicCCVelFuncBC(isHomogeneous, a_isViscous, a_dir,
@@ -3058,13 +3153,13 @@ PhysBCUtil::scalarTraceH_IBC() const
   newIBCPtr->setAdvVel(m_advVel);
 
 
-    Vector<Real> plumeVals;
-    plumeVals.push_back(m_params.HPlumeInflow);
-//    plumeVals.push_back(m_params.ThetaPlumeInflow);
-    newIBCPtr->setPlume(plumeVals, m_params.plumeBounds);
+  Vector<Real> plumeVals;
+  plumeVals.push_back(m_params.HPlumeInflow);
+  //    plumeVals.push_back(m_params.ThetaPlumeInflow);
+  newIBCPtr->setPlume(plumeVals, m_params.plumeBounds);
 
 
-    return newIBCPtr;
+  return newIBCPtr;
 
 }
 
@@ -3072,67 +3167,67 @@ PhysIBC*
 PhysBCUtil::scalarTrace_IBC(Vector<int> a_bcTypeHi, Vector<int> a_bcTypeLo, RealVect a_bcValHi,RealVect a_bcValLo, Real a_plumeInflow) const
 {
   AdvectIBC* newIBCPtr = new AdvectIBC(1);
-     RealVect bcValHi, bcValLo;
-     IntVect bcTypeHi, bcTypeLo;
+  RealVect bcValHi, bcValLo;
+  IntVect bcTypeHi, bcTypeLo;
 
-   for (int dir=0; dir<SpaceDim; dir++)
-    {
-      bcTypeHi[dir] = convertBCType(a_bcTypeHi[dir]);
-      bcTypeLo[dir] = convertBCType(a_bcTypeLo[dir]);
+  for (int dir=0; dir<SpaceDim; dir++)
+  {
+    bcTypeHi[dir] = convertBCType(a_bcTypeHi[dir]);
+    bcTypeLo[dir] = convertBCType(a_bcTypeLo[dir]);
 
-      bcValLo[dir] = a_bcValLo[dir];
-      bcValHi[dir] = a_bcValHi[dir];
-    }
+    bcValLo[dir] = a_bcValLo[dir];
+    bcValHi[dir] = a_bcValHi[dir];
+  }
 
-    applyFrameAdvectionBC(bcTypeHi, bcTypeLo);
+  applyFrameAdvectionBC(bcTypeHi, bcTypeLo);
 
-    newIBCPtr->setBoundaryValues(bcValLo, bcTypeLo,  Side::Lo,
-                                 0);
-    newIBCPtr->setBoundaryValues(bcValHi, bcTypeHi,  Side::Hi,
-                                 0);
+  newIBCPtr->setBoundaryValues(bcValLo, bcTypeLo,  Side::Lo,
+                               0);
+  newIBCPtr->setBoundaryValues(bcValHi, bcTypeHi,  Side::Hi,
+                               0);
 
-    newIBCPtr->setAdvVel(m_advVel);
+  newIBCPtr->setAdvVel(m_advVel);
 
-    Vector<Real> plumeVals;
-    plumeVals.push_back(a_plumeInflow);
-    newIBCPtr->setPlume(plumeVals, m_params.plumeBounds);
+  Vector<Real> plumeVals;
+  plumeVals.push_back(a_plumeInflow);
+  newIBCPtr->setPlume(plumeVals, m_params.plumeBounds);
 
-    return newIBCPtr;
+  return newIBCPtr;
 }
 
 PhysIBC*
 PhysBCUtil::scalarTraceC_IBC() const
 {
   AdvectIBC* newIBCPtr = new AdvectIBC(1);
-    RealVect bcValHi, bcValLo;
-    IntVect bcTypeHi, bcTypeLo;
+  RealVect bcValHi, bcValLo;
+  IntVect bcTypeHi, bcTypeLo;
 
   for (int dir=0; dir<SpaceDim; dir++)
-   {
-     bcTypeHi[dir] = convertBCType(m_params.bcTypeBulkConcentrationHi[dir]);
-     bcTypeLo[dir] = convertBCType(m_params.bcTypeBulkConcentrationLo[dir]);
+  {
+    bcTypeHi[dir] = convertBCType(m_params.bcTypeBulkConcentrationHi[dir]);
+    bcTypeLo[dir] = convertBCType(m_params.bcTypeBulkConcentrationLo[dir]);
 
-     bcValLo[dir] = m_params.bcValBulkConcentrationLo[dir];
-     bcValHi[dir] = m_params.bcValBulkConcentrationHi[dir];
-   }
+    bcValLo[dir] = m_params.bcValBulkConcentrationLo[dir];
+    bcValHi[dir] = m_params.bcValBulkConcentrationHi[dir];
+  }
 
-   applyFrameAdvectionBC(bcTypeHi, bcTypeLo);
+  applyFrameAdvectionBC(bcTypeHi, bcTypeLo);
 
-   newIBCPtr->setBoundaryValues(bcValLo, bcTypeLo,  Side::Lo,
-                                0);
-   newIBCPtr->setBoundaryValues(bcValHi, bcTypeHi,  Side::Hi,
-                                0);
+  newIBCPtr->setBoundaryValues(bcValLo, bcTypeLo,  Side::Lo,
+                               0);
+  newIBCPtr->setBoundaryValues(bcValHi, bcTypeHi,  Side::Hi,
+                               0);
 
-   newIBCPtr->setAdvVel(m_advVel);
-
-
-   Vector<Real> plumeVals;
-//   plumeVals.push_back(m_params.HPlumeInflow);
-   plumeVals.push_back(m_params.ThetaPlumeInflow);
-   newIBCPtr->setPlume(plumeVals, m_params.plumeBounds);
+  newIBCPtr->setAdvVel(m_advVel);
 
 
-   return newIBCPtr;
+  Vector<Real> plumeVals;
+  //   plumeVals.push_back(m_params.HPlumeInflow);
+  plumeVals.push_back(m_params.ThetaPlumeInflow);
+  newIBCPtr->setPlume(plumeVals, m_params.plumeBounds);
+
+
+  return newIBCPtr;
 
 }
 
@@ -3760,7 +3855,7 @@ BCHolder PhysBCUtil::ThetaFuncBC(bool a_homogeneous, LevelData<FluxBox>* a_advVe
 
 
 BCHolder PhysBCUtil::extrapVelFuncBC( int  a_comp,
-                                     Interval ghostInterval) const
+                                      Interval ghostInterval) const
 {
   RefCountedPtr<BasicExtrapBCFunction>
   extrapVelFuncBC(new BasicExtrapBCFunction(true, m_params, ghostInterval, a_comp));
@@ -3822,7 +3917,7 @@ PhysBCUtil::PhysBCUtil()
 // ---------------------------------------------------------------
 PhysBCUtil::PhysBCUtil(MushyLayerParams a_params, Real a_dx)
 {
-//  pout() << "PhysBCUtil::PhysBCUtil" << endl;
+  //  pout() << "PhysBCUtil::PhysBCUtil" << endl;
 
   // initialize to bogus values
   for (int idir=0; idir<SpaceDim; idir++)

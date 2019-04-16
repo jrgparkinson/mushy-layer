@@ -86,7 +86,19 @@ public:
 	   * This is a special case for the heat equation, where we apply BCs to enthalpy
 	   * and need to compute the boundary from the interior porosity and specified temperature
 	   */
-	  FixedTemperature
+	  FixedTemperature,
+	  /// Temperature Flux
+	  /**
+	   * BCs for enthalpy. Assume bulk concentration \f$ C_g \f$ in the ghost cell is equal to
+	   * it's value in the interior of the domain (i.e. assume a no normal flux condition) then
+	   * iteratively estimate the enthalpy \f$ H_g \f$ such that
+	   * \f$ \frac{T_g(H_g,C_g) - T_{interior} }{\Delta x}= F \f$,
+	   * in order to satisfy the temperature flux condition. Finally, set the enthalpy ghost value to \f$ H_g \f$.
+	   *
+	   * Only do this for \f$z>0.75\f$, otherwise, no flux.
+	   *
+	   */
+	  TemperatureFlux,
 	};
 
 	/// Physical parameters for the system
