@@ -215,8 +215,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
           // Make coarsened pressure
 
-          AMRLevelMushyLayer* crseML = getCoarserLevel();
-
+//          AMRLevelMushyLayer* crseML = getCoarserLevel();
 //          crseML->m_coarseAverageScalar.averageToCoarse(
 //                    coarsenedPressure,
 //                    m_projection.phi());
