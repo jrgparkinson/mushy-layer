@@ -66,7 +66,7 @@ public:
 
       string bc_name = m_name + side_labels[iside];
 
-      if (pp.contains(bc_name))
+      if (pp.contains(bc_name.c_str()))
       {
         pp.getarr(bc_name.c_str(), temp, 0, SpaceDim);
 
