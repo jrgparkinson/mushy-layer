@@ -7,6 +7,110 @@
 #include "PhysIBC.H"
 #include "AdvectIBC.H"
 
+
+
+/**
+ * Function interface for applying enthalpy boundary conditions
+ * which satisfy some condition based on the temperature field.
+ * Computes some residual, which is characterises the extent
+ * to which we have not satisfied the temperature constraint, which we attempt to minimise.
+ */
+//typedef void(*EnthalpyBCResidual)(Real&   a_residual,
+//                      const Real  a_dx,
+//                      const Real a_ghost_
+//                      Real                 a_dx,
+//                      bool                 a_homogeneous);
+
+/// Class for implementing temperature bcs on the enthalpy field
+/**
+ * This should be an abstract base class - different applications should inherit from this
+ */
+class NonlinearTemperatureBC
+{
+public:
+  NonlinearTemperatureBC();
+
+  // destructor
+  virtual ~NonlinearTemperatureBC()
+  {
+
+  }
+
+  NonlinearTemperatureBC(const MushyLayerParams a_params,
+                         const Real a_dx)
+  {
+    CH_TIME("NonlinearTemperatureBC::NonlinearTemperatureBC");
+
+    m_params = a_params;
+    m_dx = a_dx;
+  }
+
+  /// Compute the residual given the current estimate of the enthalpy on the boundary
+  virtual void computeResidual(Real& a_residual, const Real a_ghost_enthalpy, const Real a_ghost_bulk_concentration, const Real a_interior_temperature)
+  {
+
+  }
+
+protected:
+
+  MushyLayerParams m_params;
+  Real m_dx;
+
+};
+
+/// Robin temperature bcs, for applying to the enthalpy field
+/**
+ * Compute the residual of
+ *   \f$ a \frac{dT}{dz} - F_0 - b(T - T_{ref}) \f$
+ *
+ *  Specifically, the residual \f$ r \f$ is
+ *
+ *  \f$ r = \Delta x \left[F_0 - b( T_b - T_{ref}) \right] - (T_g - T_i) \f$
+ *
+ *  where \f$ T_b = (T_g + T_i)/2 \f$ is the temperature on the boundary,
+ *  \f$ T_g \f$ is the temperature in the ghost cell and \f$ T_i \f$ is the temperature
+ *  on the interior cell.
+ *
+ */
+class NonlinearTemperatureBCRobin : public NonlinearTemperatureBC
+{
+public:
+
+  virtual ~NonlinearTemperatureBCRobin()
+  {
+
+  }
+
+  NonlinearTemperatureBCRobin();
+
+  NonlinearTemperatureBCRobin(const MushyLayerParams a_params,
+                              const Real a_dx,
+                              const Real a,
+                              const Real b,
+                              const Real F,
+                              const Real T_ref) : NonlinearTemperatureBC(a_params, a_dx)
+  {
+    m_a = a;
+    m_b = b;
+    m_F = F;
+    m_T_ref = T_ref;
+  }
+
+  virtual void computeResidual(Real& a_residual, const Real a_ghost_enthalpy, const Real a_ghost_bulk_concentration, const Real a_interior_temperature)
+  {
+    Real a_ghost_T = m_params.computeTemperature(a_ghost_enthalpy, a_ghost_bulk_concentration);
+
+    Real Tflux = (a_ghost_T - a_interior_temperature);
+    Real Tboundary = (a_ghost_T + a_interior_temperature)/2;
+
+    a_residual = m_dx * (m_F - m_b*(Tboundary - m_T_ref)) - Tflux;
+  }
+
+
+protected:
+  Real m_a, m_b, m_F, m_T_ref;
+};
+
 /// Big class to encapsulate physical boundary conditions
 class PhysBCUtil
 {
@@ -99,6 +203,9 @@ public:
 	   *
 	   */
 	  TemperatureFlux,
+
+	  /// Temperature flux + radiation
+	  TemperatureFluxRadiation
 	};
 
 	/// Physical parameters for the system
