@@ -602,6 +602,20 @@ protected:
   /// Check CFL based on latest velocity is safe to use for explicit updates
   bool currentCFLIsSafe(bool printWarning=false);
 
+  /// Add a fixed heat source
+  /**
+   * \f$ Q = \frac{Q_0}{\sigma \sqrt{2 \Pi}} exp\left[ - 0.5 \left( \frac{x-x_c}{\sigma} \right)^2 \right]  0.5 \left( 1 + tanh\left[10 (z-(H-h)) \right]) \right) \f$
+   *
+   * where the parameters are found from the inputs file as:
+   * Q_0 is given by heatSource.size
+   * sigma is heatSource.width
+   * x_c is heatSource.xpos
+   * h is heatSource.depth, and measures the depth that the heat source propagates down from the top of the domain
+   *
+   * H is the domain height
+   */
+  void addHeatSource(LevelData<FArrayBox>& src);
+
   /// Set velocity to zero where porosity is sufficiently small (FArrayBox version)
   void setVelZero(FArrayBox& a_vel, const FArrayBox& a_porosity, const Real a_limit, const int a_radius=0);
 
