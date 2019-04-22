@@ -15,6 +15,7 @@
 #include "CH_Timer.H"
 #include "RealVect.H"
 #include "CH_HDF5.H"
+#include "BCInfo.h"
 
 // Comment below ensures that enums doxygen generates documentation for enums declared in this file
 /*!
@@ -617,6 +618,17 @@ public:
 	bcValPressureLo;
 
 
+	BCInfo
+	/// Position along each face, below which to enforce no heat flux (above this position, enforce some other specified heat flux)
+	m_bc_noFluxLimit,
+
+	/// Reference temperature for radiation boundary conditions
+	m_bc_bTref,
+
+	/// Some generic variable which can be used in various boundary conditions if required
+	m_bc_b;
+
+	int max_bc_iter;
 
 	/// First or second order BCs
 	int m_BCAccuracy;

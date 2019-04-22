@@ -10,6 +10,7 @@
 #include "PhysBCUtil.H"
 #include "phaseDiagram.H"
 
+
 //This is for printing out variable names, because c++ doesn't do reflection
 #define SHOW(a) pout() << #a << ": " << (a) << std::endl
 
@@ -565,7 +566,13 @@ void MushyLayerParams::getParameters()
   parseBCVals("bcValPressureHi", bcValPressureHi);
   parseBCVals("bcValPressureLo", bcValPressureLo);
 
+  // Now get extra parameters associated with boundary conditions
+  m_bc_noFluxLimit = BCInfo(string("NoFluxLimit"), false);
+  m_bc_bTref = BCInfo(string("TRef"), false);
+  m_bc_b = BCInfo(string("b"), false);
 
+  max_bc_iter = 2;
+  ppMain.query("max_bc_iter", max_bc_iter);
 
 
   // For the plume
@@ -765,6 +772,7 @@ void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool req
 
     for (int idir=0; idir<SpaceDim; idir++)
     {
+      // We're parsing bc types here, so the values should be >= 0
       if (temp[idir] !=-1)
       {
         (*a_bcHolder)[idir] = temp[idir];
