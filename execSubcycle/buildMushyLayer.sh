@@ -15,14 +15,14 @@ module load gcc/4.8.3
 
 #cd ~/mushy-layer/execSubcycle/
 cd $MUSHY_LAYER_DIR/execSubcycle/
-make all
+make all | grep --color -E 'is up to date'
 
 cd $MUSHY_LAYER_DIR/setupNewRun/
 # make clean
-make all
+make all | grep --color -E 'is up to date'
 
 cd $MUSHY_LAYER_DIR/postProcess/
-make all
+make all | grep --color -E 'is up to date'
 
 module unload gcc/4.8.3
 module load gcc/5.2.0

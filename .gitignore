@@ -40,3 +40,4 @@ visitlog.py
 **/venv*/*
 **/env/*
 **/matlab/MethodsPaper/*.png
+*.csv
