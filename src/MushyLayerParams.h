@@ -630,6 +630,8 @@ public:
 
 	int max_bc_iter;
 
+	Real max_bc_residual;
+
 	/// First or second order BCs
 	int m_BCAccuracy;
 

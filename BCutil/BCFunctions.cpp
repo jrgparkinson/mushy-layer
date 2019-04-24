@@ -280,7 +280,6 @@ void ExtrapBC(FArrayBox&      a_state,
   int boxSize = a_state.box().size(a_dir);
   a_order = min(a_order, boxSize);
 
-
   FORT_EXTRAPBC(CHF_FRA(a_state),
                 CHF_BOX(toRegion),
                 CHF_INT(isign),
@@ -325,7 +324,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
   // adv vel is never going to match in this case, so don't bother searching
   if (a_dx > fine_dx)
   {
-    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order);
+    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order, a_comp);
     return;
   }
 
@@ -428,7 +427,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
      *
      */
 
-    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order);
+    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order, a_comp);
     //    ConstantNeumBC(a_state, a_valid, a_homogeneous, 0.0, a_dir, a_side, a_dx);
     return;
   }
@@ -459,7 +458,7 @@ void OnlyInflowBC(FArrayBox&      a_state,
   // if homogeneous, apply homogeneous dirichlet BCs
   if (a_homogeneous)
   {
-    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_otherValue, a_dir, a_side, a_order);
+    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_otherValue, a_dir, a_side, a_order, a_comp);
     return;
   }
 
@@ -501,7 +500,7 @@ void PressureInflowOutflow(FArrayBox&      a_state,
   if (a_neumValue == 0)
   {
     InflowOutflowBC(a_state, a_advVel, a_valid, a_homogeneous, a_diriValue,
-                    a_dir, a_side, a_order, a_dx, a_fineDx);
+                    a_dir, a_side, a_order, a_dx, a_fineDx, a_comp);
   }
   else
   {

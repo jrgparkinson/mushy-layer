@@ -21,7 +21,7 @@ void applyCorrectScalarBC(FArrayBox&      a_state,
                     int             a_bcType,
                     Vector<Real>    a_plumeBounds,
                     Real fine_dx,
-                    int a_comp = 0);
+                    int a_comp);
 
 void ConstantDiriBC(FArrayBox&      a_state,
             const Box&      a_valid,
@@ -30,7 +30,7 @@ void ConstantDiriBC(FArrayBox&      a_state,
             int             a_dir,
             Side::LoHiSide  a_side,
             int             a_order,
-            int a_comp = 0);
+            int a_comp);
 
 void ConstantNeumBC(FArrayBox&      a_state,
             const Box&      a_valid,
@@ -39,7 +39,7 @@ void ConstantNeumBC(FArrayBox&      a_state,
             int             a_dir,
             Side::LoHiSide  a_side,
             Real			a_dx,
-            int a_comp = 0);
+            int a_comp);
 
 void VariableFluxBC(FArrayBox&      a_state,
             const Box&      a_valid,
@@ -48,14 +48,14 @@ void VariableFluxBC(FArrayBox&      a_state,
             int             a_dir,
             Side::LoHiSide  a_side,
             Real                        a_dx,
-            int a_comp = 0);
+            int a_comp);
 
 void ExtrapBC(FArrayBox&      a_state,
             const Box&      a_valid,
             int             a_dir,
             Side::LoHiSide  a_side,
             int             a_order,
-            int a_comp = 0);
+            int a_comp);
 
 // Enforce dirichlet BCs with a_value if it's inflow,
 // constant flux BCs if outflow
@@ -69,7 +69,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
             int             a_order,
             Real a_dx,
             Real fine_dx,
-            int a_comp = 0);
+            int a_comp);
 
 void OnlyInflowBC(FArrayBox&      a_state,
                      const Box&      a_valid,
@@ -81,7 +81,7 @@ void OnlyInflowBC(FArrayBox&      a_state,
                      int             a_dir,
                      Side::LoHiSide  a_side,
                      int             a_order,
-                     int a_comp = 0);
+                     int a_comp);
 
 /// Inflow/outflow BCs for pressure
 /** inflow - neumann

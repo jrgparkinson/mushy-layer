@@ -574,6 +574,9 @@ void MushyLayerParams::getParameters()
   max_bc_iter = 2;
   ppMain.query("max_bc_iter", max_bc_iter);
 
+  max_bc_residual= 1e-5;
+  ppMain.query("max_bc_residual", max_bc_residual);
+
 
   // For the plume
   ::computeBoundingEnergy(HPlumeInflow, ThetaPlumeInflow, HSolidusPlume, HLiquidusPlume, HEutecticPlume,

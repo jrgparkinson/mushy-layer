@@ -39,10 +39,11 @@ extern "C"
                       const Box&     a_valid,
                       int            a_dir,
                       Side::LoHiSide a_side,
-                      int            a_order)
+                      int            a_order,
+                      int a_comp)
   {
     // Fortran version
-    ExtrapBC(a_state, a_valid, a_dir, a_side, a_order);
+    ExtrapBC(a_state, a_valid, a_dir, a_side, a_order, a_comp);
   }
 
 
@@ -631,19 +632,29 @@ public:
                 NonlinearTemperatureBC* residual;
 
                 // default values
-                Real b=0.0, T_ref=0.0, no_flux_position_limit=0.0;
+                Real a = 0.0, b=0.0, T_ref=0.0, no_flux_position_limit=0.0, flux=0.0;
 
                 no_flux_position_limit = m_params.m_bc_noFluxLimit.getBC(idir,  side);
 
                 switch (bcType)
                 {
+                  case PhysBCUtil::FixedTemperature:
+                    T_ref = boundaryValue;
+                    b = 1.0;
+
+                    break;
+
                   case PhysBCUtil::TemperatureFlux:
+
+                    flux = boundaryValue;
+                    a = 1.0;
 
                     break;
 
                   case PhysBCUtil::TemperatureFluxRadiation:
-
+                    a = 1.0;
                     b = m_params.m_bc_b.getBC(idir, side);
+                    flux = boundaryValue;
                     T_ref = m_params.m_bc_bTref.getBC(idir, side);
 
                     break;
@@ -656,9 +667,9 @@ public:
                 }
 
                 residual = new NonlinearTemperatureBCRobin(m_params, m_dx,
-                                                           1.0, // coefficient of dt/d(x, z)
+                                                           a, // coefficient of dt/d(x, z)
                                                            b, // coefficient of thermal radiation term
-                                                           boundaryValue, // flux
+                                                           flux, // flux
                                                            T_ref); //reference temperature for thermal radiation (dummy value)
 
                 Box toRegion = adjCellBox(a_valid, idir, side, 1);
@@ -678,8 +689,9 @@ public:
                   Real interior_porosity =  m_params.computePorosity(interior_enthalpy, interior_bulk_concentration);
 
                   // Compute temperature on the boundary
+                  bool legacy_fixed_temp_bc = false;
 
-                  if (bcType == PhysBCUtil::FixedTemperature)
+                  if (bcType == PhysBCUtil::FixedTemperature && legacy_fixed_temp_bc)
                   {
                     CH_TIME("BCFunctions::FixedTemperatureBC");
 
@@ -712,11 +724,10 @@ public:
 
 
                   }
-                  else if (bcType == PhysBCUtil::TemperatureFlux || bcType == PhysBCUtil::TemperatureFluxRadiation)
+                  // if (bcType == PhysBCUtil::TemperatureFlux || bcType == PhysBCUtil::TemperatureFluxRadiation)
+                  else
                   {
                     CH_TIME("BCFunctions::TemperatureFluxBC");
-
-
 
                     if (comp == Hcomp)
                     {
@@ -757,7 +768,7 @@ public:
 
                         // 10^-2 is some arbitrary criteria
                         int num_iter = 0;
-                        while (abs(resid) > 1e-2 && num_iter < m_params.max_bc_iter)
+                        while (abs(resid) > m_params.max_bc_residual && num_iter < m_params.max_bc_iter)
                         {
 
                           // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
@@ -889,7 +900,7 @@ public:
             {
 
               ExtraBC(a_state, a_valid,
-                      idir, side, order);
+                      idir, side, order, m_comp);
               //						  ExtrapBC(  a_state, a_valid,  idir,   side, order);
 
             } // if ends match
@@ -1022,7 +1033,7 @@ public:
                     {
                       order  = 2;
                       ExtraBC(a_state, a_valid,
-                              idir, side, order);
+                              idir, side, order, m_comp);
                     }
                   } // end if tangential
                   break;
@@ -1098,7 +1109,7 @@ public:
                     {
                       order  = 2;
                       ExtraBC(a_state, a_valid,
-                              idir, side, order);
+                              idir, side, order, m_comp);
                       //                                                                          ExtrapBC(  a_state, a_valid,  idir,   side, order);
                     }
                   } // end if tangential
@@ -1392,6 +1403,9 @@ public:
 
       FArrayBox aliasStateFab(m_interval, a_state);
 
+      // aliasStateFab only has 1 component, in index 0
+      int fab_comp = 0;
+
       RefCountedPtr<ConstValueFunction>
       zeroFunc(new ConstValueFunction(0.0, aliasStateFab.nComp()));
       RefCountedPtr<ConstValueFunction>
@@ -1446,7 +1460,7 @@ public:
 
                       order = 1;
                       ExtraBC(aliasStateFab, a_valid,
-                              idir, side, order);
+                              idir, side, order, fab_comp);
                       //									  ExtrapBC(aliasStateFab, a_valid, idir, side, order);
                     }
                   } // end if tangential
@@ -1496,7 +1510,8 @@ public:
                                  a_dx,
                                  idir,
                                  side,
-                                 order);
+                                 order,
+                                 m_comp);
 
                   }
                   else
@@ -1515,7 +1530,7 @@ public:
                     {
                       order = 1;
                       ExtraBC(aliasStateFab, a_valid,
-                              idir, side, order);
+                              idir, side, order, fab_comp);
                       //                                                                          ExtrapBC(aliasStateFab, a_valid, idir, side, order);
                     }
                   } // end if tangential
@@ -1529,7 +1544,7 @@ public:
                 {
 
                   order = 1;
-                  ExtrapBC(aliasStateFab, a_valid, idir, side, order);
+                  ExtrapBC(aliasStateFab, a_valid, idir, side, order, fab_comp);
 
                   break;
                 }
@@ -1599,7 +1614,7 @@ public:
               while(shrunkFabBox.contains(grownValid))
               {
                 ExtraBC(aliasStateFab, grownValid, idir, side,
-                        0); //0th order
+                        0, fab_comp); //0th order
                 grownValid.grow(1);
               }
 
@@ -2490,8 +2505,11 @@ public:
                   //                case PhysBCUtil::Outflow :
                 {
                   int order = 2;// equivalent of HOExtrapBC. This is crucial to get projection right.
-                  ExtraBC(a_state, a_valid,
-                          idir, side, order);
+                  for (int comp=0; comp<a_state.nComp(); comp++)
+                  {
+                    ExtraBC(a_state, a_valid,
+                            idir, side, order, comp);
+                  }
                   break;
                 }
                 case PhysBCUtil::Outflow :
@@ -2582,8 +2600,13 @@ public:
             {
 
               int order = 2;// equivalent of HOExtrapBC. This is crucial to get projection right.
-              ExtraBC(a_state, a_valid,
-                      idir, side, order);
+
+              for (int comp=0; comp<a_state.nComp(); comp++)
+              {
+                ExtraBC(a_state, a_valid,
+                        idir, side, order, comp);
+              }
+
 
 
             } // end condition of matching coordinates
@@ -2752,6 +2775,9 @@ public:
   {
     if (m_isDefined)
     {
+      // hard code component for now - later may change this
+      int comp = 0;
+
       const Box& domainBox = a_domain.domainBox();
       //      PhysBCUtil bcInfo(m_params); // sets BCs from ParmParse table
 
@@ -2783,7 +2809,7 @@ public:
               //							ExtraBC(a_state, grownBox,
               //									idir, side, order);
 
-              ExtrapBC(  a_state, grownBox,  idir,   side, order);
+              ExtrapBC(  a_state, grownBox,  idir,   side, order, comp);
 
               // Grow box in the direction we're extrapolating in so we can fill more ghost cells
               grownBox.grow(idir, 1);
