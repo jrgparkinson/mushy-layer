@@ -640,7 +640,7 @@ public:
                 {
                   case PhysBCUtil::FixedTemperature:
                     T_ref = boundaryValue;
-                    b = 1.0;
+                    b = 1.0;  // the (+) sign is important here in terms of driving the bc lower if our estimated boundary temperature is too high (and vice versa)
 
                     break;
 
@@ -671,6 +671,10 @@ public:
                                                            b, // coefficient of thermal radiation term
                                                            flux, // flux
                                                            T_ref); //reference temperature for thermal radiation (dummy value)
+
+                NonlinearBCSolver* nonlinearSolver;
+//                nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual);
+                nonlinearSolver = new NonlinearBCSolverNewton(residual, m_params.max_bc_iter, m_params.max_bc_residual);
 
                 Box toRegion = adjCellBox(a_valid, idir, side, 1);
                 toRegion &= a_state.box();
@@ -756,8 +760,12 @@ public:
                         Real interior_temperature = m_params.computeTemperature(interior_enthalpy, interior_bulk_concentration);
 
                         // Initial guess of the enthalpy in the ghost cell is the 0th order extrapolation from inside the domain
-                        //interior_porosity*m_params.stefan + interior_temperature;
                         Real ghost_enthalpy =  interior_enthalpy;
+
+                        // Now solve for the enthalpy in the ghost cell
+                        nonlinearSolver->solve(ghost_enthalpy, interior_temperature, interior_bulk_concentration);
+
+                        /*Real ghost_enthalpy =  interior_enthalpy;
 
                         Real resid = 0.0;
                         residual->computeResidual(resid,
@@ -766,13 +774,13 @@ public:
                                                   interior_temperature // temperature at interior grid cell
                                                   );
 
+                        // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
+                        ghost_enthalpy = ghost_enthalpy + resid;
+
                         // 10^-2 is some arbitrary criteria
                         int num_iter = 0;
                         while (abs(resid) > m_params.max_bc_residual && num_iter < m_params.max_bc_iter)
                         {
-
-                          // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
-                          ghost_enthalpy = ghost_enthalpy + resid;
 
                           // Recompute residual
                           residual->computeResidual(resid,
@@ -781,9 +789,12 @@ public:
                                                     interior_temperature // temperature at interior grid cell
                                                     );
 
+                          // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
+                          ghost_enthalpy = ghost_enthalpy + resid;
+
                           num_iter++;
 
-                        }
+                        }*/
 
                         // Since we have determined what the enthalpy should be in the ghost cell to enforce the flux condition
                         // on temperature, just enforce this value

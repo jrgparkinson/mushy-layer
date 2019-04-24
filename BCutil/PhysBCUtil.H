@@ -100,16 +100,196 @@ public:
   {
     Real a_ghost_T = m_params.computeTemperature(a_ghost_enthalpy, a_ghost_bulk_concentration);
 
-    Real Tflux = (a_ghost_T - a_interior_temperature);
+    Real Tflux = (a_ghost_T - a_interior_temperature)/m_dx;
     Real Tboundary = (a_ghost_T + a_interior_temperature)/2;
 
-    a_residual = m_dx * (m_F - m_b*(Tboundary - m_T_ref)) - Tflux;
+    a_residual = (m_F - m_b*(Tboundary - m_T_ref)) - m_a*Tflux;
   }
 
 
 protected:
   Real m_a, m_b, m_F, m_T_ref;
 };
+
+/// Base class for solving for nonlinear ghost cell values
+/**
+ * Given a NonlinearTemperatureBC object which computes the residual, find the root
+ */
+class NonlinearBCSolver
+{
+
+public:
+
+  /// Destructor
+  virtual ~NonlinearBCSolver()
+  {
+
+  }
+
+  /// Default constructor
+  NonlinearBCSolver()
+  {
+    m_bc = NULL;
+  }
+
+  NonlinearBCSolver(NonlinearTemperatureBC* a_bc)
+  {
+    m_bc = a_bc;
+  }
+
+  /// Method for solving the system - must be implemented by inherited classes
+  virtual void solve(Real& a_ghost_enthalpy,
+                     const Real a_interior_temperature,
+                     const Real a_ghost_bulk_conc)
+  {
+
+  }
+
+  NonlinearTemperatureBC* m_bc;
+};
+
+/// Picard solver
+class NonlinearBCSolverPicard: public NonlinearBCSolver
+{
+public:
+
+  /// Destructor
+    virtual ~NonlinearBCSolverPicard()
+    {
+
+    }
+
+    /// Full constructor
+    NonlinearBCSolverPicard(NonlinearTemperatureBC* a_bc,
+                            const int a_max_iter,
+                            const Real a_max_residual) : NonlinearBCSolver(a_bc)
+    {
+      m_max_resid = a_max_residual;
+      m_max_iter = a_max_iter;
+    }
+
+    /// Method for solving the system - must be implemented by inherited classes
+    virtual void solve(Real& ghost_enthalpy,
+                       const Real a_interior_temperature,
+                       const Real a_ghost_bulk_conc)
+    {
+      CH_TIME("NonlinearBCSolverPicard::solve");
+
+      Real resid = 0.0;
+      m_bc->computeResidual(resid,
+                            ghost_enthalpy,  // enthalpy in ghost cell
+                            a_ghost_bulk_conc,  // bulk conc in ghost cell
+                            a_interior_temperature // temperature at interior grid cell
+      );
+
+      // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
+      ghost_enthalpy = ghost_enthalpy + resid;
+
+      // 10^-2 is some arbitrary criteria
+      int num_iter = 0;
+      while (abs(resid) > m_max_resid && num_iter < m_max_iter)
+      {
+
+        // Recompute residual
+        m_bc->computeResidual(resid,
+                              ghost_enthalpy,  // enthalpy in ghost cell
+                              a_ghost_bulk_conc,  // bulk conc in ghost cell
+                              a_interior_temperature // temperature at interior grid cell
+        );
+
+        // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
+        ghost_enthalpy = ghost_enthalpy + resid;
+
+        num_iter++;
+
+      }
+
+
+    }
+
+protected:
+
+      int m_max_iter;
+      Real m_max_resid;
+
+};
+
+
+/// Newton solver
+class NonlinearBCSolverNewton: public NonlinearBCSolver
+{
+public:
+
+  /// Destructor
+    virtual ~NonlinearBCSolverNewton()
+    {
+
+    }
+
+    /// Full constructor
+    NonlinearBCSolverNewton(NonlinearTemperatureBC* a_bc,
+                            const int a_max_iter,
+                            const Real a_max_residual) : NonlinearBCSolver(a_bc)
+    {
+      m_max_resid = a_max_residual;
+      m_max_iter = a_max_iter;
+    }
+
+    /// Method for solving the system - must be implemented by inherited classes
+    virtual void solve(Real& ghost_enthalpy,
+                       const Real a_interior_temperature,
+                       const Real a_ghost_bulk_conc)
+    {
+      CH_TIME("NonlinearBCSolverNewton::solve");
+
+      // This is somewhat arbitrary
+      Real dH = 0.01;
+
+      Real res_old = m_max_resid*10, res_new = m_max_resid*10;
+      int num_iter = 0;
+
+      while (abs(res_old) > m_max_resid && num_iter < m_max_iter)
+      {
+
+        // Need residual at H and H+dH
+        m_bc->computeResidual(res_old,
+                              ghost_enthalpy,  // enthalpy in ghost cell
+                              a_ghost_bulk_conc,  // bulk conc in ghost cell
+                              a_interior_temperature // temperature at interior grid cell
+        );
+
+        m_bc->computeResidual(res_new,
+                              ghost_enthalpy+dH,  // enthalpy in ghost cell
+                              a_ghost_bulk_conc,  // bulk conc in ghost cell
+                              a_interior_temperature // temperature at interior grid cell
+        );
+
+        // Near the eutectic, can have the same temperature for different enthalpies and therefore
+        // the same residual. Want to avoid dividing by 0, so just do picard iterations in this case.
+        if (abs(res_new - res_old) < 1e-10)
+        {
+          ghost_enthalpy = ghost_enthalpy + res_old;
+          // Try increasing dH to stop this happening next time
+          dH = 2*dH;
+        }
+        else
+        {
+          ghost_enthalpy = ghost_enthalpy - res_old * (dH)/(res_new - res_old);
+        }
+
+        num_iter++;
+      }
+
+    }
+
+protected:
+
+      int m_max_iter;
+      Real m_max_resid;
+
+};
+
+
 
 /// Big class to encapsulate physical boundary conditions
 class PhysBCUtil
