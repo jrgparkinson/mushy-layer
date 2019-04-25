@@ -23,6 +23,11 @@
 Contains immunity flag definitions
 */
 
+enum NonlinearBCSolveMethods {
+  picard,
+  newton
+};
+
 /// Different options for enforced porosity
 enum ParamsPorosityFunctions {
   /// Sets porosity to it's boundary value on the bottom of the domain, i.e. MushyLayerParams::bcValPorosityLo[0]
@@ -629,6 +634,8 @@ public:
 	m_bc_b;
 
 	int max_bc_iter;
+
+	int bc_nonlinear_solve_method;
 
 	Real max_bc_residual;
 

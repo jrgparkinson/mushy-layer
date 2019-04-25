@@ -577,6 +577,9 @@ void MushyLayerParams::getParameters()
   max_bc_residual= 1e-5;
   ppMain.query("max_bc_residual", max_bc_residual);
 
+  bc_nonlinear_solve_method = NonlinearBCSolveMethods::picard;
+  ppMain.query("nonlinear_bc_solve_method", bc_nonlinear_solve_method);
+
 
   // For the plume
   ::computeBoundingEnergy(HPlumeInflow, ThetaPlumeInflow, HSolidusPlume, HLiquidusPlume, HEutecticPlume,

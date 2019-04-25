@@ -9,18 +9,6 @@
 
 
 
-/**
- * Function interface for applying enthalpy boundary conditions
- * which satisfy some condition based on the temperature field.
- * Computes some residual, which is characterises the extent
- * to which we have not satisfied the temperature constraint, which we attempt to minimise.
- */
-//typedef void(*EnthalpyBCResidual)(Real&   a_residual,
-//                      const Real  a_dx,
-//                      const Real a_ghost_
-//                      Real                 a_dx,
-//                      bool                 a_homogeneous);
-
 /// Class for implementing temperature bcs on the enthalpy field
 /**
  * This should be an abstract base class - different applications should inherit from this
@@ -65,7 +53,7 @@ protected:
  *
  *  Specifically, the residual \f$ r \f$ is
  *
- *  \f$ r = \Delta x \left[F_0 - b( T_b - T_{ref}) \right] - (T_g - T_i) \f$
+ *  \f$ r =  \left[F_0 - b( T_b - T_{ref}) \right] - \frac{T_g - T_i)}{\Delta x} \f$
  *
  *  where \f$ T_b = (T_g + T_i)/2 \f$ is the temperature on the boundary,
  *  \f$ T_g \f$ is the temperature in the ghost cell and \f$ T_i \f$ is the temperature
@@ -130,11 +118,17 @@ public:
   NonlinearBCSolver()
   {
     m_bc = NULL;
+    m_max_resid = 1e-5;
+    m_max_iter = 3;
   }
 
-  NonlinearBCSolver(NonlinearTemperatureBC* a_bc)
+  NonlinearBCSolver(NonlinearTemperatureBC* a_bc,
+                    const int a_max_iter,
+                    const Real a_max_residual)
   {
     m_bc = a_bc;
+    m_max_resid = a_max_residual;
+    m_max_iter = a_max_iter;
   }
 
   /// Method for solving the system - must be implemented by inherited classes
@@ -146,6 +140,9 @@ public:
   }
 
   NonlinearTemperatureBC* m_bc;
+  int m_max_iter;
+  Real m_max_resid;
+
 };
 
 /// Picard solver
@@ -162,10 +159,8 @@ public:
     /// Full constructor
     NonlinearBCSolverPicard(NonlinearTemperatureBC* a_bc,
                             const int a_max_iter,
-                            const Real a_max_residual) : NonlinearBCSolver(a_bc)
+                            const Real a_max_residual) : NonlinearBCSolver(a_bc, a_max_iter, a_max_residual)
     {
-      m_max_resid = a_max_residual;
-      m_max_iter = a_max_iter;
     }
 
     /// Method for solving the system - must be implemented by inherited classes
@@ -197,7 +192,7 @@ public:
                               a_interior_temperature // temperature at interior grid cell
         );
 
-        // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
+        // Compute new estimate for the enthalpy in the ghost cell, by incrementing with the residual
         ghost_enthalpy = ghost_enthalpy + resid;
 
         num_iter++;
@@ -206,11 +201,6 @@ public:
 
 
     }
-
-protected:
-
-      int m_max_iter;
-      Real m_max_resid;
 
 };
 
@@ -229,10 +219,8 @@ public:
     /// Full constructor
     NonlinearBCSolverNewton(NonlinearTemperatureBC* a_bc,
                             const int a_max_iter,
-                            const Real a_max_residual) : NonlinearBCSolver(a_bc)
+                            const Real a_max_residual) : NonlinearBCSolver(a_bc, a_max_iter, a_max_residual)
     {
-      m_max_resid = a_max_residual;
-      m_max_iter = a_max_iter;
     }
 
     /// Method for solving the system - must be implemented by inherited classes
@@ -266,7 +254,7 @@ public:
 
         // Near the eutectic, can have the same temperature for different enthalpies and therefore
         // the same residual. Want to avoid dividing by 0, so just do picard iterations in this case.
-        if (abs(res_new - res_old) < 1e-10)
+        if (abs(res_new - res_old) < m_max_resid)
         {
           ghost_enthalpy = ghost_enthalpy + res_old;
           // Try increasing dH to stop this happening next time
@@ -282,10 +270,7 @@ public:
 
     }
 
-protected:
 
-      int m_max_iter;
-      Real m_max_resid;
 
 };
 

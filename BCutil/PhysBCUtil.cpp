@@ -674,7 +674,14 @@ public:
 
                 NonlinearBCSolver* nonlinearSolver;
 //                nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual);
-                nonlinearSolver = new NonlinearBCSolverNewton(residual, m_params.max_bc_iter, m_params.max_bc_residual);
+                if (m_params.bc_nonlinear_solve_method == NonlinearBCSolveMethods::newton)
+                {
+                  nonlinearSolver = new NonlinearBCSolverNewton(residual, m_params.max_bc_iter, m_params.max_bc_residual);
+                }
+                else if (m_params.bc_nonlinear_solve_method == NonlinearBCSolveMethods::picard)
+                {
+                  nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual);
+                }
 
                 Box toRegion = adjCellBox(a_valid, idir, side, 1);
                 toRegion &= a_state.box();
