@@ -92,6 +92,14 @@ public:
     Real Tboundary = (a_ghost_T + a_interior_temperature)/2;
 
     a_residual = (m_F - m_b*(Tboundary - m_T_ref)) - m_a*Tflux;
+
+    // Some basic error checking
+    // should never have a residual this big?
+    if (abs(a_residual) > 1e3)
+    {
+      MayDay::Warning("NonlinearTemperatureBCRobin::computeResidual - BC residual too large");
+      a_residual = 0.0;
+    }
   }
 
 
@@ -191,6 +199,8 @@ public:
                               a_ghost_bulk_conc,  // bulk conc in ghost cell
                               a_interior_temperature // temperature at interior grid cell
         );
+
+
 
         // Compute new estimate for the enthalpy in the ghost cell, by incrementing with the residual
         ghost_enthalpy = ghost_enthalpy + resid;
