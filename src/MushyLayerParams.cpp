@@ -242,11 +242,18 @@ void MushyLayerParams::getParameters()
   pp.query("V", V);
 
   // I do need these, to define the phase diagram
-  pp.get("eutecticTemp", eutecticTemp);
-  pp.get("eutecticComposition", eutecticComposition);
-  pp.get("initialComposition", initialComposition);
-  pp.get("liquidusSlope", liquidusSlope);
-  pp.get("waterDistributionCoeff", waterDistributionCoeff);
+  // Defaults for sea ice:
+  initialComposition = 30;
+  eutecticComposition = 230;
+  eutecticTemp = -23;
+  liquidusSlope = -0.1;
+  waterDistributionCoeff = 1e-5;
+
+  pp.query("eutecticTemp", eutecticTemp);
+  pp.query("eutecticComposition", eutecticComposition);
+  pp.query("initialComposition", initialComposition);
+  pp.query("liquidusSlope", liquidusSlope);
+  pp.query("waterDistributionCoeff", waterDistributionCoeff);
 
   pp.query("fixedTempDirection", fixedTempDirection);
   pp.query("inflowVelocity", inflowVelocity);
@@ -413,7 +420,8 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    nonDimVel = (height/liquidHeatDiffusivity) * V;
+//    nonDimVel = (height/liquidHeatDiffusivity) * V;
+    nonDimVel = 0.0;
   }
 
   pp.query("BCAccuracy", m_BCAccuracy);
@@ -435,6 +443,7 @@ void MushyLayerParams::getParameters()
   ThetaInitial = concToTheta(initialComposition);
   ThetaInf = ThetaInitial;
 
+  pp.query("initialBulkConc", ThetaInitial);
 
   plumeBounds.resize(2);
   if (pp.contains("plumeBounds"))
@@ -570,6 +579,7 @@ void MushyLayerParams::getParameters()
   m_bc_noFluxLimit = BCInfo(string("NoFluxLimit"), false);
   m_bc_bTref = BCInfo(string("TRef"), false);
   m_bc_b = BCInfo(string("b"), false);
+  m_bc_a = BCInfo(string("a"), false);
 
   max_bc_iter = 2;
   ppMain.query("max_bc_iter", max_bc_iter);

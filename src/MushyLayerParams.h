@@ -631,7 +631,8 @@ public:
 	m_bc_bTref,
 
 	/// Some generic variable which can be used in various boundary conditions if required
-	m_bc_b;
+	m_bc_b,
+	m_bc_a;
 
 	int max_bc_iter;
 

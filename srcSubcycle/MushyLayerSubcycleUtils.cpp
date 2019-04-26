@@ -398,13 +398,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.useIncrementalPressureRefinedLevels = false;
   ppProjection.query("useIncrementalPressureRefinedLevels", opt.useIncrementalPressureRefinedLevels);
-//  opt.phiScale = 1;
-//  ppProjection.query("phiScale", opt.phiScale);
-
-//  opt.scaleMACBCWithChi = false;
-//  opt.MACBCscale = 1.0;
-//  ppProjection.query("scaleMACBCWithChi", opt.scaleMACBCWithChi);
-//  ppProjection.query("MACbcScale", opt.MACBCscale);
 
   opt.doSyncOperations = true;
   ppMain.query("doSyncOperations", opt.doSyncOperations);
@@ -587,27 +580,18 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   int mgtype = MGmethod::MGTypeFAS;
 
-//  opt.AMRMultigrid_verbosity = 0;
-//  opt.AMRMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
+
   opt.AMRMultigridVerb=0;
   opt.AMRMultigridTolerance=1e-10;
   opt.AMRMultigridHang=1e-10;
   opt.AMRMultigridNormThresh=1e-10;
-//  ppAMRMultigrid.query("multigrid", opt.AMRMultigrid_verbosity);
-//  ppAMRMultigrid.query("relaxMode", opt.AMRMultigridRelaxMode);
+
   ppAMRMultigrid.query("hang_eps", opt.AMRMultigridHang);
   ppAMRMultigrid.query("tolerance", opt.AMRMultigridTolerance);
   ppAMRMultigrid.query("norm_thresh", opt.AMRMultigridNormThresh);
   ppAMRMultigrid.query("verbosity", opt.AMRMultigridVerb);
   ppAMRMultigrid.query("MGtype", mgtype);
   opt.MGtype = MGmethod(mgtype);
-
-
-//  opt.implicitAdvectionSolve = false;
-//  ppMain.query("implicitAdvectionSolve", opt.implicitAdvectionSolve);
-
-//  opt.usePhiForImplicitAdvectionSolve = true;
-//  ppMain.query("usePhiForImplicitAdvectionSolve", opt.usePhiForImplicitAdvectionSolve);
 
   opt.maxDivUFace = 1e-8;
   ppMain.query("maxDivUFace", opt.maxDivUFace);
@@ -620,9 +604,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.apply_diagnostic_bcs = true;
   ppMain.query("apply_diagnostic_bcs", opt.apply_diagnostic_bcs);
-
-//  opt.smoothingCoeff = 0.0; //0.01;
-//  ppProjection.query("pre_smoothing", opt.smoothingCoeff);
 
   opt.velMGNumSmooth=2;
   opt.velMGTolerance=1e-10;

@@ -604,7 +604,7 @@ protected:
 
   /// Add a fixed heat source
   /**
-   * \f$ Q = \frac{Q_0}{\sigma \sqrt{2 \Pi}} exp\left[ - 0.5 \left( \frac{x-x_c}{\sigma} \right)^2 \right]  0.5 \left( 1 + tanh\left[10 (z-(H-h)) \right]) \right) \f$
+   * \f$ Q = \frac{Q_0}{\sigma \sqrt{2 \pi}} \exp\left[ - 0.5 \left( \frac{x-x_c}{\sigma} \right)^2 \right]  0.5 \left( 1 + \tanh\left[10 (z-(H-h)) \right]) \right) \f$
    *
    * where the parameters are found from the inputs file as:
    * Q_0 is given by heatSource.size

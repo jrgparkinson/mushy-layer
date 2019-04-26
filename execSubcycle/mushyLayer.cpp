@@ -98,7 +98,17 @@ main(int a_argc, char* a_argv[])
     ppMain.get("max_level",max_level);
     int num_read_levels = Max(max_level,1);
     Vector<int> ref_ratios; // (num_read_levels,1);
-    ppMain.getarr("ref_ratio",ref_ratios,0,num_read_levels+1);
+
+    // Only require ref_ratio to be defined for AMR simulations
+    if (max_level > 0)
+    {
+      ppMain.getarr("ref_ratio",ref_ratios,0,num_read_levels+1);
+    }
+    else
+    {
+      // Need a dummy value for uniform mesh simulations
+      ref_ratios.push_back(1);
+    }
 
 
     mushyLayer(stopTime, nstop_int, ref_ratios);

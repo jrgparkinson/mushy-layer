@@ -652,7 +652,7 @@ public:
                     break;
 
                   case PhysBCUtil::TemperatureFluxRadiation:
-                    a = 1.0;
+                    a = m_params.m_bc_a.getBC(idir, side);;
                     b = m_params.m_bc_b.getBC(idir, side);
                     flux = boundaryValue;
                     T_ref = m_params.m_bc_bTref.getBC(idir, side);
