@@ -89,12 +89,12 @@ class MushyLayerRunSimple:
 
     def single_run(self, run_name):
 
-        test = self.make_next_dir(join(self.base_output_dir, run_name))
-        if test == -1:
+        this_run_directory = self.make_next_dir(join(self.base_output_dir, run_name))
+        if this_run_directory is None:
             print('Run already done, skipping \n \n')
             return -1
 
-        this_run_directory = self.get_most_recent_directory(run_name)
+        # this_run_directory = self.get_most_recent_directory(run_name)
 
         output_folder = join(self.base_output_dir, this_run_directory)
 
@@ -205,6 +205,8 @@ class MushyLayerRunSimple:
 
     def make_next_dir(self,  basename):
 
+
+
         if self.allow_multiple_output_dirs:
             # Take some basename, and make the directory basename-(n+1) where
             # directories basename-0 to basename-n already exist
@@ -229,7 +231,7 @@ class MushyLayerRunSimple:
 
             # If we already have this directory, return -1
             if os.path.isdir(new_dir):
-                return -1
+                return None
 
             # # Also check for directories ending in -steady with the same name
             # if not self.allow_multiple_output_dirs:
@@ -240,6 +242,7 @@ class MushyLayerRunSimple:
 
         # Make new directory
         os.makedirs(new_dir)
+        print('Making new directory %s' % new_dir)
 
         return new_dir
 
