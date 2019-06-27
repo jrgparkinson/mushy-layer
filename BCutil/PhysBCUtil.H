@@ -389,10 +389,10 @@ public:
 	/// "virtual" constructor
 	virtual PhysBCUtil* newPhysBCUtil() const;
 
-	/// returns velocity BC for tracing (inviscid)
+	/// Returns velocity BC for tracing (inviscid)
 	virtual Tuple<BCHolder, SpaceDim> tracingVelFuncBC() const;
 
-	/// returns edge-centered vel BC for edge-ctrd vel (single component)
+	/// Returns edge-centered vel BC for edge-ctrd vel (single component)
 	virtual Tuple<BCHolder, SpaceDim> advectionVelFuncBC(bool a_isViscous) const;
 
 	/// Currently unused
@@ -416,16 +416,17 @@ public:
 	/// BC holder for velocity \f$ \mathbf{u} \f$ - extrapolation
 	virtual Tuple<BCHolder, SpaceDim> velExtrapBC(Interval ghostInterval=Interval(0,0)) const;
 
-	/// returns single-component BC for viscous refluxing solves
+	/// Returns single-component BC for viscous refluxing solves
 	virtual BCHolder viscousRefluxBC(int a_dir, bool a_isViscous=false) const;
 
-	/// returns a BC object compatible with AMRGodunov advection infrastructure
+	/// Returns a BC object compatible with AMRGodunov advection infrastructure.
+	/// For use in the PatchGodunov stuff.
 	virtual PhysIBC* advectionVelIBC() const;
 
 	/// Is object defined?
 	bool isDefined();
 
-	/// sets cell spacing
+	/// Sets the cell spacing \f$ \Delta x \f$.
 	void Dx(const Real a_dx);
 
 	/// Convert to AdvectIBC BCs
@@ -435,13 +436,13 @@ public:
 	/// Handy to have a function of this form, too
 	int convertBCType(const int a_implicitBC) const;
 
-	/// returns cell spacing
+	/// Returns cell spacing
 	Real Dx() const;
 
-	/// sets time
+	/// Sets time
 	void Time(const Real a_time);
 
-	/// returns current time
+	/// Returns current time
 	Real Time() const;
 
 	/// Set pointer to advection velocity
@@ -473,7 +474,7 @@ public:
 
 	/// BC holder for freestream correction
 	/**
-	 * Normal gradient  = 0
+	 * No normal gradient, \f$ \mathbf{n} \cdot \nabla \phi = 0 \f$
 	 */
 	virtual BCHolder FreestreamCorrFuncBC() const;
 

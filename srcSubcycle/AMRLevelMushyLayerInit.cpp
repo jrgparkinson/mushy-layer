@@ -3410,15 +3410,18 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
       FArrayBox& newBulkConc = (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit];
       FArrayBox& oldBulkConc = old_bulk_conc[dit];
 
+      int vertical_index = SpaceDim-1;
+
       for (BoxIterator bit(b); bit.ok(); ++bit)
       {
+
 
         // Need to find the two cells to interpolate between, along with which fraction of each to take
         IntVect iv = bit();
         RealVect loc;
         getLocation(iv, loc, m_dx);
 
-        Real z = loc[1];
+        Real z = loc[vertical_index];
         Real z_new = z*stretching;
 
         Real dz = z-z_new;
@@ -3429,8 +3432,8 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
 
         pout() << fractional_shift << ", " << extra_shift << endl;
 
-        int z_j = iv[1] + num_cells_shift+1;
-        int z_j_lower = iv[1] + num_cells_shift;
+        int z_j = iv[vertical_index] + num_cells_shift+1;
+        int z_j_lower = iv[vertical_index] + num_cells_shift;
 
         z_j = max(lowest_j, z_j);
         z_j_lower = max(lowest_j, z_j_lower);
@@ -3438,8 +3441,12 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
         z_j = min(top_j, z_j);
         z_j_lower = min(top_j, z_j_lower);
 
-        IntVect upper = IntVect(iv[0], z_j);
-        IntVect lower = IntVect(iv[0], z_j_lower);
+
+        IntVect upper = iv;
+        upper[vertical_index] = z_j;
+
+        IntVect lower = iv;
+        lower[vertical_index] = z_j_lower;
 
         newEnthalpy(iv) = oldEnthalpy(lower)*(1-extra_shift) + extra_shift*oldEnthalpy(upper);
         newBulkConc(iv) = oldBulkConc(lower)*(1-extra_shift) + extra_shift*oldBulkConc(upper);

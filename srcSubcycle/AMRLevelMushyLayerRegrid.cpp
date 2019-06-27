@@ -514,20 +514,30 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 //    localTags.grow(1, -grow_dist);
 //    localTags.grow(1, grow_dist);
 
+    int vertical_dir = SpaceDim-1;
+
     // Only keep tags which overlap with the same tags shifted up by shift_dist cells
     int shift_dist = 5;
     IntVectSet shiftedTags = localTags;
-    shiftedTags.shift(IntVect(0, shift_dist));
+
+    // Shift in vertical direction (which has an index given by number of spatial dimensions - 1) by shift_dist
+    IntVect shiftDir = IntVect::Zero;
+    shiftDir[vertical_dir] = shift_dist;
+    shiftedTags.shift(shiftDir);
 
     localTags &= shiftedTags;
 
-    localTags.grow(1, shift_dist);
+    localTags.grow(vertical_dir, shift_dist);
 
     // Grow further downwards
     // Can only do this by shifting down then growing in both directions
     int growLo = 4;
-    localTags.shift(IntVect(0, -growLo));
-    localTags.grow(1, growLo);
+
+    // Create new shift vector
+    shiftDir = IntVect::Zero;
+    shiftDir[vertical_dir] = -growLo;
+    localTags.shift(shiftDir);
+    localTags.grow(vertical_dir, growLo);
 
   }
   else if (m_opt.tag_plume_mush)

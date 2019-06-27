@@ -33,16 +33,15 @@ static void getDomainFacePosition(RealVect&             a_retval,
 extern "C"
 {
 
-
-
   static void ExtraBC(FArrayBox&     a_state,
                       const Box&     a_valid,
                       int            a_dir,
                       Side::LoHiSide a_side,
                       int            a_order,
-                      int a_comp)
+                      int            a_comp = 0)
   {
     // Fortran version
+    CH_assert(a_comp < a_state.nComp());
     ExtrapBC(a_state, a_valid, a_dir, a_side, a_order, a_comp);
   }
 
@@ -1051,7 +1050,7 @@ public:
                     {
                       order  = 2;
                       ExtraBC(a_state, a_valid,
-                              idir, side, order, m_comp);
+                              idir, side, order);
                     }
                   } // end if tangential
                   break;
@@ -2886,7 +2885,6 @@ BCHolder PhysBCUtil::viscousRefluxBC(int a_dir, bool a_isViscous) const
 }
 
 // ---------------------------------------------------------------
-/// this is a BC object used in the PatchGodunov stuff
 //todo - should implement more than just solid walls BCs, for the cases where we have either slip or outflow bcs
 PhysIBC*
 PhysBCUtil::advectionVelIBC() const

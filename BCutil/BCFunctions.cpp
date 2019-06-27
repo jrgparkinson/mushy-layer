@@ -204,11 +204,12 @@ void VariableFluxBC(FArrayBox&      a_state,
 
     loc = iv;
     loc *= a_dx;
-    RealVect ccOffset(0.5, 0.5);
+//    RealVect ccOffset = (0.5, 0.5);
+    RealVect ccOffset = 0.5*RealVect::Unit;
     ccOffset *= a_dx;
     loc += ccOffset; // cell centred offset
 
-    Real flux = a_value*0.5*(1+tanh(50*(loc[1]-0.75)));
+    Real flux = a_value*0.5*(1+tanh(50*(loc[SpaceDim-1]-0.75)));
 
 //    pout() << iv[1] << ",";
 
@@ -279,6 +280,8 @@ void ExtrapBC(FArrayBox&      a_state,
   // If user asks for second order accuracy but we only have one interior point then don't do what they ask for
   int boxSize = a_state.box().size(a_dir);
   a_order = min(a_order, boxSize);
+
+  CH_assert(a_comp < a_state.nComp());
 
   FORT_EXTRAPBC(CHF_FRA(a_state),
                 CHF_BOX(toRegion),

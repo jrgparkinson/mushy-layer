@@ -1116,6 +1116,10 @@ Real MushyLayerParams::computePorosity(Real H, Real C)
 Real MushyLayerParams::compute_dHdT(Real H, Real C)
 {
   Real H_e, H_s, H_l, dHdT;
+  H_e = std::nan("1");
+  H_s = std::nan("1");
+  H_l = std::nan("1");
+
 
   ::computeBoundingEnergy(H_e, C, H_s, H_l, H_e, specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
 
