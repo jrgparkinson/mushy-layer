@@ -562,37 +562,46 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     const IntVect& scalGrowVect = a_scal.ghostVect();
     int scalGrow = scalGrowVect[0];
 
+    Interval             subcomps(a_comp, a_comp);
+    LevelData<FArrayBox> alias;
+    aliasLevelData(alias, &a_scal, subcomps);
+
     {
       CH_TIME("AMRLevelMushyLayer::fillScalars::linearFillPatch");
 
-       int srcComp = 0;
-       int destComp = scalComps.end();
-       int numComp = 1;
+//       int srcComp = 0;
+//       int destComp = scalComps.end();
+//       int numComp = 1;
+
+      // Now we're using an alias:
+             int srcComp = 0;
+             int destComp = 0;
+             int numComp = 1;
 
       if (scalGrow == 1)
       {
-        m_piecewiseLinearFillPatchScalarOne.fillInterp(a_scal, oldCrseScal, newCrseScal,
+        m_piecewiseLinearFillPatchScalarOne.fillInterp(alias, oldCrseScal, newCrseScal,
                                                        crse_time_interp_coeff,
 //                                                       scalComps.begin(), scalComps.end(), scalComps.size());
                                                        srcComp, destComp, numComp);
       }
       else if (scalGrow == 2)
       {
-        m_piecewiseLinearFillPatchScalarTwo.fillInterp(a_scal, oldCrseScal, newCrseScal,
+        m_piecewiseLinearFillPatchScalarTwo.fillInterp(alias, oldCrseScal, newCrseScal,
                                                        crse_time_interp_coeff,
 //                                                       scalComps.begin(), scalComps.end(), scalComps.size());
                                                        srcComp, destComp, numComp);
       }
       else if (scalGrow == 3)
       {
-        m_piecewiseLinearFillPatchScalarThree.fillInterp(a_scal, oldCrseScal, newCrseScal,
+        m_piecewiseLinearFillPatchScalarThree.fillInterp(alias, oldCrseScal, newCrseScal,
                                                          crse_time_interp_coeff,
 //                                                         scalComps.begin(), scalComps.end(), scalComps.size());
                                                          srcComp, destComp, numComp);
       }
       else if (scalGrow == 4)
       {
-        m_piecewiseLinearFillPatchScalarFour.fillInterp(a_scal, oldCrseScal, newCrseScal,
+        m_piecewiseLinearFillPatchScalarFour.fillInterp(alias, oldCrseScal, newCrseScal,
                                                         crse_time_interp_coeff,
 //                                                        scalComps.begin(), scalComps.end(), scalComps.size());
                                                         srcComp, destComp, numComp);
@@ -624,7 +633,10 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       // Fill BCs on coarse scalar - doesn't seem to make a difference
       //      crseLevel.fillScalars(avCrseScal, a_time, a_var, false, true);
 
-      m_quadCFInterpScalar.coarseFineInterp(a_scal, avCrseScal);
+
+
+//      m_quadCFInterpScalar.coarseFineInterp(a_scal, avCrseScal);
+      m_quadCFInterpScalar.coarseFineInterp(alias, avCrseScal);
     }
 
   }
