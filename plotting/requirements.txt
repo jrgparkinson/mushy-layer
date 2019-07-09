@@ -1,0 +1,11 @@
+pyproj==1.9.6
+numpy
+matplotlib<3.0
+scipy<1.3
+paramiko
+h5py
+colorama
+shapely
+geopandas
+xarray
+future
