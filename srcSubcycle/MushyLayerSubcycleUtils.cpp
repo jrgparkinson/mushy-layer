@@ -236,8 +236,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.advVelChiLimit = min(pow(10,5)*opt.lowerPorosityLimit, pow(10,-10)) ; //was 1e-10
   ppMain.query("advPorosityLimit", opt.advVelChiLimit);
 
-
-
   // by default make this tiny (so essentially turned off)
   opt.uDelU_porosityLimit = 10*opt.lowerPorosityLimit; //1e-15;
   ppMain.query("uDelu_porosity", opt.uDelU_porosityLimit);
