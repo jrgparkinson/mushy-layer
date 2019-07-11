@@ -524,7 +524,14 @@ for frame_i = 1:length(frames)
         [dTdx, dTdy] = gradient(TSmooth, dx);
         TFluxOnTopBoundary = interp2(X, Y, dTdx, x_vals, y_vals);
         
-        figure();
+        if frame_i == 1
+            ax = gca;
+        else
+            ax = axes;
+        end
+        ax.Position = options.axPos;
+        
+        %figure();
         hold on;
         plot(x_vals, TemperatureOnTopBoundary);
         ylabel('$T$');
