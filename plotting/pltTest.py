@@ -9,10 +9,10 @@ p = PltFile(file_loc)
 
 lev0Dx = p.levels[0][p.DX]
 print('dx = ' + str(lev0Dx))
-domainSize = p.domainSize
+domainSize = p.domain_size
 print('Domain extent: ' + str(domainSize))
 # av_chan_spacing = np.mean(channelSpacing)
-av_chan_spacing = (p.domainSize[2] - p.domainSize[0]) / float(num_channels)
+av_chan_spacing = (p.domain_size[2] - p.domain_size[0]) / float(num_channels)
 
 print('Num channels: ' + str(num_channels) + ', relative positions (0 = left, 1 = right): ' + str(rel_pos))
 print('Average channel spacing: ' + str(av_chan_spacing))

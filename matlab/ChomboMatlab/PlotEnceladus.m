@@ -40,8 +40,8 @@ end
 % Can either make 2D plots of the porosity and flow fields, or
 % Just plot the temperature and temperature flux at the top boundary
 % Only set one of these to 'true'
-make_2d_plot = true;
-make_top_boundary_plot = false;
+make_2d_plot = false;
+make_top_boundary_plot = true;
 
 if make_2d_plot && make_top_boundary_plot
     print('Error - cannot do 2D plot and top boundary plot simultaneously');
