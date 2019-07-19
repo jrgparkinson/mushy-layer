@@ -36,6 +36,7 @@ class ChkFile:
 
         self.inputs = read_inputs(inputs_loc)
 
+
         h5_file = h5py.File(self.filename, 'r')
 
         # print('Loaded HDF5 file with groups: ' + str(h5File.keys()))
@@ -59,9 +60,10 @@ class ChkFile:
 
         # Now read all the component names
         self.data = {}
-        all_names = attrs.values()
+        all_names = []
         for i in range(0, self.num_comps):
             name = attrs['component_' + str(i)]
+            name = name.decode('UTF-8')
             # Work out if it's a vector or scalar
             # if name[0] == 'x' or name[0] == 'y' or name[0] == 'z' and name[1:] in all_names:
             #     # Vector. Don't add if we've already got it
@@ -72,6 +74,7 @@ class ChkFile:
             # else:
             #     self.data[name] = {NUM_COMPS: 1}
             self.data[name] = {self.NUM_COMPS: 1}
+            all_names.append(name)
 
         # print(self.data)
 
@@ -111,7 +114,7 @@ class ChkFile:
                 component = 0
 
                 # Need to get data differently if this is a vector
-                is_vector =  (comp_name[0] == 'x' or comp_name[0] == 'y' or comp_name[0] == 'z' and comp_name[1:] in all_names)
+                is_vector =  (comp_name[0] == 'x' or comp_name[0] == 'y' or comp_name[0] == 'z' and comp_name in all_names)
                 if is_vector:
                     if comp_name[0] == 'x':
                         component = 0
@@ -122,7 +125,7 @@ class ChkFile:
                         component = 2
 
                     # Hardwired to 2D for now
-                    num_comps = 2
+                    num_comps = self.space_dim
 
                     data = level_group[comp_name[1:] + ':datatype=0']
                 else:
@@ -162,6 +165,8 @@ class ChkFile:
                     data_comp_box = data_box[comp_offset:comp_offset+num_comp_cells]
 
                     reshaped_data = data_comp_box.reshape((num_rows, num_cols))
+                    # reshaped_data = data_comp_box.reshape((num_cols, num_rows))
+                    reshaped_data = np.array(reshaped_data).transpose()
                     shaped_data.append(reshaped_data)
 
                     offset = offset + num_cells
@@ -203,18 +208,18 @@ class ChkFile:
         # Now compute bounding energies
         cols = enthalpy.shape[0]
         rows = enthalpy.shape[1]
-        for j in xrange(cols):
+        for j in range(cols):
 
-            for i in xrange(rows):
+            for i in range(rows):
                 eutectic_porosity = (conc_ratio + bulk_salinity[j, i]) / (theta_eutectic + conc_ratio)
                 enthalpy_eutectic[j, i] = eutectic_porosity * (stefan + theta_eutectic * (1 - cp)) + cp * theta_eutectic
                 enthalpy_solidus[j, i] = cp * (theta_eutectic + max(0.0, (-bulk_salinity[j, i] - conc_ratio) / pc))
                 enthalpy_liquidus[j, i] = stefan - bulk_salinity[j, i] + theta_eutectic + theta_eutectic
 
         # Compute diagnostic variables
-        for j in xrange(cols):
+        for j in range(cols):
 
-            for i in xrange(rows):
+            for i in range(rows):
                 if enthalpy[j, i] <= enthalpy_solidus[j, i]:
                     porosity[j, i] = 0.0
                     temperature[j, i] = enthalpy[j, i] / cp
@@ -262,40 +267,77 @@ class ChkFile:
         for box_i in range(0, len(self.levels[0]['boxes'])):
             box = self.levels[0]['boxes'][box_i]
 
-            # print(box)
+
             level_0_data_box = self.data[var_name]['data'][0][box_i]
 
-            ioffset = box[0] - self.prob_domain[0]
-            joffset = box[1] - self.prob_domain[1]
+            # ND version:
+            box_size = [box[self.space_dim + i] + 1 - box[i] for i in range(0, self.space_dim)]
+            offsets = tuple([box[i] - self.prob_domain[i] for i in range(0, self.space_dim)])
 
-            for i in range(0, box[2] + 1 - box[0]):
-                for j in range(0, box[3] + 1 - box[1]):
-                    # print(str(i) + ', ' + str(j))
-                    # val = porosityBox[j][i]
-                    level_0_data_box[j][i] = lev0dat[j + joffset][i + ioffset]
-                # porosity[j+joffset][i+ioffset] = porosityBox[j][i]
+            loopover = [range(s) for s in box_size]
+            import itertools
 
-    def get_data(self, var_name):
+            prod = itertools.product(*loopover)
+
+            for idx in prod:
+                idx_plus_offset = tuple(map(lambda x, y: x + y, idx, offsets))
+                level_0_data_box[idx] = lev0dat[idx_plus_offset]
+
+            # ioffset = box[0] - self.prob_domain[0]
+            # joffset = box[1] - self.prob_domain[1]
+            #
+            # for i in range(0, box[2] + 1 - box[0]):
+            #     for j in range(0, box[3] + 1 - box[1]):
+            #         level_0_data_box[j][i] = lev0dat[j + joffset][i + ioffset]
+
+    def get_data(self, var_name, rotate_dims = False):
         # Reconstruct level 0 data as single np array
-        width = self.prob_domain[2] + 1 - self.prob_domain[0]
-        height = self.prob_domain[3] + 1 - self.prob_domain[1]
 
-        lev0_dat = np.empty([height, width])
-
+        # N dimensional version:
+        domain_size = [self.prob_domain[self.space_dim + i] + 1 - self.prob_domain[i] for i in range(0, self.space_dim)]
+        lev0_dat = np.empty(domain_size)
         for box_i in range(0, len(self.levels[0]['boxes'])):
             box = self.levels[0]['boxes'][box_i]
-
-            # print(box)
             lev0_dat_box = self.data[var_name]['data'][0][box_i]
 
-            ioffset = box[0] - self.prob_domain[0]
-            joffset = box[1] - self.prob_domain[1]
+            box_size = [box[self.space_dim + i] + 1 - box[i] for i in range(0, self.space_dim)]
 
-            for i in range(0, box[2] + 1 - box[0]):
-                for j in range(0, box[3] + 1 - box[1]):
-                    # print(str(i) + ', ' + str(j))
-                    # val = lev0DatBox[j][i]
-                    lev0_dat[j + joffset][i + ioffset] = lev0_dat_box[j][i]
+            offsets = tuple([box[i] - self.prob_domain[i] for i in range(self.space_dim)])
+            # offsets = tuple([box[i] - self.prob_domain[i] for i in range(self.space_dim-1, -1, -1)])
+
+            loopover = [range(s) for s in box_size]
+            import itertools
+
+            prod = itertools.product(*loopover)
+
+            for idx in prod:
+                idx_plus_offset = tuple(map(lambda x, y: x + y, idx, offsets))
+                lev0_dat[idx_plus_offset] = lev0_dat_box[idx]
+
+        if rotate_dims:
+            lev0_dat = np.array(lev0_dat).transpose()
+
+
+        # width = self.prob_domain[2] + 1 - self.prob_domain[0]
+        # height = self.prob_domain[3] + 1 - self.prob_domain[1]
+        #
+        # lev0_dat = np.empty([height, width])
+        #
+        # for box_i in range(0, len(self.levels[0]['boxes'])):
+        #     box = self.levels[0]['boxes'][box_i]
+        #
+        #     # print(box)
+        #     lev0_dat_box = self.data[var_name]['data'][0][box_i]
+        #
+        #     ioffset = box[0] - self.prob_domain[0]
+        #     joffset = box[1] - self.prob_domain[1]
+        #
+        #     for i in range(0, box[2] + 1 - box[0]):
+        #         for j in range(0, box[3] + 1 - box[1]):
+        #             lev0_dat[j + joffset][i + ioffset] = lev0_dat_box[j][i]
+
+
+
 
         return lev0_dat
 
@@ -311,7 +353,7 @@ class ChkFile:
         rows = porosity.shape[1]
         channels = [None] * cols
         chimney_positions = []
-        for j in xrange(cols):
+        for j in range(cols):
             # chimneys in row
             chimneys_in_row = 0
             average_porosity = 0
@@ -319,7 +361,7 @@ class ChkFile:
             currently_liquid = False
             chimney_pos_row = []
 
-            for i in xrange(rows):
+            for i in range(rows):
                 # print porosity[i,j]
                 chi = porosity[j, i]
                 average_porosity = average_porosity + chi
@@ -398,15 +440,17 @@ class ChkFile:
         return [num_channels, rel_chan_positions]
 
 
-    def get_mesh_grid(self, level=0):
+    def get_mesh_grid(self, level=0, rotate_dims = False):
 
         dx = self.levels[level][self.DX]
         dy = dx
 
-        components = self.data.keys()
+        components = list(self.data.keys())
 
-        field_array = self.get_data(components[0])
+        field_array = self.get_data(components[0], rotate_dims)
         grid_size = field_array.shape
+
+
 
         # Make sure the grid stretches from the start of the first cell to the end of the last cell
         # this means we stretch dx slightly out of proportion, but it ensures plot limits are correct
@@ -427,9 +471,9 @@ class ChkFile:
         return x, y
 
 
-    def get_permeability(self, permeability_function='kozeny'):
+    def get_permeability(self, permeability_function='kozeny', rotate_dims = False):
 
-        porosity = self.get_data('Porosity')
+        porosity = self.get_data('Porosity', rotate_dims)
 
         if permeability_function == 'kozeny':
 

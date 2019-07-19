@@ -79,12 +79,12 @@ class PltFile:
         self.max_level = -1
         self.num_levels = -1
         self.num_comps = -1
-        self.spaceDim = -1
+        self.space_dim = -1
         self.comp_names = []
         self.levels = []
         self.time = -1
         self.prob_domain = None
-        self.domainSize = []
+        self.domain_size = []
         self.xarr_data = None
         self.level_outlines = []
 
@@ -146,7 +146,7 @@ class PltFile:
         self.num_levels = int(attrs['num_levels'])
         # self.regrid_interval = int(attrs['regrid_interval_0'])
         self.num_comps = int(attrs['num_components'])
-        self.spaceDim = int(global_attrs['SpaceDim'])
+        self.space_dim = int(global_attrs['SpaceDim'])
 
         # Now read all the component names
         self.data = {}
@@ -184,13 +184,14 @@ class PltFile:
 
                 self.prob_domain = group_atts['prob_domain']
 
-                self.domainSize = [self.prob_domain[i] * self.levels[level][self.DX] for i in
-                                   range(0, len(self.prob_domain))]
+                self.domain_size = [self.prob_domain[i] * self.levels[level][self.DX] for i in
+                                    range(0, len(self.prob_domain))]
 
-                # Assuming 2D here
-                self.fullDomainSize = self.domainSize
-                self.fullDomainSize[2] = self.fullDomainSize[2] + lev_dx
-                self.fullDomainSize[3] = self.fullDomainSize[3] + lev_dx
+                # Moving to ND
+                self.full_domain_size = self.domain_size
+                for i in range(self.space_dim, self.space_dim + self.space_dim):
+                    self.full_domain_size[i] = self.full_domain_size[i] + lev_dx
+                    # self.fullDomainSize[3] = self.fullDomainSize[3] + lev_dx
 
             # Now get the  data for each field, on each level
             data = level_group['data:datatype=0']
@@ -219,39 +220,63 @@ class PltFile:
 
             # Initialise with a box spanning the whole domain, then add data where it exists
             # Important to do it like this for refined levels, where the whole domain isn't covered with data
-            lev_dom_box_x = np.arange(self.fullDomainSize[0] + lev_dx / 2, self.fullDomainSize[2] - lev_dx / 2,
-                                      lev_dx)
-            lev_dom_box_y = np.arange(self.fullDomainSize[1] + lev_dx / 2, self.fullDomainSize[3] - lev_dx / 2,
-                                      lev_dx)
+            # lev_dom_box_x = np.arange(self.fullDomainSize[0] + lev_dx / 2, self.fullDomainSize[2] - lev_dx / 2,
+            #                           lev_dx)
+            # lev_dom_box_y = np.arange(self.fullDomainSize[1] + lev_dx / 2, self.fullDomainSize[3] - lev_dx / 2,
+            #                           lev_dx)
+            # blank_data = np.empty((lev_dom_box_x.size, lev_dom_box_y.size))
 
-            blank_data = np.empty((lev_dom_box_x.size, lev_dom_box_y.size))
+            size = []
+            for i in range(self.space_dim):
+                lev_dom_box_dir = np.arange(self.full_domain_size[i] + lev_dx / 2, self.full_domain_size[i + self.space_dim] - lev_dx / 2,
+                                            lev_dx)
+                size.append(lev_dom_box_dir.size)
+
+
+            blank_data = np.empty(tuple(size))
+
             blank_data[:] = np.nan
 
             # Use indexes rather than x, y for now - then convert to x,y later
             # this is to avoid issues with floating point arithmetic when merging datasets
             # (we can end up trying to merge datasets where x coordinates differ by ~ 10^{-10}, creating nonsense)
 
-            i = np.arange(self.prob_domain[0], self.prob_domain[self.spaceDim]   + 1)
-            j = np.arange(self.prob_domain[1], self.prob_domain[self.spaceDim+1] + 1)
 
-            blank_data = np.empty((j.size, i.size))
+            index_coords_names = ['i', 'j', 'k', 'l', 'm'] # add more here if more dimensions
+            coords = {}
+            box_size = ()
+            for d in range(self.space_dim):
+                coords_dir = np.arange(self.prob_domain[d], self.prob_domain[self.space_dim + d] + 1)
+                coords[index_coords_names[d]] = coords_dir
+                box_size = box_size + (coords_dir.size, )  # append to tuple of sizes
+
+            # i = np.arange(self.prob_domain[0], self.prob_domain[self.spaceDim]   + 1)
+            # j = np.arange(self.prob_domain[1], self.prob_domain[self.spaceDim+1] + 1)
+
+            # blank_data = np.empty((j.size, i.size))
+            blank_data = np.empty(box_size)
 
             # ds_dom_box = xr.Dataset({},
             #                     coords={'x': lev_dom_box_x, 'y': lev_dom_box_y})
 
-            ds_dom_box = xr.Dataset({},
-                                coords={'i': i, 'j': j})
+            ds_dom_box = xr.Dataset({}, coords=coords)
+                                # coords={'i': i, 'j': j})
+
 
             for comp_name in self.comp_names:
                 s = blank_data.shape
-                if not s[1] == len(i):
+                if not s[1] == len(coords['i']):
                     blank_data = blank_data.T
 
                 # ds_dom_box[comp_name] = xr.DataArray(blank_data, dims=['y', 'x'],
                 #                           coords={'x': lev_dom_box_x, 'y': lev_dom_box_y, 'level': level})
 
-                ds_dom_box[comp_name] = xr.DataArray(blank_data, dims=['j', 'i'],
-                                                     coords={'i': i, 'j': j, 'level': level})
+                extended_coords = coords
+                extended_coords['level'] = level
+                dims = index_coords_names[:self.space_dim]
+                dims= dims[::-1] # reverse list so we have k, j, i etc
+                ds_dom_box[comp_name] = xr.DataArray(blank_data, dims=dims, # dims=['j', 'i'],
+                                                     coords=extended_coords)
 
             ds_boxes.append(ds_dom_box)
 
@@ -262,26 +287,78 @@ class PltFile:
                 # Box = [lo_i lo_j hi_i hi_j]
                 lo_i = box[0]
                 lo_j = box[1]
-                hi_i = box[2]
-                hi_j = box[3]
+                hi_i = box[self.space_dim]
+                hi_j = box[self.space_dim + 1]
+
+
+
+                lo_indices = [box[i] for i in range(self.space_dim)]
+                hi_indices = [box[i] for i in range(self.space_dim, 2 * self.space_dim)]
 
                 # 0.5 because cell centred
                 x_box = lev_dx * (0.5 + np.arange(lo_i, hi_i + 1) )
                 y_box = lev_dx * (0.5 + np.arange(lo_j, hi_j + 1) )
+                if self.space_dim > 2:
+                    lo_k = box[2]
+                    hi_k = box[self.space_dim + 2]
+                    z_box = lev_dx * (0.5 + np.arange(lo_k, hi_k + 1) )
 
-                i_box = np.arange(lo_i, hi_i + 1)
-                j_box = np.arange(lo_j, hi_j + 1)
+                lo_vals =  [lev_dx *(0.5 + i) for i in lo_indices]
+                hi_vals =  [lev_dx *(0.5 + i) for i in hi_indices]
+
+                end_points = [[lo_vals[i]- lev_dx/2, hi_vals[i]+lev_dx/2] for i in range(self.space_dim)]
+
+                polygon_vertices_2d = [(x_box[0] - lev_dx / 2, y_box[0] - lev_dx / 2),
+                     (x_box[-1] + lev_dx / 2, y_box[0] - lev_dx / 2),
+                     (x_box[-1] + lev_dx / 2, y_box[-1] + lev_dx / 2),
+                     (x_box[0] - lev_dx / 2, y_box[-1] + lev_dx / 2)]
+
+                polygon_vertices_2d_new = [(lo_vals[0] - lev_dx / 2, lo_vals[1] - lev_dx / 2),
+                                       (hi_vals[0] + lev_dx / 2, lo_vals[1] - lev_dx / 2),
+                                       (hi_vals[0] + lev_dx / 2, hi_vals[1] + lev_dx / 2),
+                                       (lo_vals[0] - lev_dx / 2, hi_vals[1] + lev_dx / 2)]
+
+
+
+                from itertools import product, permutations, chain
+                # Construct vertices in n dimensions
+                polygon_vertices_auto = list(product(*end_points))
+
+                polygon_vertices_auto = sorted(polygon_vertices_auto, key=lambda x: np.arctan(x[1]/x[0]))
+
+
 
                 # For plotting level outlines
-                polygons.append(Polygon(
-                    [(x_box[0]-lev_dx/2, y_box[0]-lev_dx/2),
-                     (x_box[-1]+lev_dx/2, y_box[0]-lev_dx/2),
-                     (x_box[-1]+lev_dx/2, y_box[-1]+lev_dx/2),
-                     (x_box[0]-lev_dx/2, y_box[-1]+lev_dx/2)]))
+                # polygons.append(Polygon(
+                #     [(x_box[0]-lev_dx/2, y_box[0]-lev_dx/2),
+                #      (x_box[-1]+lev_dx/2, y_box[0]-lev_dx/2),
+                #      (x_box[-1]+lev_dx/2, y_box[-1]+lev_dx/2),
+                #      (x_box[0]-lev_dx/2, y_box[-1]+lev_dx/2)]))
 
-                num_rows = hi_j + 1 - lo_j
-                num_cols = hi_i + 1 - lo_i
-                num_cells = num_rows * num_cols * num_comps
+                # Construct vertices in n dimensions
+                # polygon_vertices = []
+
+                # polygons.append(Polygon(
+                #     [(x_box[0] - lev_dx / 2, y_box[0] - lev_dx / 2),
+                #      (x_box[-1] + lev_dx / 2, y_box[0] - lev_dx / 2),
+                #      (x_box[-1] + lev_dx / 2, y_box[-1] + lev_dx / 2),
+                #      (x_box[0] - lev_dx / 2, y_box[-1] + lev_dx / 2)]))
+
+                poly = Polygon(polygon_vertices_auto)
+                if poly.is_valid:
+                    polygons.append(poly)
+
+
+                # i_box = np.arange(lo_i, hi_i + 1)
+                # j_box = np.arange(lo_j, hi_j + 1)
+
+                n_cells_dir = [ hi_indices[d]+1 - lo_indices[d] for d in range(self.space_dim)]
+
+                # num_rows = hi_j + 1 - lo_j
+                # num_cols = hi_i + 1 - lo_i
+                # num_cells = num_rows * num_cols * num_comps
+                num_box_cells =  np.prod(n_cells_dir)
+                num_cells = num_box_cells * num_comps
                 # print(str(num_cells))
                 data_box = data_unshaped[offset:offset + num_cells]
 
@@ -294,12 +371,20 @@ class PltFile:
                 comp_offset_start = 0
                 # print(self.data.keys())
 
-                ds_box = xr.Dataset({},
-                                    coords={'i': i_box, 'j': j_box})
+                coords = {}
+                # box_size = ()
+                for d in range(self.space_dim):
+                    coords_dir = np.arange(lo_indices[d], hi_indices[d] + 1)
+                    coords[index_coords_names[d]] = coords_dir
+                    # box_size = box_size + (coords_dir.size,)  # append to tuple of sizes
+
+                ds_box = xr.Dataset({}, coords=coords)
+                                    # coords={'i': i_box, 'j': j_box})
+
 
                 for comp_name in self.comp_names:
 
-                    num_box_cells = num_rows * num_cols
+
                     # print('Num cells in a box: ' + str(num_box_cells))
                     comp_offset_finish = comp_offset_start + num_box_cells
 
@@ -307,7 +392,14 @@ class PltFile:
 
                     comp_offset_start = comp_offset_finish
 
-                    reshaped_data = data_box_comp.reshape((num_rows, num_cols))
+
+                    # reshaped_data =    data_box_comp.reshape((num_rows, num_cols))
+
+                    reshaped_data = data_box_comp.reshape(tuple(n_cells_dir))
+
+                    # I think we only need to transpose in 3D
+                    if self.space_dim == 3:
+                        reshaped_data = reshaped_data.transpose()
 
                     # Should really get data into a nice format like a np array
                     if self.data[comp_name][self.DATA][level]:
@@ -323,13 +415,21 @@ class PltFile:
                     if comp_name[0] in ('x', 'y', 'z') and comp_name[1:] in trimmed_comp_names:
                         field_type = 'vector'
 
-                    xarr_component_box = xr.DataArray(reshaped_data, dims = ['j', 'i'],
-                                                      coords={'i': i_box, 'j': j_box, 'level': level},
+                    dim_list = index_coords_names[:self.space_dim]
+                    # dim_list = dim_list[::-1]
+                    extended_coords = coords
+                    extended_coords['level'] = level
+
+                    # print(comp_name)
+
+                    xarr_component_box = xr.DataArray(reshaped_data, dims = dim_list, # ['j', 'i'],
+                                                      coords=extended_coords, # {'i': i_box, 'j': j_box, 'level': level},
                                                       attrs={'field_type': field_type})
 
                     ds_box[comp_name] = xarr_component_box
 
                 ds_boxes.append(ds_box)
+
 
             level_outline = gpd.GeoSeries(cascaded_union(polygons))
             self.level_outlines.append(level_outline)
@@ -340,23 +440,28 @@ class PltFile:
             first_box = 1
             ds_level = ds_boxes[first_box]
             for b in ds_boxes[first_box+1:]:
-                # ds_level.update(b)
-                ds_level =  ds_level.combine_first(b)
-            #     ds_level = xr.merge([ds_level, b])
 
-            # ds_level = xr.concat([ds_level], 'level')
+                ds_level =  ds_level.combine_first(b)
+
+
 
             # Create x,y,z, coordinates
+            x_y_coords_names = ['x', 'y', 'z']
 
-            ds_level.coords['x'] = ds_level.coords['i'] * lev_dx
-            ds_level.coords['y'] = ds_level.coords['j'] * lev_dx
+            for d in range(self.space_dim):
+                ds_level.coords[x_y_coords_names[d]] = ds_level.coords[index_coords_names[d]] * lev_dx
+            # ds_level.coords['x'] = ds_level.coords['i'] * lev_dx
+            # ds_level.coords['y'] = ds_level.coords['j'] * lev_dx
 
             if zero_x:
                 ds_level.coords['x'] = ds_level.coords['x'] - min(ds_level.coords['x'])
 
             # Swap i,j,k to x,y,z coordinates
-            ds_level = ds_level.swap_dims({'i': 'x'})
-            ds_level = ds_level.swap_dims({'j': 'y'})
+            for d in range(self.space_dim):
+                ds_level = ds_level.swap_dims({index_coords_names[d]: x_y_coords_names[d]})
+
+            # ds_level = ds_level.swap_dims({'i': 'x'})
+            #ds_level = ds_level.swap_dims({'j': 'y'})
 
 
             #TODO: should level be an attribute or co-ordinate? need to try with actual AMR data
@@ -417,7 +522,7 @@ class PltFile:
         rows = porosity.shape[1]
         channels = [None] * cols
         chimney_positions = []
-        for j in xrange(cols):
+        for j in range(cols):
             # chimneys in row
             chimneys_in_row = 0
             average_porosity = 0
@@ -425,7 +530,7 @@ class PltFile:
             currently_liquid = False
             chimney_pos_row = []
 
-            for i in xrange(rows):
+            for i in range(rows):
                 # print porosity[i,j]
                 chi = porosity[j, i]
                 average_porosity = average_porosity + chi
