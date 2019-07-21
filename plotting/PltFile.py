@@ -324,7 +324,7 @@ class PltFile:
                 # Construct vertices in n dimensions
                 polygon_vertices_auto = list(product(*end_points))
 
-                polygon_vertices_auto = sorted(polygon_vertices_auto, key=lambda x: np.arctan(x[1]/x[0]))
+                polygon_vertices_auto = sorted(polygon_vertices_auto, key=lambda x: np.arctan(x[1]/max(abs(x[0]), 0.0001)))
 
 
 
@@ -353,6 +353,7 @@ class PltFile:
                 # j_box = np.arange(lo_j, hi_j + 1)
 
                 n_cells_dir = [ hi_indices[d]+1 - lo_indices[d] for d in range(self.space_dim)]
+                #  n_cells_dir = [hi_indices[d] + 1 - lo_indices[d] for d in range(self.space_dim-1, -1, -1)]
 
                 # num_rows = hi_j + 1 - lo_j
                 # num_cols = hi_i + 1 - lo_i
@@ -376,6 +377,7 @@ class PltFile:
                 for d in range(self.space_dim):
                     coords_dir = np.arange(lo_indices[d], hi_indices[d] + 1)
                     coords[index_coords_names[d]] = coords_dir
+
                     # box_size = box_size + (coords_dir.size,)  # append to tuple of sizes
 
                 ds_box = xr.Dataset({}, coords=coords)
@@ -398,8 +400,10 @@ class PltFile:
                     reshaped_data = data_box_comp.reshape(tuple(n_cells_dir))
 
                     # I think we only need to transpose in 3D
-                    if self.space_dim == 3:
+                    if self.space_dim == 3 or self.space_dim == 2:
                         reshaped_data = reshaped_data.transpose()
+
+
 
                     # Should really get data into a nice format like a np array
                     if self.data[comp_name][self.DATA][level]:
