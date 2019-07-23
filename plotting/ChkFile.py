@@ -440,17 +440,15 @@ class ChkFile:
         return [num_channels, rel_chan_positions]
 
 
-    def get_mesh_grid(self, level=0, rotate_dims = False):
+    def get_mesh_grid(self, level=0, rotate_dims=False):
 
         dx = self.levels[level][self.DX]
         dy = dx
 
         components = list(self.data.keys())
 
-        field_array = self.get_data(components[0], rotate_dims)
+        field_array = self.get_data(components[0])
         grid_size = field_array.shape
-
-
 
         # Make sure the grid stretches from the start of the first cell to the end of the last cell
         # this means we stretch dx slightly out of proportion, but it ensures plot limits are correct
@@ -465,6 +463,14 @@ class ChkFile:
 
         y, x = np.mgrid[slice(dx/2, x_max-dx/2, dx),
                         slice(dy/2, y_max-dy/2, dy)]
+
+        if rotate_dims:
+            y_new = x.transpose()
+            x_new = y.transpose()
+
+            x = x_new
+            y = y_new
+
 
 
 
