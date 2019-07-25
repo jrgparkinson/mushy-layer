@@ -794,7 +794,7 @@ class PltFile:
         return field_arr
 
 
-    def set_scale_slice_transform(self, indices, reflect):
+    def set_scale_slice_transform(self, indices, reflect=False):
         """ Describe how to extract data """
         self.indices = indices
         self.reflect = reflect
