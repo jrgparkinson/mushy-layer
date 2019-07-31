@@ -9,8 +9,101 @@ import os
 from mushyLayerRunUtils import read_inputs
 import sys
 
+def compute_channel_properties(porosity, do_plots=False):
+    # width = self.prob_domain[2] +1 - self.prob_domain[0]
+    width = porosity.shape[1]
+    # print('Domain width ' + str(width))
 
+    # Iterate over porosity field
+    cols = porosity.shape[0]
+    rows = porosity.shape[1]
+    channels = [None] * cols
+    chimney_positions = []
+    for j in range(cols):
+        # chimneys in row
+        chimneys_in_row = 0
+        average_porosity = 0
 
+        currently_liquid = False
+        chimney_pos_row = []
+
+        for i in range(rows):
+            # print porosity[i,j]
+            chi = porosity[j, i]
+            average_porosity = average_porosity + chi
+            if chi < 1.0 and currently_liquid:
+                # Just left liquid region
+                currently_liquid = False
+
+            elif chi > 0.999 and not currently_liquid:
+                # Entered a liquid region
+                chimneys_in_row = chimneys_in_row + 1
+                chimney_pos_row.append(i)
+                currently_liquid = True
+
+        average_porosity = average_porosity / rows
+        if average_porosity > 0.99:
+            channels[j] = 0  # This region was entirely liquid, can't have a channel
+        else:
+            channels[j] = chimneys_in_row
+
+            # First add chimney positions for chimneys we've already found
+            # print(str(chimneyPositions))
+            # print(str(len(chimneyPositions)))
+
+            if chimneys_in_row == 0:
+                continue
+
+            for chimney_i in range(0, len(chimney_positions)):
+                if chimney_i < len(chimney_pos_row):
+                    chimney_positions[chimney_i].append(chimney_pos_row[chimney_i])
+
+            # Now, add extra rows to chimneyPositions vector if needed
+            for chimney_i in range(len(chimney_positions), chimneys_in_row):
+                if chimney_i < len(chimney_pos_row):
+                    chimney_positions.append([chimney_pos_row[chimney_i]])
+
+    # print(str(chimney_positions))
+    # Filter out short channels
+    chimney_lengths = []
+    for chimney_i in range(0, len(chimney_positions)):
+        chimney_lengths.append(float(len(chimney_positions[chimney_i])))
+
+    av_chim_length = np.mean(chimney_lengths)
+    long_enough_chimneys = []
+    for chimney_i in range(0, len(chimney_positions)):
+        if len(chimney_positions[chimney_i]) > av_chim_length / 2:
+            long_enough_chimneys.append(chimney_positions[chimney_i])
+
+    # print(str(long_enough_chimneys))
+
+    average_chan_positions = []
+    rel_chan_positions = []
+    for i in range(0, len(long_enough_chimneys)):
+        average_chan_positions.append(np.mean(long_enough_chimneys[i]))
+        rel_chan_positions.append(average_chan_positions[-1] / width)
+
+    num_channels = len(long_enough_chimneys)
+    # print('Number of channels: ' + str(numChannels))
+    # print('Channel positions: ' + str(averageChanPositions))
+    # print('Relative channel positions: ' + str(relChanPositions))
+
+    # doPlots = False
+    if do_plots:
+        cmap2 = mpl.colors.LinearSegmentedColormap.from_list('my_colormap',
+                                                             ['blue', 'black', 'red'],
+                                                             256)
+
+        # tell imshow about color map so that only set colors are used
+        img = pyplot.imshow(porosity, interpolation='nearest',
+                            cmap=cmap2, origin='lower')
+
+        # make a color bar
+        pyplot.colorbar(img, cmap=cmap2)
+
+        pyplot.show()
+
+    return [num_channels, rel_chan_positions]
 
 class ChkFile:
 
@@ -344,100 +437,7 @@ class ChkFile:
     def channel_properties(self, do_plots=False):
         porosity = self.get_data('Porosity')
 
-        # width = self.prob_domain[2] +1 - self.prob_domain[0]
-        width = porosity.shape[1]
-        # print('Domain width ' + str(width))
-
-        # Iterate over porosity field
-        cols = porosity.shape[0]
-        rows = porosity.shape[1]
-        channels = [None] * cols
-        chimney_positions = []
-        for j in range(cols):
-            # chimneys in row
-            chimneys_in_row = 0
-            average_porosity = 0
-
-            currently_liquid = False
-            chimney_pos_row = []
-
-            for i in range(rows):
-                # print porosity[i,j]
-                chi = porosity[j, i]
-                average_porosity = average_porosity + chi
-                if chi < 1.0 and currently_liquid:
-                    # Just left liquid region
-                    currently_liquid = False
-
-                elif chi > 0.999 and not currently_liquid:
-                    # Entered a liquid region
-                    chimneys_in_row = chimneys_in_row + 1
-                    chimney_pos_row.append(i)
-                    currently_liquid = True
-
-            average_porosity = average_porosity / rows
-            if average_porosity > 0.99:
-                channels[j] = 0  # This region was entirely liquid, can't have a channel
-            else:
-                channels[j] = chimneys_in_row
-
-                # First add chimney positions for chimneys we've already found
-                # print(str(chimneyPositions))
-                # print(str(len(chimneyPositions)))
-
-                if chimneys_in_row == 0:
-                    continue
-
-                for chimney_i in range(0, len(chimney_positions)):
-                    if chimney_i < len(chimney_pos_row):
-                        chimney_positions[chimney_i].append(chimney_pos_row[chimney_i])
-
-                # Now, add extra rows to chimneyPositions vector if needed
-                for chimney_i in range(len(chimney_positions), chimneys_in_row):
-                    if chimney_i < len(chimney_pos_row):
-                        chimney_positions.append([chimney_pos_row[chimney_i]])
-
-        # print(str(chimney_positions))
-        # Filter out short channels
-        chimney_lengths = []
-        for chimney_i in range(0, len(chimney_positions)):
-            chimney_lengths.append(float(len(chimney_positions[chimney_i])))
-
-        av_chim_length = np.mean(chimney_lengths)
-        long_enough_chimneys = []
-        for chimney_i in range(0, len(chimney_positions)):
-            if len(chimney_positions[chimney_i]) > av_chim_length / 2:
-                long_enough_chimneys.append(chimney_positions[chimney_i])
-
-        # print(str(long_enough_chimneys))
-
-        average_chan_positions = []
-        rel_chan_positions = []
-        for i in range(0, len(long_enough_chimneys)):
-            average_chan_positions.append(np.mean(long_enough_chimneys[i]))
-            rel_chan_positions.append(average_chan_positions[-1] / width)
-
-        num_channels = len(long_enough_chimneys)
-        # print('Number of channels: ' + str(numChannels))
-        # print('Channel positions: ' + str(averageChanPositions))
-        # print('Relative channel positions: ' + str(relChanPositions))
-
-        # doPlots = False
-        if do_plots:
-            cmap2 = mpl.colors.LinearSegmentedColormap.from_list('my_colormap',
-                                                                 ['blue', 'black', 'red'],
-                                                                 256)
-
-            # tell imshow about color map so that only set colors are used
-            img = pyplot.imshow(porosity, interpolation='nearest',
-                                cmap=cmap2, origin='lower')
-
-            # make a color bar
-            pyplot.colorbar(img, cmap=cmap2)
-
-            pyplot.show()
-
-        return [num_channels, rel_chan_positions]
+        return compute_channel_properties(porosity, do_plots)
 
 
     def get_mesh_grid(self, level=0, rotate_dims=False):
