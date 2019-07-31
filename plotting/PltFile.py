@@ -9,6 +9,7 @@ from shapely.ops import cascaded_union
 from shapely.geometry import Polygon
 import geopandas as gpd
 from mushyLayerRunUtils import read_inputs
+import sys
 
 def compute_z(porosity_slice, y_slice, porosity):
 
@@ -34,6 +35,9 @@ class PltFile:
     YT = 'YT'
     NATIVE = 'native'
     XARRAY = 'xarray'
+
+    # List of names for each direction to be used later
+    INDEX_COORDS_NAMES = ['i', 'j', 'k', 'l', 'm']  # add more here if more dimensions
 
     indices = None
     reflect = None
@@ -135,6 +139,7 @@ class PltFile:
         # Get all the different bits of data from the file
         # print(h5File)
 
+        
         chombo_group = h5_file['Chombo_global']
         global_attrs = chombo_group.attrs
 
@@ -172,6 +177,14 @@ class PltFile:
         self.levels = [None] * self.num_levels
         for level in range(0, self.num_levels):
             level_group = h5_file['level_' + str(level)]
+
+            # Data is stored differently in plot files and chk files
+            # much of what follows will be different as a result
+            if 'data:datatype=0' in list(level_group.keys()):
+                self.is_plot_file = True
+            else:
+                self.is_plot_file = False
+
             group_atts = level_group.attrs
             boxes = level_group['boxes']
             lev_dx =  group_atts['dx']
@@ -193,250 +206,234 @@ class PltFile:
                     self.full_domain_size[i] = self.full_domain_size[i] + lev_dx
                     # self.fullDomainSize[3] = self.fullDomainSize[3] + lev_dx
 
-            # Now get the  data for each field, on each level
-            data = level_group['data:datatype=0']
 
-            # Some other stuff we can get, but don't at the moment:
-            # data_offsets = level_group['data:offsets=0']
-            # data_atts = level_group['data_attributes']
-            # advVel = level_group['advVel:datatype=0']
-            # advVel_offsets = level_group['advVel:offsets=0']
-            # advVel_atts = level_group['advVel_attributes']
 
-            data_unshaped = data[()]
-            # Data is sorted by box then by component
-
-#            print(data_offsets[()])
-            # print(dataUnshaped)
-            # print('data length: ' + str(len(dataUnshaped)))
-
-            num_comps = 0
-            for comp_name in self.data.keys():
-                num_comps = num_comps + self.data[comp_name][self.NUM_COMPS]
-
-            offset = 0
-
-            ds_boxes = []
-
+            # Create a box which spans the whole domain
             # Initialise with a box spanning the whole domain, then add data where it exists
             # Important to do it like this for refined levels, where the whole domain isn't covered with data
-            # lev_dom_box_x = np.arange(self.fullDomainSize[0] + lev_dx / 2, self.fullDomainSize[2] - lev_dx / 2,
-            #                           lev_dx)
-            # lev_dom_box_y = np.arange(self.fullDomainSize[1] + lev_dx / 2, self.fullDomainSize[3] - lev_dx / 2,
-            #                           lev_dx)
-            # blank_data = np.empty((lev_dom_box_x.size, lev_dom_box_y.size))
-
             size = []
             for i in range(self.space_dim):
-                lev_dom_box_dir = np.arange(self.full_domain_size[i] + lev_dx / 2, self.full_domain_size[i + self.space_dim] - lev_dx / 2,
+                lev_dom_box_dir = np.arange(self.full_domain_size[i] + lev_dx / 2,
+                                            self.full_domain_size[i + self.space_dim] - lev_dx / 2,
                                             lev_dx)
                 size.append(lev_dom_box_dir.size)
 
-
             blank_data = np.empty(tuple(size))
-
             blank_data[:] = np.nan
+
+            # Create an empty dataset which spans entire domain, which we will use as a template for loading data into
+            coords = {}
+            box_size = ()
+            for d in range(self.space_dim):
+                coords_dir = np.arange(self.prob_domain[d], self.prob_domain[self.space_dim + d] + 1)
+                coords[self.INDEX_COORDS_NAMES[d]] = coords_dir
+                box_size = box_size + (coords_dir.size,)  # append to tuple of sizes
+
+            blank_data = np.empty(box_size)
+            ds_dom_box = xr.Dataset({}, coords=coords)
 
             # Use indexes rather than x, y for now - then convert to x,y later
             # this is to avoid issues with floating point arithmetic when merging datasets
             # (we can end up trying to merge datasets where x coordinates differ by ~ 10^{-10}, creating nonsense)
 
-
-            index_coords_names = ['i', 'j', 'k', 'l', 'm'] # add more here if more dimensions
-            coords = {}
-            box_size = ()
-            for d in range(self.space_dim):
-                coords_dir = np.arange(self.prob_domain[d], self.prob_domain[self.space_dim + d] + 1)
-                coords[index_coords_names[d]] = coords_dir
-                box_size = box_size + (coords_dir.size, )  # append to tuple of sizes
-
-            # i = np.arange(self.prob_domain[0], self.prob_domain[self.spaceDim]   + 1)
-            # j = np.arange(self.prob_domain[1], self.prob_domain[self.spaceDim+1] + 1)
-
-            # blank_data = np.empty((j.size, i.size))
-            blank_data = np.empty(box_size)
-
-            # ds_dom_box = xr.Dataset({},
-            #                     coords={'x': lev_dom_box_x, 'y': lev_dom_box_y})
-
-            ds_dom_box = xr.Dataset({}, coords=coords)
-                                # coords={'i': i, 'j': j})
-
-
+            # Create empty datasets spanning entire domain for each component
             for comp_name in self.comp_names:
                 s = blank_data.shape
                 if not s[1] == len(coords['i']):
                     blank_data = blank_data.T
 
-                # ds_dom_box[comp_name] = xr.DataArray(blank_data, dims=['y', 'x'],
-                #                           coords={'x': lev_dom_box_x, 'y': lev_dom_box_y, 'level': level})
-
                 extended_coords = coords
                 extended_coords['level'] = level
-                dims = index_coords_names[:self.space_dim]
-                dims= dims[::-1] # reverse list so we have k, j, i etc
-                ds_dom_box[comp_name] = xr.DataArray(blank_data, dims=dims, # dims=['j', 'i'],
+                dims = self.INDEX_COORDS_NAMES[:self.space_dim]
+                dims = dims[::-1]  # reverse list so we have k, j, i etc
+                ds_dom_box[comp_name] = xr.DataArray(blank_data, dims=dims,  # dims=['j', 'i'],
                                                      coords=extended_coords)
 
-            ds_boxes.append(ds_dom_box)
+            ds_boxes = [ds_dom_box]
 
+
+            # Get level outlines
             polygons = []
-
             for box in self.levels[level][self.BOXES]:
-                # print(box)
-                # Box = [lo_i lo_j hi_i hi_j]
-                lo_i = box[0]
-                lo_j = box[1]
-                hi_i = box[self.space_dim]
-                hi_j = box[self.space_dim + 1]
-
-
-
                 lo_indices = [box[i] for i in range(self.space_dim)]
                 hi_indices = [box[i] for i in range(self.space_dim, 2 * self.space_dim)]
 
                 # 0.5 because cell centred
-                x_box = lev_dx * (0.5 + np.arange(lo_i, hi_i + 1) )
-                y_box = lev_dx * (0.5 + np.arange(lo_j, hi_j + 1) )
-                if self.space_dim > 2:
-                    lo_k = box[2]
-                    hi_k = box[self.space_dim + 2]
-                    z_box = lev_dx * (0.5 + np.arange(lo_k, hi_k + 1) )
+                lo_vals = [lev_dx * (0.5 + i) for i in lo_indices]
+                hi_vals = [lev_dx * (0.5 + i) for i in hi_indices]
 
-                lo_vals =  [lev_dx *(0.5 + i) for i in lo_indices]
-                hi_vals =  [lev_dx *(0.5 + i) for i in hi_indices]
+                end_points = [[lo_vals[i] - lev_dx / 2, hi_vals[i] + lev_dx / 2] for i in range(self.space_dim)]
 
-                end_points = [[lo_vals[i]- lev_dx/2, hi_vals[i]+lev_dx/2] for i in range(self.space_dim)]
-
-                polygon_vertices_2d = [(x_box[0] - lev_dx / 2, y_box[0] - lev_dx / 2),
-                     (x_box[-1] + lev_dx / 2, y_box[0] - lev_dx / 2),
-                     (x_box[-1] + lev_dx / 2, y_box[-1] + lev_dx / 2),
-                     (x_box[0] - lev_dx / 2, y_box[-1] + lev_dx / 2)]
-
-                polygon_vertices_2d_new = [(lo_vals[0] - lev_dx / 2, lo_vals[1] - lev_dx / 2),
-                                       (hi_vals[0] + lev_dx / 2, lo_vals[1] - lev_dx / 2),
-                                       (hi_vals[0] + lev_dx / 2, hi_vals[1] + lev_dx / 2),
-                                       (lo_vals[0] - lev_dx / 2, hi_vals[1] + lev_dx / 2)]
-
-
-
+                # For plotting level outlines
                 from itertools import product, permutations, chain
                 # Construct vertices in n dimensions
                 polygon_vertices_auto = list(product(*end_points))
-
-                polygon_vertices_auto = sorted(polygon_vertices_auto, key=lambda x: np.arctan(x[1]/max(abs(x[0]), 0.0001)))
-
-
-
-                # For plotting level outlines
-                # polygons.append(Polygon(
-                #     [(x_box[0]-lev_dx/2, y_box[0]-lev_dx/2),
-                #      (x_box[-1]+lev_dx/2, y_box[0]-lev_dx/2),
-                #      (x_box[-1]+lev_dx/2, y_box[-1]+lev_dx/2),
-                #      (x_box[0]-lev_dx/2, y_box[-1]+lev_dx/2)]))
-
-                # Construct vertices in n dimensions
-                # polygon_vertices = []
-
-                # polygons.append(Polygon(
-                #     [(x_box[0] - lev_dx / 2, y_box[0] - lev_dx / 2),
-                #      (x_box[-1] + lev_dx / 2, y_box[0] - lev_dx / 2),
-                #      (x_box[-1] + lev_dx / 2, y_box[-1] + lev_dx / 2),
-                #      (x_box[0] - lev_dx / 2, y_box[-1] + lev_dx / 2)]))
+                polygon_vertices_auto = sorted(polygon_vertices_auto,
+                                               key=lambda x: np.arctan(x[1] / max(abs(x[0]), 0.0001)))
 
                 poly = Polygon(polygon_vertices_auto)
                 if poly.is_valid:
                     polygons.append(poly)
 
-
-                # i_box = np.arange(lo_i, hi_i + 1)
-                # j_box = np.arange(lo_j, hi_j + 1)
-
-                n_cells_dir = [ hi_indices[d]+1 - lo_indices[d] for d in range(self.space_dim)]
-                #  n_cells_dir = [hi_indices[d] + 1 - lo_indices[d] for d in range(self.space_dim-1, -1, -1)]
-
-                # num_rows = hi_j + 1 - lo_j
-                # num_cols = hi_i + 1 - lo_i
-                # num_cells = num_rows * num_cols * num_comps
-                num_box_cells =  np.prod(n_cells_dir)
-                num_cells = num_box_cells * num_comps
-                # print(str(num_cells))
-                data_box = data_unshaped[offset:offset + num_cells]
-
-                offset = offset + num_cells
-                # print(data_box)
-
-                # Now split into individual components
-                # data contains all fields on this level, sort into individual fields
-
-                comp_offset_start = 0
-                # print(self.data.keys())
-
-                coords = {}
-                # box_size = ()
-                for d in range(self.space_dim):
-                    coords_dir = np.arange(lo_indices[d], hi_indices[d] + 1)
-                    coords[index_coords_names[d]] = coords_dir
-
-                    # box_size = box_size + (coords_dir.size,)  # append to tuple of sizes
-
-                ds_box = xr.Dataset({}, coords=coords)
-                                    # coords={'i': i_box, 'j': j_box})
-
-
-                for comp_name in self.comp_names:
-
-
-                    # print('Num cells in a box: ' + str(num_box_cells))
-                    comp_offset_finish = comp_offset_start + num_box_cells
-
-                    data_box_comp = data_box[comp_offset_start:comp_offset_finish]
-
-                    comp_offset_start = comp_offset_finish
-
-
-                    # reshaped_data =    data_box_comp.reshape((num_rows, num_cols))
-
-                    reshaped_data = data_box_comp.reshape(tuple(n_cells_dir))
-
-                    # I think we only need to transpose in 3D
-                    if self.space_dim == 3 or self.space_dim == 2:
-                        reshaped_data = reshaped_data.transpose()
-
-
-
-                    # Should really get data into a nice format like a np array
-                    if self.data[comp_name][self.DATA][level]:
-                        self.data[comp_name][self.DATA][level].append(reshaped_data)
-                    else:
-                        self.data[comp_name][self.DATA][level] = [reshaped_data]
-
-                    reshaped_data = np.array(reshaped_data)
-
-                    # Check if scalar or vector
-                    trimmed_comp_names = [n[1:] for n in self.comp_names]
-                    field_type = 'scalar'
-                    if comp_name[0] in ('x', 'y', 'z') and comp_name[1:] in trimmed_comp_names:
-                        field_type = 'vector'
-
-                    dim_list = index_coords_names[:self.space_dim]
-                    # dim_list = dim_list[::-1]
-                    extended_coords = coords
-                    extended_coords['level'] = level
-
-                    # print(comp_name)
-
-                    xarr_component_box = xr.DataArray(reshaped_data, dims = dim_list, # ['j', 'i'],
-                                                      coords=extended_coords, # {'i': i_box, 'j': j_box, 'level': level},
-                                                      attrs={'field_type': field_type})
-
-                    ds_box[comp_name] = xarr_component_box
-
-                ds_boxes.append(ds_box)
-
-
             level_outline = gpd.GeoSeries(cascaded_union(polygons))
             self.level_outlines.append(level_outline)
+
+            # Data is sorted by box and by component, so need to know total number of components
+            num_comps = 0
+            for comp_name in self.data.keys():
+                num_comps = num_comps + self.data[comp_name][self.NUM_COMPS]
+
+
+            # Now get the  data for each field, on each level
+
+            if self.is_plot_file:
+
+                # For plt files, data is sorted by box then by component
+
+                data = level_group['data:datatype=0']
+
+                # Some other stuff we can get, but don't at the moment:
+                # data_offsets = level_group['data:offsets=0']
+                # data_atts = level_group['data_attributes']
+                # advVel = level_group['advVel:datatype=0']
+                # advVel_offsets = level_group['advVel:offsets=0']
+                # advVel_atts = level_group['advVel_attributes']
+
+                data_unshaped = data[()]
+
+
+
+                offset = 0
+
+                for box in self.levels[level][self.BOXES]:
+                    lo_indices = [box[i] for i in range(self.space_dim)]
+                    hi_indices = [box[i] for i in range(self.space_dim, 2 * self.space_dim)]
+
+
+                    n_cells_dir = [hi_indices[d] + 1 - lo_indices[d] for d in range(self.space_dim)]
+
+                    num_box_cells = np.prod(n_cells_dir)  # effectively nx * ny * nz * ...
+                    num_cells = num_box_cells * num_comps  # also multiply by number of components
+
+                    # Now split into individual components
+                    # data contains all fields on this level, sort into individual fields
+                    comp_offset_start = 0
+
+                    coords = {}
+                    # box_size = ()
+                    for d in range(self.space_dim):
+                        coords_dir = np.arange(lo_indices[d], hi_indices[d] + 1)
+                        coords[self.INDEX_COORDS_NAMES[d]] = coords_dir
+
+                    # Blank dataset for this box, which each component will be added to
+                    ds_box = xr.Dataset({}, coords=coords)
+
+                    for comp_name in self.comp_names:
+
+                        # print('Num cells in a box: ' + str(num_box_cells))
+                        comp_offset_finish = comp_offset_start + num_box_cells
+
+                        indices = [offset+comp_offset_start, offset + comp_offset_finish]
+
+                        comp_offset_start = comp_offset_finish
+
+                        ds_box[comp_name] = self.get_box_comp_data(data_unshaped, level, indices, comp_name, n_cells_dir, coords)
+
+                    # Move onto next box
+                    offset = offset + num_cells
+
+                    ds_boxes.append(ds_box)
+
+
+
+
+            else:
+
+                # For chk files, data is sotred by component then by box
+                # Loop over components and get data for that component from each box
+
+
+                box_offset = 0
+
+
+                for box in self.levels[level][self.BOXES]:
+                    lo_indices = [box[i] for i in range(self.space_dim)]
+                    hi_indices = [box[i] for i in range(self.space_dim, 2 * self.space_dim)]
+
+
+                    n_cells_dir = [hi_indices[d] + 1 - lo_indices[d] for d in range(self.space_dim)]
+
+                    num_box_cells = np.prod(n_cells_dir)  # effectively nx * ny * nz * ...
+                    # num_cells = num_box_cells * num_comps  # also multiply by number of components
+
+                    # Now split into individual components
+                    # data contains all fields on this level, sort into individual fields
+                    comp_offset_start = 0
+
+                    coords = {}
+                    # box_size = ()
+                    for d in range(self.space_dim):
+                        coords_dir = np.arange(lo_indices[d], hi_indices[d] + 1)
+                        coords[self.INDEX_COORDS_NAMES[d]] = coords_dir
+
+                    # Blank dataset for this box, which each component will be added to
+                    ds_box = xr.Dataset({}, coords=coords)
+
+
+
+                    for comp_name in self.comp_names:
+                        component = 0
+
+                        # Need to get data differently if this is a vector
+                        is_vector = (comp_name[0] == 'x' or comp_name[0] == 'y' or comp_name[
+                            0] == 'z' and comp_name in all_names)
+                        if is_vector:
+                            if comp_name[0] == 'x':
+                                component = 0
+
+                            elif comp_name[0] == 'y':
+                                component = 1
+                            elif comp_name[0] == 'z':
+                                component = 2
+
+                            # Hardwired to 2D for now
+                            num_comps = self.space_dim
+
+                            data = level_group[comp_name[1:] + ':datatype=0']
+                        else:
+                            data = level_group[comp_name + ':datatype=0']
+                            component = 0
+
+                            num_comps = 1
+
+                        data_unshaped = data[()]
+
+                        # print('Num cells in a box: ' + str(num_box_cells))
+                        #comp_offset_finish = comp_offset_start + num_box_cells
+
+                        component_offset = 0 # this is just 0 because we only get data for this component
+
+                        # For vectors, we may have an offset?
+                        if num_comps > 1:
+                            component_offset = component*num_box_cells
+
+                        start_index = component_offset + box_offset
+                        end_index = start_index + num_box_cells
+
+                        indices = [start_index, end_index]
+
+                        #comp_offset_start = comp_offset_finish
+
+                        ds_box[comp_name] = self.get_box_comp_data(data_unshaped, level, indices, comp_name, n_cells_dir, coords)
+
+                        # component_offset = component_offset + (num_box_cells*num_comps)
+
+                    # Move onto next box
+                    box_offset = box_offset + num_box_cells
+
+                    ds_boxes.append(ds_box)
+
+
 
             # ds_level = xr.merge(ds_boxes)
 
@@ -448,12 +445,11 @@ class PltFile:
                 ds_level =  ds_level.combine_first(b)
 
 
-
             # Create x,y,z, coordinates
             x_y_coords_names = ['x', 'y', 'z']
 
             for d in range(self.space_dim):
-                ds_level.coords[x_y_coords_names[d]] = ds_level.coords[index_coords_names[d]] * lev_dx
+                ds_level.coords[x_y_coords_names[d]] = ds_level.coords[self.INDEX_COORDS_NAMES[d]] * lev_dx
             # ds_level.coords['x'] = ds_level.coords['i'] * lev_dx
             # ds_level.coords['y'] = ds_level.coords['j'] * lev_dx
 
@@ -462,7 +458,7 @@ class PltFile:
 
             # Swap i,j,k to x,y,z coordinates
             for d in range(self.space_dim):
-                ds_level = ds_level.swap_dims({index_coords_names[d]: x_y_coords_names[d]})
+                ds_level = ds_level.swap_dims({self.INDEX_COORDS_NAMES[d]: x_y_coords_names[d]})
 
             # ds_level = ds_level.swap_dims({'i': 'x'})
             #ds_level = ds_level.swap_dims({'j': 'y'})
@@ -478,6 +474,37 @@ class PltFile:
         self.ds_levels = ds_levels
 
         h5_file.close()
+
+    def get_box_comp_data(self, data_unshaped, level, indices, comp_name, n_cells_dir, coords):
+
+        data_box_comp = data_unshaped[indices[0]:indices[1]]
+
+        reshaped_data = data_box_comp.reshape(tuple(n_cells_dir))
+
+        # I think we only need to transpose in 3D
+        if self.space_dim == 3 or self.space_dim == 2:
+            reshaped_data = reshaped_data.transpose()
+            
+        reshaped_data = np.array(reshaped_data)
+
+        # Check if scalar or vector
+        trimmed_comp_names = [n[1:] for n in self.comp_names]
+        field_type = 'scalar'
+        if comp_name[0] in ('x', 'y', 'z') and comp_name[1:] in trimmed_comp_names:
+            field_type = 'vector'
+
+        dim_list = self.INDEX_COORDS_NAMES[:self.space_dim]
+        # dim_list = dim_list[::-1]
+        extended_coords = coords
+        extended_coords['level'] = level
+
+        xarr_component_box = xr.DataArray(reshaped_data, dims=dim_list,  # ['j', 'i'],
+                                          coords=extended_coords,  # {'i': i_box, 'j': j_box, 'level': level},
+                                          attrs={'field_type': field_type})
+
+
+
+        return xarr_component_box
 
     def plot_outlines(self, ax, colors=None):
         """ Plot all level outlines (except level 0)"""
@@ -519,7 +546,8 @@ class PltFile:
 
         # porosity = np.empty([height, width])
 
-        porosity = self.single_box('Porosity')
+        # porosity = self.single_box('Porosity')
+        porosity = self.get_level_data('Porosity')
 
         # Iterate over porosity field 
         cols = porosity.shape[0]
@@ -689,15 +717,26 @@ class PltFile:
 
         return x, y
 
+    # Added for compatibility with ChkFile interface
+    def get_data(self, var_name):
+        return self.get_level_data(var_name)
+
     def get_level_data(self, field, level=0, valid_only=False):
 
         if self.data_load_method == self.YT:
             pass
             #TODO: write this
 
-        if field not in self.data.keys():
+        if not self.data_loaded:
+            print('Data not loaded')
+            return
+
+        available_comps = list(self.ds_levels[0].keys())
+
+        if field not in available_comps:
             print('Field: %s not found. The following fields do exist: ' % field)
-            print(self.data.keys())
+            # print(self.data.keys())
+            print(available_comps)
             return
 
         if self.data_load_method == self.XARRAY:
@@ -810,6 +849,122 @@ class PltFile:
             return self.FIELD_LABEL[field_name]
         else:
             return field_name
+
+
+
+    def compute_diagnostic_vars(self):
+        # First get parameters
+
+        if self.inputs is None:
+            print('No inputs file available, so do not know parameters and cannot compute diagnostic variables')
+            sys.exit(-1)
+
+        conc_ratio = float(self.inputs['parameters.compositionRatio'])
+        stefan = float(self.inputs['parameters.stefan'])
+        cp = float(self.inputs['parameters.specificHeatRatio'])
+        pc = float(self.inputs['parameters.waterDistributionCoeff'])
+        theta_eutectic = 0.0
+
+
+        for level in range(0, self.num_levels):
+            enthalpy_ds = self.get_level_data('Enthalpy', level)
+            bulk_salinity_ds = self.get_level_data('Bulk concentration', level)
+
+            enthalpy_eutectic = enthalpy_ds.copy(deep=True).rename('Enthalpy eutectic')
+            enthalpy_solidus = enthalpy_ds.copy(deep=True).rename('Enthalpy solidus')
+            enthalpy_liquidus = enthalpy_ds.copy(deep=True).rename('Enthalpy liquidus')
+
+            # porosity = enthalpy.copy(deep=True).rename('Porosity')
+            # temperature = enthalpy.copy(deep=True).rename('Temperature')
+            # liquid_salinity = enthalpy.copy(deep=True).rename('Liquid concentration')
+            # solid_salinity = enthalpy.copy(deep=True).rename('Solid concentration')
+
+            enthalpy = np.array(enthalpy_ds)
+            bulk_salinity = np.array(bulk_salinity_ds)
+
+            enthalpy_eutectic = np.array(enthalpy_eutectic)
+            enthalpy_solidus = np.array(enthalpy_solidus)
+            enthalpy_liquidus = np.array(enthalpy_liquidus)
+
+            porosity = np.empty(enthalpy.shape)
+            temperature = np.empty(enthalpy.shape)
+            liquid_salinity = np.empty(enthalpy.shape)
+            solid_salinity = np.empty(enthalpy.shape)
+
+            # Now compute bounding energies
+            print('Computing bounding energy')
+            cols = enthalpy.shape[0]
+            rows = enthalpy.shape[1]
+            for j in range(cols):
+
+                for i in range(rows):
+                    eutectic_porosity = (conc_ratio + bulk_salinity[j, i]) / (theta_eutectic + conc_ratio)
+                    enthalpy_eutectic[j, i] = eutectic_porosity * (stefan + theta_eutectic * (1 - cp)) + cp * theta_eutectic
+                    enthalpy_solidus[j, i] = cp * (theta_eutectic + max(0.0, (-bulk_salinity[j, i] - conc_ratio) / pc))
+                    enthalpy_liquidus[j, i] = stefan - bulk_salinity[j, i] + theta_eutectic + theta_eutectic
+
+            # eutectic_porosity = (conc_ratio + bulk_salinity) / (theta_eutectic + conc_ratio)
+            # enthalpy_eutectic = eutectic_porosity * (stefan + theta_eutectic * (1 - cp)) + cp * theta_eutectic
+            # enthalpy_solidus = cp * (theta_eutectic + np.max(0.0, (-bulk_salinity - conc_ratio) / pc))
+            # enthalpy_liquidus = stefan - bulk_salinity + theta_eutectic + theta_eutectic
+
+            print('Computing diagnostic variables')
+            # Compute diagnostic variables
+            for j in range(cols):
+
+                for i in range(rows):
+                    if enthalpy[j, i] <= enthalpy_solidus[j, i]:
+                        porosity[j, i] = 0.0
+                        temperature[j, i] = enthalpy[j, i] / cp
+                        liquid_salinity[j, i] = 0.0
+                        solid_salinity[j, i] = bulk_salinity[j, i]
+                    elif enthalpy[j, i] <= enthalpy_eutectic[j, i]:
+                        porosity[j, i] = (enthalpy[j, i] - theta_eutectic * cp) / (stefan + theta_eutectic * (1 - cp))
+                        temperature[j, i] = theta_eutectic
+                        liquid_salinity[j, i] = theta_eutectic
+                        solid_salinity[j, i] = bulk_salinity[j, i] / (1 - porosity[j, i])
+                    elif enthalpy[j, i] < enthalpy_liquidus[j, i]:
+                        a = conc_ratio * (cp - 1) + stefan * (pc - 1)
+                        b = conc_ratio * (1 - 2 * cp) + enthalpy[j, i] * (1 - pc) \
+                            - bulk_salinity[j, i] * (cp - 1) - pc * stefan
+                        c = (bulk_salinity[j, i] + conc_ratio) * cp + pc * enthalpy[j, i]
+                        porosity[j, i] = (-b - np.sqrt(b * b - 4 * a * c)) / (2 * a)
+
+                        liquid_salinity[j, i] = (bulk_salinity[j, i] + conc_ratio * (1 - porosity[j, i])) / (
+                                porosity[j, i] + pc * (1 - porosity[j, i]))
+                        temperature[j, i] = -liquid_salinity[j, i]
+                        solid_salinity[j, i] = (pc * bulk_salinity[j, i] - conc_ratio * porosity[j, i]) / (
+                                porosity[j, i] + pc * (1 - porosity[j, i]))
+                    else:
+                        porosity[j, i] = 1.0
+                        temperature[j, i] = enthalpy[j, i] - stefan
+                        liquid_salinity[j, i] = bulk_salinity[j, i]
+                        solid_salinity[j, i] = 0.0
+
+            # Finally, save data into boxes
+
+            ds_porosity = enthalpy_ds.copy(deep=True).rename('Porosity')
+            ds_porosity.values = porosity
+
+            ds_T = enthalpy_ds.copy(deep=True).rename('Temperature')
+            ds_T.values = temperature
+
+            ds_sl = enthalpy_ds.copy(deep=True).rename('Liquid concentration')
+            ds_sl.values = liquid_salinity
+
+            ds_ss = enthalpy_ds.copy(deep=True).rename('Solid concentration')
+            ds_ss.values = solid_salinity
+
+
+            self.ds_levels[level]['Porosity'] = ds_porosity
+            self.ds_levels[level]['Temperature'] = ds_T
+            self.ds_levels[level]['Liquid concentration'] = ds_sl
+            self.ds_levels[level]['Solid concentration'] = ds_ss
+
+
+            # available_comps = list(self.ds_levels[0].keys())
+            # print('Available comps: %s' % str(available_comps))
+
 
 
 
