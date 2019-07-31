@@ -3376,12 +3376,20 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
      */
 
     // First make a duplicate of the existing solution
-    IntVect ghost_vector = m_scalarNew[ScalarVars::m_enthalpy]->ghostVect();
+    // Add enough ghost vectors (num ghost cells = depth, where depth is the depth of the pond being added measured in number of grid cells)
+    // to ensure that, if the domain has been decomposed into multiple boxes,
+    // each box has access to enough adjacent cells to compute the new solution
+    IntVect ghost_vector = depth*IntVect::Unit;
     LevelData<FArrayBox> old_enthalpy(m_grids, 1, ghost_vector);
     LevelData<FArrayBox> old_bulk_conc(m_grids, 1, ghost_vector);
 
     m_scalarNew[ScalarVars::m_enthalpy]->copyTo(old_enthalpy);
     m_scalarNew[ScalarVars::m_bulkConcentration]->copyTo(old_bulk_conc);
+
+    // Fill ghost cells
+    old_enthalpy.exchange();
+    old_bulk_conc.exchange();
+
 
     // Work out how much we're squishing the old domain by
     /**
@@ -3399,7 +3407,7 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
     shrunkBox.growHi(1, -depth);
 
 
-    // Now iterate over the new grid, and fill with values interpolate from old mesh
+    // Now iterate over the new grid, and fill with values interpolated from old mesh
     for (DataIterator dit = m_scalarNew[ScalarVars::m_enthalpy]->dataIterator(); dit.ok(); ++dit)
     {
       Box b = m_grids[dit];
