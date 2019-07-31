@@ -240,7 +240,9 @@ class PltFile:
             # Create empty datasets spanning entire domain for each component
             for comp_name in self.comp_names:
                 s = blank_data.shape
-                if not s[1] == len(coords['i']):
+
+                # Last component should be x-direction
+                if not s[-1] == len(coords['i']):
                     blank_data = blank_data.T
 
                 extended_coords = coords
@@ -387,7 +389,7 @@ class PltFile:
 
                         # Need to get data differently if this is a vector
                         is_vector = (comp_name[0] == 'x' or comp_name[0] == 'y' or comp_name[
-                            0] == 'z' and comp_name in all_names)
+                            0] == 'z' and  sum([comp_name[1:] in x for x in self.comp_names]) == self.space_dim)
                         if is_vector:
                             if comp_name[0] == 'x':
                                 component = 0
@@ -542,7 +544,7 @@ class PltFile:
 
     def channel_properties(self, do_plots=False):
 
-        porosity = self.get_level_data('Porosity')
+        porosity = np.array(self.get_level_data('Porosity'))
 
         return compute_channel_properties(porosity, do_plots)
 
@@ -694,7 +696,7 @@ class PltFile:
     def get_mesh_grid(self, level=0, rotate_dims=False):
 
         dx = self.levels[level][self.DX]
-        dy = dx
+
 
         components = list(self.data.keys())
         # components = [c.decode('UTF-8') for c in components]
@@ -703,28 +705,56 @@ class PltFile:
         grid_size = field_array.shape
 
 
+
+
         # Make sure the grid stretches from the start of the first cell to the end of the last cell
         # this means we stretch dx slightly out of proportion, but it ensures plot limits are correct
         x_max = (grid_size[0] + 1) * dx
-        y_max = (grid_size[1] + 1) * dy
+        y_max = (grid_size[1] + 1) * dx
 
         grid_dx = x_max / grid_size[0]
         grid_dy = y_max / grid_size[1]
 
+
+
         y, x = np.mgrid[slice(0, x_max, grid_dx),
                         slice(0, y_max, grid_dy)]
 
-        if rotate_dims:
-            y_new = x.transpose()
-            x_new = y.transpose()
+        coord_max = [(grid_size[i] + 1) * dx for i in range(0, self.space_dim)]
+        grid_spacing = [coord_max[i] / grid_size[i] for i in range(0, self.space_dim)]
+        grids = np.mgrid[[slice(0, coord_max[i], grid_spacing[i]) for i in range(0, self.space_dim)]]
 
-            x = x_new
-            y = y_new
+        if self.space_dim == 3:
+            x = grids[0]
+            y = grids[1]
+            z = grids[2]
 
-        y = self.scale_slice_transform(y)
-        x = self.scale_slice_transform(x, no_reflect=True)
+            if rotate_dims:
+                x = x.transpose()
+                y = y.transpose()
+                z = z.transpose()
 
-        return x, y
+            z = self.scale_slice_transform(z)
+            x = self.scale_slice_transform(x, no_reflect=True)
+            y = self.scale_slice_transform(y, no_reflect=True)
+
+            return x, y, z
+
+
+        else:
+
+
+            if rotate_dims:
+                y_new = x.transpose()
+                x_new = y.transpose()
+
+                x = x_new
+                y = y_new
+
+            y = self.scale_slice_transform(y)
+            x = self.scale_slice_transform(x, no_reflect=True)
+
+            return x, y
 
     # Added for compatibility with ChkFile interface
     def get_data(self, var_name, rotate_dims=False):
@@ -921,13 +951,17 @@ class PltFile:
             print('Computing bounding energy')
             cols = enthalpy.shape[0]
             rows = enthalpy.shape[1]
-            for j in range(cols):
+            # for j in range(cols):
+            #
+            #     for i in range(rows):
+            # replaced loop over [j,i] with loop over [idx] for 3D compatibility
 
-                for i in range(rows):
-                    eutectic_porosity = (conc_ratio + bulk_salinity[j, i]) / (theta_eutectic + conc_ratio)
-                    enthalpy_eutectic[j, i] = eutectic_porosity * (stefan + theta_eutectic * (1 - cp)) + cp * theta_eutectic
-                    enthalpy_solidus[j, i] = cp * (theta_eutectic + max(0.0, (-bulk_salinity[j, i] - conc_ratio) / pc))
-                    enthalpy_liquidus[j, i] = stefan - bulk_salinity[j, i] + theta_eutectic + theta_eutectic
+            for idx, value in np.ndenumerate(enthalpy):
+
+                eutectic_porosity = (conc_ratio + bulk_salinity[idx]) / (theta_eutectic + conc_ratio)
+                enthalpy_eutectic[idx] = eutectic_porosity * (stefan + theta_eutectic * (1 - cp)) + cp * theta_eutectic
+                enthalpy_solidus[idx] = cp * (theta_eutectic + max(0.0, (-bulk_salinity[idx] - conc_ratio) / pc))
+                enthalpy_liquidus[idx] = stefan - bulk_salinity[idx] + theta_eutectic + theta_eutectic
 
             # eutectic_porosity = (conc_ratio + bulk_salinity) / (theta_eutectic + conc_ratio)
             # enthalpy_eutectic = eutectic_porosity * (stefan + theta_eutectic * (1 - cp)) + cp * theta_eutectic
@@ -936,36 +970,39 @@ class PltFile:
 
             print('Computing diagnostic variables')
             # Compute diagnostic variables
-            for j in range(cols):
+            # for j in range(cols):
+            #
+            #     for i in range(rows):
 
-                for i in range(rows):
-                    if enthalpy[j, i] <= enthalpy_solidus[j, i]:
-                        porosity[j, i] = 0.0
-                        temperature[j, i] = enthalpy[j, i] / cp
-                        liquid_salinity[j, i] = 0.0
-                        solid_salinity[j, i] = bulk_salinity[j, i]
-                    elif enthalpy[j, i] <= enthalpy_eutectic[j, i]:
-                        porosity[j, i] = (enthalpy[j, i] - theta_eutectic * cp) / (stefan + theta_eutectic * (1 - cp))
-                        temperature[j, i] = theta_eutectic
-                        liquid_salinity[j, i] = theta_eutectic
-                        solid_salinity[j, i] = bulk_salinity[j, i] / (1 - porosity[j, i])
-                    elif enthalpy[j, i] < enthalpy_liquidus[j, i]:
-                        a = conc_ratio * (cp - 1) + stefan * (pc - 1)
-                        b = conc_ratio * (1 - 2 * cp) + enthalpy[j, i] * (1 - pc) \
-                            - bulk_salinity[j, i] * (cp - 1) - pc * stefan
-                        c = (bulk_salinity[j, i] + conc_ratio) * cp + pc * enthalpy[j, i]
-                        porosity[j, i] = (-b - np.sqrt(b * b - 4 * a * c)) / (2 * a)
+            # replaced loop over [j,i] with loop over [idx] for 3D compatibility
+            for idx, value in np.ndenumerate(enthalpy):
+                if enthalpy[idx] <= enthalpy_solidus[idx]:
+                    porosity[idx] = 0.0
+                    temperature[idx] = enthalpy[idx] / cp
+                    liquid_salinity[idx] = 0.0
+                    solid_salinity[idx] = bulk_salinity[idx]
+                elif enthalpy[idx] <= enthalpy_eutectic[idx]:
+                    porosity[idx] = (enthalpy[idx] - theta_eutectic * cp) / (stefan + theta_eutectic * (1 - cp))
+                    temperature[idx] = theta_eutectic
+                    liquid_salinity[idx] = theta_eutectic
+                    solid_salinity[idx] = bulk_salinity[idx] / (1 - porosity[idx])
+                elif enthalpy[idx] < enthalpy_liquidus[idx]:
+                    a = conc_ratio * (cp - 1) + stefan * (pc - 1)
+                    b = conc_ratio * (1 - 2 * cp) + enthalpy[idx] * (1 - pc) \
+                        - bulk_salinity[idx] * (cp - 1) - pc * stefan
+                    c = (bulk_salinity[idx] + conc_ratio) * cp + pc * enthalpy[idx]
+                    porosity[idx] = (-b - np.sqrt(b * b - 4 * a * c)) / (2 * a)
 
-                        liquid_salinity[j, i] = (bulk_salinity[j, i] + conc_ratio * (1 - porosity[j, i])) / (
-                                porosity[j, i] + pc * (1 - porosity[j, i]))
-                        temperature[j, i] = -liquid_salinity[j, i]
-                        solid_salinity[j, i] = (pc * bulk_salinity[j, i] - conc_ratio * porosity[j, i]) / (
-                                porosity[j, i] + pc * (1 - porosity[j, i]))
-                    else:
-                        porosity[j, i] = 1.0
-                        temperature[j, i] = enthalpy[j, i] - stefan
-                        liquid_salinity[j, i] = bulk_salinity[j, i]
-                        solid_salinity[j, i] = 0.0
+                    liquid_salinity[idx] = (bulk_salinity[idx] + conc_ratio * (1 - porosity[idx])) / (
+                            porosity[idx] + pc * (1 - porosity[idx]))
+                    temperature[idx] = -liquid_salinity[idx]
+                    solid_salinity[idx] = (pc * bulk_salinity[idx] - conc_ratio * porosity[idx]) / (
+                            porosity[idx] + pc * (1 - porosity[idx]))
+                else:
+                    porosity[idx] = 1.0
+                    temperature[idx] = enthalpy[idx] - stefan
+                    liquid_salinity[idx] = bulk_salinity[idx]
+                    solid_salinity[idx] = 0.0
 
             # Finally, save data into boxes
 
