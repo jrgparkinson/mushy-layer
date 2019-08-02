@@ -11,6 +11,7 @@ import geopandas as gpd
 from mushyLayerRunUtils import read_inputs
 import sys
 from ChkFile import compute_channel_properties
+from scipy.signal import find_peaks
 
 def compute_z(porosity_slice, y_slice, porosity):
 
@@ -1051,6 +1052,61 @@ class PltFile:
             total_permeability = 1.0
 
         return total_permeability
+
+
+    def num_channels(self, z_ml):
+
+        bulk_salinity = self.get_level_data('Bulk concentration')
+
+        peak_height_scaling = 2.0
+        separation = 2 # minimum pixel separation
+
+        # dom = self.prob_domain
+        # min_length = min(dom)
+        # separation = float(min_length) /
+
+
+        if self.space_dim == 2:
+            slice = bulk_salinity.sel(y = z_ml, method='nearest')
+            slice_arr = np.array(slice)
+
+
+            peak_height = float(slice_arr.max()) / peak_height_scaling
+
+            peaks, _ = find_peaks(slice_arr, height=peak_height, distance=separation)
+
+            num_peaks = len(peaks)
+
+            return num_peaks
+        else:
+            from skimage.feature import peak_local_max
+
+            slice = bulk_salinity.sel(z = z_ml, method='nearest')
+
+            slice_arr = np.array(slice)
+            slice_arr = slice_arr - slice_arr.min()
+
+            peak_height = float(slice_arr.max()) / peak_height_scaling
+            # print('threshold_abs = %s' % peak_height)
+
+            coordinates = peak_local_max(slice_arr, min_distance=separation, threshold_abs=peak_height)
+
+            num_peaks = len(coordinates)
+            # print('Num channels: %d' % num_peaks)
+
+            # import matplotlib.pyplot as plt
+            # fig = plt.figure()
+            # ax = fig.gca()
+            # bulk_s = ax.pcolormesh(slice_arr)
+            # ax.plot(coordinates[:, 1], coordinates[:, 0], 'r.')
+            #
+            # plt.colorbar(bulk_s)
+            # plt.tight_layout()
+            # plt.show()
+
+            return num_peaks
+
+        return np.nan
 
 
 
