@@ -1059,7 +1059,7 @@ class PltFile:
         bulk_salinity = self.get_level_data('Bulk concentration')
 
         peak_height_scaling = 2.0
-        separation = 2 # minimum pixel separation
+        separation = 5 # minimum pixel separation
 
         # dom = self.prob_domain
         # min_length = min(dom)
@@ -1072,8 +1072,14 @@ class PltFile:
 
 
             slice = bulk_salinity.sel(y = z_ml, method='nearest')
-            slice_arr = np.array(slice)
-            slice_arr = slice_arr - slice_arr.min()
+
+            vel_slice = np.array(self.get_level_data('yDarcy velocity').sel(y=z_ml, method='nearest'))
+
+
+            # slice_arr = np.array(slice)
+            # slice_arr = slice_arr - slice_arr.min()
+
+            slice_arr = np.array(slice) * vel_slice
 
 
             prominence = float(slice_arr.max()) / 4.0
@@ -1081,7 +1087,7 @@ class PltFile:
             peaks, _ = find_peaks(slice_arr, prominence=prominence, distance=separation)
             num_peaks = len(peaks)
 
-
+            # print('Num peaks = %d' % num_peaks)
             # x = np.array(slice.coords['x'])
             # import matplotlib.pyplot as plt
             # fig = plt.figure()
@@ -1099,28 +1105,30 @@ class PltFile:
 
             slice = bulk_salinity.sel(z = z_ml, method='nearest')
 
-            slice_arr = np.array(slice)
-            slice_arr = slice_arr - slice_arr.min()
+            vel_slice = np.array(self.get_level_data('zDarcy velocity').sel(z=z_ml, method='nearest'))
+
+            slice_arr = np.array(slice)*vel_slice
+            # slice_arr = slice_arr - slice_arr.min()
 
             peak_height = float(slice_arr.max()) / peak_height_scaling
             # print('threshold_abs = %s' % peak_height)
 
-            coordinates = peak_local_max(slice_arr, min_distance=separation, threshold_abs=peak_height)
+            coordinates = peak_local_max(slice_arr, min_distance=separation, threshold_abs=peak_height, exclude_border=False)
 
             num_peaks = len(coordinates)
-            # print('Num channels: %d' % num_peaks)
 
+            # print('Num channels: %d' % num_peaks)
             # import matplotlib.pyplot as plt
             # fig = plt.figure()
             # ax = fig.gca()
             # bulk_s = ax.pcolormesh(slice_arr)
-            # ax.plot(coordinates[:, 1], coordinates[:, 0], 'r.')
-            #
+            # ax.plot(coordinates[:, 1], coordinates[:, 0], 'r+')
             # plt.colorbar(bulk_s)
             # plt.tight_layout()
             # plt.show()
 
             return num_peaks
+
 
         return np.nan
 
