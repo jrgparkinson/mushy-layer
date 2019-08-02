@@ -1067,15 +1067,31 @@ class PltFile:
 
 
         if self.space_dim == 2:
+
+            separation = 5  # minimum pixel separation
+
+
             slice = bulk_salinity.sel(y = z_ml, method='nearest')
             slice_arr = np.array(slice)
+            slice_arr = slice_arr - slice_arr.min()
 
 
-            peak_height = float(slice_arr.max()) / peak_height_scaling
+            prominence = float(slice_arr.max()) / 4.0
 
-            peaks, _ = find_peaks(slice_arr, height=peak_height, distance=separation)
-
+            peaks, _ = find_peaks(slice_arr, prominence=prominence, distance=separation)
             num_peaks = len(peaks)
+
+
+            # x = np.array(slice.coords['x'])
+            # import matplotlib.pyplot as plt
+            # fig = plt.figure()
+            # ax = fig.gca()
+            # ax.plot(x, slice_arr)
+            # x_peaks = x[peaks]
+            # ax.plot(x_peaks, slice_arr[peaks] , 'r.')
+            # plt.tight_layout()
+            # plt.show()
+
 
             return num_peaks
         else:
