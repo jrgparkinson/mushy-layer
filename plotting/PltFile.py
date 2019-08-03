@@ -1133,6 +1133,91 @@ class PltFile:
         return np.nan
 
 
+    def compute_mush_liquid_interface(self):
+
+
+        porosity = self.get_level_data('Porosity')
+        if self.space_dim == 2:
+            z = porosity.coords['y']
+        else:
+            z = porosity.coords['z']
+
+        porosity = np.array(porosity)
+
+        z_interface = np.nan
+
+        dx = self.levels[0][self.DX]
+
+        mushy_indices = np.argwhere(porosity < 1.0)
+
+        if mushy_indices.shape[0] > 0:
+            # Need to be more careful here
+            # There can be liquid cells inside/above the mushy layer which we don't want to consider
+            # Start from the bottom of the domain and trace cells upwards until we hit mushy cells
+
+            # Rather than highest liquid cell, consider lowest mushy cell
+            s = porosity.shape
+
+            iterate_shape = s[:-1]  # iterate over everything but vertical index (which is in the last index)
+            import itertools
+            liquid_z_indices = []
+            # for ix in np.arange(0, s[1]):
+
+            for ix in itertools.product(*[range(s) for s in iterate_shape]):
+                ind = list(ix)
+
+                # Don't know how to do this in 2d/3d, but should be possible
+                if self.space_dim == 2:
+                    vals = np.argwhere(porosity[ind[0], :] < 1.0)
+                elif self.space_dim == 3:
+
+                    vals = np.argwhere(porosity[ind[0], ind[1], :] < 1.0)
+
+                if vals.any():
+                    val = np.amin(vals)
+                    liquid_z_indices.append(val)
+
+            # Eutectic interface:
+            solid_indices = []
+            # for ix in np.arange(0, s[1]):
+            #     vals = np.argwhere(porosity[:, ix] < 1e-6)
+            for ix in itertools.product(*[range(s) for s in iterate_shape]):
+                ind = list(ix)
+
+                # Don't know how to do this in 2d/3d, but should be possible
+                if self.space_dim == 2:
+                    vals = np.argwhere(porosity[ind[0], :] < 1e-6)
+                elif self.space_dim == 3:
+
+                    vals = np.argwhere(porosity[ind[0], ind[1], :] < 1e-6)
+
+                if vals.any():
+                    val = np.amin(vals)
+                    solid_indices.append(val)
+
+            median_eutectic_boundary = np.median(solid_indices)
+            # eutectic_interface = median_eutectic_boundary * dx
+            # eutectic_boundary_cell = int(median_eutectic_boundary)
+
+            # liquid_indices = [np.amin(np.argwhere(porosity[:, ix] < 1.0)) for ix in np.arange(0, s[1])]
+
+            median_liquid_boundary = int(np.median(liquid_z_indices))
+
+
+            # height = abs(dx * float(median_eutectic_boundary - median_liquid_boundary))
+
+
+            z_interface = z[median_liquid_boundary]
+            # ice_ocean_boundary_cell = int(median_liquid_boundary)
+
+            # If there's a mushy layer, compute confinement depth
+            # confinment_depth = dx * (np.max(liquid_z_indices) - ice_ocean_interface)
+            # data['channel_confinement_depth'] = confinment_depth
+
+
+        return z_interface
+
+
 
 
 
