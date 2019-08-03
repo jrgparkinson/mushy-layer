@@ -32,6 +32,7 @@ visitlog.py
 **/.idea/
 **/.hg/*
 **/execNonSubcycle/*/*
+**/andrew-bug/*
 
 *.cproject
 *.tmp
