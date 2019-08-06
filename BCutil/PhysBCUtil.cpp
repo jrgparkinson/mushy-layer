@@ -618,177 +618,181 @@ public:
 
               if (bcType == PhysBCUtil::FixedTemperature || bcType == PhysBCUtil::TemperatureFlux || bcType == PhysBCUtil::TemperatureFluxRadiation)
               {
-                CH_assert(a_state.nComp() == 2);
-                // This is a special case
+//                CH_assert(a_state.nComp() == 2);
 
-                int Hcomp = 0;
-                int Ccomp = 1;
-
-
-                CH_TIME("BCFunctions::TemperatureBC");
-                int isign = sign(side);
-
-                NonlinearTemperatureBC* residual;
-
-                // default values
-                Real a = 0.0, b=0.0, T_ref=0.0, no_flux_position_limit=0.0, flux=0.0;
-
-                no_flux_position_limit = m_params.m_bc_noFluxLimit.getBC(idir,  side);
-
-                switch (bcType)
+                if (a_state.nComp() == 1)
                 {
-                  case PhysBCUtil::FixedTemperature:
-                    T_ref = boundaryValue;
-                    b = 1.0;  // the (+) sign is important here in terms of driving the bc lower if our estimated boundary temperature is too high (and vice versa)
 
-                    break;
 
-                  case PhysBCUtil::TemperatureFlux:
+                  int a_comp = 0;
+                  // if for some reason we only have one component, just apply extrapolation bcs to a_state
 
-                    flux = boundaryValue;
-                    a = 1.0;
+                  ExtraBC(a_state, a_valid,
+                                      idir, side, order, a_comp);
 
-                    break;
 
-                  case PhysBCUtil::TemperatureFluxRadiation:
-                    a = m_params.m_bc_a.getBC(idir, side);;
-                    b = m_params.m_bc_b.getBC(idir, side);
-                    flux = boundaryValue;
-                    T_ref = m_params.m_bc_bTref.getBC(idir, side);
-
-                    break;
-
-                  default:
-
-                    //MayDay::Error("Unknown bcType specified");
-
-                    break;
                 }
-
-                residual = new NonlinearTemperatureBCRobin(m_params, m_dx,
-                                                           a, // coefficient of dt/d(x, z)
-                                                           b, // coefficient of thermal radiation term
-                                                           flux, // flux
-                                                           T_ref); //reference temperature for thermal radiation (dummy value)
-
-                NonlinearBCSolver* nonlinearSolver;
-//                nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual);
-                if (m_params.bc_nonlinear_solve_method == NonlinearBCSolveMethods::newton)
+                else
                 {
-                  nonlinearSolver = new NonlinearBCSolverNewton(residual, m_params.max_bc_iter, m_params.max_bc_residual);
-                }
-                else if (m_params.bc_nonlinear_solve_method == NonlinearBCSolveMethods::picard)
-                {
-                  nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual);
-                }
 
-                Box toRegion = adjCellBox(a_valid, idir, side, 1);
-                toRegion &= a_state.box();
 
-                for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
-                {
-                  CH_TIME("BCFunctions::TemperatureBC::loopOverBox");
 
-                  IntVect ivto = bit();
-                  IntVect iv_interior = ivto - isign*BASISV(idir);
 
-                  // Assume first order BCs
-                  // Assume a_state contains enthalpy and bulk concentration components
-                  Real interior_enthalpy = a_state(iv_interior, Hcomp);
-                  Real interior_bulk_concentration = a_state(iv_interior, Ccomp);
-                  Real interior_porosity =  m_params.computePorosity(interior_enthalpy, interior_bulk_concentration);
+                  // This is a special case
 
-                  // Compute temperature on the boundary
-                  bool legacy_fixed_temp_bc = false;
+                  int Hcomp = 0;
+                  int Ccomp = 1;
 
-                  if (bcType == PhysBCUtil::FixedTemperature && legacy_fixed_temp_bc)
+
+                  CH_TIME("BCFunctions::TemperatureBC");
+                  int isign = sign(side);
+
+                  NonlinearTemperatureBC* residual;
+
+                  // default values
+                  Real a = 0.0, b=0.0, T_ref=0.0, no_flux_position_limit=0.0, flux=0.0;
+
+                  no_flux_position_limit = m_params.m_bc_noFluxLimit.getBC(idir,  side);
+
+                  switch (bcType)
                   {
-                    CH_TIME("BCFunctions::FixedTemperatureBC");
+                    case PhysBCUtil::FixedTemperature:
+                      T_ref = boundaryValue;
+                      b = 1.0;  // the (+) sign is important here in terms of driving the bc lower if our estimated boundary temperature is too high (and vice versa)
 
-                    Real boundary_temperature_value;
-                    Real bcVal;
+                      break;
 
-                    boundary_temperature_value = boundaryValue;
-                    if (comp == Hcomp)
-                    {
-                      bcVal = interior_porosity*m_params.stefan + boundary_temperature_value;
-                    }
-                    else
-                    {
-                      // This is only true in a mushy layer!!
-                      // need to think a bit more carefully about what the bulk concentration boundary condition
-                      // should be given a fixed temperature/temperature flux
-                      MayDay::Error("Can't apply temperature bcs to bulk concentration yet");
-                      bcVal = interior_porosity*boundary_temperature_value + m_params.compositionRatio*(1-interior_porosity);
-                    }
+                    case PhysBCUtil::TemperatureFlux:
 
-                    // enforce dirichlet condition
-                    if (a_homogeneous)
-                    {
-                      bcVal = 0;
-                    }
+                      flux = boundaryValue;
+                      a = 1.0;
 
-                    // Set boundary value as required
-                    // This could be more accurate for flux BCs, maybe fix later
-                    a_state(ivto, comp) = 2*bcVal - a_state(iv_interior, comp);
+                      break;
 
+                    case PhysBCUtil::TemperatureFluxRadiation:
+                      a = m_params.m_bc_a.getBC(idir, side);;
+                      b = m_params.m_bc_b.getBC(idir, side);
+                      flux = boundaryValue;
+                      T_ref = m_params.m_bc_bTref.getBC(idir, side);
 
+                      break;
+
+                    default:
+
+                      //MayDay::Error("Unknown bcType specified");
+
+                      break;
                   }
-                  // if (bcType == PhysBCUtil::TemperatureFlux || bcType == PhysBCUtil::TemperatureFluxRadiation)
-                  else
+
+                  residual = new NonlinearTemperatureBCRobin(m_params, m_dx,
+                                                             a, // coefficient of dt/d(x, z)
+                                                             b, // coefficient of thermal radiation term
+                                                             flux, // flux
+                                                             T_ref); //reference temperature for thermal radiation (dummy value)
+
+                  NonlinearBCSolver* nonlinearSolver;
+  //                nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual);
+                  if (m_params.bc_nonlinear_solve_method == NonlinearBCSolveMethods::newton)
                   {
-                    CH_TIME("BCFunctions::TemperatureFluxBC");
+                    nonlinearSolver = new NonlinearBCSolverNewton(residual, m_params.max_bc_iter, m_params.max_bc_residual);
+                  }
+                  else if (m_params.bc_nonlinear_solve_method == NonlinearBCSolveMethods::picard)
+                  {
+                    nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual);
+                  }
 
-                    if (comp == Hcomp)
+                  Box toRegion = adjCellBox(a_valid, idir, side, 1);
+                  toRegion &= a_state.box();
+
+                  for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+                  {
+                    CH_TIME("BCFunctions::TemperatureBC::loopOverBox");
+
+                    IntVect ivto = bit();
+                    IntVect iv_interior = ivto - isign*BASISV(idir);
+
+                    // Assume first order BCs
+                    // Assume a_state contains enthalpy and bulk concentration components
+                    Real interior_enthalpy = a_state(iv_interior, Hcomp);
+                    Real interior_bulk_concentration = a_state(iv_interior, Ccomp);
+                    Real interior_porosity =  m_params.computePorosity(interior_enthalpy, interior_bulk_concentration);
+
+                    // Compute temperature on the boundary
+                    bool legacy_fixed_temp_bc = false;
+
+                    if (bcType == PhysBCUtil::FixedTemperature && legacy_fixed_temp_bc)
                     {
+                      CH_TIME("BCFunctions::FixedTemperatureBC");
 
-                      // define perpendicular direction = current dir + 1 unless
-                      // current dir is the largest dimension, then go back to 0
-                      int perp_dir = (idir == SpaceDim-1) ? 0 : idir + 1;
+                      Real boundary_temperature_value;
+                      Real bcVal;
 
-                      Real face_pos = m_dx*(iv_interior[perp_dir] + 0.5);
-                      if (face_pos < no_flux_position_limit || a_homogeneous)
+                      boundary_temperature_value = boundaryValue;
+                      if (comp == Hcomp)
                       {
-                        // no flux below z = some value (0.75) for now
-//                        bcVal = 0.0;
-
-                        // No flux boundaries are easy:
-                        a_state(ivto, comp) = a_state(iv_interior, comp);
+                        bcVal = interior_porosity*m_params.stefan + boundary_temperature_value;
                       }
                       else
                       {
+                        // This is only true in a mushy layer!!
+                        // need to think a bit more carefully about what the bulk concentration boundary condition
+                        // should be given a fixed temperature/temperature flux
+                        MayDay::Error("Can't apply temperature bcs to bulk concentration yet");
+                        bcVal = interior_porosity*boundary_temperature_value + m_params.compositionRatio*(1-interior_porosity);
+                      }
 
-                        CH_TIME("BCFunctions::FixedTempBC::nonlinearsolve");
+                      // enforce dirichlet condition
+                      if (a_homogeneous)
+                      {
+                        bcVal = 0;
+                      }
 
-                        // Compute BC valute to satisfy some boundary condition whose residual is computed by the residual object.
+                      // Set boundary value as required
+                      // This could be more accurate for flux BCs, maybe fix later
+                      a_state(ivto, comp) = 2*bcVal - a_state(iv_interior, comp);
 
-                        // Get the temperature at the interior cell (which won't change) so we can compute fluxes across the boundary
-                        Real interior_temperature = m_params.computeTemperature(interior_enthalpy, interior_bulk_concentration);
 
-                        // Initial guess of the enthalpy in the ghost cell is the 0th order extrapolation from inside the domain
-                        Real ghost_enthalpy =  interior_enthalpy;
+                    }
+                    // if (bcType == PhysBCUtil::TemperatureFlux || bcType == PhysBCUtil::TemperatureFluxRadiation)
+                    else
+                    {
+                      CH_TIME("BCFunctions::TemperatureFluxBC");
 
-                        // Now solve for the enthalpy in the ghost cell
-                        nonlinearSolver->solve(ghost_enthalpy, interior_temperature, interior_bulk_concentration);
+                      if (comp == Hcomp)
+                      {
 
-                        /*Real ghost_enthalpy =  interior_enthalpy;
+                        // define perpendicular direction = current dir + 1 unless
+                        // current dir is the largest dimension, then go back to 0
+                        int perp_dir = (idir == SpaceDim-1) ? 0 : idir + 1;
 
-                        Real resid = 0.0;
-                        residual->computeResidual(resid,
-                                                  ghost_enthalpy,  // enthalpy in ghost cell
-                                                  interior_bulk_concentration,  // bulk conc in ghost cell
-                                                  interior_temperature // temperature at interior grid cell
-                                                  );
+                        Real face_pos = m_dx*(iv_interior[perp_dir] + 0.5);
+                        if (face_pos < no_flux_position_limit || a_homogeneous)
+                        {
+                          // no flux below z = some value (0.75) for now
+  //                        bcVal = 0.0;
 
-                        // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
-                        ghost_enthalpy = ghost_enthalpy + resid;
-
-                        // 10^-2 is some arbitrary criteria
-                        int num_iter = 0;
-                        while (abs(resid) > m_params.max_bc_residual && num_iter < m_params.max_bc_iter)
+                          // No flux boundaries are easy:
+                          a_state(ivto, comp) = a_state(iv_interior, comp);
+                        }
+                        else
                         {
 
-                          // Recompute residual
+                          CH_TIME("BCFunctions::FixedTempBC::nonlinearsolve");
+
+                          // Compute BC valute to satisfy some boundary condition whose residual is computed by the residual object.
+
+                          // Get the temperature at the interior cell (which won't change) so we can compute fluxes across the boundary
+                          Real interior_temperature = m_params.computeTemperature(interior_enthalpy, interior_bulk_concentration);
+
+                          // Initial guess of the enthalpy in the ghost cell is the 0th order extrapolation from inside the domain
+                          Real ghost_enthalpy =  interior_enthalpy;
+
+                          // Now solve for the enthalpy in the ghost cell
+                          nonlinearSolver->solve(ghost_enthalpy, interior_temperature, interior_bulk_concentration);
+
+                          /*Real ghost_enthalpy =  interior_enthalpy;
+
+                          Real resid = 0.0;
                           residual->computeResidual(resid,
                                                     ghost_enthalpy,  // enthalpy in ghost cell
                                                     interior_bulk_concentration,  // bulk conc in ghost cell
@@ -798,32 +802,50 @@ public:
                           // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
                           ghost_enthalpy = ghost_enthalpy + resid;
 
-                          num_iter++;
+                          // 10^-2 is some arbitrary criteria
+                          int num_iter = 0;
+                          while (abs(resid) > m_params.max_bc_residual && num_iter < m_params.max_bc_iter)
+                          {
 
-                        }*/
+                            // Recompute residual
+                            residual->computeResidual(resid,
+                                                      ghost_enthalpy,  // enthalpy in ghost cell
+                                                      interior_bulk_concentration,  // bulk conc in ghost cell
+                                                      interior_temperature // temperature at interior grid cell
+                                                      );
 
-                        // Since we have determined what the enthalpy should be in the ghost cell to enforce the flux condition
-                        // on temperature, just enforce this value
-                        a_state(ivto, comp) = ghost_enthalpy;
+                            // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
+                            ghost_enthalpy = ghost_enthalpy + resid;
 
-                      } // end if greater than/less than some z value
-                    }
-                    else
-                    {
+                            num_iter++;
 
-                      MayDay::Error("Can't apply temperature bcs to bulk concentration yet");
+                          }*/
 
-                    }
+                          // Since we have determined what the enthalpy should be in the ghost cell to enforce the flux condition
+                          // on temperature, just enforce this value
+                          a_state(ivto, comp) = ghost_enthalpy;
+
+                        } // end if greater than/less than some z value
+                      }
+                      else
+                      {
+
+                        MayDay::Error("Can't apply temperature bcs to bulk concentration yet");
+
+                      }
 
 
-                  } // end if temperature flux condition
+                    } // end if temperature flux condition
 
 
 
-                } // end loop over box
+                  } // end loop over box
 
-                // Clean up memory
-                delete residual;
+                  // Clean up memory
+                  delete residual;
+
+
+                }
 
               }
               else
