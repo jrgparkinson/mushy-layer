@@ -1395,6 +1395,16 @@ AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
 
 }
 
+void AMRLevelMushyLayer::horizAverage()
+{
+  horizontallyAverage(*m_scalarNew[ScalarVars::m_enthalpy], *m_scalarNew[ScalarVars::m_enthalpy]);
+  horizontallyAverage(*m_scalarNew[ScalarVars::m_bulkConcentration], *m_scalarNew[ScalarVars::m_bulkConcentration]);
+
+  copyNewToOldStates();
+  updateEnthalpyVariables();
+
+}
+
 void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FluxBox>& a_phi)
 {
   Vector<Real> discardVector;

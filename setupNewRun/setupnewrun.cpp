@@ -356,6 +356,20 @@ int main(int argc, char* argv[])
 
   }
 
+  // horizontal averaging
+  bool horizontalaverageIC = true;
+  if (horizontalaverageIC)
+  {
+    for (int level = 0; level <= finest_level; level++)
+    {
+      AMRLevelMushyLayer* ml = amrlevels[level];
+
+      // call the function to horizontally average data.
+      ml->horizAverage();
+
+    }
+  }
+
   // might have changed dx
   if (newLev0Dx > 0)
   {

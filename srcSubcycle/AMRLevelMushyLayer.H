@@ -417,6 +417,9 @@ public:
   /// Set whether or not to compute diagnostics
   void set_compute_diagnostics(bool compute_diags);
 
+  /// Average enthalpy and bulk salinity then recalculate all other fields
+   void horizAverage();
+
 protected:
 
   /// Has a particular variable converged to steady state?
@@ -541,6 +544,8 @@ protected:
   /// Average cell centred values in the horizontal direction
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FArrayBox>& a_phi,
                            Vector<Real>& globalAveraged);
+
+
 
   /// Compute average value of some scalar field over the liquid region of the domain
   Real averageOverLiquidRegion(int a_var);
