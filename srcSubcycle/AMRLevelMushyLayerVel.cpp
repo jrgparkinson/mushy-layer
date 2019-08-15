@@ -2374,7 +2374,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
   //  m_projection.applyFreestreamCorrection(a_advVel, m_dt);
   //  if (!freestreamBeforeProjection)
   //  {
-  if (currentCFLIsSafe())
+  if (this->isCurrentCFLSafe())
   {
     m_projection.applyFreestreamCorrection(a_advVel);
   }

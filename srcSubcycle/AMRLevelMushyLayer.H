@@ -605,7 +605,7 @@ protected:
   void computeUDelU(LevelData<FArrayBox>& U_adv_src, const LevelData<FArrayBox>& advectionSourceTerm, Real a_oldTime, Real a_dt);
 
   /// Check CFL based on latest velocity is safe to use for explicit updates
-  bool currentCFLIsSafe(bool printWarning=false);
+  bool isCurrentCFLSafe(bool printWarning=false);
 
   /// Add a fixed heat source
   /**

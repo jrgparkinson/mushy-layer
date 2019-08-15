@@ -114,6 +114,7 @@ MushyLayerParams::MushyLayerParams() {
   HEutecticPlume = -999;
 
   nonDimReluctance = -999.0;
+  heleShamPermeability = -999.0;
   width = -999.0;
 
   referenceTemperature = -999;
@@ -364,13 +365,28 @@ void MushyLayerParams::getParameters()
     darcy = referencePermeability / (height*height);
   }
 
-  if (pp.contains("nonDimReluctance"))
+//  if (pp.contains("nonDimReluctance"))
+//  {
+//    pp.get("nonDimReluctance", nonDimReluctance);
+//  }
+//  else
+//  {
+//    nonDimReluctance = referencePermeability*12/(d*d);
+//  }
+
+  if (pp.contains("heleShawPermeability"))
   {
-    pp.get("nonDimReluctance", nonDimReluctance);
+    pp.get("heleShawPermeability", heleShamPermeability);
+  }
+  else if (pp.contains("nonDimReluctance"))
+  {
+    Real rel  = 0.0;
+    pp.get("nonDimReluctance", rel);
+    heleShamPermeability = 1.0/rel;
   }
   else
   {
-    nonDimReluctance = referencePermeability*12/(d*d);
+    heleShamPermeability = d*d/(12*referencePermeability);
   }
 
 
@@ -920,8 +936,9 @@ Real MushyLayerParams::calculatePermeability(Real liquidFraction)
     // Want to take harmonic mean of cell permeability and this permeability
 
     //    Real nonDimCellPerm = d*d / (12 * darcy * height*height);
-    Real nonDimCellPerm = 1/nonDimReluctance; // = d*d/(12*K_0)
-    finalPermeability = 1 / (1/nonDimCellPerm + 1/permeability);
+//    Real nonDimCellPerm = 1/nonDimReluctance; // = d*d/(12*K_0)
+
+    finalPermeability = 1 / (1/heleShamPermeability + 1/permeability);
   }
 
   // Place a cap on the minimum permeability allowed to avoid dividing by 0
@@ -998,7 +1015,8 @@ printParameters()
   SHOW(nonDimVel);
   SHOW(nonDimHeleShawCooling);
   SHOW(timescale);
-  SHOW(nonDimReluctance);
+//  SHOW(nonDimReluctance);
+  SHOW(heleShamPermeability);
 
   SHOW(thetaEutectic);
   SHOW(thetaInf);

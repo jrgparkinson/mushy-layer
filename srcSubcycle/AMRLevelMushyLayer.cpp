@@ -685,7 +685,7 @@ Real AMRLevelMushyLayer::advance()
   // If not, skip scalar advection for this step
   bool doAdvectiveSrc = true;
 
-  if (!currentCFLIsSafe(true))
+  if (!this->isCurrentCFLSafe(true))
   {
     doAdvectiveSrc = false;
   }
@@ -4524,7 +4524,7 @@ bool AMRLevelMushyLayer::crashed()
   return false;
 }
 
-bool AMRLevelMushyLayer::currentCFLIsSafe(bool printWarning)
+bool AMRLevelMushyLayer::isCurrentCFLSafe(bool printWarning)
 {
 
   Real maxAdvU = getMaxVelocity();

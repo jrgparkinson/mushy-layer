@@ -304,9 +304,15 @@ public:
 	/// Non dimensional reluctance of the hele-shaw cell
 	/**
 	 * Inverse of permeability. Equivalent to the Darcy number if Katz & Worster (2008)
-	 * Reluctance = Da * 12 * (h/d)^2
+	 * Reluctance = 12 K_0/d^2 = Da * 12 * (h/d)^2
 	 */
 	nonDimReluctance,
+
+	/// Dimensionless Hele-Shaw cell permeability
+	/**
+	 * \f$ \Pi_H = d^2/(12 K_0)\f$. Inverse of nonDimReluctance.
+	 */
+	heleShamPermeability,
 
 
 
