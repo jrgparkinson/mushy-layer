@@ -313,6 +313,39 @@ int main(int argc, char* argv[])
     }
   }
 
+
+
+  // Add melt pond if required
+  if (addMeltPond)
+  {
+    for (int level = 0; level <= finest_level; level++)
+    {
+      AMRLevelMushyLayer* ml = amrlevels[level];
+
+      bool rescaleSolution = false;
+      pp.query("rescaleSolution", rescaleSolution);
+
+      ml->addMeltPond(meltPondDepth, meltPondSalinity, meltPondEnthalpy, rescaleSolution);
+
+    }
+
+  }
+
+  // horizontal averaging
+  bool horizontalaverageIC = false;
+  pp.query("doHorizAverage", horizontalaverageIC);
+  if (horizontalaverageIC)
+  {
+    for (int level = 0; level <= finest_level; level++)
+    {
+      AMRLevelMushyLayer* ml = amrlevels[level];
+
+      // call the function to horizontally average data.
+      ml->horizAverage();
+
+    }
+  }
+
   // Do smoothing if required
   if (smoothing > 0)
   {
@@ -348,37 +381,6 @@ int main(int argc, char* argv[])
         ml->setCCVelZero(porosity_cap);
       }
 
-  }
-
-  // Add melt pond if required
-  if (addMeltPond)
-  {
-    for (int level = 0; level <= finest_level; level++)
-    {
-      AMRLevelMushyLayer* ml = amrlevels[level];
-
-      bool rescaleSolution = false;
-      pp.query("rescaleSolution", rescaleSolution);
-
-      ml->addMeltPond(meltPondDepth, meltPondSalinity, meltPondEnthalpy, rescaleSolution);
-
-    }
-
-  }
-
-  // horizontal averaging
-  bool horizontalaverageIC = false;
-  pp.query("doHorizAverage", horizontalaverageIC);
-  if (horizontalaverageIC)
-  {
-    for (int level = 0; level <= finest_level; level++)
-    {
-      AMRLevelMushyLayer* ml = amrlevels[level];
-
-      // call the function to horizontally average data.
-      ml->horizAverage();
-
-    }
   }
 
   // might have changed dx
