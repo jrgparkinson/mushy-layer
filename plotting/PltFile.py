@@ -13,6 +13,7 @@ import sys
 from ChkFile import compute_channel_properties
 from scipy.signal import find_peaks
 
+
 def compute_z(porosity_slice, y_slice, porosity):
 
     # valid_cells = np.argwhere(porosity_slice < porosity)
@@ -242,14 +243,14 @@ class PltFile:
             for comp_name in self.comp_names:
                 s = blank_data.shape
 
-                # Last component should be x-direction
-                if not s[-1] == len(coords['i']):
+                # First component should be x-direction
+                if not s[0] == len(coords['i']):
                     blank_data = blank_data.T
 
                 extended_coords = coords
                 extended_coords['level'] = level
                 dims = self.INDEX_COORDS_NAMES[:self.space_dim]
-                dims = dims[::-1]  # reverse list so we have k, j, i etc
+                # dims = dims[::-1]  # reverse list so we have k, j, i etc
                 ds_dom_box[comp_name] = xr.DataArray(blank_data, dims=dims,  # dims=['j', 'i'],
                                                      coords=extended_coords)
 
@@ -441,12 +442,34 @@ class PltFile:
 
             # ds_level = xr.merge(ds_boxes)
 
+            # ds_level = xr.auto_combine(ds_boxes[1:])
+
             # Update will replace in place
             first_box = 1
             ds_level = ds_boxes[first_box]
             for b in ds_boxes[first_box+1:]:
 
+                # b = b.transpose()
+
                 ds_level =  ds_level.combine_first(b)
+                # ds_level = ds_level.update(b)
+
+            # fig = pyplot.figure()
+            # f, ax = pyplot.subplots(3, 3)
+            # ax_list = ax.flatten()
+            #
+            # for i in range(0, len(ax_list)):
+            #     if i > len(ds_boxes)-2:
+            #         continue
+            #
+            #     b = ds_boxes[i+1]
+            #     ax_list[i].pcolormesh(b.coords['i'], b.coords['j'], b['Porosity'].transpose())
+            #
+            # pyplot.show()
+
+            ds_level = xr.combine_by_coords(ds_boxes[1:])
+
+            # ds_level = ds_boxes[1]
 
 
             # Create x,y,z, coordinates
@@ -483,10 +506,15 @@ class PltFile:
 
         data_box_comp = data_unshaped[indices[0]:indices[1]]
 
-        reshaped_data = data_box_comp.reshape(tuple(n_cells_dir))
+        # Chombo data is indexed in reverse (i.e. data[k, j, i]), so whilst we have n_cells_dir = [Nx, Ny, Nz],
+        # we need to reshape according to [Nz, Ny, Nx] before then transposing to get
+        # an array which is indexed as data[i, j, k]
+        # reshaped_data = data_box_comp.reshape(tuple(n_cells_dir))
+        reshaped_data = data_box_comp.reshape(tuple(n_cells_dir[::-1]))
+        reshaped_data = reshaped_data.transpose()
 
         # I think we only need to transpose in 3D
-        if self.space_dim == 3 or self.space_dim == 2:
+        if self.space_dim == 3: #  or self.space_dim == 2
             reshaped_data = reshaped_data.transpose()
             
         reshaped_data = np.array(reshaped_data)
@@ -501,6 +529,15 @@ class PltFile:
         # dim_list = dim_list[::-1]
         extended_coords = coords
         extended_coords['level'] = level
+
+        # It's really unclear when we do and don't need to transpose
+        # reshaped_data = reshaped_data.transpose()
+        # dim_list = dim_list[::-1]
+
+        if not reshaped_data.shape[0] == len(extended_coords[dim_list[0]]):
+            reshaped_data = reshaped_data.transpose()
+            # dim_list = dim_list[::-1]
+
 
         xarr_component_box = xr.DataArray(reshaped_data, dims=dim_list,  # ['j', 'i'],
                                           coords=extended_coords,  # {'i': i_box, 'j': j_box, 'level': level},
@@ -694,7 +731,7 @@ class PltFile:
         return x, y
 
 
-    def get_mesh_grid(self, level=0, rotate_dims=False):
+    def get_mesh_grid(self, level=0, rotate_dims=False, extend_grid=True):
 
         dx = self.levels[level][self.DX]
 
@@ -702,24 +739,37 @@ class PltFile:
         components = list(self.data.keys())
         # components = [c.decode('UTF-8') for c in components]
 
-        field_array = self.single_box(components[0])
+        field = self.get_level_data(components[0])
+
+        field_array = np.array(field)
         grid_size = field_array.shape
-
-
 
 
         # Make sure the grid stretches from the start of the first cell to the end of the last cell
         # this means we stretch dx slightly out of proportion, but it ensures plot limits are correct
-        x_max = (grid_size[0] + 1) * dx
-        y_max = (grid_size[1] + 1) * dx
+        x_max = (len(field.coords['x']) + 1) * dx
+        y_max = (len(field.coords['y']) + 1) * dx
+
+        # x_max = np.max(field.coords['x'])
 
         grid_dx = x_max / grid_size[0]
         grid_dy = y_max / grid_size[1]
 
+        x_coords = np.array(field.coords['x'])
+        y_coords = np.array(field.coords['y'])
+
+        dx = np.abs(x_coords[1] - x_coords[0])
 
 
-        y, x = np.mgrid[slice(0, x_max, grid_dx),
-                        slice(0, y_max, grid_dy)]
+
+        # y, x = np.mgrid[slice(0, x_max, grid_dx),
+        #                 slice(0, y_max, grid_dy)]
+        if extend_grid:
+            extend = dx/2
+        else:
+            extend = 0
+        y, x = np.mgrid[slice(min(x_coords)-extend, max(x_coords)+extend, dx),
+                        slice(min(y_coords)-extend, max(y_coords)+extend, dx)]
 
         coord_max = [(grid_size[i] + 1) * dx for i in range(0, self.space_dim)]
         grid_spacing = [coord_max[i] / grid_size[i] for i in range(0, self.space_dim)]
@@ -752,8 +802,8 @@ class PltFile:
                 x = x_new
                 y = y_new
 
-            y = self.scale_slice_transform(y)
-            x = self.scale_slice_transform(x, no_reflect=True)
+            # y = self.scale_slice_transform(y)
+            # x = self.scale_slice_transform(x, no_reflect=True)
 
             return x, y
 
@@ -835,7 +885,11 @@ class PltFile:
             data = data[self.indices]
 
         if self.reflect and not no_reflect:
-            data = np.flip(data, 1)
+            # flip will change both the data values and the x coordinate
+            data = np.flip(data, 0)
+
+            # reset the x coordinate
+            data = data.assign_coords(x=np.flip(data.x))
 
         return data
 
