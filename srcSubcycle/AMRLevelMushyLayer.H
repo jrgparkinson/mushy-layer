@@ -424,7 +424,11 @@ public:
 
   /// Smooth some scalar field
   /**
-   * smoothing done implicitly via an elliptic solve
+   * smoothing done implicitly via an elliptic solve.
+   * Obtains smooth field \f$\phi_{\smooth}\f$ by solving
+   * \f$ (1-\alpha \nabla^2)\phi_{smooth} = \phi \f$
+   * where \f$\alpha\f$ is the smoothing parameter a_smoothing
+
    */
   void smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing);
 
