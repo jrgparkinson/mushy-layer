@@ -396,6 +396,8 @@ public:
   /// Set the coefficient for smoothing fields
   void setSmoothingCoeff(Real a_coeff);
 
+  void setSmoothingDone(bool a_smoothingDone);
+
   /// Add a melt pond at the top of the domain
   void addMeltPond(int depth, Real salinity, Real enthalpy, bool rescaleExistingSolution=false);
 
@@ -418,7 +420,16 @@ public:
   void set_compute_diagnostics(bool compute_diags);
 
   /// Average enthalpy and bulk salinity then recalculate all other fields
-   void horizAverage();
+  void horizAverage();
+
+  /// Smooth some scalar field
+  /**
+   * smoothing done implicitly via an elliptic solve
+   */
+  void smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing);
+
+  void smoothEnthalpyBulkConc(Real a_smoothing);
+
 
 protected:
 
@@ -874,11 +885,6 @@ protected:
                       bool quadInterp = false,
                       Real smoothing = 0.0);
 
-  /// Smooth some scalar field
-  /**
-   * smoothing done implicitly via an elliptic solve
-   */
-  void smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing);
 
   /// Get boundary conditions for implicit problems
   void getScalarBCs(BCHolder& thisBC, int a_var, bool a_homogeneous);

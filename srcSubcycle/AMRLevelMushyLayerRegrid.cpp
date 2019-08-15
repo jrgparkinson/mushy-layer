@@ -7,6 +7,11 @@ void AMRLevelMushyLayer::setSmoothingCoeff(Real a_coeff)
   s_regrid_smoothing_coeff = a_coeff;
 }
 
+void AMRLevelMushyLayer::setSmoothingDone(bool a_smoothingDone)
+{
+  m_regrid_smoothing_done = a_smoothingDone;
+}
+
 
 void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothScalar)
 {
@@ -324,15 +329,31 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
               // subtract off solution
               levelLapS[levelDit] -= levelS[levelDit] ;
 
+
+
               // Scale by diffusion/viscosity (was previously scaled by viscosity coefficient)
-              levelLapS[levelDit] *= m_scalarDiffusionCoeffs[scalComp]/m_parameters.m_viscosityCoeff;
+              levelLapS[levelDit] *= m_scalarDiffusionCoeffs[scalComp];
+              if (m_parameters.m_viscosityCoeff > 0.0)
+              {
+                levelLapS[levelDit] *= 1.0/m_parameters.m_viscosityCoeff;
+              }
 
               // Add to solution
               levelS[levelDit] += levelLapS[levelDit];
 
+
+              // Basic smoothing
+//              Box b = levelS[levelDit].box();
+//              b.grow(-1);
+//              for (BoxIterator bit = BoxIterator(b); bit.ok(); bit.begin())
+//              {
+//                IntVect iv = bit();
+//                levelS[levelDit](iv) = levelS[levelDit](iv) + this->s_regrid_smoothing_coeff* (levelS[levelDit](iv + BASISV(0))   + levelS[levelDit](iv - BASISV(0)));
+//              }
+
             }
 
-            //          int temp=0;
+                      int temp=0;
 
 
           } // end loop over levels
@@ -402,7 +423,12 @@ AMRLevelMushyLayer::defineRegridAMROp(AMRPoissonOpFactory& a_factory,
 
   // define coefficient
   Real nu = m_parameters.m_viscosityCoeff;  //m_parameters.prandtl;
-  Real mu = -m_opt.regrid_smoothing_coeff*dtLBase*nu;
+  Real mu = -m_opt.regrid_smoothing_coeff*dtLBase;
+  if (nu > 0.0)
+  {
+    mu = mu*nu;
+  }
+
 
   // Would like to use extrap BC's, since they're probably the safest
 

@@ -1036,7 +1036,8 @@ void AMRLevelMushyLayer::updateEnthalpyVariables()
   }
 
 
-  computeLambdaPorosity();
+  // stop doing this
+//  computeLambdaPorosity();
 
 }
 
@@ -4028,6 +4029,11 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
 }
 
 
+void AMRLevelMushyLayer::smoothEnthalpyBulkConc(Real a_smoothing)
+{
+  this->smoothScalarField(*m_scalarNew[ScalarVars::m_enthalpy], ScalarVars::m_enthalpy, a_smoothing);
+  this->smoothScalarField(*m_scalarNew[ScalarVars::m_bulkConcentration], ScalarVars::m_bulkConcentration, a_smoothing);
+}
 
 
 void AMRLevelMushyLayer::smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing)
