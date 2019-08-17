@@ -18,6 +18,14 @@ def get_base_output_dir():
 
     return base_output_dir
 
+def add_params(defaultParams, extra_params):
+    """ Add params from extra_params to defaultParams """
+
+    for k, v in extra_params.iteritems():
+        defaultParams[k] = v
+
+    return defaultParams
+
 
 def get_matlab_base_command():
     parent_dir = os.path.abspath(os.pardir)
