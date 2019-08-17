@@ -667,7 +667,8 @@ Real AMRLevelMushyLayer::advance()
   // Need to redefine solvers if variables have changed
   defineSolvers(m_time-m_dt); // define at old time
 
-  if (solvingFullDarcyBrinkman())
+//  if (solvingFullDarcyBrinkman())
+  if (m_opt.doEulerPart)
   {
     // This fills all the ghost cells of advectionSourceTerm
     computeAdvectionVelSourceTerm(advectionSourceTerm);
@@ -785,8 +786,11 @@ Real AMRLevelMushyLayer::advance()
   } // end if doing scalar advection/diffusion
 
 
+  // compute cell centered velocities
+  // for problems where the momentum equation has time dependence
 
-  if (solvingFullDarcyBrinkman())
+//  if (solvingFullDarcyBrinkman())
+  if (m_opt.doEulerPart)
   {
     // If we're skipping advective srcs for this timestep, skip this too
     if (!doAdvectiveSrc)
@@ -4034,6 +4038,7 @@ void AMRLevelMushyLayer::smoothEnthalpyBulkConc(Real a_smoothing)
   this->smoothScalarField(*m_scalarNew[ScalarVars::m_enthalpy], ScalarVars::m_enthalpy, a_smoothing);
   this->smoothScalarField(*m_scalarNew[ScalarVars::m_bulkConcentration], ScalarVars::m_bulkConcentration, a_smoothing);
 }
+
 
 
 void AMRLevelMushyLayer::smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing)

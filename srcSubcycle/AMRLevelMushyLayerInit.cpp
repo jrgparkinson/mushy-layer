@@ -612,6 +612,13 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
   // I'm not sure we actually need this
   solverGrids.resize(nlevels);
 
+//  bool is_time_dependent = true;
+//  if (!m_opt.doEulerPart)
+//  {
+//    is_time_dependent = false;
+//    is_time_dependent = true;
+//  }
+
   // If we're doing a multi-component solve, need SpaceDim components, otherwise just one component.
   int num_comp = m_opt.multiCompUStarSolve ? SpaceDim : 1;
 
@@ -670,7 +677,15 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
         //                                                      (*cCoef[relativeLev])[dit].setVal(0.0); // testing
 
         // This is what multiplies du/dt
-        (*aCoef[relativeLev])[dit].setVal(1.0);
+          if (isVelocityTimeDependent())
+          {
+            (*aCoef[relativeLev])[dit].setVal(1.0);
+          }
+          else
+          {
+            // no time dependence
+            (*aCoef[relativeLev])[dit].setVal(0.0);
+          }
 
         // this is what multiplies laplacian(u). Note the minus sign.
         (*bCoef[relativeLev])[dit].setVal(- m_parameters.m_viscosityCoeff);
@@ -2766,7 +2781,8 @@ void AMRLevelMushyLayer::postInitialize()
         pout() << "AMRlevelMushyLayer::postInitialize - initialize pressures" << endl;
       }
 
-      if (solvingFullDarcyBrinkman())
+//      if (solvingFullDarcyBrinkman())
+      if (m_opt.doEulerPart)
       {
         Real dtInit = computeDtInit(numLevels-1);
 
@@ -2917,7 +2933,8 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
     pout() << "AMRLevelMushyLayer::computeInitAdvectionVel (level " << m_level << ")" << endl;
   }
 
-  if (solvingFullDarcyBrinkman())
+//  if (solvingFullDarcyBrinkman())
+  if (m_opt.doEulerPart)
   {
     // Just initialising so don't advect/diffuse any scalars here
 
@@ -3119,7 +3136,10 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     thisMLPtr->m_usePrevPressureForUStar=orig_add_subtract_grad_p;
 
     thisMLPtr->getExtraPlotFields();
+    if (m_opt.doEulerPart)
+    {
     thisMLPtr->m_projection.unscaledPi(*thisMLPtr->m_scalarNew[ScalarVars::m_pressure], m_dt);
+    }
     thisMLPtr = thisMLPtr->getFinerLevel();
   }
 

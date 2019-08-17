@@ -152,8 +152,21 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
       pout() << "AMRLevelMushyLayer::calculateTimeIndAdvectionVel - with viscosity (level " << m_level << ")"    << endl;
     }
 
+    LevelData<FArrayBox> uDelu(m_grids, SpaceDim, this->m_numGhostAdvection*IntVect::Unit);
+    setValLevel(uDelu, 0.0);
+
+    LevelData<FArrayBox> advectionSourceTerm(m_grids, SpaceDim, m_numGhostAdvection*IntVect::Unit);
+    setValLevel(advectionSourceTerm, 0.0);
+//    this->computeAdvectionVelSourceTerm(advectionSourceTerm);
+    advectionSourceTerm.exchange();
+    uDelu.exchange();
+
+    this->computeUstar(uDelu, advectionSourceTerm, m_time-m_dt, m_dt, true, true, false);
+
     // Average U^* to faces for projection
-    CellToEdge(*m_vectorNew[VectorVars::m_Ustar], a_advVel);
+    // m_advUstar
+//    CellToEdge(*m_vectorNew[VectorVars::m_Ustar], a_advVel);
+    CellToEdge(*m_vectorNew[VectorVars::m_advUstar], a_advVel); // for MAC projection option in computeUstar
   }
   else
   {
@@ -214,12 +227,6 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
           setValLevel(coarsenedPressure, 0.0);
 
           // Make coarsened pressure
-
-//          AMRLevelMushyLayer* crseML = getCoarserLevel();
-//          crseML->m_coarseAverageScalar.averageToCoarse(
-//                    coarsenedPressure,
-//                    m_projection.phi());
-
           m_coarseAverageScalar.averageToCoarse(
                               coarsenedPressure,
                               m_projection.phi());
@@ -598,6 +605,8 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
   }
   else
   {
+    // not doing velocity advection
+
     if (s_verbosity >= 5)
     {
       pout() << "AMRLevelMushyLayer::computeAdvectionVelocities - computing time independent velocities" << endl;
@@ -654,7 +663,10 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 }
 
 
-
+bool AMRLevelMushyLayer::isVelocityTimeDependent()
+{
+  return m_opt.doEulerPart;
+}
 
 void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advectionSourceTerm,
                                            Real a_oldTime,
@@ -1229,8 +1241,8 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
     {
 
       Vector<RefCountedPtr<LevelBackwardEuler> > UstarBE;
-          Vector<RefCountedPtr<LevelTGA> > UstarTGA;
-          defineUstarSolver(UstarBE, UstarTGA);
+      Vector<RefCountedPtr<LevelTGA> > UstarTGA;
+      defineUstarSolver(UstarBE, UstarTGA);
 
       // Do the solve for each component separately (as the solver is hardwired for one component only)
       LevelData<FArrayBox> UstarCrse, UoldCrse, *UstarCrseComp, *UoldCrseComp, Uold;
@@ -1344,6 +1356,9 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
         int exitStatus = -1;
         Real resid = 0;
 
+        if (this->isVelocityTimeDependent())
+        {
+
         if (m_opt.timeIntegrationOrder == 1)
         {
           UstarBE[comp]->updateSoln(UstarComp, UoldComp, compSrc,
@@ -1369,6 +1384,15 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
           exitStatus = UstarTGA[comp]->exitStatus();
           resid = UstarTGA[comp]->finalResidual();
 #endif
+        }
+
+        }
+        else
+        {
+          // need to implement non time dependent solve
+
+          // might need to fix up lmax min
+          m_uStarAMRMG[comp]->solve(UstarVectComp, rhsVectComp, 0, 0, false, false);
         }
 
         pout() << " Component " << comp << ": residual = " << resid;
@@ -2281,7 +2305,7 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
   Real half_time = old_time + 0.5*m_dt;
 
   RefCountedPtr<LevelData<FluxBox> > crsePressureScaleEdgePtr, pressureScaleEdgePtrOneGhost;
-  RefCountedPtr<LevelData<FArrayBox> > pressureScalePtr, crsePressureScalePtr;
+  RefCountedPtr<LevelData<FArrayBox> > pressureScalePtr, crsePressureScalePtr, crsePressurePtr;
 
   EdgeVelBCHolder edgeVelBC(m_physBCPtr->advectionVelFuncBC(m_opt.viscousBCs));
   edgeVelBC.applyBCs(a_advVel, m_grids, m_problem_domain, m_dx,
@@ -2320,6 +2344,9 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
       crsePressureScalePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(mlCrse->m_grids, 1, IntVect::Unit));
       mlCrse->fillScalars(*crsePressureScalePtr, half_time, m_pressureScaleVar, true);
+
+      crsePressurePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(mlCrse->m_grids, 1, IntVect::Unit));
+      mlCrse->fillScalars(*crsePressurePtr,  half_time, m_pressure, true);
     }
 
     if (s_verbosity >= 6)
@@ -2349,9 +2376,20 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
     {
       projNum++;
 
-      int exitStatus = m_projection.levelMacProject(a_advVel, old_time, a_dt, pressureScalePtr, crsePressureScalePtr,
-                                   pressureScaleEdgePtrOneGhost, crsePressureScaleEdgePtr);
 
+      int exitStatus = 0;
+
+      // time depenendent verdion
+      if (m_opt.doEulerPart)
+      {
+      exitStatus = m_projection.levelMacProject(a_advVel, old_time, a_dt, pressureScalePtr, crsePressureScalePtr,
+                                   pressureScaleEdgePtrOneGhost, crsePressureScaleEdgePtr);
+      }
+      else
+      {
+        exitStatus = m_projection.levelMacProject(a_advVel, a_dt, crsePressurePtr, pressureScalePtr, crsePressureScalePtr,
+                                                  pressureScaleEdgePtrOneGhost, crsePressureScaleEdgePtr, false, 1.0);
+      }
 
       Divergence::levelDivergenceMAC(*m_scalarNew[ScalarVars::m_divUadv], a_advVel, m_dx);
 

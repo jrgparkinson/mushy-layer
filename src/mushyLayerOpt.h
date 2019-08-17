@@ -17,6 +17,36 @@
 Contains immunity flag definitions
 */
 
+/// Different ways to add refinement
+enum RefinementMethod {
+  /// Tag where fluid speed exceeds threshold
+  tagSpeed,
+
+  /// Tag where channels are
+  tagChannels,
+
+  /// Tag where these is strong downflow in the mushy layer
+  tagPlumeMush,
+
+  /// Tag porosity on level 0, and strong solute rich downflow thereafter
+  tagMushChannels,
+
+  /// Tag on some scalar field given by taggingVar
+  tagScalar,
+
+  /// Tag on some vector field given by  taggingVectorVar
+  tagVector,
+
+  /// Composite criteria for tagging cells.
+  /**
+   * Tag where \f$ \Delta x |\nabla \chi| ( 1 - \textrm{min}(w (\mathscr{C} - \Theta), 0)   ) > r \f$
+   * where \f$ r \f$ is the refinement threshold, \f$ w \f$ is the vertical velocity,
+   */
+  tagMushChannelsCompositeCriteria,
+
+
+};
+
 /// Different multigrid methods
 enum MGmethod {
   /// Normal linear multigrid
@@ -883,6 +913,9 @@ struct MushyLayerOptions {
 
   /// Whether we should tag the mush-liquid boundary for refinement
   bool tagMLboundary;
+
+  /// Method for refinement
+  RefinementMethod refinementMethod;
 
   /// Whether we should tag cells where the fluid velocity (magnitude) is greater than MushyLayerOptions::vel_thresh
   bool tag_velocity;

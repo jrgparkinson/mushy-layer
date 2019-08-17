@@ -425,10 +425,9 @@ public:
   /// Smooth some scalar field
   /**
    * smoothing done implicitly via an elliptic solve.
-   * Obtains smooth field \f$\phi_{\smooth}\f$ by solving
+   * Obtains smooth field \f$\phi_{smooth}\f$ by solving
    * \f$ (1-\alpha \nabla^2)\phi_{smooth} = \phi \f$
    * where \f$\alpha\f$ is the smoothing parameter a_smoothing
-
    */
   void smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing);
 
@@ -605,7 +604,15 @@ protected:
                          bool compute_uDelU = true,
                          bool a_MACprojection = false);
 
+  /// Is velocity time dependent?
+  bool isVelocityTimeDependent();
+
   /// Compute \f$ \mathbf{U}^* \f$, the velocity before we project it
+  /**
+   * In particular, we explicitly solve for the velocity
+   * \f$ \left[ 1 - \Delta t^\ell \, \left(Da \, \left(\nabla^\ell\right)^2 - \frac{\chi^{\ell, n+1}}{\Pi^{\ell, n+1}} \right) \right] \mathbf{U}^{\ell, n+1}_* = \mathbf{U}^{\ell, n} + \Delta t^\ell \left\{- \chi^{\ell, n+1/2} \, \nabla^\ell \pi^{\ell, n-1/2}
+        +  \chi^{\ell, n+1/2} \left[Pr \, Da^2  \left( Ra_T \theta^{\ell, n+1/2} - Ra_C \Theta^{\ell, n+1/2} \right) \right] -  \mathbf{U}_{AD, CC}^{\ell, n+1/2} \cdot \nabla^\ell \left( \frac{\mathbf{U}}{\chi} \right)^{\ell, n+1/2} \right\}\f$
+   */
   void computeUstar(LevelData<FArrayBox>& a_uDelu,
                     const LevelData<FArrayBox>& advectionSourceTerm,
                     Real a_oldTime, Real a_dt, bool doFRupdates, bool a_MACprojection = false, bool compute_uDelU=true);

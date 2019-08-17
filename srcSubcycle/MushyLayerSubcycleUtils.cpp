@@ -484,6 +484,37 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.tag_channels = false;
   ppRegrid.query("tag_channels", opt.tag_channels);
 
+
+
+  if (opt.tag_velocity)
+    {
+    opt.refinementMethod = RefinementMethod::tagSpeed;
+    }
+  else if (opt.tag_channels)
+  {
+    opt.refinementMethod = RefinementMethod::tagChannels;
+  }
+  else if (opt.tag_plume_mush)
+  {
+    opt.refinementMethod = RefinementMethod::tagPlumeMush;
+  }
+  else if (opt.taggingVar > -1)
+  {
+    opt.refinementMethod = RefinementMethod::tagScalar;
+  }
+  else if (opt.taggingVectorVar > -1)
+  {
+    opt.refinementMethod = RefinementMethod::tagVector;
+  }
+  else if (ppRegrid.contains("tag_mush_channels"))
+  {
+    opt.refinementMethod = RefinementMethod::tagMushChannels;
+  }
+  else if (ppRegrid.contains("tag_channels_composite"))
+  {
+    opt.refinementMethod = RefinementMethod::tagMushChannelsCompositeCriteria;
+  }
+
   opt.taggingMarginalPorosityLimit = 1.0;
   ppRegrid.query("marginalPorosityLimit", opt.taggingMarginalPorosityLimit);
 
