@@ -507,7 +507,10 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
   else if (m_opt.refinementMethod == RefinementMethod::tagMushChannelsCompositeCriteria)
   {
-    //todo - implement this
+    if (s_verbosity >= 2)
+       {
+         pout() << "AMRLevelMushyLayer::tagCells - using composite criteria to find mush and channels >  " << endl;
+       }
 
     DataIterator dit = m_grids.dataIterator();
         for (dit.begin(); dit.ok(); ++dit)
@@ -520,6 +523,10 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
           FArrayBox taggingMetricFab(b, 1);
           FArrayBox gradFab(b, SpaceDim);
+
+          // empirical parameter weighting for channels
+          // want to avoid
+          Real alpha=0.0;
 
           // Calculated undivided gradient
           for (int dir = 0; dir < SpaceDim; ++dir)
@@ -544,7 +551,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
             RealVect loc;
             ::getLocation(iv, loc, m_dx);
 
-            if (taggingMetricFab(iv)*(1 + min(velocity(iv, SpaceDim-1) * (m_parameters.compositionRatio-bulkC(iv)), 0.0) ) > m_opt.refineThresh)
+            if (taggingMetricFab(iv)*(1 - alpha*min(velocity(iv, SpaceDim-1) * (m_parameters.compositionRatio-bulkC(iv)), 0.0) ) > m_opt.refineThresh)
             {
               localTags |= iv;
             }
