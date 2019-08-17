@@ -5,7 +5,7 @@ from colorama import Fore, Style
 import getopt
 
 from runAMRConvergenceTest import runTest
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name, get_mushy_layer_dir
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name, get_mushy_layer_dir, add_params
 from MushyLayerRunSimple import MushyLayerRunSimple
 from BatchJob import BatchJob
 from makeFigures import fixed_chill_command
