@@ -325,6 +325,7 @@ def run_chombo_compare(argv):
 
         # If we couldn't understand the folder name, skip it
         if np.isnan(coarse_nx):
+            print('Skipping %s' % folder)
             continue
 
 
@@ -404,7 +405,7 @@ def run_chombo_compare(argv):
 
         timings.append(these_timings)
 
-    # print(err_data_sets)
+    print(err_data_sets)
     print(timings)
 
     ref_rats = set([x[1] for x in timings])
