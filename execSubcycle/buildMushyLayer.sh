@@ -13,15 +13,18 @@
 module unload gcc/5.2.0
 module load gcc/4.8.3
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+echo "Building $DIR"
 #cd ~/mushy-layer/execSubcycle/
-cd $MUSHY_LAYER_DIR/execSubcycle/
+cd DIR
 make all
 
-cd $MUSHY_LAYER_DIR/setupNewRun/
+cd ../setupNewRun/
 # make clean
 make all
 
-cd $MUSHY_LAYER_DIR/postProcess/
+cd ../postProcess/
 make all
 
 module unload gcc/4.8.3
