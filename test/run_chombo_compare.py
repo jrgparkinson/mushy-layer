@@ -117,8 +117,8 @@ def chombo_compare_analysis(data_folder):
 
 
 def get_folder_resolution(folder):
-    parts = re.findall('-(\d+)--', folder)
-    res = int(parts[0])
+    parts = re.findall('-(\d+)-', folder)
+    res = int(parts[-1])
     return res
 
 
