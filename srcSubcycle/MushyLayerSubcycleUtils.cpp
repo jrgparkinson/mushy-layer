@@ -487,6 +487,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
     ppRegrid.query("plume_salinity", opt.plumeSalinityThreshold);
 
   }
+  
+  opt.compositeChannelTagging=false;
+  ppRegrid.query("compositeChannelTagging", opt.compositeChannelTagging);
 
   opt.taggingMarginalPorosityLimit = 1.0;
   ppRegrid.query("marginalPorosityLimit", opt.taggingMarginalPorosityLimit);

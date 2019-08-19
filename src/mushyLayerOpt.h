@@ -785,6 +785,9 @@ struct MushyLayerOptions {
 
   /// Whether we should tag cells where the fluid velocity (magnitude) is greater than MushyLayerOptions::vel_thresh
   bool tag_velocity;
+  
+  /// New option for a refinement method based on a composite criteria
+  bool compositeChannelTagging;
 
   /// If MushyLayerOptions::tag_velocity is true, specify the velocity magnitude criteria here
   Real vel_thresh;
