@@ -10,6 +10,9 @@ from makeFigures import fixed_porous_command
 # 3) Convection in a fixed porous medium with variable porosity
 ##########################################################################
 
+def get_min_porosity():
+	return 0.05  # 0.05
+
 def fixed_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
     mushy_layer_base_dir = get_mushy_layer_dir()
 
@@ -65,7 +68,7 @@ def fixed_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max_r
     params['main.regrid_interval'] = str(regrid_int) + ' ' + str(regrid_int) + ' ' + str(regrid_int)
     params['main.max_grid_size'] = str(max_grid_size)  # Must be greater than block factor
 
-    chi = '0.05'
+    chi = str(get_min_porosity()) # '0.05'
     params['bc.porosityHiVal'] = chi + ' ' + chi  # 0.4 0.4
     params['bc.porosityLoVal'] = chi + ' ' + chi
 
@@ -82,7 +85,7 @@ def test_fixed_porous_hole():
 
     print(Fore.GREEN + 'Setup tests for (fixed) porous hole' + Style.RESET_ALL)
     physical_problem = 'DBVariablePorosity'
-    data_folder = os.path.join(base_output_dir, 'FixedPorousHole-1proc')
+    data_folder = os.path.join(base_output_dir, 'FixedPorousHole-1proc-minPorosity%s' % get_min_porosity())
 
     nz_uniform = [16, 32, 64, 128, 256, 512]
     amr_setup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': nz_uniform},
