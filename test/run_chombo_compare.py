@@ -131,7 +131,7 @@ def get_folder_details(folder):
     else:
         # AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref4-PorousMushyHole-16--0
         # print(folder)
-        result = re.findall('.*-MaxLevel(\d+)-.*ref(\d+)-.*-(\d+)--0', folder)
+        result = re.findall('.*-MaxLevel(\d+)-.*ref(\d+)-.*-(\d+)-', folder)
         if result:
             parts = result[0]
             max_lev = int(parts[0])
