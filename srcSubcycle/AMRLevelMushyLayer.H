@@ -564,6 +564,28 @@ protected:
   /// Compute average value of some scalar field over the liquid region of the domain
   Real averageOverLiquidRegion(int a_var);
 
+  /// Compute the intensity of light from the surface at each point in the domain
+  void computeRadianceIntensity();
+
+  /// Advect a passive tracer \f$ \xi \f$
+  /**
+   * \f$ \frac{\partial \xi}{\partial t} + \mathbf{U} \cdot \nabla (\xi/\chi) = S(x,z)\f$
+   */
+  void advectPassiveTracer();
+
+  /// Advect generic tracer
+  void advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_src);
+
+  /// Advect active tracer \f \zeta \f$
+  /**
+   * \f$ \frac{\partial \zeta}{\partial t} + \mathbf{U} \cdot \nabla (\zeta/\chi) = S(x,z)\f$
+   * where \f$ S(x,z) \f$ is a source/sink of the tracer defined in computeActiveTracerSourceSink()
+   */
+  void advectActiveTracer();
+
+  /// Compute sources/sinks for active tracer
+  void computeActiveTracerSourceSink(LevelData<FArrayBox>& a_srcSink);
+
   /// Compute mushy layer depth
   /**
    * Compute horizontally averaged porosity, then determine that the mushy layer starts
@@ -693,6 +715,15 @@ protected:
               LevelData<FArrayBox>& a_diffusiveSrc,
               PatchGodunov& a_patchGod,
               Real a_old_time, Real a_dt);
+
+
+  /// Compute advective flux
+  void computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeScal,
+                                  LevelData<FArrayBox>& a_scalar_advection_old,
+                                                      LevelData<FArrayBox>& a_src,
+                                                      LevelData<FluxBox>& a_advVel,
+                                                      int a_advectionVar,
+                                                      Real a_old_time, Real a_dt);
 
   /// Compute the advective flux
   /**

@@ -101,6 +101,11 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_scalarVarNames[ScalarVars::m_MACrhs] = string("MAC projection rhs");
   m_scalarVarNames[ScalarVars::m_CCrhs] = string("CC projection rhs");
 
+  ///Bio
+  m_scalarVarNames[ScalarVars::m_passiveScalar] = string("Passive tracer");
+  m_scalarVarNames[ScalarVars::m_activeScalar] = string("Active tracer");
+  m_scalarVarNames[ScalarVars::m_lightIntensity] = string("Light intensity");
+
   m_vectorVarNames = Vector<string>(m_numVectorVars, string("vector"));
   m_vectorVarNames[VectorVars::m_fluidVel] = string("Darcy velocity");
   m_vectorVarNames[VectorVars::m_U_porosity] = string("U divided by porosity");
@@ -155,6 +160,17 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     if (m_parameters.m_viscosityFunction != ViscosityFunction::uniformViscosity)
     {
       m_outputScalarVars.push_back(ScalarVars::m_viscosity);
+    }
+
+    if(m_opt.includeTracers)
+    {
+      m_outputScalarVars.push_back(ScalarVars::m_passiveScalar);
+      m_outputScalarVars.push_back(ScalarVars::m_activeScalar);
+    }
+
+    if (m_opt.surfaceIrradiance > 0)
+    {
+      m_outputScalarVars.push_back(ScalarVars::m_lightIntensity);
     }
 
 
@@ -1170,6 +1186,9 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
   m_makeFluxRegForScalarVar[ScalarVars::m_lambda] = true;
   m_makeFluxRegForScalarVar[ScalarVars::m_lambda_porosity] = true;
 
+  m_makeFluxRegForScalarVar[ScalarVars::m_activeScalar] = true;
+  m_makeFluxRegForScalarVar[ScalarVars::m_passiveScalar] = true;
+
   m_scalarDiffusionCoeffs[ScalarVars::m_temperature] = 0.0;
   m_scalarDiffusionCoeffs[ScalarVars::m_liquidConcentration] = 0.0;
   m_scalarDiffusionCoeffs[ScalarVars::m_bulkConcentration] = 0.0;
@@ -2099,6 +2118,11 @@ void AMRLevelMushyLayer::initialData()
     (*m_dVector[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
 
     m_advVel[dit].setVal(0.0);
+
+    (*m_scalarNew[ScalarVars::m_passiveScalar])[dit].setVal(1.0);
+    (*m_scalarNew[ScalarVars::m_activeScalar])[dit].setVal(m_opt.activeTracerInitVal);
+    (*m_scalarOld[ScalarVars::m_passiveScalar])[dit].setVal(1.0);
+    (*m_scalarOld[ScalarVars::m_activeScalar])[dit].setVal(m_opt.activeTracerInitVal);
 
 
   }

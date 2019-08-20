@@ -79,6 +79,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ParmParse ppPatchGodunov("patchGodunov");
   ParmParse ppVelMultigrid("VelocityMultigrid");
   ParmParse HCMultigrid("HCMultigrid");
+  ParmParse ppBio("bio");
 
   MushyLayerOptions opt;
 
@@ -869,6 +870,15 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("turn_off_buoyancy_time", opt.buoyancy_zero_time);
 
 
+  // Biogeochemistry
+  opt.includeTracers = false;
+  ppBio.query("includeTracers", opt.includeTracers);
+
+  opt.surfaceIrradiance = 0.0;
+  ppBio.query("surfaceIrradiance", opt.surfaceIrradiance);
+
+  opt.activeTracerInitVal=0.0;
+     ppBio.query("activeTracerInitVal", opt.activeTracerInitVal);
 
 //  opt.maxEta = -1;
 //  ppMain.query("max_eta", opt.maxEta); // let user specify different max eta if they want

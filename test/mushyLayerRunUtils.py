@@ -91,7 +91,8 @@ def get_executable_name(exec_dir='', exec_name='mushyLayer2d'):
     possible_exec_files = [f for f in os.listdir(exec_dir) if f[:len(exec_name)] == exec_name and f[-2:] == 'ex']
 
     if len(possible_exec_files) == 0:
-        print('Cannot find any executable files - have you compiled the code?')
+        print('Searching %s' % exec_dir)
+        print('Cannot find any executable files \'%s\' - have you compiled the code?' % exec_name)
         sys.exit(0)
 
     init_possible_exec_files = possible_exec_files

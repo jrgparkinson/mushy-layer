@@ -306,6 +306,15 @@ enum PorosityFunctions
     /// Right hand side for the face-centred projection solve, \f$ \nabla \cdot \mathbf{U} \f$
     m_CCrhs,
 
+    /// Passive scalar advcted by flow
+    m_passiveScalar,
+
+    /// Active scalar which is advected and also has sources/sinks
+    m_activeScalar,
+
+    /// Intensity of radiation from the surface
+    m_lightIntensity,
+
     /// Number of scalars variables
     // Make sure this comes last!
     m_numScalarVars
@@ -1185,6 +1194,15 @@ struct MushyLayerOptions {
 
   /// Specify how to treat the \f$ \mathbf{U} \cdot \nabla \left( \mathbf{U}/\chi \right) \f$ term
   velocityAdvectionTypes advectionMethod;
+
+  /// Whether to include tracer dynamics
+  bool includeTracers;
+
+  /// If > 0, compute penetration of irradiance down through the ice
+  Real surfaceIrradiance;
+
+  /// Initial value of active tracer
+  Real activeTracerInitVal;
 
 };
 

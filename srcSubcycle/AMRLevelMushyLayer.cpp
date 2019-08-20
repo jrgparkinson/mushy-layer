@@ -705,6 +705,13 @@ Real AMRLevelMushyLayer::advance()
     advectLambda(true);
   }
 
+  if (m_opt.includeTracers)
+  {
+    this->computeRadianceIntensity();
+    this->advectPassiveTracer();
+    this->advectActiveTracer();
+  }
+
 //  if (m_newLevel && m_level > 0)
 //  {
 //    if (m_opt.skipNewLevelScalars)
@@ -2223,51 +2230,107 @@ void AMRLevelMushyLayer::computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeSc
                                                     LevelData<FluxBox>& a_advVel,
                                                     Real a_old_time, Real a_dt)
 {
-  // Need grown version of this
   IntVect advect_grow = m_numGhostAdvection*IntVect::Unit;
-  LevelData<FArrayBox> scalar_advection_old(m_grids, 1, advect_grow);
-  LevelData<FArrayBox> vel(m_grids, SpaceDim, advect_grow);
   LevelData<FArrayBox> diffusiveSrc(m_grids, 1, a_edgeScal.ghostVect()+IntVect::Unit); // this needs the ghost cell to cover slope boxes
 
-  EdgeToCell(a_advVel, vel);
-  fillScalars(scalar_advection_old, a_old_time, a_advectionVar,
-              true, //do interior
-              (m_opt.CFinterpOrder_advection==2) // quad interp - this seems to fix previous issues at insulating side walls
-  );
-
   // Make diffusive source
-  bool doDiffusionSrc = true;
-  if (a_diffusionVar > -1 && doDiffusionSrc)
-  {
-    LevelData<FArrayBox>* crseScalarDiffusion = NULL;
-
-    if (m_level > 0)
+    bool doDiffusionSrc = true;
+    if (a_diffusionVar > -1 && doDiffusionSrc)
     {
-      // allocate crseBC info
-      AMRLevelMushyLayer* mlCrse = getCoarserLevel();
+      LevelData<FArrayBox>* crseScalarDiffusion = NULL;
 
-      const DisjointBoxLayout& crseGrids = mlCrse->m_grids;
-      crseScalarDiffusion = new LevelData<FArrayBox>(crseGrids,1);
+      if (m_level > 0)
+      {
+        // allocate crseBC info
+        AMRLevelMushyLayer* mlCrse = getCoarserLevel();
 
-      mlCrse->fillScalars(*crseScalarDiffusion, a_old_time, a_diffusionVar, true);
+        const DisjointBoxLayout& crseGrids = mlCrse->m_grids;
+        crseScalarDiffusion = new LevelData<FArrayBox>(crseGrids,1);
+
+        mlCrse->fillScalars(*crseScalarDiffusion, a_old_time, a_diffusionVar, true);
+      }
+
+      // Get something like grad^2(T) or div(chi dot grad S_l)
+      computeScalDiffusion(a_diffusionVar, diffusiveSrc, a_old_time);
+    }
+    else
+    {
+      setValLevel(diffusiveSrc, 0.0);
     }
 
-    // Get something like grad^2(T) or div(chi dot grad S_l)
-    computeScalDiffusion(a_diffusionVar, diffusiveSrc, a_old_time);
-  }
-  else
-  {
-    setValLevel(diffusiveSrc, 0.0);
-  }
+
+
+    LevelData<FArrayBox> scalar_advection_old(m_grids, 1, advect_grow);
+
+    fillScalars(scalar_advection_old, a_old_time, a_advectionVar,
+                true, //do interior
+                (m_opt.CFinterpOrder_advection==2) // quad interp - this seems to fix previous issues at insulating side walls
+    );
+
+    computeScalarAdvectiveFlux(a_edgeScal,scalar_advection_old, diffusiveSrc,
+                                                        a_advVel, a_advectionVar,
+                                                        a_old_time, a_dt);
+
+}
+
+void AMRLevelMushyLayer::computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeScal, LevelData<FArrayBox>& a_scalar_advection_old,
+                                                    LevelData<FArrayBox>& a_src,
+                                                    LevelData<FluxBox>& a_advVel,
+                                                    int a_advectionVar,
+                                                    Real a_old_time, Real a_dt)
+{
+
+
+
+//void AMRLevelMushyLayer::computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeScal, int a_advectionVar, int a_diffusionVar,
+//                                                    LevelData<FluxBox>& a_advVel,
+//                                                    Real a_old_time, Real a_dt)
+//{
+  // Need grown version of this
+  IntVect advect_grow = m_numGhostAdvection*IntVect::Unit;
+//  LevelData<FArrayBox> scalar_advection_old(m_grids, 1, advect_grow);
+  LevelData<FArrayBox> vel(m_grids, SpaceDim, advect_grow);
+//  LevelData<FArrayBox> diffusiveSrc(m_grids, 1, a_edgeScal.ghostVect()+IntVect::Unit); // this needs the ghost cell to cover slope boxes
+
+  EdgeToCell(a_advVel, vel);
+//  fillScalars(scalar_advection_old, a_old_time, a_advectionVar,
+//              true, //do interior
+//              (m_opt.CFinterpOrder_advection==2) // quad interp - this seems to fix previous issues at insulating side walls
+//  );
+
+  // Make diffusive source
+//  bool doDiffusionSrc = true;
+//  if (a_diffusionVar > -1 && doDiffusionSrc)
+//  {
+//    LevelData<FArrayBox>* crseScalarDiffusion = NULL;
+//
+//    if (m_level > 0)
+//    {
+//      // allocate crseBC info
+//      AMRLevelMushyLayer* mlCrse = getCoarserLevel();
+//
+//      const DisjointBoxLayout& crseGrids = mlCrse->m_grids;
+//      crseScalarDiffusion = new LevelData<FArrayBox>(crseGrids,1);
+//
+//      mlCrse->fillScalars(*crseScalarDiffusion, a_old_time, a_diffusionVar, true);
+//    }
+//
+//    // Get something like grad^2(T) or div(chi dot grad S_l)
+//    computeScalDiffusion(a_diffusionVar, diffusiveSrc, a_old_time);
+//  }
+//  else
+//  {
+//    setValLevel(diffusiveSrc, 0.0);
+//  }
 
   // determine if we have inflow or outflow
   computeInflowOutflowAdvVel();
 
   // Compute advective flux
-  computeScalarAdvectiveFlux(a_edgeScal, scalar_advection_old, a_advVel,
+  computeScalarAdvectiveFlux(a_edgeScal, a_scalar_advection_old, a_advVel,
                              m_totalAdvVel,
                              vel,
-                             diffusiveSrc, *m_patchGodScalars[a_advectionVar],
+                             a_src, *m_patchGodScalars[a_advectionVar],
                              a_old_time, m_dt);
 }
 
