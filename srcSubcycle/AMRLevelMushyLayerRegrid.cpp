@@ -514,7 +514,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
 		for (DataIterator dit= m_grids.dataIterator(); dit.ok(); ++dit)
 		{
-		  concentrationVelocity[dit].plus(1.0);
+		  concentrationVelocity[dit].plus(m_parameters.compositionRatio);
 		  concentrationVelocity[dit].mult((*m_vectorNew[m_fluidVel])[dit], SpaceDim-1, 0, 1);
 		  
 		  //solidFraction[dit].setVal(1.0);		  
