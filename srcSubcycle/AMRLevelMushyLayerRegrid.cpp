@@ -479,7 +479,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
     tagCellsVar(localTags, m_opt.vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
   }
-  else if (m_opt.tag_plume_mush)
+  else if (m_opt.tag_plume_mush || m_opt.compositeChannelTagging)
   {
     // Trying to refine plumes
 
@@ -496,17 +496,63 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     	if (m_opt.compositeChannelTagging)
     	{
     	
+    	 if (s_verbosity >= 2)
+    {
+      pout() << "AMRLevelMushyLayer::tagCells - refine channels composite criteria on level " << m_level << endl;
+    }
+    	
 	    	// Create new field, bulk concentration * vertical velocity
 		LevelData<FArrayBox> concentrationVelocity(m_grids, 1, IntVect::Zero);
 		m_scalarNew[m_bulkConcentration]->copyTo(concentrationVelocity);
+		
+		
+		// Should use porosity gradient rather than solidfraction
+		LevelData<FArrayBox> solidFraction(m_grids, 1, IntVect::Zero);
+		setValLevel(solidFraction, 1.0);
+		
 
 
 		for (DataIterator dit= m_grids.dataIterator(); dit.ok(); ++dit)
 		{
 		  concentrationVelocity[dit].plus(1.0);
 		  concentrationVelocity[dit].mult((*m_vectorNew[m_fluidVel])[dit], SpaceDim-1, 0, 1);
+		  
+		  //solidFraction[dit].setVal(1.0);		  
+		  //solidFraction[dit].minus((*m_scalarNew[m_porosity])[dit]);
+		  //concentrationVelocity[dit].mult(solidFraction[dit]);
+		  
+		  const Box& b = m_grids[dit()];
+			    FArrayBox gradFab(b, SpaceDim);
+			   
 
-		  Box b = concentrationVelocity[dit].box();
+
+			    FArrayBox taggingMetricFab(b, 1);
+
+			   
+			      // Calculated undivided gradient
+			      for (int dir = 0; dir < SpaceDim; ++dir)
+			      {
+				const Box bCenter = b & grow(m_problem_domain, -BASISV(dir));
+				const Box bLo = b & adjCellLo(bCenter, dir);
+				const int hasLo = !bLo.isEmpty();
+				const Box bHi = b & adjCellHi(bCenter, dir);
+				const int hasHi = !bHi.isEmpty();
+				FORT_GETGRADF(CHF_FRA1(gradFab, dir), CHF_CONST_FRA1((*m_scalarNew[m_porosity])[dit], 0),
+					      CHF_CONST_INT(dir), CHF_BOX(bLo), CHF_CONST_INT(hasLo),
+					      CHF_BOX(bHi), CHF_CONST_INT(hasHi), CHF_BOX(bCenter));
+			      }
+
+			      FORT_MAGNITUDEF(CHF_FRA1(taggingMetricFab, 0), CHF_CONST_FRA(gradFab),
+					      CHF_BOX(b));
+					  
+		  
+		  
+		  
+		  concentrationVelocity[dit].mult(taggingMetricFab);
+		  
+		  	  
+		 
+		  //Box b = concentrationVelocity[dit].box();
 
 		  BoxIterator bit(b);
 		  for (bit.begin(); bit.ok(); ++bit)
