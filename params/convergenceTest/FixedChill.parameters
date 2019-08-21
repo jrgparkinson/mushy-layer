@@ -78,7 +78,7 @@ parameters.liquidusSlope=-0.1
 parameters.nonDimReluctance=1e-4
 parameters.nonDimVel=0.0
 parameters.permeabilityFunction=2
-parameters.prandtl=9.0
+parameters.prandtl=10.0
 parameters.problem_type=0
 parameters.rayleighComp=1e6
 parameters.rayleighTemp=0.0
@@ -98,7 +98,7 @@ regrid.marginalPorosityLimit=0.99
 #regrid.plume_salinity=-0.8
 #regrid.plume_vel=10.0
 regrid.compositeChannelTagging=true
-main.refine_thresh=0.1
+main.refine_thresh=0.5
 
 main.time_integration_order=2
 main.checkpoint_interval=1000
