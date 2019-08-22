@@ -138,6 +138,9 @@ MushyLayerParams::MushyLayerParams() {
   m_darcyCoeff = 1;
   m_advectionCoeff = 1;
 
+  activeTracerDiffusionCoeff = 0;
+  passiveTracerDiffusionCoeff = 0;
+
   m_BCAccuracy = 1;
   m_pressureBCAccuracy = 1;
 
@@ -200,6 +203,7 @@ void MushyLayerParams::getParameters()
 
   ParmParse pp("parameters");
   ParmParse ppMain("main");
+  ParmParse ppBio("bio");
 
   m_nondimensionalisation = 0;
   ppMain.query("nondimensionalisation", m_nondimensionalisation);
@@ -781,6 +785,9 @@ void MushyLayerParams::getParameters()
   ppMain.query("buoyancySCoeff", m_buoyancySCoeff);
   ppMain.query("darcyCoeff",  m_darcyCoeff );
   ppMain.query("advectionCoeff",  m_advectionCoeff );
+
+  ppBio.query("activeTracerDiffusionCoeff", activeTracerDiffusionCoeff);
+  ppBio.query("passiveTracerDiffusionCoeff", passiveTracerDiffusionCoeff);
 
 
 

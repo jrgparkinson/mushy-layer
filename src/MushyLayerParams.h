@@ -379,6 +379,12 @@ public:
 	  /// Salt diffusion coefficient
 	  m_saltDiffusionCoeff,
 
+	  /// Active tracer diffusion coefficient
+	  activeTracerDiffusionCoeff,
+
+	  /// Passive tracer diffusion coefficient
+	  passiveTracerDiffusionCoeff,
+
 	  /// Viscosity
 	  m_viscosityCoeff,
 

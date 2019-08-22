@@ -1189,6 +1189,9 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
   m_makeFluxRegForScalarVar[ScalarVars::m_activeScalar] = true;
   m_makeFluxRegForScalarVar[ScalarVars::m_passiveScalar] = true;
 
+  m_scalarDiffusionCoeffs[ScalarVars::m_activeScalar] = m_parameters.activeTracerDiffusionCoeff;
+  m_scalarDiffusionCoeffs[ScalarVars::m_passiveScalar] = m_parameters.passiveTracerDiffusionCoeff;
+
   m_scalarDiffusionCoeffs[ScalarVars::m_temperature] = 0.0;
   m_scalarDiffusionCoeffs[ScalarVars::m_liquidConcentration] = 0.0;
   m_scalarDiffusionCoeffs[ScalarVars::m_bulkConcentration] = 0.0;

@@ -7,6 +7,7 @@
  *      source file to contain methods for doing biogeochemistry
  */
 #include "AMRLevelMushyLayer.H"
+#include "VCAMRPoissonOp2.H"
 
 
 void AMRLevelMushyLayer::computeRadianceIntensity()
@@ -115,14 +116,17 @@ void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_s
 
   DataIterator dit(m_grids);
 
-  LevelData<FArrayBox> liquid_tracer_conc(m_grids, 1, this->m_numGhostAdvection*IntVect::Unit);
-  for (DataIterator dit = liquid_tracer_conc.dataIterator(); dit.ok(); ++dit)
-  {
-    liquid_tracer_conc[dit].copy((*m_scalarNew[a_tracerVar])[dit]);
-    liquid_tracer_conc[dit].divide((*m_scalarNew[m_porosity])[dit]);
-  }
+//  LevelData<FArrayBox> liquid_tracer_conc(m_grids, 1, this->m_numGhostAdvection*IntVect::Unit);
+//  for (DataIterator dit = liquid_tracer_conc.dataIterator(); dit.ok(); ++dit)
+//  {
+//    liquid_tracer_conc[dit].copy((*m_scalarNew[a_tracerVar])[dit]);
+//    liquid_tracer_conc[dit].divide((*m_scalarNew[m_porosity])[dit]);
+//  }
+//
+//  liquid_tracer_conc.exchange();
+  LevelData<FArrayBox> liquid_tracer_conc;
+  computeScalarConcInLiquid(liquid_tracer_conc, a_tracerVar);
 
-  liquid_tracer_conc.exchange();
 
   // should have one less ghost cell than src
   LevelData<FluxBox> flux(m_grids, 1, a_src.ghostVect()-IntVect::Unit);
@@ -154,12 +158,64 @@ void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_s
 }
 
 
+void AMRLevelMushyLayer::computeScalarConcInLiquid(LevelData<FArrayBox>& liquid_tracer_conc, int a_tracerVar)
+{
+  liquid_tracer_conc.define(m_grids, 1, this->m_numGhostAdvection*IntVect::Unit);
+  for (DataIterator dit = liquid_tracer_conc.dataIterator(); dit.ok(); ++dit)
+  {
+    liquid_tracer_conc[dit].copy((*m_scalarNew[a_tracerVar])[dit]);
+    liquid_tracer_conc[dit].divide((*m_scalarNew[m_porosity])[dit]);
+  }
+
+  liquid_tracer_conc.exchange();
+}
+
 void AMRLevelMushyLayer::advectPassiveTracer()
 {
 
   LevelData<FArrayBox> a_src(m_grids, 1, 1*IntVect::Unit);
-  setValLevel(a_src, 0);
+
+  computeScalarDiffusiveSrc(ScalarVars::m_passiveScalar, a_src);
+
+//  setValLevel(a_src, 0);
   advectTracer(ScalarVars::m_passiveScalar, a_src);
+
+}
+
+void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelData<FArrayBox>& a_src)
+{
+  BCHolder bc;
+  getScalarBCs(bc, a_scalarBulkConc, false);
+
+  // Op should actually be a variable coefficient op with porosity as the variable coefficient
+
+  AMRPoissonOpFactory* op = new AMRPoissonOpFactory();
+  op->define(m_problem_domain, m_grids, m_dx, bc);
+  RefCountedPtr<AMRPoissonOpFactory> OpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(op);
+  RefCountedPtr<AMRPoissonOp> amrpop =  RefCountedPtr<AMRPoissonOp>(
+      (AMRNonLinearMultiCompOp*) OpFact->AMRnewOp(m_problem_domain) );
+
+  // todo - finish this
+  VCAMRPoissonOp2* vcop = new VCAMRPoissonOp2();
+  //op->define(m_problem_domain, m_grids, m_dx, bc, -1, 0.0, 1);
+//  vcop->define(m_grids, a_gridsFiner, a_gridsCoarser, a_dxLevel, a_refRatio, a_refRatioFiner, a_domain, a_bc, a_exchange, a_cfregion, a_nComp)
+//
+
+  LevelData<FArrayBox> *crseVar = NULL;
+
+//  AMRLevelMushyLayer* crseML = getCoarserLevel();
+//  if (crseML)
+//  {
+//    crseVar = &(*crseML->m_scalarNew[a_var]);
+//  }
+
+  amrpop->setAlphaAndBeta(0, m_scalarDiffusionCoeffs[a_scalarBulkConc]);
+
+  LevelData<FArrayBox> liquidConc;
+  computeScalarConcInLiquid(liquidConc, a_scalarBulkConc);
+
+  // This just calls applyOpI if crseHC = NULL, else does CF interpolation
+  amrpop->applyOpMg(a_src, liquidConc, crseVar, false);
 
 }
 
@@ -179,12 +235,15 @@ void AMRLevelMushyLayer::computeActiveTracerSourceSink(LevelData<FArrayBox>& a_s
 {
   // Choose this function yourself
 
-  setValLevel(a_srcSink, 0.0);
+//  setValLevel(a_srcSink, 0.0);
+  computeScalarDiffusiveSrc(ScalarVars::m_activeScalar, a_srcSink);
 
   // Example: grow tracer wherever we're a) in the ice (porosity < 1) and b) have enough light
   // growth rate proportional to light intensity
   // Also add some saturation so we don't grow any more if concentration > saturation_value
   // This is very simple, but demonstrates the sort of model we can consider
+
+  // You may also want to consider a source which varies with other fields e.g. temperature
 
   Real critical_intensity = 0.1;
   Real saturation_value = 1.0;
@@ -202,7 +261,7 @@ void AMRLevelMushyLayer::computeActiveTracerSourceSink(LevelData<FArrayBox>& a_s
 
       if (porosity(iv) < 1 && intensity(iv) > critical_intensity)
       {
-        a_srcSink[dit](iv) = (intensity(iv)-critical_intensity)*max(0, saturation_value-tracer_conc(iv));
+        a_srcSink[dit](iv) =  a_srcSink[dit](iv) + (intensity(iv)-critical_intensity)*max(0.0, saturation_value-tracer_conc(iv));
       }
 
     }

@@ -573,6 +573,19 @@ protected:
    */
   void advectPassiveTracer();
 
+  /// Compute diffusive src for some scalar with bulk concentration \f \xi \f$
+  /**
+   * \f$ S =  \nabla \cdot \chi \nabla (\xi/\chi)\f$
+   */
+  void computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelData<FArrayBox>& a_src);
+
+
+  /// Compute concentration of scalar (with bulk concentration \f$ \xi \f$) in the liquid phase
+  /**
+   * \f$ \xi/\chi \f$
+   */
+  void computeScalarConcInLiquid(LevelData<FArrayBox>& liquid_tracer_conc, int a_tracerVar);
+
   /// Advect generic tracer
   void advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_src);
 
