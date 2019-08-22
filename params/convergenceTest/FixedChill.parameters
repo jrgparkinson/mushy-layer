@@ -23,7 +23,7 @@ main.doVCreflux=0
 main.domain_height=1.0
 main.dt_tolerance_factor=1.01
 
-main.fill_ratio=0.75
+main.fill_ratio=0.9 #0.75
 main.grid_buffer_size=4
 
 main.initial_cfl=0.01
@@ -56,7 +56,7 @@ main.restart_wavenumber=8
 main.solverFailRestartMethod=0
 main.steady_state=1e-10
 
-main.tag_buffer_size=1 1 1
+main.tag_buffer_size=4 2 1
 main.useAccelDt=1
 
 main.use_limiting=0
