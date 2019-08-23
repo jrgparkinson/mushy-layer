@@ -2122,9 +2122,10 @@ void AMRLevelMushyLayer::initialData()
 
     m_advVel[dit].setVal(0.0);
 
-    (*m_scalarNew[ScalarVars::m_passiveScalar])[dit].setVal(1.0);
+    (*m_scalarNew[ScalarVars::m_passiveScalar])[dit].setVal(m_parameters.passiveTracerInitVal);
+    (*m_scalarOld[ScalarVars::m_passiveScalar])[dit].setVal(m_parameters.passiveTracerInitVal);
+
     (*m_scalarNew[ScalarVars::m_activeScalar])[dit].setVal(m_parameters.activeTracerInitVal);
-    (*m_scalarOld[ScalarVars::m_passiveScalar])[dit].setVal(1.0);
     (*m_scalarOld[ScalarVars::m_activeScalar])[dit].setVal(m_parameters.activeTracerInitVal);
 
 
