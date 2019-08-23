@@ -4397,7 +4397,7 @@ int AMRLevelMushyLayer::convertBCType(const int a_implicitBC)
 }
 
 void AMRLevelMushyLayer::convertBCType(const int a_implicitBC,  const Real a_implicitVal,
-                                       int a_explicitBC, Real a_explicitVal)
+                                       int& a_explicitBC, Real a_explicitVal)
 {
   // Default BCs
   //  int ibcType = AdvectIBC::m_dirichlet;
@@ -4410,7 +4410,6 @@ void AMRLevelMushyLayer::convertBCType(const int a_implicitBC,  const Real a_imp
 
 PhysIBC* AMRLevelMushyLayer::getScalarIBCs(int a_var)
 {
-
 
   IntVect bcTypeHi, bcTypeLo;
   RealVect bcValHi, bcValLo;
@@ -4452,9 +4451,35 @@ PhysIBC* AMRLevelMushyLayer::getScalarIBCs(int a_var)
                                        plumeVal, plumeBounds);
 
   }
+  else if (a_var == ScalarVars::m_activeScalar)
+  {
+    for (int dir=0; dir<SpaceDim; dir++)
+    {
+      bcValHi[dir] = m_parameters.activeTracerInitVal;
+      bcValLo[dir] = m_parameters.activeTracerInitVal;
+    }
+
+    return  m_physBCPtr->scalarTraceIBC(bcValLo, bcValHi,
+                                        bcTypeLo, bcTypeHi);
+
+  }
+  else if (a_var == ScalarVars::m_passiveScalar)
+  {
+    for (int dir=0; dir<SpaceDim; dir++)
+    {
+      bcValHi[dir] = m_parameters.passiveTracerInitVal;
+      bcValLo[dir] = m_parameters.passiveTracerInitVal;
+    }
+
+    return  m_physBCPtr->scalarTraceIBC(bcValLo, bcValHi,
+                                        bcTypeLo, bcTypeHi);
+
+  }
   else
   {
     pout() << "WARNING, NO IBCs for scalar var " << a_var << endl;
+
+    MayDay::Warning("WARNING, NO IBCs for scalar var");
     return  m_physBCPtr->scalarTraceIBC(bcValLo, bcValHi,
                                         bcTypeLo, bcTypeHi);
   }

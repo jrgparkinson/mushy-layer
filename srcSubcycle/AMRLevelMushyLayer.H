@@ -961,7 +961,7 @@ protected:
    *
    */
   void convertBCType(const int a_implicitBC,  const Real a_implicitVal,
-                     int a_explicitBC, Real a_explicitVal);
+                     int& a_explicitBC, Real a_explicitVal);
 
   /// Convert implicit BCs
   int convertBCType(const int a_implicitBC);
