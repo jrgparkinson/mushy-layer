@@ -385,6 +385,12 @@ public:
 	  /// Passive tracer diffusion coefficient
 	  passiveTracerDiffusionCoeff,
 
+	  /// Initial value of active tracer
+	  activeTracerInitVal,
+
+	  /// Initial value of passive tracer
+	  passiveTracerInitVal,
+
 	  /// Viscosity
 	  m_viscosityCoeff,
 

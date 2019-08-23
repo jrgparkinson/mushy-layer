@@ -4527,6 +4527,15 @@ void AMRLevelMushyLayer::getScalarBCs(BCHolder& thisBC, int a_var, bool a_homoge
   {
     thisBC = m_physBCPtr->extrapFuncBC();
   }
+  else if (a_var == ScalarVars::m_activeScalar)
+  {
+    thisBC = m_physBCPtr->TracerBC(a_homogeneous, &m_totalAdvVel, m_parameters.activeTracerInitVal);
+  }
+  else if(a_var == ScalarVars::m_passiveScalar)
+  {
+//    thisBC = m_physBCPtr->noFluxBC();
+    thisBC = m_physBCPtr->TracerBC(a_homogeneous, &m_totalAdvVel, m_parameters.passiveTracerInitVal);
+  }
   else
   {
     pout() << "WARNING No BCs for " << m_scalarVarNames[a_var] << endl;

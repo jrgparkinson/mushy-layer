@@ -1201,8 +1201,6 @@ struct MushyLayerOptions {
   /// If > 0, compute penetration of irradiance down through the ice
   Real surfaceIrradiance;
 
-  /// Initial value of active tracer
-  Real activeTracerInitVal;
 
 };
 

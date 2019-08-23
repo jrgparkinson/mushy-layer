@@ -30,7 +30,8 @@ def add_params(defaultParams, extra_params):
 def get_matlab_base_command():
     parent_dir = os.path.abspath(os.pardir)
     matlab_folder = os.path.join(parent_dir, 'matlab', 'MethodsPaper')
-    matlab_command = 'cd ' + matlab_folder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
+    #
+    matlab_command = 'cd ' + matlab_folder + '; \n source etc/profile.d/modules.sh \n module load idl/870 \n module load matlab/R2018b  \n \n matlab -nodisplay -nosplash -nodesktop -r'
 
     return matlab_command
 

@@ -140,6 +140,8 @@ MushyLayerParams::MushyLayerParams() {
 
   activeTracerDiffusionCoeff = 0;
   passiveTracerDiffusionCoeff = 0;
+  activeTracerInitVal = 0;
+  passiveTracerInitVal = 0;
 
   m_BCAccuracy = 1;
   m_pressureBCAccuracy = 1;
@@ -788,6 +790,9 @@ void MushyLayerParams::getParameters()
 
   ppBio.query("activeTracerDiffusionCoeff", activeTracerDiffusionCoeff);
   ppBio.query("passiveTracerDiffusionCoeff", passiveTracerDiffusionCoeff);
+
+  ppBio.query("activeTracerInitVal", activeTracerInitVal);
+  ppBio.query("passiveTracerInitVal", passiveTracerInitVal);
 
 
 

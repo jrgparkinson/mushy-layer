@@ -877,8 +877,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.surfaceIrradiance = 0.0;
   ppBio.query("surfaceIrradiance", opt.surfaceIrradiance);
 
-  opt.activeTracerInitVal=0.0;
-     ppBio.query("activeTracerInitVal", opt.activeTracerInitVal);
+//  opt.activeTracerInitVal=0.0;
+//     ppBio.query("activeTracerInitVal", opt.activeTracerInitVal);
 
 //  opt.maxEta = -1;
 //  ppMain.query("max_eta", opt.maxEta); // let user specify different max eta if they want

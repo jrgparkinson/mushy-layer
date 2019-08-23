@@ -8,6 +8,7 @@
  */
 #include "AMRLevelMushyLayer.H"
 #include "VCAMRPoissonOp2.H"
+#include "AMRScalarDiffusionOp.h"
 
 
 void AMRLevelMushyLayer::computeRadianceIntensity()
@@ -184,6 +185,7 @@ void AMRLevelMushyLayer::advectPassiveTracer()
 
 void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelData<FArrayBox>& a_src)
 {
+  //TODO: set BCs for the scalar
   BCHolder bc;
   getScalarBCs(bc, a_scalarBulkConc, false);
 
@@ -196,26 +198,83 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelDa
       (AMRNonLinearMultiCompOp*) OpFact->AMRnewOp(m_problem_domain) );
 
   // todo - finish this
-  VCAMRPoissonOp2* vcop = new VCAMRPoissonOp2();
-  //op->define(m_problem_domain, m_grids, m_dx, bc, -1, 0.0, 1);
-//  vcop->define(m_grids, a_gridsFiner, a_gridsCoarser, a_dxLevel, a_refRatio, a_refRatioFiner, a_domain, a_bc, a_exchange, a_cfregion, a_nComp)
-//
+  int num_levels = 1;
+  Vector<int> ref_rat;
+  Vector<DisjointBoxLayout> grids;
+  AMRLevelMushyLayer* ml = this;
+
+  Real dx = m_dx;
+
+  if (m_level > 0)
+  {
+    num_levels = 2;
+
+    ml =  this->getCoarserLevel();
+    ref_rat.push_back(ml->refRatio());
+    grids.push_back(ml->m_grids);
+    dx= ml->dx();
+  }
+
+  grids.push_back(m_grids);
+  ref_rat.push_back(refRatio());
+
+
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > aCoef(num_levels);
+  Vector<RefCountedPtr<LevelData<FluxBox> > > bCoef(num_levels);
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > porosity(num_levels);
+  Real alpha = 0;
+  Real beta = m_scalarDiffusionCoeffs[a_scalarBulkConc];
+
+
+
+  IntVect ivGhost = IntVect::Unit;
+
+  // Fill aCoef, bCoef
+  for (int lev=0; lev < num_levels; lev++)
+    {
+      bCoef[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, ivGhost));
+//      porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, ivGhost));
+      aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+      porosity[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+
+      ml->fillScalarFace(*bCoef[lev], m_time, m_porosity, true, true);
+      ml->fillScalars(*porosity[lev], m_time, m_porosity, true, true);
+      setValLevel(*aCoef[lev], 1.0);
+
+      aCoef[lev]->exchange();
+
+      ml = ml->getFinerLevel();
+    } // end loop over levels
+
+//  AMRScalarDiffusionOpFactory* vcop = new AMRScalarDiffusionOpFactory(); //new AMRScalarDiffusionOp();
+//  vcop->define(m_problem_domain, grids, ref_rat, dx, bc, alpha, aCoef, beta, bCoef, porosity);
+
+  VCAMRPoissonOp2Factory* vcop = new VCAMRPoissonOp2Factory(); //new AMRScalarDiffusionOp();
+  vcop->define(m_problem_domain, grids, ref_rat, dx, bc, alpha, aCoef, beta, bCoef);
+  RefCountedPtr<VCAMRPoissonOp2Factory> VCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcop);
+    RefCountedPtr<VCAMRPoissonOp2> vcamrpop =  RefCountedPtr<VCAMRPoissonOp2>(
+        (VCAMRPoissonOp2*) VCOpFact->AMRnewOp(m_problem_domain) );
+
 
   LevelData<FArrayBox> *crseVar = NULL;
 
-//  AMRLevelMushyLayer* crseML = getCoarserLevel();
-//  if (crseML)
-//  {
+  AMRLevelMushyLayer* crseML = getCoarserLevel();
+  if (crseML)
+  {
 //    crseVar = &(*crseML->m_scalarNew[a_var]);
-//  }
+    crseML->computeScalarConcInLiquid(*crseVar, a_scalarBulkConc);
+  }
 
-  amrpop->setAlphaAndBeta(0, m_scalarDiffusionCoeffs[a_scalarBulkConc]);
+  amrpop->setAlphaAndBeta(0, -m_scalarDiffusionCoeffs[a_scalarBulkConc]);
 
   LevelData<FArrayBox> liquidConc;
   computeScalarConcInLiquid(liquidConc, a_scalarBulkConc);
 
   // This just calls applyOpI if crseHC = NULL, else does CF interpolation
-  amrpop->applyOpMg(a_src, liquidConc, crseVar, false);
+//  amrpop->applyOpMg(a_src, liquidConc, crseVar, false);
+  amrpop->applyOp(a_src, liquidConc, false);
+
+  a_src.exchange();
 
 }
 
