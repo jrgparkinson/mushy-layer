@@ -808,11 +808,105 @@ void MushyLayerParams::getParameters()
 void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool required)
 {
   std::vector<int>  temp = std::vector<int>();
+  std::vector<string>  temp_str = std::vector<string>();
   ParmParse ppBC("bc");
 
   if (ppBC.contains(a_name))
   {
-    ppBC.getarr(a_name.c_str(), temp, 0, SpaceDim);
+    string val;
+    ppBC.get(a_name.c_str(), val);
+
+    // determine how we should read the bcs in
+    if (is_integer(val))
+    {
+      ppBC.getarr(a_name.c_str(), temp, 0, SpaceDim);
+    }
+    else
+    {
+      ppBC.getarr(a_name.c_str(), temp_str, 0, SpaceDim);
+
+      temp.resize(temp_str.size());
+
+      // Convert strings to numbers
+      for (int idir=0; idir<SpaceDim; idir++)
+      {
+        if (temp_str[idir] == "noflux")
+        {
+          temp[idir] = 1;
+        }
+        else if (temp_str[idir] == "fixed")
+        {
+          temp[idir] = 0;
+        }
+        else if (temp_str[idir] == "open")
+        {
+          temp[idir] = 2;
+        }
+        else if (temp_str[idir] == "inflow")
+        {
+          temp[idir] = 3;
+        }
+        /**
+         * SolidWall,
+                Inflow,
+                Outflow,
+                OutflowNormal, // only a normal velocity
+                VelInflowOutflow, // both inflow and outflow possible
+                noShear,
+                Symmetry,
+                VelInflowPlume,
+                OutflowPressureGrad,
+                PressureHead,
+         */
+        else if (temp_str[idir] == "solidwall" || temp_str[idir] == "noflow")
+        {
+          temp[idir] = 0;
+        }
+        else if (temp_str[idir] == "inflow")
+        {
+          temp[idir] = 1;
+        }
+        else if (temp_str[idir] == "outflow" || temp_str[idir] == "open")
+        {
+          temp[idir] = 2;
+        }
+        else if (temp_str[idir] == "outflownormal")
+        {
+          temp[idir] = 3;
+        }
+        else if (temp_str[idir] == "inflowoutflow")
+        {
+          temp[idir] = 4;
+        }
+        else if (temp_str[idir] == "noshear")
+        {
+          temp[idir] = 5;
+        }
+        else if (temp_str[idir] == "symmetry")
+        {
+          temp[idir] = 6;
+        }
+        else if (temp_str[idir] == "inflowPlume")
+        {
+          temp[idir] = 7;
+        }
+        else if (temp_str[idir] == "outflowPressureGrad")
+        {
+          temp[idir] = 8;
+        }
+        else if (temp_str[idir] == "pressureHead")
+        {
+          temp[idir] = 9;
+        }
+
+        else
+        {
+          pout() << "Unknown BC " << temp_str[idir] << endl;
+          temp[idir] = 0;
+        }
+      }
+    }
+
 
     for (int idir=0; idir<SpaceDim; idir++)
     {
