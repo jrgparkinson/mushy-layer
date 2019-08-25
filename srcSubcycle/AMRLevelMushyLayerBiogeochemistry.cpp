@@ -15,6 +15,11 @@ void AMRLevelMushyLayer::computeRadianceIntensity()
 {
   // Compute radiation intensity by Beer-Lambert law (or something better)
 
+  // only works in 2-D at the moment
+  CH_assert(SpaceDim==2);
+
+#if CH_SPACEDIM==2
+
   // First need to compute transmittance at each point in space
   LevelData<FArrayBox> attenuation(m_grids, 1, IntVect::Unit);
   LevelData<FArrayBox> attenuationSum(m_grids, 1, IntVect::Unit);
@@ -92,6 +97,8 @@ void AMRLevelMushyLayer::computeRadianceIntensity()
     }
    }
 
+#endif
+
 
 }
 
@@ -117,14 +124,6 @@ void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_s
 
   DataIterator dit(m_grids);
 
-//  LevelData<FArrayBox> liquid_tracer_conc(m_grids, 1, this->m_numGhostAdvection*IntVect::Unit);
-//  for (DataIterator dit = liquid_tracer_conc.dataIterator(); dit.ok(); ++dit)
-//  {
-//    liquid_tracer_conc[dit].copy((*m_scalarNew[a_tracerVar])[dit]);
-//    liquid_tracer_conc[dit].divide((*m_scalarNew[m_porosity])[dit]);
-//  }
-//
-//  liquid_tracer_conc.exchange();
   LevelData<FArrayBox> liquid_tracer_conc;
   computeScalarConcInLiquid(liquid_tracer_conc, a_tracerVar);
 
@@ -147,6 +146,7 @@ void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_s
   {
     update[dit].mult(m_dt);
     (*m_scalarNew[a_tracerVar])[dit] -= update[dit];
+//    (*m_scalarNew[a_tracerVar])[dit] += update[dit];
 
   }
 
@@ -154,6 +154,7 @@ void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_s
 
     Real scale = m_dt;
     updateScalarFluxRegister(a_tracerVar, flux, scale);
+
 
 
 }
@@ -273,6 +274,9 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelDa
   // This just calls applyOpI if crseHC = NULL, else does CF interpolation
 //  amrpop->applyOpMg(a_src, liquidConc, crseVar, false);
   amrpop->applyOp(a_src, liquidConc, false);
+
+//  Real maxSrc = ::computeNorm(a_src, NULL, -1, m_dx);
+//  pout() << "Max diffusive tracer src = " << maxSrc << endl;
 
   a_src.exchange();
 
