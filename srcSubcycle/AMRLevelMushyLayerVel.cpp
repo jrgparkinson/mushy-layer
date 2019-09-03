@@ -403,17 +403,17 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
   edgeVelBC.applyBCs(m_advVel, m_grids, m_problem_domain, m_dx,
                      false); // inhomogeneous
 
-  if (m_opt.doEulerPart)
+  if (doVelocityAdvection())
   {
     if (s_verbosity >= 5)
     {
       pout() << "AMRLevelMushyLayer::computeAdvectionVelocities - doing advection of velocities" << endl;
     }
 
-      if (s_verbosity >= 5)
-      {
-        pout() << "AMRLevelMushyLayer::computeAdvectionVelocities() - explicit tracing scheme" << endl;
-      }
+//      if (s_verbosity >= 5)
+//      {
+//        pout() << "AMRLevelMushyLayer::computeAdvectionVelocities() - explicit tracing scheme" << endl;
+//      }
 
 
 
@@ -665,7 +665,8 @@ AMRLevelMushyLayer::computeAdvectionVelocities(LevelData<FArrayBox>& advectionSo
 
 bool AMRLevelMushyLayer::isVelocityTimeDependent()
 {
-  return m_opt.doEulerPart;
+  //todo: this condition should be more complicated
+  return doVelocityAdvection();
 }
 
 void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advectionSourceTerm,
@@ -1694,7 +1695,7 @@ void AMRLevelMushyLayer::computeUDelU(LevelData<FArrayBox>& U_adv_src, const Lev
   LevelData<FArrayBox> UdelU_porosity(m_grids, SpaceDim, m_numGhostAdvection*IntVect::Unit);
   DataIterator dit = UdelU_porosity.dataIterator();
 
-  if (m_opt.doEulerPart)
+  if (doVelocityAdvection())
   {
 
     // option 0 - use advection velocity to upwind old velocities to cell faces, and use these in calculation
@@ -2379,8 +2380,8 @@ void AMRLevelMushyLayer::correctEdgeCentredVelocity(LevelData<FluxBox>& a_advVel
 
       int exitStatus = 0;
 
-      // time depenendent verdion
-      if (m_opt.doEulerPart)
+
+      if (doVelocityAdvection())
       {
       exitStatus = m_projection.levelMacProject(a_advVel, old_time, a_dt, pressureScalePtr, crsePressureScalePtr,
                                    pressureScaleEdgePtrOneGhost, crsePressureScaleEdgePtr);

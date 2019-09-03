@@ -1086,6 +1086,11 @@ AMRLevelMushyLayer::defineIBCs ()
 {
   for (int var = 0; var < m_numScalarVars; var++) {
     if (m_makeFluxRegForScalarVar[var]) {
+
+      // Delete if they already exist
+      delete m_scalarIBC[var];
+      m_scalarIBC[var] = NULL;
+
       m_scalarIBC[var] = getScalarIBCs (var);
     }
   }
@@ -2810,7 +2815,7 @@ void AMRLevelMushyLayer::postInitialize()
       }
 
 //      if (solvingFullDarcyBrinkman())
-      if (m_opt.doEulerPart)
+      if (this->doVelocityAdvection())
       {
         Real dtInit = computeDtInit(numLevels-1);
 
@@ -2962,7 +2967,7 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
   }
 
 //  if (solvingFullDarcyBrinkman())
-  if (m_opt.doEulerPart)
+  if (this->doVelocityAdvection())
   {
     // Just initialising so don't advect/diffuse any scalars here
 
@@ -2971,18 +2976,18 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
 
     computeAdvectionVelSourceTerm(advectionSourceTerm);
 
-    if (!m_opt.doEulerPart)
-    {
-      // Compute unprojected cell centred velocity (don't need to project it though)
-
-      computeCCvelocity(advectionSourceTerm, m_time, m_dt,
-                        false, // don't do flux register updates
-                        false, // don't do projection
-                        false, // don't compute u.del(u)
-                        false); // not a mac projection
-
-      m_vectorNew[m_UpreProjection]->copyTo(*m_vectorOld[m_UpreProjection]);
-    }
+//    if (!m_opt.doEulerPart)
+//    {
+//      // Compute unprojected cell centred velocity (don't need to project it though)
+//
+//      computeCCvelocity(advectionSourceTerm, m_time, m_dt,
+//                        false, // don't do flux register updates
+//                        false, // don't do projection
+//                        false, // don't compute u.del(u)
+//                        false); // not a mac projection
+//
+//      m_vectorNew[m_UpreProjection]->copyTo(*m_vectorOld[m_UpreProjection]);
+//    }
 
     computeAdvectionVelocities(advectionSourceTerm);
 
@@ -3164,10 +3169,11 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     thisMLPtr->m_usePrevPressureForUStar=orig_add_subtract_grad_p;
 
     thisMLPtr->getExtraPlotFields();
-    if (m_opt.doEulerPart)
+    if (doVelocityAdvection())
     {
-    thisMLPtr->m_projection.unscaledPi(*thisMLPtr->m_scalarNew[ScalarVars::m_pressure], m_dt);
+      thisMLPtr->m_projection.unscaledPi(*thisMLPtr->m_scalarNew[ScalarVars::m_pressure], m_dt);
     }
+
     thisMLPtr = thisMLPtr->getFinerLevel();
   }
 

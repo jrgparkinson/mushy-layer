@@ -534,6 +534,8 @@ public:
 	/// BC holder for liquid concentration, \f$ \Theta_l \f$
 	virtual BCHolder ThetaLFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel= NULL) const;
 
+	virtual BCHolder TracerBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel= NULL, Real a_boundaryVal=1.0) const;
+
 
 	/// BC holder for temperature, \f$ \theta \f$
 	virtual BCHolder BasicthetaFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel = NULL) const;

@@ -451,6 +451,24 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
 //  }
 //}
 
+bool AMRLevelMushyLayer::doVelocityAdvection()
+{
+  if (m_parameters.darcy==0)
+  {
+    return false;
+  }
+
+  if (m_opt.doEulerPart)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+
+}
+
 
 void AMRLevelMushyLayer::copyNewToOldStates()
 {
@@ -668,7 +686,7 @@ Real AMRLevelMushyLayer::advance()
   defineSolvers(m_time-m_dt); // define at old time
 
 //  if (solvingFullDarcyBrinkman())
-  if (m_opt.doEulerPart)
+  if (doVelocityAdvection())
   {
     // This fills all the ghost cells of advectionSourceTerm
     computeAdvectionVelSourceTerm(advectionSourceTerm);
@@ -797,7 +815,7 @@ Real AMRLevelMushyLayer::advance()
   // for problems where the momentum equation has time dependence
 
 //  if (solvingFullDarcyBrinkman())
-  if (m_opt.doEulerPart)
+  if (isVelocityTimeDependent())
   {
     // If we're skipping advective srcs for this timestep, skip this too
     if (!doAdvectiveSrc)

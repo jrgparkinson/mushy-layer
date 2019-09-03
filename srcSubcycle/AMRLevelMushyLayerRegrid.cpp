@@ -1653,7 +1653,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
         initializeGlobalPressure(dtInit, false);
       }
 
-      if (!(solvingFullDarcyBrinkman() && m_opt.doEulerPart))
+      if (!(solvingFullDarcyBrinkman() && doVelocityAdvection()))
       {
 
         // Should do some initialisation here?

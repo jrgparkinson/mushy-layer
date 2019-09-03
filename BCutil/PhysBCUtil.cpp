@@ -1157,7 +1157,7 @@ public:
                 }
                 case PhysBCUtil::Outflow :
                 {
-                  // this is set to whatever it is set to by MAC
+                  // this is set to whatever it is set to by MAC projection
                   // NoOp
 
 
@@ -3189,6 +3189,36 @@ BCHolder PhysBCUtil::ThetaLFuncBC(bool a_homogeneous, LevelData<FluxBox>* a_advV
                                                   customLoBCVal, customHiBCVal));
 
   return BCHolder(basicThetaLBCFunction);
+}
+
+
+BCHolder PhysBCUtil::TracerBC(bool a_homogeneous, LevelData<FluxBox>* a_advVel, Real a_boundaryVal) const
+{
+
+  Vector<Vector<int> > customLoBC, customHiBC; // First index refers to direction, second to component
+  Vector< Vector<Real> > customLoBCVal, customHiBCVal; // first index refers to direction, second to component
+  Vector<Real> plumeVal(1, 1.0);
+
+  for (int dir =0; dir<SpaceDim; dir++)
+  {
+//    customLoBC.push_back(Vector<int>(1, m_params.bcTypeLiquidConcentrationLo[dir]));
+//    customHiBC.push_back(Vector<int>(1, m_params.bcTypeLiquidConcentrationHi[dir]));
+
+    customLoBCVal.push_back(Vector<Real>(1, a_boundaryVal));
+    customHiBCVal.push_back(Vector<Real>(1, a_boundaryVal));
+
+  }
+
+  RefCountedPtr<AdvectDiffuseScalarBC>
+  bc(new AdvectDiffuseScalarBC(true,
+                                                  m_params, a_homogeneous,
+                                                  m_advVel, m_dx,
+                                                  plumeVal,
+                                                  Interval(0,0),
+                                                  customLoBC, customHiBC,
+                                                  customLoBCVal, customHiBCVal));
+
+  return BCHolder(bc);
 }
 
 

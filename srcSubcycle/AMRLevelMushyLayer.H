@@ -995,6 +995,12 @@ protected:
   /// Copy new data to old data holders
   void copyNewToOldStates();
 
+  /// Do we need to do velocity advection?
+  /**
+   * I.e. do we solve for \f$ \mathbf{U} \cdot \nabla (\mathbf{U}/\chi) \f$ terms?
+   */
+  bool doVelocityAdvection();
+
   // Copy old data to new data holders
 //  void copyOldToNewStates();
 
