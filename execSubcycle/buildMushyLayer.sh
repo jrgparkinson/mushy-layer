@@ -14,7 +14,7 @@ module unload gcc/5.2.0
 module load gcc/4.8.3
 
 # Dimensions to build in (usually 2)
-D=2
+D=3
 echo "Build with DIM=$D"
 
 #cd ~/mushy-layer/execSubcycle/
