@@ -1088,8 +1088,9 @@ AMRLevelMushyLayer::defineIBCs ()
     if (m_makeFluxRegForScalarVar[var]) {
 
       // Delete if they already exist
-      delete m_scalarIBC[var];
-      m_scalarIBC[var] = NULL;
+      // This causes issues on AOPP servers
+//      delete m_scalarIBC[var];
+//      m_scalarIBC[var] = NULL;
 
       m_scalarIBC[var] = getScalarIBCs (var);
     }
