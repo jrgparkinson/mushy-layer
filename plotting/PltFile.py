@@ -467,7 +467,12 @@ class PltFile:
             #
             # pyplot.show()
 
-            ds_level = xr.combine_by_coords(ds_boxes[1:])
+            # Version that works with earlier xarray?
+            if hasattr(xr, 'combine_by_coords'):
+                ds_level = xr.combine_by_coords(ds_boxes[1:])
+            else:
+                ds_level = xr.auto_combine(ds_boxes[1:])
+            # ds_level = xr.combine_by_coords(ds_boxes[1:])
 
             # ds_level = ds_boxes[1]
 
