@@ -244,8 +244,8 @@ class PltFile:
                 s = blank_data.shape
 
                 # First component should be x-direction
-                if not s[0] == len(coords['i']):
-                    blank_data = blank_data.T
+                # if not s[0] == len(coords['i']):
+                #     blank_data = blank_data.T
 
                 extended_coords = coords
                 extended_coords['level'] = level
@@ -519,8 +519,8 @@ class PltFile:
         reshaped_data = reshaped_data.transpose()
 
         # I think we only need to transpose in 3D
-        if self.space_dim == 3: #  or self.space_dim == 2
-            reshaped_data = reshaped_data.transpose()
+        # if self.space_dim == 3: #  or self.space_dim == 2
+        #     reshaped_data = reshaped_data.transpose()
             
         reshaped_data = np.array(reshaped_data)
 
