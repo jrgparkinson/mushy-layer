@@ -25,6 +25,8 @@ def compute_z(porosity_slice, y_slice, porosity):
     return z
 
 
+# TODO: Fix: AMR plotting is broken at the moment
+
 class PltFile:
     """ Class to load a plot file and perform operations on it
          e.g. find where brine channels are"""
@@ -45,6 +47,8 @@ class PltFile:
     indices = None
     reflect = None
     ds_amr = None
+
+    python_index_ordering = True
 
     FIELD_LABEL = {'Porosity': '$\chi$',
                    'Bulk concentration': '$\Theta$',
@@ -454,6 +458,7 @@ class PltFile:
                 ds_level =  ds_level.combine_first(b)
                 # ds_level = ds_level.update(b)
 
+            # Debugging:
             # fig = pyplot.figure()
             # f, ax = pyplot.subplots(3, 3)
             # ax_list = ax.flatten()
@@ -467,14 +472,11 @@ class PltFile:
             #
             # pyplot.show()
 
-            # Version that works with earlier xarray?
-            if hasattr(xr, 'combine_by_coords'):
-                ds_level = xr.combine_by_coords(ds_boxes[1:])
-            else:
-                ds_level = xr.auto_combine(ds_boxes[1:])
-            # ds_level = xr.combine_by_coords(ds_boxes[1:])
-
-            # ds_level = ds_boxes[1]
+            # Old version:
+            # if hasattr(xr, 'combine_by_coords'):
+            #     ds_level = xr.combine_by_coords(ds_boxes[1:])
+            # else:
+            #     ds_level = xr.auto_combine(ds_boxes[1:])
 
 
             # Create x,y,z, coordinates
@@ -735,8 +737,18 @@ class PltFile:
 
         return x, y
 
+    def get_rotate_dims(self, rotate_dims):
+        """ Backward compatibility fix. Originally user had to ask to rotate dimensions to match
+        python indexing. We now do this by default. """
+
+        if self.python_index_ordering:
+            rotate_dims = (not rotate_dims)
+
+        return rotate_dims
 
     def get_mesh_grid(self, level=0, rotate_dims=False, extend_grid=True):
+
+        rotate_dims = self.get_rotate_dims(rotate_dims)
 
         dx = self.levels[level][self.DX]
 
@@ -814,6 +826,9 @@ class PltFile:
 
     # Added for compatibility with ChkFile interface
     def get_data(self, var_name, rotate_dims=False):
+
+        rotate_dims = self.get_rotate_dims(rotate_dims)
+
         data = self.get_level_data(var_name)
 
         if data is None:
@@ -857,6 +872,8 @@ class PltFile:
 
             ld = ds_lev[field]
 
+
+
             # Set covered cells to NaN
             # This is really slow, I'm sure there's a faster way
             if valid_only and level < self.num_levels - 1:
@@ -870,6 +887,14 @@ class PltFile:
 
                 isnan = np.isnan(coarse_fine)
                 ld = ld.where(isnan == True)
+
+
+            # By default, swap to python indexing
+            if self.python_index_ordering:
+                if self.space_dim == 3:
+                    ld = ld.transpose('z', 'y', 'x')
+                elif self.space_dim == 2:
+                    ld = ld.transpose('y', 'x')
 
         else:
             ld = self.single_box(field, level)
@@ -1089,6 +1114,8 @@ class PltFile:
             # print('Available comps: %s' % str(available_comps))
 
     def get_permeability(self, permeability_function='kozeny', rotate_dims=False):
+
+        rotate_dims = self.get_rotate_dims(rotate_dims)
 
         porosity = self.get_data('Porosity', rotate_dims=rotate_dims)
         permeability = np.empty(porosity.shape)
