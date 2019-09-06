@@ -358,11 +358,14 @@ class PltFile:
 
             else:
 
-                # For chk files, data is sotred by component then by box
+                # For chk files, data is sorted by component then by box
                 # Loop over components and get data for that component from each box
 
 
-                box_offset = 0
+                box_offset_scalar = 0
+
+
+                num_boxes = len(self.levels[level][self.BOXES])
 
 
                 for box in self.levels[level][self.BOXES]:
@@ -375,9 +378,11 @@ class PltFile:
                     num_box_cells = np.prod(n_cells_dir)  # effectively nx * ny * nz * ...
                     # num_cells = num_box_cells * num_comps  # also multiply by number of components
 
+                    num_domain_cells = num_box_cells * num_boxes
+
                     # Now split into individual components
                     # data contains all fields on this level, sort into individual fields
-                    comp_offset_start = 0
+                    # comp_offset_start = 0
 
                     coords = {}
                     # box_size = ()
@@ -408,6 +413,7 @@ class PltFile:
                             # Hardwired to 2D for now
                             num_comps = self.space_dim
 
+                            # This is the data for this component in all boxes
                             data = level_group[comp_name[1:] + ':datatype=0']
                         else:
                             data = level_group[comp_name + ':datatype=0']
@@ -416,6 +422,8 @@ class PltFile:
                             num_comps = 1
 
                         data_unshaped = data[()]
+
+
 
                         # print('Num cells in a box: ' + str(num_box_cells))
                         #comp_offset_finish = comp_offset_start + num_box_cells
@@ -426,7 +434,8 @@ class PltFile:
                         if num_comps > 1:
                             component_offset = component*num_box_cells
 
-                        start_index = component_offset + box_offset
+                        # start_index = component_offset + box_offset
+                        start_index = box_offset_scalar*num_comps + component_offset
                         end_index = start_index + num_box_cells
 
                         indices = [start_index, end_index]
@@ -438,7 +447,7 @@ class PltFile:
                         # component_offset = component_offset + (num_box_cells*num_comps)
 
                     # Move onto next box
-                    box_offset = box_offset + num_box_cells
+                    box_offset_scalar = box_offset_scalar + num_box_cells
 
                     ds_boxes.append(ds_box)
 
