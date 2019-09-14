@@ -8,11 +8,19 @@
 void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxBox>& a_advVel)
 {
 
+
+
   if (s_verbosity >= 5)
   {
     pout() << "AMRLevelMushyLayer::calculateTimeIndAdvectionVel (level " << m_level << ")"    << endl;
   }
   CH_TIME("AMRLevelMushyLayer::calculateTimeIndAdvectionVel");
+
+  // Perform a quick check:
+//  if (!m_parameters.heleShaw)
+//  {
+//    MayDay::Warning("Warning - computing Darcy velocity without ")
+//  }
 
   IntVect ivGhost = m_numGhost*IntVect::Unit;
   IntVect advectionGhost = m_numGhostAdvection*IntVect::Unit;

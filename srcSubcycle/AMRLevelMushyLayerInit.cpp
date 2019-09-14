@@ -975,8 +975,14 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
   //        EnthalpyVariable calcTemperature = computeTemperatureFunc;
   BCHolder temperature_Sl_BC; // = m_physBCPtr->BasicthetaFuncBC();
   temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC();
-  BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC();
 
+  // We used to use a BC which enforced the boundary conditions on enthalpy-bulk salinity in a rather complicated way, but
+  // we actually only need this boundary for computing diffusive terms where it's actually the temperature and liquid salinity
+  // that we need to know. We enforced the temperature and liquid salinity constraint separately, using m_physBCPtr->temperatureLiquidSalinityBC() as above
+  // so the enthalpy-bulk salinity BC doesn't need to to anything.
+  // We just set it to no flux for now.
+  // BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC(); // old version
+  BCHolder HC_BC = m_physBCPtr->noFluxBC();
 
 
   AMRNonLinearMultiCompOpFactory* HCop = new AMRNonLinearMultiCompOpFactory();

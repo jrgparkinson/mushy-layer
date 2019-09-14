@@ -7,7 +7,7 @@
 #include "AdvectIBC.H"
 #include "BCFunctions.H"
 #include "computeSum.H"
-
+#include "NonlinearBC.H"
 #include "viscousBCF_F.H"
 
 //#include "NamespaceHeader.H"
@@ -622,21 +622,15 @@ public:
 
                 if (a_state.nComp() == 1)
                 {
-
-
                   int a_comp = 0;
                   // if for some reason we only have one component, just apply extrapolation bcs to a_state
 
                   ExtraBC(a_state, a_valid,
                                       idir, side, order, a_comp);
 
-
                 }
                 else
                 {
-
-
-
 
                   // This is a special case
 
@@ -691,17 +685,20 @@ public:
                                                              T_ref); //reference temperature for thermal radiation (dummy value)
 
                   NonlinearBCSolver* nonlinearSolver;
-  //                nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual);
+
                   if (m_params.bc_nonlinear_solve_method == NonlinearBCSolveMethods::newton)
                   {
                     nonlinearSolver = new NonlinearBCSolverNewton(residual, m_params.max_bc_iter, m_params.max_bc_residual);
                   }
                   else if (m_params.bc_nonlinear_solve_method == NonlinearBCSolveMethods::picard)
                   {
-                    nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual);
+                    nonlinearSolver = new NonlinearBCSolverPicard(residual, m_params.max_bc_iter, m_params.max_bc_residual, m_params.bc_relax_coeff);
                   }
 
-                  Box toRegion = adjCellBox(a_valid, idir, side, 1);
+                  Box grownBox(a_valid);
+
+
+                  Box toRegion = adjCellBox(grownBox, idir, side, 1);
                   toRegion &= a_state.box();
 
                   for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
@@ -790,37 +787,6 @@ public:
                           // Now solve for the enthalpy in the ghost cell
                           nonlinearSolver->solve(ghost_enthalpy, interior_temperature, interior_bulk_concentration);
 
-                          /*Real ghost_enthalpy =  interior_enthalpy;
-
-                          Real resid = 0.0;
-                          residual->computeResidual(resid,
-                                                    ghost_enthalpy,  // enthalpy in ghost cell
-                                                    interior_bulk_concentration,  // bulk conc in ghost cell
-                                                    interior_temperature // temperature at interior grid cell
-                                                    );
-
-                          // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
-                          ghost_enthalpy = ghost_enthalpy + resid;
-
-                          // 10^-2 is some arbitrary criteria
-                          int num_iter = 0;
-                          while (abs(resid) > m_params.max_bc_residual && num_iter < m_params.max_bc_iter)
-                          {
-
-                            // Recompute residual
-                            residual->computeResidual(resid,
-                                                      ghost_enthalpy,  // enthalpy in ghost cell
-                                                      interior_bulk_concentration,  // bulk conc in ghost cell
-                                                      interior_temperature // temperature at interior grid cell
-                                                      );
-
-                            // Compute new estimate for the enthalpy in the ghost cell, by incrementing by the residual
-                            ghost_enthalpy = ghost_enthalpy + resid;
-
-                            num_iter++;
-
-                          }*/
-
                           // Since we have determined what the enthalpy should be in the ghost cell to enforce the flux condition
                           // on temperature, just enforce this value
                           a_state(ivto, comp) = ghost_enthalpy;
@@ -847,9 +813,61 @@ public:
 
                 }
 
+
               }
-              else
+              else if (bcType == PhysBCUtil::MixedBCTemperatureSalinity)
               {
+
+                  // This is a special case
+
+                  int Tcomp = 0;
+                  int Slcomp = 1;
+
+
+                  CH_TIME("BCFunctions::MixedTemperatureSalinityBC");
+                  int isign = sign(side);
+
+                  //                                  NonlinearTemperatureBC* residual;
+
+                  // default values
+                  Real a = 0.0, b=0.0, T_ref=0.0, no_flux_position_limit=0.0, flux=0.0;
+
+                  no_flux_position_limit = m_params.m_bc_noFluxLimit.getBC(idir,  side);
+
+                  a = m_params.m_bc_a.getBC(idir, side);;
+                  b = m_params.m_bc_b.getBC(idir, side);
+                  flux = boundaryValue;
+                  T_ref = m_params.m_bc_bTref.getBC(idir, side);
+
+                  Box toRegion = adjCellBox(a_valid, idir, side, 1);
+                  toRegion &= a_state.box();
+
+                  Real ghostVal = 0.0;
+
+                  for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+                  {
+                    // TODO - should write this in fortran for speed
+                    CH_TIME("BCFunctions::MixedTemperatureSalinityBC::loopOverBox");
+
+                    IntVect ivto = bit();
+                    IntVect iv_interior = ivto - isign*BASISV(idir);
+
+                    ghostVal = (a_state(iv_interior, Tcomp)*(a/m_dx + b/2) + flux - b*T_ref ) / (a/m_dx - b/2);
+                    a_state(ivto, Tcomp) = ghostVal;
+                    if (a_state.nComp() == 2)
+                    {
+                      a_state(ivto, Slcomp) = a_state(iv_interior, Slcomp);
+                    }
+
+                  }
+
+//                }
+
+
+            }
+            else
+              {
+              // All other BCs (e.g. dirichlet, neumann) are applied here.
 
                 applyCorrectScalarBC(a_state,
                                      m_advVel,
@@ -3858,17 +3876,14 @@ BCHolder PhysBCUtil::temperatureLiquidSalinityBC(bool a_homogeneous) const
 
 
 
+
 BCHolder PhysBCUtil::enthalpySalinityBC(bool a_homogeneous) const
 {
   //temperature BC for comp 0, liquid salinity BC for comp 1
   Vector<Real> topVals, bottomVals, plumeVals;
   topVals.resize(2); bottomVals.resize(2); plumeVals.resize(2);
-  //  topVals[0] = m_params.HTop;
-  //  bottomVals[0] = m_params.HBottom;
-  plumeVals[0] = m_params.HPlumeInflow;
 
-  //  topVals[1] = m_params.ThetaTop;
-  //  bottomVals[1] = m_params.ThetaBottom;
+  plumeVals[0] = m_params.HPlumeInflow;
   plumeVals[1] = m_params.ThetaPlumeInflow;
 
   Vector<Vector<int> > bcLo, bcHi;

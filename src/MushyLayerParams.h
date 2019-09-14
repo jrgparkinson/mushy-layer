@@ -658,6 +658,9 @@ public:
 
 	Real max_bc_residual;
 
+	/// For nonlinear BCs solve
+	Real bc_relax_coeff;
+
 	/// First or second order BCs
 	int m_BCAccuracy;
 

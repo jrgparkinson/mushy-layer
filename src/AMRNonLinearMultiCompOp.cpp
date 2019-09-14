@@ -925,7 +925,20 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
           {
             CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::BCs");
             m_bc(thisPhi, region, m_domain, m_dx, homogeneous);
+//            m_bc(thisPhi, region., m_domain, m_dx, homogeneous);
           }
+//        }
+//
+//        a_phi.exchange(a_phi.interval(), m_exchangeCopier);
+//
+//        for (dit.begin(); dit.ok(); ++dit)
+//                {
+//                  const Box& region = dbl.get(dit());
+//                  const FluxBox& thisBCoef  = (*m_bCoef)[dit];
+//                  FArrayBox& thisPhi = a_phi[dit];
+//                  FArrayBox& thisDerivedVar = derivedVar[dit];
+
+
 
           // Need to do this every pass or convergence is very slow
 //          if (!m_superOptimised || whichPass == 0)
@@ -1732,3 +1745,4 @@ finerOperatorChanged(const MGLevelOp<LevelData<FArrayBox> >& a_operator,
 //-----------------------------------------------------------------------
 
 #include "NamespaceFooter.H"
+

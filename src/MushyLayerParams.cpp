@@ -186,12 +186,16 @@ MushyLayerParams::computeDerivedBCs ()
                            ThetaEutectic);
     bcValPermeabilityHi[dir] = calculatePermeability (bcValPorosityHi[dir]);
     bcValPermeabilityLo[dir] = calculatePermeability (bcValPorosityLo[dir]);
-    if (dir == SpaceDim - 1) {
+
+    if (dir == SpaceDim - 1)
+    {
       bool useTop = (bcValEnthalpyHi[dir] > bcValEnthalpyLo[dir]);
-      if (useTop) {
+      if (useTop)
+      {
         Hinitial = bcValEnthalpyHi[dir];
       }
-      else {
+      else
+      {
         Hinitial = bcValEnthalpyLo[dir];
         ;
       }
@@ -608,6 +612,9 @@ void MushyLayerParams::getParameters()
 
   max_bc_residual= 1e-5;
   ppMain.query("max_bc_residual", max_bc_residual);
+
+  bc_relax_coeff = 0.5;
+  ppMain.query("bc_relax_coeff", bc_relax_coeff);
 
   bc_nonlinear_solve_method = NonlinearBCSolveMethods::picard;
   ppMain.query("nonlinear_bc_solve_method", bc_nonlinear_solve_method);
