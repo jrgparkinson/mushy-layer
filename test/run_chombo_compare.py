@@ -234,6 +234,7 @@ def run_chombo_compare(argv):
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.03'
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015-hole0.04-veryGoodUseThis'
+    #data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/'
     field = 'Porosity'
     err_type = 'L2'
 
@@ -243,11 +244,12 @@ def run_chombo_compare(argv):
 
 
 
-    # figure_number = 6
+    figure_number = 6
     # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc'
-    # run_analysis = True
-    # field = 'xDarcy velocity'
-    # err_type = 'L2'
+    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/'
+    run_analysis = False
+    field = 'xDarcy velocity'
+    err_type = 'L2'
 
     # figure_number = 0
     # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.17/chi0.4-Da1.0e-06-Ra1.0e+09'
@@ -526,6 +528,8 @@ def run_chombo_compare(argv):
 
         axes[1].set_xlim([0, 4])
         axes[1].set_ylim([0, 1])
+
+        axes[1].set_xticks([0, 2, 4])
 
         xl = axes[1].get_xlim()
         yl = axes[1].get_ylim()

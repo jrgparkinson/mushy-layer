@@ -492,7 +492,8 @@ class PltFile:
             x_y_coords_names = ['x', 'y', 'z']
 
             for d in range(self.space_dim):
-                ds_level.coords[x_y_coords_names[d]] = ds_level.coords[self.INDEX_COORDS_NAMES[d]] * lev_dx
+                # Factor of 0.5 accounts for cell centering
+                ds_level.coords[x_y_coords_names[d]] = (ds_level.coords[self.INDEX_COORDS_NAMES[d]] + 0.5)* lev_dx
             # ds_level.coords['x'] = ds_level.coords['i'] * lev_dx
             # ds_level.coords['y'] = ds_level.coords['j'] * lev_dx
 

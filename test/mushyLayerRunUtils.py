@@ -79,7 +79,7 @@ def get_executable(base_name, dim=2):
     return executable_name
 
 
-def get_executable_name(exec_dir='', exec_name='mushyLayer2d'):
+def get_executable_name(exec_dir='', exec_name='mushyLayer2d', return_full_path=False):
     """ Get the executable in MUSHY_LAYER_DIR/execSubcycle/ which contains mushyLayer2d,
      prioritising OPT over DEBUG compilations.
      Independent of the architecture (i.e. will find for different C++ compilers, fortran versions etc.) """
@@ -135,7 +135,10 @@ def get_executable_name(exec_dir='', exec_name='mushyLayer2d'):
         print('Executable ' + exec_file +' not found in directory ' + exec_dir)
         sys.exit(0)
 
-    return exec_file
+    if return_full_path:
+        return os.path.join(exec_dir, exec_file)
+    else:
+        return exec_file
 
 
 def construct_run_name(params):
@@ -262,7 +265,7 @@ def read_inputs(inputs_file):
 def write_inputs(location, params, ignore_list = None, doSort=True):
     output_file = ''
 
-    key_list = params.keys()
+    key_list = list(params.keys())
     if doSort:
         key_list.sort()
     

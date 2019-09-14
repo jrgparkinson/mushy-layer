@@ -3,7 +3,7 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import numpy as np
 from util.nondimensionalisation import *
-from OptimalStates.plotUtils import latexify
+from util.plotUtils import latexify
 import matplotlib as mpl
 import math
 
@@ -27,26 +27,13 @@ def get_color(colors, min_time, max_time, time):
 
     return colors[index]
 
-folder = '/home/parkinsonjl/phd/python/analysis_postprocess/testing3/'
 
-folder = '/home/parkinsonjl/mnt/sharedStorage/LongDeepRun/SeaIce-512x1024-Ttop-15.0-Tbottom-2.9-np16-0'
-#folder = '/home/parkinsonjl/mnt/sharedStorage/LongDeepRun/SeaIce-512x1024-Ttop-5.0-Tbottom-2.9-NewTbottom5.0-np16-0-0'
+# Define these
+control_folder = ''
+warming_folder = ''
 
-folder = '/home/parkinsonjl/mnt/sharedStorage/LongDeepRun/SeaIce-256x512-Ttop-5.0-Tbottom-2.9-NewTbottom5.0-np4-0-0'
-folder = '/home/parkinsonjl/mnt/sharedStorage/LongDeepRun/SeaIce-256x512-Ttop-5.0-Tbottom-2.9-np4-0'
-
-base_folder = '/home/parkinsonjl/mnt/sharedStorage/LongDeepRun/'
-
-
-folder_to_plot = os.path.join(base_folder, 'SeaIce-256x512-Ttop-5.0-Tbottom-2.9-np4-0')
-folder_to_use = os.path.join(base_folder, 'SeaIce-256x512-Ttop-5.0-Tbottom-2.9-NewTbottom5.0-np4-0-0')
-
-profiles_path = os.path.join(folder, 'profiles.nc')
-
-# profiles = get_profiles(folder)
-
-profiles_control = get_profiles(folder_to_plot)
-profiles_warming = get_profiles(folder_to_use)
+profiles_control = get_profiles(control_folder)
+profiles_warming = get_profiles(warming_folder)
 
 
 print(profiles_control)
@@ -64,34 +51,6 @@ time_warming = np.array(profiles_warming['Porosity'].coords['t'])
 dim_times_control = dimensional_time(times_control)
 dim_times_warming = dimensional_time(times_control)
 
-#this_time = times[0]
-#profile = rm_profile.sel(t=this_time)
-
-#latexify(3,3)
-#fig = plt.figure()
-
-# t_mesh, z_mesh = np.mgrid[slice(np.amin(z), np.amax(z), z[1]-z[0]),
-#                           slice(np.amin(times), np.amax(times), times[1]-times[0])]
-
-#plt.pcolormesh(t_mesh, z_mesh, profiles['Rm profile'])
-
-
-# profiles['Rm profile'].transpose().plot.pcolormesh()
-# field = 'Rm profile'
-# field = 'Porosity'
-# field = 'BulkSalinity'
-# field = 'LiquidSalinity'
-# data = profiles[field].transpose()
-#
-# plt.pcolormesh(dim_times_control, z, data)
-#
-# plt.xlabel('$t$ (days)')
-# plt.ylabel('$z$ (metres)')
-# cbar = plt.colorbar()
-# cbar.set_label(field)
-# plt.tight_layout()
-# plt.draw()
-#plt.colorbar()
 
 
 valid_control_times = times_control[times_control > time_warming[0]]

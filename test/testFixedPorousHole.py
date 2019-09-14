@@ -20,7 +20,7 @@ def fixed_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max_r
         grid_file = mushy_layer_base_dir + '/grids/middleXSmall/' + str(nx_coarse) + 'x' + str(nz_coarse)
     else:
         grid_file = mushy_layer_base_dir + '/grids/middleXSmall/' + str(nx_coarse * 2) + 'x' + str(nz_coarse * 2)
-    # params = readInputs(mushyLayerBaseDir + )
+    # params = read_inputs(mushyLayerBaseDir + )
 
     params_file = mushy_layer_base_dir + '/params/convergenceTest/DBVariablePorosityConvTest.parameters'
 

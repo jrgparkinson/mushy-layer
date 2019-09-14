@@ -149,7 +149,7 @@ class MushyLayerRunSimple:
         # Read in the file
         params_key = 'main.params_file'
 
-        #inputsParams = readInputs(inputs_file)
+        #inputsParams = read_inputs(inputs_file)
         inputsParams = {}
         
         extraParams = {}
