@@ -125,6 +125,14 @@ MushyLayerParams::MushyLayerParams() {
   m_time = -999;
   m_timeDependentBC = m_constant;
 
+  sinusoidal_temperature_bc_timescale = 1;
+  sinusoidal_temperature_bc_amplitude = 0.5;
+  sinusoidal_temperature_bc_av = 0.5;
+  sinusoidal_temperature_bc_phase_diff = 0.0;
+
+  max_bc_residual = 3;
+  bc_relax_coeff = 0.5;
+
   prandtl = 0.0;
 
   m_advectionCoeff = 1.0;
@@ -207,50 +215,51 @@ void MushyLayerParams::getParameters()
 {
   CH_TIME("MushyLayerParams::getParameters()");
 
-  ParmParse pp("parameters");
+  ParmParse ppParams("parameters");
   ParmParse ppMain("main");
   ParmParse ppBio("bio");
+  ParmParse ppBC("bc");
 
   m_nondimensionalisation = 0;
   ppMain.query("nondimensionalisation", m_nondimensionalisation);
 
   int phys_problem;
-  pp.get("problem_type", phys_problem);
+  ppParams.get("problem_type", phys_problem);
   physicalProblem = PhysicalProblems(phys_problem);
 
   int perm_func = permeabilityFunction;
-  pp.query("permeabilityFunction", perm_func);
+  ppParams.query("permeabilityFunction", perm_func);
   permeabilityFunction = PermeabilityFunctions(perm_func);
 
   int poros_func = m_porosityFunction;
-  pp.query("porosityFunction", poros_func);
+  ppParams.query("porosityFunction", poros_func);
   m_porosityFunction = ParamsPorosityFunctions(poros_func);
 
   int viscous_func = m_viscosityFunction;
-  pp.query("viscosity_function", viscous_func);
+  ppParams.query("viscosity_function", viscous_func);
   m_viscosityFunction = ViscosityFunction(viscous_func);
-  pp.query("max_viscosity", max_viscosity);
+  ppParams.query("max_viscosity", max_viscosity);
 
-  pp.query("heleShaw", heleShaw);
+  ppParams.query("heleShaw", heleShaw);
 
   // I don't think I necessarily need these, if I'm specifying non dimensional parameters
-  pp.query("viscosity", viscosity);
-  pp.query("heatConductivityLiquid", heatConductivityLiquid);
-  pp.query("heatConductivitySolid", heatConductivitySolid);
-  pp.query("specificHeatLiquid", specificHeatLiquid);
-  pp.query("specificHeatSolid", specificHeatSolid);
-  pp.query("liquidDensity", liquidDensity);
-  pp.query("latentHeatDissolution", latentHeatDissolution);
-  pp.query("thermalExpansivity", thermalExpansivity);
-  pp.query("solutalExpansivity", solutalExpansivity);
+  ppParams.query("viscosity", viscosity);
+  ppParams.query("heatConductivityLiquid", heatConductivityLiquid);
+  ppParams.query("heatConductivitySolid", heatConductivitySolid);
+  ppParams.query("specificHeatLiquid", specificHeatLiquid);
+  ppParams.query("specificHeatSolid", specificHeatSolid);
+  ppParams.query("liquidDensity", liquidDensity);
+  ppParams.query("latentHeatDissolution", latentHeatDissolution);
+  ppParams.query("thermalExpansivity", thermalExpansivity);
+  ppParams.query("solutalExpansivity", solutalExpansivity);
 
-  pp.query("heleShawCoolingCoeff", heleShawCoolingCoeff);
-  pp.query("liquidSoluteDiffusivity", liquidSoluteDiffusivity);
-  pp.query("d", d);
-  pp.query("height", height);
-  pp.query("referencePermeability", referencePermeability);
-  pp.query("gravitationalAcceleration", gravitationalAcceleration);
-  pp.query("V", V);
+  ppParams.query("heleShawCoolingCoeff", heleShawCoolingCoeff);
+  ppParams.query("liquidSoluteDiffusivity", liquidSoluteDiffusivity);
+  ppParams.query("d", d);
+  ppParams.query("height", height);
+  ppParams.query("referencePermeability", referencePermeability);
+  ppParams.query("gravitationalAcceleration", gravitationalAcceleration);
+  ppParams.query("V", V);
 
   // I do need these, to define the phase diagram
   // Defaults for sea ice:
@@ -260,23 +269,27 @@ void MushyLayerParams::getParameters()
   liquidusSlope = -0.1;
   waterDistributionCoeff = 1e-5;
 
-  pp.query("eutecticTemp", eutecticTemp);
-  pp.query("eutecticComposition", eutecticComposition);
-  pp.query("initialComposition", initialComposition);
-  pp.query("liquidusSlope", liquidusSlope);
-  pp.query("waterDistributionCoeff", waterDistributionCoeff);
+  ppParams.query("eutecticTemp", eutecticTemp);
+  ppParams.query("eutecticComposition", eutecticComposition);
+  ppParams.query("initialComposition", initialComposition);
+  ppParams.query("liquidusSlope", liquidusSlope);
+  ppParams.query("waterDistributionCoeff", waterDistributionCoeff);
 
-  pp.query("fixedTempDirection", fixedTempDirection);
-  pp.query("inflowVelocity", inflowVelocity);
+  ppParams.query("fixedTempDirection", fixedTempDirection);
+  ppParams.query("inflowVelocity", inflowVelocity);
 
 
+  ppBC.query("sinusoidal_temperature_bc_timescale", sinusoidal_temperature_bc_timescale);
+  ppBC.query("sinusoidal_temperature_bc_amplitude", sinusoidal_temperature_bc_amplitude);
+  ppBC.query("sinusoidal_temperature_bc_av", sinusoidal_temperature_bc_av);
+  ppBC.query("sinusoidal_temperature_bc_phase_diff", sinusoidal_temperature_bc_phase_diff);
 
-  pp.query("timeDependentBC", m_timeDependentBC);
+  ppBC.query("timeDependent", m_timeDependentBC);
 
   //Derived parameters. Can enforce these if needed (e.g. for benchmarking with a reduced model)
-  if (pp.contains("deltaSalt"))
+  if (ppParams.contains("deltaSalt"))
   {
-    pp.get("deltaSalt", deltaSalt);
+    ppParams.get("deltaSalt", deltaSalt);
   }
   else
   {
@@ -284,81 +297,81 @@ void MushyLayerParams::getParameters()
   }
 
 
-  if (pp.contains("deltaTemp"))
+  if (ppParams.contains("deltaTemp"))
   {
-    pp.get("deltaTemp", deltaTemp);
+    ppParams.get("deltaTemp", deltaTemp);
   }
   else
   {
     deltaTemp = - liquidusSlope * deltaSalt;
   }
 
-  if (pp.contains("stefan"))
+  if (ppParams.contains("stefan"))
   {
-    pp.get("stefan", stefan);
+    ppParams.get("stefan", stefan);
   }
   else
   {
     stefan = latentHeatDissolution / (specificHeatLiquid * deltaTemp);
   }
 
-  if (pp.contains("compositionRatio"))
+  if (ppParams.contains("compositionRatio"))
   {
-    pp.get("compositionRatio", compositionRatio);
+    ppParams.get("compositionRatio", compositionRatio);
   }
   else
   {
     compositionRatio = (1-waterDistributionCoeff) * eutecticComposition / deltaSalt;
   }
 
-  if (pp.contains("liquidHeatDiffusivity"))
+  if (ppParams.contains("liquidHeatDiffusivity"))
   {
-    pp.get("liquidHeatDiffusivity", liquidHeatDiffusivity);
+    ppParams.get("liquidHeatDiffusivity", liquidHeatDiffusivity);
   }
   else
   {
     liquidHeatDiffusivity = heatConductivityLiquid/(liquidDensity * specificHeatLiquid);
   }
 
-  if (pp.contains("heatConductivityRatio"))
+  if (ppParams.contains("heatConductivityRatio"))
   {
-    pp.get("heatConductivityRatio", heatConductivityRatio);
+    ppParams.get("heatConductivityRatio", heatConductivityRatio);
   }
   else
   {
     heatConductivityRatio = heatConductivitySolid/heatConductivityLiquid;
   }
 
-  if (pp.contains("specificHeatRatio"))
+  if (ppParams.contains("specificHeatRatio"))
   {
-    pp.get("specificHeatRatio", specificHeatRatio);
+    ppParams.get("specificHeatRatio", specificHeatRatio);
   }
   else
   {
     specificHeatRatio = specificHeatSolid/specificHeatLiquid;
   }
 
-  if (pp.contains("lewis"))
+  if (ppParams.contains("lewis"))
   {
-    pp.get("lewis", lewis);
+    ppParams.get("lewis", lewis);
   }
   else
   {
     lewis = liquidHeatDiffusivity/liquidSoluteDiffusivity;
   }
 
-  if (pp.contains("reynolds"))
+  if (ppParams.contains("reynolds"))
   {
-    pp.get("reynolds", reynolds);
+    ppParams.get("reynolds", reynolds);
   }
   else
   {
     reynolds = liquidDensity*liquidHeatDiffusivity/viscosity;
   }
 
-  if (pp.contains("prandtl"))
+  if (ppParams.contains("prandtl"))
   {
-    pp.get("prandtl", prandtl);
+    ppParams.get("prandtl", prandtl);
   }
   else
   {
@@ -366,9 +379,9 @@ void MushyLayerParams::getParameters()
   }
 
 
-  if (pp.contains("darcy"))
+  if (ppParams.contains("darcy"))
   {
-    pp.get("darcy", darcy);
+    ppParams.get("darcy", darcy);
   }
   else
   {
@@ -384,14 +397,14 @@ void MushyLayerParams::getParameters()
 //    nonDimReluctance = referencePermeability*12/(d*d);
 //  }
 
-  if (pp.contains("heleShawPermeability"))
+  if (ppParams.contains("heleShawPermeability"))
   {
-    pp.get("heleShawPermeability", heleShamPermeability);
+    ppParams.get("heleShawPermeability", heleShamPermeability);
   }
-  else if (pp.contains("nonDimReluctance"))
+  else if (ppParams.contains("nonDimReluctance"))
   {
     Real rel  = 0.0;
-    pp.get("nonDimReluctance", rel);
+    ppParams.get("nonDimReluctance", rel);
     heleShamPermeability = 1.0/rel;
   }
   else
@@ -400,18 +413,18 @@ void MushyLayerParams::getParameters()
   }
 
 
-  if (pp.contains("nonDimHeleShawCooling"))
+  if (ppParams.contains("nonDimHeleShawCooling"))
   {
-    pp.get("nonDimHeleShawCooling", nonDimHeleShawCooling);
+    ppParams.get("nonDimHeleShawCooling", nonDimHeleShawCooling);
   }
   else
   {
     nonDimHeleShawCooling = heleShawCoolingCoeff * (height*height)/heatConductivityLiquid;
   }
 
-  if (pp.contains("rayleighTemp"))
+  if (ppParams.contains("rayleighTemp"))
   {
-    pp.get("rayleighTemp", rayleighTemp);
+    ppParams.get("rayleighTemp", rayleighTemp);
   }
   else
   {
@@ -419,9 +432,9 @@ void MushyLayerParams::getParameters()
         deltaTemp*referencePermeability / (liquidHeatDiffusivity*viscosity);
   }
 
-  if (pp.contains("rayleighComp"))
+  if (ppParams.contains("rayleighComp"))
   {
-    pp.get("rayleighComp", rayleighComposition);
+    ppParams.get("rayleighComp", rayleighComposition);
   }
   else
   {
@@ -440,9 +453,9 @@ void MushyLayerParams::getParameters()
 
 
   //Some nondimensional parameters and boundary conditions
-  if (pp.contains("nonDimVel"))
+  if (ppParams.contains("nonDimVel"))
   {
-    pp.get("nonDimVel", nonDimVel);
+    ppParams.get("nonDimVel", nonDimVel);
   }
   else
   {
@@ -450,18 +463,18 @@ void MushyLayerParams::getParameters()
     nonDimVel = 0.0;
   }
 
-  pp.query("BCAccuracy", m_BCAccuracy);
-  pp.query("pressureBCAccuracy", m_pressureBCAccuracy);
+  ppParams.query("BCAccuracy", m_BCAccuracy);
+  ppParams.query("pressureBCAccuracy", m_pressureBCAccuracy);
 
   body_force = 0.0;
-  pp.query("body_force", body_force);
+  ppParams.query("body_force", body_force);
 
   // Default nondimensionalisation is about eutectic
   referenceTemperature = eutecticTemp;
   referenceSalinity = eutecticComposition;
 
-  pp.query("referenceTemperature", referenceTemperature);
-  pp.query("referenceSalinity", referenceSalinity);
+  ppParams.query("referenceTemperature", referenceTemperature);
+  ppParams.query("referenceSalinity", referenceSalinity);
 
   thetaEutectic = tempTotheta(eutecticTemp);
   ThetaEutectic = concToTheta(eutecticComposition);
@@ -469,13 +482,13 @@ void MushyLayerParams::getParameters()
   ThetaInitial = concToTheta(initialComposition);
   ThetaInf = ThetaInitial;
 
-  pp.query("initialBulkConc", ThetaInitial);
+  ppParams.query("initialBulkConc", ThetaInitial);
 
   plumeBounds.resize(2);
-  if (pp.contains("plumeBounds"))
+  if (ppParams.contains("plumeBounds"))
   {
     std::vector<Real>  temp = std::vector<Real>();
-    pp.getarr("plumeBounds", temp, 0, 2);
+    ppParams.getarr("plumeBounds", temp, 0, 2);
     //    for (int dir=0; dir<SpaceDim; dir++)
     //    {
     //      plumeBounds[dir] = temp[dir];
@@ -484,11 +497,11 @@ void MushyLayerParams::getParameters()
   }
 
 
-  pp.query("enthalpyPlume", HPlumeInflow);
-  pp.query("bulkConcPlume", ThetaPlumeInflow);
+  ppParams.query("enthalpyPlume", HPlumeInflow);
+  ppParams.query("bulkConcPlume", ThetaPlumeInflow);
 
 
-  ParmParse ppBC("bc");
+//  ParmParse ppBC("bc");
 
   // Define BC objects
   bcTypeVelLo.resize(SpaceDim, PhysBCUtil::SolidWall);
@@ -591,9 +604,9 @@ void MushyLayerParams::getParameters()
   }
 
   // Legacy option
-  if (pp.contains("pressureHead"))
+  if (ppParams.contains("pressureHead"))
   {
-    pp.query("pressureHead", pressureHead);
+    ppParams.query("pressureHead", pressureHead);
     bcValPressureHi[SpaceDim-1] = pressureHead;
     bcValPressureLo[SpaceDim-1] = 0.0;
   }
@@ -979,28 +992,6 @@ void MushyLayerParams::setTime(Real a_time)
 {
   m_time = a_time;
 
-  // Update BCs if necessary
-  if (m_timeDependentBC == m_sinusoid)
-
-  {
-
-    // dimensionless 0.1 mangitude is about 2 degrees C
-    Real T = bcValTemperatureLo[1] - 0.15*sin(2*M_PI*a_time/365);
-
-    // Ensure T isn't less than freezing
-    T = max(T, 0.001);
-
-    bcValTemperatureLo[1] = T;
-    bcValEnthalpyLo[1] = stefan + T;
-
-    //    pout() << "Set bottom temperature BC = " << T << endl;
-
-
-    // m_BCtimescale = 1;
-    //   m_time = -999;
-    //   m_timeDependentBC = m_constant;)
-  }
-
 
 }
 
@@ -1302,6 +1293,7 @@ void MushyLayerParams::computeDiagnosticVars(Real H, Real C, Real T, Real porosi
   ::computeEnthalpyVars(H, C, porosity, T, Cl, Cs, H_s, H_l, H_e,
                         specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
 }
+
 
 string MushyLayerParams::getVelocityScale() const
 {

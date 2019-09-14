@@ -582,8 +582,8 @@ Real AMRLevelMushyLayer::advance()
 
       amrMLptr = amrMLptr->getFinerLevel();
     }
-
   }
+
 
   if (s_verbosity >= 1)
   {
@@ -596,6 +596,7 @@ Real AMRLevelMushyLayer::advance()
 
   // Reset BCs in case they change with time
   m_parameters.setTime(m_time); // BCs are stored in m_parameters
+  this->m_physBCPtr->Time(m_time);
   setAdvectionBCs(); // Reset BCs on advection physics objects
 
   // Elliptic operators get the BC from m_parameters when they're defined (later)

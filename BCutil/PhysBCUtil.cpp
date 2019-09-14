@@ -861,11 +861,10 @@ public:
 
                   }
 
-//                }
 
+              }
 
-            }
-            else
+              else
               {
               // All other BCs (e.g. dirichlet, neumann) are applied here.
 
@@ -885,18 +884,16 @@ public:
                                      m_dx,
                                      comp);
 
-              }
+              } // end loop over different BCs
 
+            } // loop over components
 
+          } // end if this box is at the edge of the domain
+        } // end loop over sides
+      } // end if domain isn't periodic in this direction
+    } // loop over directions
 
-            }
-
-          }
-        }
-      }
-    }
-
-  }
+  } // end operator() function
 };
 
 
@@ -4221,6 +4218,48 @@ void
 PhysBCUtil::Time(const Real a_time)
 {
   m_time = a_time;
+
+  this->updateTimeDependentBCs();
+}
+
+void PhysBCUtil::updateTimeDependentBCs()
+{
+
+
+  // Update BCs if necessary
+
+  if (m_params.m_timeDependentBC == MushyLayerParams::m_sinusoid)
+  {
+
+    // For now, just the change the temperature at the top boundary if necessary
+    int dir = SpaceDim - 1;
+
+    // Make sure we're doing dirichlet
+    CH_assert(m_params.bcTypeTemperatureHi[dir] == PhysBCUtil::Dirichlet);
+
+
+    // dimensionless 0.1 mangitude is about 2 degrees C
+//     m_params.sinusoidal_temperature_bc_timescale = 1;
+//     m_params.sinusoidal_temperature_bc_amplitude = 0.5;
+//     m_params.sinusoidal_temperature_bc_av = 0.5;
+//     m_params.sinusoidal_temperature_bc_phase_diff = 0.0;
+//    Real T = bcValTemperatureHi[dir] - amplitude*sin(2*M_PI*a_time/timescale);
+
+    // Ensure T isn't less than freezing
+//    T = max(T, 0.001);
+
+    m_params.bcValTemperatureHi[dir] = m_params.sinusoidal_temperature_bc_av + m_params.sinusoidal_temperature_bc_amplitude
+        *sin(2*M_PI*(m_params.sinusoidal_temperature_bc_phase_diff + m_time/m_params.sinusoidal_temperature_bc_timescale) );
+//    bcValEnthalpyLo[dir] = stefan + T;
+
+    //    pout() << "Set bottom temperature BC = " << T << endl;
+
+
+    // m_BCtimescale = 1;
+    //   m_time = -999;
+    //   m_timeDependentBC = m_constant;)
+  }
+
 }
 
 // ---------------------------------------------------------------

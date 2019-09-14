@@ -124,7 +124,9 @@ public:
 	   * The liquid salinity is given by \f$(\Theta_l)_g = - \theta_g\f$  if \f$0 < \chi < 1\f$, and \f$ (\Theta_l)_g = (\Theta_l)_i \f$ otherwise.
 	   *
 	   */
-	  MixedBCTemperatureSalinity
+	  MixedBCTemperatureSalinity,
+
+
 	};
 
 	/// Physical parameters for the system
@@ -185,6 +187,9 @@ public:
 
 	/// Sets time
 	void Time(const Real a_time);
+
+	/// Update time dependent BCs (e.g. after changing the time)
+	void updateTimeDependentBCs();
 
 	/// Returns current time
 	Real Time() const;

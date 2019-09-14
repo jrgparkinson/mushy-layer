@@ -555,6 +555,12 @@ public:
 	/// Permeability boundary conditions (hi side, for each spatial direction)
 	bcTypePermeabilityHi;
 
+	Real
+	sinusoidal_temperature_bc_timescale,
+	sinusoidal_temperature_bc_amplitude,
+	sinusoidal_temperature_bc_av,
+	sinusoidal_temperature_bc_phase_diff;
+
 	/// Unified BCs for all scalars (lo side, for each spatial direction)
 	Vector<int> bcTypeScalarLo,
 
@@ -674,9 +680,14 @@ public:
 	int m_timeDependentBC;
 
 	/// Possible time dependences for BCs
+	/**
+	 * These are implemented in PhysBCUtil::updateTimeDependentBCs()
+	 * With the parameters for each option contained with this MushyLayerParams object.
+	 * You can add your own options to the list below, then implement them in PhysBCUtil::updateTimeDependentBCs()
+	 */
 	enum timeDependentBCtypes{
 	  m_constant,
-	  m_sinusoid, // val = constant val + m_BCamplitude * sin(2 pi t/m_BCtimescale)
+	  m_sinusoid, // val = constant val + m_BCamplitude * sin(2 pi t/m_BCtimescale + phase_shift)
 	  m_custom
 	};
 

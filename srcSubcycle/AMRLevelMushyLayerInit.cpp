@@ -1129,6 +1129,7 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
 
   m_physBCPtr = new PhysBCUtil(m_parameters, m_dx);
   m_physBCPtr->setAdvVel(&m_advVel);
+  m_physBCPtr->Time(m_time);
 
 
 
