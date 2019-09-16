@@ -173,3 +173,19 @@
 \form#172:$ \int_0^L \mathbf{F}_H \cdot \mathbf{z} dx $
 \form#173:$ \omega $
 \form#174:$ \nabla \cdot \mathbf{U}_f $
+\form#175:$ a \frac{dT}{dz} - F_0 - b(T - T_{ref}) $
+\form#176:$ r $
+\form#177:$ r = \left[F_0 - b( T_b - T_{ref}) \right] - \frac{T_g - T_i)}{\Delta x} $
+\form#178:$ T_b = (T_g + T_i)/2 $
+\form#179:$ T_g $
+\form#180:$ T_i $
+\form#181:$ \mathbf{n} \cdot \nabla \phi = 0 $
+\form#182:$ C_g $
+\form#183:$ H_g $
+\form#184:$ \frac{T_g(H_g,C_g) - T_{interior} }{\Delta x}= F $
+\form#185:$z>0.75$
+\form#186:$ Q = \frac{Q_0}{\sigma \sqrt{2 \pi}} \exp\left[ - 0.5 \left( \frac{x-x_c}{\sigma} \right)^2 \right] 0.5 \left( 1 + \tanh\left[10 (z-(H-h)) \right]) \right) $
+\form#187:$ \Pi_H = d^2/(12 K_0)$
+\form#188:$\phi_{smooth}$
+\form#189:$ (1-\alpha \nabla^2)\phi_{smooth} = \phi $
+\form#190:$ \left[ 1 - \Delta t^\ell \, \left(Da \, \left(\nabla^\ell\right)^2 - \frac{\chi^{\ell, n+1}}{\Pi^{\ell, n+1}} \right) \right] \mathbf{U}^{\ell, n+1}_* = \mathbf{U}^{\ell, n} + \Delta t^\ell \left\{- \chi^{\ell, n+1/2} \, \nabla^\ell \pi^{\ell, n-1/2} + \chi^{\ell, n+1/2} \left[Pr \, Da^2 \left( Ra_T \theta^{\ell, n+1/2} - Ra_C \Theta^{\ell, n+1/2} \right) \right] - \mathbf{U}_{AD, CC}^{\ell, n+1/2} \cdot \nabla^\ell \left( \frac{\mathbf{U}}{\chi} \right)^{\ell, n+1/2} \right\}$

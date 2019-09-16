@@ -29,6 +29,7 @@ var searchData=
   ['usefortranregularisationface',['useFortranRegularisationFace',['../struct_mushy_layer_options.html#a4d2370260d6a49bf5a988f379592320c',1,'MushyLayerOptions']]],
   ['usehighorderlimiter',['useHighOrderLimiter',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classGodunovUtilities.html#ae8b0cf6b0b6ac7f81e29b45db9ac63c5',1,'GodunovUtilities']]],
   ['useincrementalpressure',['useIncrementalPressure',['../struct_mushy_layer_options.html#a0ee4602f8acbf255e32a89397409a67c',1,'MushyLayerOptions']]],
+  ['useincrementalpressurerefinedlevels',['useIncrementalPressureRefinedLevels',['../struct_mushy_layer_options.html#a58be59c481f1d2f2283b943c723cb73f',1,'MushyLayerOptions']]],
   ['useinitacceldt',['useInitAccelDt',['../struct_mushy_layer_options.html#a5df4bdfad1515e71893b5c54996f3c17',1,'MushyLayerOptions']]],
   ['uselimiting',['useLimiting',['../struct_mushy_layer_options.html#aa02f318d80e38081925d47679b9539b8',1,'MushyLayerOptions']]],
   ['useoldadvvel',['useOldAdvVel',['../struct_mushy_layer_options.html#a4e2bb36126700e04d36012af3412c817',1,'MushyLayerOptions']]],
@@ -38,6 +39,6 @@ var searchData=
   ['usesubcyclingintime',['useSubcyclingInTime',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classAMR.html#a974c367993af99bcbc22ce4e19941f5e',1,'AMR']]],
   ['usingbasenamespace_2eh',['UsingBaseNamespace.H',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/UsingBaseNamespace_8H.html',1,'']]],
   ['usingnamespace_2eh',['UsingNamespace.H',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/UsingNamespace_8H.html',1,'']]],
-  ['ustarfuncbc',['uStarFuncBC',['../class_phys_b_c_util.html#abb7e75548708a66c6ac30b64d2461ab3',1,'PhysBCUtil']]],
+  ['ustarfuncbc',['uStarFuncBC',['../class_phys_b_c_util.html#a33c3a4bf7388455545a5ec5ce14f1748',1,'PhysBCUtil']]],
   ['usz_5ft',['USz_t',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/namespaceArSp.html#a40cb09fe356801150aa6a8676ca9f2d1',1,'ArSp']]]
 ];

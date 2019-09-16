@@ -20,5 +20,5 @@ var searchData=
   ['upwind',['upwind',['../class_a_m_r_level_mushy_layer.html#a6d02158d0d0bc38c7d7841f526b6a5f8',1,'AMRLevelMushyLayer']]],
   ['usehighorderlimiter',['useHighOrderLimiter',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classGodunovUtilities.html#ae8b0cf6b0b6ac7f81e29b45db9ac63c5',1,'GodunovUtilities']]],
   ['usesubcyclingintime',['useSubcyclingInTime',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classAMR.html#a974c367993af99bcbc22ce4e19941f5e',1,'AMR']]],
-  ['ustarfuncbc',['uStarFuncBC',['../class_phys_b_c_util.html#abb7e75548708a66c6ac30b64d2461ab3',1,'PhysBCUtil']]]
+  ['ustarfuncbc',['uStarFuncBC',['../class_phys_b_c_util.html#a33c3a4bf7388455545a5ec5ce14f1748',1,'PhysBCUtil']]]
 ];

@@ -31,6 +31,7 @@ var searchData=
   ['bcfunction',['BCFunction',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBCFunction.html',1,'']]],
   ['bcfuncwrapper',['BCFuncWrapper',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBCFuncWrapper.html',1,'']]],
   ['bcholder',['BCHolder',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBCHolder.html',1,'']]],
+  ['bcinfo',['BCInfo',['../class_b_c_info.html',1,'']]],
   ['bcvaluefunction',['BCValueFunction',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBCValueFunction.html',1,'']]],
   ['bcvalueholder',['BCValueHolder',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBCValueHolder.html',1,'']]],
   ['bicgstabsolver',['BiCGStabSolver',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classBiCGStabSolver.html',1,'']]],
