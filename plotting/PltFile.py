@@ -167,6 +167,10 @@ class PltFile:
             name = attrs['component_' + str(i)]
             name = name.decode('UTF-8')
 
+            # Some of my files have wierd xEnthalpy yEnthalpy fields, which we should skip
+            if name == 'xEnthalpy' or name == 'yEnthalpy':
+                continue
+
             # Previously, we treated vectors and scalars differently,
             # now we just store vector components as separate scalar fields
             # retained previous code (commented out below) in case I ever want it
@@ -522,6 +526,9 @@ class PltFile:
     def get_box_comp_data(self, data_unshaped, level, indices, comp_name, n_cells_dir, coords):
 
         data_box_comp = data_unshaped[indices[0]:indices[1]]
+
+        if len(data_box_comp) == 0:
+            print('ERROR - no data in box')
 
         # Chombo data is indexed in reverse (i.e. data[k, j, i]), so whilst we have n_cells_dir = [Nx, Ny, Nz],
         # we need to reshape according to [Nz, Ny, Nx] before then transposing to get
