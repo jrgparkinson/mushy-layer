@@ -2107,23 +2107,24 @@ void AMRLevelMushyLayer::initialData()
     return;
   }
 
-  // Defaults:
+
   DataIterator dit = m_grids.dataIterator();
 
+  // Fill defaults initial data:
   for (dit.reset(); dit.ok(); ++dit)
   {
 
     (*m_scalarNew[ScalarVars::m_lambda])[dit].setVal(1.0);
     (*m_scalarOld[ScalarVars::m_lambda])[dit].setVal(1.0);
-    //    (*m_dScalar[ScalarVars::m_lambda])[dit].setVal(1.0);
+
 
     (*m_scalarNew[ScalarVars::m_enthalpy])[dit].setVal(m_parameters.Hinitial);
     (*m_scalarOld[ScalarVars::m_enthalpy])[dit].setVal(m_parameters.Hinitial);
-    //    (*m_dScalar[ScalarVars::m_enthalpy])[dit].setVal(m_parameters.Hinitial);
+
 
     (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit].setVal(m_parameters.ThetaInitial);
     (*m_scalarOld[ScalarVars::m_bulkConcentration])[dit].setVal(m_parameters.ThetaInitial);
-    //    (*m_dScalar[ScalarVars::m_bulkConcentration])[dit].setVal(m_parameters.ThetaInitial);
+
 
     (*m_vectorNew[VectorVars::m_fluidVel])[dit].setVal(0.0);
     (*m_vectorOld[VectorVars::m_fluidVel])[dit].setVal(0.0);
