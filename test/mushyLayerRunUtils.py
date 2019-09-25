@@ -5,12 +5,23 @@ import math
 import sys
 import subprocess
 import socket
-
+from datetime import date
 
 def get_base_output_dir():
+    """ Define the full path to the directory where the output of running test problems should go """
     #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
     #base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDiffusiveTimescale/'
+
     base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDevelopment/'
+
+
+    # For making a test directory with the day's date:
+    #today = date.today()
+    #today_str = today.strftime("%b-%d-%Y")
+    #base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test-%s/' % today_str
+
+    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestFinal/'
+
 
 
     if not os.path.exists(base_output_dir):
@@ -18,16 +29,18 @@ def get_base_output_dir():
 
     return base_output_dir
 
-def add_params(defaultParams, extra_params):
+def add_params(default_params, extra_params):
     """ Add params from extra_params to defaultParams """
 
     for k, v in extra_params.iteritems():
-        defaultParams[k] = v
+        default_params[k] = v
 
-    return defaultParams
+    return default_params
 
 
 def get_matlab_base_command():
+    """ Define the command(s) needed to startup matlab.
+     E.g. load modules if needed """
     parent_dir = os.path.abspath(os.pardir)
     matlab_folder = os.path.join(parent_dir, 'matlab', 'MethodsPaper')
     #
