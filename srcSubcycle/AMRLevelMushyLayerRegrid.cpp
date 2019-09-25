@@ -495,7 +495,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
 
 
-  if (m_opt.refinementMethod == RefinementMethod::tagScalar) // m_opt.tag_velocity
+  if (m_opt.refinementMethod == RefinementMethod::tagSpeed) // m_opt.tag_velocity
   {
 
     if (s_verbosity >= 2)
