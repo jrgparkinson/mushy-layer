@@ -12,7 +12,7 @@ from mushyLayerRunUtils import read_inputs
 import sys
 from ChkFile import compute_channel_properties
 from scipy.signal import find_peaks
-
+from skimage.feature import peak_local_max
 
 def compute_z(porosity_slice, y_slice, porosity):
 
@@ -1204,7 +1204,7 @@ class PltFile:
 
             return num_peaks
         else:
-            from skimage.feature import peak_local_max
+
 
             slice = bulk_salinity.sel(z = z_ml, method='nearest')
 
