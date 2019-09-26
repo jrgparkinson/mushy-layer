@@ -70,7 +70,7 @@ Most of these options/parameters can just be left at their default values. The i
 `main.max_grid_size=256` split domain into boxes (for sending to different processors) of max size in any dimension given by this parameter.
 
 ## Initial and boundary conditions
-See the [separate document](../InitialAndBoundaryConditions.md)
+See the [separate document](InitialAndBoundaryConditions.md).
 
 
 ## Dimensionless parameters
