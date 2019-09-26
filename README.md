@@ -58,6 +58,13 @@ For more details on how to setup your inputs file for the problem you're interes
 
 There are example problems, with input files, in the `/examples/` directory.
 
+For running in parallel (with 2 processors in this example), run the code like
+
+```console
+$ cd execSubcycle
+$ mpirun -np 2 ./mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex inputs
+```
+
 # Documentation
 Documentation can be generated using [Doyxgen](http://www.doxygen.nl/) if it is installed. A default configuration file can be found in the `/docs/` directory, which can be run via:
 
