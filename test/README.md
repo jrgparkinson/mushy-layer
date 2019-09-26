@@ -6,7 +6,7 @@ This directory contains python scripts for running various test problems which d
 # Setup
 These tests require the code in `mushy-layer/execSubcycle/` and `mushy-layer/setupNewRun/` to be built.
 
-Before running the test problems, you must first specify a directory to save the output to. This is done by the `getBaseOutputDir()` function in `mushyLayerRunUtils.py`. 
+Before running the test problems, you must first specify a directory to save the output to. This is done by the `get_base_output_dir()` function in `mushyLayerRunUtils.py`. 
 You should also add the directory (`/path/to/mushy-layer/test/`) to your PYTHONPATH.
 
 Some of the error calculation is done using the Chombo compare utility located in `/path/to/chombo/lib/util/chomboCompare`. Make sure you have compiled this program, and make sure you have defined the environmental variable `CHOMBO_HOME=/path/to/chombo/`.
