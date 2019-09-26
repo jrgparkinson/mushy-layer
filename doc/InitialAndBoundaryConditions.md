@@ -12,7 +12,7 @@ Boundary conditions are defined in two ways. Firstly we define the type of bound
 1. Neumann
 2. Inflow/outflow
 
-For vectors, there are lots of options, some of the most important being
+For velocity, there are lots of options, some of the most important being
 
 0. Solid wall
 2. Inflow/outflow - pressure = 0, velocity determined by the projection
@@ -49,3 +49,4 @@ bc.porosityLo
 bc.liquidConcentrationLo
 permeabilityLo
 ```
+
