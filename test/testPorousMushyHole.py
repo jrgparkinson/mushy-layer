@@ -47,7 +47,7 @@ def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, 
     regrid_int = int(math.ceil(float(nz_coarse) / 16.0))
     regrid_int = max(regrid_int, 1)
 
-    params['main.refine_thresh'] = float(params['main.radius']) * 1.0 / float(nz_coarse)  # 0.05*64.0/float(nz_coarse)
+    params['main.refine_thresh'] = float(params['main.radius']) * 10.0 / float(nz_coarse)  # 0.05*64.0/float(nz_coarse)
 
     bf = max(int(nx_coarse / 4), 4)
 
