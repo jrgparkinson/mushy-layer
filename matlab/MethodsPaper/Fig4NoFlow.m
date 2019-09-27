@@ -459,7 +459,7 @@ if savePlots
     fprintf('Saved to %s \n', figureName);
     print(h,figureName,'-depsc','-r50')
 
-    savefig(figureName)
+    savefig([figureName, '.fig'])
     
 end
 
