@@ -6,9 +6,10 @@ import re
 
 
 class BatchJob:
-    '''
+    """
+    Class to create and run batch jobs through a queueing system.
     This is setup for SLURM, but should be fairly straightforward to modify for other queuing systems
-    '''
+    """
 
     MAX_TASKS_PER_NODE = 16
     MAX_MEMORY = 128000.0  # MB
@@ -189,31 +190,39 @@ class BatchJob:
         fh.close()
 
     def run_task(self, runFileName='run.sh'):
-        '''
+        """
         This method will write out a batch file for the slurm queuing system, then run it.
         If you don't have slurm, you'll need to rewrite this method
-        '''
+        """
+
         self.write_batch_file(runFileName)
         slurm_command = 'sbatch' # change this if you're not using slurm!
 
         cmd = 'cd ' + self.folder + '; ' + slurm_command + ' ' + self.get_run_file(runFileName)
 
-        result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
 
-        print(result)
+        try:
+            result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+            print(result)
 
-        job_id_search = re.findall('Submitted batch job (\d+)', result)
+            job_id_search = re.findall('Submitted batch job (\d+)', result)
 
-        if job_id_search:
-            self.job_id = int(job_id_search[0])
+            if job_id_search:
+                self.job_id = int(job_id_search[0])
 
-        # Make a file in the output folder stating the slurm job id
-        F = open(os.path.join(self.folder, 'jobid'), 'w')
-        F.write(str(self.job_id))
-        F.close()
+            # Make a file in the output folder stating the slurm job id
+            F = open(os.path.join(self.folder, 'jobid'), 'w')
+            F.write(str(self.job_id))
+            F.close()
 
-        # Pause briefly in case submitting lots of slurm jobs
-        time.sleep(0.5)
+            # Pause briefly in case submitting lots of slurm jobs
+            time.sleep(0.5)
+
+        except:
+            print("Unable to run command, maybe SLURM isn't installed? You'll need to run it manually; \n %s" % cmd)
+
+
+
 
     def get_run_file(self, runFileName):
         return os.path.join(self.folder, runFileName)
