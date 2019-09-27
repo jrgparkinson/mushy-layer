@@ -11,7 +11,7 @@ from datetime import date
 def get_base_output_dir():
     """ Define the full path to the directory where the output of running test problems should go """
 
-    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDevelopment-27Sep/'
+    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDevelopment-27Sep-V2/'
 
     if base_output_dir == '':
 
