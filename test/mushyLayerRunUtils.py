@@ -9,20 +9,14 @@ from datetime import date
 
 def get_base_output_dir():
     """ Define the full path to the directory where the output of running test problems should go """
-    #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
-    #base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDiffusiveTimescale/'
 
-    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDevelopment/'
+    base_output_dir = ''
 
+    if base_output_dir == '':
 
-    # For making a test directory with the day's date:
-    #today = date.today()
-    #today_str = today.strftime("%b-%d-%Y")
-    #base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test-%s/' % today_str
-
-    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestFinal/'
-
-
+        this_file = os.path.realpath(__file__)
+        print('You need to set the output directory for test problems in the get_base_output_dir() method in %s' % this_file)
+        sys.exit(-1)
 
     if not os.path.exists(base_output_dir):
         os.makedirs(base_output_dir)
@@ -50,6 +44,10 @@ def get_matlab_base_command():
 
 
 def get_current_vcs_revision():
+    """
+    Get the git respository version of the current directory through the command line
+    :return: git repository version
+    """
     # For mercurial:
     # pipe = subprocess.Popen(
     #    ["hg", "identify", "--num"],
@@ -64,6 +62,10 @@ def get_current_vcs_revision():
     return repo_version
 
 def get_mushy_layer_dir():
+    """
+    Get the path to the mushy-layer directory which this code is contained in
+    :return:  full path to mushy-layer/
+    """
 
     #if 'MUSHY_LAYER_DIR' in os
     this_file_path = os.path.realpath(__file__)
@@ -155,6 +157,11 @@ def get_executable_name(exec_dir='', exec_name='mushyLayer2d', return_full_path=
 
 
 def construct_run_name(params):
+    """
+    Given some parameters, construct a folder name which describes them for running a simulation in
+    :param params: dictionary which maps parameter names to their values
+    :return: folder name
+    """
     # run_name = 'CR' + str(params['parameters.compositionRatio']) + 'RaC' + str(params['parameters.rayleighComp'])
 
     long_to_short_name = {'parameters.compositionRatio': 'CR',
@@ -222,6 +229,9 @@ def construct_run_name(params):
 
 
 def isfloat(value):
+    """
+    Determine if value is a float
+    """
     try:
         float(value)
         return True
@@ -229,6 +239,10 @@ def isfloat(value):
         return False
     
 def isint(value):
+    """
+    Determines if value is an integer
+    """
+
     try:
         int(value)
         return True
@@ -276,6 +290,9 @@ def read_inputs(inputs_file):
 
 
 def write_inputs(location, params, ignore_list = None, doSort=True):
+    """
+     Write out a set of parameters to an inputs file
+    """
     output_file = ''
 
     key_list = list(params.keys())
@@ -299,6 +316,9 @@ def write_inputs(location, params, ignore_list = None, doSort=True):
 
 
 def has_reached_steady_state(folder):
+    """
+    Determine if a simulation in a particular folder has reached steady state. Not full proof.
+    """
     time_table_file = os.path.join(folder, 'time.table.0')
 
     if os.path.exists(time_table_file):
@@ -306,6 +326,9 @@ def has_reached_steady_state(folder):
         
 
 def time_since_folder_updated(directory):
+    """
+    Compute time since a folder was last changed
+    """
     smallest_t = 1e100
     for filename in os.listdir(directory):
         this_time_diff = time_since_file_updated(os.path.join(directory, filename))
@@ -315,6 +338,8 @@ def time_since_folder_updated(directory):
 
 
 def time_since_file_updated(filename):
+    """ Compute time since a file was last updated """
+
     current_t = time.time()
     t = os.path.getmtime(filename)
         
@@ -323,6 +348,10 @@ def time_since_file_updated(filename):
     return this_time_diff
     
 def get_restart_file(most_recent_path):
+    """
+    Get the most recent (largest frame number) checkpoint file in a directory, which can then be used
+    to restart a simulation from
+    """
 
     restart_file = ''
     
@@ -340,6 +369,7 @@ def get_restart_file(most_recent_path):
 
 
 def get_final_plot_file(directory):
+    """ Get the most recent (largest frame) plot file in a directory """
     files_dir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
     plt_files = []
     # print(files_dir)
@@ -360,6 +390,8 @@ def get_final_plot_file(directory):
 
 
 def get_final_chk_file(directory):
+    """ Get the most recent (largest frame) checkpoint file in a directory """
+
     files_dir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
     plt_files = []
 
@@ -381,6 +413,7 @@ def get_final_chk_file(directory):
 
 
 def is_power_of_two(n):
+    """ Determine if a number if a power of 2 """
     test = math.log(n)/math.log(2)
     
     if round(test) == test:
@@ -390,6 +423,9 @@ def is_power_of_two(n):
 
 
 def string_to_array(string, conversion = lambda x:int(x)):
+    """ Convert a string separated by spaces to an array, i.e.
+    a b c -> [a,b,c]
+     """
 
     if isinstance(string, list):
         return string
@@ -400,15 +436,22 @@ def string_to_array(string, conversion = lambda x:int(x)):
 
 
 def array_to_string(array):
+    """ Convert an array to a string with the elements separated by spaces i.e.
+    [a,b,c] -> a b c
+    """
     str_array = [str(a) for a in array]
     string = ' '.join(str_array)
     return string
 
 
 
-def check_exec_exists(exec_dir, exec_name):
+def check_exec_exists(exec_dir, exec_name, dim=2):
+    """
+    Check if an executable file exists in directory exec_dir with a name that starts with exec_name
+    """
+
     base_name = os.path.join(exec_dir, exec_name)
-    exec_name = get_executable(base_name, 2)
+    exec_name = get_executable(base_name, dim)
 
     # If executable exists, we're all good
     if os.path.exists(exec_name):
