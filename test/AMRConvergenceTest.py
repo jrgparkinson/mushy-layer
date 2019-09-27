@@ -6,6 +6,10 @@ from mushyLayerRunUtils import get_restart_file, get_executable_name,\
     get_final_chk_file, get_mushy_layer_dir
 from BatchJob import BatchJob
 
+def get_suffix(num):
+
+    # return '-%d' % num
+    return ''
 
 def amr_convergence_test(params, full_output_dir, physicalProblem, nzs, 
                          num_procs = [1], num_restarts=0, analysis_command='',
@@ -32,7 +36,7 @@ def amr_convergence_test(params, full_output_dir, physicalProblem, nzs,
         
         #cwd = os.getcwd()
         run_name = p['main.plot_prefix']
-        test_name = run_name + '-0'
+        test_name = run_name + get_suffix(0)
         full_path = os.path.join(full_output_dir, test_name)
         
         allow_restarts = False
@@ -50,13 +54,13 @@ def amr_convergence_test(params, full_output_dir, physicalProblem, nzs,
                 i = 0
                 while os.path.exists(full_path):
                     i = i + 1
-                    test_name = run_name + '-' + str(i)
+                    test_name = run_name + get_suffix(i)
                     full_path = os.path.join(full_output_dir, test_name)
                 
                 if i > num_restarts:
                     continue
                     
-                most_recent_path = os.path.join(full_output_dir, run_name + '-' + str(i-1))  
+                most_recent_path = os.path.join(full_output_dir, run_name + get_suffix(i-1))
                 # Now get the restart file
                 restart_file = get_restart_file(most_recent_path)
                 if restart_file:
