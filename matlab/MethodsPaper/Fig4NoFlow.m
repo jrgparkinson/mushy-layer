@@ -465,7 +465,11 @@ end
 
 
 
-function err = getErr(dataFolder, prefix, gridRes, forceRecalculate, errType)
+function err = getErr(dataFolder, prefix, gridRes, forceRecalculate, errType, folder_ending)
+if nargin < 6
+folder_ending = ''
+end
+
 if nargin < 5
     errType = 'L1';
 end
@@ -522,7 +526,11 @@ end
 end
 
 
-function times = getTimes(dataFolder, prefix, gridRes)
+function times = getTimes(dataFolder, prefix, gridRes, folder_ending)
+
+if nargin < 4
+folder_ending = ''
+end
 
 times = NaN*ones(length(gridRes), 1);
 
