@@ -1864,7 +1864,6 @@ void AMRLevelMushyLayer::initialDataMushyLayer()
       }
     }
 
-
   }
   else
   {
