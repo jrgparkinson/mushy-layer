@@ -137,7 +137,8 @@ void AMRProjectionOpFactory::define(const ProblemDomain&                        
                                    Vector<RefCountedPtr<LevelData<FluxBox> > >&   a_bCoef,
                                    int                                            a_averaging_type)
 {
-  CH_TIME("AMRProjectionOpFactory::define");
+  // For some reason this timer introduces big memory leak
+//  CH_TIME("AMRProjectionOpFactory::define");
 
   setDefaultValues();
 

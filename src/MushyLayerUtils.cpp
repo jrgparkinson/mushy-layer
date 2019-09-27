@@ -592,12 +592,12 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
 
     if(params.permeabilityFunction == PermeabilityFunctions::m_permeabilityXSquared)
     {
-      permeability = x*x;
+//      permeability = x*x;
 
       Real scale = 0.1;
 
       // Creates a channel of high permeability in the middle of the domain
-      permeability = exp(-pow(x-0.5,2)/scale);
+//      permeability = exp(-pow(x-0.5,2)/scale);
 
       // Create a hole of low permeabilty in the middle of the domain
       //					permeability = 1-exp(-pow(x-0.5,2)/scale)*exp(-pow(z-0.5,2)/scale);
@@ -615,7 +615,7 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
 
       if (params.heleShaw)
       {
-        permeability = 1 / (1/params.nonDimReluctance + referencePerm/permeability);
+        permeability = 1 / (1/params.heleShamPermeability + 1.0/permeability);
       }
     }
 

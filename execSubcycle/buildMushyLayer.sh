@@ -10,23 +10,29 @@
 #    $ buildmush 
 # from the command line
 
-module unload gcc/5.2.0
-module load gcc/4.8.3
+#module unload gcc/5.2.0
+#module load gcc/4.8.3
+
+# Dimensions to build in (usually 2)
+D=2
+echo "Build with DIM=$D"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo "Building $DIR"
 #cd ~/mushy-layer/execSubcycle/
-cd DIR
-make all
+cd $MUSHY_LAYER_DIR/execSubcycle/
+make all DIM=$D | grep --color -E 'is up to date'
+
 
 cd ../setupNewRun/
 # make clean
-make all
+make all DIM=$D | grep --color -E 'is up to date'
 
-cd ../postProcess/
-make all
+cd $MUSHY_LAYER_DIR/postProcess/
+make all DIM=$D | grep --color -E 'is up to date'
 
-module unload gcc/4.8.3
-module load gcc/5.2.0
+
+#module unload gcc/4.8.3
+#module load gcc/5.2.0
 

@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['_7e_20bcinfo',['~ BCInfo',['../class_b_c_info.html#ae54656180d04287c737404cb21cd3c3f',1,'BCInfo']]],
   ['_7eadvectibc',['~AdvectIBC',['../class_advect_i_b_c.html#a4d1d956949384ad8621ba145de87952e',1,'AdvectIBC']]],
   ['_7eadvectionphysics',['~AdvectionPhysics',['../class_advection_physics.html#a90f848be0b676fed24227e782aec2eb6',1,'AdvectionPhysics']]],
   ['_7eadvectphysics',['~AdvectPhysics',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classAdvectPhysics.html#a0910d8feb9680bd96d3181b453ee5833',1,'AdvectPhysics']]],
@@ -152,6 +153,9 @@ var searchData=
   ['_7enodemginterp',['~NodeMGInterp',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classNodeMGInterp.html#a77f4429a2c4735297d03191228840644',1,'NodeMGInterp']]],
   ['_7enodeqcfi',['~NodeQCFI',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classNodeQCFI.html#ae2e63333bf79f1b3fff77fd7392e57b4',1,'NodeQCFI']]],
   ['_7enodequadcfinterp2',['~NodeQuadCFInterp2',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classNodeQuadCFInterp2.html#af581a355fb95221fbb69fdc73ce17b74',1,'NodeQuadCFInterp2']]],
+  ['_7enonlinearbcsolver',['~NonlinearBCSolver',['../class_nonlinear_b_c_solver.html#a1021520079adc1f89ef622a09f10e7c8',1,'NonlinearBCSolver']]],
+  ['_7enonlinearbcsolvernewton',['~NonlinearBCSolverNewton',['../class_nonlinear_b_c_solver_newton.html#a67236cd2fbb2c5ac235caaf282949ca0',1,'NonlinearBCSolverNewton']]],
+  ['_7enonlinearbcsolverpicard',['~NonlinearBCSolverPicard',['../class_nonlinear_b_c_solver_picard.html#aadd7fd7236e3bd17e9ecbe98732fbaef',1,'NonlinearBCSolverPicard']]],
   ['_7enoopsolver',['~NoOpSolver',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classNoOpSolver.html#a6a7b82adb1b488f4794cf0e1c0dc02a0',1,'NoOpSolver']]],
   ['_7enwoquadcfinterp',['~NWOQuadCFInterp',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classNWOQuadCFInterp.html#a6643d7d855ae6eb2e1a9ca43a01f0357',1,'NWOQuadCFInterp']]],
   ['_7enwoviscoustensorop',['~NWOViscousTensorOp',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classNWOViscousTensorOp.html#ad8f445445d5c16cb614b1d93fbbb748a',1,'NWOViscousTensorOp']]],

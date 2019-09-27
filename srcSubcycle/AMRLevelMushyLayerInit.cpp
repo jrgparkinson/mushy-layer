@@ -12,8 +12,8 @@ void AMRLevelMushyLayer::setDefaults()
   // Need to make sure these are initialised,
   // else  Some conditional statements will depends on uninitialised value(s)
   m_newGrids_different = false;
-//  m_newLevel=false;
-//  m_opt.perturbationTime = 0.0;
+  m_prev_diag_output = m_time;
+
 }
 
 
@@ -78,10 +78,8 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_scalarVarNames[ScalarVars::m_temperatureAnalytic] = string("T analytic");
   m_scalarVarNames[ScalarVars::m_porosityAnalytic] = string("Porosity analytic");
   m_scalarVarNames[ScalarVars::m_saltEqnSrcGodunov] = string("Salt src term godunov");
-  m_scalarVarNames[ScalarVars::m_saltEqnSrcFiniteDiff] = string("Salt src term finite");
-  m_scalarVarNames[ScalarVars::m_saltEqnOp] = string("Salt op");
+
   m_scalarVarNames[ScalarVars::m_Terr] = string("T err");
-  m_scalarVarNames[ScalarVars::m_enthalpyOp] = string("H opp");
   m_scalarVarNames[ScalarVars::m_enthalpySrc] = string("H src");
   m_scalarVarNames[ScalarVars::m_divUadv] = string("div U face");
   m_scalarVarNames[ScalarVars::m_dHdt] = string("dHdt");
@@ -89,7 +87,6 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_scalarVarNames[ScalarVars::m_averageVerticalFlux] = string("average vertical solute flux");
   m_scalarVarNames[ScalarVars::m_soluteFluxAnalytic] = string("analytic vertical solute flux");
   m_scalarVarNames[ScalarVars::m_verticalFlux] = string("vertical solute flux");
-  m_scalarVarNames[ScalarVars::m_saltResidual] = string("salt residual");
   m_scalarVarNames[ScalarVars::m_divU] = string("div U cell");
   m_scalarVarNames[ScalarVars::m_averageHeatFlux] = string("average vertical heat flux");
   m_scalarVarNames[ScalarVars::m_streamfunction] = string("streamfunction");
@@ -103,6 +100,11 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_scalarVarNames[ScalarVars::m_MACBC] = string("MAC projection BC");
   m_scalarVarNames[ScalarVars::m_MACrhs] = string("MAC projection rhs");
   m_scalarVarNames[ScalarVars::m_CCrhs] = string("CC projection rhs");
+
+  ///Bio
+  m_scalarVarNames[ScalarVars::m_passiveScalar] = string("Passive tracer");
+  m_scalarVarNames[ScalarVars::m_activeScalar] = string("Active tracer");
+  m_scalarVarNames[ScalarVars::m_lightIntensity] = string("Light intensity");
 
   m_vectorVarNames = Vector<string>(m_numVectorVars, string("vector"));
   m_vectorVarNames[VectorVars::m_fluidVel] = string("Darcy velocity");
@@ -160,6 +162,17 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
       m_outputScalarVars.push_back(ScalarVars::m_viscosity);
     }
 
+    if(m_opt.includeTracers)
+    {
+      m_outputScalarVars.push_back(ScalarVars::m_passiveScalar);
+      m_outputScalarVars.push_back(ScalarVars::m_activeScalar);
+    }
+
+    if (m_opt.surfaceIrradiance > 0)
+    {
+      m_outputScalarVars.push_back(ScalarVars::m_lightIntensity);
+    }
+
 
     if (m_opt.debug)
     {
@@ -175,7 +188,6 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
         m_outputScalarVars.push_back(ScalarVars::m_Terr);
       }
 
-      m_outputScalarVars.push_back(ScalarVars::m_enthalpyOp);
       m_outputScalarVars.push_back(ScalarVars::m_enthalpySrc);
       m_outputScalarVars.push_back(ScalarVars::m_divUadv);
       m_outputScalarVars.push_back(ScalarVars::m_dHdt);
@@ -183,7 +195,6 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
       m_outputScalarVars.push_back(ScalarVars::m_dSdt);
       m_outputScalarVars.push_back(ScalarVars::m_soluteFluxAnalytic);
       m_outputScalarVars.push_back(ScalarVars::m_verticalFlux);
-      m_outputScalarVars.push_back(ScalarVars::m_saltResidual);
       m_outputScalarVars.push_back(ScalarVars::m_divU);
       m_outputScalarVars.push_back(ScalarVars::m_averageHeatFlux);
 
@@ -617,6 +628,13 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
   // I'm not sure we actually need this
   solverGrids.resize(nlevels);
 
+//  bool is_time_dependent = true;
+//  if (!m_opt.doEulerPart)
+//  {
+//    is_time_dependent = false;
+//    is_time_dependent = true;
+//  }
+
   // If we're doing a multi-component solve, need SpaceDim components, otherwise just one component.
   int num_comp = m_opt.multiCompUStarSolve ? SpaceDim : 1;
 
@@ -675,7 +693,15 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
         //                                                      (*cCoef[relativeLev])[dit].setVal(0.0); // testing
 
         // This is what multiplies du/dt
-        (*aCoef[relativeLev])[dit].setVal(1.0);
+          if (isVelocityTimeDependent())
+          {
+            (*aCoef[relativeLev])[dit].setVal(1.0);
+          }
+          else
+          {
+            // no time dependence
+            (*aCoef[relativeLev])[dit].setVal(0.0);
+          }
 
         // this is what multiplies laplacian(u). Note the minus sign.
         (*bCoef[relativeLev])[dit].setVal(- m_parameters.m_viscosityCoeff);
@@ -854,8 +880,8 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, IntVect::Zero));
     //    porosity[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
 
-    enthalpy[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-    bulkConcentration[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+//    enthalpy[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+//    bulkConcentration[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
 
     enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
     enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
@@ -878,14 +904,13 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
 
       amrML->fillScalarFace(*porosityFace[lev], a_time, ScalarVars::m_porosity, true, secondOrder);
 
-      //      amrML->fillScalars(*porosity[lev], m_time-m_dt/2, m_porosity, true, secondOrder);
-
-      amrML->fillScalars(*enthalpy[lev], a_time, ScalarVars::m_enthalpy, true , secondOrder);
-      amrML->fillScalars(*bulkConcentration[lev], a_time, ScalarVars::m_bulkConcentration, true, secondOrder);
+//      amrML->fillScalars(*enthalpy[lev], a_time, ScalarVars::m_enthalpy, true , secondOrder);
+//      amrML->fillScalars(*bulkConcentration[lev], a_time, ScalarVars::m_bulkConcentration, true, secondOrder);
 
       amrML->fillScalars(*enthalpySolidus[lev],a_time, ScalarVars::m_enthalpySolidus, true, secondOrder);
       amrML->fillScalars(*enthalpyLiquidus[lev], a_time, ScalarVars::m_enthalpyLiquidus, true, secondOrder);
       amrML->fillScalars(*enthalpyEutectic[lev],a_time, ScalarVars::m_enthalpyEutectic, true ,secondOrder);
+
     }
 
     amrML = amrML->getFinerLevel();
@@ -950,14 +975,22 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
   //        EnthalpyVariable calcTemperature = computeTemperatureFunc;
   BCHolder temperature_Sl_BC; // = m_physBCPtr->BasicthetaFuncBC();
   temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC();
-  BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC();
+
+  // We used to use a BC which enforced the boundary conditions on enthalpy-bulk salinity in a rather complicated way, but
+  // we actually only need this boundary for computing diffusive terms where it's actually the temperature and liquid salinity
+  // that we need to know. We enforced the temperature and liquid salinity constraint separately, using m_physBCPtr->temperatureLiquidSalinityBC() as above
+  // so the enthalpy-bulk salinity BC doesn't need to to anything.
+  // We just set it to no flux for now.
+  // BCHolder HC_BC  = m_physBCPtr->enthalpySalinityBC(); // old version
+  BCHolder HC_BC = m_physBCPtr->noFluxBC();
+
 
   AMRNonLinearMultiCompOpFactory* HCop = new AMRNonLinearMultiCompOpFactory();
   HCop->define(lev0Dom, grids, refRat, lev0Dx, HC_BC,
                alpha, aCoef, beta, bCoef,
                enthalpySolidus, enthalpyLiquidus, enthalpyEutectic,
                mlParamsPtr, temperature_Sl_BC,
-               m_opt.HCMultigridRelaxMode, porosityEdgeBC);
+               m_opt.HCMultigridRelaxMode, porosityEdgeBC, m_opt.apply_diagnostic_bcs);
 
   if (m_opt.nonlinearHCOpSuperOptimised)
   {
@@ -1059,6 +1092,12 @@ AMRLevelMushyLayer::defineIBCs ()
 {
   for (int var = 0; var < m_numScalarVars; var++) {
     if (m_makeFluxRegForScalarVar[var]) {
+
+      // Delete if they already exist
+      // This causes issues on AOPP servers
+//      delete m_scalarIBC[var];
+//      m_scalarIBC[var] = NULL;
+
       m_scalarIBC[var] = getScalarIBCs (var);
     }
   }
@@ -1090,6 +1129,7 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
 
   m_physBCPtr = new PhysBCUtil(m_parameters, m_dx);
   m_physBCPtr->setAdvVel(&m_advVel);
+  m_physBCPtr->Time(m_time);
 
 
 
@@ -1147,6 +1187,7 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
   //I don't think it makes sense to do projection *and* calculate grad(P)
   m_enforceGradP = (!m_opt.doProjection);
 
+
   // Define which scalar fields we want flux registers for
   for (int var = 0; var < m_numScalarVars; var++)
   {
@@ -1157,6 +1198,12 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
   // Anything I want to be able to advect
   m_makeFluxRegForScalarVar[ScalarVars::m_lambda] = true;
   m_makeFluxRegForScalarVar[ScalarVars::m_lambda_porosity] = true;
+
+  m_makeFluxRegForScalarVar[ScalarVars::m_activeScalar] = true;
+  m_makeFluxRegForScalarVar[ScalarVars::m_passiveScalar] = true;
+
+  m_scalarDiffusionCoeffs[ScalarVars::m_activeScalar] = m_parameters.activeTracerDiffusionCoeff;
+  m_scalarDiffusionCoeffs[ScalarVars::m_passiveScalar] = m_parameters.passiveTracerDiffusionCoeff;
 
   m_scalarDiffusionCoeffs[ScalarVars::m_temperature] = 0.0;
   m_scalarDiffusionCoeffs[ScalarVars::m_liquidConcentration] = 0.0;
@@ -2060,23 +2107,24 @@ void AMRLevelMushyLayer::initialData()
     return;
   }
 
-  // Defaults:
+
   DataIterator dit = m_grids.dataIterator();
 
+  // Fill defaults initial data:
   for (dit.reset(); dit.ok(); ++dit)
   {
 
     (*m_scalarNew[ScalarVars::m_lambda])[dit].setVal(1.0);
     (*m_scalarOld[ScalarVars::m_lambda])[dit].setVal(1.0);
-    //    (*m_dScalar[ScalarVars::m_lambda])[dit].setVal(1.0);
+
 
     (*m_scalarNew[ScalarVars::m_enthalpy])[dit].setVal(m_parameters.Hinitial);
     (*m_scalarOld[ScalarVars::m_enthalpy])[dit].setVal(m_parameters.Hinitial);
-    //    (*m_dScalar[ScalarVars::m_enthalpy])[dit].setVal(m_parameters.Hinitial);
+
 
     (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit].setVal(m_parameters.ThetaInitial);
     (*m_scalarOld[ScalarVars::m_bulkConcentration])[dit].setVal(m_parameters.ThetaInitial);
-    //    (*m_dScalar[ScalarVars::m_bulkConcentration])[dit].setVal(m_parameters.ThetaInitial);
+
 
     (*m_vectorNew[VectorVars::m_fluidVel])[dit].setVal(0.0);
     (*m_vectorOld[VectorVars::m_fluidVel])[dit].setVal(0.0);
@@ -2087,6 +2135,12 @@ void AMRLevelMushyLayer::initialData()
     (*m_dVector[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
 
     m_advVel[dit].setVal(0.0);
+
+    (*m_scalarNew[ScalarVars::m_passiveScalar])[dit].setVal(m_parameters.passiveTracerInitVal);
+    (*m_scalarOld[ScalarVars::m_passiveScalar])[dit].setVal(m_parameters.passiveTracerInitVal);
+
+    (*m_scalarNew[ScalarVars::m_activeScalar])[dit].setVal(m_parameters.activeTracerInitVal);
+    (*m_scalarOld[ScalarVars::m_activeScalar])[dit].setVal(m_parameters.activeTracerInitVal);
 
 
   }
@@ -2769,7 +2823,8 @@ void AMRLevelMushyLayer::postInitialize()
         pout() << "AMRlevelMushyLayer::postInitialize - initialize pressures" << endl;
       }
 
-      if (solvingFullDarcyBrinkman())
+//      if (solvingFullDarcyBrinkman())
+      if (this->doVelocityAdvection())
       {
         Real dtInit = computeDtInit(numLevels-1);
 
@@ -2860,11 +2915,17 @@ void AMRLevelMushyLayer::postInitialize()
 
 }
 
-void AMRLevelMushyLayer::initTimeIndependentPressure(AMRLevelMushyLayer* lev)
+void AMRLevelMushyLayer::initTimeIndependentPressure(AMRLevelMushyLayer* lev, int a_max_num_iter)
 {
   Real maxDivU = 1e10;
-  int i = 1;
-  int maxNumIter = 20;
+  int i = 0;
+  int maxNumIter = m_opt.num_init_passes;
+
+  // Possible for the argument to override the default number of passes
+  if (a_max_num_iter >= 0)
+  {
+    maxNumIter = a_max_num_iter;
+  }
 
   while(maxDivU > 1e-10 && i < maxNumIter)
   {
@@ -2872,7 +2933,7 @@ void AMRLevelMushyLayer::initTimeIndependentPressure(AMRLevelMushyLayer* lev)
 
     Divergence::levelDivergenceMAC(*lev->m_scalarNew[ScalarVars::m_divUadv], lev->m_advVel, m_dx);
     maxDivU = ::computeNorm(*lev->m_scalarNew[ScalarVars::m_divUadv], NULL, 1, lev->m_dx, Interval(0,0), 0);
-    pout() << "Pressure init " << i << ", max(div U) = " << maxDivU << endl;
+    pout() << "  Pressure init " << i << ", max(div U) = " << maxDivU << endl;
 
     i = i + 1;
   }
@@ -2914,16 +2975,31 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
     pout() << "AMRLevelMushyLayer::computeInitAdvectionVel (level " << m_level << ")" << endl;
   }
 
-  if (solvingFullDarcyBrinkman())
+//  if (solvingFullDarcyBrinkman())
+  if (this->doVelocityAdvection())
   {
+    // Just initialising so don't advect/diffuse any scalars here
 
     IntVect ivGhost = m_numGhostAdvection*IntVect::Unit;
     LevelData<FArrayBox> advectionSourceTerm(m_grids, SpaceDim, ivGhost);
+
     computeAdvectionVelSourceTerm(advectionSourceTerm);
 
+//    if (!m_opt.doEulerPart)
+//    {
+//      // Compute unprojected cell centred velocity (don't need to project it though)
+//
+//      computeCCvelocity(advectionSourceTerm, m_time, m_dt,
+//                        false, // don't do flux register updates
+//                        false, // don't do projection
+//                        false, // don't compute u.del(u)
+//                        false); // not a mac projection
+//
+//      m_vectorNew[m_UpreProjection]->copyTo(*m_vectorOld[m_UpreProjection]);
+//    }
 
     computeAdvectionVelocities(advectionSourceTerm);
-    // Just initialising so don't advect/diffuse any scalars here
+
   }
   else
   {
@@ -2940,6 +3016,9 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   {
     pout() << "AMRLevelMushyLayer::initializeGlobalPressure (level " << m_level << ")" << endl;
   }
+
+  // This function is only for darcy-brinkman - throw an error if that's not the case
+  CH_assert(solvingFullDarcyBrinkman());
 
   setAdvVelCentering(m_opt.initAdvVelCentering);
 
@@ -3033,10 +3112,7 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
       thisMLPtr->initializeLevelPressure(cur_time, dtInit); // advance current new states by a small dt
 
       bool doLambdaReflux = true;
-      //      if (iter == s_num_init_passes-1)
-      //      {
-      //        doLambdaReflux = true;
-      //      }
+
 
       // Also advect lambda to see how this behaves
       thisMLPtr->advectLambda(doLambdaReflux);
@@ -3102,7 +3178,11 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     thisMLPtr->m_usePrevPressureForUStar=orig_add_subtract_grad_p;
 
     thisMLPtr->getExtraPlotFields();
-    thisMLPtr->m_projection.unscaledPi(*thisMLPtr->m_scalarNew[ScalarVars::m_pressure], m_dt);
+    if (doVelocityAdvection())
+    {
+      thisMLPtr->m_projection.unscaledPi(*thisMLPtr->m_scalarNew[ScalarVars::m_pressure], m_dt);
+    }
+
     thisMLPtr = thisMLPtr->getFinerLevel();
   }
 
@@ -3289,8 +3369,6 @@ void AMRLevelMushyLayer::createDataStructures()
         new LevelData<FArrayBox>(m_grids, 1, ivGhost));
     m_scalarOld[scalarVar] = RefCountedPtr<LevelData<FArrayBox> >(
         new LevelData<FArrayBox>(m_grids, 1, ivGhost));
-    //    m_dScalar[scalarVar] = RefCountedPtr<LevelData<FArrayBox> >(
-    //        new LevelData<FArrayBox>(m_grids, 1, ivGhost));
     m_scalarRestart[scalarVar] = RefCountedPtr<LevelData<FArrayBox> >(
         new LevelData<FArrayBox>(m_grids, 1, ivGhost));
   }
@@ -3317,12 +3395,16 @@ void AMRLevelMushyLayer::createDataStructures()
         new LevelData<FArrayBox>(m_grids, SpaceDim, ghost));
   }
 
+  // When created, all our variables will have some bogus value 10^300
+  // Leave most of our variables like this, so we that if we don't initialise memory in the algorithm we find out
+  // There are a few exception though, which we want to set to 0 initially, do this here:
   for (DataIterator dit = m_advVel.dataIterator(); dit.ok(); ++dit)
   {
     m_advVel[dit].setVal(0.0);
     m_advVelOld[dit].setVal(0.0);
     m_advVelNew[dit].setVal(0.0);
 
+    (*m_scalarNew[ScalarVars::m_streamfunction])[dit].setVal(0.0);
 
     (*m_vectorNew[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
   }
@@ -3357,12 +3439,20 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
      */
 
     // First make a duplicate of the existing solution
-    IntVect ghost_vector = m_scalarNew[ScalarVars::m_enthalpy]->ghostVect();
+    // Add enough ghost vectors (num ghost cells = depth, where depth is the depth of the pond being added measured in number of grid cells)
+    // to ensure that, if the domain has been decomposed into multiple boxes,
+    // each box has access to enough adjacent cells to compute the new solution
+    IntVect ghost_vector = depth*IntVect::Unit;
     LevelData<FArrayBox> old_enthalpy(m_grids, 1, ghost_vector);
     LevelData<FArrayBox> old_bulk_conc(m_grids, 1, ghost_vector);
 
     m_scalarNew[ScalarVars::m_enthalpy]->copyTo(old_enthalpy);
     m_scalarNew[ScalarVars::m_bulkConcentration]->copyTo(old_bulk_conc);
+
+    // Fill ghost cells
+    old_enthalpy.exchange();
+    old_bulk_conc.exchange();
+
 
     // Work out how much we're squishing the old domain by
     /**
@@ -3380,7 +3470,7 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
     shrunkBox.growHi(1, -depth);
 
 
-    // Now iterate over the new grid, and fill with values interpolate from old mesh
+    // Now iterate over the new grid, and fill with values interpolated from old mesh
     for (DataIterator dit = m_scalarNew[ScalarVars::m_enthalpy]->dataIterator(); dit.ok(); ++dit)
     {
       Box b = m_grids[dit];
@@ -3391,15 +3481,18 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
       FArrayBox& newBulkConc = (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit];
       FArrayBox& oldBulkConc = old_bulk_conc[dit];
 
+      int vertical_index = SpaceDim-1;
+
       for (BoxIterator bit(b); bit.ok(); ++bit)
       {
+
 
         // Need to find the two cells to interpolate between, along with which fraction of each to take
         IntVect iv = bit();
         RealVect loc;
         getLocation(iv, loc, m_dx);
 
-        Real z = loc[1];
+        Real z = loc[vertical_index];
         Real z_new = z*stretching;
 
         Real dz = z-z_new;
@@ -3410,8 +3503,8 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
 
         pout() << fractional_shift << ", " << extra_shift << endl;
 
-        int z_j = iv[1] + num_cells_shift+1;
-        int z_j_lower = iv[1] + num_cells_shift;
+        int z_j = iv[vertical_index] + num_cells_shift+1;
+        int z_j_lower = iv[vertical_index] + num_cells_shift;
 
         z_j = max(lowest_j, z_j);
         z_j_lower = max(lowest_j, z_j_lower);
@@ -3419,8 +3512,12 @@ void AMRLevelMushyLayer::addMeltPond(int depth, Real salinity, Real enthalpy, bo
         z_j = min(top_j, z_j);
         z_j_lower = min(top_j, z_j_lower);
 
-        IntVect upper = IntVect(iv[0], z_j);
-        IntVect lower = IntVect(iv[0], z_j_lower);
+
+        IntVect upper = iv;
+        upper[vertical_index] = z_j;
+
+        IntVect lower = iv;
+        lower[vertical_index] = z_j_lower;
 
         newEnthalpy(iv) = oldEnthalpy(lower)*(1-extra_shift) + extra_shift*oldEnthalpy(upper);
         newBulkConc(iv) = oldBulkConc(lower)*(1-extra_shift) + extra_shift*oldBulkConc(upper);
@@ -3530,8 +3627,7 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
 
   // Should also initialise pressure if we're restarting
 
-  if (a_restart
-      && m_opt.initialize_pressures)
+  if (a_restart)
   {
 
     // Get the pressure from the checkpoint file
@@ -3543,18 +3639,32 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     LevelData<FArrayBox>& phi = m_projection.phi();
     m_scalarNew[ScalarVars::m_pressure]->copyTo(pi);
     m_scalarNew[ScalarVars::m_pressure]->copyTo(phi);
-    for (DataIterator dit = pi.dataIterator(); dit.ok(); ++dit)
+
+    // Fill pressure BCs
+    this->fillScalars(pi, m_time, m_pressure, false, false);
+    this->fillScalars(phi, m_time, m_pressure, false, false);
+
+    if (solvingFullDarcyBrinkman())
     {
-      pi[dit].divide(m_dt);
+      for (DataIterator dit = pi.dataIterator(); dit.ok(); ++dit)
+      {
+        pi[dit].divide(m_dt);
+      }
     }
 
-    if (!solvingFullDarcyBrinkman())
+    if(m_opt.initialize_pressures)
     {
-      AMRLevelMushyLayer* lev = this->getCoarsestLevel();
-      initTimeIndependentPressure(lev);
+      if (solvingFullDarcyBrinkman())
+      {
+        initializeGlobalPressure(m_dt,
+                                 false); // not initialising, but restarting
+      }
+      else
+      {
+        AMRLevelMushyLayer* lev = this->getCoarsestLevel();
+        initTimeIndependentPressure(lev);
+      }
     }
-
-
 
     // Only do this on level 0 to ensure all other levels are setup
     if (m_level == 0)
@@ -3625,7 +3735,9 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
       diagsToPrint.push_back(DiagnosticNames::diag_L0FsVertFrame);
       diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxTop);
       diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxBottom);
-      diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxSponge);
+      diagsToPrint.push_back(DiagnosticNames::diag_saltFluxAbsMismatch);
+      diagsToPrint.push_back(DiagnosticNames::diag_heatFluxAbsMismatch);
+//      diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxSponge);
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxBottom);
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxTop);
       diagsToPrint.push_back(DiagnosticNames::diag_dUdt);
@@ -3639,6 +3751,14 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
       diagsToPrint.push_back(DiagnosticNames::diag_HorizAvSalinity60);
       diagsToPrint.push_back(DiagnosticNames::diag_avSalinity);
       diagsToPrint.push_back(DiagnosticNames::diag_mushDepth);
+      diagsToPrint.push_back(DiagnosticNames::diag_mushyAverageBulkConc);
+      diagsToPrint.push_back(DiagnosticNames::diag_mushyAveragePorosity);
+      diagsToPrint.push_back(DiagnosticNames::diag_mushyVol);
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs10);
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs20);
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs30); // diag_Fs40
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs40);
+      diagsToPrint.push_back(DiagnosticNames::diag_Fs50);
 
       break;
 

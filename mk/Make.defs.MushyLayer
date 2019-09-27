@@ -10,3 +10,10 @@ LOCAL=atmlxlap005
 ifneq (,$(findstring $(GYRE),$(HOST)))
     XTRACONFIG = .GYRE
 endif
+
+#VERSION=18.04
+#VERSION=$(shell cat /etc/issue)
+#BIONIC=18.04
+#ifneq (,$(findstring $(BIONIC), $(VERSION)))
+#    XTRACONFIG=.BIONIC
+#endif

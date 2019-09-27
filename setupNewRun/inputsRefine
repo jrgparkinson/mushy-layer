@@ -1,24 +1,32 @@
+# Example inputs file for producing a checkpoint file which is at a higher resolution than a previous checkpoint file
+# Usage: 
+# 0) Edit this inputs file appropriately (see notes below)
+# 1) compile the program in this directory:
+#    $ cd /mushy-layer/setupNewRun
+#    $ make all
+# 2) run the program with this inputs file:
+#    $ ./setupnewrun2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex inputsRefine
+# 3) That's it.
 
+# Old checkpoint file that you want to refine:
 inFile="/home/parkinsonjl/mnt/sharedStorage/highLeBifurcationDarcy/CR2.0RaC200Le2e10ChiCubedPermeabilitypts16-steady/chkCR2.0RaC200Le2e10ChiCubedPermeabilitypts16-162798.2d.hdf5"
+
+# Inputs for the old simulation 
 run_inputs="/home/parkinsonjl/mnt/sharedStorage/highLeBifurcationDarcy/CR2.0RaC200Le2e10ChiCubedPermeabilitypts16-steady/inputs"
 
+# Where to save the new, higher resolution, checkpoint file to
 outFile  = /home/parkinsonjl/convection-in-sea-ice/MushyLayer/setupNewRun/test.2d.hdf5
 
+# Refinement factor
+# e.g. refinement = 2 will turn a 128x256 domain into a 256x512 domain
+# keep to powers of 2 (2, 4, 8, 16, ...) to be safe
+refinement = 2
 
-# If this is different to previous Nx,
-# then change domain
-# Ny, H stays the same
-deltaNxLeft=0
-deltaNxRight=0
-deltaNzTop = 0
-deltaNzBottom = 0
+# Uncomment below to set a new max_box_size 
+# this is the maximum size of a box that the domain will be split into
+# before sending each part of the domain off to different processors when 
+# solving in parallel. If you're making the domain bigger, you probably want
+# to increase this relative to the old simulation.
+# box_size = 64
 
 
-# Shift all data by xShift cells in the x direction
-# only works if periodic
-#xShift = -15
-
-# New max_box_size
-box_size = 64
-
-refinement = 4

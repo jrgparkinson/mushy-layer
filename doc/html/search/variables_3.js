@@ -10,6 +10,7 @@ var searchData=
   ['deltatemp',['deltaTemp',['../class_mushy_layer_params.html#ae221423b95517958c6a2c7acf5c271c6',1,'MushyLayerParams']]],
   ['dest',['dest',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classRegionGather_1_1Message.html#af92c798e353129ddb8fd5230188cfc1a',1,'RegionGather::Message']]],
   ['destindex',['destIndex',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/classRegionGather_1_1Message.html#a6ba8e3a87c876e317270e96a67ba7347',1,'RegionGather::Message']]],
+  ['diagnostics_5fperiod',['diagnostics_period',['../struct_mushy_layer_options.html#a9cd6c0292c7ad464b3e8dce21e74b653',1,'MushyLayerOptions']]],
   ['dimb',['dimB',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/structCHRange.html#a20b965fb09b9e3f98642a23f294f156a',1,'CHRange']]],
   ['dime',['dimE',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/structCHRange.html#a5440db7b0df47909bbceed1d2c18b9ec',1,'CHRange']]],
   ['direction',['direction',['http://davis.lbl.gov/Manuals/CHOMBO-RELEASE-3.2/structSliceSpec.html#a8c3d9923143ea336ab0fad104b71a0c2',1,'SliceSpec']]],

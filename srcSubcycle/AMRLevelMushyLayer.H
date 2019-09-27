@@ -108,6 +108,8 @@ public:
     m_timestepReduced = false;
     m_useLimiting = false;
 
+    m_prev_diag_output = 0.0;
+
     m_physBCPtr = NULL;
 
 //    m_newLevel=false;
@@ -394,6 +396,8 @@ public:
   /// Set the coefficient for smoothing fields
   void setSmoothingCoeff(Real a_coeff);
 
+  void setSmoothingDone(bool a_smoothingDone);
+
   /// Add a melt pond at the top of the domain
   void addMeltPond(int depth, Real salinity, Real enthalpy, bool rescaleExistingSolution=false);
 
@@ -414,6 +418,21 @@ public:
 
   /// Set whether or not to compute diagnostics
   void set_compute_diagnostics(bool compute_diags);
+
+  /// Average enthalpy and bulk salinity then recalculate all other fields
+  void horizAverage();
+
+  /// Smooth some scalar field
+  /**
+   * smoothing done implicitly via an elliptic solve.
+   * Obtains smooth field \f$\phi_{smooth}\f$ by solving
+   * \f$ (1-\alpha \nabla^2)\phi_{smooth} = \phi \f$
+   * where \f$\alpha\f$ is the smoothing parameter a_smoothing
+   */
+  void smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing);
+
+  void smoothEnthalpyBulkConc(Real a_smoothing);
+
 
 protected:
 
@@ -540,8 +559,52 @@ protected:
   void horizontallyAverage(LevelData<FArrayBox>& a_averaged, LevelData<FArrayBox>& a_phi,
                            Vector<Real>& globalAveraged);
 
+
+
   /// Compute average value of some scalar field over the liquid region of the domain
   Real averageOverLiquidRegion(int a_var);
+
+  /// Compute the intensity of light from the surface at each point in the domain
+  void computeRadianceIntensity();
+
+  /// Advect a passive tracer \f$ \xi \f$
+  /**
+   * \f$ \frac{\partial \xi}{\partial t} + \mathbf{U} \cdot \nabla (\xi/\chi) = S(x,z)\f$
+   */
+  void advectPassiveTracer();
+
+  /// Compute diffusive src for some scalar with bulk concentration \f \xi \f$
+  /**
+   * \f$ S =  \nabla \cdot \chi \nabla (\xi/\chi)\f$
+   */
+  void computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelData<FArrayBox>& a_src);
+
+
+  /// Compute concentration of scalar (with bulk concentration \f$ \xi \f$) in the liquid phase
+  /**
+   * \f$ \xi/\chi \f$
+   */
+  void computeScalarConcInLiquid(LevelData<FArrayBox>& liquid_tracer_conc, int a_tracerVar);
+
+  /// Advect generic tracer
+  void advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_src);
+
+  /// Advect active tracer \f \zeta \f$
+  /**
+   * \f$ \frac{\partial \zeta}{\partial t} + \mathbf{U} \cdot \nabla (\zeta/\chi) = S(x,z)\f$
+   * where \f$ S(x,z) \f$ is a source/sink of the tracer defined in computeActiveTracerSourceSink()
+   */
+  void advectActiveTracer();
+
+  /// Compute sources/sinks for active tracer
+  void computeActiveTracerSourceSink(LevelData<FArrayBox>& a_srcSink);
+
+  /// Compute mushy layer depth
+  /**
+   * Compute horizontally averaged porosity, then determine that the mushy layer starts
+   * at the minimum height where the porosity is < a_porosity_criteria.
+   */
+  Real computeMushDepth(Real a_porosity_criteria = 0.99);
 
   /// Calculate advective + diffusive flux
   void getTotalFlux(LevelData<FluxBox>& totalFlux);
@@ -576,7 +639,15 @@ protected:
                          bool compute_uDelU = true,
                          bool a_MACprojection = false);
 
+  /// Is velocity time dependent?
+  bool isVelocityTimeDependent();
+
   /// Compute \f$ \mathbf{U}^* \f$, the velocity before we project it
+  /**
+   * In particular, we explicitly solve for the velocity
+   * \f$ \left[ 1 - \Delta t^\ell \, \left(Da \, \left(\nabla^\ell\right)^2 - \frac{\chi^{\ell, n+1}}{\Pi^{\ell, n+1}} \right) \right] \mathbf{U}^{\ell, n+1}_* = \mathbf{U}^{\ell, n} + \Delta t^\ell \left\{- \chi^{\ell, n+1/2} \, \nabla^\ell \pi^{\ell, n-1/2}
+        +  \chi^{\ell, n+1/2} \left[Pr \, Da^2  \left( Ra_T \theta^{\ell, n+1/2} - Ra_C \Theta^{\ell, n+1/2} \right) \right] -  \mathbf{U}_{AD, CC}^{\ell, n+1/2} \cdot \nabla^\ell \left( \frac{\mathbf{U}}{\chi} \right)^{\ell, n+1/2} \right\}\f$
+   */
   void computeUstar(LevelData<FArrayBox>& a_uDelu,
                     const LevelData<FArrayBox>& advectionSourceTerm,
                     Real a_oldTime, Real a_dt, bool doFRupdates, bool a_MACprojection = false, bool compute_uDelU=true);
@@ -591,7 +662,21 @@ protected:
   void computeUDelU(LevelData<FArrayBox>& U_adv_src, const LevelData<FArrayBox>& advectionSourceTerm, Real a_oldTime, Real a_dt);
 
   /// Check CFL based on latest velocity is safe to use for explicit updates
-  bool currentCFLIsSafe(bool printWarning=false);
+  bool isCurrentCFLSafe(bool printWarning=false);
+
+  /// Add a fixed heat source
+  /**
+   * \f$ Q = \frac{Q_0}{\sigma \sqrt{2 \pi}} \exp\left[ - 0.5 \left( \frac{x-x_c}{\sigma} \right)^2 \right]  0.5 \left( 1 + \tanh\left[10 (z-(H-h)) \right]) \right) \f$
+   *
+   * where the parameters are found from the inputs file as:
+   * Q_0 is given by heatSource.size
+   * sigma is heatSource.width
+   * x_c is heatSource.xpos
+   * h is heatSource.depth, and measures the depth that the heat source propagates down from the top of the domain
+   *
+   * H is the domain height
+   */
+  void addHeatSource(LevelData<FArrayBox>& src);
 
   /// Set velocity to zero where porosity is sufficiently small (FArrayBox version)
   void setVelZero(FArrayBox& a_vel, const FArrayBox& a_porosity, const Real a_limit, const int a_radius=0);
@@ -643,6 +728,15 @@ protected:
               LevelData<FArrayBox>& a_diffusiveSrc,
               PatchGodunov& a_patchGod,
               Real a_old_time, Real a_dt);
+
+
+  /// Compute advective flux
+  void computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeScal,
+                                  LevelData<FArrayBox>& a_scalar_advection_old,
+                                                      LevelData<FArrayBox>& a_src,
+                                                      LevelData<FluxBox>& a_advVel,
+                                                      int a_advectionVar,
+                                                      Real a_old_time, Real a_dt);
 
   /// Compute the advective flux
   /**
@@ -744,7 +838,7 @@ protected:
 
   /// Should include correct exchange calls
   void fillMultiComp(LevelData<FArrayBox>& a_phi, Real a_time, int scal1, int scal2,
-                     bool doInterior = true, bool quadInterp = true);
+                     bool doInterior = true, bool quadInterp = true, bool apply_bcs=true);
 
   /// Compile \f$ \lambda \f$ across the entire AMR hierarchy
   void fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda);
@@ -782,7 +876,10 @@ protected:
   void computeInitAdvectionVel();
 
   /// Initialise phi (pressure for Darcy equation)
-  void initTimeIndependentPressure(AMRLevelMushyLayer* lev);
+  /**
+   * By default a_max_num_iter = -1, meaning we use the globally defined value in m_opt.num_init_passes
+   */
+  void initTimeIndependentPressure(AMRLevelMushyLayer* lev, int a_max_num_iter=-1);
 
   /// Flag if a new level has been added
 //  bool newLevelAdded();
@@ -826,7 +923,7 @@ protected:
   /// Fill ghost cells of scalar field
   void fillScalars(LevelData<FArrayBox>& a_scal,
                    Real a_time, const int a_var,
-                   bool doInterior = false, bool quadInterp = false);
+                   bool doInterior = false, bool quadInterp = false, int a_comp=0, bool apply_bcs=true);
 
   /// Helper function
   void fillBuoyancy(LevelData<FArrayBox>& a_buoyancy, Real a_time, bool quadInterp);
@@ -843,11 +940,6 @@ protected:
                       bool quadInterp = false,
                       Real smoothing = 0.0);
 
-  /// Smooth some scalar field
-  /**
-   * smoothing done implicitly via an elliptic solve
-   */
-  void smoothScalarField(LevelData<FArrayBox>& a_phi, int a_var, Real a_smoothing);
 
   /// Get boundary conditions for implicit problems
   void getScalarBCs(BCHolder& thisBC, int a_var, bool a_homogeneous);
@@ -869,7 +961,7 @@ protected:
    *
    */
   void convertBCType(const int a_implicitBC,  const Real a_implicitVal,
-                     int a_explicitBC, Real a_explicitVal);
+                     int& a_explicitBC, Real a_explicitVal);
 
   /// Convert implicit BCs
   int convertBCType(const int a_implicitBC);
@@ -886,22 +978,28 @@ protected:
    * Liquid concentration \f$ -1 <= \Theta_l <= 0 \f$
    */
   void doRegularisationOps(LevelData<FArrayBox>& a_scal,
-                           int a_var);
+                           int a_var, int a_comp = 0);
 
   /// Operations to keep variables bounded correctly.
-  void doRegularisationOps(LevelData<FluxBox>& a_scal, int a_var);
+  void doRegularisationOps(LevelData<FluxBox>& a_scal, int a_var, int a_comp=0);
 
   /// Operations to keep variables bounded correctly.
-  void doRegularisationOps(int a_var, FArrayBox& a_state);
+  void doRegularisationOps(int a_var, FArrayBox& a_state, int a_comp=0);
 
   /// New version of doRegularisationOps() which uses fortran routines
-  void doRegularisationOpsNew(int a_var, FArrayBox& a_state);
+  void doRegularisationOpsNew(int a_var, FArrayBox& a_state, int a_comp=0);
 
   /// Reset all flux registers
   void setFluxRegistersZero();
 
   /// Copy new data to old data holders
   void copyNewToOldStates();
+
+  /// Do we need to do velocity advection?
+  /**
+   * I.e. do we solve for \f$ \mathbf{U} \cdot \nabla (\mathbf{U}/\chi) \f$ terms?
+   */
+  bool doVelocityAdvection();
 
   // Copy old data to new data holders
 //  void copyOldToNewStates();
@@ -1109,6 +1207,9 @@ protected:
 
   /// Physical parameters
   MushyLayerParams m_parameters;
+
+  /// Time when we last produced diagnostics output
+  Real m_prev_diag_output;
 
   /// Should we enforce some analytic \f$ \nabla P \f$
   /**

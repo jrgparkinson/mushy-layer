@@ -20,7 +20,7 @@ set(0, 'defaultTextFontName', font);
 
 savePlots = true;
 
-
+folder_ending = ''; % was '-0' before
 uniformPrefix = 'Uniform-noFlow-';
 gridRes = [8,16,32,64,128,256];
 dz = 4./gridRes;
@@ -44,10 +44,10 @@ horizSpacing = 0.05;
 doColorbar = true;
 
 fprintf('Loading 2 level solution \n');
-output2lev        = getFinalPlotFile(fullfile(dataFolder, [amrPrefix2lev, '16--0']));
+output2lev        = getFinalPlotFile(fullfile(dataFolder, [amrPrefix2lev, '16-', folder_ending]));
 
 fprintf('Loading uniform fine solution \n');
-outputUniformFine = getFinalPlotFile(fullfile(dataFolder, [uniformPrefix, '64--0']));
+outputUniformFine = getFinalPlotFile(fullfile(dataFolder, [uniformPrefix, '64-', folder_ending]));
 %output = MushyLayerOutput(2, 224, dataFolder, AMRplot_prefix, true);
 
 perm = output2lev.dataForComp(output2lev.components.Porosity);
@@ -299,7 +299,7 @@ gridResPlot = [16 32 64];
 for f =1:length(gridResPlot)
     thisRes = gridResPlot(f);
     
-    folder = [uniformPrefix, num2str(thisRes),'--0'];
+    folder = [uniformPrefix, num2str(thisRes),'-', folder_ending];
     
     fprintf(['Loading 2 level solution with resolution ', num2str(thisRes), ' \n']);
     output2lev = getFinalPlotFile(fullfile(dataFolder, folder));
@@ -458,6 +458,8 @@ if savePlots
     %print(h,[dataFolder, 'noFlowSolution.png'],'-dpng','-r300')
     fprintf('Saved to %s \n', figureName);
     print(h,figureName,'-depsc','-r50')
+
+    savefig([figureName, '.fig'])
     
 end
 
@@ -465,7 +467,11 @@ end
 
 
 
-function err = getErr(dataFolder, prefix, gridRes, forceRecalculate, errType)
+function err = getErr(dataFolder, prefix, gridRes, forceRecalculate, errType, folder_ending)
+if nargin < 6
+folder_ending = ''
+end
+
 if nargin < 5
     errType = 'L1';
 end
@@ -480,7 +486,7 @@ for f =1:length(gridRes)
 
     thisRes = gridRes(f);
     
-    folder_name = [prefix, num2str(gridRes(f)),'--0'];
+    folder_name = [prefix, num2str(gridRes(f)),'-', folder_ending];
     thisFolder = fullfile(dataFolder, folder_name);
     errFile = [thisFolder, '/err.mat'];
     
@@ -522,7 +528,11 @@ end
 end
 
 
-function times = getTimes(dataFolder, prefix, gridRes)
+function times = getTimes(dataFolder, prefix, gridRes, folder_ending)
+
+if nargin < 4
+folder_ending = ''
+end
 
 times = NaN*ones(length(gridRes), 1);
 
@@ -530,7 +540,7 @@ for f =1:length(gridRes)
     
 thisRes = gridRes(f);
     
-    folder_name = [prefix, num2str(thisRes),'--0'];
+    folder_name = [prefix, num2str(thisRes),'-', folder_ending];
     thisFolder = fullfile(dataFolder, folder_name);
     
     times(f)  = getRuntime( thisFolder );

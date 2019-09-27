@@ -310,41 +310,41 @@ void AdvectIBC::setBdrySlopes(FArrayBox&       a_dW,
                               const Real&      a_time)
 {
 
-  /*
+
+
   // We don't know what the slopes should be, so do nothing here
-  Box b = a_dW.box();
-
-  // Iterate over sides
-  for (SideIterator sit = SideIterator(); sit.ok(); ++sit)
-  {
-    Box loBox(b);
-    loBox.shiftHalf(a_dir,sign(side));
-
-    if (!m_domain.contains(tmp))
-    {
-      tmp &= m_domain;
-
-      Box boundaryBox;
-
-      // Find the strip of cells next to the domain boundary
-      if (side == Side::Lo)
-      {
-        boundaryBox = bdryLo(tmp,a_dir);
-      }
-      else
-      {
-        boundaryBox = bdryHi(tmp,a_dir);
-      }
-
-      for (BoxIterator bit = BoxIterator(boundaryBox); bit.ok(); ++bit)
-      {
-        // Could potentially fill slope BCs here
-      }
-
-
-    }
-  }
-  */
+//  Box b = a_dW.box();
+//
+//  // Iterate over sides
+//  for (SideIterator sit = SideIterator(); sit.ok(); ++sit)
+//  {
+//    Box loBox(b);
+//    loBox.shiftHalf(a_dir,sign(side));
+//
+//    if (!m_domain.contains(tmp))
+//    {
+//      tmp &= m_domain;
+//
+//      Box boundaryBox;
+//
+//      // Find the strip of cells next to the domain boundary
+//      if (side == Side::Lo)
+//      {
+//        boundaryBox = bdryLo(tmp,a_dir);
+//      }
+//      else
+//      {
+//        boundaryBox = bdryHi(tmp,a_dir);
+//      }
+//
+//      for (BoxIterator bit = BoxIterator(boundaryBox); bit.ok(); ++bit)
+//      {
+//        // Could potentially fill slope BCs here
+//      }
+//
+//
+//    }
+//  }
 
 }
 

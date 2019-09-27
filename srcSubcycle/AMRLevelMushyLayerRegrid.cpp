@@ -7,6 +7,11 @@ void AMRLevelMushyLayer::setSmoothingCoeff(Real a_coeff)
   s_regrid_smoothing_coeff = a_coeff;
 }
 
+void AMRLevelMushyLayer::setSmoothingDone(bool a_smoothingDone)
+{
+  m_regrid_smoothing_done = a_smoothingDone;
+}
+
 
 void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothScalar)
 {
@@ -324,15 +329,31 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
               // subtract off solution
               levelLapS[levelDit] -= levelS[levelDit] ;
 
+
+
               // Scale by diffusion/viscosity (was previously scaled by viscosity coefficient)
-              levelLapS[levelDit] *= m_scalarDiffusionCoeffs[scalComp]/m_parameters.m_viscosityCoeff;
+              levelLapS[levelDit] *= m_scalarDiffusionCoeffs[scalComp];
+              if (m_parameters.m_viscosityCoeff > 0.0)
+              {
+                levelLapS[levelDit] *= 1.0/m_parameters.m_viscosityCoeff;
+              }
 
               // Add to solution
               levelS[levelDit] += levelLapS[levelDit];
 
+
+              // Basic smoothing
+//              Box b = levelS[levelDit].box();
+//              b.grow(-1);
+//              for (BoxIterator bit = BoxIterator(b); bit.ok(); bit.begin())
+//              {
+//                IntVect iv = bit();
+//                levelS[levelDit](iv) = levelS[levelDit](iv) + this->s_regrid_smoothing_coeff* (levelS[levelDit](iv + BASISV(0))   + levelS[levelDit](iv - BASISV(0)));
+//              }
+
             }
 
-            //          int temp=0;
+//                      int temp=0;
 
 
           } // end loop over levels
@@ -402,7 +423,12 @@ AMRLevelMushyLayer::defineRegridAMROp(AMRPoissonOpFactory& a_factory,
 
   // define coefficient
   Real nu = m_parameters.m_viscosityCoeff;  //m_parameters.prandtl;
-  Real mu = -m_opt.regrid_smoothing_coeff*dtLBase*nu;
+  Real mu = -m_opt.regrid_smoothing_coeff*dtLBase;
+  if (nu > 0.0)
+  {
+    mu = mu*nu;
+  }
+
 
   // Would like to use extrap BC's, since they're probably the safest
 
@@ -469,7 +495,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
 
 
-  if (m_opt.tag_velocity)
+  if (m_opt.refinementMethod == RefinementMethod::tagSpeed) // m_opt.tag_velocity
   {
 
     if (s_verbosity >= 2)
@@ -479,13 +505,140 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
     tagCellsVar(localTags, m_opt.vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
   }
-  else if (m_opt.tag_plume_mush || m_opt.compositeChannelTagging)
+// <<<<<<< development
+  else if (m_opt.refinementMethod == RefinementMethod::tagMushChannelsCompositeCriteria)
+  {
+    if (s_verbosity >= 2)
+       {
+         pout() << "AMRLevelMushyLayer::tagCells - using composite criteria to find mush and channels >  " << endl;
+       }
+
+    DataIterator dit = m_grids.dataIterator();
+        for (dit.begin(); dit.ok(); ++dit)
+        {
+          const Box& b = m_grids[dit()];
+
+          FArrayBox& porosity = (*m_scalarNew[m_porosity])[dit];
+          FArrayBox& velocity = (*m_vectorNew[m_fluidVel])[dit];
+          FArrayBox& bulkC = (*m_scalarNew[m_bulkConcentration])[dit];
+
+          FArrayBox taggingMetricFab(b, 1);
+          FArrayBox gradFab(b, SpaceDim);
+
+          // empirical parameter weighting for channels
+          // want to avoid
+          Real alpha=0.0;
+
+          // Calculated undivided gradient
+          for (int dir = 0; dir < SpaceDim; ++dir)
+          {
+            const Box bCenter = b & grow(m_problem_domain, -BASISV(dir));
+            const Box bLo = b & adjCellLo(bCenter, dir);
+            const int hasLo = !bLo.isEmpty();
+            const Box bHi = b & adjCellHi(bCenter, dir);
+            const int hasHi = !bHi.isEmpty();
+            FORT_GETGRADF(CHF_FRA1(gradFab, dir), CHF_CONST_FRA1(porosity, 0),
+                          CHF_CONST_INT(dir), CHF_BOX(bLo), CHF_CONST_INT(hasLo),
+                          CHF_BOX(bHi), CHF_CONST_INT(hasHi), CHF_BOX(bCenter));
+          }
+
+          FORT_MAGNITUDEF(CHF_FRA1(taggingMetricFab, 0), CHF_CONST_FRA(gradFab),
+                          CHF_BOX(b));
+
+
+          for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
+          {
+            IntVect iv = bit();
+            RealVect loc;
+            ::getLocation(iv, loc, m_dx);
+
+            if (taggingMetricFab(iv)*(1 - alpha*min(velocity(iv, SpaceDim-1) * (m_parameters.compositionRatio-bulkC(iv)), 0.0) ) > m_opt.refineThresh)
+            {
+              localTags |= iv;
+            }
+          }
+        }
+
+  }
+  else if (m_opt.refinementMethod == RefinementMethod::tagChannels) // m_opt.tag_channels
+  {
+    Real porosity_limit = 0.5;
+    Real vel_limit = 0.5;
+    Real porosity_criteria = 0.9; // how low the horizontally averaged porosity must be for us to decide we're in a mushy layer
+    Real y_limit =  m_domainHeight - computeMushDepth(porosity_criteria);
+
+    DataIterator dit = m_grids.dataIterator();
+    for (dit.begin(); dit.ok(); ++dit)
+    {
+      const Box& b = m_grids[dit()];
+
+      FArrayBox& porosity = (*m_scalarNew[m_porosity])[dit];
+      FArrayBox& velocity = (*m_vectorNew[m_fluidVel])[dit];
+
+      for (BoxIterator bit = BoxIterator(b); bit.ok(); ++bit)
+      {
+        IntVect iv = bit();
+        RealVect loc;
+        ::getLocation(iv, loc, m_dx);
+
+        if (loc[1] > y_limit
+            && (porosity(iv) > porosity_limit
+            || abs(velocity(iv, 1)) > vel_limit ))
+        {
+          localTags |= iv;
+        }
+      }
+    }
+
+    // Shrink the regrow tags invertical direction to get rid of individual odd cells
+//    int grow_dist = 5;
+//    localTags.grow(1, -grow_dist);
+//    localTags.grow(1, grow_dist);
+
+    int vertical_dir = SpaceDim-1;
+
+    // Only keep tags which overlap with the same tags shifted up by shift_dist cells
+    int shift_dist = 5;
+    IntVectSet shiftedTags = localTags;
+
+    // Shift in vertical direction (which has an index given by number of spatial dimensions - 1) by shift_dist
+    IntVect shiftDir = IntVect::Zero;
+    shiftDir[vertical_dir] = shift_dist;
+    shiftedTags.shift(shiftDir);
+
+    localTags &= shiftedTags;
+
+    localTags.grow(vertical_dir, shift_dist);
+
+    // Grow further downwards
+    // Can only do this by shifting down then growing in both directions
+    int growLo = 4;
+
+    // Create new shift vector
+    shiftDir = IntVect::Zero;
+    shiftDir[vertical_dir] = -growLo;
+    localTags.shift(shiftDir);
+    localTags.grow(vertical_dir, growLo);
+
+  }
+  else if (m_opt.refinementMethod == RefinementMethod::tagPlumeMush
+      || m_opt.refinementMethod == RefinementMethod::tagMushChannels)  // m_opt.tag_plume_mush
+// =======
+//   else if (m_opt.tag_plume_mush || m_opt.compositeChannelTagging)
+// >>>>>>> master
   {
     // Trying to refine plumes
 
     if (s_verbosity >= 2)
     {
-      pout() << "AMRLevelMushyLayer::tagCells - refine plume mush - " << m_level << endl;
+      if (m_opt.refinementMethod == RefinementMethod::tagPlumeMush)
+      {
+        pout() << "AMRLevelMushyLayer::tagCells - refine plume mush - " << m_level << endl;
+      }
+      else
+      {
+        pout() << "AMRLevelMushyLayer::tagCells - refine mush channels - " << m_level << endl;
+      }
     }
 
 
@@ -570,47 +723,121 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
         else
         {
 
-	      // Refine cells that are already refined + have large salinity gradients
 
-	      IntVectSet downflowCells;
-	      //    Real refineThresh = m_refineThresh;
+      if (m_opt.refinementMethod == RefinementMethod::tagMushChannels)
+      {
 
-	      IntVectSet porosityGradientCells;
-	      tagCellsVar(porosityGradientCells, m_opt.refineThresh, m_porosity, -1, m_opt.taggingMethod);
+        // Create new field, bulk concentration * vertical velocity
+        LevelData<FArrayBox> concentrationVelocity(m_grids, 1, IntVect::Zero);
+        m_scalarNew[m_bulkConcentration]->copyTo(concentrationVelocity);
 
-	      // Grow these cells to go further into the channel,
-	      // where the salinity is high and fluid velocities are large and negative
-	      porosityGradientCells.grow(2*m_opt.tagBufferSize);
 
-	      // Tag regions of downflow
-	      tagCellsVar(downflowCells,
-		          m_opt.plumeVelThreshold, // refine thresh
-		          -1, // don't consider a scalar field
-		          m_fluidVel, TaggingMethod::CompareLargerThanNegative, 1); // y component of velocity
+        for (DataIterator dit= m_grids.dataIterator(); dit.ok(); ++dit)
+        {
+          concentrationVelocity[dit].plus(1.0);
+          concentrationVelocity[dit].mult((*m_vectorNew[m_fluidVel])[dit], SpaceDim-1, 0, 1);
 
-	      IntVectSet saltyCells;
-	      tagCellsVar(saltyCells, m_opt.plumeSalinityThreshold,
-		          ScalarVars::m_bulkConcentration,
-		          -1, TaggingMethod::CompareLargerThan);
+          Box b = concentrationVelocity[dit].box();
 
-	      // Only take the cells which have the porosity gradient
-	      // and either downflow or very salty
+          BoxIterator bit(b);
+          for (bit.begin(); bit.ok(); ++bit)
+          {
+            const IntVect& iv = bit();
 
-	      // Combine downflow and salty
-	      downflowCells |= saltyCells;
+            if (concentrationVelocity[dit](iv) < -m_opt.refineThresh)
+            {
+              localTags |= iv;
+            }
+          }
+        }
 
-	      // Only take downflow cells which are also in the set of cells satisfying the porosity gradient condition
-	      downflowCells &= porosityGradientCells;
+      }
+      else
+      {
 
-	      if (s_verbosity >= 5)
-	      {
-		pout() << "Downflow & porous gradient cells: " << downflowCells << endl;
-	      }
+        // Refine cells that are already refined + have large salinity gradients
 
-	      // Add to the local tag set
-	      localTags |= downflowCells;
+        IntVectSet downflowCells;
+
+
+        IntVectSet porosityGradientCells;
+        tagCellsVar(porosityGradientCells, m_opt.refineThresh, m_porosity, -1, m_opt.taggingMethod);
+
+        // Grow these cells to go further into the channel,
+        // where the salinity is high and fluid velocities are large and negative
+        porosityGradientCells.grow(2*m_opt.tagBufferSize);
+
+        // Tag regions of downflow
+        tagCellsVar(downflowCells,
+                    m_opt.plumeVelThreshold, // refine thresh
+                    -1, // don't consider a scalar field
+                    m_fluidVel, TaggingMethod::CompareLargerThanNegative, 1); // y component of velocity
+
+        IntVectSet saltyCells;
+        tagCellsVar(saltyCells, m_opt.plumeSalinityThreshold,
+                    ScalarVars::m_bulkConcentration,
+                    -1, TaggingMethod::CompareLargerThan);
+
+        // Only take the cells which have the porosity gradient
+        // and either downflow or very salty
+
+        // Combine downflow and salty
+        downflowCells |= saltyCells;
+
+        // Only take downflow cells which are also in the set of cells satisfying the porosity gradient condition
+        downflowCells &= porosityGradientCells;
+
+        if (s_verbosity >= 5)
+        {
+          pout() << "Downflow & porous gradient cells: " << downflowCells << endl;
+        }
+
+        // Add to the local tag set
+        localTags |= downflowCells;
+      }
+// =======
+// 	      // Refine cells that are already refined + have large salinity gradients
+
+// 	      IntVectSet downflowCells;
+// 	      //    Real refineThresh = m_refineThresh;
+
+// 	      IntVectSet porosityGradientCells;
+// 	      tagCellsVar(porosityGradientCells, m_opt.refineThresh, m_porosity, -1, m_opt.taggingMethod);
+
+// 	      // Grow these cells to go further into the channel,
+// 	      // where the salinity is high and fluid velocities are large and negative
+// 	      porosityGradientCells.grow(2*m_opt.tagBufferSize);
+
+// 	      // Tag regions of downflow
+// 	      tagCellsVar(downflowCells,
+// 		          m_opt.plumeVelThreshold, // refine thresh
+// 		          -1, // don't consider a scalar field
+// 		          m_fluidVel, TaggingMethod::CompareLargerThanNegative, 1); // y component of velocity
+
+// 	      IntVectSet saltyCells;
+// 	      tagCellsVar(saltyCells, m_opt.plumeSalinityThreshold,
+// 		          ScalarVars::m_bulkConcentration,
+// 		          -1, TaggingMethod::CompareLargerThan);
+
+// 	      // Only take the cells which have the porosity gradient
+// 	      // and either downflow or very salty
+
+// 	      // Combine downflow and salty
+// 	      downflowCells |= saltyCells;
+
+// 	      // Only take downflow cells which are also in the set of cells satisfying the porosity gradient condition
+// 	      downflowCells &= porosityGradientCells;
+
+// 	      if (s_verbosity >= 5)
+// 	      {
+// 		pout() << "Downflow & porous gradient cells: " << downflowCells << endl;
+// 	      }
+
+// 	      // Add to the local tag set
+// 	      localTags |= downflowCells;
 	      
-	}
+// 	}
+// >>>>>>> master
 
     }
     else
@@ -650,21 +877,43 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
 
   }
-  else if (m_opt.taggingVar > -1 || m_opt.taggingVectorVar > -1)
+//  else if (m_opt.taggingVar > -1 || m_opt.taggingVectorVar > -1)
+//  {
+//    if (s_verbosity >= 2)
+//    {
+//      if (m_opt.taggingVar > -1)
+//      {
+//        pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[m_opt.taggingVar] << endl;
+//      }
+//      else
+//      {
+//        pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_vectorVarNames[m_opt.taggingVectorVar] << endl;
+//      }
+//    }
+//
+//    tagCellsVar(localTags, m_opt.refineThresh, m_opt.taggingVar, m_opt.taggingVectorVar, m_opt.taggingMethod);
+//  }
+  else if (m_opt.refinementMethod == RefinementMethod::tagScalar)
   {
     if (s_verbosity >= 2)
     {
-      if (m_opt.taggingVar > -1)
-      {
-        pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[m_opt.taggingVar] << endl;
-      }
-      else
-      {
-        pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_vectorVarNames[m_opt.taggingVectorVar] << endl;
-      }
+
+      pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[m_opt.taggingVar] << endl;
+
     }
 
-    tagCellsVar(localTags, m_opt.refineThresh, m_opt.taggingVar, m_opt.taggingVectorVar, m_opt.taggingMethod);
+    tagCellsVar(localTags, m_opt.refineThresh, m_opt.taggingVar, -1, m_opt.taggingMethod);
+  }
+  else if (m_opt.refinementMethod == RefinementMethod::tagVector)
+  {
+    if (s_verbosity >= 2)
+    {
+
+      pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_vectorVarNames[m_opt.taggingVectorVar] << endl;
+
+    }
+
+    tagCellsVar(localTags, m_opt.refineThresh, -1, m_opt.taggingVectorVar, m_opt.taggingMethod);
   }
   else
   {
@@ -743,8 +992,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
   localTags.grow(m_opt.tagBufferSize);
 
-  // New option - when regridding, move to specified gridfile
-
+  // Another option - when regridding, move to specified gridfile
   if (m_opt.fixed_grid_time >= 0)
   {
     // Define new intvect set
@@ -821,9 +1069,11 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
   }
 
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 3)
   {
     pout() << "Final local tags: " << localTags << endl;
+    pout() << "  Num points: " << localTags.numPts() << endl;
+    pout() << "  Min enclosing box: " << localTags.minBox() << endl;
   }
 
   a_tags = localTags;
@@ -1347,16 +1597,28 @@ void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, Probl
 //    m_scalarNew[scalarVar]->copyTo(scalInterval, *previousScal, scalInterval);
     fillScalars(*previousScal, m_time, scalarVar, true, true);
     m_scalarNew[scalarVar]->define(a_grids, 1, ivGhost); //reshape
-    //    previousScal->copyTo(scalInterval, *m_scalarNew[scalarVar], scalInterval); // copy back
-    scalarInterp.interpToFine(*m_scalarNew[scalarVar], *previousScal);
+    if (m_opt.regrid_linear_interp)
+    {
+      scalarInterp.interpToFine(*m_scalarNew[scalarVar], *previousScal);
+    }
+    else
+    {
+      scalarInterp.pwcinterpToFine(*m_scalarNew[scalarVar], *previousScal);
+    }
   }
 
   for (int vectorVar = 0; vectorVar < m_numVectorVars; vectorVar++)
   {
     m_vectorNew[vectorVar]->copyTo(vectInterval, *previousVect, vectInterval);
     m_vectorNew[vectorVar]->define(a_grids, SpaceDim, ivGhost); //reshape
-    //    previousVect->copyTo(vectInterval, *m_vectorNew[vectorVar], vectInterval); // copy back
-    vectorInterp.interpToFine(*m_vectorNew[vectorVar], *previousVect);
+    if (m_opt.regrid_linear_interp)
+    {
+      vectorInterp.interpToFine(*m_vectorNew[vectorVar], *previousVect);
+    }
+    else
+    {
+      vectorInterp.pwcinterpToFine(*m_vectorNew[vectorVar], *previousVect);
+    }
   }
 
   //  ProblemDomain oldDomain = m_problem_domain;
@@ -1370,6 +1632,18 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
   {
     pout() << "AMRLevelMushyLayer::postRegrid (level " << m_level << ")" << endl;
   }
+
+  // Check div(u)
+//  AMRLevelMushyLayer* thisLevelData = this;
+//  while (thisLevelData)
+//  {
+//    thisLevelData->calculateTimeIndAdvectionVel(m_time, thisLevelData->m_advVel);
+//    Divergence::levelDivergenceMAC(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv],thisLevelData->m_advVel, m_dx);
+//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], NULL, 1, thisLevelData->dx(), Interval(0,0));
+//    pout() << "PostRegrid(level " << thisLevelData->level() << ") -- max(div(u)) = " << maxDivU <<  endl;
+//
+//    thisLevelData = thisLevelData->getFinerLevel();
+//  }
 
   // If the new grids are no different to old grids, don't do anything
   // Need to check across all levels
@@ -1406,29 +1680,6 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
   if (m_level == 0 && m_opt.doProjection)
   {
     AMRLevelMushyLayer* thisLevelData = this;
-
-//    Real newLevelAdded = false;
-    // determine if new level added
-
-//    thisLevelData = this;
-//    while (thisLevelData)
-//    {
-//      newLevelAdded = newLevelAdded || thisLevelData->m_newLevel;
-//      thisLevelData = thisLevelData->getFinerLevel();
-//    }
-
-//    if (newLevelAdded && m_opt.variable_eta_factor != 1.0)
-//    {
-//      // From stabilty analysis, believe this is the maximum stable eta allowed
-//
-//      Real maxEta = maxAllowedEta();
-//      setEta(maxEta);
-//
-//      if (s_verbosity >= 3)
-//      {
-//        pout() << "New level added, set eta = " << maxEta << endl;
-//      }
-//    }
 
     thisLevelData = this;
     while (thisLevelData->hasFinerLevel())
@@ -1514,7 +1765,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     int finest_level = numLevels-1;
     Real dtInit = computeDtInit(finest_level);
 
-    if (m_opt.initialize_pressures)
+    if (m_opt.regrid_init_pressure)
     {
       if (m_opt.makeRegridPlots)
       {
@@ -1523,7 +1774,25 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
       dtInit *= m_opt.regrid_dt_scale;
 
-      initializeGlobalPressure(dtInit, false);
+      if (solvingFullDarcyBrinkman())
+      {
+        initializeGlobalPressure(dtInit, false);
+      }
+
+      if (!(solvingFullDarcyBrinkman() && doVelocityAdvection()))
+      {
+
+        // Should do some initialisation here?
+        thisLevelData = this;
+
+        for (int lev = 0; lev < numLevels; lev++)
+        {
+          int num_passes = 1;
+          initTimeIndependentPressure(thisLevelData, num_passes);
+          thisLevelData = thisLevelData->getFinerLevel();
+        }
+
+      }
 
     }
 
@@ -1634,6 +1903,18 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     } // end if initialising lambda correction
 
   } // end if level 0 and doing projection
+
+  // Check div(u)
+//  thisLevelData = this;
+//  while (thisLevelData)
+//  {
+//    thisLevelData->calculateTimeIndAdvectionVel(m_time, thisLevelData->m_advVel);
+//    Divergence::levelDivergenceMAC(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv],thisLevelData->m_advVel, m_dx);
+//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], NULL, 1, thisLevelData->dx(), Interval(0,0));
+//    pout() << "PostRegrid(level " << thisLevelData->level() << ") -- max(div(u)) = " << maxDivU <<  endl;
+//
+//    thisLevelData = thisLevelData->getFinerLevel();
+//  }
 
 }
 

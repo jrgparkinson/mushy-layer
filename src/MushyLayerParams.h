@@ -15,12 +15,18 @@
 #include "CH_Timer.H"
 #include "RealVect.H"
 #include "CH_HDF5.H"
+#include "BCInfo.h"
 
 // Comment below ensures that enums doxygen generates documentation for enums declared in this file
 /*!
 @file
 Contains immunity flag definitions
 */
+
+enum NonlinearBCSolveMethods {
+  picard,
+  newton
+};
 
 /// Different options for enforced porosity
 enum ParamsPorosityFunctions {
@@ -298,9 +304,15 @@ public:
 	/// Non dimensional reluctance of the hele-shaw cell
 	/**
 	 * Inverse of permeability. Equivalent to the Darcy number if Katz & Worster (2008)
-	 * Reluctance = Da * 12 * (h/d)^2
+	 * Reluctance = 12 K_0/d^2 = Da * 12 * (h/d)^2
 	 */
 	nonDimReluctance,
+
+	/// Dimensionless Hele-Shaw cell permeability
+	/**
+	 * \f$ \Pi_H = d^2/(12 K_0)\f$. Inverse of nonDimReluctance.
+	 */
+	heleShamPermeability,
 
 
 
@@ -366,6 +378,18 @@ public:
 
 	  /// Salt diffusion coefficient
 	  m_saltDiffusionCoeff,
+
+	  /// Active tracer diffusion coefficient
+	  activeTracerDiffusionCoeff,
+
+	  /// Passive tracer diffusion coefficient
+	  passiveTracerDiffusionCoeff,
+
+	  /// Initial value of active tracer
+	  activeTracerInitVal,
+
+	  /// Initial value of passive tracer
+	  passiveTracerInitVal,
 
 	  /// Viscosity
 	  m_viscosityCoeff,
@@ -531,6 +555,12 @@ public:
 	/// Permeability boundary conditions (hi side, for each spatial direction)
 	bcTypePermeabilityHi;
 
+	Real
+	sinusoidal_temperature_bc_timescale,
+	sinusoidal_temperature_bc_amplitude,
+	sinusoidal_temperature_bc_av,
+	sinusoidal_temperature_bc_phase_diff;
+
 	/// Unified BCs for all scalars (lo side, for each spatial direction)
 	Vector<int> bcTypeScalarLo,
 
@@ -617,6 +647,25 @@ public:
 	bcValPressureLo;
 
 
+	BCInfo
+	/// Position along each face, below which to enforce no heat flux (above this position, enforce some other specified heat flux)
+	m_bc_noFluxLimit,
+
+	/// Reference temperature for radiation boundary conditions
+	m_bc_bTref,
+
+	/// Some generic variable which can be used in various boundary conditions if required
+	m_bc_b,
+	m_bc_a;
+
+	int max_bc_iter;
+
+	int bc_nonlinear_solve_method;
+
+	Real max_bc_residual;
+
+	/// For nonlinear BCs solve
+	Real bc_relax_coeff;
 
 	/// First or second order BCs
 	int m_BCAccuracy;
@@ -631,9 +680,14 @@ public:
 	int m_timeDependentBC;
 
 	/// Possible time dependences for BCs
+	/**
+	 * These are implemented in PhysBCUtil::updateTimeDependentBCs()
+	 * With the parameters for each option contained with this MushyLayerParams object.
+	 * You can add your own options to the list below, then implement them in PhysBCUtil::updateTimeDependentBCs()
+	 */
 	enum timeDependentBCtypes{
 	  m_constant,
-	  m_sinusoid, // val = constant val + m_BCamplitude * sin(2 pi t/m_BCtimescale)
+	  m_sinusoid, // val = constant val + m_BCamplitude * sin(2 pi t/m_BCtimescale + phase_shift)
 	  m_custom
 	};
 
@@ -703,6 +757,18 @@ public:
 
 	/// Returns a string indicating the velocity scale used for nondimensionalisation
 	string getVelocityScale() const;
+
+	/// Utility function to compute porosity given a single enthalpy/bulk concentration value
+	Real computePorosity(Real H, Real C);
+
+	Real compute_dHdT(Real H, Real C);
+
+	/// Utility function to compute temperature given a single enthalpy/bulk concentration value
+	Real computeTemperature(Real H, Real C);
+
+	/// Compute everything from enthalpy and bulk concentration
+	//todo - implement
+	void computeDiagnosticVars(Real H, Real C, Real T, Real porosity, Real Cl, Real Cs);
 
 	/// Returns a string indicating the time scale used for nondimensionalisation
 	string getTimescale() const;

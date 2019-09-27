@@ -79,6 +79,18 @@ void applyCorrectScalarBC(FArrayBox&      a_state,
                  a_side,
                  a_order,
                  a_comp);
+
+  }
+  else if (a_bcType == PhysBCUtil::VariableFlux)
+    {
+    VariableFluxBC(a_state,
+                       a_valid,
+                       a_homogeneous,
+                       a_diriValue,
+                       a_idir,
+                       a_side,
+                       a_dx,
+                       a_comp);
   }
   else
   {
@@ -152,6 +164,78 @@ void ConstantNeumBC(FArrayBox&      a_state,
 
 }
 
+// For when each side has a fixed gradient along the entire side
+// Currently just for the first component of a_state
+void VariableFluxBC(FArrayBox&      a_state,
+                    const Box&      a_valid,
+                    bool            a_homogeneous,
+                    Real                        a_value,
+                    int             a_dir,
+                    Side::LoHiSide  a_side,
+                    Real                        a_dx,
+                    int a_comp)
+{
+  CH_TIME("BCFunctions::VariableFluxBC");
+  int isign = sign(a_side);
+
+  Box toRegion = adjCellBox(a_valid, a_dir, a_side, 1);
+  toRegion &= a_state.box();
+
+  if (a_homogeneous)
+  {
+    a_value = 0;
+  }
+
+//  FORT_NEUMBC(CHF_FRA(a_state),
+//              CHF_REAL(a_value),
+//              CHF_BOX(toRegion),
+//              CHF_INT(isign),
+//              CHF_INT(a_dir),
+//              CHF_REAL(a_dx),
+//              CHF_INT(a_comp));
+
+  RealVect loc;
+//  pout() << endl;
+
+  for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+  {
+    IntVect iv = bit();
+//    ::getLocation(iv, loc, a_dx);
+
+    loc = iv;
+    loc *= a_dx;
+//    RealVect ccOffset = (0.5, 0.5);
+    RealVect ccOffset = 0.5*RealVect::Unit;
+    ccOffset *= a_dx;
+    loc += ccOffset; // cell centred offset
+
+    Real flux = a_value*0.5*(1+tanh(50*(loc[SpaceDim-1]-0.75)));
+
+//    pout() << iv[1] << ",";
+
+//    if (loc[1] > 0.5)
+//    {
+//      flux = a_value;
+//    }
+//    else
+//    {
+//      flux = 0.0;
+//    }
+
+//    flux = 200;
+
+    IntVect ivFrom = iv - isign*BASISV(a_dir);
+
+    a_state(iv, a_comp) = a_state(ivFrom, a_comp) + a_dx*flux;
+
+
+  }
+
+//  pout() << endl;
+
+}
+
+
 void ExtrapBC(FArrayBox&      a_state,
               const Box&      a_valid,
               int             a_dir,
@@ -197,6 +281,7 @@ void ExtrapBC(FArrayBox&      a_state,
   int boxSize = a_state.box().size(a_dir);
   a_order = min(a_order, boxSize);
 
+  CH_assert(a_comp < a_state.nComp());
 
   FORT_EXTRAPBC(CHF_FRA(a_state),
                 CHF_BOX(toRegion),
@@ -242,7 +327,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
   // adv vel is never going to match in this case, so don't bother searching
   if (a_dx > fine_dx)
   {
-    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order);
+    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order, a_comp);
     return;
   }
 
@@ -345,7 +430,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
      *
      */
 
-    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order);
+    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order, a_comp);
     //    ConstantNeumBC(a_state, a_valid, a_homogeneous, 0.0, a_dir, a_side, a_dx);
     return;
   }
@@ -376,7 +461,7 @@ void OnlyInflowBC(FArrayBox&      a_state,
   // if homogeneous, apply homogeneous dirichlet BCs
   if (a_homogeneous)
   {
-    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_otherValue, a_dir, a_side, a_order);
+    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_otherValue, a_dir, a_side, a_order, a_comp);
     return;
   }
 
@@ -418,7 +503,7 @@ void PressureInflowOutflow(FArrayBox&      a_state,
   if (a_neumValue == 0)
   {
     InflowOutflowBC(a_state, a_advVel, a_valid, a_homogeneous, a_diriValue,
-                    a_dir, a_side, a_order, a_dx, a_fineDx);
+                    a_dir, a_side, a_order, a_dx, a_fineDx, a_comp);
   }
   else
   {

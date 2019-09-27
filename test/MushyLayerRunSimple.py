@@ -89,20 +89,23 @@ class MushyLayerRunSimple:
 
     def single_run(self, run_name):
 
-        test = self.make_next_dir(join(self.base_output_dir, run_name))
-        if test == -1:
+        this_run_directory = self.make_next_dir(join(self.base_output_dir, run_name))
+        if this_run_directory is None:
             print('Run already done, skipping \n \n')
             return -1
 
-        this_run_directory = self.get_most_recent_directory(run_name)
+        # this_run_directory = self.get_most_recent_directory(run_name)
 
-        exit_status = self.run_model(self.parameters['main.num_cells'],
-                                    join(self.base_output_dir, this_run_directory),
-                                    False)
+        output_folder = join(self.base_output_dir, this_run_directory)
 
-        return exit_status
+        # exit_status = self.run_model(self.parameters['main.num_cells'],
+        #                             join(self.base_output_dir, this_run_directory),
+        #                             False)
 
-    def run_model(self,  grid_res,  output_folder,  analytic):
+
+    #     return exit_status
+    #
+    # def run_model(self,  output_folder):
 
         # Perform various checks on the inputs
 
@@ -146,7 +149,7 @@ class MushyLayerRunSimple:
         # Read in the file
         params_key = 'main.params_file'
 
-        #inputsParams = readInputs(inputs_file)
+        #inputsParams = read_inputs(inputs_file)
         inputsParams = {}
         
         extraParams = {}
@@ -186,7 +189,6 @@ class MushyLayerRunSimple:
         write_inputs(new_input_file, self.parameters)
 
         # Set remaining parameters on the slurm jobs
-
         self.slurm_job.folder = output_folder
         self.slurm_job.set_exec_file(os.path.join(self.exec_dir, self.program_name))
         print('Exec dir: %s, program name: %s, exec file: %s' % ( self.exec_dir, self.program_name, os.path.join(self.exec_dir, self.program_name)) )
@@ -194,33 +196,53 @@ class MushyLayerRunSimple:
         # self.slurm_job.write_slurm_file()
         self.slurm_job.run_task()
 
-        return 1
+        exit_status = 1
 
-    # Take some basename, and make the directory basename-(n+1) where
-    # directories basename-0 to basename-n already exist
+        return exit_status
+
+
+
+
     def make_next_dir(self,  basename):
-        i = 0
-        new_dir = basename + "-" + str(i) + "/"
-        while os.path.isdir(new_dir):
-            print('    Path exists: ' + new_dir + ', ' + str(os.path.isdir(new_dir)))
-            onlyfiles = [f for f in listdir(new_dir) if isfile(join(new_dir, f))]
-            print(str(onlyfiles))
-            
-            i = i + 1
-            new_dir = basename + "-" + str(i) + "/"
-            
-        # If we already have directory -0, we may not want to create -1, -2 etc.
-        if i > 0 and not self.allow_multiple_output_dirs:
-            return -1
-            
-        # Also check for directories ending in -steady with the same name
-        if not self.allow_multiple_output_dirs:
-            steady_name = new_dir.replace('-' + str(i), '-steady')
-            if os.path.isdir(steady_name):
-                print('    Path exists: ' + steady_name)
-                return -1
 
+
+
+        if self.allow_multiple_output_dirs:
+            # Take some basename, and make the directory basename-(n+1) where
+            # directories basename-0 to basename-n already exist
+
+            i = 0
+            new_dir = basename + "-" + str(i) + "/"
+            while os.path.isdir(new_dir):
+                print('    Path exists: ' + new_dir + ', ' + str(os.path.isdir(new_dir)))
+                onlyfiles = [f for f in listdir(new_dir) if isfile(join(new_dir, f))]
+                print(str(onlyfiles))
+
+                i = i + 1
+                new_dir = basename + "-" + str(i) + "/"
+
+        else:
+
+            # Check if the folder 'basename' exists.
+            # If so, return -1 (folder already exists)
+            # If not, make the new directory
+
+            new_dir = basename
+
+            # If we already have this directory, return -1
+            if os.path.isdir(new_dir):
+                return None
+
+            # # Also check for directories ending in -steady with the same name
+            # if not self.allow_multiple_output_dirs:
+            #     steady_name = new_dir.replace('-' + str(i), '-steady')
+            #     if os.path.isdir(steady_name):
+            #         print('    Path exists: ' + steady_name)
+            #         return -1
+
+        # Make new directory
         os.makedirs(new_dir)
+        print('Making new directory %s' % new_dir)
 
         return new_dir
 

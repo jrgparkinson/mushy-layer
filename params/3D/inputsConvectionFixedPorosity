@@ -120,11 +120,9 @@ projection.solverTol=1e-15
 projector.verbosity=0
 run_name=Uniform
 
-main.implicitAdvectionSolve = false
 projection.usePiAdvectionBCs=true
 projection.phiScale=1.0 
 projection.MACbcScale=-0.5 #0.4
-main.usePhiForImplicitAdvectionSolve=false
 
 main.nondimensionalisation=1
 

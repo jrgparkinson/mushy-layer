@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['tag_5fchannels',['tag_channels',['../struct_mushy_layer_options.html#a65cf14658cc2885d6c2d5c8e0875a31b',1,'MushyLayerOptions']]],
   ['tag_5fplume_5fmush',['tag_plume_mush',['../struct_mushy_layer_options.html#ac65cf5a7ea59d60c33af0141d9d940c3',1,'MushyLayerOptions']]],
   ['tag_5fvelocity',['tag_velocity',['../struct_mushy_layer_options.html#a34abc03bc7d8a50a7e3517a3df24e4db',1,'MushyLayerOptions']]],
   ['tagbuffersize',['tagBufferSize',['../struct_mushy_layer_options.html#aee00363c430d38cedff300e5fbfc6e22',1,'MushyLayerOptions']]],
@@ -16,13 +17,13 @@ var searchData=
   ['testregridcoarsening',['testRegridCoarsening',['../struct_mushy_layer_options.html#a837666f529c0421b42d23bf175094066',1,'MushyLayerOptions']]],
   ['thermalexpansivity',['thermalExpansivity',['../class_mushy_layer_params.html#abac32891e2e9f03ab16ce6502104db9a',1,'MushyLayerParams']]],
   ['thetaeutectic',['thetaEutectic',['../class_mushy_layer_params.html#a45829b6d494fc913f1680e2352596c38',1,'MushyLayerParams::thetaEutectic()'],['../class_mushy_layer_params.html#add018c55cd0f09f969e3fa03872c6cf3',1,'MushyLayerParams::ThetaEutectic()']]],
-  ['thetainf',['thetaInf',['../class_mushy_layer_params.html#a5fbe1ecc5dec8ea3d40f2f790207245c',1,'MushyLayerParams::thetaInf()'],['../class_mushy_layer_params.html#ae6ea963354fd718de64b7fefc8d06446',1,'MushyLayerParams::ThetaInf()']]],
-  ['thetainitial',['thetaInitial',['../class_mushy_layer_params.html#a8f801f6995fcd9d6cbe8a99fb07c4aaf',1,'MushyLayerParams::thetaInitial()'],['../class_mushy_layer_params.html#ae326e39ee5950300791ce6d4a03657fc',1,'MushyLayerParams::ThetaInitial()']]],
+  ['thetainf',['ThetaInf',['../class_mushy_layer_params.html#ae6ea963354fd718de64b7fefc8d06446',1,'MushyLayerParams::ThetaInf()'],['../class_mushy_layer_params.html#a5fbe1ecc5dec8ea3d40f2f790207245c',1,'MushyLayerParams::thetaInf()']]],
+  ['thetainitial',['ThetaInitial',['../class_mushy_layer_params.html#ae326e39ee5950300791ce6d4a03657fc',1,'MushyLayerParams::ThetaInitial()'],['../class_mushy_layer_params.html#a8f801f6995fcd9d6cbe8a99fb07c4aaf',1,'MushyLayerParams::thetaInitial()']]],
   ['thetainitialliquidus',['thetaInitialLiquidus',['../class_mushy_layer_params.html#a5cbbc3540205aa69d2e54d1695c08c86',1,'MushyLayerParams']]],
   ['thetainterface',['thetaInterface',['../class_mushy_layer_params.html#a4f5bbe8dd1098ccc6bac03fce6b6bfa0',1,'MushyLayerParams']]],
   ['thetalinitial',['ThetaLInitial',['../class_mushy_layer_params.html#a3781f0d56c7054c5f28a7004324a0891',1,'MushyLayerParams']]],
   ['thetalplumeinflow',['ThetaLPlumeInflow',['../class_mushy_layer_params.html#ab0d16dc81fb443313e427b11ff37a83d',1,'MushyLayerParams']]],
-  ['thetaplumeinflow',['thetaPlumeInflow',['../class_mushy_layer_params.html#abd2acb1163b9a8660abea009ecbc2a09',1,'MushyLayerParams::thetaPlumeInflow()'],['../class_mushy_layer_params.html#a20062da3b7047b0f9fc5a3f5d320499c',1,'MushyLayerParams::ThetaPlumeInflow()']]],
+  ['thetaplumeinflow',['ThetaPlumeInflow',['../class_mushy_layer_params.html#a20062da3b7047b0f9fc5a3f5d320499c',1,'MushyLayerParams::ThetaPlumeInflow()'],['../class_mushy_layer_params.html#abd2acb1163b9a8660abea009ecbc2a09',1,'MushyLayerParams::thetaPlumeInflow()']]],
   ['thetasinitial',['ThetaSInitial',['../class_mushy_layer_params.html#a71937d2796fc2c061fc8b4781355fd00',1,'MushyLayerParams']]],
   ['thetasplumeinflow',['ThetaSPlumeInflow',['../class_mushy_layer_params.html#a70175dbbe59391b96e645b6177299f46',1,'MushyLayerParams']]],
   ['timeintegrationorder',['timeIntegrationOrder',['../struct_mushy_layer_options.html#a49077940c621196e64ed753633096164',1,'MushyLayerOptions']]],

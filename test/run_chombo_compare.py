@@ -117,8 +117,8 @@ def chombo_compare_analysis(data_folder):
 
 
 def get_folder_resolution(folder):
-    parts = re.findall('-(\d+)--', folder)
-    res = int(parts[0])
+    parts = re.findall('-(\d+)-', folder)
+    res = int(parts[-1])
     return res
 
 
@@ -131,7 +131,7 @@ def get_folder_details(folder):
     else:
         # AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref4-PorousMushyHole-16--0
         # print(folder)
-        result = re.findall('.*-MaxLevel(\d+)-.*ref(\d+)-.*-(\d+)--0', folder)
+        result = re.findall('.*-MaxLevel(\d+)-.*ref(\d+)-.*-(\d+)-', folder)
         if result:
             parts = result[0]
             max_lev = int(parts[0])
@@ -234,6 +234,7 @@ def run_chombo_compare(argv):
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.03'
     data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015-hole0.04-veryGoodUseThis'
+    #data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/'
     field = 'Porosity'
     err_type = 'L2'
 
@@ -243,11 +244,12 @@ def run_chombo_compare(argv):
 
 
 
-    # figure_number = 6
+    figure_number = 6
     # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc'
-    # run_analysis = True
-    # field = 'xDarcy velocity'
-    # err_type = 'L2'
+    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/'
+    run_analysis = False
+    field = 'xDarcy velocity'
+    err_type = 'L2'
 
     # figure_number = 0
     # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.17/chi0.4-Da1.0e-06-Ra1.0e+09'
@@ -325,6 +327,7 @@ def run_chombo_compare(argv):
 
         # If we couldn't understand the folder name, skip it
         if np.isnan(coarse_nx):
+            print('Skipping %s' % folder)
             continue
 
 
@@ -404,7 +407,7 @@ def run_chombo_compare(argv):
 
         timings.append(these_timings)
 
-    # print(err_data_sets)
+    print(err_data_sets)
     print(timings)
 
     ref_rats = set([x[1] for x in timings])
@@ -525,6 +528,8 @@ def run_chombo_compare(argv):
 
         axes[1].set_xlim([0, 4])
         axes[1].set_ylim([0, 1])
+
+        axes[1].set_xticks([0, 2, 4])
 
         xl = axes[1].get_xlim()
         yl = axes[1].get_ylim()

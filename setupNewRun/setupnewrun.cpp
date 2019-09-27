@@ -131,6 +131,12 @@ int main(int argc, char* argv[])
   int refinement = 1;
   Real dtReductionFactor = 10;
   Real smoothing = 0.0;
+  bool reset_time = true;
+  bool reset_step_count = true;
+
+  pp.query("reset_time", reset_time);
+  pp.query("reset_step_count", reset_step_count);
+
   pp.get("run_inputs",previousInputsFile);
   pp.get("inFile" ,previousRestartFile);
   pp.get("outFile" ,newRestartFile);
@@ -307,32 +313,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  // Do smoothing if required
-  if (smoothing > 0)
-  {
-    bool smoothVel = true;
-    bool smoothScalar = true;
-    pp.query("smoothVel", smoothVel);
-    pp.query("smoothScalar", smoothScalar);
 
-    pout() << "Doing smoothing with coefficient " << smoothing << endl;
-    // Only have to call this from the coarsest level
-      AMRLevelMushyLayer* mlCoarsest = amrlevels[0];
-      mlCoarsest->setSmoothingCoeff(smoothing);
-      mlCoarsest->doPostRegridSmoothing(smoothVel, smoothScalar);
-
-      // Now ensure U=0 in the right places
-      for (int level = 0; level <= finest_level; level++)
-      {
-        Real porosity_cap = 0.01;
-        ppMain.query("ccvel_porosity_cap", porosity_cap);
-
-        AMRLevelMushyLayer* ml = amrlevels[level];
-        ml->updateEnthalpyVariables();
-        ml->setCCVelZero(porosity_cap);
-      }
-
-  }
 
   // Add melt pond if required
   if (addMeltPond)
@@ -347,6 +328,58 @@ int main(int argc, char* argv[])
       ml->addMeltPond(meltPondDepth, meltPondSalinity, meltPondEnthalpy, rescaleSolution);
 
     }
+
+  }
+
+  // horizontal averaging
+  bool horizontalaverageIC = false;
+  pp.query("doHorizAverage", horizontalaverageIC);
+  if (horizontalaverageIC)
+  {
+    for (int level = 0; level <= finest_level; level++)
+    {
+      AMRLevelMushyLayer* ml = amrlevels[level];
+
+      // call the function to horizontally average data.
+      ml->horizAverage();
+
+    }
+  }
+
+  // Do smoothing if required
+  if (smoothing > 0)
+  {
+    bool smoothVel = true;
+    bool smoothScalar = true;
+    int num_smooth_cycles = 1;
+    pp.query("numSmoothCycles", num_smooth_cycles);
+    pp.query("smoothVel", smoothVel);
+    pp.query("smoothScalar", smoothScalar);
+
+    pout() << "Doing smoothing with coefficient " << smoothing << endl;
+    // Only have to call this from the coarsest level
+      AMRLevelMushyLayer* mlCoarsest = amrlevels[0];
+      mlCoarsest->setSmoothingCoeff(smoothing);
+
+      for (int num_cycles=0; num_cycles < num_smooth_cycles; num_cycles++)
+      {
+//      mlCoarsest->doPostRegridSmoothing(smoothVel, smoothScalar);
+//      mlCoarsest->setSmoothingDone(false);
+
+        mlCoarsest->smoothEnthalpyBulkConc(smoothing);
+      }
+
+      // Now ensure U=0 in the right places
+      for (int level = 0; level <= finest_level; level++)
+      {
+        Real porosity_cap = 0.01;
+        ppMain.query("ccvel_porosity_cap", porosity_cap);
+
+        AMRLevelMushyLayer* ml = amrlevels[level];
+        //todo - should probably turn this back on but it breaks things
+//        ml->updateEnthalpyVariables();
+        ml->setCCVelZero(porosity_cap);
+      }
 
   }
 
@@ -379,8 +412,15 @@ int main(int argc, char* argv[])
   // Reset iteration and time
   //  header.m_int ["max_level"]  = max_level;
   //  header.m_int ["num_levels"] = finest_level + 1;
-  header.m_int ["iteration"]  = 0;
-  header.m_real["time"]       = 0.0;
+  if (reset_step_count)
+  {
+    header.m_int ["iteration"]  = 0;
+  }
+
+  if (reset_time)
+  {
+    header.m_real["time"]       = 0.0;
+  }
 
   // Set periodicity info
   // Get the periodicity info -- this is more complicated than it really

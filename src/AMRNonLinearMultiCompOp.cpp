@@ -79,6 +79,10 @@ void AMRNonLinearMultiCompOp::computeDiffusedVar(FArrayBox& a_diffusedVar,
                        CHF_CONST_REAL(m_params->thetaEutectic),
                        CHF_CONST_REAL(m_params->ThetaEutectic));
 
+  // Apply BCs to H-C, then compute T, S_l, porosity BC from these values
+  // a_phi is const so can't apply BCs here - assume they're already set
+//  m_bc(a_phi, m_domain.domainBox(), m_domain, m_dx, a_homogeneous);
+
   FORT_CALCULATE_T_CL(CHF_FRA(a_diffusedVar),
                       CHF_CONST_FRA(a_phi),
                       CHF_CONST_FRA(Hs),
@@ -92,44 +96,12 @@ void AMRNonLinearMultiCompOp::computeDiffusedVar(FArrayBox& a_diffusedVar,
                       CHF_CONST_REAL(m_params->thetaEutectic),
                       CHF_CONST_REAL(m_params->ThetaEutectic));
 
-  // set to false - this doesn't seem to make a difference
-//  bool recalculatePorosity = false;
+  if (m_apply_bcs_to_diagnostic_var)
+  {
+    m_diffusedVarBC(a_diffusedVar, m_domain.domainBox(), m_domain, m_dx, a_homogeneous);
+  }
 
-  // Let's try also recalculating porosity
-//  if (recalculatePorosity)
-//  {
-//    FArrayBox porosity(Hs.box(), a_phi.nComp());
-//    int porosityComp = 1;
-//
-//    FORT_CALCULATEPOROSITY_MULTICOMP(CHF_FRA(porosity),
-//                          CHF_CONST_INT(porosityComp), // porosity component
-//                          CHF_CONST_FRA(a_phi),
-//                          CHF_CONST_FRA(Hs),
-//                          CHF_CONST_FRA(He),
-//                          CHF_CONST_FRA(Hl),
-//                          CHF_BOX(region),
-//                          CHF_CONST_REAL(m_params->compositionRatio),
-//                          CHF_CONST_REAL(m_params->waterDistributionCoeff),
-//                          CHF_CONST_REAL(m_params->specificHeatRatio),
-//                          CHF_CONST_REAL(m_params->stefan),
-//                          CHF_CONST_REAL(m_params->thetaEutectic));
-//
-//
-//    porosity.mult(1/m_params->lewis);
-//  //  porosity.mult(0.0);
-//
-//    int cellComp = 0;
-//    int edgeComp = 1;
-//    for (int dir=0; dir<SpaceDim; dir++)
-//    {
-//      CellToEdge(porosity, cellComp, (*m_bCoef)[dit][dir], edgeComp, dir, geometricAveraging);
-//      (*m_bCoef)[dit][dir].mult(-1, 1, 1);
-//    }
-//
-//    m_lambdaNeedsResetting = true;
-//  }
-
-  m_diffusedVarBC(a_diffusedVar, m_domain.domainBox(), m_domain, m_dx, a_homogeneous);
+//  this->m_bc
 }
 
 void AMRNonLinearMultiCompOp::residualI(LevelData<FArrayBox>&       a_lhs,
@@ -953,7 +925,20 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
           {
             CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::BCs");
             m_bc(thisPhi, region, m_domain, m_dx, homogeneous);
+//            m_bc(thisPhi, region., m_domain, m_dx, homogeneous);
           }
+//        }
+//
+//        a_phi.exchange(a_phi.interval(), m_exchangeCopier);
+//
+//        for (dit.begin(); dit.ok(); ++dit)
+//                {
+//                  const Box& region = dbl.get(dit());
+//                  const FluxBox& thisBCoef  = (*m_bCoef)[dit];
+//                  FArrayBox& thisPhi = a_phi[dit];
+//                  FArrayBox& thisDerivedVar = derivedVar[dit];
+
+
 
           // Need to do this every pass or convergence is very slow
 //          if (!m_superOptimised || whichPass == 0)
@@ -1278,7 +1263,8 @@ void AMRNonLinearMultiCompOpFactory::define(const ProblemDomain& a_coarseDomain,
                                             MushyLayerParams*			   a_params,
                                             BCHolder  a_derivedVarBC,
                                             int a_relaxMode,
-                                            EdgeVelBCHolder a_porosityEdgeBC)
+                                            EdgeVelBCHolder a_porosityEdgeBC,
+                                            bool a_apply_bcs_to_diagnostic_var)
 {
   CH_TIME("AMRNonLinearMultiCompOpFactory::define");
 
@@ -1290,6 +1276,7 @@ void AMRNonLinearMultiCompOpFactory::define(const ProblemDomain& a_coarseDomain,
 
   m_bc = a_bc;
   m_diffusedVarBC = a_derivedVarBC;
+  m_apply_bcs_to_diagnostic_var = a_apply_bcs_to_diagnostic_var;
   m_porosityEdgeBC = a_porosityEdgeBC;
 
   m_params = a_params;
@@ -1462,6 +1449,8 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
   newOp->m_params = m_params;
 
   newOp->m_diffusedVarBC = m_diffusedVarBC;
+
+  newOp->m_apply_bcs_to_diagnostic_var = m_apply_bcs_to_diagnostic_var;
 
   newOp->m_superOptimised = m_superOptimised;
 
@@ -1658,6 +1647,7 @@ AMRLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::AMRnewOp(cons
   newOp->m_params = m_params;
   //  newOp->m_calcEnthalpyVar = m_calcEnthalpyVar;
   newOp->m_diffusedVarBC = m_diffusedVarBC;
+  newOp->m_apply_bcs_to_diagnostic_var = m_apply_bcs_to_diagnostic_var;
   //  newOp->m_computeEnthalpyVars =m_computeEnthalpyVars;
   //  (newOp->m_computeEnthalpyVars).define(m_computeEnthalpyVars.m_derivedVar, a_indexSpace, m_dx[ref], m_computeEnthalpyVars.m_derivedVarBC);
   //  newOp->m_porosityEdgeBC = m_porosityEdgeBC;
@@ -1755,3 +1745,4 @@ finerOperatorChanged(const MGLevelOp<LevelData<FArrayBox> >& a_operator,
 //-----------------------------------------------------------------------
 
 #include "NamespaceFooter.H"
+

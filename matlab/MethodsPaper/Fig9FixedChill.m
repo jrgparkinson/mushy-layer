@@ -129,6 +129,7 @@ end
 
 if savePNG
     print(h,[filename, '.png'],'-dpng','-r800')
+    savefig([filename, '.fig'])
 end
 
 %print(h,[filename, '.tiff'],'-dtiff','-r800')

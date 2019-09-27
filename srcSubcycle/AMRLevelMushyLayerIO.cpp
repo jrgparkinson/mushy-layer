@@ -524,25 +524,16 @@ readCheckpointLevel(HDF5Handle& a_handle)
     {
       dataStatus =  read<FArrayBox>(a_handle, tempVector,m_vectorVarNames[var], m_grids);
       tempVector.copyTo(Interval(0, SpaceDim-1), *m_vectorNew[var], Interval(0, SpaceDim-1) );
-      if (dataStatus != 0)
-      {
-        if (s_verbosity >= 10)
-        {
-          pout() << "       ... variable not found in checkpoint file, continuing anyway " << endl;
-        }
-      }
-      else if (s_verbosity >= 10)
-      {
-        pout() << "       ... done " << endl;
-      }
+//      if (dataStatus != 0)
+//      {
+        //pout() << "       ... variable not found in checkpoint file, continuing anyway " << endl;
+//     }
+
 
     }
     else
     {
-      if (s_verbosity >= 10)
-      {
-        pout() << "       ... skipping " << endl;
-      }
+     // do nothing
     }
   }
 
@@ -581,6 +572,8 @@ readCheckpointLevel(HDF5Handle& a_handle)
   }
 
 
+
+
   m_dt = m_dt/m_opt.dtReductionFactor;
   pout() << "dt reduced by factor " << m_opt.dtReductionFactor << " to " << m_dt << endl;
 
@@ -592,6 +585,9 @@ readCheckpointLevel(HDF5Handle& a_handle)
 
   // Set up data structures
   levelSetup();
+
+  // Copy pressure to phi
+  m_scalarNew[m_pressure]->copyTo(m_projection.phi());
 }
 
 /*******/
@@ -882,7 +878,6 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
   // now solve on this level
   solver.solve(amrPsi, amrVorticity, m_level,
                m_level, false); // don't initialize to zero
-
 
 }
 

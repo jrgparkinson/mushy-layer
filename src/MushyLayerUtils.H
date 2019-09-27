@@ -127,6 +127,8 @@ Real stokesDarcyInit(Real x, Real y, int dir, MushyLayerParams params);
 extern bool
 getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain, string gridfileParam = "gridfile");
 
+/// Check if string is also an integer
+bool is_integer(const std::string& s);
 
 //void
 //timeInterpWithGhostCells(LevelData<FArrayBox>& a_dest, Real a_time,

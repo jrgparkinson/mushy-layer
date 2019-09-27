@@ -32,6 +32,7 @@ visitlog.py
 **/.idea/
 **/.hg/*
 **/execNonSubcycle/*/*
+**/andrew-bug/*
 
 *.cproject
 *.tmp
@@ -40,3 +41,4 @@ visitlog.py
 **/venv*/*
 **/env/*
 **/matlab/MethodsPaper/*.png
+*.csv

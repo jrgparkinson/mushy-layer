@@ -31,7 +31,6 @@ main.enforceAnalyticSoln=false
 main.fill_ratio=0.75
 
 main.ignoreSolverFails=true
-main.implicitAdvectionSolve=false
 main.initialPerturbation=0.0
 main.initial_cfl=0.001 # was 0.01
 main.initialize_pressure=true
@@ -63,7 +62,7 @@ main.steady_state=1e-9
 main.symmetric_domain=false
 
 
-main.usePhiForImplicitAdvectionSolve=false
+
 main.use_limiting=true
 
 main.verbosity=2

@@ -7,6 +7,8 @@
 #include "PhysIBC.H"
 #include "AdvectIBC.H"
 
+
+
 /// Big class to encapsulate physical boundary conditions
 class PhysBCUtil
 {
@@ -75,7 +77,56 @@ public:
 	  /**
 	   * Not implemented yet
 	   */
-	  Robin
+	  Robin,
+	  /// Variable flux
+	  /**
+	   * Flux which varies along the boundary
+	   */
+	  VariableFlux,
+	  /// Fixed temperature
+	  /**
+	   * This is a special case for the heat equation, where we apply BCs to enthalpy
+	   * and need to compute the boundary from the interior porosity and specified temperature
+	   */
+	  FixedTemperature,
+	  /// Temperature Flux
+	  /**
+	   * BCs for enthalpy. Assume bulk concentration \f$ C_g \f$ in the ghost cell is equal to
+	   * it's value in the interior of the domain (i.e. assume a no normal flux condition) then
+	   * iteratively estimate the enthalpy \f$ H_g \f$ such that
+	   * \f$ \frac{T_g(H_g,C_g) - T_{interior} }{\Delta x}= F \f$,
+	   * in order to satisfy the temperature flux condition. Finally, set the enthalpy ghost value to \f$ H_g \f$.
+	   *
+	   * \f$ a \frac{dT}{dz} - F_0 - b(T - T_{ref}) \f$
+	   *
+	   * Only do this for \f$z>0.75\f$, otherwise, no flux.
+	   *
+	   */
+	  TemperatureFlux,
+
+
+
+	  /// Temperature flux + radiation
+	  TemperatureFluxRadiation,
+
+	  /// Mixed BC for temperature/salinity
+	  /**
+	   * BCs to apply to temperature \f$ \theta \f$ and liquid salinity \f$ \Theta_l \f$ fields
+	   *
+	   * \f$ a \frac{d \theta}{dz} - F_0 - b(\theta - \theta_{ref}) = 0   \f$
+	   *
+	   * The temperature ghost values are given by
+	   *
+	   * \f$ \theta_g = \left( \frac{a}{\Delta x} - \frac{b}{2} \right)^{-1} \left[ \theta_i \left( \frac{a}{\Delta x} + \frac{b}{2} \right) + F_0 - b \theta_r \right] \f$
+	   *
+	   * where \f$ \theta_i \f$ is the value on the interior side of the boundary.
+	   *
+	   * The liquid salinity is given by \f$(\Theta_l)_g = - \theta_g\f$  if \f$0 < \chi < 1\f$, and \f$ (\Theta_l)_g = (\Theta_l)_i \f$ otherwise.
+	   *
+	   */
+	  MixedBCTemperatureSalinity,
+
+
 	};
 
 	/// Physical parameters for the system
@@ -84,10 +135,10 @@ public:
 	/// "virtual" constructor
 	virtual PhysBCUtil* newPhysBCUtil() const;
 
-	/// returns velocity BC for tracing (inviscid)
+	/// Returns velocity BC for tracing (inviscid)
 	virtual Tuple<BCHolder, SpaceDim> tracingVelFuncBC() const;
 
-	/// returns edge-centered vel BC for edge-ctrd vel (single component)
+	/// Returns edge-centered vel BC for edge-ctrd vel (single component)
 	virtual Tuple<BCHolder, SpaceDim> advectionVelFuncBC(bool a_isViscous) const;
 
 	/// Currently unused
@@ -111,16 +162,17 @@ public:
 	/// BC holder for velocity \f$ \mathbf{u} \f$ - extrapolation
 	virtual Tuple<BCHolder, SpaceDim> velExtrapBC(Interval ghostInterval=Interval(0,0)) const;
 
-	/// returns single-component BC for viscous refluxing solves
+	/// Returns single-component BC for viscous refluxing solves
 	virtual BCHolder viscousRefluxBC(int a_dir, bool a_isViscous=false) const;
 
-	/// returns a BC object compatible with AMRGodunov advection infrastructure
+	/// Returns a BC object compatible with AMRGodunov advection infrastructure.
+	/// For use in the PatchGodunov stuff.
 	virtual PhysIBC* advectionVelIBC() const;
 
 	/// Is object defined?
 	bool isDefined();
 
-	/// sets cell spacing
+	/// Sets the cell spacing \f$ \Delta x \f$.
 	void Dx(const Real a_dx);
 
 	/// Convert to AdvectIBC BCs
@@ -130,13 +182,16 @@ public:
 	/// Handy to have a function of this form, too
 	int convertBCType(const int a_implicitBC) const;
 
-	/// returns cell spacing
+	/// Returns cell spacing
 	Real Dx() const;
 
-	/// sets time
+	/// Sets time
 	void Time(const Real a_time);
 
-	/// returns current time
+	/// Update time dependent BCs (e.g. after changing the time)
+	void updateTimeDependentBCs();
+
+	/// Returns current time
 	Real Time() const;
 
 	/// Set pointer to advection velocity
@@ -168,7 +223,7 @@ public:
 
 	/// BC holder for freestream correction
 	/**
-	 * Normal gradient  = 0
+	 * No normal gradient, \f$ \mathbf{n} \cdot \nabla \phi = 0 \f$
 	 */
 	virtual BCHolder FreestreamCorrFuncBC() const;
 
@@ -227,6 +282,8 @@ public:
 
 	/// BC holder for liquid concentration, \f$ \Theta_l \f$
 	virtual BCHolder ThetaLFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel= NULL) const;
+
+	virtual BCHolder TracerBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel= NULL, Real a_boundaryVal=1.0) const;
 
 
 	/// BC holder for temperature, \f$ \theta \f$

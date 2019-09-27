@@ -101,7 +101,8 @@ c   Enforce a minimum and maximum value cap on phi
      &     CHF_FRA[phi],
      &     CHF_BOX[region],
      &     CHF_CONST_REAL[minVal],
-     &     CHF_CONST_REAL[maxVal])
+     &     CHF_CONST_REAL[maxVal],
+     &     CHF_CONST_INT[comp])
      
       integer n, ncomp
       integer CHF_DDECL[i;j;k]
@@ -109,13 +110,13 @@ c   Enforce a minimum and maximum value cap on phi
       ncomp = CHF_NCOMP[phi]
       
       CHF_MULTIDO[region; i; j; k]
-        do n = 0, ncomp-1
-          if (phi(CHF_IX[i;j;k],n) .le. minVal) then
-            phi(CHF_IX[i;j;k],n) = minVal
-          else if (phi(CHF_IX[i;j;k],n) .gt. maxVal) then
-          	phi(CHF_IX[i;j;k],n) = maxVal
+C        do n = 0, ncomp-1
+          if (phi(CHF_IX[i;j;k],comp) .le. minVal) then
+            phi(CHF_IX[i;j;k],comp) = minVal
+          else if (phi(CHF_IX[i;j;k],comp) .gt. maxVal) then
+          	phi(CHF_IX[i;j;k],comp) = maxVal
           endif
-        enddo
+C        enddo
      
       CHF_ENDDO
      
@@ -126,7 +127,8 @@ c   Enforce a minimum value cap on phi
       subroutine SETMINVAL(
      &     CHF_FRA[phi],
      &     CHF_BOX[region],
-     &     CHF_CONST_REAL[minVal])
+     &     CHF_CONST_REAL[minVal],
+     &     CHF_CONST_INT[comp])
      
       integer n, ncomp
       integer CHF_DDECL[i;j;k]
@@ -134,11 +136,11 @@ c   Enforce a minimum value cap on phi
       ncomp = CHF_NCOMP[phi]
       
       CHF_MULTIDO[region; i; j; k]
-        do n = 0, ncomp-1
-          if (phi(CHF_IX[i;j;k],n) .le. minVal) then
-            phi(CHF_IX[i;j;k],n) = minVal
+C        do n = 0, ncomp-1
+          if (phi(CHF_IX[i;j;k],comp) .le. minVal) then
+            phi(CHF_IX[i;j;k],comp) = minVal
           endif
-        enddo
+C        enddo
      
       CHF_ENDDO
      

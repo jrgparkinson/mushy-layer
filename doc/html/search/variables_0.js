@@ -22,5 +22,6 @@ var searchData=
   ['amrsaltsum_5fnew',['AMRSaltSum_new',['../class_a_m_r_level_mushy_layer.html#a40949c8df12b362facb7aa3f1d879cf6',1,'AMRLevelMushyLayer']]],
   ['amrsaltsum_5fold',['AMRSaltSum_old',['../class_a_m_r_level_mushy_layer.html#a9e9671d353d9bdf3e9be0bdbb06bc2be',1,'AMRLevelMushyLayer']]],
   ['analyticsolution',['analyticSolution',['../struct_mushy_layer_options.html#abf28d877dea7de52109802ad51f75fa2',1,'MushyLayerOptions']]],
-  ['analyticveltype',['analyticVelType',['../struct_mushy_layer_options.html#a44b95443518ac507326c3187d614d065',1,'MushyLayerOptions']]]
+  ['analyticveltype',['analyticVelType',['../struct_mushy_layer_options.html#a44b95443518ac507326c3187d614d065',1,'MushyLayerOptions']]],
+  ['apply_5fdiagnostic_5fbcs',['apply_diagnostic_bcs',['../struct_mushy_layer_options.html#a078a1ef21c19a8b1eb903f0c5c90ad4f',1,'MushyLayerOptions']]]
 ];

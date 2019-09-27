@@ -19,7 +19,10 @@ if nargin < 1
     
     % local
     baseFolder = '/home/parkinsonjl/mnt/sharedStorage/'; 
-    folder= [baseFolder, 'TestDiffusiveTimescale/FixedChill-t5.0e-02-Ra1e+06-Da4.8e-04-C2.00-Rel1.0e-04-0/'];
+    
+    folder= [baseFolder, 'TestRelease/FixedChill-t2.0e-02-Ra1e+06-Da1.0e-04-C2.00-Rel1.0e-04-0/'];
+    
+    
 end
 
 framePrefix = 'frame';

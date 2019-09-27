@@ -53,7 +53,7 @@ Real AdvectionPhysics::getMaxWaveSpeed(const FArrayBox& a_U,
 
   // note that for this advection problem, the max wavespeed
   // is based entirely on the cell-centered velocity
-  Real maxSpeed, speed = 0.0;
+  Real maxSpeed = 0.0, speed = 0.0;
   for (int dir = 0; dir < SpaceDim; dir++)
     {
       FArrayBox& vel = *m_cellVelPtr;

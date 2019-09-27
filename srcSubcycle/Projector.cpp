@@ -537,9 +537,9 @@ void Projector::variableSetUp()
   ppProjection.query("doQuadInterp", tempBool);
   m_doQuadInterp = (tempBool == 1);
 
-  tempBool = (int) m_adaptSolverParamsDivU;
-  ppProjection.query("adaptSolverParamsDivU", tempBool);
-  m_adaptSolverParamsDivU = (tempBool == 1);
+//  tempBool = (int) m_adaptSolverParamsDivU;
+  ppProjection.query("adaptSolverParamsDivU", m_adaptSolverParamsDivU);
+//  m_adaptSolverParamsDivU = (tempBool == 1);
 
   m_scalePressureWithPorosity = false;
   ppProjection.query("scalePressureWithPorosity", m_scalePressureWithPorosity);
@@ -1145,13 +1145,9 @@ void Projector::checkDivergence(LevelData<FluxBox>& a_uEdge)
 
   Real maxDivU = ::computeNorm(DivU, NULL, 1, m_dx, Interval(0,0), 0);
 
-//  int minNumSmooth = 2;
-//  int maxNumSmooth = 20;
   Real tol = 1e-11;
 
   ParmParse ppProjection("projection");
-//  ppProjection.query("maxNumSmooth", maxNumSmooth);
-//  ppProjection.query("minNumSmooth", minNumSmooth);
   ppProjection.query("divergence_tolerance", tol);
 
   // If maxDivU < tol, increase solver tolerance
@@ -1165,32 +1161,6 @@ void Projector::checkDivergence(LevelData<FluxBox>& a_uEdge)
   {
     pout() << "  Projector::checkDivergence - Setting solver tolerance = " << s_solver_tolerance << endl;
   }
-
-//  if (maxDivU < tol)
-//  {
-//    this->s_solver_tolerance = s_solver_tolerance/10;
-////    // We might be able to reduce the number of smoothings
-////    if (s_num_smooth_down > minNumSmooth || s_num_smooth_up > minNumSmooth)
-////    {
-////      s_num_smooth_down = max(s_num_smooth_down-2, minNumSmooth);
-////      s_num_smooth_up = max(s_num_smooth_up-2, minNumSmooth);
-////
-////      pout() << "  max(div U)  = " << maxDivU << " < " << tol << ", decreasing number of smoothing steps to " <<
-////          s_num_smooth_down << " (down) " << s_num_smooth_up << " (up) "<< endl;
-////    }
-//
-//  }
-//  else
-//  {
-//    // Increasing the number of smoothings may help
-////    if (s_num_smooth_down < maxNumSmooth || s_num_smooth_up < maxNumSmooth)
-////    {
-////      s_num_smooth_down = min(s_num_smooth_down+2, maxNumSmooth);
-////      s_num_smooth_up = min(s_num_smooth_up+2, maxNumSmooth);
-////      pout() << "  max(div U)  = " << maxDivU << " > " << tol << ", increasing number of smoothing steps to " <<
-////          s_num_smooth_down << " (down) " << s_num_smooth_up << " (up) " << endl;
-////    }
-//  }
 
 }
 

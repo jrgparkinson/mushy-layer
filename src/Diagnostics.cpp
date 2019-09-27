@@ -54,6 +54,11 @@ Diagnostics::Diagnostics ()
   m_diagnosticNames[DiagnosticNames::diag_saltFluxRelMismatch] = "Fs_rel_mismatch";
 
   m_diagnosticNames[DiagnosticNames::diag_averageVerticalSaltFlux] = "Fs_vertical_av";
+  m_diagnosticNames[DiagnosticNames::diag_Fs10] = "Fs_vert_10pc";
+  m_diagnosticNames[DiagnosticNames::diag_Fs20] = "Fs_vert_20pc";
+  m_diagnosticNames[DiagnosticNames::diag_Fs30] = "Fs_vert_30pc";
+  m_diagnosticNames[DiagnosticNames::diag_Fs40] = "Fs_vert_40pc";
+  m_diagnosticNames[DiagnosticNames::diag_Fs50] = "Fs_vert_50pc";
 
   m_diagnosticNames[DiagnosticNames::diag_L2FsVertDiffusion] = "L2FsVertDiffusion";
   m_diagnosticNames[DiagnosticNames::diag_L2FsVertFluid] = "L2FsVertFluid";
@@ -70,6 +75,10 @@ Diagnostics::Diagnostics ()
   m_diagnosticNames[DiagnosticNames::diag_maxLambda] = "LambdaMax";
   m_diagnosticNames[DiagnosticNames::diag_sumLambda] = "LambdaSum";
   m_diagnosticNames[DiagnosticNames::diag_maxVel] = "maxVel";
+
+  m_diagnosticNames[DiagnosticNames::diag_mushyAverageBulkConc] = "mushAvBulkConc";
+  m_diagnosticNames[DiagnosticNames::diag_mushyAveragePorosity] = "mushAvPorosity";
+  m_diagnosticNames[DiagnosticNames::diag_mushyVol] = "mushVol";
 
   // Sanity check to ensure we have given all the diagnostics names
   for (int i = 0; i < numDiagnostics; i++)
@@ -98,7 +107,7 @@ void Diagnostics::define(Real a_movingAverageTimescale, int a_verbosity, Real a_
   m_verbosity = a_verbosity;
   m_convergenceCriteria = a_convCrit;
 
-  m_diagnosticsFile.open("diagnostics.out", std::ios_base::app);
+  m_diagnosticsFile.open("diagnostics.csv", std::ios_base::app);
 
 
   if (m_verbosity > 2)
@@ -301,7 +310,7 @@ void Diagnostics::printDiagnostics(Real a_time)
   printDiagnostics(a_time, m_diagnosticsFile);
 
   // Open latest diags file and delete contents, then rewrite
-  m_diagnosticsFileLatest.open("diagnosticsLatest.out", std::ofstream::out | std::ofstream::trunc);
+  m_diagnosticsFileLatest.open("diagnosticsLatest.csv", std::ofstream::out | std::ofstream::trunc);
   printHeader(m_diagnosticsFileLatest);
   printDiagnostics(a_time, m_diagnosticsFileLatest);
   m_diagnosticsFileLatest.close();

@@ -79,6 +79,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ParmParse ppPatchGodunov("patchGodunov");
   ParmParse ppVelMultigrid("VelocityMultigrid");
   ParmParse HCMultigrid("HCMultigrid");
+  ParmParse ppBio("bio");
 
   MushyLayerOptions opt;
 
@@ -235,8 +236,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.advVelChiLimit = min(pow(10,5)*opt.lowerPorosityLimit, pow(10,-10)) ; //was 1e-10
   ppMain.query("advPorosityLimit", opt.advVelChiLimit);
-
-
 
   // by default make this tiny (so essentially turned off)
   opt.uDelU_porosityLimit = 10*opt.lowerPorosityLimit; //1e-15;
@@ -396,13 +395,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.useIncrementalPressure = false;
   ppProjection.query("useIncrementalPressure", opt.useIncrementalPressure);
 
-//  opt.phiScale = 1;
-//  ppProjection.query("phiScale", opt.phiScale);
-
-//  opt.scaleMACBCWithChi = false;
-//  opt.MACBCscale = 1.0;
-//  ppProjection.query("scaleMACBCWithChi", opt.scaleMACBCWithChi);
-//  ppProjection.query("MACbcScale", opt.MACBCscale);
+  opt.useIncrementalPressureRefinedLevels = false;
+  ppProjection.query("useIncrementalPressureRefinedLevels", opt.useIncrementalPressureRefinedLevels);
 
   opt.doSyncOperations = true;
   ppMain.query("doSyncOperations", opt.doSyncOperations);
@@ -491,6 +485,40 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.compositeChannelTagging=false;
   ppRegrid.query("compositeChannelTagging", opt.compositeChannelTagging);
 
+  opt.tag_channels = false;
+  ppRegrid.query("tag_channels", opt.tag_channels);
+
+
+
+  if (opt.tag_velocity)
+    {
+    opt.refinementMethod = RefinementMethod::tagSpeed;
+    }
+  else if (opt.tag_channels)
+  {
+    opt.refinementMethod = RefinementMethod::tagChannels;
+  }
+  else if (opt.tag_plume_mush)
+  {
+    opt.refinementMethod = RefinementMethod::tagPlumeMush;
+  }
+  else if (opt.taggingVar > -1)
+  {
+    opt.refinementMethod = RefinementMethod::tagScalar;
+  }
+  else if (opt.taggingVectorVar > -1)
+  {
+    opt.refinementMethod = RefinementMethod::tagVector;
+  }
+  else if (ppRegrid.contains("tag_mush_channels"))
+  {
+    opt.refinementMethod = RefinementMethod::tagMushChannels;
+  }
+  else if (ppRegrid.contains("tag_channels_composite"))
+  {
+    opt.refinementMethod = RefinementMethod::tagMushChannelsCompositeCriteria;
+  }
+
   opt.taggingMarginalPorosityLimit = 1.0;
   ppRegrid.query("marginalPorosityLimit", opt.taggingMarginalPorosityLimit);
 
@@ -541,8 +569,14 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
     opt.project_initial_vel = false;
   }
 
+  opt.regrid_init_pressure = true;
+  ppMain.query("regrid_init_pressure", opt.regrid_init_pressure);
+
   ppMain.query("initialize_pressure", opt.initialize_pressures);
   ppMain.query("project_initial_vel", opt.project_initial_vel);
+
+  opt.regrid_linear_interp = true;
+  ppMain.query("regrid_linear_interp", opt.regrid_linear_interp);
 
   opt.usePrevPressureForUStar = true;
   ppMain.query("addSubtractGradP", opt.usePrevPressureForUStar);
@@ -555,6 +589,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.initResetStates = true;
   ppMain.query("init_resetStates", opt.initResetStates);
+
+  opt.diagnostics_period = -1;
+  ppMain.query("diagnostics_period", opt.diagnostics_period);
 
   /**
    * Solver options
@@ -576,27 +613,18 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   int mgtype = MGmethod::MGTypeFAS;
 
-//  opt.AMRMultigrid_verbosity = 0;
-//  opt.AMRMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
+
   opt.AMRMultigridVerb=0;
   opt.AMRMultigridTolerance=1e-10;
   opt.AMRMultigridHang=1e-10;
   opt.AMRMultigridNormThresh=1e-10;
-//  ppAMRMultigrid.query("multigrid", opt.AMRMultigrid_verbosity);
-//  ppAMRMultigrid.query("relaxMode", opt.AMRMultigridRelaxMode);
+
   ppAMRMultigrid.query("hang_eps", opt.AMRMultigridHang);
   ppAMRMultigrid.query("tolerance", opt.AMRMultigridTolerance);
   ppAMRMultigrid.query("norm_thresh", opt.AMRMultigridNormThresh);
   ppAMRMultigrid.query("verbosity", opt.AMRMultigridVerb);
   ppAMRMultigrid.query("MGtype", mgtype);
   opt.MGtype = MGmethod(mgtype);
-
-
-//  opt.implicitAdvectionSolve = false;
-//  ppMain.query("implicitAdvectionSolve", opt.implicitAdvectionSolve);
-
-//  opt.usePhiForImplicitAdvectionSolve = true;
-//  ppMain.query("usePhiForImplicitAdvectionSolve", opt.usePhiForImplicitAdvectionSolve);
 
   opt.maxDivUFace = 1e-8;
   ppMain.query("maxDivUFace", opt.maxDivUFace);
@@ -607,8 +635,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.nonlinearHCOpSuperOptimised = false;
   ppMain.query("nonlinearHCOpSuperOptimised", opt.nonlinearHCOpSuperOptimised);
 
-//  opt.smoothingCoeff = 0.0; //0.01;
-//  ppProjection.query("pre_smoothing", opt.smoothingCoeff);
+  opt.apply_diagnostic_bcs = true;
+  ppMain.query("apply_diagnostic_bcs", opt.apply_diagnostic_bcs);
 
   opt.velMGNumSmooth=2;
   opt.velMGTolerance=1e-10;
@@ -845,6 +873,15 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("turn_off_buoyancy_time", opt.buoyancy_zero_time);
 
 
+  // Biogeochemistry
+  opt.includeTracers = false;
+  ppBio.query("includeTracers", opt.includeTracers);
+
+  opt.surfaceIrradiance = 0.0;
+  ppBio.query("surfaceIrradiance", opt.surfaceIrradiance);
+
+//  opt.activeTracerInitVal=0.0;
+//     ppBio.query("activeTracerInitVal", opt.activeTracerInitVal);
 
 //  opt.maxEta = -1;
 //  ppMain.query("max_eta", opt.maxEta); // let user specify different max eta if they want
@@ -1198,8 +1235,10 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
   ParmParse ppMain("main");
 
   // make new blank diagnostics file
-  std::ofstream diagnosticsFile ("diagnostics.out");
-  diagnosticsFile.close();
+  // overwrites existing file if one exists
+  // Stop doing this - in danger of deleting data
+//  std::ofstream diagnosticsFile ("diagnostics.csv");
+//  diagnosticsFile.close();
 
   // Check
   Vector<Vector<Box> > fixedGrids;
@@ -1257,6 +1296,13 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
 
 
 
+}
+
+bool is_integer(const std::string& s)
+{
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && std::isdigit(*it)) ++it;
+    return !s.empty() && it == s.end();
 }
 
 

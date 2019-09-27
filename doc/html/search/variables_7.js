@@ -21,6 +21,7 @@ var searchData=
   ['heatconductivityratio',['heatConductivityRatio',['../class_mushy_layer_params.html#aca0e7fca4cf6ab1fca77d8ff63045125',1,'MushyLayerParams']]],
   ['heatconductivitysolid',['heatConductivitySolid',['../class_mushy_layer_params.html#a57cd61cc35cfd06330a3cb6e67c1bddc',1,'MushyLayerParams']]],
   ['height',['height',['../class_mushy_layer_params.html#ae6c806a4560f2711543ba1a9b72e7d76',1,'MushyLayerParams']]],
+  ['heleshampermeability',['heleShamPermeability',['../class_mushy_layer_params.html#add7d54ce252c7efdaad45e934fdff49d',1,'MushyLayerParams']]],
   ['heleshaw',['heleShaw',['../class_mushy_layer_params.html#a55a2f43bc312f950f53d4e05dca51b55',1,'MushyLayerParams']]],
   ['heleshawcoolingcoeff',['heleShawCoolingCoeff',['../class_mushy_layer_params.html#aad3b65b68693c8e28778eed4738cfeb7',1,'MushyLayerParams']]],
   ['heutecticplume',['HEutecticPlume',['../class_mushy_layer_params.html#ad4c0bfd873c178376e2d9238f97c40f2',1,'MushyLayerParams']]],

@@ -5,37 +5,52 @@ import math
 import sys
 import subprocess
 import socket
+from datetime import date
 
-def add_params(defaultParams, extra_params):
-    """ Add params from extra_params to defaultParams """
-
-    for k, v in extra_params.iteritems():
-        defaultParams[k] = v
-
-    return defaultParams
 
 def get_base_output_dir():
-    #base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
-    #base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDiffusiveTimescale/'
-    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestFinal/'
+    """ Define the full path to the directory where the output of running test problems should go """
 
+    base_output_dir = ''
+
+    if base_output_dir == '':
+
+        this_file = os.path.realpath(__file__)
+        print('You need to set the output directory for test problems in the get_base_output_dir() method in %s' % this_file)
+        sys.exit(-1)
 
     if not os.path.exists(base_output_dir):
         os.makedirs(base_output_dir)
 
     return base_output_dir
 
+def add_params(default_params, extra_params):
+    """ Add params from extra_params to defaultParams """
+
+    for k, v in extra_params.iteritems():
+        default_params[k] = v
+
+    return default_params
+
 
 def get_matlab_base_command():
+    """ Define the command(s) needed to startup matlab.
+     E.g. load modules if needed """
     parent_dir = os.path.abspath(os.pardir)
     matlab_folder = os.path.join(parent_dir, 'matlab', 'MethodsPaper')
+
     # matlab_command = 'cd ' + matlab_folder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
+
     matlab_command = 'cd ' + matlab_folder + '; \n source etc/profile.d/modules.sh \n module load idl/870 \n module load matlab/R2018b  \n \n matlab -nodisplay -nosplash -nodesktop -r'
 
     return matlab_command
 
 
 def get_current_vcs_revision():
+    """
+    Get the git respository version of the current directory through the command line
+    :return: git repository version
+    """
     # For mercurial:
     # pipe = subprocess.Popen(
     #    ["hg", "identify", "--num"],
@@ -50,6 +65,10 @@ def get_current_vcs_revision():
     return repo_version
 
 def get_mushy_layer_dir():
+    """
+    Get the path to the mushy-layer directory which this code is contained in
+    :return:  full path to mushy-layer/
+    """
 
     #if 'MUSHY_LAYER_DIR' in os
     this_file_path = os.path.realpath(__file__)
@@ -78,7 +97,7 @@ def get_executable(base_name, dim=2):
     return executable_name
 
 
-def get_executable_name(exec_dir='', exec_name='mushyLayer2d'):
+def get_executable_name(exec_dir='', exec_name='mushyLayer2d', return_full_path=False):
     """ Get the executable in MUSHY_LAYER_DIR/execSubcycle/ which contains mushyLayer2d,
      prioritising OPT over DEBUG compilations.
      Independent of the architecture (i.e. will find for different C++ compilers, fortran versions etc.) """
@@ -91,7 +110,8 @@ def get_executable_name(exec_dir='', exec_name='mushyLayer2d'):
     possible_exec_files = [f for f in os.listdir(exec_dir) if f[:len(exec_name)] == exec_name and f[-2:] == 'ex']
 
     if len(possible_exec_files) == 0:
-        print('Cannot find any executable files - have you compiled the code?')
+        print('Searching %s' % exec_dir)
+        print('Cannot find any executable files \'%s\' - have you compiled the code?' % exec_name)
         sys.exit(0)
 
     init_possible_exec_files = possible_exec_files
@@ -133,10 +153,18 @@ def get_executable_name(exec_dir='', exec_name='mushyLayer2d'):
         print('Executable ' + exec_file +' not found in directory ' + exec_dir)
         sys.exit(0)
 
-    return exec_file
+    if return_full_path:
+        return os.path.join(exec_dir, exec_file)
+    else:
+        return exec_file
 
 
 def construct_run_name(params):
+    """
+    Given some parameters, construct a folder name which describes them for running a simulation in
+    :param params: dictionary which maps parameter names to their values
+    :return: folder name
+    """
     # run_name = 'CR' + str(params['parameters.compositionRatio']) + 'RaC' + str(params['parameters.rayleighComp'])
 
     long_to_short_name = {'parameters.compositionRatio': 'CR',
@@ -203,6 +231,27 @@ def construct_run_name(params):
     return run_name
 
 
+def isfloat(value):
+    """
+    Determine if value is a float
+    """
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+    
+def isint(value):
+    """
+    Determines if value is an integer
+    """
+
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+    
 def read_inputs(inputs_file):
     """ Load up an inputs file and parse it into a dictionary """
 
@@ -222,20 +271,34 @@ def read_inputs(inputs_file):
         # Remove anything after a #
         line = re.sub('#[^\n]*[\n]', '', line)
 
-        parts = line.split('=')
-        if len(parts) > 1:
-            key = parts[0].strip()
-            val = parts[1].strip()
-            params[key] = val
+        parts = re.findall('^([^=]*)=(.*)$', line)
 
+        # parts = line.split('=')
+        # if len(parts) > 1:
+        if parts:
+            match = parts[0]
+            key = match[0].strip()
+            val = match[1].strip()
+
+            # Convert to float/int as appropriate
+            if isint(val):
+                val = int(val)
+            elif isfloat(val):
+                val = float(val)
+
+            params[key] = val
+            
     # print(params)
     return params
 
 
 def write_inputs(location, params, ignore_list = None, doSort=True):
+    """
+     Write out a set of parameters to an inputs file
+    """
     output_file = ''
 
-    key_list = params.keys()
+    key_list = list(params.keys())
     if doSort:
         key_list.sort()
     
@@ -256,6 +319,9 @@ def write_inputs(location, params, ignore_list = None, doSort=True):
 
 
 def has_reached_steady_state(folder):
+    """
+    Determine if a simulation in a particular folder has reached steady state. Not full proof.
+    """
     time_table_file = os.path.join(folder, 'time.table.0')
 
     if os.path.exists(time_table_file):
@@ -263,6 +329,9 @@ def has_reached_steady_state(folder):
         
 
 def time_since_folder_updated(directory):
+    """
+    Compute time since a folder was last changed
+    """
     smallest_t = 1e100
     for filename in os.listdir(directory):
         this_time_diff = time_since_file_updated(os.path.join(directory, filename))
@@ -272,6 +341,8 @@ def time_since_folder_updated(directory):
 
 
 def time_since_file_updated(filename):
+    """ Compute time since a file was last updated """
+
     current_t = time.time()
     t = os.path.getmtime(filename)
         
@@ -280,6 +351,10 @@ def time_since_file_updated(filename):
     return this_time_diff
     
 def get_restart_file(most_recent_path):
+    """
+    Get the most recent (largest frame number) checkpoint file in a directory, which can then be used
+    to restart a simulation from
+    """
 
     restart_file = ''
     
@@ -297,6 +372,7 @@ def get_restart_file(most_recent_path):
 
 
 def get_final_plot_file(directory):
+    """ Get the most recent (largest frame) plot file in a directory """
     files_dir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
     plt_files = []
     # print(files_dir)
@@ -317,6 +393,8 @@ def get_final_plot_file(directory):
 
 
 def get_final_chk_file(directory):
+    """ Get the most recent (largest frame) checkpoint file in a directory """
+
     files_dir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
     plt_files = []
 
@@ -338,6 +416,7 @@ def get_final_chk_file(directory):
 
 
 def is_power_of_two(n):
+    """ Determine if a number if a power of 2 """
     test = math.log(n)/math.log(2)
     
     if round(test) == test:
@@ -346,26 +425,36 @@ def is_power_of_two(n):
         return False
 
 
-def string_to_array(string):
+def string_to_array(string, conversion = lambda x:int(x)):
+    """ Convert a string separated by spaces to an array, i.e.
+    a b c -> [a,b,c]
+     """
 
     if isinstance(string, list):
         return string
 
     parts = string.split(' ')
-    array = [int(i) for i in parts]
+    array = [conversion(i) for i in parts]
     return array
 
 
 def array_to_string(array):
+    """ Convert an array to a string with the elements separated by spaces i.e.
+    [a,b,c] -> a b c
+    """
     str_array = [str(a) for a in array]
     string = ' '.join(str_array)
     return string
 
 
 
-def check_exec_exists(exec_dir, exec_name):
+def check_exec_exists(exec_dir, exec_name, dim=2):
+    """
+    Check if an executable file exists in directory exec_dir with a name that starts with exec_name
+    """
+
     base_name = os.path.join(exec_dir, exec_name)
-    exec_name = get_executable(base_name, 2)
+    exec_name = get_executable(base_name, dim)
 
     # If executable exists, we're all good
     if os.path.exists(exec_name):

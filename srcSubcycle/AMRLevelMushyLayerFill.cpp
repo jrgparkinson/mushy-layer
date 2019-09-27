@@ -353,23 +353,32 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 void AMRLevelMushyLayer::fillTCl(LevelData<FArrayBox>& a_phi, Real a_time,
                                  bool doInterior, bool quadInterp )
 {
-  fillMultiComp(a_phi, a_time, m_temperature, m_liquidConcentration, doInterior, quadInterp);
+
+  bool apply_bcs = false;
+  fillMultiComp(a_phi, a_time, m_temperature, m_liquidConcentration, doInterior, quadInterp, apply_bcs);
+
+  BCHolder bc = m_physBCPtr->temperatureLiquidSalinityBC();
+  for (DataIterator dit = a_phi.dataIterator(); dit.ok(); ++dit)
+  {
+    bc(a_phi[dit], m_grids[dit], m_problem_domain, m_dx, false);
+  }
 }
 
 
 void AMRLevelMushyLayer::fillMultiComp(LevelData<FArrayBox>& a_phi, Real a_time, int scal1, int scal2,
-                                       bool doInterior , bool quadInterp)
+                                       bool doInterior , bool quadInterp, bool apply_bcs)
 {
   CH_assert(a_phi.nComp() == 2);
+
+  if (apply_bcs)
+  {
+    MayDay::Warning("trying to apply bcs in multi comp");
+  }
 
   LevelData<FArrayBox> temp1(a_phi.disjointBoxLayout(), 1, a_phi.ghostVect());
   LevelData<FArrayBox> temp2(a_phi.disjointBoxLayout(), 1, a_phi.ghostVect());
   fillScalars(temp1, a_time, scal1, doInterior, quadInterp);
   fillScalars(temp2, a_time, scal2, doInterior, quadInterp);
-
-  // This doesn't copy ghost cells!
-  //    temp1.copyTo(Interval(0,0), a_phi, Interval(0,0));
-  //    temp2.copyTo(Interval(0,0), a_phi, Interval(1, 1));
 
   // Need to do copying this way to transfer ghost cells
   for (DataIterator dit = a_phi.dataIterator(); dit.ok(); ++dit)
@@ -377,13 +386,25 @@ void AMRLevelMushyLayer::fillMultiComp(LevelData<FArrayBox>& a_phi, Real a_time,
     a_phi[dit].copy(temp1[dit], 0, 0, 1);
     a_phi[dit].copy(temp2[dit], 0, 1, 1);
   }
+//
+//  fillScalars(a_phi, a_time, scal1, doInterior, quadInterp, 0, apply_bcs); // 0th component
+//  fillScalars(a_phi, a_time, scal2, doInterior, quadInterp, 1, apply_bcs); // 1st component
+
 }
 
 
 void AMRLevelMushyLayer::fillHC(LevelData<FArrayBox>& a_phi, Real a_time,
-                                bool doInterior , bool quadInterp )
+                                bool doInterior , bool quadInterp)
 {
-  fillMultiComp(a_phi, a_time, ScalarVars::m_enthalpy, ScalarVars::m_bulkConcentration, doInterior, quadInterp);
+  // Don't apply BCs for HC as they are complicated and we need to do it later
+  bool apply_bcs = false;
+  fillMultiComp(a_phi, a_time, ScalarVars::m_enthalpy, ScalarVars::m_bulkConcentration, doInterior, quadInterp, apply_bcs);
+
+  BCHolder bc = m_physBCPtr->enthalpySalinityBC();
+  for (DataIterator dit = a_phi.dataIterator(); dit.ok(); ++dit)
+  {
+    bc(a_phi[dit], m_grids[dit], m_problem_domain, m_dx, false);
+  }
 }
 
 
@@ -463,7 +484,7 @@ void AMRLevelMushyLayer::fillScalarFace(LevelData<FluxBox>& a_scal, Real a_time,
 }
 // Fill a single component of a scalar field
 void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
-                                     const int a_var, bool doInterior, bool quadInterp)
+                                     const int a_var, bool doInterior, bool quadInterp, int a_comp, bool apply_bcs)
 {
 
   CH_TIME("AMRLevelMushyLayer::fillScalars");
@@ -473,9 +494,9 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   }
 
   //  const DisjointBoxLayout& levelGrids = m_grids;
-
-  Interval scalComps = Interval(0,0); // only works with this for now
-  CH_assert(a_scal.nComp() == 1);
+  Interval scalComps = Interval(a_comp,a_comp);
+  Interval srcComps = Interval(0,0);
+//  CH_assert(a_scal.nComp() == 1);
 
   Real old_time = m_time - m_dt;
 
@@ -489,14 +510,14 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
     if (abs(a_time - old_time) < TIME_EPS)
     {
-      m_scalarOld[a_var]->copyTo(scalComps, a_scal, scalComps);
+      m_scalarOld[a_var]->copyTo(srcComps, a_scal, scalComps);
     } else if (abs(a_time - m_time) < TIME_EPS)
     {
-      m_scalarNew[a_var]->copyTo(scalComps, a_scal, scalComps);
+      m_scalarNew[a_var]->copyTo(srcComps, a_scal, scalComps);
     } else {
       // do linear interpolation in time
       timeInterp(a_scal, a_time, *m_scalarOld[a_var], old_time,
-                 *m_scalarNew[a_var], m_time, scalComps);
+                 *m_scalarNew[a_var], m_time, srcComps, scalComps);
     }
 
   }
@@ -554,32 +575,49 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     const IntVect& scalGrowVect = a_scal.ghostVect();
     int scalGrow = scalGrowVect[0];
 
+    Interval             subcomps(a_comp, a_comp);
+    LevelData<FArrayBox> alias;
+    aliasLevelData(alias, &a_scal, subcomps);
+
     {
       CH_TIME("AMRLevelMushyLayer::fillScalars::linearFillPatch");
 
+//       int srcComp = 0;
+//       int destComp = scalComps.end();
+//       int numComp = 1;
+
+      // Now we're using an alias:
+             int srcComp = 0; // the data to interpolate from always has 1 comp
+             int destComp = 0;
+             int numComp = 1;
+
       if (scalGrow == 1)
       {
-        m_piecewiseLinearFillPatchScalarOne.fillInterp(a_scal, oldCrseScal, newCrseScal,
+        m_piecewiseLinearFillPatchScalarOne.fillInterp(alias, oldCrseScal, newCrseScal,
                                                        crse_time_interp_coeff,
-                                                       scalComps.begin(), scalComps.end(), scalComps.size());
+//                                                       scalComps.begin(), scalComps.end(), scalComps.size());
+                                                       srcComp, destComp, numComp);
       }
       else if (scalGrow == 2)
       {
-        m_piecewiseLinearFillPatchScalarTwo.fillInterp(a_scal, oldCrseScal, newCrseScal,
+        m_piecewiseLinearFillPatchScalarTwo.fillInterp(alias, oldCrseScal, newCrseScal,
                                                        crse_time_interp_coeff,
-                                                       scalComps.begin(), scalComps.end(), scalComps.size());
+//                                                       scalComps.begin(), scalComps.end(), scalComps.size());
+                                                       srcComp, destComp, numComp);
       }
       else if (scalGrow == 3)
       {
-        m_piecewiseLinearFillPatchScalarThree.fillInterp(a_scal, oldCrseScal, newCrseScal,
+        m_piecewiseLinearFillPatchScalarThree.fillInterp(alias, oldCrseScal, newCrseScal,
                                                          crse_time_interp_coeff,
-                                                         scalComps.begin(), scalComps.end(), scalComps.size());
+//                                                         scalComps.begin(), scalComps.end(), scalComps.size());
+                                                         srcComp, destComp, numComp);
       }
       else if (scalGrow == 4)
       {
-        m_piecewiseLinearFillPatchScalarFour.fillInterp(a_scal, oldCrseScal, newCrseScal,
+        m_piecewiseLinearFillPatchScalarFour.fillInterp(alias, oldCrseScal, newCrseScal,
                                                         crse_time_interp_coeff,
-                                                        scalComps.begin(), scalComps.end(), scalComps.size());
+//                                                        scalComps.begin(), scalComps.end(), scalComps.size());
+                                                        srcComp, destComp, numComp);
       }
       else
       {
@@ -598,7 +636,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       }
 
       LevelData<FArrayBox> avCrseScal(crseGrids, 1, oldCrseScal.ghostVect());
-      ::timeInterp(avCrseScal, a_time, oldCrseScal, crse_old_time, newCrseScal, crse_new_time, scalComps);
+      ::timeInterp(avCrseScal, a_time, oldCrseScal, crse_old_time, newCrseScal, crse_new_time, Interval(0,0));
 
       if (s_verbosity >= 6)
       {
@@ -608,7 +646,10 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       // Fill BCs on coarse scalar - doesn't seem to make a difference
       //      crseLevel.fillScalars(avCrseScal, a_time, a_var, false, true);
 
-      m_quadCFInterpScalar.coarseFineInterp(a_scal, avCrseScal);
+
+
+//      m_quadCFInterpScalar.coarseFineInterp(a_scal, avCrseScal);
+      m_quadCFInterpScalar.coarseFineInterp(alias, avCrseScal);
     }
 
   }
@@ -622,7 +663,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   }
 
   // Do domain BCs if we have ghost cells
-  if (numGhost > 0)
+  if (numGhost > 0 &&  apply_bcs)
   {
     CH_TIME("AMRLevelMushyLayer::fillScalars::domainBCs");
 
@@ -649,7 +690,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   }
 
 
-  doRegularisationOps(a_scal, a_var);
+  doRegularisationOps(a_scal, a_var, a_comp);
 
   {
     CH_TIME("AMRLevelMushyLayer::fillScalars::exchange");

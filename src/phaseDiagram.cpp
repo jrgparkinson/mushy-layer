@@ -36,7 +36,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
                              LevelData<FArrayBox>& enthalpyEutectic,
                              MushyLayerParams a_params)
 {
-  DisjointBoxLayout grids = HC.disjointBoxLayout();
+    DisjointBoxLayout grids = HC.disjointBoxLayout();
     IntVect ghostVect = HC.ghostVect();
 
     LevelData<FArrayBox> enthalpy(grids, 1, ghostVect);
@@ -235,6 +235,71 @@ void computeEnthalpyVars(const Real H, const Real C, Real& porosity, Real& theta
     theta = H - stefan;
     C_s = 0;
   }
+}
+
+Real computeTemperature(Real H, Real C, Real compositionRatio, Real specificHeatRatio,
+                               Real stefan, Real waterDistributionCoeff, Real heatCapacityRatio,
+                               Real thetaEutectic, Real ThetaEutectic)
+{
+  Real H_e, H_s, H_l, theta;
+
+  ::computeBoundingEnergy(H, C, H_s, H_l, H_e, heatCapacityRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+
+  if (H <= H_s)
+  {
+    theta = H/specificHeatRatio;
+  }
+  else if (H > H_s && H <= H_e)
+  {
+    theta = thetaEutectic;
+  }
+  else if (H > H_e && H < H_l)
+  {
+    Real porosity = computePorosityMushyLayer( H,  C,  compositionRatio,  specificHeatRatio,
+                                               stefan,  waterDistributionCoeff);
+    theta = - (C + compositionRatio*(1-porosity)) / (porosity + waterDistributionCoeff*(1-porosity));
+  }
+  else
+  {
+    theta = H - stefan;
+  }
+
+  return theta;
+
+}
+
+Real computePorosity(Real H, Real C, Real compositionRatio, Real specificHeatRatio,
+                               Real stefan, Real waterDistributionCoeff, Real heatCapacityRatio,
+                               Real thetaEutectic, Real ThetaEutectic)
+{
+  Real H_e, H_s, H_l, porosity;
+
+  ::computeBoundingEnergy(H_e, C, H_s, H_l, H_e, heatCapacityRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+
+  if (H <= H_s)
+  {
+
+    porosity = 0.0;
+  }
+  else if (H > H_s && H <= H_e)
+  {
+    porosity = (H-thetaEutectic*specificHeatRatio)/(stefan + thetaEutectic*(1-specificHeatRatio));
+
+  }
+  else if (H > H_e && H < H_l)
+  {
+
+    porosity = computePorosityMushyLayer( H,  C,  compositionRatio,  specificHeatRatio,
+                                          stefan,  waterDistributionCoeff);
+
+  }
+  else
+  {
+
+    porosity = 1.0;
+  }
+
+  return porosity;
 }
 
 

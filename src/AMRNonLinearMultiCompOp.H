@@ -291,6 +291,9 @@ public:
 /// Boundary conditions for the diffused field
   BCHolder m_diffusedVarBC;
 
+  /// Should we apply BCs explicitly to the diagnostic variables?
+  bool m_apply_bcs_to_diagnostic_var;
+
 
 
   /// Laplacian operator spatially varying coefficient storage (face-centered) --- if you change this call resetLambda()
@@ -410,7 +413,8 @@ public:
               MushyLayerParams*			   a_params,
               BCHolder  a_derivedVarBC,
               int a_relaxMode,
-              EdgeVelBCHolder a_porosityEdgeBC);
+              EdgeVelBCHolder a_porosityEdgeBC,
+              bool a_apply_bcs_to_diagnostic_var = true);
 
 
   /// New MGLevelOp
@@ -458,6 +462,9 @@ private:
 
   /// Physical boundary condition
   BCHolder m_bc, m_diffusedVarBC;
+
+  /// Apply BCs explicitly to the diagnostic variables?
+  bool m_apply_bcs_to_diagnostic_var;
 
   /// Porosity boundary condition
   EdgeVelBCHolder m_porosityEdgeBC;
