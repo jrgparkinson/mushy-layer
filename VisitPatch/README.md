@@ -29,6 +29,8 @@ level_1
 ```
 
 ## Brief summary of patch
+The files in this directory (avtChomboFileFormat.cpp/.h) contain this change. A brief summary of the changes is included below.
+
 * Add Protected field `bool m_isCheckpointFile;`
 * `avtChomboFileFormat(...)`: initialise new field to `False` by default.
 * `InitializeReader()`: if the existing check determines that no data exists, assume this is a checkpoint file (set `m_isCheckpointFile=true`)

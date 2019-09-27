@@ -87,7 +87,8 @@ def testPorousMushyHole(argv):
     print(Fore.GREEN + 'Setup tests for porous mushy hole' + Style.RESET_ALL)
     physicalProblem = 'PorousMushyHole'
     # dataFolder = os.path.join(base_output_dir, 'PorousMushyHole-t' + str(max_time) + '-hole' + str(hole_radius) )
-    dataFolder = os.path.join(base_output_dir, 'PorousMushyHole-t' + str(max_time))
+    minC = -9.0 # default -5
+    dataFolder = os.path.join(base_output_dir, 'PorousMushyHole-t%s-minC%s' % (max_time, minC))
 
     Nz_uniform = [16, 32, 64, 128, 256, 512]
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
@@ -121,7 +122,8 @@ def testPorousMushyHole(argv):
 
     # Run
     extra_params = {'main.max_time':max_time,
-                    'main.radius': hole_radius}
+                    'main.radius': hole_radius,
+                    'bc.bulkConcentrationHiVal' : [-1, minC]}
 
     runTest(dataFolder, physicalProblem, porous_mushy_hole_resolution_specific_params,
             AMRSetup, num_procs, analysis_command, extra_params)

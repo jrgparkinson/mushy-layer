@@ -84,7 +84,7 @@ def testHeleShawFixedChill(argv):
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
 
-    analysis_command = get_matlab_base_command() + ' "%s; exit;"' % fixed_chill_command(folderName)
+    analysis_command = get_matlab_base_command() + ' "%s; exit;"' % fixed_chill_command(folderName + '-0')
 
     singleRun = True
 
@@ -93,6 +93,9 @@ def testHeleShawFixedChill(argv):
         num_proc = 1
         defaultParams['concise_run_name'] = folderName
         
+        defaultParams = add_params(defaultParams, extra_params)
+
+        # Overwrite default params with any extra params we've specified
         defaultParams = add_params(defaultParams, extra_params)
 
         allowRestarts = False

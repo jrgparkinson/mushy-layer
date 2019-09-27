@@ -7,6 +7,7 @@ import subprocess
 import socket
 from datetime import date
 
+
 def get_base_output_dir():
     """ Define the full path to the directory where the output of running test problems should go """
 
@@ -37,7 +38,9 @@ def get_matlab_base_command():
      E.g. load modules if needed """
     parent_dir = os.path.abspath(os.pardir)
     matlab_folder = os.path.join(parent_dir, 'matlab', 'MethodsPaper')
-    #
+
+    # matlab_command = 'cd ' + matlab_folder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
+
     matlab_command = 'cd ' + matlab_folder + '; \n source etc/profile.d/modules.sh \n module load idl/870 \n module load matlab/R2018b  \n \n matlab -nodisplay -nosplash -nodesktop -r'
 
     return matlab_command

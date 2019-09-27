@@ -17,16 +17,21 @@
 D=2
 echo "Build with DIM=$D"
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+echo "Building $DIR"
 #cd ~/mushy-layer/execSubcycle/
 cd $MUSHY_LAYER_DIR/execSubcycle/
 make all DIM=$D | grep --color -E 'is up to date'
 
-cd $MUSHY_LAYER_DIR/setupNewRun/
+
+cd ../setupNewRun/
 # make clean
 make all DIM=$D | grep --color -E 'is up to date'
 
 cd $MUSHY_LAYER_DIR/postProcess/
 make all DIM=$D | grep --color -E 'is up to date'
+
 
 #module unload gcc/4.8.3
 #module load gcc/5.2.0

@@ -505,6 +505,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
     tagCellsVar(localTags, m_opt.vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
   }
+// <<<<<<< development
   else if (m_opt.refinementMethod == RefinementMethod::tagMushChannelsCompositeCriteria)
   {
     if (s_verbosity >= 2)
@@ -622,6 +623,9 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
   else if (m_opt.refinementMethod == RefinementMethod::tagPlumeMush
       || m_opt.refinementMethod == RefinementMethod::tagMushChannels)  // m_opt.tag_plume_mush
+// =======
+//   else if (m_opt.tag_plume_mush || m_opt.compositeChannelTagging)
+// >>>>>>> master
   {
     // Trying to refine plumes
 
@@ -641,6 +645,84 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     // Place finest resolution around channels
     if (m_level == finestLevel - 1)
     {
+    
+    	if (m_opt.compositeChannelTagging)
+    	{
+    	
+    	 if (s_verbosity >= 2)
+    {
+      pout() << "AMRLevelMushyLayer::tagCells - refine channels composite criteria on level " << m_level << endl;
+    }
+    	
+	    	// Create new field, bulk concentration * vertical velocity
+		LevelData<FArrayBox> concentrationVelocity(m_grids, 1, IntVect::Zero);
+		m_scalarNew[m_bulkConcentration]->copyTo(concentrationVelocity);
+		
+		
+		// Should use porosity gradient rather than solidfraction
+		LevelData<FArrayBox> solidFraction(m_grids, 1, IntVect::Zero);
+		setValLevel(solidFraction, 1.0);
+		
+
+
+		for (DataIterator dit= m_grids.dataIterator(); dit.ok(); ++dit)
+		{
+		  concentrationVelocity[dit].plus(m_parameters.compositionRatio);
+		  concentrationVelocity[dit].mult((*m_vectorNew[m_fluidVel])[dit], SpaceDim-1, 0, 1);
+		  
+		  //solidFraction[dit].setVal(1.0);		  
+		  //solidFraction[dit].minus((*m_scalarNew[m_porosity])[dit]);
+		  //concentrationVelocity[dit].mult(solidFraction[dit]);
+		  
+		  const Box& b = m_grids[dit()];
+			    FArrayBox gradFab(b, SpaceDim);
+			   
+
+
+			    FArrayBox taggingMetricFab(b, 1);
+
+			   
+			      // Calculated undivided gradient
+			      for (int dir = 0; dir < SpaceDim; ++dir)
+			      {
+				const Box bCenter = b & grow(m_problem_domain, -BASISV(dir));
+				const Box bLo = b & adjCellLo(bCenter, dir);
+				const int hasLo = !bLo.isEmpty();
+				const Box bHi = b & adjCellHi(bCenter, dir);
+				const int hasHi = !bHi.isEmpty();
+				FORT_GETGRADF(CHF_FRA1(gradFab, dir), CHF_CONST_FRA1((*m_scalarNew[m_porosity])[dit], 0),
+					      CHF_CONST_INT(dir), CHF_BOX(bLo), CHF_CONST_INT(hasLo),
+					      CHF_BOX(bHi), CHF_CONST_INT(hasHi), CHF_BOX(bCenter));
+			      }
+
+			      FORT_MAGNITUDEF(CHF_FRA1(taggingMetricFab, 0), CHF_CONST_FRA(gradFab),
+					      CHF_BOX(b));
+					  
+		  
+		  
+		  
+		  concentrationVelocity[dit].mult(taggingMetricFab);
+		  
+		  	  
+		 
+		  //Box b = concentrationVelocity[dit].box();
+
+		  BoxIterator bit(b);
+		  for (bit.begin(); bit.ok(); ++bit)
+		  {
+		    const IntVect& iv = bit();
+
+		    if (concentrationVelocity[dit](iv) < -m_opt.refineThresh)
+		    {
+		      localTags |= iv;
+		    }
+		  }
+		}
+        
+        }
+        else
+        {
+
 
       if (m_opt.refinementMethod == RefinementMethod::tagMushChannels)
       {
@@ -713,6 +795,49 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
         // Add to the local tag set
         localTags |= downflowCells;
       }
+// =======
+// 	      // Refine cells that are already refined + have large salinity gradients
+
+// 	      IntVectSet downflowCells;
+// 	      //    Real refineThresh = m_refineThresh;
+
+// 	      IntVectSet porosityGradientCells;
+// 	      tagCellsVar(porosityGradientCells, m_opt.refineThresh, m_porosity, -1, m_opt.taggingMethod);
+
+// 	      // Grow these cells to go further into the channel,
+// 	      // where the salinity is high and fluid velocities are large and negative
+// 	      porosityGradientCells.grow(2*m_opt.tagBufferSize);
+
+// 	      // Tag regions of downflow
+// 	      tagCellsVar(downflowCells,
+// 		          m_opt.plumeVelThreshold, // refine thresh
+// 		          -1, // don't consider a scalar field
+// 		          m_fluidVel, TaggingMethod::CompareLargerThanNegative, 1); // y component of velocity
+
+// 	      IntVectSet saltyCells;
+// 	      tagCellsVar(saltyCells, m_opt.plumeSalinityThreshold,
+// 		          ScalarVars::m_bulkConcentration,
+// 		          -1, TaggingMethod::CompareLargerThan);
+
+// 	      // Only take the cells which have the porosity gradient
+// 	      // and either downflow or very salty
+
+// 	      // Combine downflow and salty
+// 	      downflowCells |= saltyCells;
+
+// 	      // Only take downflow cells which are also in the set of cells satisfying the porosity gradient condition
+// 	      downflowCells &= porosityGradientCells;
+
+// 	      if (s_verbosity >= 5)
+// 	      {
+// 		pout() << "Downflow & porous gradient cells: " << downflowCells << endl;
+// 	      }
+
+// 	      // Add to the local tag set
+// 	      localTags |= downflowCells;
+	      
+// 	}
+// >>>>>>> master
 
     }
     else

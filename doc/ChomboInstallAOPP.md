@@ -47,3 +47,45 @@ The output files produced are most easily opened using the [Visit software](http
 ## Running code on AOPP servers
 There is an example SLURM batch script in `execSubcycle/slurmExample`.
 There is a batch script for building all the mushy layer code (with the relevant module dependencies) in `execSubcycle/buildMushyLayer.sh`, which can be modified for your needs.
+
+
+## Time saving tips for AOPP
+1.  **Automating tasks on login**. After logging in to the machine where you run code from (e.g. atmlxmaster), add commands to your ~/.login file so you don't have to run them manually each time you login, e.g.
+```bash
+module load visit/2.13.2 # gives you access to the visit command, which will let you visualise hdf5 files
+module load hdf5/1.8.18v18__parallel # load hdf5 for data I/O
+module load chombo/3.2__hdf5v18 # load chombo (though you may find it easier to just compile your own copy locally)
+
+# Set default squeue format to display longer job names
+setenv SQUEUE_FORMAT "%.18i %.9P %.25j %.8u %.2t %.10M %.6D %.20R"
+
+# Make sure we produce time.table files in chombo
+setenv CH_TIMER "true"
+```
+
+2. **Mounting remote drives**. (Currently only tested on linux machines). You can mount remote drives like shared storage or your home directory over SSH, so that you can access them from your default file browser. On your local computer, first create a blank directory into which you will mount the drive, e.g.
+```console
+$ cd ~
+$ mkdir mnt
+$ cd mnt
+$ mkdir shared_storage
+```
+Now setup an SSH alias to tunnel through the gateway server, by adding the following (change your username!) to `~/.ssh/config` (create the file if it doesn't already exist):
+```
+Host atmlxmaster
+User          parkinsonj
+HostName      atmlxmaster
+ProxyCommand  ssh parkinsonj@ssh-gateway.physics.ox.ac.uk nc %h %p %r 2> /dev/null
+```
+then run the command (change your shared storage folder unless you want to mount mine!)
+```console
+$ sshfs -o idmap=user atmlxmaster:/network/group/aopp/oceans/AW002_PARKINSON_MUSH ~/mnt/shared_storage
+```
+you will be prompted for your SSH password (possibly twice). Thereafter you can access all your files from your local machine by going to
+```
+cd ~/mnt/shared_storage
+```
+You can also mount your home drive in the same way i.e.
+```console
+$ sshfs -o idmap=user atmlxmaster:/home/parkinsonj/  ~/mnt/home
+```

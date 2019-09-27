@@ -34,7 +34,7 @@ Make sure you use the `--enable-parallel` option with configure.
 
 Once installed make sure you set the evironment variable
 
-`LD_LIBRARY_PATH=/path/to/hdf5` e.g. `LD_LIBRARY_PATH=/home/parkinsonj/soft/hdf5/`.
+`LD_LIBRARY_PATH=/path/to/hdf5/lib/` e.g. `LD_LIBRARY_PATH=/home/parkinsonj/soft/hdf5/lib/`.
 
 Do this in your .bashrc or whatever gets called whenever you open a terminal so it's always there.
 

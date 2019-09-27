@@ -58,6 +58,13 @@ For more details on how to setup your inputs file for the problem you're interes
 
 There are example problems, with input files, in the `/examples/` directory.
 
+For running in parallel (with 2 processors in this example), run the code like
+
+```console
+$ cd execSubcycle
+$ mpirun -np 2 ./mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex inputs
+```
+
 # Documentation
 Documentation can be generated using [Doyxgen](http://www.doxygen.nl/) if it is installed. A default configuration file can be found in the `/docs/` directory, which can be run via:
 
@@ -77,6 +84,8 @@ This repository contains various other pieces of code for running simulations.
 `/params/` contains input files for different types of simulations. They may not all work, sorry.
 `/grids/` contains gridfiles which can be loaded via `main.gridfile=/path/to/gridfile` in an inputs file, and sets a fixed variable mesh (i.e. not adaptive) for simulations.
 `/mk/` contains some custom Makefile options for compiling on some of the machines in AOPP at the University of Oxford.
+
+The code in `/setupNewRun/` and `/postProcess/` needs to be compiled like the code in `/execSubcycle/`. First update the `GNUMakefile` files in each subdirectory, then run `make all` as before.
 
 # Source code
 The source code is spread across a number of directories, which are briefly summarised here.
