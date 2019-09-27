@@ -353,7 +353,15 @@ void AMRLevelMushyLayer::fillFixedPorosity(LevelData<FArrayBox>& a_porosity)
 void AMRLevelMushyLayer::fillTCl(LevelData<FArrayBox>& a_phi, Real a_time,
                                  bool doInterior, bool quadInterp )
 {
-  fillMultiComp(a_phi, a_time, m_temperature, m_liquidConcentration, doInterior, quadInterp);
+
+  bool apply_bcs = false;
+  fillMultiComp(a_phi, a_time, m_temperature, m_liquidConcentration, doInterior, quadInterp, apply_bcs);
+
+  BCHolder bc = m_physBCPtr->temperatureLiquidSalinityBC();
+  for (DataIterator dit = a_phi.dataIterator(); dit.ok(); ++dit)
+  {
+    bc(a_phi[dit], m_grids[dit], m_problem_domain, m_dx, false);
+  }
 }
 
 
@@ -362,20 +370,25 @@ void AMRLevelMushyLayer::fillMultiComp(LevelData<FArrayBox>& a_phi, Real a_time,
 {
   CH_assert(a_phi.nComp() == 2);
 
-//  LevelData<FArrayBox> temp1(a_phi.disjointBoxLayout(), 1, a_phi.ghostVect());
-//  LevelData<FArrayBox> temp2(a_phi.disjointBoxLayout(), 1, a_phi.ghostVect());
-//  fillScalars(temp1, a_time, scal1, doInterior, quadInterp);
-//  fillScalars(temp2, a_time, scal2, doInterior, quadInterp);
-//
-//  // Need to do copying this way to transfer ghost cells
-//  for (DataIterator dit = a_phi.dataIterator(); dit.ok(); ++dit)
-//  {
-//    a_phi[dit].copy(temp1[dit], 0, 0, 1);
-//    a_phi[dit].copy(temp2[dit], 0, 1, 1);
-//  }
+  if (apply_bcs)
+  {
+    MayDay::Warning("trying to apply bcs in multi comp");
+  }
 
-  fillScalars(a_phi, a_time, scal1, doInterior, quadInterp, 0, apply_bcs); // 0th component
-  fillScalars(a_phi, a_time, scal2, doInterior, quadInterp, 1, apply_bcs); // 1st component
+  LevelData<FArrayBox> temp1(a_phi.disjointBoxLayout(), 1, a_phi.ghostVect());
+  LevelData<FArrayBox> temp2(a_phi.disjointBoxLayout(), 1, a_phi.ghostVect());
+  fillScalars(temp1, a_time, scal1, doInterior, quadInterp);
+  fillScalars(temp2, a_time, scal2, doInterior, quadInterp);
+
+  // Need to do copying this way to transfer ghost cells
+  for (DataIterator dit = a_phi.dataIterator(); dit.ok(); ++dit)
+  {
+    a_phi[dit].copy(temp1[dit], 0, 0, 1);
+    a_phi[dit].copy(temp2[dit], 0, 1, 1);
+  }
+//
+//  fillScalars(a_phi, a_time, scal1, doInterior, quadInterp, 0, apply_bcs); // 0th component
+//  fillScalars(a_phi, a_time, scal2, doInterior, quadInterp, 1, apply_bcs); // 1st component
 
 }
 
@@ -574,7 +587,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 //       int numComp = 1;
 
       // Now we're using an alias:
-             int srcComp = 0;
+             int srcComp = 0; // the data to interpolate from always has 1 comp
              int destComp = 0;
              int numComp = 1;
 
