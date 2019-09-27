@@ -387,7 +387,8 @@ function success = Fig9PlotFrame(options, output_dir, actual_plot_prefix, thisFr
     if frame_i == options.numFrames
 
      xlab = xlabel(allAxes{frame_i}(1), '$x$');
-     xlab.Position(2) = xlab.Position(2) + 0.05;
+     xlab.Position(2) = xlab.Position(2) + 0.1;
+     print('Moving x label');
      axLabels{frame_i}.XTick = xl;
      axLabels{frame_i}.XTickLabels = {sprintf(format, xl(1)-dx/4), sprintf(format, xl(2)+dx/4)};
     

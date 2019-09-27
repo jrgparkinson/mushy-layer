@@ -23,7 +23,7 @@ main.doVCreflux=0
 main.domain_height=1.0
 main.dt_tolerance_factor=1.01
 
-main.fill_ratio=0.75
+main.fill_ratio=0.9 #0.75
 main.grid_buffer_size=4
 
 main.initial_cfl=0.01
@@ -34,8 +34,8 @@ main.max_grid_size=32
 main.max_init_dt=1e-2
 main.max_level=2
 main.max_step=800000
-main.max_time=0.02
-main.min_time=0.02
+main.max_time=0.015
+main.min_time=0.015
 main.nondimensionalisation=0
 main.num_cells=32 32 32
 main.output_folder=/network/group/aopp/oceans/AW002_PARKINSON_MUSH/fixedChillAMR/TBottom1.3AMR4-2-0
@@ -56,7 +56,7 @@ main.restart_wavenumber=8
 main.solverFailRestartMethod=0
 main.steady_state=1e-10
 
-main.tag_buffer_size=1 1 1
+main.tag_buffer_size=4 2 1
 main.useAccelDt=1
 
 main.use_limiting=0
@@ -78,7 +78,7 @@ parameters.liquidusSlope=-0.1
 parameters.nonDimReluctance=1e-4
 parameters.nonDimVel=0.0
 parameters.permeabilityFunction=2
-parameters.prandtl=9.0
+parameters.prandtl=10.0
 parameters.problem_type=0
 parameters.rayleighComp=1e6
 parameters.rayleighTemp=0.0
@@ -98,7 +98,7 @@ regrid.marginalPorosityLimit=0.99
 #regrid.plume_salinity=-0.8
 #regrid.plume_vel=10.0
 regrid.compositeChannelTagging=true
-main.refine_thresh=0.1
+main.refine_thresh=0.5
 
 main.time_integration_order=2
 main.checkpoint_interval=1000
