@@ -769,27 +769,27 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 //    tagCellsVar(localTags, m_opt.refineThresh, m_opt.taggingVar, m_opt.taggingVectorVar, m_opt.taggingMethod);
 //  }
   else if (m_opt.refinementMethod == RefinementMethod::tagScalar)
+  {
+    if (s_verbosity >= 2)
     {
-      if (s_verbosity >= 2)
-      {
 
-          pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[m_opt.taggingVar] << endl;
+      pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[m_opt.taggingVar] << endl;
 
-      }
-
-      tagCellsVar(localTags, m_opt.refineThresh, m_opt.taggingVar, -1, m_opt.taggingMethod);
     }
-    else if (m_opt.refinementMethod == RefinementMethod::tagVector)
+
+    tagCellsVar(localTags, m_opt.refineThresh, m_opt.taggingVar, -1, m_opt.taggingMethod);
+  }
+  else if (m_opt.refinementMethod == RefinementMethod::tagVector)
+  {
+    if (s_verbosity >= 2)
     {
-      if (s_verbosity >= 2)
-      {
 
-          pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_vectorVarNames[m_opt.taggingVectorVar] << endl;
+      pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_vectorVarNames[m_opt.taggingVectorVar] << endl;
 
-      }
-
-      tagCellsVar(localTags, m_opt.refineThresh, -1, m_opt.taggingVectorVar, m_opt.taggingMethod);
     }
+
+    tagCellsVar(localTags, m_opt.refineThresh, -1, m_opt.taggingVectorVar, m_opt.taggingMethod);
+  }
   else
   {
 
@@ -867,8 +867,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
   localTags.grow(m_opt.tagBufferSize);
 
-  // New option - when regridding, move to specified gridfile
-
+  // Another option - when regridding, move to specified gridfile
   if (m_opt.fixed_grid_time >= 0)
   {
     // Define new intvect set
@@ -945,9 +944,11 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
   }
 
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 3)
   {
     pout() << "Final local tags: " << localTags << endl;
+    pout() << "  Num points: " << localTags.numPts() << endl;
+    pout() << "  Min enclosing box: " << localTags.minBox() << endl;
   }
 
   a_tags = localTags;
