@@ -41,7 +41,8 @@ def get_matlab_base_command():
 
     # matlab_command = 'cd ' + matlab_folder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
 
-    matlab_command = 'cd ' + matlab_folder + '; \n source etc/profile.d/modules.sh \n module load idl/870 \n module load matlab/R2018b  \n \n matlab -nodisplay -nosplash -nodesktop -r'
+    matlab_command = 'cd ' + matlab_folder + '; \n source /etc/profile.d/modules.sh \n module load idl/870 \n module load matlab/R2018b  \n \n matlab -nodisplay -nosplash -nodesktop -r'
+
 
     return matlab_command
 
@@ -62,6 +63,7 @@ def get_current_vcs_revision():
     # For git:
     repo_version = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
 
+    
     return repo_version
 
 def get_mushy_layer_dir():

@@ -87,7 +87,7 @@ def testPorousMushyHole(argv):
     print(Fore.GREEN + 'Setup tests for porous mushy hole' + Style.RESET_ALL)
     physicalProblem = 'PorousMushyHole'
     # dataFolder = os.path.join(base_output_dir, 'PorousMushyHole-t' + str(max_time) + '-hole' + str(hole_radius) )
-    minC = -9.0 # default -5
+    minC = -5.0 # default -5
     dataFolder = os.path.join(base_output_dir, 'PorousMushyHole-t%s-minC%s' % (max_time, minC))
 
     Nz_uniform = [16, 32, 64, 128, 256, 512]
