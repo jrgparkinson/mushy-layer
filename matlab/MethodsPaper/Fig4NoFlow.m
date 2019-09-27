@@ -458,6 +458,8 @@ if savePlots
     %print(h,[dataFolder, 'noFlowSolution.png'],'-dpng','-r300')
     fprintf('Saved to %s \n', figureName);
     print(h,figureName,'-depsc','-r50')
+
+    savefig(figureName)
     
 end
 
