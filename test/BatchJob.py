@@ -69,6 +69,13 @@ class BatchJob:
             print('Reducing memory limit to %1.0f GB per node to avoid exceeding node memory limit. \n' % (
                     self.memory_limit / 1000))
 
+    def get_batch_job_command(self):
+        """ Define the command used to run batch jobs
+         change this if you're not using slurm! """
+        slurm_command = 'sbatch'
+
+        return slurm_command
+
     def set_preprocess(self, cmd):
         self.preprocess_command = cmd
 
@@ -196,9 +203,9 @@ class BatchJob:
         """
 
         self.write_batch_file(runFileName)
-        slurm_command = 'sbatch' # change this if you're not using slurm!
 
-        cmd = 'cd ' + self.folder + '; ' + slurm_command + ' ' + self.get_run_file(runFileName)
+
+        cmd = 'cd ' + self.folder + '; ' + self.get_batch_job_command() + ' ' + self.get_run_file(runFileName)
 
 
         try:
