@@ -24,7 +24,7 @@ You may overwrite the default initial conditions using the `main.initData` input
 
 Here is an example of how you would add a new initial condition that establishes a linear enthalpy gradient and constant bulk concentration across the domain:
 
-1. Create a new initial data function `AMRLevelMushyLayer::initialDataDefault()`, e.g.
+1. Create a new initial data function `AMRLevelMushyLayer::initialDataLinearGradient()`, e.g.
 
 ```c++
 void AMRLevelMushyLayer::initialDataLinearGradient()
