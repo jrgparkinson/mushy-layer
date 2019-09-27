@@ -267,7 +267,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
 
 void AMRLevelMushyLayer::setAdvVelCentering(Real a_fraction)
 {
-  CH_assert(m_level==0);
+//  CH_assert(m_level==0);
   AMRLevelMushyLayer* mlPtr = this;
   while(mlPtr)
   {

@@ -866,6 +866,10 @@ void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool req
         {
           temp[idir] = 3;
         }
+        else if (temp_str[idir] == "mixed")
+        {
+          temp[idir] = 9;
+        }
         /**
          * SolidWall,
                 Inflow,

@@ -1,0 +1,144 @@
+
+bc.bulkConcentrationHiVal=-1 -1 -1
+bc.bulkConcentrationLoVal=-1 -1 -1
+bc.enthalpyHiVal=0 0 -0.2
+bc.enthalpyLoVal=0.0 0 6.5
+bc.scalarHi=1 1 0
+#bc.scalarLo=1 1 2
+bc.velHi=6 6 0
+#bc.velLo=6 6 2
+
+bc.scalarLo=1 1 0
+bc.velLo=6 6 0
+
+
+main.block_factor=8
+main.cfl=0.2
+main.checkpoint_interval=50000
+main.chk_prefix=chk
+main.debug=false
+main.doProjection=1
+main.domain_height=1.0
+main.dt_tolerance_factor=1.01
+main.enforceAnalyticSoln=false
+main.fill_ratio=0.75
+main.grid_buffer_size=0 0 0
+main.ignoreSolverFails=false
+main.initialize_pressure=true
+main.iteration_plot_interval=-1
+main.max_dt=0.1
+main.max_dt_growth=1.05
+main.max_grid_size=256
+
+main.max_level=0
+main.max_step=1000000
+main.max_time=10.0
+main.min_time=10000.0
+main.nondimensionalisation=0
+main.num_cells=256 512
+main.output_folder=.
+main.periodic_bc=1 1 0
+main.plot_period=0.005
+main.plot_prefix=plt
+main.ref_ratio=2 2 2
+main.regrid_interval=8 8 8
+main.solverFailRestartMethod=0
+main.steady_state=0.001
+main.tag_buffer_size=4
+main.time_integration_order=2
+main.use_limiting=true
+main.use_subcycling=1
+main.verbosity=2
+parameters.K=1
+parameters.compositionRatio=51.0
+parameters.darcy=0.0
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.heatConductivityRatio=1
+parameters.heleShaw=true
+parameters.initialComposition=30
+parameters.lewis=100
+parameters.liquidusSlope=-0.1
+#parameters.nonDimReluctance=0.001
+parameters.nonDimVel=0.0
+parameters.permeabilityFunction=2
+parameters.prandtl=0
+parameters.problem_type=0
+parameters.rayleighComp=1.0
+parameters.rayleighTemp=0
+parameters.specificHeatRatio=1
+parameters.stefan=5.0
+parameters.theta_infinity=1.2
+parameters.waterDistributionCoeff=1e-05
+projection.eta=0.0
+
+main.num_cells = 32 32 32
+#main.num_cells = 16 16 16
+main.plot_interval=1
+parameters.rayleighComp=10
+parameters.compositionRatio=51.0 # 51.0
+main.plot_period=10.0
+
+
+main.max_time=2.0
+
+#parameters.nonDimReluctance=1e-4
+parameters.darcy=1e-3
+parameters.prandtl=10.0
+parameters.rayleighComp=1e4
+
+main.initial_cfl=2e-03
+
+bc.enthalpyHiVal=0 0 3.0
+
+
+parameters.rayleighComp=1e5
+parameters.compositionRatio=1.5
+main.num_cells = 64 64 64
+
+#parameters.nonDimReluctance=1e-5
+parameters.rayleighComp=2e4
+#parameters.compositionRatio=11.0
+
+
+parameters.rayleighComp=2e5
+parameters.compositionRatio=2.0
+
+
+#parameters.compositionRatio=1.15
+#parameters.rayleighComp=5e3
+main.max_init_dt=1e-02
+main.initial_cfl=1e-2
+
+parameters.darcy=1e-3
+parameters.heleShawPermeability=1e5
+
+
+main.uDelu_porosity=0.05 # turn off u.del u source term
+
+main.doEuler=1
+main.advPorosityLimit=0.05
+
+#2D:
+#bc.enthalpyHiVal=0 3.0
+#bc.enthalpyLoVal=0.0 6.1
+#bc.scalarHi=1 0
+#bc.scalarLo=1 2
+#bc.velHi=6 0
+#bc.velLo=6 2
+#main.periodic_bc=1 0 0
+#main.plot_prefix=2dplt
+
+
+
+# AMR 
+main.max_level=0
+main.num_cells = 16 16 16
+main.regrid_interval=8 8 8
+main.plot_interval=5
+projection.eta=0.95
+projection.eta=0.0
+
+
+
+main.num_cells = 32 32 32

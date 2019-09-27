@@ -1,6 +1,8 @@
 # Initial and boundary conditions
 This document describes how to implement the initial conditions and boundary conditions.
 
+The python script in `/plotting/boundaryConditionsFigure.py` is designed to create a visualisation of the boundary conditions specified in an inputs file, which you may find useful. 
+
 ## Initial conditions
 
 There are two options for setting the initial data in a simulation. 
@@ -87,7 +89,7 @@ switch(m_opt.customInitData)
 
 ## Boundary conditions
 
-Boundary conditions are defined in two ways. Firstly we define the type of boundary condition to apply to each side, then we define the value to use (where needed) at each side. For scalars, options are:
+Boundary conditions are defined in two ways. Firstly we define the type of boundary condition to apply to each side, then we define the value to use (where needed) at each side. For scalars, the simple options are:
 
 0. Dirichlet
 1. Neumann
@@ -113,21 +115,116 @@ We set boundary conditions on the 'high' side of the domain in each dimension, t
 
 `bc.velLo=6 2`
 
-We then specify the values of the bulk concentration and enthalpy on each boundary in a similar way
+We must now specify the values of the various thermodynamic fields on each boundary. In older versions of the code, the only way to do this was to specify the enthalpy and bulk salinity, e.g. 
 
-`bc.bulkConcentrationHiVal=-1 -1`
-
-`bc.bulkConcentrationLoVal=-1 -1`
-
-`bc.enthalpyHiVal=0 0.9`
-
-`bc.enthalpyLoVal=0.0 6.03`
-
-Boundary values for temperature, porosity, liquid salinity etc. are computed from the specified bulk concentration and enthalpy. If needed, they can be provided explicitly using e.g
 ```
-bc.temperatureLo
+bc.bulkConcentrationHiVal=-1 -1
+bc.bulkConcentrationLoVal=-1 -1
+bc.enthalpyHiVal=0 0.9
+bc.enthalpyLoVal=0.0 6.03
+```
+
+From which the temperature, porosity, liquid salinity and solid salinity are computed using the phase diagram.
+
+However, this is not always particularly convenient as it doesn't give precise control over the temperature at a boundary. If you instead want to fix other fields, this can be done directly e.g. 
+
+```
+bc.temperatureHi = 0 1
+bc.temperatureHiVal = 0.5 0.0
+```
+
+would set the temperature at the top boundary to be 0.5. Other relevant thermodynamic variables can similarly be controlled e.g.
+
+```
 bc.porosityLo
 bc.liquidConcentrationLo
 permeabilityLo
 ```
 
+### Mixed temperature BC
+A notable extra boundary condition available is designed to enforce the following condition:
+
+```
+a \frac{d \theta}{dz} - F - b(\theta - \theta_{ref}) = 0
+``` 
+
+where `\theta` is the dimensionless temperature. The correct implementation of this BC can be confirmed using the test problem in `/test/diffusiveGrowth/`.
+
+To use this BC, first set the temperature to use BC type `9` on the appropriate face(s). E.g. to use this BC on the top face,
+
+```
+bc.temperatureHi=1 9   # use no flux in x direction, and the mixed BC above in the vertical direction
+```
+
+Then define the values of a, b, F, \theta_{ref} via:
+
+```
+bc.TRefHi=0 -0.8  # \theta_{ref}
+bc.aHi=0 0.5  # a
+bc.bHi=0 -1.0 # b
+bc.temperatureHiVal=0 -1.0 # F
+```
+
+Note that we have also defined values for these variables in the x-direction, but these are irrelevant and not used.
+
+### Time dependent BCs
+Time dependent BCs are possible. At the moment the only option implemented is a sinusoidally varying temperature. An example of this can be found in `/examples/sinusoialcooling/` like
+
+```
+bc.timeDependent=1
+bc.temperatureHi=1 0
+bc.temperatureHiVal=0 -999 # last value here shouldn't matter as we do time dependent bcs
+main.plot_prefix=Sinusoidal
+
+bc.sinusoidal_temperature_bc_timescale = 0.2
+bc.sinusoidal_temperature_bc_amplitude = 0.2
+bc.sinusoidal_temperature_bc_av = -0.8
+bc.sinusoidal_temperature_bc_phase_diff = 0.0
+```
+
+These BCs are implemented in the function `PhysBCUtil::updateTimeDependentBCs()`, where should serve as a model for adding your own other time dependent BCs.
+
+### 3D
+
+In 3D, you must specify three values as there are three dimensions. The vertical dimension becomes the final item in the list, i.e.
+
+```
+bc.temperatureHi = 0.0 0.0 -1.0  # x, y, and z values
+```
+
+### Allowed text keywords
+The latest version of the code will let you define BC types using text rather than numbers, which can make the inputs file read a little easier. This is handled by the function `MushyLayerParams::parseBCs()`. Currently supported options are:
+
+Scalars:
+* 'noflux'
+* 'fixed'
+* 'open'
+* 'inflow'
+* 'mixed' 
+
+Velocity:
+* 'solidwall' or 'noflow'
+* 'inflow'
+* 'outflow' or 'open'
+* 'outflownormal'
+* 'inflowoutflow'
+* 'noshear'
+* 'symmetry'
+* 'pressureHead'
+
+
+Example usage:
+
+```
+bc.scalarHi = noflux fixed
+bc.velLo = symmetry open
+```
+
+which is equivalent to
+
+```
+bc.scalarHi = 1 0
+bc.velLo = 6 2
+```
+
+Note that in one particular line, you must use either all integers or all text to define the BCs.
