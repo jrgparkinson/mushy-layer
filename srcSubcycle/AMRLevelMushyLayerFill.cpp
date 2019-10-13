@@ -522,7 +522,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
-  if (s_verbosity >= 6)
+  if (s_verbosity >= 10)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - done interior filling" << endl;
   }
@@ -567,7 +567,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       crse_time_interp_coeff = (a_time - crse_old_time) / crse_dt;
     }
 
-    if (s_verbosity >= 5)
+    if (s_verbosity >= 10)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - crse_time_inter_coeff = " << crse_time_interp_coeff << endl;
     }
@@ -657,7 +657,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   const ProblemDomain& physDomain = problemDomain();
 
   int numGhost = a_scal.ghostVect()[0];
-  if (s_verbosity >= 6)
+  if (s_verbosity >= 10)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - num ghost: " << numGhost << endl;
   }
@@ -667,7 +667,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   {
     CH_TIME("AMRLevelMushyLayer::fillScalars::domainBCs");
 
-    if (s_verbosity >= 5)
+    if (s_verbosity >= 10)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - do  BCs" << endl;
     }
@@ -684,7 +684,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 10)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - regularisation ops" << endl;
   }
