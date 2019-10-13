@@ -92,11 +92,11 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.min_time = 0;
   ppMain.query("min_time", opt.min_time);
 
-  opt.output_dir = "";
+  opt.output_dir = ".";
   ppMain.query("output_folder", opt.output_dir);
 
-  opt.plotfile_prefix = "plt";
-  ppMain.query("plot_prefix", opt.plotfile_prefix);
+//  opt.plotfile_prefix = "plt";
+//  ppMain.query("plot_prefix", opt.plotfile_prefix);
 
   opt.minimalOutput = false;
   opt.debug = false;
@@ -185,8 +185,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("computeDiagnostics", opt.computeDiagnostics);
 
   // Only relevant for darcy brinkman
+  // Decides whether or not we solve for inertial terms in the momentum equation
   opt.doEulerPart = true;
   ppMain.query("doEuler", opt.doEulerPart);
+  ppMain.query("includeInertialTerms", opt.doEulerPart); // extra option with clearer name
 
   opt.doScalarAdvectionDiffusion = true;
   ppMain.query("doScalarAdvectionDiffusion", opt.doScalarAdvectionDiffusion);
@@ -1115,8 +1117,25 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain, string
   int max_level;
   int max_grid_size;
 
-  ppMain.get("max_level", max_level);
-  ppMain.get("max_grid_size", max_grid_size);
+  if (ppMain.contains("max_level"))
+  {
+    ppMain.get("max_level", max_level);
+  }
+  else
+  {
+    max_level = 0;
+    pout() << "No max_level given, using max_level = 0" << endl;
+  }
+
+  if (ppMain.contains("max_grid_size"))
+  {
+    ppMain.get("max_grid_size", max_grid_size);
+  }
+  else
+  {
+    max_grid_size = prob_domain.domainBox().longside();
+    pout() << "No max_grid_size given, using max_grid_size = " << max_grid_size << endl;
+  }
 
 
   bool predefinedGrids = ppMain.contains(gridfileParam);
