@@ -332,7 +332,7 @@ struct MushyLayerOptions {
   string output_dir;
 
   /// Prefix for plot files
-//  string plotfile_prefix;
+  string plotfile_prefix;
 
   /// Turn on to only produce a minimal ammount of output
   bool minimalOutput;

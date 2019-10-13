@@ -95,8 +95,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.output_dir = ".";
   ppMain.query("output_folder", opt.output_dir);
 
-//  opt.plotfile_prefix = "plt";
-//  ppMain.query("plot_prefix", opt.plotfile_prefix);
+  opt.plotfile_prefix = "plt";
+  ppMain.query("plot_prefix", opt.plotfile_prefix);
 
   opt.minimalOutput = false;
   opt.debug = false;
@@ -906,7 +906,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.accelCFL = -1;
   ppMain.query("accelCFL", opt.accelCFL);
 
-  opt.max_init_dt = -1;
+  // This needs to be small to deal with initial transient adjustment
+  opt.max_init_dt = 1e-3;
   ppMain.query("max_init_dt", opt.max_init_dt);
 
   opt.max_possible_level = 0;
