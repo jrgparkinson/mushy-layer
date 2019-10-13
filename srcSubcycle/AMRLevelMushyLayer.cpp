@@ -3845,9 +3845,22 @@ Real AMRLevelMushyLayer::computeInitialDt()
     max_init_dt = m_opt.max_init_dt;
   }
 
-  dt = min(dt, max_init_dt);
+  localdt = min(localdt, max_init_dt);
 
-  return dt;
+#ifdef CH_MPI
+  Real recv;
+  int result = MPI_Allreduce(&localdt, &recv, 1, MPI_CH_REAL,
+                             MPI_MAX, Chombo_MPI::comm);
+
+  if (result != MPI_SUCCESS)
+  {
+    MayDay::Error("Sorry, but I had a communication error in getMaxAdvVel");
+  }
+
+  localdt = recv;
+#endif
+
+  return localdt;
 }
 
 void AMRLevelMushyLayer::setFluxRegistersZero()
