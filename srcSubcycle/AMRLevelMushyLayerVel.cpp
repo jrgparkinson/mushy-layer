@@ -1169,6 +1169,11 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
 {
   CH_TIME("AMRLevelMushyLayer::computeUstar");
 
+  if (s_verbosity >= 5)
+  {
+    pout() << "AMRLevelMushyLayer::computeUstar (level " << m_level << ")"    << endl;
+  }
+
 
   // old u should be m_fluidVel, whether we're doing MAC projection or not
   int ustarVar = m_Ustar;
@@ -1220,6 +1225,11 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
   }  // end if inviscid
   else
   {
+
+    if (s_verbosity >= 5)
+    {
+      pout() << "   AMRLevelMushyLayer::computerUstar - viscous solve (level " << m_level << ")"    << endl;
+    }
 
 
 

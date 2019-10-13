@@ -602,6 +602,11 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
 {
   CH_TIME("AMRLevelMushyLayer::defineUstarMultigrid");
 
+  if (s_verbosity >= 5)
+  {
+    pout() << "AMRLevelMushyLayer::defineUstarMultigrid solver (level " << m_level << ")"    << endl;
+  }
+
   // Define multigrid solver for this level and coarser level if one exists
 
   Vector<AMRLevelMushyLayer*> hierarchy;
@@ -733,6 +738,11 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
     for (int idir = 0; idir < SpaceDim; idir++)
     {
 
+      if (s_verbosity >= 5)
+      {
+        pout() << "AMRLevelMushyLayer::defineUstarMultigrid, dir = " << idir  << endl;
+      }
+
       BCHolder viscousBC = m_physBCPtr->velFuncBC(idir, m_opt.viscousBCs);
 
       RefCountedPtr<DarcyBrinkmanOpFactory> vcamrpop = RefCountedPtr<DarcyBrinkmanOpFactory>(new DarcyBrinkmanOpFactory());
@@ -754,6 +764,11 @@ void AMRLevelMushyLayer::defineUstarSolver(     Vector<RefCountedPtr<LevelBackwa
                                                 Vector<RefCountedPtr<LevelTGA> >& UstarTGA)
 {
   CH_TIME("AMRLevelMushyLayer::defineUstarSolver");
+
+  if (s_verbosity >= 5)
+  {
+    pout() << "AMRLevelMushyLayer::defineUstarSolver (level " << m_level << ")"    << endl;
+  }
 
   Vector<AMRLevelMushyLayer*> hierarchy;
   Vector<DisjointBoxLayout> allGrids;
