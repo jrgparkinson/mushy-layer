@@ -3825,7 +3825,18 @@ Real AMRLevelMushyLayer::computeInitialDt()
     pout() << "AMRlevelMushyLayer::computeInitialDt" << endl;
   }
 
-  Real dt = computeDt(m_initial_dt_multiplier*m_opt.cfl);
+  Real localdt;
+
+
+
+  localdt = computeDt(m_initial_dt_multiplier*m_opt.cfl);
+
+
+  // Enforce absolute maximum dt
+  if (s_verbosity >= 4)
+  {
+    pout() << "AMRlevelMushyLayer::computeInitialDt - enforce max dt" << endl;
+  }
 
   Real max_init_dt = m_opt.max_dt*m_initial_dt_multiplier;
 
