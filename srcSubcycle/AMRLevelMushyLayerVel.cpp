@@ -7,20 +7,11 @@
 
 void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxBox>& a_advVel)
 {
-
-
-
   if (s_verbosity >= 5)
   {
     pout() << "AMRLevelMushyLayer::calculateTimeIndAdvectionVel (level " << m_level << ")"    << endl;
   }
   CH_TIME("AMRLevelMushyLayer::calculateTimeIndAdvectionVel");
-
-  // Perform a quick check:
-//  if (!m_parameters.heleShaw)
-//  {
-//    MayDay::Warning("Warning - computing Darcy velocity without ")
-//  }
 
   IntVect ivGhost = m_numGhost*IntVect::Unit;
   IntVect advectionGhost = m_numGhostAdvection*IntVect::Unit;
@@ -35,9 +26,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
 
   RefCountedPtr<LevelData<FluxBox> > crsePressureScaleEdgePtr, pressureScaleEdgePtr;
   RefCountedPtr<LevelData<FArrayBox> > crsePressureScalePtr, pressureScalePtr;
-
   RefCountedPtr<LevelData<FArrayBox> > crsePressurePtr, pressurePtr;
-
   AMRLevelMushyLayer* amrMLcrse = getCoarserLevel();
 
   LevelData<FluxBox>* velocityBCVals = new LevelData<FluxBox>(m_grids, 1, a_advVel.ghostVect());
@@ -172,9 +161,11 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     this->computeUstar(uDelu, advectionSourceTerm, m_time-m_dt, m_dt, true, true, false);
 
     // Average U^* to faces for projection
-    // m_advUstar
-//    CellToEdge(*m_vectorNew[VectorVars::m_Ustar], a_advVel);
+
+    // not sure if these exchange calls are necessary, could possibly remove to speed up code
+    m_vectorNew[VectorVars::m_advUstar]->exchange();
     CellToEdge(*m_vectorNew[VectorVars::m_advUstar], a_advVel); // for MAC projection option in computeUstar
+    a_advVel.exchange();
   }
   else
   {
@@ -1169,6 +1160,11 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
 {
   CH_TIME("AMRLevelMushyLayer::computeUstar");
 
+  if (s_verbosity >= 5)
+  {
+    pout() << "AMRLevelMushyLayer::computeUstar (level " << m_level << ")"    << endl;
+  }
+
 
   // old u should be m_fluidVel, whether we're doing MAC projection or not
   int ustarVar = m_Ustar;
@@ -1220,6 +1216,11 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
   }  // end if inviscid
   else
   {
+
+    if (s_verbosity >= 5)
+    {
+      pout() << "   AMRLevelMushyLayer::computerUstar - viscous solve (level " << m_level << ")"    << endl;
+    }
 
 
 

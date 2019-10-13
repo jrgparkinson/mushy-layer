@@ -87,15 +87,50 @@ main(int a_argc, char* a_argv[])
     ParmParse ppMain("main");
 
 
+    bool stopTimeOrStep = false;
+
     Real stopTime = 0.0;
-    ppMain.get("max_time",stopTime);
+    if (ppMain.contains("max_time"))
+    {
+      ppMain.get("max_time",stopTime);
+      stopTimeOrStep = true;
+    }
+    else
+    {
+      stopTime = 100000.0;
+      pout() << "No max_time given, using max_time = " << stopTime << endl;
+
+    }
 
     Real nstop = 0;
-    ppMain.get("max_step",nstop);
+    if (ppMain.contains("max_step"))
+    {
+      ppMain.get("max_step",nstop);
+      stopTimeOrStep = true;
+    }
+    else
+    {
+      nstop = 9999999;
+      pout() << "No max_step given, using max_step = " << nstop << endl;
+    }
     int nstop_int = round(nstop);
 
+    if (!stopTimeOrStep)
+    {
+      pout() << "Neither max_step or max_time given, please define one of these to decide when to stop the simulation." << endl;
+      MayDay::Error("Quitting as no max_step or max_time");
+    }
+
     int max_level = 0;
-    ppMain.get("max_level",max_level);
+    if (ppMain.contains("max_level"))
+    {
+      ppMain.get("max_level",max_level);
+    }
+    else
+    {
+      pout() << "No max_level give, using max_level = " << max_level << endl;
+    }
+
     int num_read_levels = Max(max_level,1);
     Vector<int> ref_ratios; // (num_read_levels,1);
 

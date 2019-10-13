@@ -223,8 +223,8 @@ void MushyLayerParams::getParameters()
   m_nondimensionalisation = 0;
   ppMain.query("nondimensionalisation", m_nondimensionalisation);
 
-  int phys_problem;
-  ppParams.get("problem_type", phys_problem);
+  int phys_problem = PhysicalProblems::m_mushyLayer;
+  ppParams.query("problem_type", phys_problem);
   physicalProblem = PhysicalProblems(phys_problem);
 
   int perm_func = permeabilityFunction;

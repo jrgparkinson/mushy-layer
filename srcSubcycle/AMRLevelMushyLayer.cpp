@@ -3796,7 +3796,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 
   }
 
-  // make sure we consider acceleration for determinig dt at time 0.
+  // make sure we consider acceleration for determining dt at time 0.
   // The initialisation may have generated a small initial velocity, with a corresponding CFL timestep,
   // which we want to override.
 
@@ -3825,7 +3825,18 @@ Real AMRLevelMushyLayer::computeInitialDt()
     pout() << "AMRlevelMushyLayer::computeInitialDt" << endl;
   }
 
-  Real dt = computeDt(m_initial_dt_multiplier*m_opt.cfl);
+  Real localdt;
+
+
+
+  localdt = computeDt(m_initial_dt_multiplier*m_opt.cfl);
+
+
+  // Enforce absolute maximum dt
+  if (s_verbosity >= 4)
+  {
+    pout() << "AMRlevelMushyLayer::computeInitialDt - enforce max dt" << endl;
+  }
 
   Real max_init_dt = m_opt.max_dt*m_initial_dt_multiplier;
 
@@ -3834,9 +3845,22 @@ Real AMRLevelMushyLayer::computeInitialDt()
     max_init_dt = m_opt.max_init_dt;
   }
 
-  dt = min(dt, max_init_dt);
+  localdt = min(localdt, max_init_dt);
 
-  return dt;
+#ifdef CH_MPI
+  Real recv;
+  int result = MPI_Allreduce(&localdt, &recv, 1, MPI_CH_REAL,
+                             MPI_MAX, Chombo_MPI::comm);
+
+  if (result != MPI_SUCCESS)
+  {
+    MayDay::Error("Sorry, but I had a communication error in getMaxAdvVel");
+  }
+
+  localdt = recv;
+#endif
+
+  return localdt;
 }
 
 void AMRLevelMushyLayer::setFluxRegistersZero()
