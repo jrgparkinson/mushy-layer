@@ -3796,7 +3796,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 
   }
 
-  // make sure we consider acceleration for determinig dt at time 0.
+  // make sure we consider acceleration for determining dt at time 0.
   // The initialisation may have generated a small initial velocity, with a corresponding CFL timestep,
   // which we want to override.
 
