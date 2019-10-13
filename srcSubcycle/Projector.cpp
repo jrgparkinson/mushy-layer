@@ -518,6 +518,14 @@ void Projector::variableSetUp()
 {
   // first set up parm parse object
   ParmParse ppProjection("projection");
+  ParmParse ppMain("main");
+
+  int max_level = 0;
+  ppMain.query("max_level", max_level);
+  if (max_level == 0)
+  {
+    m_etaLambda = 0.0;
+  }
 
   int tempBool;
 
