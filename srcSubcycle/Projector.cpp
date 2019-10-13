@@ -903,7 +903,10 @@ void Projector::gradPiBCs(LevelData<FArrayBox>& a_gradPi, bool extrapBCs, bool a
   LevelData<FArrayBox> pressureTemp(m_Pi.disjointBoxLayout(), 1, m_Pi.ghostVect());
   if ( a_usePhi)
   {
-    pressureTemp[dit].copy(m_phi[dit]);
+    for (dit.reset(); dit.ok(); ++dit)
+    {
+      pressureTemp[dit].copy(m_phi[dit]);
+    }
   }
   else
   {
