@@ -26,8 +26,6 @@ def get_sea_ice_material_properties():
     return properties
 
 
-
-
 # Ttop = -5.0 # top temperature, celcius
 # Tbottom = -2.9 # bottom temperature, celcius
 # Si = 30.0 # initial liquid salinity, g/kg
@@ -49,10 +47,7 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     # Physical constants
 
 
-    params['dimensional_values'] = '"Ttop=%f celcius, Tbottom=%f celcius, Si=%f g/kg, L=%f metres, d=%e metres, K0=%e m^2"' % (Ttop, Tbottom, Si, h, d, K0)
-
-
-
+    params['dimensional_values'] = '"Ttop=%.3g celcius, Tbottom=%.3g celcius, Si=%.3g g/kg, L=%.3g metres, d=%.3g metres, K0=%.3g m^2"' % (Ttop, Tbottom, Si, h, d, K0)
 
     ##############################
     # Compute quantities derived from our dimensional inputs
