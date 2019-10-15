@@ -19,7 +19,7 @@ def get_sea_ice_material_properties():
                   'ks': 2.22, # heat conductivity (solid) W/m/celcius
                   'cpl': 4185, # heat capacity (liquid) J/kg/celcius
                   'cps': 2212, # heat capacity (solid) J/kg/celcius
-                  'liquidusSlope': 0.1 # llinearised iquidus slope (celcius / g/kg)
+                  'liquidusSlope': -0.1 # llinearised iquidus slope (celcius / g/kg)
     }
 
 
@@ -54,7 +54,7 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     ###############################
 
     Cref = properties['Se']
-    Ti = -properties['liquidusSlope'] * Si # liquidus temperature for initial salinity
+    Ti = properties['liquidusSlope'] * Si # liquidus temperature for initial salinity
     delta_c = properties['Se'] - Si
     delta_T = Ti - properties['Te']
 
@@ -145,6 +145,9 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     params['bc.scalarHi']= '1 ' * (dim-1) + '0'
     params['bc.scalarLo']= '1 ' * (dim-1) + '2'
 
+    params['bc.velHi'] = '0 ' * dim
+    params['bc.velLo'] = '0 ' * dim
+
     if darcy_brinkman and params['parameters.heleShawPermeability'] * params['parameters.darcy'] < 10.0:
         print('Warning - for Darcy Brinkman need \\Pi_H * Da \ll 1')
 
@@ -156,21 +159,23 @@ if __name__ == "__main__":
     dim = 3
     periodic = True
 
-    Ttop = -15  # top temperature (celcius)
-    Tbottom_above_freezing = 0.1  # ocean temperature - initial freezing point  (celcius)
+    material_properties = get_sea_ice_material_properties()
     Si = 30.0  # initial salinity (g/kg)
+
+    Ttop = -15  # top temperature (celcius)
+    initial_freezing_point = material_properties['liquidusSlope'] * Si
+    Tbottom = initial_freezing_point + 0.1  # ocean temperature - initial freezing point  (celcius)
+
     h = 1.0  # box depth (m)
     d = 1e-4  # Hele-Shaw gap width (m)
     K0 = 1e-10  # Sea ice permeability
 
-    initial_freezing_point = -Si * 0.1
-
     darcy_brinkman = False
 
-    material_properties = get_sea_ice_material_properties()
+
 
     params = {}
-    p = set_params(params, Ttop, Tbottom_above_freezing + initial_freezing_point, Si=Si, h=h, d=d, K0=K0,
+    p = set_params(params, Ttop, Tbottom, Si=Si, h=h, d=d, K0=K0,
                    darcy_brinkman=darcy_brinkman, properties = material_properties, dim=dim,
                    periodic=periodic)
 
