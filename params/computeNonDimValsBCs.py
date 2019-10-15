@@ -43,7 +43,7 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
 # alpha = 3.87e-5  , # thermal expansion celcius^-1
                darcy_brinkman=False,
                properties=get_sea_ice_material_properties(),
-               dim=2):
+               dim=2, periodic=True):
     # Physical constants
 
 
@@ -127,6 +127,11 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     else:
         bc_str = '0 0 %.' + str(bc_accuracy) +'g'
 
+    if periodic:
+        params['main.periodic_bc'] = '1 ' * (dim-1) + '0'
+    else:
+        params['main.periodic_bc'] = '0 ' * dim
+
     params['bc.bulkConcentrationHi'] = '1 ' * dim # no salt flux at either boundary
     params['bc.bulkConcentrationHiVal']= '0 ' * dim # no salt flux at either boundary
     params['bc.bulkConcentrationLoVal']= bc_str % ThetaBottom  # fixed value (ocean salinity) at bottom boundary
@@ -149,7 +154,7 @@ if __name__ == "__main__":
 
     #
     dim = 3
-
+    periodic = True
 
     Ttop = -15  # top temperature (celcius)
     Tbottom_above_freezing = 0.1  # ocean temperature - initial freezing point  (celcius)
@@ -166,7 +171,8 @@ if __name__ == "__main__":
 
     params = {}
     p = set_params(params, Ttop, Tbottom_above_freezing + initial_freezing_point, Si=Si, h=h, d=d, K0=K0,
-                   darcy_brinkman=darcy_brinkman, properties = material_properties, dim=dim)
+                   darcy_brinkman=darcy_brinkman, properties = material_properties, dim=dim,
+                   periodic=periodic)
 
     for key in p:
         try:
