@@ -13,6 +13,7 @@
 #include "CH_HDF5.H"
 #include "parstream.H"
 
+
 #include "AMR.H"
 #include "AMRLevelMushyLayerFactory.H"
 #include "DebugDump.H"
@@ -38,22 +39,25 @@ void mushyLayer(const Real& a_stopTime,
 
 //  printRepoVersion();
 
+  // Define the problem domain (size, resolution, and periodicity)
   ProblemDomain prob_domain;
   getProblemDomain(prob_domain);
 
+  // Define the object which
   RefCountedPtr<AMRLevelMushyLayerFactory>  amrg_fact;
   getAMRFactory(amrg_fact);
 
   AMR amr;
   defineAMR(amr, amrg_fact, prob_domain, a_refRat);
 
+  //
   setupAMRForAMRRun(amr, prob_domain);
 
-  // run
+  // run the simulation
   amr.run(a_stopTime,a_nstop);
 
-  // output last pltfile and statistics
-  //cleanup
+  // Output last pltfile and statistics.
+  // Also cleanup everything.
   amr.conclude();
 
 }

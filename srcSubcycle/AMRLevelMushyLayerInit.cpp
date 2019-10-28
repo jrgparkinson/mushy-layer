@@ -2227,6 +2227,12 @@ void AMRLevelMushyLayer::initialData()
   }
   addMeltPond();
 
+  // Initial perturbation
+  if (m_opt.initialRandomPerturbation > 0.0)
+  {
+    addPerturbation(ScalarVars::m_enthalpy, m_opt.initialRandomPerturbation);
+  }
+
 //  if(m_parameters.physicalProblem == PhysicalProblems::m_poiseuilleFlow)
 //  {
 //    stokesDarcyForcing(*m_scalarNew[ScalarVars::m_temperature], 0);
@@ -2290,6 +2296,16 @@ void AMRLevelMushyLayer::addPerturbation(int a_var, Real alpha, int waveNumber, 
   {
     rands2[i] = ((double) rand()/ (RAND_MAX));
   }
+
+#if CH_SPACEDIM==2
+  Vector<Real> rands3(m_numCells[2]);
+  for (int i = 0; i < m_numCells[2]; i++)
+  {
+    rands3[i] = ((double) rand()/ (RAND_MAX));
+  }
+
+#endif
+
   for (int i = 0; i < m_opt.maxRestartWavenumbers; i++)
   {
     randsk[i] = ((double) rand()/ (RAND_MAX));
@@ -3601,7 +3617,6 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
 
     if (m_opt.restartPerturbation != 0)
     {
-
       // For now just apply to enthalpy - eventually let this be a choice
       addPerturbation(m_opt.restart_perturbation_var, m_opt.restartPerturbation, m_opt.perturbationWavenumber);
       copyNewToOldStates();
