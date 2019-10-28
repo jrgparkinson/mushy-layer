@@ -794,7 +794,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("perturbationPhaseShift", opt.perturbationPhaseShift);
 
   opt.delayedPerturbation = 0.0;
-  ppMain.query("delayedPerturbaation", opt.delayedPerturbation);
+  ppMain.query("delayedPerturbation", opt.delayedPerturbation);
 
   opt.perturbationTime = 0.0;
   ppMain.query("perturbationTime", opt.perturbationTime);
@@ -804,6 +804,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.perturbationSin = false;
   ppMain.query("perturbationSin", opt.perturbationSin);
+
+  opt.initialRandomPerturbation=false;
+  ppMain.query("initialRandomPerturbation", opt.initialRandomPerturbation);
 
   opt.maxRestartWavenumbers = 50;
   ppMain.query("maxRestartWavenumber", opt.maxRestartWavenumbers);

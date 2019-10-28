@@ -1103,6 +1103,9 @@ struct MushyLayerOptions {
    */
   bool perturbationSin = false;
 
+  /// Add an initial random perturbation to enthalpy
+  Real initialRandomPerturbation = 0.0;
+
   /// Porosity value to set if we're using a fixed porosity.
   /**
    * If < 0, use some functional form for the porosity as defined by MushyLayerOptions::porosityFunction

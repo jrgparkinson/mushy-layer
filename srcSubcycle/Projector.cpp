@@ -1023,26 +1023,26 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 
     Box domBox = m_domain.domainBox();
 
-    for (DataIterator dit = rhsInterior.dataIterator(); dit.ok(); ++dit)
-    {
-      SideIterator sit;
-      for (sit.reset(); sit.ok(); ++sit)
-      {
-        Side::LoHiSide side = sit();
-
-        for (int dir=0; dir < SpaceDim; dir++)
-        {
-          int boxSize = 5;
-          Box zeroBox = adjCellBox(domBox, dir, side, boxSize);
-          zeroBox.shift(dir, -boxSize);
-
-          Box stateBox = rhsInterior[dit].box();
-
-          zeroBox &= stateBox;
-          rhsInterior[dit].setVal(0.0, zeroBox, 0);
-        }
-      }
-    }
+//    for (DataIterator dit = rhsInterior.dataIterator(); dit.ok(); ++dit)
+//    {
+//      SideIterator sit;
+//      for (sit.reset(); sit.ok(); ++sit)
+//      {
+//        Side::LoHiSide side = sit();
+//
+//        for (int dir=0; dir < SpaceDim; dir++)
+//        {
+//          int boxSize = 5;
+//          Box zeroBox = adjCellBox(domBox, dir, side, boxSize);
+//          zeroBox.shift(dir, -boxSize);
+//
+//          Box stateBox = rhsInterior[dit].box();
+//
+//          zeroBox &= stateBox;
+//          rhsInterior[dit].setVal(0.0, zeroBox, 0);
+//        }
+//      }
+//    }
 
     Real sumRHSInterior = ::computeSum(rhsInterior, finerGridsPtr,
                                        nRefFine, m_dx, MACrhs().interval());
@@ -1062,6 +1062,7 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
   }
 
   MACrhs().exchange();
+
 
   int exitStatus = solveMGlevel(m_phi, a_crsePressurePtr, MACrhs(), a_pressureScalePtr, a_crsePressureScalePtr,
                a_pressureScaleEdgePtr, a_crsePressureScaleEdgePtr);
@@ -1105,6 +1106,8 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
                              m_gradIVS,
                              m_cfInterp);
 
+  gradPhi.exchange();
+
   // now rescale and subtract from uEdge
 
   // assumes that uEdge and phi can use same dataIterator
@@ -1129,7 +1132,7 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     }
   }
 
-  if(alreadyHasPhi)
+  if (alreadyHasPhi)
   {
     for (dit.reset(); dit.ok(); ++dit)
     {
