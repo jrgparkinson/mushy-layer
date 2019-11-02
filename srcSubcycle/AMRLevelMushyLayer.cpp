@@ -4668,6 +4668,7 @@ bool AMRLevelMushyLayer::crashed()
     Real limit = 1e50;
     if (max > limit || min < -limit)
     {
+      pout() << "WARNING: abs|" << m_scalarVarNames[vars[i]] << "| > " << limit << endl;
       return true;
     }
   }
