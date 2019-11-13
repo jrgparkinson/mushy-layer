@@ -503,7 +503,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   if (doInterior)
   {
     CH_TIME("AMRLevelMushyLayer::fillScalars::interior");
-    if (s_verbosity >= 6)
+    if (s_verbosity >= 9)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - start interior filling, a_time:" << a_time << ", old_time: " << old_time << endl;
     }
@@ -630,7 +630,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     if (quadInterp && m_quadCFInterpScalar.isDefined())
     {
       CH_TIME("AMRLevelMushyLayer::fillScalars::quadCFinterp");
-      if (s_verbosity >= 6)
+      if (s_verbosity >= 9)
       {
         pout() << "  AMRLevelMushyLayer::fillScalars - do quad interp" << endl;
       }
@@ -700,7 +700,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
     if (a_scal.ghostVect()[0] > 0 && m_opt.scalarExchangeCorners)
     {
-      if (s_verbosity >= 5)
+      if (s_verbosity >= 9)
       {
         pout() << "  AMRLevelMushyLayer::fillScalars - corner copier" << endl;
       }
@@ -712,7 +712,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 9)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - finished" << endl;
   }
