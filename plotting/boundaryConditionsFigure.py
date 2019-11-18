@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib
 import os
 import socket
+from util import shared_storage
 
 def latexify(fig_width=None, fig_height=None):
     """Set up matplotlib's RC params for LaTeX plotting.
@@ -306,7 +307,7 @@ def make_bc_text(inputs, directory, side):
 if __name__ == "__main__":
 
     inputs_file = '/home/parkinsonjl/mushy-layer/execSubcycle/enceladus/inputs'
-    inputs_file = '/home/parkinsonjl/mnt/sharedStorage/enceladus/256x128-Rm200-HeatSourceSize0.2-TopBCFixedH-similarToNoFlow/inputs'
+    inputs_file = shared_storage.get_dir('enceladus/256x128-Rm200-HeatSourceSize0.2-TopBCFixedH-similarToNoFlow/inputs')
 
     arg = sys.argv[1:]
     try:
