@@ -173,7 +173,7 @@ axes[1].set_position([0.15, 0.14, 0.8, 0.6])
 
 plt.draw()
 
-figure_output_directory = '/home/parkinsonjl/phd/python/plotting/'
+figure_output_directory = '/home/parkinsonjl/phd/figures/'
 fig_name = '%s_profile_warming' % profile_name
 
 if comparison:

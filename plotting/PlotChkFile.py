@@ -9,12 +9,12 @@ from util import shared_storage
 plt.close('all')
 latexify(fig_width=4.0, fig_height=3.0)
 
-figure_output_directory = '/home/parkinsonjl/phd/python/plotting/'
+figure_output_directory = '/home/parkinsonjl/phd/figures/'
 
 fig_name = 'chk088000'
 # fig_name = 'chk277000'
 
-base_folder = shared_storage.get_dir('/home/parkinsonjl/mnt/sharedStorage/SeaIceGrowth/T-20HigherPermeability/')
+base_folder = shared_storage.get_dir('SeaIceGrowth/T-20HigherPermeability/')
 cf = ChkFile(os.path.join(base_folder, '%s.2d.hdf5' % fig_name))
 
 
