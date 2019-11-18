@@ -4,7 +4,7 @@ import sys
 import os
 import re
 import numpy as np
-
+from util import shared_storage
 
 import matplotlib
 matplotlib.use('Agg')
@@ -231,9 +231,9 @@ def load_error(folder):
 def run_chombo_compare(argv):
 
     figure_number = 8
-    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
-    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.03'
-    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015-hole0.04-veryGoodUseThis'
+    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
+    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.03'
+    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015-hole0.04-veryGoodUseThis'
     #data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/'
     field = 'Porosity'
     err_type = 'L2'
@@ -246,7 +246,7 @@ def run_chombo_compare(argv):
 
     figure_number = 6
     # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc'
-    data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/'
+    data_folder = shared_storage.get_dir('TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/')
     run_analysis = False
     field = 'xDarcy velocity'
     err_type = 'L2'
