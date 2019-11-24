@@ -1,7 +1,7 @@
 # Regression tests
 This directory contains regression tests. The idea is to run a simulation and check that the output hasn't changed (hasn't 'regressed'). Assuming the original output was correct, the program still works.
 
-We can compare both the text output (e.g `pout.0` or `diagnostics.csv`) and the data output (`.hdf5` files). Each subdirectory contains a test, which at a bare minimum consist of the following files:
+We compare either the text output (e.g `pout.0` or `diagnostics.csv`) and/or the data output (`.hdf5` files). Each subdirectory contains a test, which at a bare minimum consist of the following files:
 
 1. `inputs`: the input parameters for the simulation
 2. `regression.json`: the options for running the test (number of dimensions, processors etc.). See an existing file for a template.
@@ -19,3 +19,9 @@ Run all the tests using the python file `run_regression_tests.py` e.g.
 ```
 
 Check the output to the terminal, which will report which tests fail and which succeed, along with further information on test failures.
+
+# Modify a test
+If you wish to update the expected results of a test (e.g. you have changed the code and the test now 'fails' when it shouldn't) then just replace the existing `*.expected` files with new ones you have generated.
+
+# Create a new test
+To add a new test, make a new subdirectory in this present directory with the an `inputs` file, `regression.json` file (see an existing example for a template) and the `*.expected` files you wish to test against. The test will be run automatically by the python script (it searches this directory for all subdirectories)
