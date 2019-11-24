@@ -195,9 +195,14 @@ def run_compare(next_folder, this_folder, err_type):
 
 def load_error(folder):
 
-    errors = {}
 
     error_file = os.path.join(folder, 'pout.0')
+
+    return load_error_file(error_file)
+
+def load_error_file(error_file):
+    errors = {}
+
     if not os.path.exists(error_file):
         # print('Cannot find %s' % error_file)
         return errors

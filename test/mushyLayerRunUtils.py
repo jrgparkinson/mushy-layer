@@ -83,7 +83,7 @@ def get_mushy_layer_dir():
     return mushy_layer_dir
 
 
-def get_executable(base_name, dim=2):
+def get_executable(base_name='mushyLayer', dim=2):
     """ Given some program name, and assuming compilation options (mpiCC, gfortran, OPT, MPI etc.)
      return the correct executable for this system"""
 
