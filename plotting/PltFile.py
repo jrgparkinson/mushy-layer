@@ -58,7 +58,7 @@ class PltFile:
                    'yAdvection velocity': '$w$',
                    'streamfunction': '$\psi$'}
 
-    def __init__(self, filename, load_data=False):
+    def __init__(self, filename, load_data=False, inputs_file='inputs'):
         if not os.path.exists(filename):
             print('PltFile: file does not exist %s ' % filename)
             return
@@ -82,8 +82,7 @@ class PltFile:
 
         self.data_load_method = self.XARRAY
 
-        if load_data:
-            self.load_data()
+
 
         # Initialise to bogus values
         self.iteration = -1
@@ -106,11 +105,15 @@ class PltFile:
 
         # get inputs
         output_folder = os.path.abspath(os.path.join(self.filename, '..'))
-        inputs_file_loc = os.path.join(output_folder, 'inputs')
+        inputs_file_loc = os.path.join(output_folder, inputs_file)
         if os.path.exists(inputs_file_loc):
             self.inputs = read_inputs(inputs_file_loc)
         else:
+            print('Cannot find inputs file %s' % inputs_file_loc)
             self.inputs = None
+
+        if load_data:
+            self.load_data()
 
     def load_data(self, zero_x=False):
         if self.data_loaded:
@@ -1020,7 +1023,11 @@ class PltFile:
         conc_ratio = float(self.inputs['parameters.compositionRatio'])
         stefan = float(self.inputs['parameters.stefan'])
         cp = float(self.inputs['parameters.specificHeatRatio'])
-        pc = float(self.inputs['parameters.waterDistributionCoeff'])
+        if 'parameters.waterDistributionCoeff' in self.inputs.keys():
+            pc = float(self.inputs['parameters.waterDistributionCoeff'])
+        else:
+            pc = 1e-5
+
         theta_eutectic = 0.0
 
 
@@ -1144,7 +1151,13 @@ class PltFile:
 
             liquid_permeability = porosity ** 3 / (1 - porosity) ** 2
 
-            hele_shaw_permeability = 1 / float(self.inputs['parameters.nonDimReluctance'])
+            if 'parameters.heleShawPermeability' in self.inputs.keys():
+                hele_shaw_permeability = self.inputs['parameters.heleShawPermeability']
+            elif 'parameters.nonDimReluctance' in self.inputs.keys():
+                hele_shaw_permeability = 1 / float(self.inputs['parameters.nonDimReluctance'])
+            else:
+                print('Unable to determine Hele-Shaw permeability, cannot find either parameters.heleShawPermeability or parameters.nonDimReluctance in the inputs file. ')
+                sys.exit(-1)
 
             total_permeability = (hele_shaw_permeability ** (-1) + liquid_permeability ** (-1)) ** (-1)
 
@@ -1298,13 +1311,16 @@ class PltFile:
                     val = np.amin(vals)
                     solid_indices.append(val)
 
-            median_eutectic_boundary = np.median(solid_indices)
+            # median_eutectic_boundary = np.median(solid_indices)
             # eutectic_interface = median_eutectic_boundary * dx
             # eutectic_boundary_cell = int(median_eutectic_boundary)
 
             # liquid_indices = [np.amin(np.argwhere(porosity[:, ix] < 1.0)) for ix in np.arange(0, s[1])]
 
-            median_liquid_boundary = int(np.median(liquid_z_indices))
+            if liquid_z_indices:
+                median_liquid_boundary = int(np.median(liquid_z_indices))
+            else:
+                median_liquid_boundary = 0
 
 
             # height = abs(dx * float(median_eutectic_boundary - median_liquid_boundary))
