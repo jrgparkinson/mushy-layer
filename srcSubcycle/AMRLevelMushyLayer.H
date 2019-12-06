@@ -573,14 +573,14 @@ protected:
    */
   void advectPassiveTracer();
 
-  /// Compute diffusive src for some scalar with bulk concentration \f \xi \f$
+  /// Compute diffusive src for some scalar with bulk concentration \f$ \xi \f$
   /**
    * \f$ S =  \nabla \cdot \chi \nabla (\xi/\chi)\f$
    */
   void computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelData<FArrayBox>& a_src);
 
 
-  /// Compute concentration of scalar (with bulk concentration \f$ \xi \f$) in the liquid phase
+  /// Compute concentration of scalar (with bulk concentration \f$ \xi \f$ ) in the liquid phase
   /**
    * \f$ \xi/\chi \f$
    */
@@ -589,7 +589,7 @@ protected:
   /// Advect generic tracer
   void advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_src);
 
-  /// Advect active tracer \f \zeta \f$
+  /// Advect active tracer \f$ \zeta \f$
   /**
    * \f$ \frac{\partial \zeta}{\partial t} + \mathbf{U} \cdot \nabla (\zeta/\chi) = S(x,z)\f$
    * where \f$ S(x,z) \f$ is a source/sink of the tracer defined in computeActiveTracerSourceSink()
@@ -1122,9 +1122,6 @@ protected:
   /// Vector fields at old time
   Vector<RefCountedPtr<LevelData<FArrayBox> > > m_vectorOld;
 
-  /// Change in vector fields
-  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_dVector;
-
   /// Backed up vector fields to be used for restarting
   Vector<RefCountedPtr<LevelData<FArrayBox> > > m_vectorRestart;
 
@@ -1133,6 +1130,9 @@ protected:
 
   /// Names of vector variables
   Vector<string> m_vectorVarNames;
+
+  /// Indexes of vector fields to save for restarting
+  Vector<int> m_vectRestartVars;
 
   /// TGA integrators (2nd order in time)
   RefCountedPtr<LevelTGA> m_enthalpySalinityTGA;

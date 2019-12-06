@@ -60,6 +60,10 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_numGhost = 1;
   m_numGhostAdvection = 4;
 
+  // Currently just one element in this vector, fluid velocity
+  m_vectRestartVars = Vector<int>(1, 0);
+  m_vectRestartVars[0] = VectorVars::m_fluidVel;
+
   m_scalarVarNames = Vector<string>(m_numScalarVars, string("scalar"));
   m_scalarVarNames[ScalarVars::m_enthalpy] = string("Enthalpy");
   m_scalarVarNames[ScalarVars::m_bulkConcentration] = string("Bulk concentration");
@@ -2142,11 +2146,11 @@ void AMRLevelMushyLayer::initialData()
 
     (*m_vectorNew[VectorVars::m_fluidVel])[dit].setVal(0.0);
     (*m_vectorOld[VectorVars::m_fluidVel])[dit].setVal(0.0);
-    (*m_dVector[VectorVars::m_fluidVel])[dit].setVal(0.0);
+
 
     (*m_vectorNew[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
     (*m_vectorOld[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
-    (*m_dVector[VectorVars::m_bodyForce])[dit].setVal(m_parameters.body_force);
+
 
     m_advVel[dit].setVal(0.0);
 
@@ -2297,7 +2301,7 @@ void AMRLevelMushyLayer::addPerturbation(int a_var, Real alpha, int waveNumber, 
     rands2[i] = ((double) rand()/ (RAND_MAX));
   }
 
-#if CH_SPACEDIM==2
+#if CH_SPACEDIM==3
   Vector<Real> rands3(m_numCells[2]);
   for (int i = 0; i < m_numCells[2]; i++)
   {
@@ -3364,8 +3368,7 @@ void AMRLevelMushyLayer::initDataStructures()
 
   m_vectorNew.resize(m_numVectorVars);
   m_vectorOld.resize(m_numVectorVars);
-  m_dVector.resize(m_numVectorVars);
-  m_vectorRestart.resize(m_numVectorVars);
+  m_vectorRestart.resize(m_vectRestartVars.size());
 }
 
 void AMRLevelMushyLayer::createDataStructures()
@@ -3403,9 +3406,9 @@ void AMRLevelMushyLayer::createDataStructures()
         new LevelData<FArrayBox>(m_grids, 1, ivGhost));
   }
 
+  IntVect ghost;
   for (int vectorVar = 0; vectorVar < m_numVectorVars; vectorVar++)
   {
-    IntVect ghost;
     if (vectorVar == m_advSrcLapU)
     {
       ghost = m_numGhostAdvection*ivGhost;
@@ -3419,10 +3422,12 @@ void AMRLevelMushyLayer::createDataStructures()
         new LevelData<FArrayBox>(m_grids, SpaceDim, ghost));
     m_vectorOld[vectorVar] = RefCountedPtr<LevelData<FArrayBox> >(
         new LevelData<FArrayBox>(m_grids, SpaceDim, ghost));
-    m_dVector[vectorVar] = RefCountedPtr<LevelData<FArrayBox> >(
-        new LevelData<FArrayBox>(m_grids, SpaceDim, ghost));
-    m_vectorRestart[vectorVar] = RefCountedPtr<LevelData<FArrayBox> >(
-        new LevelData<FArrayBox>(m_grids, SpaceDim, ghost));
+  }
+
+  for (int restartVar = 0; restartVar < m_vectRestartVars.size(); restartVar++)
+  {
+    m_vectorRestart[restartVar] = RefCountedPtr<LevelData<FArrayBox> >(
+            new LevelData<FArrayBox>(m_grids, SpaceDim, ivGhost));
   }
 
   // When created, all our variables will have some bogus value 10^300

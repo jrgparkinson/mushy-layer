@@ -1678,9 +1678,12 @@ void AMRLevelMushyLayer::backupTimestep()
       (*m_scalarRestart[var])[dit].copy((*m_scalarNew[var])[dit]);
     }
 
-    for (int var = 0; var < m_numVectorVars; var++)
+    // Map index i in m_vectorRestart to
+    // index vectRestartVars[i] in m_vectorNew/Old
+    for (int i = 0; i < m_vectRestartVars.size(); i++)
     {
-      (*m_vectorRestart[var])[dit].copy((*m_vectorNew[var])[dit]);
+      int var = m_vectRestartVars[i];
+      (*m_vectorRestart[i])[dit].copy((*m_vectorNew[var])[dit]);
     }
   }
 
@@ -1703,9 +1706,6 @@ void AMRLevelMushyLayer::restartTimestepFromBackup(bool ignorePressure)
   restartVars.push_back(ScalarVars::m_pressure);
   restartVars.push_back(ScalarVars::m_lambda);
 
-  Vector<int> vectRestartVars;
-  vectRestartVars.push_back(VectorVars::m_fluidVel);
-
   // Make sure we copy ghost cells
   for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
   {
@@ -1720,12 +1720,13 @@ void AMRLevelMushyLayer::restartTimestepFromBackup(bool ignorePressure)
       }
     }
 
-    for (int i = 0; i < vectRestartVars.size(); i++)
+    // Map index i in m_vectorRestart to
+    // index vectRestartVars[i] in m_vectorNew/Old
+    for (int i = 0; i < m_vectRestartVars.size(); i++)
     {
-      int var = vectRestartVars[i];
-      (*m_vectorNew[var])[dit].copy((*m_vectorRestart[var])[dit]);
-      (*m_vectorOld[var])[dit].copy((*m_vectorRestart[var])[dit]);
-
+      int var = m_vectRestartVars[i];
+      (*m_vectorNew[var])[dit].copy((*m_vectorRestart[i])[dit]);
+      (*m_vectorOld[var])[dit].copy((*m_vectorRestart[i])[dit]);
     }
   }
 
