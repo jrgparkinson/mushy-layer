@@ -1134,6 +1134,9 @@ protected:
   /// Indexes of vector fields to save for restarting
   Vector<int> m_vectRestartVars;
 
+  /// Indexes of scalar fields to save for restarting
+  Vector<int> m_scalRestartVars;
+
   /// TGA integrators (2nd order in time)
   RefCountedPtr<LevelTGA> m_enthalpySalinityTGA;
 

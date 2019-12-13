@@ -64,6 +64,12 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_vectRestartVars = Vector<int>(1, 0);
   m_vectRestartVars[0] = VectorVars::m_fluidVel;
 
+  m_scalRestartVars = Vector<int>(4, 0);
+  m_scalRestartVars[0] = ScalarVars::m_enthalpy;
+  m_scalRestartVars[1] = ScalarVars::m_bulkConcentration;
+  m_scalRestartVars[2] = ScalarVars::m_lambda;
+  m_scalRestartVars[2] = ScalarVars::m_pressure;
+
   m_scalarVarNames = Vector<string>(m_numScalarVars, string("scalar"));
   m_scalarVarNames[ScalarVars::m_enthalpy] = string("Enthalpy");
   m_scalarVarNames[ScalarVars::m_bulkConcentration] = string("Bulk concentration");
@@ -121,7 +127,6 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_vectorVarNames[VectorVars::m_advectionSrc] = string("Advection Source");
   m_vectorVarNames[VectorVars::m_fluidVelAnalytic] = string("Darcy Vel Analytic");
   m_vectorVarNames[VectorVars::m_fluidVelErr] = string("Darcy Vel Error");
-  //  m_vectorVarNames[m_fluidRefluxCorr] = string("Vel reflux correction");
   m_vectorVarNames[VectorVars::m_dUdt] = string("dUdt");
   m_vectorVarNames[VectorVars::m_FsDiffusion] = string("FsDiffusion");
   m_vectorVarNames[VectorVars::m_FsFluid] = string("FsFluid");
@@ -132,8 +137,6 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_vectorVarNames[VectorVars::m_advectionImplicitSrc] = string("Implicit Advection Src");
   m_vectorVarNames[VectorVars::m_MACcorrection] = string("MAC correction");
   m_vectorVarNames[VectorVars::CCcorrection] = string("CC correction");
-  //  m_vectorVarNames[m_lapUinit] = string("Lap U init");
-  //  m_vectorVarNames[m_lapUfinal] = string("Lap U final");
   m_vectorVarNames[VectorVars::m_advSrcLapU] = string("AdvSrc Lap U");
 
   m_vectorVarNames[VectorVars::m_bodyForce] = string("Body force");
@@ -157,7 +160,6 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
     m_outputScalarVars.push_back(ScalarVars::m_streamfunction);
     m_outputScalarVars.push_back(ScalarVars::m_permeability);
     m_outputScalarVars.push_back(ScalarVars::m_lambda);
-    //    m_outputScalarVars.push_back(ScalarVars::m_lambda_porosity);
 
     m_outputScalarVars.push_back(ScalarVars::m_pressure);
 
@@ -3348,10 +3350,8 @@ void AMRLevelMushyLayer::initDataStructures()
   }
   m_scalarNew.resize(m_numScalarVars);
   m_scalarOld.resize(m_numScalarVars);
-  //  m_dScalar.resize(m_numScalarVars);
+
   m_scalarRestart.resize(m_numScalarVars);
-  //  m_scalarFluxNew.resize(m_numScalarVars);
-  //  m_scalarFluxOld.resize(m_numScalarVars);
 
   m_vectorNew.resize(m_numVectorVars);
   m_vectorOld.resize(m_numVectorVars);

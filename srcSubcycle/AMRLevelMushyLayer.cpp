@@ -1673,8 +1673,9 @@ void AMRLevelMushyLayer::backupTimestep()
 
   for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
   {
-    for (int var = 0; var < m_numScalarVars; var++)
+    for (int i = 0; i < m_scalRestartVars.size(); i++)
     {
+      int var = m_scalRestartVars[i];
       (*m_scalarRestart[var])[dit].copy((*m_scalarNew[var])[dit]);
     }
 
@@ -1700,19 +1701,13 @@ void AMRLevelMushyLayer::restartTimestepFromBackup(bool ignorePressure)
   }
   Vector<int> restartVars;
 
-  // This should be all we need:
-  restartVars.push_back(ScalarVars::m_enthalpy);
-  restartVars.push_back(ScalarVars::m_bulkConcentration);
-  restartVars.push_back(ScalarVars::m_pressure);
-  restartVars.push_back(ScalarVars::m_lambda);
-
   // Make sure we copy ghost cells
   for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
   {
 
-    for (int i = 0; i < restartVars.size(); i++)
+    for (int i = 0; i < m_scalRestartVars.size(); i++)
     {
-      int var = restartVars[i];
+      int var = m_scalRestartVars[i];
       if (! (var == ScalarVars::m_pressure && ignorePressure))
       {
         (*m_scalarNew[var])[dit].copy((*m_scalarRestart[var])[dit]);
