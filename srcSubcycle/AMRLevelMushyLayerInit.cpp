@@ -3758,12 +3758,8 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
       diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxBottom);
       diagsToPrint.push_back(DiagnosticNames::diag_saltFluxAbsMismatch);
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxAbsMismatch);
-//      diagsToPrint.push_back(DiagnosticNames::diag_soluteFluxSponge);
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxBottom);
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxTop);
-      diagsToPrint.push_back(DiagnosticNames::diag_dUdt);
-      diagsToPrint.push_back(DiagnosticNames::diag_dSdt);
-      diagsToPrint.push_back(DiagnosticNames::diag_dTdt);
       diagsToPrint.push_back(DiagnosticNames::diag_chimneySpacing);
       diagsToPrint.push_back(DiagnosticNames::diag_chimneyWidth);
       diagsToPrint.push_back(DiagnosticNames::diag_HorizAvSalinity0);
