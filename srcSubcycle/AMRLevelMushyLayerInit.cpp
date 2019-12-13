@@ -2,7 +2,7 @@
 #include "AMRLevelMushyLayer.H"
 #include "analyticSolns.H"
 #include "SetValLevel.H"
-
+#include <ctime>
 /**
  * This source file contains methods for initialising and defining objects
  */
@@ -2288,28 +2288,7 @@ void AMRLevelMushyLayer::addPerturbation(int a_var, Real alpha, int waveNumber, 
 
   Real domainWidth = m_opt.domainWidth;
 
-
-  Vector<Real> rands1(m_numCells[0]);
-  Vector<Real> rands2(m_numCells[1]);
   Vector<Real> randsk(m_opt.maxRestartWavenumbers);
-  for (int i = 0; i < m_numCells[0]; i++)
-  {
-    rands1[i] = ((double) rand()/ (RAND_MAX));
-  }
-  for (int i = 0; i < m_numCells[1]; i++)
-  {
-    rands2[i] = ((double) rand()/ (RAND_MAX));
-  }
-
-#if CH_SPACEDIM==3
-  Vector<Real> rands3(m_numCells[2]);
-  for (int i = 0; i < m_numCells[2]; i++)
-  {
-    rands3[i] = ((double) rand()/ (RAND_MAX));
-  }
-
-#endif
-
   for (int i = 0; i < m_opt.maxRestartWavenumbers; i++)
   {
     randsk[i] = ((double) rand()/ (RAND_MAX));
@@ -2319,6 +2298,14 @@ void AMRLevelMushyLayer::addPerturbation(int a_var, Real alpha, int waveNumber, 
   {
     Box b = (*m_scalarNew[a_var])[dit].box();
     b &= m_problem_domain.domainBox();
+
+    // Seed the random number generator in each box separately
+    if (m_opt.seedRandomPert)
+    {
+      Real seed = std::time(0)*procID();
+      pout() << "Seeding random number with " << seed << " on processor " << procID() << endl;
+      srand(seed);
+    }
 
     for (BoxIterator bit(b); bit.ok(); ++bit)
     {

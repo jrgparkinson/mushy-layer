@@ -265,24 +265,11 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.initAnalyticVel=false;
   ppMain.query("initAnalyticVel", opt.initAnalyticVel);
 
-
-
-
   opt.useOldAdvVel = false;
   ppMain.query("useOldAdvVelForTracing", opt.useOldAdvVel);
 
-//  opt.lapVelNumSmooth = 0;
-//  ppMain.query("lapVelNumSmooth", opt.lapVelNumSmooth);
-//
-//  opt.lapVelSmoothScale = 0.0;
-//  ppMain.query("lapVelSmoothScale", opt.lapVelSmoothScale);
-
   opt.CCVelSrcTermCentering = 0.5;
   ppMain.query("vel_src_centering", opt.CCVelSrcTermCentering);
-
-//  opt.advSrcAllowLaggedLapVel = false;
-//  ppAdvsrc.query("allow_lagged_lap_vel", opt.advSrcAllowLaggedLapVel);
-
 
   opt.advVelPressureSrc = false;
   opt.advVelDarcySrc = true;
@@ -807,6 +794,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.initialRandomPerturbation=false;
   ppMain.query("initialRandomPerturbation", opt.initialRandomPerturbation);
+
+  opt.seedRandomPert = true;
+  ppMain.query("seedRandomPert", opt.seedRandomPert);
 
   opt.maxRestartWavenumbers = 50;
   ppMain.query("maxRestartWavenumber", opt.maxRestartWavenumbers);

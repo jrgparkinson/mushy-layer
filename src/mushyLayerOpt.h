@@ -1106,6 +1106,10 @@ struct MushyLayerOptions {
   /// Add an initial random perturbation to enthalpy
   Real initialRandomPerturbation = 0.0;
 
+  /// Turn on to seed random perturbations on different boxes
+  /// to prevent the same 'random' number patterns in each box
+  bool seedRandomPert = true;
+
   /// Porosity value to set if we're using a fixed porosity.
   /**
    * If < 0, use some functional form for the porosity as defined by MushyLayerOptions::porosityFunction
