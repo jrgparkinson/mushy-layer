@@ -6,6 +6,9 @@ import subprocess
 import traceback
 import logging
 import time
+import getopt, sys
+
+# Two imports from the directory above this one - make sure /path/to/mushy-layer/test is in your python path
 import mushyLayerRunUtils as utils
 import run_chombo_compare as chcompare
 
@@ -175,9 +178,11 @@ def test_folder(test_dir):
                 print('** Test failed \n')
                 return False
 
-
     return True
 
+
+def usage():
+    print('python run_regression_tests.py [-t test_dir]')
 
 if __name__ == "__main__":
 
@@ -185,6 +190,8 @@ if __name__ == "__main__":
     timings.append(time.time())
 
     ## Initial setup
+
+    # Constants
     EXPECTED = '.expected'
     PROPERTIES_FILE = 'properties.json'
     DIFF = 'diff-'
@@ -194,9 +201,28 @@ if __name__ == "__main__":
     # Get full path to this script
     script_loc = os.path.dirname(os.path.realpath(__file__))
 
-    # Assume every subdirectory is a test
+    # By default assume every subdirectory is a test
     test_dirs = [f for f in os.listdir(script_loc) if os.path.isdir(os.path.join(script_loc, f))]
-    print('Tests: ' + ','.join(test_dirs))
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "ht:", ["help", "test="])
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print(err)  # will print something like "option -a not recognized"
+        usage()
+        sys.exit(2)
+    for o, arg in opts:
+        if o in ("-h", "--help"):
+            usage()
+            sys.exit()
+        elif o in ("-t", "--test"):
+            test_dirs = [arg]
+        else:
+            assert False, "unhandled option"
+            
+    print('Tests to run: ' + ','.join(test_dirs))
+
+
 
     # Containers to collate passed/failed tests
     failed_tests = []
