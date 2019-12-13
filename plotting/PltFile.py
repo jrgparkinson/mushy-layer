@@ -115,6 +115,9 @@ class PltFile:
         if load_data:
             self.load_data()
 
+    def __repr__(self):
+        return '<PltFile object for %s>' % self.filename
+
     def load_data(self, zero_x=False):
         if self.data_loaded:
             return
