@@ -478,35 +478,50 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppRegrid.query("tag_channels", opt.tag_channels);
 
 
+  // Default refinement is for mushy layer simulations with channels
+  opt.refinementMethod =  RefinementMethod::tagMushChannels;
 
   if (opt.tag_velocity)
-    {
+  {
+    pout() << "Refinement method: tag fluid speed" << endl;
     opt.refinementMethod = RefinementMethod::tagSpeed;
-    }
+  }
   else if (opt.tag_channels)
   {
+    pout() << "Refinement method: tag channels" << endl;
     opt.refinementMethod = RefinementMethod::tagChannels;
   }
   else if (opt.tag_plume_mush)
   {
+    pout() << "Refinement method: tag plume mush" << endl;
     opt.refinementMethod = RefinementMethod::tagPlumeMush;
   }
   else if (opt.taggingVar > -1)
   {
+    pout() << "Refinement method: tag scalar field" << endl;
     opt.refinementMethod = RefinementMethod::tagScalar;
   }
   else if (opt.taggingVectorVar > -1)
   {
+    pout() << "Refinement method: tag vector" << endl;
     opt.refinementMethod = RefinementMethod::tagVector;
   }
   else if (ppRegrid.contains("tag_mush_channels"))
   {
+    pout() << "Refinement method: tag_mush_channes" << endl;
     opt.refinementMethod = RefinementMethod::tagMushChannels;
   }
   else if (ppRegrid.contains("tag_channels_composite"))
   {
+    pout() << "Refinement method: tag_channels_composite" << endl;
     opt.refinementMethod = RefinementMethod::tagMushChannelsCompositeCriteria;
   }
+
+  opt.onlyTagPorousCells = false;
+  ppRegrid.query("onlyTagPorousCells", opt.onlyTagPorousCells);
+
+  opt.porousCellsShrink = 0;
+  ppRegrid.query("porousCellsShrink", opt.porousCellsShrink);
 
   opt.taggingMarginalPorosityLimit = 1.0;
   ppRegrid.query("marginalPorosityLimit", opt.taggingMarginalPorosityLimit);

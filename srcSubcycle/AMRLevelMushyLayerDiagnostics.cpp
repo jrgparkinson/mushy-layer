@@ -421,7 +421,6 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
       Vector<Real> averageVertFs;
       horizontallyAverage(averageVertFs, *m_scalarNew[ScalarVars::m_averageVerticalFlux]);
-//      LevelData<FArrayBox>& averageVertFs = *m_scalarNew[ScalarVars::m_averageVerticalFlux];
       int j_top = m_problem_domain.domainBox().bigEnd()[SpaceDim-1];
       int j_bottom = m_problem_domain.domainBox().smallEnd()[SpaceDim-1];
       int domHeight = j_top-j_bottom;
@@ -431,16 +430,13 @@ void AMRLevelMushyLayer::computeDiagnostics()
       int j_40 = j_bottom + int(0.4*domHeight);
       int j_50 = j_bottom + int(0.5*domHeight);
 
-
       m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs10, m_time, averageVertFs[j_10]);
       m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs20, m_time, averageVertFs[j_20]);
       m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs30, m_time, averageVertFs[j_30]);
       m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs40, m_time, averageVertFs[j_40]);
       m_diagnostics.addDiagnostic(DiagnosticNames::diag_Fs50, m_time, averageVertFs[j_50]);
 
-
       // Another diagnostic - average vertical solute flux across the whole domain
-      //    Real domainSize = m_domainWidth*m_domainHeight;
       Real volume = 0.0;
       Real domainAverageFs = computeSum(volume, horizAvFs, refRat, lev0Dx, Interval(0,0), 0);
       //    domainAverageFs = domainAverageFs / domainSize;

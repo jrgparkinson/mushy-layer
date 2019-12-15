@@ -1622,8 +1622,6 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
 
   }
 
-  //  pout() << "HorizontallyAverage - got local averages, now broadcast/gather" << endl;
-
   // Broadcast/gather to compute averages over whole domain
   int srcProc = 0;
 

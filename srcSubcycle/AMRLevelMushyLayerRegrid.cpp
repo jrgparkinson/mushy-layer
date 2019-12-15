@@ -473,6 +473,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   // Compute liquid, mushy and inbetween cells - these will be useful
   IntVectSet liquidCells;
   IntVectSet mushyCells;
+  IntVectSet shrunkMushyCells;
   IntVectSet marginalCells;
 
   for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
@@ -494,6 +495,13 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
   }
 
+  shrunkMushyCells = mushyCells;
+  IntVectSet shiftedTags = shrunkMushyCells;
+  IntVect shiftVect = IntVect::Zero;
+  shiftVect[SpaceDim-1] = m_opt.porousCellsShrink; // distance to shift
+  shiftedTags.shift(shiftVect);
+  shrunkMushyCells &= shiftedTags;
+
 
   if (m_opt.refinementMethod == RefinementMethod::tagSpeed) // m_opt.tag_velocity
   {
@@ -505,7 +513,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
     tagCellsVar(localTags, m_opt.vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
   }
-// <<<<<<< development
   else if (m_opt.refinementMethod == RefinementMethod::tagMushChannelsCompositeCriteria)
   {
     if (s_verbosity >= 2)
@@ -642,7 +649,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     // Place finest resolution around channels
     if (m_level == finestLevel - 1)
     {
-
 
       if (m_opt.refinementMethod == RefinementMethod::tagMushChannels)
       {
@@ -808,6 +814,11 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
     // Also tag all cells where U > Ra_C/4 (i.e. high velocity)
     //tagCellsVar(localTags, m_parameters.rayleighComposition/4, 1, -1, m_advectionVel);
+  }
+
+  if (m_opt.onlyTagPorousCells)
+  {
+    localTags &= shrunkMushyCells;
   }
 
 

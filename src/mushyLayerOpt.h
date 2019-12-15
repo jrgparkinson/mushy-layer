@@ -926,6 +926,16 @@ struct MushyLayerOptions {
   /// Method for refinement
   RefinementMethod refinementMethod;
 
+  /// Turn on to only tags cells where other refinement criteria are met and porosity \f$\chi < 1 \f$
+  bool onlyTagPorousCells;
+
+  /// Filter porous cells to remove anomalies
+  /**
+   * Select all cells with \f$\chi < 1\f$, then shift vertically
+   * by this value and tag only the intersection of the two
+   */
+  int porousCellsShrink;
+
   /// Whether we should tag cells where the fluid velocity (magnitude) is greater than MushyLayerOptions::vel_thresh
   bool tag_velocity;
   
