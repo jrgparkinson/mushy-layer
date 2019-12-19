@@ -3,12 +3,13 @@ import matplotlib
 
 from PltFile import PltFile
 import matplotlib.pyplot as plt
-
+from util import shared_storage
 
 # file_loc = '/home/parkinsonjl/mnt/sharedStorage/optimalStates-restructured/Le200/CR2.000/RaC100/' \
 #     'pts116-steady/CR2.0RaC100Le200ChiCubedPermeabilitypts116-033512.2d.hdf5'
 
-file_loc = '/home/parkinsonjl/mnt/sharedStorage/SeaIceGrowth/T-10Outflow/chk135000.2d.hdf5'
+
+file_loc = shared_storage.get_dir('SeaIceGrowth/T-10Outflow/chk135000.2d.hdf5')
 p = PltFile(file_loc)
 
 p.load_data()
