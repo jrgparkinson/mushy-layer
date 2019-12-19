@@ -219,10 +219,8 @@ if __name__ == "__main__":
             test_dirs = [arg]
         else:
             assert False, "unhandled option"
-            
+
     print('Tests to run: ' + ','.join(test_dirs))
-
-
 
     # Containers to collate passed/failed tests
     failed_tests = []
