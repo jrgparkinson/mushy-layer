@@ -38,7 +38,7 @@ def get_default_cfl():
 def test_uniform_porous_convection(argv):
     # Default vals:
     cfl = get_default_cfl()
-    nz_uniform = -1 # don't do uniform mesh simulations by default
+    nz_uniform = 64 # don't do uniform mesh simulations by default
     nz_vm = 64
     chi = 0.4
     bc_accuracy = 2
