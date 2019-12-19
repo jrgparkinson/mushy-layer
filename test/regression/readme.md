@@ -24,4 +24,6 @@ Check the output to the terminal, which will report which tests fail and which s
 If you wish to update the expected results of a test (e.g. you have changed the code and the test now 'fails' when it shouldn't) then just replace the existing `*.expected` files with new ones you have generated.
 
 # Create a new test
-To add a new test, make a new subdirectory in this present directory with the an `inputs` file, `regression.json` file (see an existing example for a template) and the `*.expected` files you wish to test against. The test will be run automatically by the python script (it searches this directory for all subdirectories)
+To add a new test, make a new subdirectory in this present directory with the an `inputs` file, `regression.json` file (see an existing example for a template) and the `*.expected` files you wish to test against. The test will be run automatically by the python script (it searches this directory for all subdirectories).
+
+Please try and ensure that you keep the test runtime to a manageable length (~10 seconds). The idea is that it is possible to run all the tests in a few minutes, to encourage users to do so regularly following changes to the code (and especially before committing code).
