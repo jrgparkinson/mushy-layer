@@ -27,8 +27,15 @@ def filter_pout(text_lines):
 
     return filtered_output
 
+def printl(text):
+    sys.stdout.write(text)
+    sys.stdout.flush()
 
-def test_folder(test_dir):
+def print_status(text):
+    sys.stdout.write('%-8s' % text)
+    sys.stdout.flush()
+
+def test_folder(test_dir, verbose=False):
     '''
     Run the regression test contained within a folder. Expects the folder o have the following files:
     - inputs
@@ -43,24 +50,33 @@ def test_folder(test_dir):
     # Check the required files exist
     # if not, skip this test
     if not all(elem in test_files for elem in REQUIRED):
-        print('Required files for conducting a test (%s) not found in %s' % (REQUIRED, test_dir))
-        print('Skipping test \n')
+        if verbose:
+            print('  Required files for conducting a test (%s) not found in %s' % (REQUIRED, test_dir))
+            print('  Skipping test \n')
+        else:
+            test_name = test_dir.split('/')[-1]
+            printl('%-25s    ' % test_name)
+            print_status('[Void]')
         return False
 
     # Load properties
     with open(os.path.join(test_dir, PROPERTIES_FILE)) as json_file:
         properties = json.load(json_file)
 
-    print('==Running test: %s==' % properties['name'])
+    # print('==Running test: %s==' % properties['name'])
+    printl('%-25s    ' % properties['name'])
 
     # Get correct executable
     mushy_layer_exec = utils.get_executable(dim=properties['dim'])
     mushy_layer_exec_path = os.path.join(utils.get_mushy_layer_dir(), 'execSubcycle', mushy_layer_exec)
 
     if not os.path.exists(mushy_layer_exec_path):
-        print('Could not find mushy layer executable: %s' % mushy_layer_exec_path)
-        print('Have you compiled the code for the right number of dimensions?')
-        print('Use \'make all DIM=3\' to compile in 3D')
+        if verbose:
+            print('Could not find mushy layer executable: %s' % mushy_layer_exec_path)
+            print('Have you compiled the code for the right number of dimensions?')
+            print('Use \'make all DIM=3\' to compile in 3D')
+        else:
+            print_status('[Failed]')
         return False
 
     # Run test
@@ -73,7 +89,10 @@ def test_folder(test_dir):
 
     expected_files = [f for f in test_files if EXPECTED in f]
     if not expected_files:
-        print('No expected files to compared against')
+        if verbose:
+            print('No expected files to compared against')
+        else:
+            print_status('[Void]')
         return False
 
     for expected_file in expected_files:
@@ -82,7 +101,10 @@ def test_folder(test_dir):
         test_output_filename = expected_file.replace(EXPECTED, '')
         test_output_file_path = os.path.join(test_dir, test_output_filename)
         if not os.path.exists(test_output_file_path):
-            print('No output file generated to compare against: %s' % test_output_file_path)
+            if verbose:
+                print('No output file generated to compare against: %s' % test_output_file_path)
+            else:
+                print_status('[Failed]')
             return False
 
         if '.hdf5' in expected_file:
@@ -100,7 +122,7 @@ def test_folder(test_dir):
             compare_exec = os.path.join(compare_dir, compare_exec)
             # print('Found executable %s ' % compare_exec)
 
-            if not os.path.exists(compare_exec):
+            if not os.path.exists(compare_exec) and verbose:
                 print('Could not find Chombo compare executable %s' % compare_exec)
                 print('So cannot compare hdf5 output files')
 
@@ -144,17 +166,14 @@ def test_folder(test_dir):
                 for err_type in field_errs.keys():
                     err = field_errs[err_type]
                     if abs(err) > 1e-10:
-                        print('Error in field %s is non-zero' % field)
-                        print('See %s and %s for more info' % (new_pout_name, error_file))
+                        if verbose:
+                            print('Error in field %s is non-zero' % field)
+                            print('See %s and %s for more info' % (new_pout_name, error_file))
+                        else:
+                            print_status('[Failed]')
                         return False
-
-
-
-
         else:
             # Assume text file - do a diff
-
-
             text1 = open(os.path.join(test_dir, expected_file)).readlines()
             text2 = open(os.path.join(test_dir, test_output_file_path)).readlines()
 
@@ -173,16 +192,20 @@ def test_folder(test_dir):
             # print('Diff: %s' % differences)
 
             if differences:
-                print('Differences found in %s' % test_output_file_path)
-                print('For details, see %s' % diff_out_file)
-                print('** Test failed \n')
+                if verbose:
+                    print('Differences found in %s' % test_output_file_path)
+                    print('For details, see %s' % diff_out_file)
+                    print('** Test failed \n')
+                else:
+                    print_status('[Failed]')
                 return False
 
+    print_status('[OK]')
     return True
 
 
 def usage():
-    print('python run_regression_tests.py [-t test_dir]')
+    print('python run_regression_tests.py [-t <test_dir>] [-v verbose] ')
 
 if __name__ == "__main__":
 
@@ -203,9 +226,10 @@ if __name__ == "__main__":
 
     # By default assume every subdirectory is a test
     test_dirs = [f for f in os.listdir(script_loc) if os.path.isdir(os.path.join(script_loc, f))]
+    verbose = False
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ht:", ["help", "test="])
+        opts, args = getopt.getopt(sys.argv[1:], "ht:v", ["help", "test="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
@@ -217,6 +241,8 @@ if __name__ == "__main__":
             sys.exit()
         elif o in ("-t", "--test"):
             test_dirs = [arg]
+        elif o in ("-v"):
+            verbose = True
         else:
             assert False, "unhandled option"
 
@@ -228,29 +254,31 @@ if __name__ == "__main__":
 
     #Timing
     timings.append(time.time())
-    print('Setup time: %.3g seconds' % (timings[-1] - timings[-2]))
 
     for test_dir in test_dirs:
 
         try:
             full_dir = os.path.join(script_loc, test_dir)
-            success = test_folder(full_dir)
+            success = test_folder(full_dir, verbose)
 
             # Timing
             timings.append(time.time())
-            print('Test runtime: %.3g seconds' % (timings[-1] - timings[-2]))
+            print(' (%.3g seconds)' % (timings[-1] - timings[-2]))
 
         except Exception as e:
 
-            print('**Error running test**')
-            logging.error(traceback.format_exc())
+            if verbose:
+                print('**Error running test**')
+                logging.error(traceback.format_exc())
+            else:
+                print_status('[Failed]')
             success = False
 
         if success:
-            print('**Test passed** \n')
+            # print('**Test passed** \n')
             passed_tests.append(test_dir)
         else:
-            print('**Test failed** \n')
+            # print('**Test failed** \n')
             failed_tests.append(test_dir)
 
 
