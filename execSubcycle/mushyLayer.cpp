@@ -141,13 +141,12 @@ main(int a_argc, char* a_argv[])
     // Only require ref_ratio to be defined for AMR simulations
     if (max_level > 0)
     {
-      ppMain.getarr("ref_ratio",ref_ratios,0,num_read_levels+1);
+      ppMain.getarr("ref_ratio",ref_ratios,0,num_read_levels);
     }
-    else
-    {
-      // Need a dummy value for uniform mesh simulations
-      ref_ratios.push_back(1);
-    }
+    // AMR expects max_level + 1 values of ref_ratio
+    // so add a dummy value
+    ref_ratios.push_back(1);
+
 
 
     mushyLayer(stopTime, nstop_int, ref_ratios);
