@@ -172,7 +172,7 @@ def test_uniform_porous_convection(argv):
 
             this_data_folder = os.path.join(base_dataFolder, output_dir)
             job_ids = runTest(this_data_folder, physical_problem, uniform_porous_resolution_specific_params,
-                              amr_setup, num_procs, '', extra_params, restart_from_low_res=True)
+                              amr_setup, num_procs, '', extra_params, restart_from_low_res=False)
             
             all_job_ids = all_job_ids + job_ids
 
