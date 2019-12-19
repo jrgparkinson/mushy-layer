@@ -95,9 +95,9 @@ text(0.04, 0.92, '(b)', 'FontSize', textFontSize, 'Color', [0 0 0]);
 subplot(m, n, 3);
 
 AMRsol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, ...
-    'AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref2-DBVariablePorosity-32--0'));
+    'AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref2-DBVariablePorosity-32-'));
 UniformFineSol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, ...
-    'Uniform-DBVariablePorosity-64--0'));
+    'Uniform-DBVariablePorosity-64-'));
 
 makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
 
@@ -105,7 +105,7 @@ makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
 axErr = gca;
 
  
-text(0.04, 0.92, '(c)', 'FontSize', textFontSize, 'Color', [0 0 0]);
+text(0.03, 0.92, '(c)', 'FontSize', textFontSize, 'Color', [0 0 0]);
 
 set(h,'Units','Inches');
 pos = get(h,'Position');
@@ -116,6 +116,7 @@ if saveFigure
     fprintf('Saved to %s \n', figureName);
     print(h,[figureName, '.eps'],'-depsc','-r50')
     print(h,[figureName, '.png'],'-dpng','-r1000')
+    savefig([figureName, '.fig'])
 end
 
 end
@@ -171,11 +172,11 @@ end
 end
 
 function f = plotPrefixAMR(N)
-f =  ['VM-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-convectionDB-',num2str(N),'--0'];
+f =  ['VM-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-convectionDB-',num2str(N),'-'];
 end
 
 function f = plotPrefixUniform(N)
-f =  ['Uniform-convectionDB-',num2str(N),'--0'];
+f =  ['Uniform-convectionDB-',num2str(N),'-'];
 end
 
 
