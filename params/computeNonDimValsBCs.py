@@ -121,7 +121,7 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     #params['bc.bulkConcentrationHiVal']= '0 0'
     #params['bc.bulkConcentrationLoVal']= '0 -1'  # fixed value at bottom boundary
 
-    bc_accuracy = 3 # num significant figures
+    bc_accuracy = 4 # num significant figures
     if dim == 2:
         bc_str = '0 %.' + str(bc_accuracy) +'g'  # 0 in x dir, some val in vertical dir
     else:
@@ -162,17 +162,15 @@ if __name__ == "__main__":
     material_properties = get_sea_ice_material_properties()
     Si = 30.0  # initial salinity (g/kg)
 
-    Ttop = -15  # top temperature (celcius)
+    Ttop = -10 # top temperature (celcius)
     initial_freezing_point = material_properties['liquidusSlope'] * Si
-    Tbottom = initial_freezing_point + 0.1  # ocean temperature - initial freezing point  (celcius)
+    Tbottom = initial_freezing_point + 0.3  # ocean temperature - initial freezing point  (celcius)
 
     h = 1.0  # box depth (m)
     d = 1e-4  # Hele-Shaw gap width (m)
     K0 = 1e-10  # Sea ice permeability
 
     darcy_brinkman = False
-
-
 
     params = {}
     p = set_params(params, Ttop, Tbottom, Si=Si, h=h, d=d, K0=K0,
