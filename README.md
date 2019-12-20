@@ -1,9 +1,9 @@
-# AMR Mushy Layer
+# SOFTBALL: SOLidification, Flow and Thermodynamics in Binary ALLoys
 
 # Introduction
-This is code to simulate flow in a reactive porous media, a "mushy layer", within a square box.
-
-In this readme we first present some instructions on downloading and installing the code, then describe how to recreate the test problems and figures found in the scientific [paper](#) (currently unpublished, email [james.parkinson@physics.ox.ac.uk] for a copy)  written about this method. The paper is a good reference for more information on the physics of this model.
+This is code to simulate flow in a reactive porous media, a "mushy layer". This if a finite volume/difference code, built on the [Chombo library](https://commons.lbl.gov/display/chombo/Chombo+-+Software+for+Adaptive+Solutions+of+Partial+Differential+Equations), which solves the governing conservation equations on a cuboidal domains with Adaptive Mesh Refinement (AMR).
+ 
+In this readme we first present some instructions on downloading and installing the code, then describe how to recreate the test problems and figures found in [Parkinson et. al. 2020](https://www.sciencedirect.com/science/article/pii/S2590055219300599). The paper is a good reference for more information on the physics of this model.
 
 If you have any issues, please contact [james.parkinson@physics.ox.ac.uk].
 
