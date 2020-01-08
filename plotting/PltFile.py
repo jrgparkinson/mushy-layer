@@ -866,6 +866,9 @@ class PltFile:
 
     def get_level_data(self, field, level=0, valid_only=False):
 
+        if len(self.comp_names) == 0:
+            print('No data loaded, perhaps you meant to call PltFile.load_data() first? ')
+
         if self.data_load_method == self.YT:
             pass
             #TODO: write this
