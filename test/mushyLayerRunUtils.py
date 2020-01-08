@@ -6,7 +6,7 @@ import sys
 import subprocess
 import socket
 from datetime import date
-
+import matplotlib as mpl
 
 def get_base_output_dir():
     """ Define the full path to the directory where the output of running test problems should go """
@@ -159,6 +159,26 @@ def get_executable_name(exec_dir='', exec_name='mushyLayer2d', return_full_path=
         return os.path.join(exec_dir, exec_file)
     else:
         return exec_file
+
+def latexify(fig_width=5.0, fig_height=4.0):
+
+    font_size = 12
+
+    params = {'backend': 'ps',
+              'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}'],
+              'axes.labelsize': font_size,  # fontsize for x and y labels (was 10)
+              'axes.titlesize': font_size,
+              'legend.fontsize': font_size,  # was 10
+              'xtick.labelsize': font_size,
+              'ytick.labelsize': font_size,
+              'lines.markersize': 3,
+              'lines.linewidth': 1,
+              'text.usetex': True,
+              'figure.figsize': [fig_width, fig_height],
+              'font.family': 'serif'
+              }
+
+    mpl.rcParams.update(params)
 
 
 def construct_run_name(params):

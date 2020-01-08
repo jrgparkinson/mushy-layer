@@ -1,15 +1,15 @@
-from PltFile import PltFile
+from plotting.PltFile import PltFile
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_bvp
 import os
 import matplotlib as mpl
 import cycler
-import mushyLayerRunUtils
+import test.mushyLayerRunUtils as mushyLayerRunUtils
 import subprocess
 import sys
 import shutil
-
+from test.mushyLayerRunUtils import latexify
 
 # This script is for testing that the mushy-layer code correctly solves diffusion problems correctly
 # with all sorts of boundary conditions
@@ -18,27 +18,6 @@ import shutil
 #  a) run an appropriate simulation using the mushy layer code to compute the temperature T(z, t)
 #  b) solve the steady-state problem using the solve_bvp function in scipy.integrate, to find T_{python}(z)
 #  c) plot the two solutions along with the error in the final mushy-layer simulation
-
-def latexify(fig_width=5.0, fig_height=4.0):
-
-    font_size = 12
-
-    params = {'backend': 'ps',
-              'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}'],
-              'axes.labelsize': font_size,  # fontsize for x and y labels (was 10)
-              'axes.titlesize': font_size,
-              'legend.fontsize': font_size,  # was 10
-              'xtick.labelsize': font_size,
-              'ytick.labelsize': font_size,
-              'lines.markersize': 3,
-              'lines.linewidth': 1,
-              'text.usetex': True,
-              'figure.figsize': [fig_width, fig_height],
-              'font.family': 'serif'
-              }
-
-    mpl.rcParams.update(params)
-
 
 class DiffusiveSolution:
 
@@ -155,13 +134,12 @@ def base_inputs():
 
 if __name__ == "__main__":
 
-
     # Ensure we can find HDF5 libraries to run mushy layer code
+    hdf5_library_path = '/home/parkinsonjl/soft/hdf5-1.8.21p-new/lib/'
     if 'LD_LIBRARY_PATH' in os.environ:
-        os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ':/home/parkinsonjl/soft/hdf5-1.8.21p-new/lib/'
+        os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ':' + hdf5_library_path
     else:
-        os.environ['LD_LIBRARY_PATH'] = '/home/parkinsonjl/soft/hdf5-1.8.21p-new/lib/'
-
+        os.environ['LD_LIBRARY_PATH'] = hdf5_library_path
 
     # Chose some parameter options:
 
