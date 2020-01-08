@@ -73,7 +73,7 @@ $ cd /docs/
 $ doxygen
 ```
 
-You can also find a reasonably up to date version of the documentation online at [https://jrgparkinson.github.io/mushy-layer/doc/html/index.html], if you do not want to compile it yourself. The Classes section is particularly useful.
+You can also find a reasonably up to date version of the documentation online at [https://amr-softball.github.io/doc/html/index.html], if you do not want to compile it yourself. The Classes section is particularly useful.
 
 # Extra utilities
 This repository contains various other pieces of code for running simulations. 
