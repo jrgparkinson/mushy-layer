@@ -29,6 +29,8 @@ visitlog.py
 **/oldInputs/*
 **/execSubcycle/*/*
 **/doc/latex/*
+**/doc/html/*
+!/doc/html/index.html
 **/.idea/
 **/.hg/*
 **/execNonSubcycle/*/*

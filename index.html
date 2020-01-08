@@ -1,12 +1,276 @@
-<!DOCTYPE HTML>
-<html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="refresh" content="1;url=doc/html/index.html">
-        <title>Page Redirection</title>
-    </head>
-    <body>
-        If you are not redirected automatically, 
-        follow the <a href="doc/html/index.html">link to the documentation</a>
-    </body>
-</html>
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v3.8.6">
+    <title>SOFTBALL: SOLidification, Flow, and Thermodynamics in Binary ALLoys</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/carousel/">
+
+    <!-- Bootstrap core CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<!-- Syntax highlighting-->
+<!--<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>-->
+
+<!--<link rel="stylesheet"  href="web/highlight/styles/default.css">-->
+<link rel="stylesheet"  href="web/highlight/styles/rainbow.css">
+<script src="web/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+    <!-- Favicons -->
+<!--<link rel="apple-touch-icon" href="img/favicons/apple-touch-icon.png" sizes="180x180">-->
+<!--<link rel="icon" href="/docs/4.4/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">-->
+<link rel="icon" href="web/img/softballYellow32.png" sizes="32x32" type="image/png">
+<!--<link rel="manifest" href="/docs/4.4/assets/img/favicons/manifest.json">
+<link rel="mask-icon" href="/docs/4.4/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
+<link rel="icon" href="/docs/4.4/assets/img/favicons/favicon.ico">
+<meta name="msapplication-config" content="/docs/4.4/assets/img/favicons/browserconfig.xml">-->
+<meta name="theme-color" content="#F0F8FF">
+
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="web/carousel.css" rel="stylesheet">
+  </head>
+  <body>
+
+     <header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="#">SOFTBALL</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/jrgparkinson/mushy-layer">Code</a> <!--<span class="sr-only">(current)</span>-->
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/jrgparkinson/mushy-layer/blob/master/README.md">Installation guide</a> <!--<span class="sr-only">(current)</span>-->
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://jrgparkinson.github.io/mushy-layer/doc/html/">Documentation</a>
+        </li>
+          <li class="nav-item">
+          <a class="nav-link" href="#examples">Examples</a>
+        </li>
+          <li class="nav-item">
+          <a class="nav-link" href="#contribute">Contribute</a>
+        </li>
+       
+      </ul>
+      
+    </div>
+  </nav>
+</header>
+ 
+
+
+          
+         <main role="main">
+
+  <section class="jumbotron text-center">
+    <div class="container">
+
+      <h1 class="jumbotron-heading">S<img src="web/img/softballYellow.svg" alt="O" class="inline-logo">FTBALL</h1>
+      <p class="lead text-muted"><b>SO</b>lidification, <b>F</b>low, and <b>T</b>hermodynamics in <b>B</b>inary <b>ALL</b>oys.<br>
+        A code for simulation convection in mushy layers with Adaptive Mesh Refinement.</p>
+      <p>
+        <!--<a class="btn btn-lg btn-primary" href="#" role="button">Installation guide</a>-->
+        <a href="https://github.com/jrgparkinson/mushy-layer" class="btn btn-primary my-2">Get the code</a>
+        <a href="https://github.com/jrgparkinson/mushy-layer/blob/master/README.md" class="btn btn-success my-2">Installation guide</a>
+        <a href="https://jrgparkinson.github.io/mushy-layer/doc/html/" class="btn btn-danger my-2">Documentation</a>
+        <a href="#examples" class="btn btn-info my-2">Examples</a>
+        <a href="#contribute" class="btn btn-warning my-2">Contribute</a>
+        
+      </p>
+    </div>
+  </section>
+
+  <div class="album py-5 bg-light">
+    <div class="container">
+
+      <div class="card" style="width: 100%;">
+        <div class="card-body">
+          <h3 class="card-title">About</h3>
+           <p class="card-text about-card">
+          <!--<h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>-->
+          <table>
+            <tr>
+              <td class="about-title"><span class="badge badge-primary">Science</span></td>
+              <td>SOFTBALL solves for <b>flow</b> and <b>phase change</b> in <b>mushy layers</b>, 
+             solving continuous equations for conservation of heat, solute, mass, and momentum <a href="#parkinson2019">(Parkinson et. al, 2020)</a>.</td>
+            </tr>
+            <tr>
+              <td class="about-title"><span class="badge badge-primary">Technical</span></td>
+              <td>A <b>parallel</b> C++ and Fortran code, with <b>Adaptive Mesh Refinement</b>
+            facilitated by the Chombo library for <b>fast</b> efficient simulations.</td>
+            </tr>
+          </table>
+
+
+         
+           
+
+         
+        </div>
+      </div>
+
+
+
+ <div class="card" style="width: 100%;">
+        <div class="card-body">
+          <h3 class="card-title"><a class="anchor" id="examples"></a>Examples</h3>
+           <p class="card-text about-card">
+
+           	<div class="media">
+              <div class="media-item">
+             <video width="450" height="200" controls autoplay loop muted>
+              <source src="web/video/fig9.mp4" type="video/mp4">
+              </video>
+            </div>
+              <div class="media-body align-self-center">
+                <h5 class="mt-0">AMR Darcy-Brinkman</h5>
+                <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
+                <p class="mb-0">Donec sed odio dui. Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+              </div>
+            </div>
+
+            <div class="media">
+             
+              <div class="media-body align-self-center">
+                <h5 class="mt-0">Darcy flow</h5>
+                <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
+                <p class="mb-0">Donec sed odio dui. Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+              </div>
+              <div class="media-item align-self-center">
+                <video width="600" height="600" id="fixedChill" class="align-self-center" controls autoplay loop muted>
+                <source src="web/video/fixedChill.mp4" type="video/mp4">
+                </video>
+              </div>
+              
+            </div>
+
+
+             <div class="media">
+              <div class="media-item">
+             <video width="450" height="200" controls autoplay loop muted>
+              <source src="web/video/3D.mp4" type="video/mp4" >
+              </video>
+            </div>
+              <div class="media-body align-self-center  ">
+                <h5 class="mt-0">3D</h5>
+                <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
+                <p class="mb-0">Donec sed odio dui. Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+              </div>
+              
+            </div>
+               
+
+    </p>
+  </div>
+  </div>
+
+  <div class="card" style="width: 100%;">
+        <div class="card-body">
+          <h3 class="card-title"><a class="anchor" id="contribute"></a>Contribute</h3>
+           <p class="card-text about-card">
+           	Anyone can contribute to SOFTBALL, and doing so is actively encouraged.
+           	<ol>
+           		<li><b>Create a <a href="https://github.com/join" target="_blank">GitHub account</a></b></li>
+           		<li><b>Create your own <a href="https://help.github.com/en/github/getting-started-with-github/fork-a-repo">fork</a> of the code</b>
+           			<br>
+           			Go to the <a href="https://github.com/jrgparkinson/mushy-layer">repo</a> and click on the fork button (top right)
+           			<br>
+           			<pre><code class="language-shell">$ git clone https://github.com/YOUR_USERNAME/mushy-layer.git</code></pre>
+           		 </li>
+           		 <li><b>Make sure you're working on the <i>development</i> branch</b>
+           		 	<pre><code class="language-shell">$ git branch
+* development
+  master</code></pre>
+           		 	If you're not on the development branch, you can switch to it via
+           		 	<pre><code class="language-shell">$ git checkout remotes/origin/development
+$ git branch development</code></pre>
+           		 	</li>
+           		 	<li><b>Make some changes</b>
+<pre><code class="language-shell">$ nano README.md
+$ git status	
+On branch development
+Your branch is up-to-date with 'origin/development'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   README.md
+
+no changes added to commit (use "git add" and/or "git commit -a")</code></pre>
+           		 	
+           		 </li>
+           		<li><b><a href="https://help.github.com/en/desktop/contributing-to-projects/committing-and-reviewing-changes-to-your-project">Commit</a> your changes</b>
+           			<pre><code class="language-shell">$ git add README.md
+$ git commit -m "Testing"
+$ git push</code></pre>
+           		</li>
+           		You might need to enter your username and password to push the changes.
+           		<li><b>Create a <a href="https://help.github.com/en/desktop/contributing-to-projects/creating-a-pull-request">pull request</a> to merge your branch into our <i>development</i> branch</b>
+           			<br>Go to your fork on github, i.e. 
+           			<pre><code class="language-shell">https://github.com/YOUR_USERNAME/mushy-layer/tree/development</code></pre>
+           			and click on the 'Compare & Pull Request' button.
+           		</li>
+           		<li><b>We will then check and approve your pull request</b></li>
+           	</ol>
+           	
+           </p>
+       </div>
+   </div>
+
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="text-muted">
+  <div class="container">
+   <!-- <p class="float-right">
+      <a href="#">Back to top</a>
+    </p>-->
+    <p><b>Funding</b></p>
+    <p><a href="https://nerc.ukri.org/" target="_blank"><img src="web/img/funding/nerc-logo.svg" alt="NERC" class="funding"></a>
+     <a href="http://www.ox.ac.uk/" target="_blank"><img src="web/img/funding/Oxford.svg" alt="Oxford" class="funding"></a>
+      <a href="https://www.lbl.gov/" target="_blank"><img src="web/img/funding/Berkeley_Lab_Logo_Small.svg" alt="Berkeley Lab" class="funding"></a>
+      <a href="https://royalsociety.org/" target="_blank"><img src="web/img/funding/royalSocietyLogo2.png" alt="The Royal Society" class="funding"></a>
+    </p>
+    <br>
+    <p><b>References</b></p>
+    <p><a class="anchor" id="parkinson2019"></a> J. Parkinson, D. Martin, A. Wells and R.F. Katz. (2019). Modelling binary alloy solidification with Adaptive Mesh Refinement. 
+      J. Comp. Phys. doi:<a href="http://dx.doi.org/10.1016/j.jcpx.2019.100043"  target="_blank">10.1016/j.jcpx.2019.100043.</p>
+  </div>
+</footer>
