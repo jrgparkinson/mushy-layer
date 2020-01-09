@@ -23,7 +23,6 @@ visitlog.py
 *pout.*
 *time.table.*
 **/.settings/*
-*.ex
 *diagnostics.out
 *diagnosticsLatest.out
 **/oldInputs/*
@@ -35,7 +34,7 @@ visitlog.py
 **/.hg/*
 **/execNonSubcycle/*/*
 **/andrew-bug/*
-
+**/test/poiseuilleFlow/output/*
 *.cproject
 *.tmp
 *.eps
@@ -44,3 +43,4 @@ visitlog.py
 **/env/*
 **/matlab/MethodsPaper/*.png
 *.csv
+/zzindex.html
