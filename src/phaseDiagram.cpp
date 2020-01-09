@@ -273,12 +273,12 @@ Real computePorosity(Real H, Real C, Real compositionRatio, Real specificHeatRat
                                Real thetaEutectic, Real ThetaEutectic)
 {
   Real H_e, H_s, H_l, porosity;
+  H_e = H_s = H_l = porosity = BASEFAB_REAL_SETVAL;
 
   ::computeBoundingEnergy(H_e, C, H_s, H_l, H_e, heatCapacityRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
 
   if (H <= H_s)
   {
-
     porosity = 0.0;
   }
   else if (H > H_s && H <= H_e)

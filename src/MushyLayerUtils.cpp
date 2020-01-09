@@ -559,7 +559,7 @@ void printRepoVersion()
   std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
   if (!pipe) throw std::runtime_error("popen() failed!");
   while (!feof(pipe.get())) {
-    if (fgets(buffer.data(), 128, pipe.get()) != NULL)
+    if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
       result += buffer.data();
   }
 
@@ -588,7 +588,7 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
 
     Real liquidFraction = (1-solidFraction);
     Real permeability;
-    Real referencePerm = params.referencePermeability;
+//    Real referencePerm = params.referencePermeability;
 
     if(params.permeabilityFunction == PermeabilityFunctions::m_permeabilityXSquared)
     {

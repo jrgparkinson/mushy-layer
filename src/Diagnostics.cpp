@@ -12,7 +12,7 @@
 
 Diagnostics::Diagnostics ()
 {
-  m_diagnostics.resize(numDiagnostics, NULL);
+  m_diagnostics.resize(numDiagnostics, nullptr);
   m_diagnosticNames.resize(numDiagnostics);
 
   for (int i = 0; i < numDiagnostics; i++)
@@ -124,7 +124,7 @@ Diagnostics::~Diagnostics ()
   for (int i = 0; i < numDiagnostics; i++)
     {
       delete m_diagnostics[i];
-      m_diagnostics[i] = NULL;
+      m_diagnostics[i] = nullptr;
     }
 }
 

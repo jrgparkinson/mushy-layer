@@ -1025,7 +1025,7 @@ MGLevelOp<LevelData<FArrayBox> >* DarcyBrinkmanOpFactory::MGnewOp(const ProblemD
 
   if (coarsening > 1 && !m_boxes[ref].coarsenable(coarsening*DarcyBrinkmanOp::s_maxCoarse))
   {
-    return NULL;
+    return nullptr;
   }
 
   dx *= coarsening;
@@ -1046,7 +1046,7 @@ MGLevelOp<LevelData<FArrayBox> >* DarcyBrinkmanOpFactory::MGnewOp(const ProblemD
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 

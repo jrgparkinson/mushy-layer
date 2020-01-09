@@ -260,7 +260,7 @@ MGLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::MGnewOp(const ProblemD
 
   if (coarsening > 1 && !m_boxes[ref].coarsenable(coarsening*AMRProjectionOp::s_maxCoarse))
   {
-    return NULL;
+    return nullptr;
   }
 
   dx *= coarsening;
@@ -355,7 +355,7 @@ AMRLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::AMRnewOp(const Proble
   // Find number of comps from m_bCoef, which should be defined on at least one level
   for (int lev = 0; lev <m_bCoef.size(); lev++)
   {
-    if (m_bCoef[lev] != NULL)
+    if (m_bCoef[lev] != nullptr)
     {
       nComp = m_bCoef[lev]->nComp();
       break;
@@ -431,7 +431,7 @@ AMRLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::AMRnewOp(const Proble
   newOp->m_aCoef = m_aCoef[ref];
   newOp->m_bCoef = m_bCoef[ref];
 
-  if (newOp->m_aCoef != NULL)
+  if (newOp->m_aCoef != nullptr)
   {
     newOp->computeLambda();
   }

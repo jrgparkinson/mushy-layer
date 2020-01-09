@@ -83,10 +83,10 @@ void AMRLevelMushyLayer::getCoarseScalarDataPointers(const int a_scalarVar,
                                                      LevelFluxRegister** a_coarserFRPtr, LevelFluxRegister** a_finerFRPtr,
                                                      Real& a_tCoarserOld, Real& a_tCoarserNew)
 {
-  *a_coarserDataOldPtr = NULL;
-  *a_coarserDataNewPtr = NULL;
-  *a_coarserFRPtr = NULL;
-  *a_finerFRPtr = NULL;
+  *a_coarserDataOldPtr = nullptr;
+  *a_coarserDataNewPtr = nullptr;
+  *a_coarserFRPtr = nullptr;
+  *a_finerFRPtr = nullptr;
 
   a_tCoarserOld = 0.0;
   a_tCoarserNew = 0.0;
@@ -247,7 +247,7 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   // If we've converged, it may be that we just haven't kicked off the instability yet
   // Trying adding a small perturbation and keep going
   // Only do this once though
-//  Real maxVel = ::computeNorm(*m_vectorNew[VectorVars::m_advectionVel], NULL, -1, m_dx, Interval(0, SpaceDim-1), 0);
+//  Real maxVel = ::computeNorm(*m_vectorNew[VectorVars::m_advectionVel], nullptr, -1, m_dx, Interval(0, SpaceDim-1), 0);
 //  if (hasConverged && m_doAutomaticRestart && abs(maxVel) < 1e-3)
 //  {
 //    pout() << "Max Vel = " << maxVel << ". Trying to restart with a small perturbation to kick off instability" << endl;
@@ -336,7 +336,7 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
   Real max;
 
   // Need this to ensure we only calculate sum over valid regions
-  DisjointBoxLayout* fineGridsPtr = NULL;
+  DisjointBoxLayout* fineGridsPtr = nullptr;
   if (hasFinerLevel())
   {
     fineGridsPtr = &(getFinerLevel()->m_grids);
@@ -388,7 +388,7 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
     largestDim = SpaceDim-1;
   }
 
-  Real norm = ::computeNorm(diff, NULL, -1, m_dx, Interval(0, largestDim), m_opt.steadyStateNormType);
+  Real norm = ::computeNorm(diff, nullptr, -1, m_dx, Interval(0, largestDim), m_opt.steadyStateNormType);
 
   norm = norm/max;
 
@@ -534,7 +534,7 @@ Real AMRLevelMushyLayer::advance()
   }
 
   // Get the coarser level, so we can work out later if this is in fact the coarsest level
-  AMRLevelMushyLayer *amrMLcrse = NULL;
+  AMRLevelMushyLayer *amrMLcrse = nullptr;
   if (m_level > 0)
   {
     amrMLcrse = getCoarserLevel();
@@ -542,7 +542,7 @@ Real AMRLevelMushyLayer::advance()
 
   // Do some setup operations on only the coarsest level
   // If the coarser level pointer is null, it means that this is the coarsest level
-  if (amrMLcrse == NULL)
+  if (amrMLcrse == nullptr)
   {
     // 1) set all levels reflux registers to zero
     AMRLevelMushyLayer *amrMLptr = this;
@@ -712,7 +712,7 @@ Real AMRLevelMushyLayer::advance()
 
   // Another sanity check
   //  Divergence::levelDivergenceMAC(*m_scalarNew[ScalarVars::m_divUadv], m_advVel, m_dx);
-  //  Real  maxDivU = ::computeNorm(*m_scalarNew[ScalarVars::m_divUadv], NULL, 1, m_dx, Interval(0,0));
+  //  Real  maxDivU = ::computeNorm(*m_scalarNew[ScalarVars::m_divUadv], nullptr, 1, m_dx, Interval(0,0));
   //  pout() << "  Sanity check: max(div u) = " << maxDivU << endl;
 
   // always* advect lambda (and update flux registers)
@@ -985,7 +985,7 @@ void AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& a_src, int a
   RefCountedPtr<AMRPoissonOp> amrpop =  RefCountedPtr<AMRPoissonOp>(
       (AMRNonLinearMultiCompOp*) OpFact->AMRnewOp(m_problem_domain) );
 
-  LevelData<FArrayBox> *crseVar = NULL;
+  LevelData<FArrayBox> *crseVar = nullptr;
 
   AMRLevelMushyLayer* crseML = getCoarserLevel();
   if (crseML)
@@ -995,7 +995,7 @@ void AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& a_src, int a
 
   amrpop->setAlphaAndBeta(0, 1);
 
-  // This just calls applyOpI if crseHC = NULL, else does CF interpolation
+  // This just calls applyOpI if crseHC = nullptr, else does CF interpolation
   amrpop->applyOpMg(a_src, *m_scalarNew[a_var], crseVar, false);
 
 
@@ -1182,7 +1182,7 @@ void AMRLevelMushyLayer::upwind(LevelData<FluxBox>& a_edgeScal,
   // Get AdvectionPhysics object within the PatchGodunov object
   AdvectionPhysics* advectionPhysics =
       dynamic_cast<AdvectionPhysics*>(a_patchGodScalar.getGodunovPhysicsPtr());
-  if (advectionPhysics == NULL)
+  if (advectionPhysics == nullptr)
   {
     MayDay::Error("AMRLevelMushyLayer::upwind - unable to upcast GodunovPhysics to AdvectionPhysics");
   }
@@ -1375,7 +1375,7 @@ AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
       (AMRNonLinearMultiCompOp*) m_HCOpFact->AMRnewOp(m_problem_domain));
 
   LevelData<FArrayBox> HC(m_grids, 2, IntVect::Unit);
-  LevelData<FArrayBox> *crseHC = NULL;
+  LevelData<FArrayBox> *crseHC = nullptr;
 
   fillHC(HC, a_time, true, true);
 
@@ -1388,7 +1388,7 @@ AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
 
   amrpop->setAlphaAndBeta(0, 1);
 
-  // This just calls applyOpI if crseHC = NULL, else does CF interpolation
+  // This just calls applyOpI if crseHC = nullptr, else does CF interpolation
   amrpop->applyOpMg(diffusiveSrc, HC, crseHC, isHomogeneous);
 
   int order = 1;
@@ -1418,10 +1418,10 @@ AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
   }
 
   // Clean up
-  if (crseHC != NULL)
+  if (crseHC != nullptr)
   {
     delete crseHC;
-    crseHC = NULL;
+    crseHC = nullptr;
   }
 
 }
@@ -1591,7 +1591,6 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
   int z_low = smallEnd[SpaceDim-1];
 
   Real length = m_numCells[SpaceDim-1]+1; // need an extra cell here
-  Real width = m_opt.domainWidth;
   int horizontalCells = m_numCells[0];
   if (SpaceDim == 3)
   {
@@ -1780,12 +1779,12 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
   // Set up coarse-fine boundary conditions
 
-  LevelFluxRegister* coarserFRPtr = NULL;
-  LevelFluxRegister* finerFRPtr = NULL;
+  LevelFluxRegister* coarserFRPtr = nullptr;
+  LevelFluxRegister* finerFRPtr = nullptr;
   Real tCoarserOld, tCoarserNew;
 
-  LevelData<FArrayBox>* coarserDataOldPtr = NULL;
-  LevelData<FArrayBox>* coarserDataNewPtr = NULL;
+  LevelData<FArrayBox>* coarserDataOldPtr = nullptr;
+  LevelData<FArrayBox>* coarserDataNewPtr = nullptr;
 
   tCoarserOld = 0.0;
   tCoarserNew = 0.0;
@@ -1831,8 +1830,8 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   }
   else
   {
-    finerFRPtr = NULL;
-    coarserFRPtr = NULL;
+    finerFRPtr = nullptr;
+    coarserFRPtr = nullptr;
   }// end if do advective flux reg updates
 
   if (s_verbosity > 5)
@@ -1843,7 +1842,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
   Real old_time = m_time-m_dt;
 
-  BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister>* baseLevBE = NULL;
+  BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister>* baseLevBE = nullptr;
 
   if (m_opt.timeIntegrationOrder == 2)
   {
@@ -1890,7 +1889,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 //        amrpop->relax(a_phi_new, thisSrc, 1000);
 //
 //        amrpop->residual(a_res, a_phi_new, thisSrc, false);
-//        Real maxRes = ::computeNorm(a_res, NULL, 1, m_dx, Interval(0, 1), 0);
+//        Real maxRes = ::computeNorm(a_res, nullptr, 1, m_dx, Interval(0, 1), 0);
 //        pout() << "  Max residual = " << maxRes << endl;
 //
 //        if (maxRes < 1e-10)
@@ -1925,7 +1924,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   Real residual = 0;
 
 #ifdef CH_FORK
-  if (baseLevBE != NULL)
+  if (baseLevBE != nullptr)
   {
     exitStatus = baseLevBE->exitStatus();
     residual = baseLevBE->finalResidual();
@@ -1938,16 +1937,16 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 #endif
 
   // Clean up
-  if (coarserDataNewPtr != NULL)
+  if (coarserDataNewPtr != nullptr)
   {
     delete coarserDataNewPtr;
-    coarserDataNewPtr = NULL;
+    coarserDataNewPtr = nullptr;
   }
 
-  if (coarserDataOldPtr != NULL)
+  if (coarserDataOldPtr != nullptr)
   {
     delete coarserDataOldPtr;
-    coarserDataOldPtr = NULL;
+    coarserDataOldPtr = nullptr;
   }
 
 
@@ -2247,7 +2246,7 @@ void AMRLevelMushyLayer::computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeSc
     bool doDiffusionSrc = true;
     if (a_diffusionVar > -1 && doDiffusionSrc)
     {
-      LevelData<FArrayBox>* crseScalarDiffusion = NULL;
+      LevelData<FArrayBox>* crseScalarDiffusion = nullptr;
 
       if (m_level > 0)
       {
@@ -2312,7 +2311,7 @@ void AMRLevelMushyLayer::computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeSc
 //  bool doDiffusionSrc = true;
 //  if (a_diffusionVar > -1 && doDiffusionSrc)
 //  {
-//    LevelData<FArrayBox>* crseScalarDiffusion = NULL;
+//    LevelData<FArrayBox>* crseScalarDiffusion = nullptr;
 //
 //    if (m_level > 0)
 //    {
@@ -2404,10 +2403,10 @@ void AMRLevelMushyLayer::advectScalar(const int a_scalarVar, const int a_advecti
                                       LevelData<FluxBox>& a_advVel, bool doFRupdates,
                                       LevelData<FluxBox>& flux)
 {
-  LevelFluxRegister* coarserFRPtr = NULL;
-  LevelFluxRegister* finerFRPtr = NULL;
-  LevelData<FArrayBox>* coarserDataOldPtr = NULL;
-  LevelData<FArrayBox>* coarserDataNewPtr = NULL;
+  LevelFluxRegister* coarserFRPtr = nullptr;
+  LevelFluxRegister* finerFRPtr = nullptr;
+  LevelData<FArrayBox>* coarserDataOldPtr = nullptr;
+  LevelData<FArrayBox>* coarserDataNewPtr = nullptr;
   Real tCoarserOld, tCoarserNew;
 
   getCoarseScalarDataPointers(a_scalarVar,
@@ -2417,8 +2416,8 @@ void AMRLevelMushyLayer::advectScalar(const int a_scalarVar, const int a_advecti
 
   if (!doFRupdates)
   {
-    coarserFRPtr = NULL;
-    finerFRPtr = NULL;
+    coarserFRPtr = nullptr;
+    finerFRPtr = nullptr;
   }
 
   DataIterator dit(m_grids);
@@ -2837,7 +2836,7 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
 
     LevelData<FArrayBox> U(m_grids, SpaceDim);
     EdgeToCell(m_advVel, U);
-    maxAdvULocal = ::computeNorm(U, NULL, 1, m_dx, Interval(0,SpaceDim-1), 0);
+    maxAdvULocal = ::computeNorm(U, nullptr, 1, m_dx, Interval(0,SpaceDim-1), 0);
     return maxAdvULocal;
   }
 
@@ -2904,7 +2903,7 @@ Real AMRLevelMushyLayer::getMaxVelocity()
 
   if (maxAdvU > 1e100)
   {
-    maxAdvU = ::computeNorm(*m_vectorNew[VectorVars::m_fluidVel], NULL, 1, m_dx, Interval(0,SpaceDim-1), 0);
+    maxAdvU = ::computeNorm(*m_vectorNew[VectorVars::m_fluidVel], nullptr, 1, m_dx, Interval(0,SpaceDim-1), 0);
     if (s_verbosity >= 3)
     {
       pout() << "AMRlevelMushyLayer::getMaxVelocity - max (cell centered U) = " << maxAdvU << endl;
@@ -2932,7 +2931,7 @@ Real AMRLevelMushyLayer::computeMaxUChi()
   LevelData<FArrayBox> U_chi(m_grids, SpaceDim, IntVect::Zero);
   fillVectorField(U_chi, m_time, m_U_porosity, true);
 
-  Real maxUChi = computeMax(U_chi, NULL, -1, Interval(0,SpaceDim-1));
+  Real maxUChi = computeMax(U_chi, nullptr, -1, Interval(0,SpaceDim-1));
   return maxUChi;
 }
 
@@ -3004,7 +3003,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 
   Real finest_dx = ml->m_dx;
 
-  Real maxPorosity = ::computeMax(*m_scalarNew[ScalarVars::m_porosity], NULL, -1, Interval(0,0));
+  Real maxPorosity = ::computeMax(*m_scalarNew[ScalarVars::m_porosity], nullptr, -1, Interval(0,0));
 
   Real maxUChi = computeMaxUChi();
 
@@ -3014,7 +3013,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   //  Real acceleration = max(buoyancy_acceleration, darcy_acceleration);
   //    acceleration = max(acceleration, viscous_acceleration);
 
-  Real acceleration = computeNorm(*m_vectorNew[VectorVars::m_advectionSrc], NULL, 1, m_dx, Interval(0, SpaceDim-1), 0);
+  Real acceleration = computeNorm(*m_vectorNew[VectorVars::m_advectionSrc], nullptr, 1, m_dx, Interval(0, SpaceDim-1), 0);
 
   // Ignore bogus values
   if (abs(acceleration) > 1e100)
@@ -3124,7 +3123,7 @@ void AMRLevelMushyLayer::setFluxRegistersZero()
   {
     if (m_makeFluxRegForScalarVar[a_scalarVar])
     {
-      if (m_fluxRegisters[a_scalarVar] == NULL)
+      if (m_fluxRegisters[a_scalarVar] == nullptr)
       {
         return;
       }
@@ -3166,13 +3165,13 @@ AMRLevelMushyLayer::getCoarsestLevel()
 
 AMRLevelMushyLayer*
 AMRLevelMushyLayer::getCoarserLevel() const {
-  AMRLevelMushyLayer* amrADCoarserPtr = NULL;
+  AMRLevelMushyLayer* amrADCoarserPtr = nullptr;
 
-  if (m_coarser_level_ptr != NULL)
+  if (m_coarser_level_ptr != nullptr)
   {
     amrADCoarserPtr =  dynamic_cast<AMRLevelMushyLayer*>(m_coarser_level_ptr);
 
-    if (amrADCoarserPtr == NULL)
+    if (amrADCoarserPtr == nullptr)
     {
       MayDay::Error("AMRLevelMushyLayer::getCoarserLevel: dynamic cast failed");
     }
@@ -3184,13 +3183,13 @@ AMRLevelMushyLayer::getCoarserLevel() const {
 /*******/
 AMRLevelMushyLayer*
 AMRLevelMushyLayer::getFinerLevel() const {
-  AMRLevelMushyLayer* amrADFinerPtr = NULL;
+  AMRLevelMushyLayer* amrADFinerPtr = nullptr;
 
-  if (m_finer_level_ptr != NULL)
+  if (m_finer_level_ptr != nullptr)
   {
     amrADFinerPtr = dynamic_cast<AMRLevelMushyLayer*>(m_finer_level_ptr);
 
-    if (amrADFinerPtr == NULL)
+    if (amrADFinerPtr == nullptr)
     {
       MayDay::Error(
           "AMRLevelMushyLayer::getFinerLevel: dynamic cast failed");
@@ -3480,9 +3479,9 @@ void AMRLevelMushyLayer::smoothScalarField(LevelData<FArrayBox>& a_phi, int a_va
 
   // Just solve on this level
   Vector<LevelData<FArrayBox>*> correction(finest_level + 1,
-                                           NULL);
+                                           nullptr);
   Vector<LevelData<FArrayBox>*> rhs(finest_level + 1,
-                                    NULL);
+                                    nullptr);
   //
   thisMLPtr = startLevelPtr;
   // Only solve on one level!
@@ -3897,8 +3896,8 @@ bool AMRLevelMushyLayer::crashed()
 
   for (int i=1; i<vars.size(); i++)
   {
-    Real max = computeMax(*m_scalarNew[vars[i]], NULL, m_ref_ratio, Interval(0,0));
-    Real min = computeMin(*m_scalarNew[vars[i]], NULL, m_ref_ratio, Interval(0,0));
+    Real max = computeMax(*m_scalarNew[vars[i]], nullptr, m_ref_ratio, Interval(0,0));
+    Real min = computeMin(*m_scalarNew[vars[i]], nullptr, m_ref_ratio, Interval(0,0));
 
     Real limit = 1e50;
     if (max > limit || min < -limit)
