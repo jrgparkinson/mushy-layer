@@ -212,6 +212,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.scaleP_CC = opt.scaleP_MAC;
   ppProjection.query("scaleCCPressure", opt.scaleP_CC);
 
+  opt.explicitViscousVelSolve = false;
+  ppMain.query("explicitViscousVelSolve", opt.explicitViscousVelSolve);
+
   opt.projection_verbosity = 0;
   ppProjection.query("verbosity", opt.projection_verbosity);
 

@@ -731,10 +731,21 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
   LevelData<FluxBox> T_face(m_grids, 1, ghost);
   LevelData<FluxBox> C_face(m_grids, 1, ghost);
   LevelData<FluxBox> viscosity_face(m_grids, 1, ghost);
+  LevelData<FluxBox> viscous_velocity_face(m_grids, 1, ghost);
   fillScalarFace(permeability_face, time, ScalarVars::m_permeability,          true, false);
   fillScalarFace(T_face,            time, ScalarVars::m_temperature,           true, false);
   fillScalarFace(C_face,            time, ScalarVars::m_liquidConcentration,   true, false);
   fillScalarFace(viscosity_face,    time, ScalarVars::m_viscosity,             true, false);
+
+  if (m_opt.explicitViscousVelSolve)
+  {
+    LevelData<FArrayBox> viscous(m_grids, SpaceDim, ghost);
+    LevelData<FArrayBox> *crseVelPtr = nullptr;
+
+    computeLapVel(viscous, *m_vectorOld[m_fluidVel], crseVelPtr);
+
+    CellToEdge(viscous, viscous_velocity_face);
+  }
 
 //  int gravityDir = SpaceDim-1;
 
@@ -742,14 +753,10 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
   {
     a_advVel[dit].setVal(0.0);
 
-    FArrayBox& fabVelz = a_advVel[dit][SpaceDim-1]; // for debugging
+    FArrayBox& fabVelz = a_advVel[dit][SpaceDim-1];
 
     fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.m_buoyancyTCoeff);
     fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.m_buoyancySCoeff);
-
-    // Add the body force
-//    FArrayBox& bodyForce = (*m_vectorNew[VectorVars::m_bodyForce])[dit];
-//    fabVelz.plus(bodyForce, 1, gravityDir, gravityDir, 1);
     fabVelz.plus(m_parameters.body_force);
 
     for (int idir=0; idir<SpaceDim; idir++)
@@ -760,6 +767,12 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
       {
         a_advVel[dit][idir].divide(viscosity_face[dit][idir]);
       }
+
+      if (m_opt.explicitViscousVelSolve)
+      {
+        a_advVel[dit][idir].plus(viscous_velocity_face[dit][idir]);
+      }
+
     }
 
   }

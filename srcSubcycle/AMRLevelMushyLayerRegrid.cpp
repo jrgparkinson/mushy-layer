@@ -69,14 +69,14 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
     }
 
     // now set up multilevel stuff
-    Vector<LevelData<FArrayBox>* > amrS(finest_level+1,NULL);
+    Vector<LevelData<FArrayBox>* > amrS(finest_level+1,nullptr);
     Vector<LevelData<FArrayBox>* > amrLapS(finest_level+1);
     Vector<DisjointBoxLayout> amrGrids(finest_level+1);
     Vector<int> amrRefRatios(finest_level+1,0);
     Vector<Real> amrDx(finest_level+1,0);
     Vector<ProblemDomain> amrDomains(finest_level+1);
     // will use this to do averaging down
-    Vector<CoarseAverage*> amrAvgDown(finest_level+1, NULL);
+    Vector<CoarseAverage*> amrAvgDown(finest_level+1, nullptr);
 
     // loop over levels, allocate temp storage for velocities,
     // set up for amrsolves
@@ -223,15 +223,15 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
     // since we're done with velocity, can clear up storage space
     for (int lev=0; lev<=finest_level; lev++)
     {
-      if (amrS[lev] != NULL)
+      if (amrS[lev] != nullptr)
       {
         delete amrS[lev];
-        amrS[lev] = NULL;
+        amrS[lev] = nullptr;
       }
-      if (amrLapS[lev] != NULL)
+      if (amrLapS[lev] != nullptr)
       {
         delete amrLapS[lev];
-        amrLapS[lev] = NULL;
+        amrLapS[lev] = nullptr;
       }
     }
 
@@ -365,10 +365,10 @@ void AMRLevelMushyLayer::doPostRegridSmoothing(bool a_smoothVel, bool a_smoothSc
     // finally, clean up storage for coarseAverages
     for (int lev=0; lev<=finest_level; ++lev)
     {
-      if (amrAvgDown[lev] != NULL)
+      if (amrAvgDown[lev] != nullptr)
       {
         delete amrAvgDown[lev];
-        amrAvgDown[lev] = NULL;
+        amrAvgDown[lev] = nullptr;
       }
 
 
@@ -502,6 +502,18 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   shiftedTags.shift(shiftVect);
   shrunkMushyCells &= shiftedTags;
 
+  // Recover original cells
+  shrunkMushyCells.shift(-shiftVect);
+  for (int i=0; i < m_opt.porousCellsShrink-1; i++)
+  {
+    shrunkMushyCells.growHi(SpaceDim-1);
+
+    // Grow horizontally to get around some edge effects
+    for (int horizontal_dir = 0; horizontal_dir < SpaceDim-1; horizontal_dir++)
+    {
+      shrunkMushyCells.growHi(horizontal_dir);
+    }
+  }
 
   if (m_opt.refinementMethod == RefinementMethod::tagSpeed) // m_opt.tag_velocity
   {
@@ -656,7 +668,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
         // Create new field, bulk concentration * vertical velocity
         LevelData<FArrayBox> concentrationVelocity(m_grids, 1, IntVect::Zero);
         m_scalarNew[m_bulkConcentration]->copyTo(concentrationVelocity);
-
 
         for (DataIterator dit= m_grids.dataIterator(); dit.ok(); ++dit)
         {
@@ -925,7 +936,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     if (m_hasFiner)
     {
       AMRLevelMushyLayer* fine =getFinerLevel();
-      if (fine  != NULL)
+      if (fine  != nullptr)
       {
         Vector<Box> boxes = fine->boxes();
         if (boxes.size() > 0)
@@ -1513,7 +1524,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 //  {
 //    thisLevelData->calculateTimeIndAdvectionVel(m_time, thisLevelData->m_advVel);
 //    Divergence::levelDivergenceMAC(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv],thisLevelData->m_advVel, m_dx);
-//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], NULL, 1, thisLevelData->dx(), Interval(0,0));
+//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], nullptr, 1, thisLevelData->dx(), Interval(0,0));
 //    pout() << "PostRegrid(level " << thisLevelData->level() << ") -- max(div(u)) = " << maxDivU <<  endl;
 //
 //    thisLevelData = thisLevelData->getFinerLevel();
@@ -1592,7 +1603,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
       //      amrLambda[lev] = &(*thisLevelData->m_scalarNew[ScalarVars::m_lambda]);
 
-      if (thisLevelData->m_finer_level_ptr != NULL)
+      if (thisLevelData->m_finer_level_ptr != nullptr)
       {
         thisLevelData =
             dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
@@ -1627,7 +1638,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       const DisjointBoxLayout& thisLevelGrids = thisAmrVel.getBoxes();
       velBC.applyBCs(thisAmrVel, thisLevelGrids, levelDomain, levelDx,
                      false); // inhomogeneous
-      if (thisLevelData->m_finer_level_ptr != NULL)
+      if (thisLevelData->m_finer_level_ptr != nullptr)
       {
         thisLevelData = dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
       }
@@ -1784,7 +1795,7 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 //  {
 //    thisLevelData->calculateTimeIndAdvectionVel(m_time, thisLevelData->m_advVel);
 //    Divergence::levelDivergenceMAC(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv],thisLevelData->m_advVel, m_dx);
-//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], NULL, 1, thisLevelData->dx(), Interval(0,0));
+//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], nullptr, 1, thisLevelData->dx(), Interval(0,0));
 //    pout() << "PostRegrid(level " << thisLevelData->level() << ") -- max(div(u)) = " << maxDivU <<  endl;
 //
 //    thisLevelData = thisLevelData->getFinerLevel();
@@ -1806,7 +1817,7 @@ void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
 
     amrLambda[lev] = &(*thisLevelData->m_scalarNew[ScalarVars::m_lambda]);
 
-    if (thisLevelData->m_finer_level_ptr != NULL)
+    if (thisLevelData->m_finer_level_ptr != nullptr)
     {
       thisLevelData =
           dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
@@ -1844,14 +1855,14 @@ void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
 //  }
 //
 //  // now set up multilevel stuff
-//  Vector<LevelData<FArrayBox>*> oldS(finest_level+1, NULL);
-//  Vector<LevelData<FArrayBox>*> newS(finest_level+1, NULL);
+//  Vector<LevelData<FArrayBox>*> oldS(finest_level+1, nullptr);
+//  Vector<LevelData<FArrayBox>*> newS(finest_level+1, nullptr);
 //  Vector<DisjointBoxLayout> amrGrids(finest_level+1);
 //  Vector<int> amrRefRatios(finest_level+1,0);
 //  Vector<Real> amrDx(finest_level+1,0);
 //  Vector<ProblemDomain> amrDomains(finest_level+1);
 //  // also will need to avg down new stuff
-//  Vector<CoarseAverage*> amrAvgDown(finest_level+1,NULL);
+//  Vector<CoarseAverage*> amrAvgDown(finest_level+1,nullptr);
 //
 //  // loop over levels, allocate temp storage for velocities,
 //  // set up for amrsolves
@@ -1937,15 +1948,15 @@ void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
 //  // since scalars won't need temp storge, clean it up here
 //  for (int lev=startLev; lev<= finest_level; lev++)
 //  {
-//    if (newS[lev] != NULL)
+//    if (newS[lev] != nullptr)
 //    {
 //      delete newS[lev];
-//      newS[lev] = NULL;
+//      newS[lev] = nullptr;
 //    }
-//    if (oldS[lev] != NULL)
+//    if (oldS[lev] != nullptr)
 //    {
 //      delete oldS[lev];
-//      oldS[lev] = NULL;
+//      oldS[lev] = nullptr;
 //    }
 //  }
 //
@@ -1979,10 +1990,10 @@ void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
 //  thisMLPtr = this;
 //  for (int lev=m_level; lev<= finest_level; lev++)
 //  {
-//    if (amrAvgDown[lev] != NULL)
+//    if (amrAvgDown[lev] != nullptr)
 //    {
 //      delete amrAvgDown[lev];
-//      amrAvgDown[lev] = NULL;
+//      amrAvgDown[lev] = nullptr;
 //    }
 //    thisMLPtr->m_regrid_smoothing_done = false;
 //    thisMLPtr = thisMLPtr->getFinerLevel();

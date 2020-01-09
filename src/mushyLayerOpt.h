@@ -622,6 +622,9 @@ struct MushyLayerOptions {
    */
   bool scaleP_CC;
 
+  /// Compute viscous terms explicitly in velocity calculation
+  bool explicitViscousVelSolve;
+
 
 //  bool explicitDarcyTerm;
 
