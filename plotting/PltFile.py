@@ -790,20 +790,11 @@ class PltFile:
         x_max = (len(field.coords['x']) + 1) * dx
         y_max = (len(field.coords['y']) + 1) * dx
 
-        # x_max = np.max(field.coords['x'])
-
-        grid_dx = x_max / grid_size[0]
-        grid_dy = y_max / grid_size[1]
-
         x_coords = np.array(field.coords['x'])
         y_coords = np.array(field.coords['y'])
 
         dx = np.abs(x_coords[1] - x_coords[0])
 
-
-
-        # y, x = np.mgrid[slice(0, x_max, grid_dx),
-        #                 slice(0, y_max, grid_dy)]
         if extend_grid:
             extend = dx/2
         else:
@@ -1064,13 +1055,6 @@ class PltFile:
 
             # Now compute bounding energies
             print('Computing bounding energy')
-            cols = enthalpy.shape[0]
-            rows = enthalpy.shape[1]
-            # for j in range(cols):
-            #
-            #     for i in range(rows):
-            # replaced loop over [j,i] with loop over [idx] for 3D compatibility
-
             for idx, value in np.ndenumerate(enthalpy):
 
                 eutectic_porosity = (conc_ratio + bulk_salinity[idx]) / (theta_eutectic + conc_ratio)

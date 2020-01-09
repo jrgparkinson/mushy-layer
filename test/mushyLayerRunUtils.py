@@ -44,7 +44,12 @@ def get_matlab_base_command():
 
     # matlab_command = 'cd ' + matlab_folder + '; \n \n matlab -nodisplay -nosplash -nodesktop -r'
 
-    matlab_command = 'cd ' + matlab_folder + '; \n source /etc/profile.d/modules.sh \n module load idl/870 \n module load matlab/R2018b  \n \n matlab -nodisplay -nosplash -nodesktop -r'
+    matlab_command = 'cd ' + matlab_folder + ';\n' \
+                                             'source /etc/profile.d/modules.sh\n' \
+                                             'module load idl/870\n' \
+                                             'module load matlab/R2018b' \
+                                             '\n\n' \
+                                             'matlab -nodisplay -nosplash -nodesktop -r'
 
 
     return matlab_command
@@ -235,16 +240,18 @@ def construct_run_name(params):
             pass
             
     if float(params['parameters.darcy']) > 0:
-            run_name = run_name + long_to_short_name['parameters.darcy'] + param_format['parameters.darcy'] % float(params['parameters.darcy'])
-            run_name = run_name + long_to_short_name['parameters.nonDimReluctance'] + param_format['parameters.nonDimReluctance'] % float(params['parameters.nonDimReluctance'])
+            run_name = run_name + long_to_short_name['parameters.darcy'] \
+                       + param_format['parameters.darcy'] % float(params['parameters.darcy'])
+            run_name = run_name + long_to_short_name['parameters.nonDimReluctance'] \
+                       + param_format['parameters.nonDimReluctance'] % float(params['parameters.nonDimReluctance'])
 
     # params which don't follow the same format
 
     # if we're using a sponge
-    if ('main.spongeHeight' in params 
-        and 'main.spongeRelaxationCoeff' in params
-        and float(params['main.spongeHeight']) > 0.0
-        and float(params['main.spongeRelaxationCoeff']) > 0.0):
+    if ('main.spongeHeight' in params
+            and 'main.spongeRelaxationCoeff' in params
+            and float(params['main.spongeHeight']) > 0.0
+            and float(params['main.spongeRelaxationCoeff']) > 0.0):
         run_name = run_name + '_sponge_'
 
     # grid resolution
@@ -406,7 +413,6 @@ def get_final_plot_file(directory):
         # Match if it doesn't start with chk, and finished like 01234.2d.hdf5
         pattern = '^(?!chk.*$).*\d+\.\dd\.hdf5'
         if re.match(pattern, f):
-        #if len(f) > 5 and not 'chk' in f and f[-5:] == '.hdf5':
             plt_files.append(f)
 
     plt_files = sorted(plt_files)
@@ -429,7 +435,6 @@ def get_final_chk_file(directory):
         pattern = '^chk.*\d+\.\dd\.hdf5'
 
         if re.match(pattern, f):
-        #if len(f) > 5 and 'chk' in f and f[-5:] == '.hdf5':
             plt_files.append(f)
 
     plt_files = sorted(plt_files)

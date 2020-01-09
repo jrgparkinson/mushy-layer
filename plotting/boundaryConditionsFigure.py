@@ -177,24 +177,23 @@ def make_bc_fig(inputs_file, ndim=2):
     # Also add dimensionless parameters to the middle of the domain
     dim_params = 'Dynamics: $Rm_S = %g, Rm_T = %g$ \n     $\Pi_H = %g, Da = %g, Pr=%g$, \n ' \
                  'Material properties: $Le = %g, c_p = %g, k = %g$, \n' \
-                 'Thermodynamics: $\mathscr{C}=%g, \mathscr{S}=%g,$ \n'\
+                 'Thermodynamics: $\mathscr{C}=%g, \mathscr{S}=%g,$ \n' \
                  'Phase diagram: $\Gamma=%g, C_i = %g,$ \n     $C_e = %g, T_e=%g$ \n' % (
-                                                                                  inputs['parameters.rayleighComp'],
-                                                                                  inputs['parameters.rayleighTemp'],
-                                                                                  1.0/inputs['parameters.nonDimReluctance'],
-                                                                                  inputs['parameters.darcy'],
-                                                                                  inputs['parameters.prandtl'],
-                                                 inputs['parameters.lewis'],
-                                                 inputs['parameters.specificHeatRatio'],
-                                                 inputs['parameters.heatConductivityRatio'],
-
-                                                                    inputs['parameters.compositionRatio'],
-                                                                                  inputs['parameters.stefan'],
-                                                                                  inputs['parameters.liquidusSlope'],
-                                                              inputs['parameters.initialComposition'],
-                                                              inputs['parameters.eutecticComposition'],
-                                                              inputs['parameters.eutecticTemp']
-                                                 )
+                     inputs['parameters.rayleighComp'],
+                     inputs['parameters.rayleighTemp'],
+                     1.0 / inputs['parameters.nonDimReluctance'],
+                     inputs['parameters.darcy'],
+                     inputs['parameters.prandtl'],
+                     inputs['parameters.lewis'],
+                     inputs['parameters.specificHeatRatio'],
+                     inputs['parameters.heatConductivityRatio'],
+                     inputs['parameters.compositionRatio'],
+                     inputs['parameters.stefan'],
+                     inputs['parameters.liquidusSlope'],
+                     inputs['parameters.initialComposition'],
+                     inputs['parameters.eutecticComposition'],
+                     inputs['parameters.eutecticTemp']
+                 )
 
     if 'heatSource.size' in inputs:
         dim_params = dim_params + '+ heat source $Q = \\frac{Q_0}{\sigma \sqrt{2 \pi}} \exp\left[ - 0.5 \left( \\frac{x-x_c}{\sigma} \\right)^2 \\right]  0.5 \left( 1 + \\tanh\left[10 (z-(H-h)) \\right]) \\right)$, \n' \

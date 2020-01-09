@@ -4,7 +4,7 @@ from colorama import Fore, Style
 import getopt
 import math
 
-from runAMRConvergenceTest import runTest
+from AMRConvergenceTest import runTest
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
 from makeFigures import porous_hole_command
 

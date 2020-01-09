@@ -2,7 +2,7 @@
 import os, sys
 from colorama import Fore, Style
 
-from runAMRConvergenceTest import runTest
+from AMRConvergenceTest import runTest
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
 
 ######################################

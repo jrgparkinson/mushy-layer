@@ -2355,16 +2355,26 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 
 		//		Box domBox = m_amrDomains[lev].domainBox();
 
-		Gradient::compGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
-				&*a_phiCrse, &*a_phiFine, m_amrDx[lev], a_nRefFine,
-				*m_amrGradIVS[lev], *m_amrCFInterps[lev]);
+		if (a_phiFine)
+		{
+                  Gradient::compGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
+                                  &*a_phiCrse, &*a_phiFine, m_amrDx[lev], a_nRefFine,
+                                  *m_amrGradIVS[lev], *m_amrCFInterps[lev]);
+		}
+		else if (a_phiCrse)
+		{
+		  Gradient::levelGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
+		                             &*a_phiCrse, m_amrDx[lev],
+		                             *m_amrGradIVS[lev], *m_amrCFInterps[lev]);
+		}
+		else
+		{
+		  Gradient::levelGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
+		                             m_amrDx[lev]);
+		}
 
-		//		Gradient::levelGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
-		//						&*a_phiCrse, m_amrDx[lev],
-		//						*m_amrGradIVS[lev], *m_amrCFInterps[lev]);
 
-		//		Gradient::levelGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
-		//							m_amrDx[lev]);
+
 
 		//		Gradient::levelGradientMACNew(*m_gradPressureEdge[lev], *m_pressure[lev], m_amrDx[lev]);
 

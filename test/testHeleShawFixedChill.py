@@ -4,7 +4,7 @@ import sys
 from colorama import Fore, Style
 import getopt
 
-from runAMRConvergenceTest import runTest
+from AMRConvergenceTest import runTest
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name, get_mushy_layer_dir, add_params
 from MushyLayerRunSimple import MushyLayerRunSimple
 from BatchJob import BatchJob
@@ -75,11 +75,14 @@ def testHeleShawFixedChill(argv):
             doAMR = True
 
     base_output_dir = get_base_output_dir()
-    matlab_command = get_matlab_base_command()
 
     print(Fore.GREEN + 'Setup tests for fixed chill in a Hele-Shaw cell' + Style.RESET_ALL)
     physicalProblem = 'FixedChill'
-    folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f-Rel%1.1e" % (extra_params['main.max_time'], extra_params['parameters.rayleighComp'], extra_params['parameters.darcy'], extra_params['parameters.compositionRatio'], extra_params['parameters.nonDimReluctance'])
+    folderName = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f-Rel%1.1e" % (extra_params['main.max_time'],
+                                                                       extra_params['parameters.rayleighComp'],
+                                                                       extra_params['parameters.darcy'],
+                                                                       extra_params['parameters.compositionRatio'],
+                                                                       extra_params['parameters.nonDimReluctance'])
     if periodic:
         folderName = folderName + '-periodic'
     dataFolder = os.path.join(base_output_dir, folderName)
@@ -116,7 +119,7 @@ def testHeleShawFixedChill(argv):
 
         # While testing:
         Nz_uniform = [64]
-       # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
+        # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
         #            {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [64]}]
         AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform}]
 
