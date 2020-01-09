@@ -1008,8 +1008,8 @@ int amrMushyLayer::getRefinementRatio(int coarseLevel)
 }
 
 void amrMushyLayer::interpToFineSolutions(int lev,
-                                          const std::vector<int> scalarVars,
-                                          const std::vector<int> vectorVars)
+                                          const std::vector<int>& scalarVars,
+                                          const std::vector<int>& vectorVars)
 {
   bool averageFromDest = true;
   //For consistency, get level > 0 vars by interpolation

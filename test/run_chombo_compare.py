@@ -1,10 +1,11 @@
+from plotting.PltFile import latexify
 from mushyLayerRunUtils import write_inputs, get_executable_name, get_final_plot_file
 import getopt
 import sys
 import os
 import re
 import numpy as np
-from util import shared_storage
+import sys
 
 import matplotlib
 matplotlib.use('Agg')
@@ -22,56 +23,6 @@ def format_field_name(field):
         return formatted_names[field]
     else:
         return field
-
-def latexify(fig_width=None, fig_height=None, columns=1):
-    """Set up matplotlib's RC params for LaTeX plotting.
-    Call this before plotting a figure.
-
-    Parameters
-    ----------
-    fig_width : float, optional, inches
-    fig_height : float,  optional, inches
-    columns : {1, 2}
-    """
-
-    # code adapted from http://www.scipy.org/Cookbook/Matplotlib/LaTeX_Examples
-
-    # Width and max height in inches for IEEE journals taken from
-    # computer.org/cms/Computer.org/Journal%20templates/transactions_art_guide.pdf
-
-    assert (columns in [1, 2])
-
-    if fig_width is None:
-        fig_width = 3.39 if columns == 1 else 6.9  # width in inches
-
-    if fig_height is None:
-        golden_mean = (np.sqrt(5) - 1.0) / 2.0  # Aesthetic ratio
-        fig_height = fig_width * golden_mean  # height in inches
-
-    max_height_inches = 8.0
-    if fig_height > max_height_inches:
-        print("WARNING: fig_height too large:" + str(fig_height) +
-              "so will reduce to" + str(max_height_inches) + "inches.")
-        fig_height = max_height_inches
-
-    # Need the mathsrfs package for \mathscr if text.usetex = True
-    font_size = 9
-
-    params = {'backend': 'ps',
-              'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}'],
-              'axes.labelsize': font_size,  # fontsize for x and y labels (was 10)
-              'axes.titlesize': font_size,
-              'legend.fontsize': font_size,  # was 10
-              'xtick.labelsize': font_size,
-              'ytick.labelsize': font_size,
-              'lines.markersize': 3,
-              'lines.linewidth': 1,
-              'text.usetex': True,
-              'figure.figsize': [fig_width, fig_height],
-              'font.family': 'serif'
-              }
-
-    matplotlib.rcParams.update(params)
 
 
 def chombo_compare_analysis(data_folder):
@@ -237,7 +188,7 @@ def run_chombo_compare(argv):
     # Some default options
     include_richardson = True # for problems with no analytic solution
     figure_number = 6
-    data_folder = shared_storage.get_dir('TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/')
+    data_folder = None
     run_analysis = False
     field = 'xDarcy velocity'
     err_type = 'L2'
@@ -266,6 +217,10 @@ def run_chombo_compare(argv):
             figure_number = int(arg)
         elif opt in "-d":
             figure_output_directory = str(arg)
+
+    if not data_folder:
+        print('Error, no data folder given')
+        sys.exit(-1)
 
     if not figure_output_directory:
         figure_output_directory = data_folder

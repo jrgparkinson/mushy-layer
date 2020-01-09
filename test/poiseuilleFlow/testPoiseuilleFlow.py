@@ -1,4 +1,4 @@
-from PltFile import PltFile
+from PltFile import PltFile, latexify2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_bvp
@@ -7,7 +7,7 @@ import mushyLayerRunUtils
 import subprocess
 import sys
 import shutil
-from mushyLayerRunUtils import latexify
+
 
 class PoiseuilleSolution():
 
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     plt_files = sorted(plt_files)
 
     # Create the figure window
-    latexify(7.5, 3.5)
+    latexify2(7.5, 3.5)
     fig, axes  = plt.subplots(1, 2)
     ax_list = axes.flatten()
     ax_left = ax_list[0]

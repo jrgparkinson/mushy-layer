@@ -3,7 +3,7 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import numpy as np
 from nondimensionalisation import *
-from mushyLayerRunUtils import latexify
+from PltFile import latexify2
 import matplotlib as mpl
 import re
 import math
@@ -54,7 +54,7 @@ dim_times_warming = dimensional_time(times_control)
 
 valid_control_times = times_control[times_control > time_warming[0]]
 
-latexify(3,3)
+latexify2(3, 3)
 fig2, axes = plt.subplots(2, 1)
 plot_interval = 10
 #num_steps = int(float(len(times))/float(plot_interval))

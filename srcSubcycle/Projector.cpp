@@ -297,40 +297,31 @@ PhysBCUtil* Projector::getPhysBCPtr() const
 
 // ------------------------------------------------------
 // default constructor
-Projector::Projector()
-{
-  m_level = -1;
-  m_nRefCrse = -1;
-  m_isInitialized = false;
-  // have to initialize this to _something_!
-  m_finest_level = false;
-  m_physBCPtr = nullptr;
-  m_bottomSolverLevel = nullptr;
-  m_limitSolverCoarsening = false;
-  m_crseProjPtr = nullptr;
-  m_dx = -1;
-  m_fineProjPtr = nullptr;
-  m_BiCGBottomSolverLevel = nullptr;
-  m_sumVDrhs = 0.0;
-  m_usePiAdvectionBCs = true;
-  m_phiScale=1.0;
-  m_MACbcScale=-0.5;
-  m_scale_lambda_with_porosity = false;
-  m_scale_lambda_err_with_porosity = false;
-  m_scaleSyncCorrection=true;
-  m_scalePressureWithPorosity=true;
-}
+Projector::Projector() : m_sumVDrhs(0.0),
+    m_usePiAdvectionBCs(true),
+    m_scalePressureWithPorosity(true),
+    m_scaleSyncCorrection(true),
+    m_level(-1),
+    m_dx(-1),
+    m_fineProjPtr(nullptr),
+    m_crseProjPtr(nullptr),
+    m_nRefCrse(-1),
+    m_isInitialized(false),
+    m_limitSolverCoarsening(false),
+    m_finest_level(false),
+    m_phiScale(1.0),
+    m_MACbcScale(-0.5),
+    m_scale_lambda_with_porosity(false),
+    m_scale_lambda_err_with_porosity(false),
+    m_bottomSolverLevel(nullptr),
+    m_BiCGBottomSolverLevel(nullptr),
+    m_physBCPtr(nullptr) {}
+
 
 // ------------------------------------------------------
 // destructor
 Projector::~Projector()
 {
-  //We don't own this anymore
-  //  if (m_physBCPtr != nullptr)
-  //    {
-  //      delete m_physBCPtr;
-  //      m_physBCPtr = nullptr;
-  //    }
 
   if(m_bottomSolverLevel != nullptr) {
 

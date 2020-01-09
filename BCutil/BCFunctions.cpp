@@ -340,7 +340,6 @@ void InflowOutflowBC(FArrayBox&      a_state,
   bool tryCoarsening = false;
   if (tryCoarsening)
   {
-
     int refRat = a_dx/fine_dx;
 
     DataIterator dit = a_advVel->dataIterator();

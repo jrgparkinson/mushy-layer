@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
-from util.plotUtils import latexify, format_axes
+from PltFile import latexify
 import os
 import numpy as np
 from ChkFile import ChkFile
-from util.nondimensionalisation import dimensional_time
-from util import shared_storage
+from nondimensionalisation import dimensional_time
 
 plt.close('all')
 latexify(fig_width=4.0, fig_height=3.0)
@@ -14,7 +13,7 @@ figure_output_directory = '/home/parkinsonjl/phd/figures/'
 fig_name = 'chk088000'
 # fig_name = 'chk277000'
 
-base_folder = shared_storage.get_dir('SeaIceGrowth/T-20HigherPermeability/')
+base_folder = '/path/to/data/to/plot'
 cf = ChkFile(os.path.join(base_folder, '%s.2d.hdf5' % fig_name))
 
 
@@ -75,7 +74,6 @@ cbar_temperature.set_ticklabels(levels[::2])
 ax.set_xlabel('$x$ (metres)')
 ax.set_ylabel('$z$ (metres)')
 
-ax = format_axes(ax)
 ax.set_aspect('equal', adjustable='box')
 
 
@@ -89,11 +87,7 @@ plt.tight_layout()
 # Move axis left a bit
 ax.set_position([-0.2, 0.15, 0.7, 0.75])
 
-
-
 plt.draw()
-
-
 
 figure_full_path = os.path.join(figure_output_directory, fig_name + '.jpg')
 plt.savefig(figure_full_path,  format='jpg', dpi=800)

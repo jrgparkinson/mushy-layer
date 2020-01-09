@@ -536,13 +536,12 @@ public:
                         Vector<Vector<Real> >&  a_customHiBCVal) : AbstractScalarBCFunction(a_isDefined,
                                                                                             a_params, a_homogeneous,
                                                                                             a_advVel, a_dx, a_interval),
-                                                                                            m_plumeVal(a_plumeVals)
-  {
-    m_customLoBC = a_customLoBC;
-    m_customHiBC = a_customHiBC;
-    m_customLoBCVal = a_customLoBCVal;
-    m_customHiBCVal = a_customHiBCVal;
-  }
+                                                                                            m_plumeVal(a_plumeVals),
+                                                                                            m_customLoBC(a_customLoBC),
+                                                                                            m_customHiBC(a_customHiBC),
+                                                                                            m_customLoBCVal(a_customLoBCVal),
+                                                                                            m_customHiBCVal(a_customHiBCVal)
+  { }
 
   virtual void operator()(FArrayBox&           a_state,
                           const Box&           a_valid,
@@ -1969,15 +1968,13 @@ public:
   ):
     AbstractFaceBCFunction(a_isHomogeneous,
                            a_comp,
-                           a_params)
+                           a_params) , m_plumeVal(a_plumeVal),
+                           m_bcTypeLo(a_bcTypeLo),
+                           m_bcTypeHi(a_bcTypeHi),
+                           m_bcValLo(a_bcValLo),
+                           m_bcValHi(a_bcValHi)
 
-  {
-    m_plumeVal = a_plumeVal;
-    m_bcTypeLo = a_bcTypeLo;
-    m_bcTypeHi = a_bcTypeHi;
-    m_bcValLo = a_bcValLo;
-    m_bcValHi = a_bcValHi;
-  }
+  {  }
 
   /// Apply BC
   void operator()(FArrayBox&           a_state,
@@ -4061,13 +4058,11 @@ LevelData<FluxBox>*  PhysBCUtil::getAdvVel()
   return m_advVel;
 }
 
-PhysBCUtil::PhysBCUtil()
-{
-  m_dx = -1;
-  m_defined = false;
-  m_advVel = nullptr;
-  m_time = 0;
-}
+PhysBCUtil::PhysBCUtil() : m_dx(-1),
+    m_defined(false),
+    m_advVel(nullptr),
+    m_time(0)
+{ }
 
 // ---------------------------------------------------------------
 PhysBCUtil::PhysBCUtil(MushyLayerParams a_params, Real a_dx)
@@ -4111,15 +4106,13 @@ PhysBCUtil::operator= (const PhysBCUtil& rhs)
 }
 
 // ---------------------------------------------------------------
-PhysBCUtil::PhysBCUtil(const PhysBCUtil& rhs)
-{
-  m_loBC = rhs.m_loBC;
-  m_hiBC = rhs.m_hiBC;
-  m_dx = rhs.m_dx;
-  m_time = rhs.m_time;
-  m_defined = false;
-  m_advVel = nullptr;
-}
+PhysBCUtil::PhysBCUtil(const PhysBCUtil& rhs) :   m_loBC(rhs.m_loBC),
+    m_hiBC(rhs.m_hiBC),
+    m_dx(rhs.m_dx),
+    m_time(rhs.m_time),
+    m_defined(false),
+    m_advVel(nullptr)
+{ }
 
 // ---------------------------------------------------------------
 void

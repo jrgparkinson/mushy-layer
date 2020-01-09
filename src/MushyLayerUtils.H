@@ -118,10 +118,10 @@ void getLocation(const IntVect iv, RealVect& loc, const Real a_dx,
 Real burgersPeriodicInit(Real x, Real y, int dir, MushyLayerParams params);
 
 /// Initial data for burgers problem benchmark
-Real burgersSinInit(Real x, Real y, int dir, MushyLayerParams params);
+Real burgersSinInit(Real x, Real y, int dir, const MushyLayerParams& params);
 
 /// Initial data for Stokes-Darcy channel flow benchmark
-Real stokesDarcyInit(Real x, Real y, int dir, MushyLayerParams params);
+Real stokesDarcyInit(Real x, Real y, int dir, const MushyLayerParams& params);
 
 /// Read in fixed grids
 extern bool

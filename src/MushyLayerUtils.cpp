@@ -667,7 +667,7 @@ Real burgersPeriodicInit(Real x, Real y, int dir, MushyLayerParams params)
   }
 }
 
-Real burgersSinInit(Real x, Real y, int dir, MushyLayerParams params)
+Real burgersSinInit(Real x, Real y, int dir, const MushyLayerParams& params)
 {
   if (dir == 1)
   {
@@ -689,7 +689,7 @@ Real burgersSinInit(Real x, Real y, int dir, MushyLayerParams params)
  * periodic in y
  * See latex file for more details
  */
-Real stokesDarcyInit(Real x, Real y, int dir, MushyLayerParams params)
+Real stokesDarcyInit(Real x, Real y, int dir, const MushyLayerParams& params)
 {
 
   if (dir == 1)

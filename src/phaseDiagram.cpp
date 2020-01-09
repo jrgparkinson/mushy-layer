@@ -34,7 +34,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
                              LevelData<FArrayBox>& enthalpySolid, LevelData<FArrayBox>& enthalpyLiquid,
                              LevelData<FArrayBox>& enthalpyEutectic,
-                             MushyLayerParams a_params)
+                             const MushyLayerParams& a_params)
 {
     DisjointBoxLayout grids = HC.disjointBoxLayout();
     IntVect ghostVect = HC.ghostVect();
@@ -52,7 +52,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
 void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
                              LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
-                             MushyLayerParams a_params)
+                             const MushyLayerParams& a_params)
 {
   DisjointBoxLayout grids = theta.disjointBoxLayout();
   IntVect ghostVect = theta.ghostVect();
@@ -71,7 +71,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
 void updateEnthalpyVariables(LevelData<FArrayBox>& enthalpy, LevelData<FArrayBox>& composition,
                              LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
-                             MushyLayerParams a_params)
+                             const MushyLayerParams& a_params)
 {
   DisjointBoxLayout grids = theta.disjointBoxLayout();
   IntVect ghostVect = theta.ghostVect();
@@ -89,7 +89,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& enthalpy, LevelData<FArrayBox
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
                              LevelData<FArrayBox>& enthalpySolid, LevelData<FArrayBox>& enthalpyLiquid,
                              LevelData<FArrayBox>& enthalpyEutectic,
-                             MushyLayerParams a_params)
+                             const MushyLayerParams& a_params)
 {
   DisjointBoxLayout grids = temperature.disjointBoxLayout();
   IntVect ghostVect = temperature.ghostVect();

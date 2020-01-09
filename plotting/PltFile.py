@@ -1,4 +1,8 @@
+import socket
+
 import h5py
+import matplotlib
+import matplotlib as mpl
 import numpy as np
 from matplotlib import pyplot
 import re
@@ -1194,13 +1198,76 @@ class PltFile:
         return z_interface
 
 
+def latexify(fig_width=None, fig_height=None):
+    """Set up matplotlib's RC params for LaTeX plotting.
+    Call this before plotting a figure.
+
+    Parameters
+    ----------
+    fig_width : float, optional, inches
+    fig_height : float,  optional, inches
+
+    Note that, in the thesis template, the standard column width is just over 5.8 inches and font size is 12pt
+    """
+
+    # code adapted from http://www.scipy.org/Cookbook/Matplotlib/LaTeX_Examples
+
+    # Width and max height in inches for IEEE journals taken from
+    # computer.org/cms/Computer.org/Journal%20templates/transactions_art_guide.pdf
+
+    default_fig_width = 5.0
+
+    # Pretty sure this is the standard caption font size in latex
+    font_size = 9
+    linewidth = 1
 
 
+    if fig_width is None:
+        # fig_width = 3.39 if columns == 1 else 6.9  # width in inches
+        fig_width = default_fig_width
+
+    if fig_height is None:
+        golden_mean = (np.sqrt(5) - 1.0) / 2.0  # Aesthetic ratio
+        fig_height = fig_width * golden_mean  # height in inches
+
+    # Need the mathsrfs package for \mathscr if text.usetex = True
+    params = {'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}', '\\usepackage{amsmath}'],
+              'axes.labelsize': font_size, 'axes.titlesize': font_size, 'legend.fontsize': font_size,
+              'xtick.labelsize': font_size, 'ytick.labelsize': font_size, 'font.size': font_size,
+              'xtick.direction': 'in', 'ytick.direction': 'in', 'lines.markersize': 3, 'lines.linewidth': linewidth,
+              'text.usetex': True, 'figure.figsize': [fig_width, fig_height], 'font.family': 'serif', 'backend': 'ps'}
+
+    if 'osx' in socket.gethostname():
+        #params['text.usetex'] = False
+        params['pgf.texsystem'] = 'pdflatex'
+        os.environ['PATH'] = os.environ['PATH'] + ':/Library/TeX/texbin/:/usr/local/bin/'
+
+    matplotlib.rcParams.update(params)
 
 
+def latexify2(fig_width=5.0, fig_height=4.0):
+    """
+    Have ended up with two different latex formatting functions, unifying them here. Old version commented below.
+    :param fig_width:
+    :param fig_height:
+    :return:
+    """
+    latexify(fig_width, fig_height)
 
-
-
-
-
-
+    # font_size = 12
+    #
+    # params = {'backend': 'ps',
+    #           'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}'],
+    #           'axes.labelsize': font_size,  # fontsize for x and y labels (was 10)
+    #           'axes.titlesize': font_size,
+    #           'legend.fontsize': font_size,  # was 10
+    #           'xtick.labelsize': font_size,
+    #           'ytick.labelsize': font_size,
+    #           'lines.markersize': 3,
+    #           'lines.linewidth': 1,
+    #           'text.usetex': True,
+    #           'figure.figsize': [fig_width, fig_height],
+    #           'font.family': 'serif'
+    #           }
+    #
+    # mpl.rcParams.update(params)

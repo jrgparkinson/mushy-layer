@@ -9,7 +9,8 @@ import test.mushyLayerRunUtils as mushyLayerRunUtils
 import subprocess
 import sys
 import shutil
-from test.mushyLayerRunUtils import latexify
+from PltFile import latexify2
+
 
 # This script is for testing that the mushy-layer code correctly solves diffusion problems correctly
 # with all sorts of boundary conditions
@@ -239,7 +240,7 @@ if __name__ == "__main__":
 
     times = []
 
-    latexify(5.5, 3.5)
+    latexify2(5.5, 3.5)
 
     fig  = plt.figure()
 
