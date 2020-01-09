@@ -41,7 +41,7 @@ public:
     m_lambdaNeedsResetting = true;
     m_time = -1;
     m_FAS = false;
-    m_params = NULL;
+    m_params = nullptr;
 }
 
   ///

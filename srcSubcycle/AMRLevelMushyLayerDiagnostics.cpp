@@ -60,14 +60,14 @@ void AMRLevelMushyLayer::computeDiagnostics()
       Vector<LevelData<FArrayBox>* > gradT(nLevels);
       Vector<LevelData<FArrayBox>* > AMRNu(nLevels);
       Vector<LevelData<FluxBox>* > gradEdgeT(nLevels);
-      LevelData<FArrayBox>* crseT = NULL;
-      //    LevelData<FArrayBox>* fineT = NULL;
+      LevelData<FArrayBox>* crseT = nullptr;
+      //    LevelData<FArrayBox>* fineT = nullptr;
 
       // Use domain flux registers to calculate Nu
       Vector<LevelDomainFluxRegister*> Tflux(nLevels);
 
-      LevelDomainFluxRegister* fineFR = NULL;
-      LevelDomainFluxRegister* coarseFR = NULL;
+      LevelDomainFluxRegister* fineFR = nullptr;
+      LevelDomainFluxRegister* coarseFR = nullptr;
 
       for (int lev=0; lev<nLevels; lev++)
       {
@@ -90,7 +90,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
         }
         else
         {
-          coarseFR = NULL;
+          coarseFR = nullptr;
         }
 
         if (lev < (nLevels-1))
@@ -99,7 +99,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
         }
         else
         {
-          fineFR = NULL;
+          fineFR = nullptr;
         }
 
 
@@ -217,28 +217,28 @@ void AMRLevelMushyLayer::computeDiagnostics()
       // Cleanup after nusselt calculation
       for (int lev=0; lev<nLevels; lev++)
       {
-        if (Tflux[lev] != NULL)
+        if (Tflux[lev] != nullptr)
         {
           delete Tflux[lev];
-          Tflux[lev] = NULL;
+          Tflux[lev] = nullptr;
         }
 
-        if (gradT[lev] != NULL)
+        if (gradT[lev] != nullptr)
         {
           delete gradT[lev];
-          gradT[lev] = NULL;
+          gradT[lev] = nullptr;
         }
 
-        if ( gradEdgeT[lev] != NULL)
+        if ( gradEdgeT[lev] != nullptr)
         {
           delete gradEdgeT[lev] ;
-          gradEdgeT[lev]  = NULL;
+          gradEdgeT[lev]  = nullptr;
         }
 
-        if ( AMRNu[lev]  != NULL)
+        if ( AMRNu[lev]  != nullptr)
         {
           delete  AMRNu[lev] ;
-          AMRNu[lev]  = NULL;
+          AMRNu[lev]  = nullptr;
         }
 
       }
@@ -472,16 +472,16 @@ void AMRLevelMushyLayer::computeDiagnostics()
       for(int lev = 0; lev < nLevels; lev++)
       {
         delete horizAvFs[lev];
-        horizAvFs[lev] = NULL;
+        horizAvFs[lev] = nullptr;
 
         delete Fs_vert_diffusion[lev];
-        Fs_vert_diffusion[lev] = NULL;
+        Fs_vert_diffusion[lev] = nullptr;
 
         delete Fs_vert_fluid[lev];
-        Fs_vert_fluid[lev]= NULL;
+        Fs_vert_fluid[lev]= nullptr;
 
         delete Fs_vert_frame[lev];
-        Fs_vert_frame[lev]= NULL;
+        Fs_vert_frame[lev]= nullptr;
       }
 
       // Calculate sums over valid regions

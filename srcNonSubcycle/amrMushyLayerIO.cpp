@@ -171,7 +171,7 @@ amrMushyLayer::writePlotFile(int iteration)
 	getVarNames(varNames);
 
 	// compute plot data
-	Vector<LevelData<FArrayBox>* > plotData(m_scalarNew[0].size(), NULL);
+	Vector<LevelData<FArrayBox>* > plotData(m_scalarNew[0].size(), nullptr);
 	for (int lev=0; lev<numLevels; lev++)
 	{
 		// first allocate storage
@@ -277,10 +277,10 @@ amrMushyLayer::writePlotFile(int iteration)
 	// need to delete plotData
 	for (int lev=0; lev<numLevels; lev++)
 	{
-		if (plotData[lev] != NULL)
+		if (plotData[lev] != nullptr)
 		{
 			delete plotData[lev];
-			plotData[lev] = NULL;
+			plotData[lev] = nullptr;
 		}
 	}
 }
@@ -586,8 +586,8 @@ amrMushyLayer::readCheckpointFile(HDF5Handle& a_handle)
 	m_amrGrids.resize(m_max_level+1);
 	m_amrDx.resize(m_max_level+1);
 
-	m_frameAdv.resize(m_max_level+1, NULL);
-	m_fluidAdv.resize(m_max_level+1, NULL);
+	m_frameAdv.resize(m_max_level+1, nullptr);
+	m_fluidAdv.resize(m_max_level+1, nullptr);
 
 	m_fluxRegister.resize(m_numVars);
 

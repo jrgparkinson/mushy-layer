@@ -191,7 +191,7 @@ public:
   PressureInflowValueFunction()
   :
     m_value(0), m_nComp(0), m_inflowValue(0.0), m_plumeStart(0.0), m_plumeEnd(0.0),
-    m_params(NULL)
+    m_params(nullptr)
   {
   }
 
@@ -269,7 +269,7 @@ public:
   /// Default constructor
   AbstractScalarBCFunction()
   :
-    m_isDefined(false), m_homogeneous(false), m_advVel(NULL), m_dx(-1), m_interval(Interval(0,0))
+    m_isDefined(false), m_homogeneous(false), m_advVel(nullptr), m_dx(-1), m_interval(Interval(0,0))
   {
   }
 
@@ -367,7 +367,7 @@ public:
       }
 
       delete[] value;
-      value = NULL;
+      value = nullptr;
     }
   }
 
@@ -997,7 +997,7 @@ public:
                        int  a_comp,
                        const Interval& a_interval,
                        MushyLayerParams a_params,
-                       LevelData<FluxBox>* a_velocityBCVals = NULL) : AbstractFaceBCFunction(a_isHomogeneous,
+                       LevelData<FluxBox>* a_velocityBCVals = nullptr) : AbstractFaceBCFunction(a_isHomogeneous,
                                                                                              a_comp,
                                                                                              a_params),
                                                                                              m_isViscous(a_isViscous),
@@ -1188,8 +1188,8 @@ public:
                   // Need to find the correct dataiterator
                   DataIterator dit = m_velBCvals->dataIterator();
 
-                  //                  FluxBox* velBCVals = NULL;
-                  FArrayBox* velBCValComp = NULL;
+                  //                  FluxBox* velBCVals = nullptr;
+                  FArrayBox* velBCValComp = nullptr;
 
                   Box domBox2(domainBox);
                   domBox2.surroundingNodes(idir);
@@ -1218,7 +1218,7 @@ public:
 
                   }
 
-                  if (velBCValComp != NULL)
+                  if (velBCValComp != nullptr)
                   {
 
                     Box toRegion(a_valid);
@@ -4065,7 +4065,7 @@ PhysBCUtil::PhysBCUtil()
 {
   m_dx = -1;
   m_defined = false;
-  m_advVel = NULL;
+  m_advVel = nullptr;
   m_time = 0;
 }
 
@@ -4116,7 +4116,7 @@ PhysBCUtil::PhysBCUtil(const PhysBCUtil& rhs)
   m_dx = rhs.m_dx;
   m_time = rhs.m_time;
   m_defined = false;
-  m_advVel = NULL;
+  m_advVel = nullptr;
 }
 
 // ---------------------------------------------------------------

@@ -223,7 +223,7 @@ void AMRNonLinearMultiCompOp::applyOpMg(LevelData<FArrayBox>& a_lhs, LevelData<F
                                         LevelData<FArrayBox>* a_phiCoarse, bool a_homogeneous)
 {
   // Do CF stuff if we have a coarser level that's not just a single grid cell
-  if (a_phiCoarse != NULL)
+  if (a_phiCoarse != nullptr)
   {
     const ProblemDomain& probDomain = a_phiCoarse->disjointBoxLayout().physDomain();
     const Box& domBox = probDomain.domainBox();
@@ -395,7 +395,7 @@ void AMRNonLinearMultiCompOp::restrictResidual(LevelData<FArrayBox>& a_resCoarse
 
   if (m_FAS)
   {
-    if (a_phiCoarse != NULL)
+    if (a_phiCoarse != nullptr)
     {
       // Do inhomo CF bcs
       m_interpWithCoarser.coarseFineInterp(a_phiFine, *a_phiCoarse);
@@ -507,7 +507,7 @@ void AMRNonLinearMultiCompOp::restrictResidual(LevelData<FArrayBox>&       a_res
                                                const LevelData<FArrayBox>& a_rhsFine)
 {
   // default implementation is homogeneous
-  restrictResidual(a_resCoarse, a_phiFine, NULL, a_rhsFine, true);
+  restrictResidual(a_resCoarse, a_phiFine, nullptr, a_rhsFine, true);
 }
 
 void AMRNonLinearMultiCompOp::restrictR(LevelData<FArrayBox>& a_phiCoarse,
@@ -1380,7 +1380,7 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
 
   if (coarsening > 1 && !m_boxes[ref].coarsenable(coarsening*AMRNonLinearMultiCompOp::s_maxCoarse))
   {
-    return NULL;
+    return nullptr;
   }
 
   dx *= coarsening;
@@ -1400,7 +1400,7 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
     }
     else
     {
-      return NULL;
+      return nullptr;
     }
   }
 

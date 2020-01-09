@@ -110,7 +110,7 @@ public:
 
     m_prev_diag_output = 0.0;
 
-    m_physBCPtr = NULL;
+    m_physBCPtr = nullptr;
 
 //    m_newLevel=false;
 
@@ -641,6 +641,14 @@ protected:
 
   /// Is velocity time dependent?
   bool isVelocityTimeDependent();
+
+  /// Add pressure to \f$ \mathbf{U}^* \f$ before projection
+  /**
+   * Something like
+   * \f$ \mathbf{U}^* \to \mathbf{U}^* + \chi \nabla p \f$
+   */
+  void addPressureToUStar (Real a_oldTime, Real a_dt,
+                      bool a_MACprojection, int uvar);
 
   /// Compute \f$ \mathbf{U}^* \f$, the velocity before we project it
   /**

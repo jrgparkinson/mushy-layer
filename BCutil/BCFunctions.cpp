@@ -311,7 +311,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
 
   // If no velocity, then we should throw an error
   // however just apply diri BC
-  if (a_advVel == NULL)
+  if (a_advVel == nullptr)
   {
     pout() << "InflowOutflowBC error - haven't specified the velocity field";
     //    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order);

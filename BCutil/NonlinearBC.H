@@ -139,7 +139,7 @@ public:
   /// Default constructor
   NonlinearBCSolver()
   {
-    m_bc = NULL;
+    m_bc = nullptr;
     m_max_resid = 1e-5;
     m_max_iter = 3;
     m_relax_coeff = 0.5;

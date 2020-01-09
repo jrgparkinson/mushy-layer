@@ -97,7 +97,7 @@ void getAMRHierarchy(string inFile, Vector<AMRLevelMushyLayer*>& amrlevels, int&
 
     amrlevels[level] = (static_cast <AMRLevelMushyLayer*> (mlFact->new_amrlevel()) );
 
-    AMRLevelMushyLayer* crsePtr = NULL;
+    AMRLevelMushyLayer* crsePtr = nullptr;
     if (level > 0)
     {
       crsePtr =  amrlevels[level-1];

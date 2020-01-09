@@ -29,12 +29,12 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   // Call inherited define
   AMRLevel::define(a_coarserLevelPtr, a_problemDomain, a_level, a_refRatio);
 
-  if (a_coarserLevelPtr != NULL)
+  if (a_coarserLevelPtr != nullptr)
   {
     AMRLevelMushyLayer* amrMLcrse =
         dynamic_cast<AMRLevelMushyLayer*>(a_coarserLevelPtr);
 
-    if (amrMLcrse != NULL)
+    if (amrMLcrse != nullptr)
     {
       define(amrMLcrse->m_opt, amrMLcrse->m_parameters);
     }
@@ -339,18 +339,18 @@ void AMRLevelMushyLayer::levelSetup()
   AMRLevelMushyLayer* amrMLCoarserPtr = getCoarserLevel();
   AMRLevelMushyLayer* amrMLFinerPtr = getFinerLevel();
 
-  m_hasCoarser = (amrMLCoarserPtr != NULL);
-  m_hasFiner = (amrMLFinerPtr != NULL);
+  m_hasCoarser = (amrMLCoarserPtr != nullptr);
+  m_hasFiner = (amrMLFinerPtr != nullptr);
 
   int nRefCrse = -1;
 
-  DisjointBoxLayout* crseGridsPtr = NULL;
+  DisjointBoxLayout* crseGridsPtr = nullptr;
 
-  Projector *crsProj = NULL;
-  Projector *fineProj = NULL;
-  Projector *crsProjBackup = NULL;
-  Projector *fineProjBackup = NULL;
-  //    DisjointBoxLayout *crseGrids = NULL;
+  Projector *crsProj = nullptr;
+  Projector *fineProj = nullptr;
+  Projector *crsProjBackup = nullptr;
+  Projector *fineProjBackup = nullptr;
+  //    DisjointBoxLayout *crseGrids = nullptr;
 
   bool scaleFineFluxes = true;
 
@@ -367,10 +367,10 @@ void AMRLevelMushyLayer::levelSetup()
     nRefCrse = amrMLCoarserPtr->m_ref_ratio;
   }
 
-  LevelDomainFluxRegister* fineDomainFRheat = NULL;
-  LevelDomainFluxRegister* coarseDomainFRheat = NULL;
-  LevelDomainFluxRegister* fineDomainFRsalt = NULL;
-  LevelDomainFluxRegister* coarseDomainFRsalt = NULL;
+  LevelDomainFluxRegister* fineDomainFRheat = nullptr;
+  LevelDomainFluxRegister* coarseDomainFRheat = nullptr;
+  LevelDomainFluxRegister* fineDomainFRsalt = nullptr;
+  LevelDomainFluxRegister* coarseDomainFRsalt = nullptr;
 
   if (m_hasCoarser)
   {
@@ -824,7 +824,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
 
   int numLevels = grids.size();
 
-  const DisjointBoxLayout* crseGridsPtr = NULL;
+  const DisjointBoxLayout* crseGridsPtr = nullptr;
   int nRefCrse = -1;
 
   if (m_level > 0)
@@ -857,7 +857,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     for (int idir = 0; idir < SpaceDim; idir++)
     {
       // I think we only have to define this once
-      if (m_uStarAMRMG[idir] == NULL)
+      if (m_uStarAMRMG[idir] == nullptr)
       {
         m_uStarAMRMG[idir] =
             RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > >(
@@ -895,7 +895,7 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
   // Fill all levels
   int lev = 0;
 
-  while(amrML != NULL && lev < numLevels)
+  while(amrML != nullptr && lev < numLevels)
   {
 
     porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, IntVect::Zero));
@@ -1117,7 +1117,7 @@ AMRLevelMushyLayer::defineIBCs ()
       // Delete if they already exist
       // This causes issues on AOPP servers
 //      delete m_scalarIBC[var];
-//      m_scalarIBC[var] = NULL;
+//      m_scalarIBC[var] = nullptr;
 
       m_scalarIBC[var] = getScalarIBCs (var);
     }
@@ -1998,6 +1998,8 @@ void AMRLevelMushyLayer::initialDataIceBlock()
 
 void AMRLevelMushyLayer::initialDataPoiseuille()
 {
+  pout() << "initialDataPoiseuille() porosity function = " << m_opt.porosityFunction << endl;
+
   DataIterator dit = m_grids.dataIterator();
   for (dit.reset(); dit.ok(); ++dit)
   {
@@ -2712,7 +2714,7 @@ void AMRLevelMushyLayer::postInitialize()
       // This deals with periodic BCs
       thisAmrVel.exchange();
 
-      if (thisLevelData->m_finer_level_ptr != NULL)
+      if (thisLevelData->m_finer_level_ptr != nullptr)
       {
         thisLevelData =
             dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
@@ -2832,7 +2834,7 @@ void AMRLevelMushyLayer::postInitialize()
       const DisjointBoxLayout& thisLevelGrids = thisAmrVel.getBoxes();
       velBC.applyBCs(thisAmrVel, thisLevelGrids, levelDomain, levelDx,
                      false); // inhomogeneous
-      if (thisLevelData->m_finer_level_ptr != NULL)
+      if (thisLevelData->m_finer_level_ptr != nullptr)
       {
         thisLevelData =
             dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
@@ -2955,7 +2957,7 @@ void AMRLevelMushyLayer::initTimeIndependentPressure(AMRLevelMushyLayer* lev, in
     lev->calculateTimeIndAdvectionVel(lev->m_time, lev->m_advVel);
 
     Divergence::levelDivergenceMAC(*lev->m_scalarNew[ScalarVars::m_divUadv], lev->m_advVel, m_dx);
-    maxDivU = ::computeNorm(*lev->m_scalarNew[ScalarVars::m_divUadv], NULL, 1, lev->m_dx, Interval(0,0), 0);
+    maxDivU = ::computeNorm(*lev->m_scalarNew[ScalarVars::m_divUadv], nullptr, 1, lev->m_dx, Interval(0,0), 0);
     pout() << "  Pressure init " << i << ", max(div U) = " << maxDivU << endl;
 
     i = i + 1;

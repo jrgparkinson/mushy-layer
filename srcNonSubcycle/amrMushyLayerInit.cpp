@@ -67,7 +67,7 @@ amrMushyLayer::setDefaults()
   m_total_num_iterations = 1;
 
 
-  m_physBCPtr = NULL; //new PhysBCUtil(m_parameters, m_amrDx[0]);
+  m_physBCPtr = nullptr; //new PhysBCUtil(m_parameters, m_amrDx[0]);
 
   // MAKE SURE YOU UPDATE THIS IF YOU ADD ANOTHER (SCALAR) VARIABLE!
   //  m_numVars = 48;
@@ -303,8 +303,8 @@ amrMushyLayer::initialize()
     // if we're not restarting
 
     // now set up data holders
-    //      m_old_phi.resize(m_max_level+1, NULL);
-    //      m_new_phi.resize(m_max_level+1, NULL);
+    //      m_old_phi.resize(m_max_level+1, nullptr);
+    //      m_new_phi.resize(m_max_level+1, nullptr);
 
     m_scalarOld.resize(m_numVars);
     m_scalarNew.resize(m_numVars);
@@ -314,8 +314,8 @@ amrMushyLayer::initialize()
     m_vectorNew.resize(m_numVectorVars);
     m_dVector.resize(m_numVectorVars);
 
-    m_frameAdv.resize(m_max_level+1, NULL);
-    m_fluidAdv.resize(m_max_level+1, NULL);
+    m_frameAdv.resize(m_max_level+1, nullptr);
+    m_fluidAdv.resize(m_max_level+1, nullptr);
 
     m_fluxRegister.resize(m_numVars);
     m_vectorFluxRegister.resize(m_numVectorVars);
@@ -334,13 +334,13 @@ amrMushyLayer::initialize()
       m_scalarDiffusionCoeffs[ScalarVars::m_bulkConcentration] = 1/m_parameters.lewis;
     }
 
-    m_HC.resize(m_max_level+1, NULL);
+    m_HC.resize(m_max_level+1, nullptr);
 
     for (int a_var=0; a_var<m_numVectorVars; a_var++)
     {
-      m_vectorOld[a_var].resize(m_max_level+1, NULL);
-      m_vectorNew[a_var].resize(m_max_level+1, NULL);
-      m_dVector[a_var].resize(m_max_level+1, NULL);
+      m_vectorOld[a_var].resize(m_max_level+1, nullptr);
+      m_vectorNew[a_var].resize(m_max_level+1, nullptr);
+      m_dVector[a_var].resize(m_max_level+1, nullptr);
       m_vectorFluxRegister[a_var].resize(m_max_level+1);
     }
 
@@ -1417,7 +1417,7 @@ getThetaLOpCoeffs(Real& alpha, Real& beta,
 
   aCoef.resize(m_finest_level+1);
   bCoef.resize(m_finest_level+1);
-  b.resize(m_finest_level+1, NULL);
+  b.resize(m_finest_level+1, nullptr);
 
   Vector<LevelData<FArrayBox>* > averagePorosity = timeCenteredScalar(ScalarVars::m_porosity);
 
@@ -1493,10 +1493,10 @@ getThetaLOpCoeffs(Real& alpha, Real& beta,
   //Clean up memory
   for (int lev=0; lev<=m_finest_level; lev++)
   {
-    if (averagePorosity[lev] != NULL)
+    if (averagePorosity[lev] != nullptr)
     {
       delete averagePorosity[lev];
-      averagePorosity[lev] = NULL;
+      averagePorosity[lev] = nullptr;
     }
   }
 }
@@ -1578,10 +1578,10 @@ thetaVCOpCoeffs(Real& alpha, Real& beta,
   //Clean up memory
   for (int lev=0; lev<=m_finest_level; lev++)
   {
-    if (chi[lev] != NULL)
+    if (chi[lev] != nullptr)
     {
       delete chi[lev];
-      chi[lev] = NULL;
+      chi[lev] = nullptr;
     }
   }
 }

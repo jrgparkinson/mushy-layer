@@ -150,7 +150,7 @@ public:
 
 	/// BC holder for \f$ \mathbf{u} \f$ (edge centred)
 	virtual Tuple<BCHolder, SpaceDim> edgeVelFuncBC(bool a_isViscous = false,
-	                                                LevelData<FluxBox>* velocityBCVals = NULL) const;
+	                                                LevelData<FluxBox>* velocityBCVals = nullptr) const;
 
 
 	/// BC holder for porosity \f$ \chi \f$, (edge centred)
@@ -281,13 +281,13 @@ public:
 //			Vector<RefCountedPtr<LevelData<FArrayBox> > > a_theta =  Vector<RefCountedPtr<LevelData<FArrayBox> > >(0)) const;
 
 	/// BC holder for liquid concentration, \f$ \Theta_l \f$
-	virtual BCHolder ThetaLFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel= NULL) const;
+	virtual BCHolder ThetaLFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel= nullptr) const;
 
-	virtual BCHolder TracerBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel= NULL, Real a_boundaryVal=1.0) const;
+	virtual BCHolder TracerBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel= nullptr, Real a_boundaryVal=1.0) const;
 
 
 	/// BC holder for temperature, \f$ \theta \f$
-	virtual BCHolder BasicthetaFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel = NULL) const;
+	virtual BCHolder BasicthetaFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel = nullptr) const;
 
 //	virtual BCHolder porosityFuncBC(bool a_homogeneous = false) const;
 
@@ -305,19 +305,19 @@ public:
 
 	/// BC holder for enthalpy
 	virtual BCHolder BasicEnthalpyFuncBC(bool a_homogeneous = false,
-	                                     LevelData<FluxBox>* a_advVel = NULL) const;
+	                                     LevelData<FluxBox>* a_advVel = nullptr) const;
 
 	/// Boundary conditions for calculating the liquidus
 	virtual BCHolder BasicLiquidusBC(bool a_homogeneous = false,
-	                                             LevelData<FluxBox>* a_advVel = NULL) const;
+	                                             LevelData<FluxBox>* a_advVel = nullptr) const;
 
 	/// Boundary conditions for calculating the eutectic
 	virtual BCHolder BasicEutecticBC(bool a_homogeneous = false,
-	                                             LevelData<FluxBox>* a_advVel = NULL) const;
+	                                             LevelData<FluxBox>* a_advVel = nullptr) const;
 
 	/// Boundary conditions for calculating the solidus
 	virtual BCHolder BasicSolidusBC(bool a_homogeneous = false,
-	                                             LevelData<FluxBox>* a_advVel = NULL) const;
+	                                             LevelData<FluxBox>* a_advVel = nullptr) const;
 
 	/// BC holder for some generic scalar
 	virtual BCHolder BasicScalarFuncBC(Real a_topVal, Real a_bottomVal,
@@ -325,7 +325,7 @@ public:
 	                                   bool a_homogeneous=false) const;
 
 	/// BC holder for bulk concentration \f$ \Theta \f$
-	virtual BCHolder ThetaFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel = NULL) const;
+	virtual BCHolder ThetaFuncBC(bool a_homogeneous = false, LevelData<FluxBox>* a_advVel = nullptr) const;
 
 	/// BC holder for \f$ \lambda \f$ (for finding freestream preservation errors)
 	virtual BCHolder lambdaBC(bool a_homogeneous = false, bool a_scaleWithPorosity=false)const;
@@ -377,7 +377,7 @@ protected:
 			bool a_isViscous,
 			int  a_comp,
 			const Interval& a_interval,
-			LevelData<FluxBox>* a_velocityBCVals = NULL) const;
+			LevelData<FluxBox>* a_velocityBCVals = nullptr) const;
 
 
 

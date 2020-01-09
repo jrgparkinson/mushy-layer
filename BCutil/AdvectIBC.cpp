@@ -53,8 +53,8 @@ AdvectIBC::setDefaultValues(int a_numComp)
   m_isBCvalSet = false;
   m_isSlopeValSet = false;
   m_isBCtypeSet = false;
-  m_advVel=NULL;
-  m_advVelBox = NULL;
+  m_advVel=nullptr;
+  m_advVelBox = nullptr;
 }
 
 // Factory method - this object is its own factory:
@@ -174,14 +174,14 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
         }
 
         // Let's get the FAB for the velocity at this point
-        FluxBox* advVel = NULL;
+        FluxBox* advVel = nullptr;
         if (m_advVelBox)
         {
           advVel = m_advVelBox;
         }
         else
         {
-          if (m_advVel == NULL)
+          if (m_advVel == nullptr)
           {
             pout() << "AdvectIBC error - haven't specified the velocity field";
           }

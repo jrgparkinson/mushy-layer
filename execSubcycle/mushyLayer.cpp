@@ -73,7 +73,7 @@ main(int a_argc, char* a_argv[])
 
 
     // Check for an input file
-    char* inFile = NULL;
+    char* inFile = nullptr;
 
     if (a_argc > 1)
       {
@@ -86,7 +86,7 @@ main(int a_argc, char* a_argv[])
         return -1;
       }
     // Parse the command line and the input file (if any)
-    ParmParse pp(a_argc-2,a_argv+2,NULL,inFile);
+    ParmParse pp(a_argc-2,a_argv+2,nullptr,inFile);
 
     ParmParse ppMain("main");
 
