@@ -8,8 +8,8 @@ import socket
 from mushyLayerRunUtils import read_inputs, write_inputs, get_current_vcs_revision, get_mushy_layer_dir
 
 """ 
-This class basically just makes the output directory and dumps an input file into it
- It also performs various sanity checks """
+This class basically just makes the output directory and dumps an input file into it 
+"""
 class MushyLayerRunSimple:
 
     def __init__(self, base_output_dir, num_proc, parameters, slurm_job, allow_multiple_dirs, program_name):

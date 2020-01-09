@@ -243,7 +243,8 @@ if __name__ == "__main__":
         elif o in ("-v"):
             verbose = True
         else:
-            assert False, "unhandled option"
+            print('Unknown command line option: %s' % o)
+            sys.exit(-1)
 
     print('Tests to run: ' + ','.join(test_dirs))
 

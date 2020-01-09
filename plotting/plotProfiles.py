@@ -129,7 +129,7 @@ for i in range(30, len(time_warming)-1):
     # rm_time = rm_profile_.sel(t=time)
     # temperature_time = temperature_profile_control.sel(t=time)
     
-    if not profile_name in profiles_warming.keys():
+    if profile_name not in profiles_warming.keys():
         continue
 
     profile = profiles_warming[profile_name].sel(t=time)

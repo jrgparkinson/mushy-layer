@@ -27,6 +27,15 @@ def get_base_output_dir():
 
     return base_output_dir
 
+def get_data_dir():
+
+    if socket.gethostname() == 'atmlxlap005':
+        return '/home/parkinsonjl/mnt/sharedStorage/'
+    else:
+        this_file = os.path.realpath(__file__)
+        print('No data dir defined in %s : get_data_dir()' % this_file)
+        sys.exit(-1)
+
 def add_params(default_params, extra_params):
     """ Add params from extra_params to defaultParams """
 

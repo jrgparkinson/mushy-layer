@@ -3,10 +3,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from PltFile import latexify
-from mushyLayerRunUtils import read_inputs, string_to_array
+from mushyLayerRunUtils import read_inputs, string_to_array, get_data_dir
 import sys
 import getopt
-
+import os
 
 def make_bc_fig(inputs_file, ndim=2):
 
@@ -227,7 +227,7 @@ def make_bc_text(inputs, directory, side):
 if __name__ == "__main__":
 
     inputs_file = '/home/parkinsonjl/mushy-layer/execSubcycle/enceladus/inputs'
-    inputs_file = shared_storage.get_dir('enceladus/256x128-Rm200-HeatSourceSize0.2-TopBCFixedH-similarToNoFlow/inputs')
+    inputs_file = os.path.join(get_data_dir(), 'enceladus/256x128-Rm200-HeatSourceSize0.2-TopBCFixedH-similarToNoFlow/inputs')
 
     arg = sys.argv[1:]
     try:

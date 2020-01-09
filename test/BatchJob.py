@@ -3,7 +3,7 @@ import math
 import time
 import subprocess
 import re
-
+from colorama import Fore
 
 class BatchJob:
     """
@@ -228,8 +228,10 @@ class BatchJob:
             # Pause briefly in case submitting lots of slurm jobs
             time.sleep(0.5)
 
-        except:
+        except subprocess.CalledProcessError:
+            print(Fore.RED)
             print("Unable to run command, maybe SLURM isn't installed? You'll need to run it manually; \n %s" % cmd)
+            print(Fore.RESET)
 
     def get_run_file(self, runFileName):
         return os.path.join(self.folder, runFileName)
