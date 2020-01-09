@@ -37,27 +37,27 @@ public:
   void buildMask(BaseFab<int>& a_mask,
                  const ProblemDomain& a_dProblem,
                  const BoxLayout& a_grids,
-                 const BoxLayout* a_fineGridsPtr=NULL,
+                 const BoxLayout* a_fineGridsPtr=nullptr,
                  int a_nRefFine = -1);
 
   /// Build masks
   void buildMasks(LevelData<BaseFab <int> >& a_masks,
                   const ProblemDomain& a_dProblem,
                   const BoxLayout& a_grids,
-                  const BoxLayout* a_fineGridsPtr=NULL,
+                  const BoxLayout* a_fineGridsPtr=nullptr,
                   int a_nRefFine = -1);
 
   /// deprecated interface
   void buildMask(BaseFab<int>& a_mask, const Box& a_dProblem,
                  const BoxLayout& a_grids,
-                 const BoxLayout* a_fineGridsPtr=NULL,
+                 const BoxLayout* a_fineGridsPtr=nullptr,
                  int a_nRefFine = -1);
 
   /// deprecated interface
   void buildMasks(LevelData<BaseFab <int> >& a_masks,
                   const Box& a_dProblem,
                   const BoxLayout& a_grids,
-                  const BoxLayout* a_fineGridsPtr=NULL,
+                  const BoxLayout* a_fineGridsPtr=nullptr,
                   int a_nRefFine = -1);
 };
 
