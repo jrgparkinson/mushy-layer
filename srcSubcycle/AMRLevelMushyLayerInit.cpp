@@ -68,7 +68,7 @@ void AMRLevelMushyLayer::define(AMRLevel* a_coarserLevelPtr,
   m_scalRestartVars[0] = ScalarVars::m_enthalpy;
   m_scalRestartVars[1] = ScalarVars::m_bulkConcentration;
   m_scalRestartVars[2] = ScalarVars::m_lambda;
-  m_scalRestartVars[2] = ScalarVars::m_pressure;
+  m_scalRestartVars[3] = ScalarVars::m_pressure;
 
   m_scalarVarNames = Vector<string>(m_numScalarVars, string("scalar"));
   m_scalarVarNames[ScalarVars::m_enthalpy] = string("Enthalpy");
@@ -342,8 +342,6 @@ void AMRLevelMushyLayer::levelSetup()
   m_hasCoarser = (amrMLCoarserPtr != nullptr);
   m_hasFiner = (amrMLFinerPtr != nullptr);
 
-  int nRefCrse = -1;
-
   DisjointBoxLayout* crseGridsPtr = nullptr;
 
   Projector *crsProj = nullptr;
@@ -351,8 +349,6 @@ void AMRLevelMushyLayer::levelSetup()
   Projector *crsProjBackup = nullptr;
   Projector *fineProjBackup = nullptr;
   //    DisjointBoxLayout *crseGrids = nullptr;
-
-  bool scaleFineFluxes = true;
 
   if (m_hasFiner)
   {
@@ -364,7 +360,6 @@ void AMRLevelMushyLayer::levelSetup()
     crsProj = &(amrMLCoarserPtr->m_projection);
     crsProjBackup = &(amrMLCoarserPtr->m_projectionBackup);
     crseGridsPtr = &(amrMLCoarserPtr->m_grids);
-    nRefCrse = amrMLCoarserPtr->m_ref_ratio;
   }
 
   LevelDomainFluxRegister* fineDomainFRheat = nullptr;
@@ -392,9 +387,7 @@ void AMRLevelMushyLayer::levelSetup()
 
   if (m_hasCoarser)
   {
-    nRefCrse = m_coarser_level_ptr->refRatio();
-
-    //    const DisjointBoxLayout& coarserLevelDomain = amrMLCoarserPtr->m_grids;
+    int nRefCrse = m_coarser_level_ptr->refRatio();
 
     m_coarseAverageScalar.define(m_grids, 1, nRefCrse);
     m_coarseAverageHC.define(m_grids, 2, nRefCrse);
@@ -424,7 +417,7 @@ void AMRLevelMushyLayer::levelSetup()
             LevelFluxRegister>(
                 new LevelFluxRegister(m_grids, amrMLCoarserPtr->m_grids,
                                       m_problem_domain, amrMLCoarserPtr->m_ref_ratio,
-                                      1, scaleFineFluxes));
+                                      1));
         amrMLCoarserPtr->m_fluxRegisters[a_scalarVar]->setToZero();
       }
     }
@@ -433,7 +426,7 @@ void AMRLevelMushyLayer::levelSetup()
         LevelFluxRegister>(
             new LevelFluxRegister(m_grids, amrMLCoarserPtr->m_grids,
                                   m_problem_domain, amrMLCoarserPtr->m_ref_ratio,
-                                  2, scaleFineFluxes));
+                                  2));
     amrMLCoarserPtr->m_fluxRegHC->setToZero();
 
     for (int a_vectorVar = 0; a_vectorVar < m_numVectorVars;
@@ -455,7 +448,6 @@ void AMRLevelMushyLayer::levelSetup()
 
 
     // Some of our level structures can't be setup until we've created grids on this level
-    Vector<Box> b = m_grids.boxArray();
     if (m_grids.boxArray().size() > 0)
     {
       m_projection.verbosity(m_opt.projection_verbosity);
@@ -654,8 +646,7 @@ void AMRLevelMushyLayer::defineUstarMultigrid()
 
     int relativeLev = lev - coarsestLevel;
 
-    AMRLevelMushyLayer* thisLevel =
-        (AMRLevelMushyLayer*) (hierarchy[lev]);
+    AMRLevelMushyLayer* thisLevel = static_cast<AMRLevelMushyLayer*> (hierarchy[lev]);
     DisjointBoxLayout& levelGrids = thisLevel->m_grids;
 
     solverGrids[relativeLev] = levelGrids;
@@ -1368,15 +1359,13 @@ void AMRLevelMushyLayer::initialDataHRL()
 
         // Preferred wavelength
         alpha = 0.1;
-        int wavenumber = 2; // 2 for vertical profiles (matching 3d profile)
-        wavenumber = 3; // 3 for Nu(Ra)
-        wavenumber = 1;
+//        int wavenumber = 2; // 2 for vertical profiles (matching 3d profile)
+//        int wavenumber = 3; // 3 for Nu(Ra)
+        int wavenumber = 1;
         perturbation = alpha*cos(2*wavenumber*M_PI*x/(m_opt.domainWidth))*sin((y/m_domainHeight)*M_PI);
 
         //perturbation = alpha*cos(8*(x/domainWidth)*M_PI)*sin((y/domainHeight)*M_PI);
       }
-
-
 
       (*m_scalarNew[ScalarVars::m_enthalpy])[dit](iv) = m_parameters.bcValEnthalpyLo[dir] + deltaH * loc[dir]/m_domainHeight + perturbation;
       (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit](iv) = m_parameters.bcValBulkConcentrationLo[dir] + deltaC * loc[dir]/m_domainHeight;
@@ -1677,14 +1666,6 @@ void AMRLevelMushyLayer::addVortex(RealVect center, Real strength, Real radius)
 
       r = sqrt(pow(x-center[0], 2) + pow(y-center[1], 2));
       Real y_x = (y-center[1])/(x-center[0]);
-      //        if ((y-center[1]) > 0)
-      //        {
-      //          theta = atan(y_x);
-      //        }
-      //        else
-      //        {
-      //          theta = -atan(y_x);
-      //        }
       theta = atan(y_x);
 
       // Compute velocity in polar coords
