@@ -1,13 +1,11 @@
 # Script to test convergence of uniform and AMR solutions
 import os
 import sys
-import math
 import getopt
-from colorama import Fore, Style
-from mushyLayerRunUtils import read_inputs, is_power_of_two, string_to_array
+from colorama import Fore
+from mushyLayerRunUtils import is_power_of_two, string_to_array
 from BatchJob import BatchJob
 from AMRConvergenceTest import amr_convergence_test
-
 
 #TODO - should allow this function to set which servers to run on
 
@@ -251,7 +249,7 @@ def main(argv):
 
     # Change things below here
     # num_proc = 1
-    Nzs = [16, 32, 64, 128, 256, 512]
+    # Nzs = [16, 32, 64, 128, 256, 512]
     # Nzs = [128]
 
     # num_procs = num_proc+0*Nzs

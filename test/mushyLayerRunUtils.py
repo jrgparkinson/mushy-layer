@@ -5,13 +5,16 @@ import math
 import sys
 import subprocess
 import socket
-from datetime import date
 import matplotlib as mpl
 
 def get_base_output_dir():
     """ Define the full path to the directory where the output of running test problems should go """
 
-    base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDevelopment-26Nov/'
+    base_output_dir = ''
+    if 'atmlxmaster' in socket.gethostname():
+        base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDevelopment-19Dec/'
+    elif 'atmlxlap005' in socket.gethostname():
+        base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 
     if base_output_dir == '':
 

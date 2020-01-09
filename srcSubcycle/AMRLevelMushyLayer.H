@@ -647,7 +647,7 @@ protected:
    * Something like
    * \f$ \mathbf{U}^* \to \mathbf{U}^* + \chi \nabla p \f$
    */
-  void addPressureToUStar (Real a_oldTime, Real a_dt,
+  void removeGradPressure(Real a_oldTime, Real a_dt,
                       bool a_MACprojection, int uvar);
 
   /// Compute \f$ \mathbf{U}^* \f$, the velocity before we project it

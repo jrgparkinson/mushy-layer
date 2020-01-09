@@ -135,7 +135,8 @@ class BatchJob:
         slurm_header = ['# Set your minimum acceptable walltime, format: day-hours:minutes:seconds \n',
                          '#SBATCH --time=' + time_string + '\n', partitions_str, exclude_str,
                          '# Set name of job shown in squeue' + '\n', '#SBATCH --job-name ' + self.jobname + '\n',
-                         '# Request CPU resources' + '\n', '#SBATCH --ntasks=' + str(int(self.num_proc)) + '                  # Number of MPI ranks' + '\n',
+                         '# Request CPU resources' + '\n', '#SBATCH --ntasks=' + str(int(self.num_proc)) +
+                         '                  # Number of MPI ranks' + '\n',
                          '#SBATCH --cpus-per-task=' + str(int(self.cpu_per_task)) + '            # Number of cores per MPI rank ' + '\n',
                          '#SBATCH --nodes=' + str(int(self.num_nodes)) + '                    # Number of nodes' + '\n',
                          '#SBATCH --ntasks-per-node=' + str(int(self.tasks_per_node)) + '         # How many tasks on each node' + '\n',

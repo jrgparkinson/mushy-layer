@@ -615,7 +615,7 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
 
       if (params.heleShaw)
       {
-        permeability = 1 / (1/params.heleShamPermeability + 1.0/permeability);
+        permeability = 1 / (1/params.heleShawPermeability + 1.0/permeability);
       }
     }
 

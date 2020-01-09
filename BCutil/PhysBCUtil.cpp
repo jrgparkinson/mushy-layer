@@ -4073,6 +4073,7 @@ PhysBCUtil::PhysBCUtil()
 PhysBCUtil::PhysBCUtil(MushyLayerParams a_params, Real a_dx)
 {
   //  pout() << "PhysBCUtil::PhysBCUtil" << endl;
+  m_advVel = nullptr;
 
   // initialize to bogus values
   for (int idir=0; idir<SpaceDim; idir++)
@@ -4105,6 +4106,7 @@ PhysBCUtil::operator= (const PhysBCUtil& rhs)
 {
   m_loBC = rhs.m_loBC;
   m_hiBC = rhs.m_hiBC;
+  m_advVel = rhs.m_advVel;
   return *this;
 }
 

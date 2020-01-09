@@ -1359,11 +1359,8 @@ Real AMRLevelMushyLayer::doHCreflux()
   } // end loop over levels
 
   // Clean up
-  if (diffusionSolver != nullptr)
-  {
-    delete diffusionSolver;
-    diffusionSolver = nullptr;
-  }
+  delete diffusionSolver;
+  diffusionSolver = nullptr;
 
   // clean up temporary scalar storage
   for (int lev = 0; lev <= finest_level; lev++)

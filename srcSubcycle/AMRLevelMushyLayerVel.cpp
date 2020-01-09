@@ -673,7 +673,7 @@ bool AMRLevelMushyLayer::isVelocityTimeDependent()
 }
 
 void
-AMRLevelMushyLayer::addPressureToUStar (Real a_oldTime, Real a_dt,
+AMRLevelMushyLayer::removeGradPressure (Real a_oldTime, Real a_dt,
                     bool a_MACprojection, int uvar)
 {
 
@@ -805,7 +805,7 @@ void AMRLevelMushyLayer::computeCCvelocity(const LevelData<FArrayBox>& advection
   // Before we project, remove grad(P)]
     if (m_usePrevPressureForUStar)
     {
-      addPressureToUStar(a_oldTime, a_dt, a_MACprojection, uvar);
+      removeGradPressure(a_oldTime, a_dt, a_MACprojection, uvar);
     }
 
   // need to do physical boundary conditions and exchanges
@@ -1443,7 +1443,7 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
 
   if (a_MACprojection && m_usePrevPressureForUStar)
   {
-    addPressureToUStar(a_oldTime, a_dt, a_MACprojection, ustarVar);
+    removeGradPressure(a_oldTime, a_dt, a_MACprojection, ustarVar);
   }
 
 }

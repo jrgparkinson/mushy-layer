@@ -1697,6 +1697,8 @@ void AMRNonLinearMultiCompOpFactory::setDefaultValues()
   m_coefficient_average_type = CoarseAverage::arithmetic;
 
   m_superOptimised = false;
+
+  m_numComp = 2;
 }
 //-----------------------------------------------------------------------
 

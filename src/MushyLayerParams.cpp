@@ -32,129 +32,107 @@ string MushyLayerParams::s_ADVECTIVE_VELOCITY_SCALE = "Advective";
 /// Darcy velocity scale
 string MushyLayerParams::s_DARCY_VELOCITY_SCALE = "Darcy";
 
-MushyLayerParams::MushyLayerParams() {
-  //Initialise everything
-
-  // Use some ridiculous defaults to highlight any parameters we forget to set
-
-  physicalProblem = PhysicalProblems::m_mushyLayer;
-  viscosity = -999 ;
-  heatConductivityLiquid = -999;
-  heatConductivitySolid = -999 ;
-  specificHeatLiquid = -999 ;
-  specificHeatSolid = -999 ;
-  liquidDensity = -999 ;
-  latentHeatDissolution = -999 ;
-  thermalExpansivity = -999 ;
-  solutalExpansivity = -999 ;
-  eutecticTemp = -999 ;
-  //  bottomTemp = -999 ;
-  //  topTemp = -999 ;
-  eutecticComposition = -999 ;
-  initialComposition = -999 ;
-  liquidusSlope = -999 ;
-  waterDistributionCoeff = -999 ;
-  heleShawCoolingCoeff = -999 ;
-  liquidSoluteDiffusivity = -999 ;
-  d = -999 ;
-  height = -999 ;
-  referencePermeability = -999 ;
-  gravitationalAcceleration = -999 ;
-  V = -999 ;
-
-  deltaTemp = -999 ;
-  deltaSalt = -999;
-  stefan = -999 ;
-  compositionRatio = -999 ;
-  liquidHeatDiffusivity = -999 ;
-  heatConductivityRatio = -999 ;
-  specificHeatRatio = -999 ;
-  lewis = -999 ;
-  darcy = -999;
-  reynolds = -999;
-  rayleighTemp = -999 ;
-  rayleighComposition = -999 ;
-  nonDimVel = -999 ;
-  nonDimHeleShawCooling = -999 ;
-  timescale = -999 ;
-
-  body_force = 0.0;
-
-  thetaEutectic = -999 ;
-  thetaInf = -999 ;
-  thetaInitialLiquidus = -999 ;
-  thetaInitial = -999 ;
-  thetaInterface = -999 ;
-  ThetaEutectic = -999 ;
-  ThetaInitial = -999 ;
-  ThetaInf = -999 ;
-  ThetaLInitial = -999 ;
-  ThetaSInitial = -999;
-  Hinitial = -999 ;
-
-  fixedTempDirection = -999;
-  heleShaw = false;
-  permeabilityFunction = PermeabilityFunctions::m_kozenyCarman;
-  m_porosityFunction = ParamsPorosityFunctions::m_porosityConstant;
-  m_viscosityFunction = ViscosityFunction::uniformViscosity;
-  max_viscosity = 1.0;
-  inflowVelocity = -999;
-  pressureHead = 0;
-
-
-  thetaPlumeInflow = -999;
-  HPlumeInflow = -999;
-  ThetaPlumeInflow = -999;
-  ThetaLPlumeInflow = -999;
-  porosityPlume = -999;
-  ThetaSPlumeInflow = -999;
-  permeabilityPlume = -999;
-  HSolidusPlume = -999;
-  HLiquidusPlume = -999;
-  HEutecticPlume = -999;
-
-  nonDimReluctance = -999.0;
-  heleShamPermeability = -999.0;
-  width = -999.0;
-
-  referenceTemperature = -999;
-  referenceSalinity = -999;
-
-  m_BCamplitude = 0;
-  m_BCtimescale = 1;
-  m_time = -999;
-  m_timeDependentBC = m_constant;
-
-  sinusoidal_temperature_bc_timescale = 1;
-  sinusoidal_temperature_bc_amplitude = 0.5;
-  sinusoidal_temperature_bc_av = 0.5;
-  sinusoidal_temperature_bc_phase_diff = 0.0;
-
-  max_bc_residual = 3;
-  bc_relax_coeff = 0.5;
-
-  prandtl = 0.0;
-
-  m_advectionCoeff = 1.0;
-  m_buoyancyTCoeff = 1.0;
-  m_nondimensionalisation = 0;
-  m_heatDiffusionCoeff= 1;
-  m_saltDiffusionCoeff = 1;
-  m_viscosityCoeff = 1;
-  m_buoyancyTCoeff = 1;
-  m_buoyancySCoeff = 1;
-  m_darcyCoeff = 1;
-  m_advectionCoeff = 1;
-
-  activeTracerDiffusionCoeff = 0;
-  passiveTracerDiffusionCoeff = 0;
-  activeTracerInitVal = 0;
-  passiveTracerInitVal = 0;
-
-  m_BCAccuracy = 1;
-  m_pressureBCAccuracy = 1;
-
-}
+// Initialise in initialization list
+MushyLayerParams::MushyLayerParams() : physicalProblem(PhysicalProblems::m_mushyLayer),
+    viscosity(-999),
+    heatConductivityLiquid(-999),
+    heatConductivitySolid(-999 ),
+    specificHeatLiquid(-999 ),
+    specificHeatSolid(-999 ),
+    liquidDensity(-999 ),
+    latentHeatDissolution(-999 ),
+    thermalExpansivity(-999 ),
+    solutalExpansivity(-999 ),
+    eutecticTemp(-999 ),
+    eutecticComposition(-999 ),
+    initialComposition(-999 ),
+    liquidusSlope(-999 ),
+    waterDistributionCoeff(-999 ),
+    heleShawCoolingCoeff(-999 ),
+    liquidSoluteDiffusivity(-999 ),
+    d(-999 ),
+    height(-999 ),
+    width(-999),
+    referencePermeability(-999 ),
+    gravitationalAcceleration(-999 ),
+    V(-999 ),
+    deltaTemp(-999 ),
+    deltaSalt(-999),
+    stefan(-999 ),
+    compositionRatio(-999 ),
+    liquidHeatDiffusivity(-999 ),
+    heatConductivityRatio(-999 ),
+    specificHeatRatio(-999 ),
+    lewis(-999 ),
+    darcy(-999),
+    nonDimReluctance(-999.0),
+    heleShawPermeability(-999.0),
+    reynolds(-999),
+    prandtl(0.0),
+    rayleighTemp(-999 ),
+    rayleighComposition(-999 ),
+    timescale(-999 ),
+    m_nondimensionalisation(0),
+    m_heatDiffusionCoeff(1),
+    m_saltDiffusionCoeff(1),
+    activeTracerDiffusionCoeff(0),
+    passiveTracerDiffusionCoeff(0),
+    activeTracerInitVal(0),
+    passiveTracerInitVal(0),
+    m_viscosityCoeff(1),
+    m_buoyancyTCoeff(1.0),
+    m_buoyancySCoeff(1),
+    m_darcyCoeff(1),
+    m_advectionCoeff(1.0),
+    body_force(0.0),
+    nonDimVel(-999 ),
+    nonDimHeleShawCooling(-999 ),
+    thetaEutectic(-999 ),
+    thetaInf(-999 ),
+    thetaInitialLiquidus(-999 ),
+    thetaInitial(-999 ),
+    thetaInterface(-999 ),
+    ThetaEutectic(-999 ),
+    ThetaInitial(-999 ),
+    ThetaInf(-999 ),
+    ThetaLInitial(-999 ),
+    ThetaSInitial(-999),
+    Hinitial(-999 ),
+    thetaPlumeInflow(-999),
+    HPlumeInflow(-999),
+    ThetaPlumeInflow(-999),
+    ThetaLPlumeInflow(-999),
+    ThetaSPlumeInflow(-999),
+    porosityPlume(-999),
+    permeabilityPlume(-999),
+    HLiquidusPlume(-999),
+    HEutecticPlume(-999),
+    HSolidusPlume(-999),
+    referenceTemperature(-999),
+    referenceSalinity(-999),
+    inflowVelocity(-999),
+    pressureHead(0),
+    sinusoidal_temperature_bc_timescale(1),
+    sinusoidal_temperature_bc_amplitude(0.5),
+    sinusoidal_temperature_bc_av(0.5),
+    sinusoidal_temperature_bc_phase_diff(0.0),
+    max_bc_iter(1),
+    bc_nonlinear_solve_method(NonlinearBCSolveMethods::picard) ,
+    max_bc_residual(3),
+    bc_relax_coeff(0.5),
+    m_BCAccuracy(1),
+    m_pressureBCAccuracy(1),
+    m_time(-999),
+    m_timeDependentBC(m_constant),
+    m_BCamplitude(0),
+    m_BCtimescale(1),
+    fixedTempDirection(-999),
+    permeabilityFunction(PermeabilityFunctions::m_kozenyCarman),
+    heleShaw(false),
+    m_porosityFunction(ParamsPorosityFunctions::m_porosityConstant),
+    m_viscosityFunction(ViscosityFunction::uniformViscosity),
+    max_viscosity(1.0)
+{}
 
 MushyLayerParams::~MushyLayerParams() {
 }
@@ -399,17 +377,17 @@ void MushyLayerParams::getParameters()
 
   if (ppParams.contains("heleShawPermeability"))
   {
-    ppParams.get("heleShawPermeability", heleShamPermeability);
+    ppParams.get("heleShawPermeability", heleShawPermeability);
   }
   else if (ppParams.contains("nonDimReluctance"))
   {
     Real rel  = 0.0;
     ppParams.get("nonDimReluctance", rel);
-    heleShamPermeability = 1.0/rel;
+    heleShawPermeability = 1.0/rel;
   }
   else
   {
-    heleShamPermeability = d*d/(12*referencePermeability);
+    heleShawPermeability = d*d/(12*referencePermeability);
   }
 
 
@@ -1046,7 +1024,7 @@ Real MushyLayerParams::calculatePermeability(Real liquidFraction)
     //    Real nonDimCellPerm = d*d / (12 * darcy * height*height);
 //    Real nonDimCellPerm = 1/nonDimReluctance; // = d*d/(12*K_0)
 
-    finalPermeability = 1 / (1/heleShamPermeability + 1/permeability);
+    finalPermeability = 1 / (1/heleShawPermeability + 1/permeability);
   }
 
   // Place a cap on the minimum permeability allowed to avoid dividing by 0
@@ -1124,7 +1102,7 @@ printParameters()
   SHOW(nonDimHeleShawCooling);
   SHOW(timescale);
 //  SHOW(nonDimReluctance);
-  SHOW(heleShamPermeability);
+  SHOW(heleShawPermeability);
 
   SHOW(thetaEutectic);
   SHOW(thetaInf);

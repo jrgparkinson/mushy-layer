@@ -1,7 +1,7 @@
 # Run all convergence tests for the methods paper
 import os
 from colorama import Fore, Style
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command
+from mushyLayerRunUtils import get_base_output_dir
 from testUniformPorousConvection import get_default_cfl
 from BatchJob import BatchJob
 
@@ -87,13 +87,14 @@ def make_figures():
     # Write out as a script then run that
     scriptFile = os.path.join(base_output_dir, 'makeFigureScript.m')
     f = open(scriptFile, "w")
-    full_matlab_command = "set(groot, 'defaultAxesFontName', 'Latin Modern Math'); \nset(groot, 'defaultTextFontName', 'Latin Modern Math'); \n" + full_matlab_command
+    full_matlab_command = "set(groot, 'defaultAxesFontName', 'Latin Modern Math');\n" \
+                          "set(groot, 'defaultTextFontName', 'Latin Modern Math');\n" + full_matlab_command
     f.write(full_matlab_command)
     f.close()
 
     slurm_command = '  matlab -nodisplay -nosplash -nodesktop -r " makeFigureScript; exit; "'
     #slurmCommand = matlab_command + ' "' + full_matlab_command + ' exit;"'
- #  + makeFig5 + '; ' + makeFig6 + '; exit ;"'
+    #  + makeFig5 + '; ' + makeFig6 + '; exit ;"'
 
     job_name = 'makeFigures'
 
