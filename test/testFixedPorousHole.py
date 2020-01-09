@@ -103,25 +103,18 @@ def test_fixed_porous_hole():
     # Setup up the post processing command
 
     # uniform_prefix = 'Uniform-DBVariablePorosity-'
-
     python_compare_file = os.path.join(get_mushy_layer_dir(), 'test', 'run_chombo_compare.py')
-    chombo_compare_analyse ='python %s -f %s -a -v \'xDarcy velocity\' -e L2 -r True -n 6 \n \n' % (python_compare_file, data_folder)
+    chombo_compare_analyse ='python %s -f %s -a -v \'xDarcy velocity\' -e L2 -r True -n 6 -d %s \n \n' % (python_compare_file,
+                                                                                                          data_folder,
+                                                                                                          base_output_dir)
 
-    # make_figures = 'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')'
-
-    # make_figures = 'analyseVariablePorosityTest(\'' + data_folder + '\', [' + ','.join([str(a) for a in nz_uniform]) + '], true, true, \'' + uniform_prefix + '\', \'xDarcyvelocity\', \'L2\')'
-    # make_figures = fixed_porous_command()
-
-    # analysis_command = chombo_compare_analyse + '\n\n' + \
-    #                   matlab_command + ' "%s; exit;"' % make_figures
+    # Just do analysis - make figures manually once we know the sidewall problem has also finished
     analysis_command = chombo_compare_analyse
-
 
     # Run
     extra_params = {}
     runTest(data_folder, physical_problem, fixed_porous_resolution_specific_params, amr_setup, num_procs,
             analysis_command, extra_params)
-
 
 if __name__ == "__main__":
     test_fixed_porous_hole()

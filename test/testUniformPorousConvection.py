@@ -13,21 +13,21 @@ from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, rea
 # Just run for a single grid resolution and compare to previously published values
 ######################################
 
-def uniform_porous_resolution_specific_params(p : ConvergenceTestParams):
+def uniform_porous_resolution_specific_params(p):
     mushyLayerBaseDir = get_mushy_layer_dir()
 
-    nx_coarse = nz_coarse
+    nx_coarse = p.nz_coarse
 
-    gridFile = mushyLayerBaseDir + '/grids/leftRight/' + str(nx_coarse) + 'x' + str(nz_coarse)
+    gridFile = mushyLayerBaseDir + '/grids/leftRight/' + str(nx_coarse) + 'x' + str(p.nz_coarse)
 
     params_file = mushyLayerBaseDir + '/params/convergenceTest/convectionDarcyBrinkmanConvTest.parameters'
     params = read_inputs(params_file)
 
-    params['main.refine_thresh'] = str(3.0 / float(nz_coarse))
-    params['main.tag_buffer_size'] = str(max(2, int(float(nz_coarse) / 8)))
+    params['main.refine_thresh'] = str(3.0 / float(p.nz_coarse))
+    params['main.tag_buffer_size'] = str(max(2, int(float(p.nz_coarse) / 8)))
 
     # Make sure we don't split up the grids as there's currently a bug in Chombo with higher order advection methods
-    params['main.max_grid_size'] = int(nz_coarse*2)
+    params['main.max_grid_size'] = int(p.nz_coarse*2)
 
     return nx_coarse, params, gridFile
 
