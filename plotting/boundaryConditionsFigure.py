@@ -48,36 +48,12 @@ def latexify(fig_width=None, fig_height=None):
         golden_mean = (np.sqrt(5) - 1.0) / 2.0  # Aesthetic ratio
         fig_height = fig_width * golden_mean  # height in inches
 
-
-    # if fig_height > max_height_inches:
-    #     print("WARNING: fig_height too large: " + str(fig_height) +
-    #           "so will reduce to " + str(max_height_inches) + " inches.")
-    #     fig_height = max_height_inches
-
     # Need the mathsrfs package for \mathscr if text.usetex = True
-
-
-
-    params = {
-        # If I wanted to be really clever, could probably import the latex macro definitions here for my papers/thesis
-        # then use e.g. \Rm for Rayleigh number in my plotting scripts. But I haven't.
-              'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}', '\\usepackage{amsmath}'],
-              'axes.labelsize': font_size,  # fontsize for x and y labels (was 10)
-              'axes.titlesize': font_size,
-              'legend.fontsize': font_size,  # was 10
-              'xtick.labelsize': font_size,
-              'ytick.labelsize': font_size,
-              'font.size': font_size,
-              'xtick.direction': 'in',
-              'ytick.direction': 'in',
-              'lines.markersize': 3,
-              'lines.linewidth': linewidth,
-              'text.usetex': True,
-              'figure.figsize': [fig_width, fig_height],
-              'font.family': 'serif'
-              }
-
-    params['backend'] = 'ps'
+    params = {'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}', '\\usepackage{amsmath}'],
+              'axes.labelsize': font_size, 'axes.titlesize': font_size, 'legend.fontsize': font_size,
+              'xtick.labelsize': font_size, 'ytick.labelsize': font_size, 'font.size': font_size,
+              'xtick.direction': 'in', 'ytick.direction': 'in', 'lines.markersize': 3, 'lines.linewidth': linewidth,
+              'text.usetex': True, 'figure.figsize': [fig_width, fig_height], 'font.family': 'serif', 'backend': 'ps'}
 
     if 'osx' in socket.gethostname():
         #params['text.usetex'] = False
@@ -196,8 +172,12 @@ def make_bc_fig(inputs_file, ndim=2):
                  )
 
     if 'heatSource.size' in inputs:
-        dim_params = dim_params + '+ heat source $Q = \\frac{Q_0}{\sigma \sqrt{2 \pi}} \exp\left[ - 0.5 \left( \\frac{x-x_c}{\sigma} \\right)^2 \\right]  0.5 \left( 1 + \\tanh\left[10 (z-(H-h)) \\right]) \\right)$, \n' \
-                'where $Q_0=%s,\sigma=%s,x_c=%s,h=%s$' % (inputs['heatSource.size'], inputs['heatSource.width'], inputs['heatSource.xpos'], inputs['heatSource.depth'])
+        dim_params = dim_params + '+ heat source $Q = \\frac{Q_0}{\sigma \sqrt{2 \pi}} ' \
+                                  '\exp\left[ - 0.5 \left( \\frac{x-x_c}{\sigma} \\right)^2 \\right]  ' \
+                                  '0.5 \left( 1 + \\tanh\left[10 (z-(H-h)) \\right]) \\right)$, \n' \
+                                  'where $Q_0=%s,\sigma=%s,x_c=%s,h=%s$' % (
+                     inputs['heatSource.size'], inputs['heatSource.width'], inputs['heatSource.xpos'],
+                     inputs['heatSource.depth'])
 
     ax.text(0.5, 0.4, dim_params, horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
 
@@ -214,20 +194,20 @@ def make_bc_fig(inputs_file, ndim=2):
 
 
 def make_bc_text(inputs, directory, side):
-    scalar_options = ['Dirichlet', 'Neumann', 'InflowOutflow', 'OnlyInflow', 'Robin', 'VariableFlux', 'FixedTemperature', 'TemperatureFlux', 'TemperatureFluxRadation']
+    scalar_options = ['Dirichlet', 'Neumann', 'InflowOutflow', 'OnlyInflow', 'Robin', 'VariableFlux',
+                      'FixedTemperature', 'TemperatureFlux', 'TemperatureFluxRadation']
     scalars = {'enthalpy': 'H', 'bulkConcentration': '\Theta', 'vel': '\mathbf{U}'}
     BC_TYPES = {'bulkConcentration': scalar_options,
                 'enthalpy': scalar_options,
                 'vel': ['$\mathbf{U} = 0$', 'Inflow',
-		'Outflow',
-		'OutflowNormal', # only a normal velocity
-		'InflowOutflow', # both inflow and outflow possible
-		'noShear',
-		'Symmetry ($\mathbf{U} \cdot \mathbf{n} = 0$) ',
-		'Plume inflow',
-		'Outflow with enforced pressure gradient',
-		'Pressure head']}
-
+                        'Outflow',
+                        'OutflowNormal',  # only a normal velocity
+                        'InflowOutflow',  # both inflow and outflow possible
+                        'noShear',
+                        'Symmetry ($\mathbf{U} \cdot \mathbf{n} = 0$) ',
+                        'Plume inflow',
+                        'Outflow with enforced pressure gradient',
+                        'Pressure head']}
 
     sides = ['Lo', 'Hi']
     dirs = ['x', 'y']
@@ -241,8 +221,6 @@ def make_bc_text(inputs, directory, side):
     var_texts = []
 
     for v in variables:
-        this_var_text = ''
-
         bc_type_name = 'bc.%s%s' % (v, side_text)
         bc_val_name = 'bc.%s%sVal' % (v, side_text)
 
@@ -274,7 +252,8 @@ def make_bc_text(inputs, directory, side):
                 this_var_text = 'No flux: $\mathbf{n} \cdot \\nabla %s = 0$' % scalars[v]
             elif bc_type_description == 'VariableFlux':
 
-                this_var_text = 'Variable flux: $\mathbf{n} \cdot \\nabla %s = $ \n $%g (1+\\textrm{tanh}(50(%s-0.75)))$' % (scalars[v], bc_val*0.5, perp_dir_string)
+                this_var_text = 'Variable flux: $\mathbf{n} \cdot \\nabla %s = $ \n' \
+                                '$%g (1+\\textrm{tanh}(50(%s-0.75)))$' % (scalars[v], bc_val*0.5, perp_dir_string)
 
             elif bc_type_description == 'FixedTemperature':
                 no_flux_limit = string_to_array(inputs['bc.NoFluxLimit%s' % side_text], conversion=lambda x: float(x))[directory]

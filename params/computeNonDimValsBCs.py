@@ -46,8 +46,8 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
                dim=2, periodic=True):
     # Physical constants
 
-
-    params['dimensional_values'] = '"Ttop=%.3g celcius, Tbottom=%.3g celcius, Si=%.3g g/kg, L=%.3g metres, d=%.3g metres, K0=%.3g m^2"' % (Ttop, Tbottom, Si, h, d, K0)
+    params['dimensional_values'] = '"Ttop=%.3g celcius, Tbottom=%.3g celcius, Si=%.3g g/kg, ' \
+                                   'L=%.3g metres, d=%.3g metres, K0=%.3g m^2"' % (Ttop, Tbottom, Si, h, d, K0)
 
     ##############################
     # Compute quantities derived from our dimensional inputs
@@ -75,7 +75,7 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     RmS = Da*RaS
     Le = 200
     Pr = properties['eta']/(properties['rho_l']*kappa_l)
-    timescale = h**2/kappa_l
+    # timescale = h**2/kappa_l
     St = properties['L'] / (properties['cpl'] * abs(delta_T))
     ThetaTop = (S_top - properties['Se'])/delta_c
     # ThetaTop = -CR

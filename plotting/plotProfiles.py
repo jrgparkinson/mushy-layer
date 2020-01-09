@@ -2,9 +2,10 @@ import os
 import xarray as xr
 import matplotlib.pyplot as plt
 import numpy as np
-from util.nondimensionalisation import *
-from util.plotUtils import latexify
+from nondimensionalisation import *
+from mushyLayerRunUtils import latexify
 import matplotlib as mpl
+import re
 import math
 
 def get_profiles(folder):
@@ -51,8 +52,6 @@ time_warming = np.array(profiles_warming['Porosity'].coords['t'])
 dim_times_control = dimensional_time(times_control)
 dim_times_warming = dimensional_time(times_control)
 
-
-
 valid_control_times = times_control[times_control > time_warming[0]]
 
 latexify(3,3)
@@ -79,14 +78,10 @@ profile_name = 'Rm profile no z dependence'
 
 profile_name = 'Min Vertical Velocity'
 
- # bodc - ship board data
- # bas - bejas
-
 comparison = False
 
 min_time = time_warming[0]
 max_time = time_warming[-1]
-
 
 plot_interval = 10
 
@@ -95,9 +90,6 @@ plot_interval_time = 0.001
 # last_plot_
 
 if comparison:
-    # max_time = np.amax([time_warming[-1], times_control[-1]])
-
-
 
     for i in range(0, len(times_control)):
 
@@ -182,7 +174,5 @@ if comparison:
 figure_full_path = os.path.join(figure_output_directory, fig_name + '.jpg')
 plt.savefig(figure_full_path,  format='jpg', dpi=800)
 print('Saved figure to %s' % figure_full_path)
-
-
 
 plt.show()

@@ -19,7 +19,6 @@ def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, 
 
     params = read_inputs(params_file)
 
-
     nx_coarse = nz_coarse
 
     Nx_grid = nx_coarse
@@ -107,7 +106,7 @@ def testPorousMushyHole(argv):
     # Setup up the post processing command
 
     # figureName = os.path.join(dataFolder, 'noFlow.pdf')
-    uniform_prefix = 'Uniform-' + physicalProblem + '-'
+    # uniform_prefix = 'Uniform-' + physicalProblem + '-'
 
     python_compare_file = os.path.join(get_mushy_layer_dir(), 'test', 'run_chombo_compare.py')
     chombo_compare_analyse ='python %s -f %s -a -v Porosity -e L2 -r True -n 8 \n \n' % (python_compare_file, dataFolder)

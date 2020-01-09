@@ -106,7 +106,7 @@ def test_fixed_porous_hole():
     # make_figures = 'Fig5FixedPorosityConvectionPlots(\'' + data_folder_nu + '\', \'' + data_folder_variable_porosity + '\', \'' + figure_directory + '\')'
 
     # make_figures = 'analyseVariablePorosityTest(\'' + data_folder + '\', [' + ','.join([str(a) for a in nz_uniform]) + '], true, true, \'' + uniform_prefix + '\', \'xDarcyvelocity\', \'L2\')'
-    make_figures = fixed_porous_command()
+    # make_figures = fixed_porous_command()
 
     # analysis_command = chombo_compare_analyse + '\n\n' + \
     #                   matlab_command + ' "%s; exit;"' % make_figures

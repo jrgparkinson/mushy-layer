@@ -255,12 +255,6 @@ class PltFile:
 
             # Create empty datasets spanning entire domain for each component
             for comp_name in self.comp_names:
-                s = blank_data.shape
-
-                # First component should be x-direction
-                # if not s[0] == len(coords['i']):
-                #     blank_data = blank_data.T
-
                 extended_coords = coords
                 extended_coords['level'] = level
                 dims = self.INDEX_COORDS_NAMES[:self.space_dim]
@@ -388,7 +382,7 @@ class PltFile:
                     num_box_cells = np.prod(n_cells_dir)  # effectively nx * ny * nz * ...
                     # num_cells = num_box_cells * num_comps  # also multiply by number of components
 
-                    num_domain_cells = num_box_cells * num_boxes
+                    # num_domain_cells = num_box_cells * num_boxes
 
                     # Now split into individual components
                     # data contains all fields on this level, sort into individual fields
@@ -1262,9 +1256,7 @@ class PltFile:
             # Start from the bottom of the domain and trace cells upwards until we hit mushy cells
 
             # Rather than highest liquid cell, consider lowest mushy cell
-            s = porosity.shape
-
-            iterate_shape = s[:-1]  # iterate over everything but vertical index (which is in the last index)
+            iterate_shape = porosity.shape[:-1]  # iterate over everything but vertical index (which is in the last index)
             import itertools
             liquid_z_indices = []
             # for ix in np.arange(0, s[1]):
