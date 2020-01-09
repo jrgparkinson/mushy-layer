@@ -14,7 +14,11 @@ from makeFigures import fixed_chill_command
 # 3) Convection in a mushy layer with an initial porous hole
 ##########################################################################
 
-def hele_shaw_resolution_specific_params(p : ConvergenceTestParams):
+def hele_shaw_resolution_specific_params(p):
+    """
+    :param p: ConvergenceTestParams
+    :return:
+    """
     mushyLayerBaseDir = get_mushy_layer_dir()
 
     params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'

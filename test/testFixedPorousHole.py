@@ -13,7 +13,11 @@ from makeFigures import fixed_porous_command
 def get_min_porosity():
     return 0.05  # 0.05
 
-def fixed_porous_resolution_specific_params(p : ConvergenceTestParams):
+def fixed_porous_resolution_specific_params(p):
+    """
+    :param p: ConvergenceTestParams
+    :return:
+    """
     mushy_layer_base_dir = get_mushy_layer_dir()
 
     integration_time = 2e-4

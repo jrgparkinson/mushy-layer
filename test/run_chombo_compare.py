@@ -241,12 +241,14 @@ def run_chombo_compare(argv):
     run_analysis = False
     field = 'xDarcy velocity'
     err_type = 'L2'
+    figure_output_directory = None
 
     try:
         opts, args = getopt.getopt(argv, "f:v:e:r:n:a")
     except getopt.GetoptError as err:
         print(str(err))
-        print('run_chombo_compare.py -f <folder> -a<run analysis> -v <variable to consider> -e < err type> -r <include richardson errors?> -n <figure number>')
+        print('run_chombo_compare.py -f <folder> -a<run analysis> -v <variable to consider> -e < err type> '
+              '-r <include richardson errors?> -n <figure number> -d <figure output directory>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -262,7 +264,11 @@ def run_chombo_compare(argv):
             include_richardson = bool(arg)
         elif opt in "-n":
             figure_number = int(arg)
+        elif opt in "-d":
+            figure_output_directory = str(arg)
 
+    if not figure_output_directory:
+        figure_output_directory = data_folder
 
     # Compute the errors
     if run_analysis:
@@ -519,8 +525,6 @@ def run_chombo_compare(argv):
 
 
     # Finally, save plot
-
-    figure_output_directory = data_folder
     filename = 'Fig%dError-%s-%s.eps' % (figure_number, field, err_type)
     filename = filename.replace(' ', '_') # remove spaces
     figure_full_path = os.path.join(figure_output_directory, filename)

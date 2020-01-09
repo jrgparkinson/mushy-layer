@@ -20,9 +20,12 @@ def get_suffix(num):
     # return '-%d' % num
     return ''
 
-def amr_convergence_test(params, full_output_dir, nzs, num_procs=[1], num_restarts=0, restart_from_low_res=False):
+def amr_convergence_test(params, full_output_dir, nzs, num_procs=1, num_restarts=0, restart_from_low_res=False):
 
     os.environ["CH_TIMER"] = "1"
+
+    if not isinstance(num_procs, list):
+        num_procs = [num_procs]
 
     dependencies = []
     prev_job_id = -1

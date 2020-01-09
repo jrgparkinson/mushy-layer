@@ -13,16 +13,16 @@ from makeFigures import porous_hole_command
 ##########################################################################
 
 
-def porous_mushy_hole_resolution_specific_params(p : ConvergenceTestParams):
+def porous_mushy_hole_resolution_specific_params(p):
     mushyLayerBaseDir = get_mushy_layer_dir()
     params_file = os.path.join(mushyLayerBaseDir,'params/convergenceTest/porousMushyHole.parameters')
 
     params = read_inputs(params_file)
 
-    nx_coarse = nz_coarse
+    nx_coarse = p.nz_coarse
 
     Nx_grid = nx_coarse
-    if ref_rat == 4:
+    if p.ref_rat == 4:
         Nx_grid = 2 * nx_coarse
 
     gridFile = mushyLayerBaseDir + '/grids/middleXSmall/' + str(Nx_grid) + 'x' + str(Nx_grid)
@@ -43,10 +43,10 @@ def porous_mushy_hole_resolution_specific_params(p : ConvergenceTestParams):
     if not num_steps.is_integer():
         print(Fore.RED + 'WARNING: dt is not an integer division of max time')
 
-    regrid_int = int(math.ceil(float(nz_coarse) / 16.0))
+    regrid_int = int(math.ceil(float(p.nz_coarse) / 16.0))
     regrid_int = max(regrid_int, 1)
 
-    params['main.refine_thresh'] = float(params['main.radius']) * 10.0 / float(nz_coarse)  # 0.05*64.0/float(nz_coarse)
+    params['main.refine_thresh'] = float(params['main.radius']) * 10.0 / float(p.nz_coarse)  # 0.05*64.0/float(nz_coarse)
 
     bf = max(int(nx_coarse / 4), 4)
 
@@ -87,7 +87,8 @@ def testPorousMushyHole(argv):
     physicalProblem = 'PorousMushyHole'
     # dataFolder = os.path.join(base_output_dir, 'PorousMushyHole-t' + str(max_time) + '-hole' + str(hole_radius) )
     minC = -5.0 # default -5
-    dataFolder = os.path.join(base_output_dir, 'PorousMushyHole-t%s-minC%s' % (max_time, minC))
+    folder_name = 'PorousMushyHole-t%s-minC%s' % (max_time, minC)
+    dataFolder = os.path.join(base_output_dir, folder_name)
 
     Nz_uniform = [16, 32, 64, 128, 256, 512]
     AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': Nz_uniform},
@@ -109,10 +110,12 @@ def testPorousMushyHole(argv):
     # uniform_prefix = 'Uniform-' + physicalProblem + '-'
 
     python_compare_file = os.path.join(get_mushy_layer_dir(), 'test', 'run_chombo_compare.py')
-    chombo_compare_analyse ='python %s -f %s -a -v Porosity -e L2 -r True -n 8 \n \n' % (python_compare_file, dataFolder)
+    chombo_compare_analyse ='python %s -f %s -a -v Porosity -e L2 -r True -n 8 -d %s \n \n' % (python_compare_file,
+                                                                                               dataFolder,
+                                                                                               base_output_dir)
 
     # make_figures  = 'Fig7PorousHole(\'' + dataFolder + '\', \'' + dataFolder + '\')'
-    make_figures = porous_hole_command()
+    make_figures = porous_hole_command(folder_name=folder_name)
     #analyse_in_matlab = 'analyseVariablePorosityTest(\'' + dataFolder + '\', [' + ','.join([str(a) for a in Nz_uniform]) + '],' \
     # 'true, true, \'' + uniform_prefix + '\', \'Porosity\', \'L2\');'
 
