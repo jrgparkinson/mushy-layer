@@ -1,13 +1,10 @@
 import socket
-
 import h5py
 import matplotlib
-import matplotlib as mpl
 import numpy as np
 from matplotlib import pyplot
 import re
 import os
-# import yt
 import xarray as xr
 from shapely.ops import cascaded_union
 from shapely.geometry import Polygon
@@ -17,6 +14,7 @@ import sys
 from ChkFile import compute_channel_properties
 from scipy.signal import find_peaks
 from skimage.feature import peak_local_max
+from itertools import product
 
 def compute_z(porosity_slice, y_slice, porosity):
 
@@ -281,7 +279,7 @@ class PltFile:
                 end_points = [[lo_vals[i] - lev_dx / 2, hi_vals[i] + lev_dx / 2] for i in range(self.space_dim)]
 
                 # For plotting level outlines
-                from itertools import product, permutations, chain
+
                 # Construct vertices in n dimensions
                 polygon_vertices_auto = list(product(*end_points))
                 polygon_vertices_auto = sorted(polygon_vertices_auto,
@@ -540,7 +538,6 @@ class PltFile:
         # I think we only need to transpose in 3D
         # if self.space_dim == 3: #  or self.space_dim == 2
         #     reshaped_data = reshaped_data.transpose()
-            
         reshaped_data = np.array(reshaped_data)
 
         # Check if scalar or vector
@@ -768,8 +765,6 @@ class PltFile:
 
             ld = ds_lev[field]
 
-
-
             # Set covered cells to NaN
             # This is really slow, I'm sure there's a faster way
             if valid_only and level < self.num_levels - 1:
@@ -782,8 +777,8 @@ class PltFile:
                 coarse_fine = np.sum(temp, axis=(1,3))
 
                 isnan = np.isnan(coarse_fine)
-                ld = ld.where(isnan == True)
-
+                # ld = ld.where(isnan == True)
+                ld = ld.where(isnan)
 
             # By default, swap to python indexing
             if self.python_index_ordering:
@@ -934,7 +929,7 @@ class PltFile:
 
             # Now compute bounding energies
             print('Computing bounding energy')
-            for idx, value in np.ndenumerate(enthalpy):
+            for idx, _ in np.ndenumerate(enthalpy):
 
                 eutectic_porosity = (conc_ratio + bulk_salinity[idx]) / (theta_eutectic + conc_ratio)
                 enthalpy_eutectic[idx] = eutectic_porosity * (stefan + theta_eutectic * (1 - cp)) + cp * theta_eutectic
@@ -1024,7 +1019,8 @@ class PltFile:
             elif 'parameters.nonDimReluctance' in self.inputs.keys():
                 hele_shaw_permeability = 1 / float(self.inputs['parameters.nonDimReluctance'])
             else:
-                print('Unable to determine Hele-Shaw permeability, cannot find either parameters.heleShawPermeability or parameters.nonDimReluctance in the inputs file. ')
+                print('Unable to determine Hele-Shaw permeability, cannot find either parameters.heleShawPermeability '
+                      'or parameters.nonDimReluctance in the inputs file. ')
                 sys.exit(-1)
 
             total_permeability = (hele_shaw_permeability ** (-1) + liquid_permeability ** (-1)) ** (-1)
@@ -1049,22 +1045,13 @@ class PltFile:
         # min_length = min(dom)
         # separation = float(min_length) /
 
-
         if self.space_dim == 2:
 
             separation = 5  # minimum pixel separation
 
-
-            slice = bulk_salinity.sel(y = z_ml, method='nearest')
-
+            bulk_s_slice = bulk_salinity.sel(y = z_ml, method='nearest')
             vel_slice = np.array(self.get_level_data('yDarcy velocity').sel(y=z_ml, method='nearest'))
-
-
-            # slice_arr = np.array(slice)
-            # slice_arr = slice_arr - slice_arr.min()
-
-            slice_arr = np.array(slice) * vel_slice
-
+            slice_arr = np.array(bulk_s_slice) * vel_slice
 
             prominence = float(slice_arr.max()) / 4.0
 
@@ -1087,11 +1074,11 @@ class PltFile:
         else:
 
 
-            slice = bulk_salinity.sel(z = z_ml, method='nearest')
+            bulk_s_slice = bulk_salinity.sel(z = z_ml, method='nearest')
 
             vel_slice = np.array(self.get_level_data('zDarcy velocity').sel(z=z_ml, method='nearest'))
 
-            slice_arr = np.array(slice)*vel_slice
+            slice_arr = np.array(bulk_s_slice)*vel_slice
             # slice_arr = slice_arr - slice_arr.min()
 
             peak_height = float(slice_arr.max()) / peak_height_scaling
