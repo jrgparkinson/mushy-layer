@@ -35,6 +35,14 @@ class DiffusiveSolution:
 
         self.method = method
 
+        self.V = np.nan
+        self.cr = np.nan
+        self.st = np.nan
+        self.a = np.nan
+        self.b = np.nan
+        self.T_ref = np.nan
+        self.F = np.nan
+
     def set_nonlinear_bcs(self, a, b, T_ref, F, V, cr, st):
         self.a = a
         self.b =b

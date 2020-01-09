@@ -209,8 +209,7 @@ def usage():
 
 if __name__ == "__main__":
 
-    timings = []
-    timings.append(time.time())
+    timings = [time.time()]
 
     ## Initial setup
 

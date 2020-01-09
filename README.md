@@ -1,25 +1,26 @@
-# AMR Mushy Layer
+# AMR SOFTBALL
+A code for simulating flow and solidification in mushy layers
   
-# Introduction
+## Introduction
 This is code to simulate flow in a reactive porous media, a "mushy layer", within a square box.
 
 In this readme we first present some instructions on downloading and installing the code, then describe how to recreate the test problems and figures found in the scientific [paper](#) (currently unpublished, email [james.parkinson@physics.ox.ac.uk] for a copy)  written about this method. The paper is a good reference for more information on the physics of this model.
 
 If you have any issues, please contact [james.parkinson@physics.ox.ac.uk].
 
-# Prerequisites
-## Required
-* [Chombo](https://commons.lbl.gov/display/chombo/Chombo+-+Software+for+Adaptive+Solutions+of+Partial+Differential+Equations) installation ([how to download Chombo](https://anag-repo.lbl.gov/chombo-3.2/access.html)). You will need to configure Chombo with HDF5 support in order to write out data files. This code requires Chombo version 3.2, patch 6 or above. Earlier versions of Chombo do not include the `AMRFASMultigrid` functionality, required for solving nonlinear elliptic equations.
+## Prerequisites
+### Required
+*   [Chombo](https://commons.lbl.gov/display/chombo/Chombo+-+Software+for+Adaptive+Solutions+of+Partial+Differential+Equations) installation ([how to download Chombo](https://anag-repo.lbl.gov/chombo-3.2/access.html)). You will need to configure Chombo with HDF5 support in order to write out data files. This code requires Chombo version 3.2, patch 6 or above. Earlier versions of Chombo do not include the `AMRFASMultigrid` functionality, required for solving nonlinear elliptic equations.
 
-## Optional
-* git. For downloading and updating code.
-* python. For setting up the test problems.
-* MATLAB. For analysis of the test problems.
-* doxygen. For generating documentation.
-* slurm. The code for running the test problems will create a set of batch scripts and try to submit these to the slurm queuing system. If you do not have slurm installed, you'll need to run the batch scripts manually.
-* [visit](http://www.nersc.gov/users/data-analytics/data-visualization/visit-2/). Visualisation software for Chombo AMR files.
+### Optional
+  * git. For downloading and updating code.
+  * python. For setting up the test problems.
+  * MATLAB. For analysis of the test problems.
+  * doxygen. For generating documentation.
+  * slurm. The code for running the test problems will create a set of batch scripts and try to submit these to the slurm queuing system. If you do not have slurm installed, you'll need to run the batch scripts manually.
+  * [visit](http://www.nersc.gov/users/data-analytics/data-visualization/visit-2/). Visualisation software for Chombo AMR files.
 
-# Accessing the code
+## Accessing the code
 Cloning the repository from GitHub is straightforward:
 
 ```console
@@ -29,7 +30,7 @@ $ git clone https://github.com/jrgparkinson/mushy-layer.git mushy-layer
 To fetch and merge any changes to the library, use `git pull`.
 
 
-# Installation
+## Installation
 To compile the code, you must first have a working Chombo installation (see the ChomboInstallationGuide.md file in the docs folder). Define the path to your chombo library folder in the GNUMakefile (`/execSubcyle/GNUMakefile`) then you should be able to compile by
 
 ```console
@@ -44,7 +45,7 @@ export MUSHY_LAYER_DIR=/path/to/mushy-layer/
 ```
 
 
-# Running
+## Running
 The executable in `/execSubcycle/` requires inputs in order to run. These can either be supplied at the command line or, more sensibly, by specifying the location of a file which contains a list of inputs, e.g.
 
 ```console
@@ -65,7 +66,7 @@ $ cd execSubcycle
 $ mpirun -np 2 ./mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex inputs
 ```
 
-# Documentation
+## Documentation
 Documentation can be generated using [Doyxgen](http://www.doxygen.nl/) if it is installed. A default configuration file can be found in the `/docs/` directory, which can be run via:
 
 ```console
@@ -75,7 +76,7 @@ $ doxygen
 
 You can also find a reasonably up to date version of the documentation online at [https://amr-softball.github.io/doc/html/index.html], if you do not want to compile it yourself. The Classes section is particularly useful.
 
-# Extra utilities
+## Extra utilities
 This repository contains various other pieces of code for running simulations. 
 
 `/setupNewRun/` takes a checkpoint file and creates a new file with the same data on a domain with a different width, which is useful for computing optimal states.
@@ -87,7 +88,7 @@ This repository contains various other pieces of code for running simulations.
 
 The code in `/setupNewRun/` and `/postProcess/` needs to be compiled like the code in `/execSubcycle/`. First update the `GNUMakefile` files in each subdirectory, then run `make all` as before.
 
-# Source code
+## Source code
 The source code is spread across a number of directories, which are briefly summarised here.
 
 `/BCutil/` contains code for implementing boundary conditions.
@@ -98,10 +99,10 @@ The source code is spread across a number of directories, which are briefly summ
 `/srcNonSubcycle/` contains mushy layer code for the non-subcycled algorithm (currently broken)
 `/execNonSubcycle/` contains the driver code for the non-subcycle application (currently broken)
 
-## Methods paper
+### Methods paper
 We have written a paper describing the physics of this model. A draft can be found in the `/docs/` directory. In this paper, we demonstrate the accuracy and convergence properties of our code. Everything you need to run these tests yourself should be found in the `/tests/` directory, as described below. 
 
-# Testing
+## Testing
 `/test/` contains python scripts for running various test problems, which demonstrate the accuracy and efficiency of the code. You can run all the problems via the script `runMethodsPaperTests.py`. For more information, see the README located in the `/test/` directory.
 
 You must ensure that the `/test/` directory is in your `PYTHONPATH`, i.e. place the following in your ~/.bashrc or similar
@@ -118,10 +119,8 @@ addpath(genpath('/path/to/matlab/'))
 
 Note that running all the tests will take some time unless you have lots of processors available (i.e. multiple days) and will take up a reasonable amount of disk space (~50GB).
 
-# Figures
+## Figures
 Having run the test problems, some of the figures found in the paper will have been created automatically in the subdirectory for each tests problem (e.g. `/path/to/test_output/FixedPorousHole-1proc/Fig6Error-xDarcy_velocity-L2.eps`). The python script located at `mushy-layer/test/makeFigures.py` should then make the remaining figures for you, mainly by calling various matlab scripts. 
-
-
 
 ## The mushy layer code
 In this section we briefly describe how the code works with the Chombo library so solve equations on a hierarchy of adaptive meshes. If you are planning on making changes to the code, or want to see which bits solve which equations, this might be a useful starting point. If you are going to look at the code regularly, you are highly recommended to use an Integrated Development Environment (IDE) - e.g. [Eclipse](https://www.eclipse.org/downloads/packages/release/2018-12/r/eclipse-ide-cc-developers). Brief setup instructions for Eclipse can be found below.
@@ -134,34 +133,34 @@ c) Create an `AMR` object which handles solving the equations over a hierarchy o
 
 The code then tells the AMR object to run until a certain time or number of steps. The AMR object is the heart of Chombo. It continually evolves the solution, periodically calling into functions from the Mushy Layer code to do things, e.g.
 
-* Initialisation - most of the Mushy layer specific stuff is contained in `srcSubcycle/AMRLevelMushyLayerInit.cpp`.
-* Advancing the solution - this is done `srcSubcycle/AMRLevelMushyLayer.cpp` in the `advance(...)` function (which subsequently calls lots of other mushy layer functions).
-* Finding the current maximum allowed timestep - implemented in `srcSubcycle/AMRLevelMushyLayer.cpp :: computeDt()`.
-* Regridding, if necessary - see `srcSubcycle/AMRLevelMushyLayerRegrid.cpp :: regrid(..)`.
-* Post timestep synchronisation - mainly contained in `srcSubcycle/AMRLevelMushyLayerSync.cpp :: postTimestep(..)`
+  * Initialisation - most of the Mushy layer specific stuff is contained in `srcSubcycle/AMRLevelMushyLayerInit.cpp`.
+  * Advancing the solution - this is done `srcSubcycle/AMRLevelMushyLayer.cpp` in the `advance(...)` function (which subsequently calls lots of other mushy layer functions).
+  * Finding the current maximum allowed timestep - implemented in `srcSubcycle/AMRLevelMushyLayer.cpp :: computeDt()`.
+  * Regridding, if necessary - see `srcSubcycle/AMRLevelMushyLayerRegrid.cpp :: regrid(..)`.
+  * Post timestep synchronisation - mainly contained in `srcSubcycle/AMRLevelMushyLayerSync.cpp :: postTimestep(..)`
 
 Within the `advance(..)` method, the key pieces are:
 
-* `computeAdvectionVelocities(..)` - computes face centered velocities for doing advection with.
-* `exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, doFRUpdates, doAdvectiveSrc);` - updates enthalpy and salinity fields.
-* `computeCCvelocity(advectionSourceTerm, m_time-m_dt, m_dt, doFRupdates, doProjection, compute_uDelU);` - compute new cell centred velocity.
+  * `computeAdvectionVelocities(..)` - computes face centered velocities for doing advection with.
+  * `exitStatus = multiCompAdvectDiffuse(HC_old, HC_new, srcMultiComp, doFRUpdates, doAdvectiveSrc);` - updates enthalpy and salinity fields.
+  * `computeCCvelocity(advectionSourceTerm, m_time-m_dt, m_dt, doFRupdates, doProjection, compute_uDelU);` - compute new cell centred velocity.
 
-# Notes on adding new code
+## Notes on adding new code
 For those new to this code/Chombo, here are some tips:
 
-* An AMRLevelMushyLayer object exists on a particular level of refinement. You can access the coarser and finer levels via `getCoarserLevel()`, `getFinerLevel()`.
-* During a timestep, `m_time` is the new time ($t^{n+1} = t^n + \Delta t$).
-* Scalar and vector fields are stored in arrays `m_scalarNew`, `m_vectorNew`, indexed by the field name, i.e. enthalpy on a level of refinement is `m_scalarNew[ScalarVars::m_enthalpy]`
-* When using scalar and vector fields, you can ensure all the boundary conditions and ghost cells are filled by calling `fillScalars(..)`, e.g.
+  * An AMRLevelMushyLayer object exists on a particular level of refinement. You can access the coarser and finer levels via `getCoarserLevel()`, `getFinerLevel()`.
+  * During a timestep, `m_time` is the new time ($t^{n+1} = t^n + \Delta t$).
+  * Scalar and vector fields are stored in arrays `m_scalarNew`, `m_vectorNew`, indexed by the field name, i.e. enthalpy on a level of refinement is `m_scalarNew[ScalarVars::m_enthalpy]`
+  * When using scalar and vector fields, you can ensure all the boundary conditions and ghost cells are filled by calling `fillScalars(..)`, e.g.
 ` fillScalars(*m_scalarNew[ScalarVars::m_enthalpy], m_time, ScalarVars::m_enthalpy);`
 
 
-# Eclipse + Chombo + Mushy Layer
+## Eclipse + Chombo + Mushy Layer
 [Eclipse](https://www.eclipse.org/downloads/packages/release/2018-12/r/eclipse-ide-cc-developers) is an Integrated Development Environment (IDE). In short, it is a powerful code editor (syntax highlighting, advanced find/replace) which also understands the structure of a program. For codes like this one which are spread over multiple files in multiple folders, and use external libraries, it is invaluable. Useful features include:
 
-* Find where a variable or function is defined (right click on variable/function -> Open Declaration)
-* Finding all usages of a variable or function (right click -> References -> workspace)
-* Debugging. Insert breakpoints via the top menu: Run  -> Toggle Breakpoint.
+  * Find where a variable or function is defined (right click on variable/function -> Open Declaration)
+  * Finding all usages of a variable or function (right click -> References -> workspace)
+  * Debugging. Insert breakpoints via the top menu: Run  -> Toggle Breakpoint.
 
 In short, it's a bit like MATLAB (but for C++).
 
@@ -200,8 +199,8 @@ and an instance of Visit should open showing you the source term field on this l
 `call viewFluxLevel(&m_advVel)`
 Other useful options available for viewing data include
 
-* `viewFAB(&fab)` for FArrayBoxes (LevelData's are composed of FArrayBoxes). If you have a FluxBox `fluxbox` instead, you can look at each component in turn with `viewFAB(&fluxbox[0])`, `viewFAB(&fluxbox[1])` etc.
-* `p m_time` return the value of any variable (you can also hover over a variable in the editor window).
+  * `viewFAB(&fab)` for FArrayBoxes (LevelData's are composed of FArrayBoxes). If you have a FluxBox `fluxbox` instead, you can look at each component in turn with `viewFAB(&fluxbox[0])`, `viewFAB(&fluxbox[1])` etc.
+  * `p m_time` return the value of any variable (you can also hover over a variable in the editor window).
 
 There are probably more, and these are documented in the ChomboDesign.pdf document.
 

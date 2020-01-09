@@ -1,7 +1,6 @@
 from plotting.PltFile import latexify
 from mushyLayerRunUtils import write_inputs, get_executable_name, get_final_plot_file
 import getopt
-import sys
 import os
 import re
 import numpy as np
@@ -10,7 +9,7 @@ import sys
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-# plt.style.use('classic')
+
 
 def format_field_name(field):
 

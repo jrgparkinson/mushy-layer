@@ -3,7 +3,7 @@ import os
 from colorama import Fore
 from MushyLayerRunSimple import MushyLayerRunSimple
 from mushyLayerRunUtils import get_restart_file, get_executable_name,\
-    get_final_chk_file, get_mushy_layer_dir,is_power_of_two, string_to_array
+    get_final_chk_file, get_mushy_layer_dir, is_power_of_two, string_to_array
 from BatchJob import BatchJob
 
 class ConvergenceTestParams:
@@ -44,7 +44,7 @@ def amr_convergence_test(params, full_output_dir, nzs, num_procs=1, num_restarts
                    
         # Don't repeat runs, unless we're restarting
         
-        #cwd = os.getcwd()
+        # cwd = os.getcwd()
         run_name = p['main.plot_prefix']
         test_name = run_name + get_suffix(0)
         full_path = os.path.join(full_output_dir, test_name)
@@ -113,7 +113,6 @@ def amr_convergence_test(params, full_output_dir, nzs, num_procs=1, num_restarts
                     preprocess_cmd = 'python %s -p %s -n %s -r %d \n' % (python_file, coarser_dir, new_dir, refinement)
                     s.set_preprocess(preprocess_cmd)
                     p['main.restart_file'] = os.path.join(new_dir, 'restart.2d.hdf5')
-                
 
         ml_run = MushyLayerRunSimple(full_output_dir, num_proc, p, s, allow_restarts, get_executable_name())
         ml_run.single_run(run_name)
@@ -125,9 +124,7 @@ def amr_convergence_test(params, full_output_dir, nzs, num_procs=1, num_restarts
 
         print('==================')
 
-        
     return dependencies
-
 
 def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, num_procs, analysis_command='',
             extra_params=None, numRestarts=0, restart_from_low_res=False):

@@ -42,9 +42,11 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
 # g = 9.8  ,# gravitational acceleration m/s
 # alpha = 3.87e-5  , # thermal expansion celcius^-1
                darcy_brinkman=False,
-               properties=get_sea_ice_material_properties(),
+               properties_func=get_sea_ice_material_properties,
                dim=2, periodic=True):
     # Physical constants
+
+    properties = properties_func()
 
     params['dimensional_values'] = '"Ttop=%.3g celcius, Tbottom=%.3g celcius, Si=%.3g g/kg, ' \
                                    'L=%.3g metres, d=%.3g metres, K0=%.3g m^2"' % (Ttop, Tbottom, Si, h, d, K0)

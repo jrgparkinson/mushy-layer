@@ -63,6 +63,7 @@ class PltFile:
                    'streamfunction': '$\psi$'}
 
     def __init__(self, filename, load_data=False, inputs_file='inputs'):
+        self.is_plot_file = False
         if not os.path.exists(filename):
             print('PltFile: file does not exist %s ' % filename)
             return
@@ -86,7 +87,7 @@ class PltFile:
 
         self.data_load_method = self.XARRAY
 
-
+        self.ds_levels = []
 
         # Initialise to bogus values
         self.iteration = -1
@@ -203,8 +204,6 @@ class PltFile:
             # much of what follows will be different as a result
             if 'data:datatype=0' in list(level_group.keys()):
                 self.is_plot_file = True
-            else:
-                self.is_plot_file = False
 
             group_atts = level_group.attrs
             boxes = level_group['boxes']
@@ -611,7 +610,8 @@ class PltFile:
 
         return compute_channel_properties(porosity, do_plots)
 
-    def get_mesh_grid_n(self, arr, grow=0):
+    @staticmethod
+    def get_mesh_grid_n(arr, grow=0):
         x = np.array(arr.coords['x'])
         y = np.array(arr.coords['y'])
 
@@ -629,7 +629,8 @@ class PltFile:
         return x, y
 
 
-    def get_mesh_grid_xarray(self, arr, grow=False):
+    @staticmethod
+    def get_mesh_grid_xarray(arr, grow=False):
         x = np.array(arr.coords['x'])
         y = np.array(arr.coords['y'])
 

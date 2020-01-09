@@ -69,7 +69,8 @@ class BatchJob:
             print('Reducing memory limit to %1.0f GB per node to avoid exceeding node memory limit. \n' % (
                     self.memory_limit / 1000))
 
-    def get_batch_job_command(self):
+    @staticmethod
+    def get_batch_job_command():
         """ Define the command used to run batch jobs
          change this if you're not using slurm! """
         slurm_command = 'sbatch'
@@ -133,18 +134,21 @@ class BatchJob:
 
         # If you don't have slurm, this should be different
         slurm_header = ['# Set your minimum acceptable walltime, format: day-hours:minutes:seconds \n',
-                         '#SBATCH --time=' + time_string + '\n', partitions_str, exclude_str,
-                         '# Set name of job shown in squeue' + '\n', '#SBATCH --job-name ' + self.jobname + '\n',
-                         '# Request CPU resources' + '\n', '#SBATCH --ntasks=' + str(int(self.num_proc)) +
-                         '                  # Number of MPI ranks' + '\n',
-                         '#SBATCH --cpus-per-task=' + str(int(self.cpu_per_task)) + '            # Number of cores per MPI rank ' + '\n',
-                         '#SBATCH --nodes=' + str(int(self.num_nodes)) + '                    # Number of nodes' + '\n',
-                         '#SBATCH --ntasks-per-node=' + str(int(self.tasks_per_node)) + '         # How many tasks on each node' + '\n',
-                         '#SBATCH --ntasks-per-socket=' + str(int(self.tasks_per_socket)) +
-                         '        # How many tasks on each CPU or socket (not sure what this really means)' + '\n',
-                         '#SBATCH --distribution=cyclic:cyclic # Distribute tasks cyclically on nodes and sockets' + '\n',
-                         '# Memory usage (MB)' + '\n', '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
-                         '#SBATCH --output=' + os.path.join(self.folder, 'sbatch%j.out') + '   # Standard output and error log' + '\n']
+                        '#SBATCH --time=' + time_string + '\n', partitions_str, exclude_str,
+                        '# Set name of job shown in squeue' + '\n', '#SBATCH --job-name ' + self.jobname + '\n',
+                        '# Request CPU resources' + '\n', '#SBATCH --ntasks=' + str(int(self.num_proc)) +
+                        '                  # Number of MPI ranks' + '\n',
+                        '#SBATCH --cpus-per-task=' + str(
+                            int(self.cpu_per_task)) + '            # Number of cores per MPI rank ' + '\n',
+                        '#SBATCH --nodes=' + str(int(self.num_nodes)) + '                    # Number of nodes' + '\n',
+                        '#SBATCH --ntasks-per-node=' + str(
+                            int(self.tasks_per_node)) + '         # How many tasks on each node' + '\n',
+                        '#SBATCH --ntasks-per-socket=' + str(int(self.tasks_per_socket)) +
+                        '        # How many tasks on each CPU or socket (not sure what this really means)' + '\n',
+                        '#SBATCH --distribution=cyclic:cyclic # Distribute tasks cyclically on nodes and sockets' + '\n',
+                        '# Memory usage (MB)' + '\n', '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
+                        '#SBATCH --output=' + os.path.join(self.folder,
+                                                           'sbatch%j.out') + '   # Standard output and error log' + '\n']
 
 
         # The commands to execute will look the same regardless of whether you're using SLURM or not
@@ -193,7 +197,6 @@ class BatchJob:
         file_contents.append(dependency_str)
         file_contents.extend(commands_to_execute)
 
-
         fh.writelines(file_contents)
 
         fh.close()
@@ -206,9 +209,7 @@ class BatchJob:
 
         self.write_batch_file(runFileName)
 
-
         cmd = 'cd ' + self.folder + '; ' + self.get_batch_job_command() + ' ' + self.get_run_file(runFileName)
-
 
         try:
             result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
@@ -229,9 +230,6 @@ class BatchJob:
 
         except:
             print("Unable to run command, maybe SLURM isn't installed? You'll need to run it manually; \n %s" % cmd)
-
-
-
 
     def get_run_file(self, runFileName):
         return os.path.join(self.folder, runFileName)

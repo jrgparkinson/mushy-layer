@@ -56,7 +56,8 @@ class PoiseuilleSolution():
         perm = np.interp(x, self.x, self.permeability)
         return np.vstack((v[1], (chi / perm) * (1 / self.da) * v[0] - chi * self.body_force))
 
-    def bc(self, va, vb):
+    @staticmethod
+    def bc(va, vb):
         """
         Define boundary conditions (no flow at either boundary)
         :param va: vertical velocity on x=0 boundary

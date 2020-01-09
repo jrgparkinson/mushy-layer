@@ -2,17 +2,15 @@
 # describing the boundary conditions being used
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-
 from PltFile import latexify
 from mushyLayerRunUtils import read_inputs, string_to_array
-# from util.plotUtils import latexify
-import sys, getopt
+import sys
+import getopt
 
 
 def make_bc_fig(inputs_file, ndim=2):
 
     inputs = read_inputs(inputs_file)
-
 
     n_cells = string_to_array(inputs['main.num_cells'])
     nx = n_cells[0]
@@ -55,12 +53,10 @@ def make_bc_fig(inputs_file, ndim=2):
             if side == 0:
                 plus_minus = -1
 
-
             if dim == 0:
                 # X direction bcs (left/right)
                 # rotate = 90
                 # ypos = 0.0
-
 
                 rotate = 0
                 ypos = scaled_ny/2.0

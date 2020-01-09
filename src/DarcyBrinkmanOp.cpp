@@ -388,7 +388,7 @@ void DarcyBrinkmanOp::reflux(const LevelData<FArrayBox>&        a_phiFine,
   // const cast:  OK because we're changing ghost cells only
   LevelData<FArrayBox>& phiFineRef = ( LevelData<FArrayBox>&)a_phiFine;
 
-  DarcyBrinkmanOp* finerAMRPOp = (DarcyBrinkmanOp*) a_finerOp;
+  DarcyBrinkmanOp* finerAMRPOp = static_cast<DarcyBrinkmanOp*>(a_finerOp);
   QuadCFInterp& quadCFI = finerAMRPOp->m_interpWithCoarser;
 
   quadCFI.coarseFineInterp(phiFineRef, a_phi);
