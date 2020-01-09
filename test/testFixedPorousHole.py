@@ -2,7 +2,7 @@
 import os, sys
 from colorama import Fore, Style
 
-from AMRConvergenceTest import runTest
+from AMRConvergenceTest import runTest, ConvergenceTestParams
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
 from makeFigures import fixed_porous_command
 
@@ -11,18 +11,18 @@ from makeFigures import fixed_porous_command
 ##########################################################################
 
 def get_min_porosity():
-	return 0.05  # 0.05
+    return 0.05  # 0.05
 
-def fixed_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
+def fixed_porous_resolution_specific_params(p : ConvergenceTestParams):
     mushy_layer_base_dir = get_mushy_layer_dir()
 
     integration_time = 2e-4
-    nx_coarse = nz_coarse
+    nx_coarse = p.nz_coarse
 
-    if ref_rat == 2:
-        grid_file = mushy_layer_base_dir + '/grids/middleXSmall/' + str(nx_coarse) + 'x' + str(nz_coarse)
+    if p.ref_rat == 2:
+        grid_file = mushy_layer_base_dir + '/grids/middleXSmall/' + str(nx_coarse) + 'x' + str(p.nz_coarse)
     else:
-        grid_file = mushy_layer_base_dir + '/grids/middleXSmall/' + str(nx_coarse * 2) + 'x' + str(nz_coarse * 2)
+        grid_file = mushy_layer_base_dir + '/grids/middleXSmall/' + str(nx_coarse * 2) + 'x' + str(p.nz_coarse * 2)
     # params = read_inputs(mushyLayerBaseDir + )
 
     params_file = mushy_layer_base_dir + '/params/convergenceTest/DBVariablePorosityConvTest.parameters'
@@ -35,7 +35,7 @@ def fixed_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max_r
     # runTypes = ['amr']
 
     # For a fixed dt:
-    dt = 1e-5 * float(16.0 / float(nz_coarse))
+    dt = 1e-5 * float(16.0 / float(p.nz_coarse))
     num_steps = float(integration_time) / dt
 
     params['main.plot_interval'] = str(int(num_steps / 5.0))
@@ -51,15 +51,15 @@ def fixed_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max_r
     regrid_int = int(4.0 * float(nx_coarse) / 16.0)
 
     # Make sure we always have one grid
-    max_grid_size = max(nx_coarse * max_refinement, 4)
+    max_grid_size = max(nx_coarse * p.max_refinement, 4)
 
     # bf = max(maxGridSize/2,4)
-    bf = max(nx_coarse * max_refinement / 8, 4)
+    bf = max(nx_coarse * p.max_refinement / 8, 4)
 
     grid_buffer = 0  # max(bf/4,1)
     tag_buffer = 0  # gridBuffer
 
-    if max_level == 2:
+    if p.max_level == 2:
         grid_buffer = max(bf / 4, 4)
 
     params['main.block_factor'] = str(bf)
@@ -89,16 +89,16 @@ def test_fixed_porous_hole():
 
     nz_uniform = [16, 32, 64, 128, 256, 512]
     amr_setup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': nz_uniform},
-                {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [16, 32, 64, 128]},
-                {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]},
-                {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
+                 {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [16, 32, 64, 128]},
+                 {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]},
+                 {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
 
     # Nzs 	  = [16, 32, 64]
     num_procs = [1] * len(nz_uniform) #[1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
 
     # Setup up the post processing command
 
-    uniform_prefix = 'Uniform-DBVariablePorosity-'
+    # uniform_prefix = 'Uniform-DBVariablePorosity-'
 
     python_compare_file = os.path.join(get_mushy_layer_dir(), 'test', 'run_chombo_compare.py')
     chombo_compare_analyse ='python %s -f %s -a -v \'xDarcy velocity\' -e L2 -r True -n 6 \n \n' % (python_compare_file, data_folder)
@@ -115,12 +115,9 @@ def test_fixed_porous_hole():
 
     # Run
     extra_params = {}
-    runTest(data_folder, physical_problem, fixed_porous_resolution_specific_params,
-            amr_setup, num_procs, analysis_command, extra_params)
+    runTest(data_folder, physical_problem, fixed_porous_resolution_specific_params, amr_setup, num_procs,
+            analysis_command, extra_params)
 
-def main(argv):
-    test_fixed_porous_hole()
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
-
+    test_fixed_porous_hole()

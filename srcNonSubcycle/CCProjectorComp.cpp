@@ -2100,11 +2100,6 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 		const Vector<LevelData<FArrayBox> *> a_Ustar,
 		const int order)
 {
-	bool enforceUstar = false;
-	bool enforceDivUstar = false;
-	bool enforceP = false;
-	bool enforceGradP = false;
-	bool enforceUstarEdge = false;
 	Real rayleighTemp = 100; Real perturbation = 0.1;
 
 	EdgeVelBCHolder edgeVelBC(m_physBCPtr->edgeVelFuncBC(false));
@@ -2122,79 +2117,6 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 							false); // inhomogeneous
 	}
 
-	if (enforceUstar)
-	{
-		for (int lev=0; lev<=finest_level; lev++)
-		{
-			for (DataIterator dit = a_Ustar[lev]->dataIterator(); dit.ok(); ++dit)
-			{
-				Box b = (*a_Ustar[lev])[dit].box();
-				Box interiorBox = b;
-				//					interiorBox.grow(-(num_ghost+1));
-
-				b.grow(-num_ghost);
-				int idir=1;
-
-				Box lo = adjCellLo(b, idir);
-				Box hi = adjCellHi(b, idir);
-
-				// Fill ghost cells in y direction
-				for (BoxIterator bit=BoxIterator(lo); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-
-					Real v_i = (*a_Ustar[lev])[dit](iv, idir);
-					Real v_ii = (*a_Ustar[lev])[dit](iv + BASISV(idir), idir);
-					Real v_iii = (*a_Ustar[lev])[dit](iv + 2*BASISV(idir), idir);
-
-					(*a_Ustar[lev])[dit](iv - BASISV(idir), 0) = 3*(v_i - v_ii) + v_iii;
-				}
-
-				for (BoxIterator bit=BoxIterator(hi); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-
-					Real v_i = (*a_Ustar[lev])[dit](iv, idir);
-					Real v_ii = (*a_Ustar[lev])[dit](iv - BASISV(idir), idir);
-					Real v_iii = (*a_Ustar[lev])[dit](iv -  2*BASISV(idir), idir);
-
-					(*a_Ustar[lev])[dit](iv + BASISV(idir), 0) = 3*(v_i - v_ii) + v_iii;
-				}
-
-
-				b.grow(num_ghost);
-
-				FArrayBox err(b, 1);
-				err.copy((*a_Ustar[lev])[dit], 1, 0, 1);
-
-				for (BoxIterator bit(b); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-
-					//Only fills ghost cells for now
-					//						if (!interiorBox.contains(iv))
-					//						{
-
-					RealVect loc = iv;
-					loc *= m_amrDx[lev];
-					loc += 0.5*m_amrDx[lev]*RealVect::Unit;
-					Real x = loc[0];
-					Real y = loc[1];
-
-
-					(*a_Ustar[lev])[dit](iv, 0) = 0;
-					(*a_Ustar[lev])[dit](iv, 1) = rayleighTemp * (y + perturbation*cos(M_PI*(x))*sin(M_PI*(y)));
-
-					err(iv, 0) -= rayleighTemp * (y + perturbation*cos(M_PI*(x))*sin(M_PI*(y)));
-					//						}
-
-				}
-
-//				int temp=0;
-			}
-		}
-
-	}
 
 	//First calculate div(U^*)
 	LevelData<FArrayBox>* a_uCrsePtr;
@@ -2241,93 +2163,15 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 
 	}
 
-	if (enforceDivUstar)
-	{
-		for (int lev=0; lev<=finest_level; lev++)
-		{
-			for (DataIterator dit = m_divUstar[lev]->dataIterator(); dit.ok(); ++dit)
-			{
-				Box b = (*m_divUstar[lev])[dit].box();
-				FArrayBox err(b, 1);
-				for (BoxIterator bit(b); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-					RealVect loc = iv;
-					loc *= m_amrDx[lev];
-					loc += 0.5*m_amrDx[lev]*RealVect::Unit;
-					Real x = loc[0];
-					Real y = loc[1];
-					Real div = rayleighTemp *(-1+perturbation*M_PI*cos(M_PI*(x))*cos(M_PI*(y)));
-
-					err(iv, 0) = (*m_divUstar[lev])[dit](iv, 0) - div;
-
-					(*m_divUstar[lev])[dit](iv, 0) =  div;
-				}
-
-//				int temp=0;
-			}
-		}
-	}
 
 	//Then solve for Pressure
 
-	// Initialise to zero
-	//todo - remove this!
-//	for (int lev = 0; lev <= finest_level; lev++)
-//	{
-//		setValLevel(*m_pressure[lev], 0.0);
-//	}
 
 	Real sum = computeSum(m_divUstar, m_refinement_ratios, m_amrDx[0]);
 	pout() << "     CCProjectorComp - sum of div(U^*) = " << sum << endl;
-
-//	for (DataIterator dit = m_pressure[0]->dataIterator(); dit.ok(); ++dit)
-//				{
-//					FArrayBox& divU = (*m_divUstar[0])[dit];
-//					FluxBox& perm = (*m_permeability[0])[dit];
-//					int temp=0;
-//
-//				}
+		}
 
 	m_solverMG.solve(m_pressure, m_divUstar, finest_level, 0, false);
-
-	if (enforceP)
-	{
-		for (int lev=0; lev<=finest_level; lev++)
-		{
-			for (DataIterator dit = m_pressure[lev]->dataIterator(); dit.ok(); ++dit)
-			{
-				Box b = (*m_pressure[lev])[dit].box();
-				for (BoxIterator bit(b); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-					RealVect loc = iv;
-					loc *= m_amrDx[lev];
-					loc += 0.5*m_amrDx[lev]*RealVect::Unit;
-					Real x = loc[0];
-					Real y = loc[1];
-					(*m_pressure[lev])[dit](iv,0) = rayleighTemp *(y-0.5*y*y - (perturbation/(2*M_PI))*cos(M_PI*(x))*cos(M_PI*(y)));
-				}
-			}
-		}
-	}
-
-	//Enforce physical BCs on Pressure
-	//	BCHolder bcHolder = m_physBCPtr->gradMacPressureFuncBC();
-	//	for (int lev=0; lev<=finest_level; lev++)
-	//	{
-	//	  const DisjointBoxLayout& levelGrids = m_amrGrids[lev];
-	//
-	//	  DataIterator dit = m_pressure[lev]->dataIterator();
-	//	  for (dit.reset(); dit.ok(); ++dit)
-	//	    {
-	//	      bcHolder.operator()((*m_pressure[lev])[dit],
-	//	                          levelGrids[dit],
-	//	                          m_amrDomains[lev],
-	//	                          m_amrDx[lev],
-	//	                          false); // not homogeneous
-	//	    }
-	//	}
 
 
 	//Then take grad(P)
@@ -2364,7 +2208,7 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 		else if (a_phiCrse)
 		{
 		  Gradient::levelGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
-		                             &*a_phiCrse, m_amrDx[lev],
+		                             a_phiCrse, m_amrDx[lev],
 		                             *m_amrGradIVS[lev], *m_amrCFInterps[lev]);
 		}
 		else
@@ -2374,71 +2218,7 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 		}
 
 
-
-
-		//		Gradient::levelGradientMACNew(*m_gradPressureEdge[lev], *m_pressure[lev], m_amrDx[lev]);
-
-		//m_amrDomains[lev]);
-
-
-//		for (DataIterator dit = m_gradPressureEdge[lev]->dataIterator(); dit.ok(); ++dit)
-//		{
-//
-//			FluxBox& gradP = (*m_gradPressureEdge[lev])[dit];
-//
-//
-//			int temp=0;
-//
-//		}
-
 	} // end loop over levels
-
-
-	//todo - remove testing - enforcing analytic grad(P)
-	if (enforceGradP)
-	{
-		for (int lev=0; lev<=finest_level; lev++)
-		{
-			for (DataIterator dit = m_gradPressure[lev]->dataIterator(); dit.ok(); ++dit)
-			{
-
-				//				Box b = (*m_gradPressure[lev])[dit].box();
-
-				for (int idir=0; idir<SpaceDim; idir++)
-				{
-					Box b = (*m_gradPressureEdge[lev])[dit][idir].box();
-
-
-					for (BoxIterator bit(b); bit.ok(); ++bit)
-					{
-						IntVect iv = bit();
-						RealVect loc = iv;
-						loc *= m_amrDx[lev];
-						loc += 0.5*m_amrDx[lev]*RealVect::Unit;
-						Real xEdge = loc[0];
-						Real yEdge = loc[1];
-
-
-
-						Real gradPedge = 0;
-						if (idir == 0)
-						{
-							xEdge = xEdge - m_amrDx[lev]/2;
-							gradPedge = rayleighTemp *(0.5*perturbation*sin(M_PI*(xEdge))*cos(M_PI*(yEdge)));
-						}
-						else if (idir == 1)
-						{
-							yEdge = yEdge - m_amrDx[lev]/2;
-							gradPedge = rayleighTemp *(1-yEdge+0.5*perturbation*cos(M_PI*(xEdge))*sin(M_PI*(yEdge)));
-						}
-						(*m_gradPressureEdge[lev])[dit][idir](iv,0) = gradPedge;
-
-					}
-				}
-//				int temp=0;
-			}
-		}
-	} // end if enforce grad(P)
 
 
 

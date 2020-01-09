@@ -3,7 +3,7 @@ import os
 import sys
 from colorama import Fore, Style
 import getopt
-from AMRConvergenceTest import runTest
+from AMRConvergenceTest import runTest, ConvergenceTestParams
 from BatchJob import BatchJob
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir, check_exec_exists
 
@@ -13,7 +13,7 @@ from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, rea
 # Just run for a single grid resolution and compare to previously published values
 ######################################
 
-def uniform_porous_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
+def uniform_porous_resolution_specific_params(p : ConvergenceTestParams):
     mushyLayerBaseDir = get_mushy_layer_dir()
 
     nx_coarse = nz_coarse
@@ -171,8 +171,8 @@ def test_uniform_porous_convection(argv):
             output_dir = "chi" + chi_str + "-Da" + da_str + "-Ra" + ra_str
 
             this_data_folder = os.path.join(base_dataFolder, output_dir)
-            job_ids = runTest(this_data_folder, physical_problem, uniform_porous_resolution_specific_params,
-                              amr_setup, num_procs, '', extra_params, restart_from_low_res=False)
+            job_ids = runTest(this_data_folder, physical_problem, uniform_porous_resolution_specific_params, amr_setup,
+                              num_procs, '', extra_params, restart_from_low_res=False)
             
             all_job_ids = all_job_ids + job_ids
 

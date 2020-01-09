@@ -395,7 +395,6 @@ void DarcyBrinkmanOp::reflux(const LevelData<FArrayBox>&        a_phiFine,
   // I'm pretty sure this is not necessary. bvs -- flux calculations use
   // outer ghost cells, but not inner ones
   // phiFineRef.exchange(a_phiFine.interval());
-  IntVect phiGhost = phiFineRef.ghostVect();
   int ncomps = a_phiFine.nComp();
 
   CH_TIMER("DarcyBrinkmanOp::reflux::incrementFine", t3);

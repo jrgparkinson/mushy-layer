@@ -365,12 +365,9 @@ class PltFile:
                 # For chk files, data is sorted by component then by box
                 # Loop over components and get data for that component from each box
 
-
                 box_offset_scalar = 0
 
-
-                num_boxes = len(self.levels[level][self.BOXES])
-
+                # num_boxes = len(self.levels[level][self.BOXES])
 
                 for box in self.levels[level][self.BOXES]:
                     lo_indices = [box[i] for i in range(self.space_dim)]
@@ -610,100 +607,6 @@ class PltFile:
 
         return compute_channel_properties(porosity, do_plots)
 
-
-        # Reconstruct level 0 porosity as single np array
-        # width = self.prob_domain[2] + 1 - self.prob_domain[0]
-        # # height = self.prob_domain[3] + 1 - self.prob_domain[1]
-        #
-        # # porosity = np.empty([height, width])
-        #
-        # # porosity = self.single_box('Porosity')
-        # porosity = self.get_level_data('Porosity')
-        #
-        # # Iterate over porosity field
-        # cols = porosity.shape[0]
-        # rows = porosity.shape[1]
-        # channels = [None] * cols
-        # chimney_positions = []
-        # for j in range(cols):
-        #     # chimneys in row
-        #     chimneys_in_row = 0
-        #     average_porosity = 0
-        #
-        #     currently_liquid = False
-        #     chimney_pos_row = []
-        #
-        #     for i in range(rows):
-        #         # print porosity[i,j]
-        #         chi = porosity[j, i]
-        #         average_porosity = average_porosity + chi
-        #         if chi < 1.0 and currently_liquid:
-        #             # Just left liquid region
-        #             currently_liquid = False
-        #
-        #         elif chi > 0.999 and not currently_liquid:
-        #             # Entered a liquid region
-        #             chimneys_in_row = chimneys_in_row + 1
-        #             chimney_pos_row.append(i)
-        #             currently_liquid = True
-        #
-        #     average_porosity = average_porosity / rows
-        #     if average_porosity > 0.99:
-        #         channels[j] = 0  # This region was entirely liquid, can't have a channel
-        #     else:
-        #         channels[j] = chimneys_in_row
-        #
-        #         # First add chimney positions for chimneys we've already found
-        #         # print(str(chimney_positions))
-        #         # print(str(len(chimney_positions)))
-        #
-        #         if chimneys_in_row == 0:
-        #             continue
-        #
-        #         for chimney_i in range(0, len(chimney_positions)):
-        #             if chimney_i < len(chimney_pos_row):
-        #                 this_chimney_position_in_row = chimney_pos_row[chimney_i]
-        #                 chimney_positions[chimney_i].append(this_chimney_position_in_row)
-        #
-        #         # Now, add extra rows to chimney_positions vector if needed
-        #         for chimney_i in range(len(chimney_positions), chimneys_in_row):
-        #             chimney_positions.append([chimney_pos_row[chimney_i]])
-        #
-        # # Get an idea of the channel depths
-        # chan_depths = []
-        # for i in range(0, len(chimney_positions)):
-        #     chan_depths.append(len(chimney_positions[i]))
-        #
-        # max_chan_depth = 0
-        # if chan_depths:
-        #     max_chan_depth = max(chan_depths)
-        #
-        # average_chan_positions = []
-        # rel_chan_positions = []
-        # num_channels = 0
-        # for i in range(0, len(chimney_positions)):
-        #     if chan_depths[i] > 0.5 * max_chan_depth:
-        #         average_chan_positions.append(np.mean(chimney_positions[i]))
-        #         rel_chan_positions.append(average_chan_positions[-1] / width)
-        #         num_channels = num_channels + 1
-        #     # else:
-        #     # print('Discarding channel as too short: '  + str(chimney_positions[i]))
-        # # print('Number of channels: ' + str(num_channels))
-        # # print('Channel positions: ' + str(average_chan_positions))
-        # # print('Relative channel positions: ' + str(rel_chan_positions))
-        #
-        # # doPlots = False
-        # if do_plots:
-        #     print('Making plot')
-        #     self.plot_field('Porosity')
-        #
-        # channel_spacing = [(rel_chan_positions[i] - rel_chan_positions[i - 1]) for i in
-        #                    range(1, len(rel_chan_positions))]
-        # # channel_spacing = channel_spacing*self.levels[0][DX]
-        #
-        # return [num_channels, rel_chan_positions, channel_spacing]
-
-
     def get_mesh_grid_n(self, arr, grow=0):
         x = np.array(arr.coords['x'])
         y = np.array(arr.coords['y'])
@@ -718,14 +621,6 @@ class PltFile:
 
         x = np.linspace(x_min, x_max, nx)
         y = np.linspace(y_min, y_max, ny)
-
-
-        #
-        # y, x = np.mgrid[slice(float(y[0]), float(y[-1]) + dy, dy),
-        #                 slice(float(x[0]), float(x[-1]) + dx, dx)                     ]
-        #
-        # y = self.scale_slice_transform(y)
-        # x = self.scale_slice_transform(x, no_reflect=True)
 
         return x, y
 
@@ -744,14 +639,6 @@ class PltFile:
             x = x-dx/2
             y = y-dx/2
 
-
-        #
-        # y, x = np.mgrid[slice(float(y[0]), float(y[-1]) + dy, dy),
-        #                 slice(float(x[0]), float(x[-1]) + dx, dx)                     ]
-        #
-        # y = self.scale_slice_transform(y)
-        # x = self.scale_slice_transform(x, no_reflect=True)
-
         return x, y
 
     def get_rotate_dims(self, rotate_dims):
@@ -767,8 +654,7 @@ class PltFile:
 
         rotate_dims = self.get_rotate_dims(rotate_dims)
 
-        dx = self.levels[level][self.DX]
-
+        # dx = self.levels[level][self.DX]
 
         components = list(self.data.keys())
         # components = [c.decode('UTF-8') for c in components]
@@ -777,12 +663,6 @@ class PltFile:
 
         field_array = np.array(field)
         grid_size = field_array.shape
-
-
-        # Make sure the grid stretches from the start of the first cell to the end of the last cell
-        # this means we stretch dx slightly out of proportion, but it ensures plot limits are correct
-        x_max = (len(field.coords['x']) + 1) * dx
-        y_max = (len(field.coords['y']) + 1) * dx
 
         x_coords = np.array(field.coords['x'])
         y_coords = np.array(field.coords['y'])
@@ -1126,7 +1006,6 @@ class PltFile:
         rotate_dims = self.get_rotate_dims(rotate_dims)
 
         porosity = self.get_data('Porosity', rotate_dims=rotate_dims)
-        permeability = np.empty(porosity.shape)
 
         if permeability_function == 'kozeny':
 
@@ -1243,11 +1122,7 @@ class PltFile:
             z = porosity.coords['z']
 
         porosity = np.array(porosity)
-
         z_interface = np.nan
-
-        dx = self.levels[0][self.DX]
-
         mushy_indices = np.argwhere(porosity < 1.0)
 
         if mushy_indices.shape[0] > 0:

@@ -4,7 +4,7 @@ import sys
 from colorama import Fore, Style
 import getopt
 
-from AMRConvergenceTest import runTest
+from AMRConvergenceTest import runTest, ConvergenceTestParams
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name, get_mushy_layer_dir, add_params
 from MushyLayerRunSimple import MushyLayerRunSimple
 from BatchJob import BatchJob
@@ -14,7 +14,7 @@ from makeFigures import fixed_chill_command
 # 3) Convection in a mushy layer with an initial porous hole
 ##########################################################################
 
-def hele_shaw_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
+def hele_shaw_resolution_specific_params(p : ConvergenceTestParams):
     mushyLayerBaseDir = get_mushy_layer_dir()
 
     params_file = mushyLayerBaseDir + '/params/convergenceTest/FixedChill.parameters'
@@ -130,8 +130,8 @@ def testHeleShawFixedChill(argv):
 
         num_procs = [1]  # Needs to be as long as the longest Nzs
 
-        runTest(dataFolder, physicalProblem, hele_shaw_resolution_specific_params,
-                AMRSetup, num_procs, analysis_command, extra_params, 0, params_file)
+        runTest(dataFolder, physicalProblem, hele_shaw_resolution_specific_params, AMRSetup, num_procs,
+                analysis_command, extra_params, 0)
 
 if __name__ == "__main__":
     testHeleShawFixedChill(sys.argv[1:])

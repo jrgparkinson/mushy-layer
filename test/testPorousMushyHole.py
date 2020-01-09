@@ -4,7 +4,7 @@ from colorama import Fore, Style
 import getopt
 import math
 
-from AMRConvergenceTest import runTest
+from AMRConvergenceTest import runTest, ConvergenceTestParams
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
 from makeFigures import porous_hole_command
 
@@ -13,7 +13,7 @@ from makeFigures import porous_hole_command
 ##########################################################################
 
 
-def porous_mushy_hole_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
+def porous_mushy_hole_resolution_specific_params(p : ConvergenceTestParams):
     mushyLayerBaseDir = get_mushy_layer_dir()
     params_file = os.path.join(mushyLayerBaseDir,'params/convergenceTest/porousMushyHole.parameters')
 
@@ -124,8 +124,8 @@ def testPorousMushyHole(argv):
                     'main.radius': hole_radius,
                     'bc.bulkConcentrationHiVal' : [-1, minC]}
 
-    runTest(dataFolder, physicalProblem, porous_mushy_hole_resolution_specific_params,
-            AMRSetup, num_procs, analysis_command, extra_params)
+    runTest(dataFolder, physicalProblem, porous_mushy_hole_resolution_specific_params, AMRSetup, num_procs,
+            analysis_command, extra_params)
 
 if __name__ == "__main__":
     testPorousMushyHole(sys.argv[1:])

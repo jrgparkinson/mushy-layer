@@ -91,7 +91,6 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     RmT = RaT*Da
 
     heleShawPerm = d**2/(12*K0)
-    reluctance = 1/heleShawPerm
 
     if darcy_brinkman:
         params['parameters.rayleighComp'] = RaS

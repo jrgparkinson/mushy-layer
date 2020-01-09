@@ -6,15 +6,21 @@ from mushyLayerRunUtils import get_restart_file, get_executable_name,\
     get_final_chk_file, get_mushy_layer_dir,is_power_of_two, string_to_array
 from BatchJob import BatchJob
 
+class ConvergenceTestParams:
+
+    def __init__(self, nz_coarse, ref_rat, max_level, max_refinement):
+        self.nz_coarse = nz_coarse
+        self.ref_rat = ref_rat
+        self.max_level = max_level
+        self.max_refinement = max_refinement
+
 
 def get_suffix(num):
 
     # return '-%d' % num
     return ''
 
-def amr_convergence_test(params, full_output_dir, physicalProblem, nzs, 
-                         num_procs = [1], num_restarts=0, analysis_command='',
-                         restart_from_low_res=False):
+def amr_convergence_test(params, full_output_dir, nzs, num_procs=[1], num_restarts=0, restart_from_low_res=False):
 
     os.environ["CH_TIMER"] = "1"
 
@@ -120,9 +126,8 @@ def amr_convergence_test(params, full_output_dir, physicalProblem, nzs,
     return dependencies
 
 
-def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, num_procs,
-            analysis_command='', extra_params={},
-            numRestarts=0, params_file='', restart_from_low_res=False):
+def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, num_procs, analysis_command='',
+            extra_params=None, numRestarts=0, restart_from_low_res=False):
     """ Driver for the AMRConvergenceTest class """
 
     # base_dir should be e.g.
@@ -153,19 +158,8 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
 
             Nz_i = Nz_i + 1
 
-            # Some default options
-
-            # Use same aspect ratio as already defined
-            # nx_coarse = -1  # if this isn't changed, we'll eventually just use the predetermined aspect ratio
-            # gridFile = ''
-
-            # defaultParamsFile = os.path.join(mushyLayerBaseDir, '/params/convergenceTest/' + physical_problem + '.parameters')
-            # if os.path.exists(defaultParamsFile):
-            #    params = read_inputs(defaultParamsFile)
-
-            output_dir = ''
-
-            nx_coarse, params, gridFile = resolution_specific_params(nz_coarse, ref_rat, max_level, maxRefinement)
+            res_params = ConvergenceTestParams(nz_coarse, ref_rat, max_level, maxRefinement)
+            nx_coarse, params, gridFile = resolution_specific_params(res_params)
 
             # Default options
             if nx_coarse == -1:
@@ -187,13 +181,14 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
                 params['main.debug'] = 'false'
 
             # Any extra params we may have
-            for k, v in extra_params.iteritems():
-                params[k] = v
+            if extra_params:
+                for k, v in extra_params.iteritems():
+                    params[k] = v
 
             # numCellsAMR = str(nx_coarse) + ' ' + str(nz_coarse) + '  8'
             numCellsAMR = [int(nx_coarse), int(nz_coarse), 8]
 
-            gridFileQuarter = mushyLayerBaseDir + '/grids/rightQuarter/' + str(nx_coarse) + 'x' + str(nz_coarse)
+            # gridFileQuarter = mushyLayerBaseDir + '/grids/rightQuarter/' + str(nx_coarse) + 'x' + str(nz_coarse)
             gridFileThreeLevels = mushyLayerBaseDir + '/grids/rightHalfThreeLevel/' + str(nx_coarse) + 'x' + str(
                 nz_coarse)
             # numCellsUniform = str(nx_coarse * finestRefinement) + ' ' + str(nz_coarse * finestRefinement) + '  8'
@@ -306,9 +301,7 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
         # full_output_dir = os.path.join(base_dir, output_dir)
         full_output_dir = base_dir
 
-        these_job_ids = amr_convergence_test(all_params, full_output_dir,
-                                             physical_problem, Nzs, num_procs,
-                                             numRestarts, analysis_command,
+        these_job_ids = amr_convergence_test(all_params, full_output_dir, Nzs, num_procs, numRestarts,
                                              restart_from_low_res)
 
         # Concatenate lists

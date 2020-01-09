@@ -290,7 +290,6 @@ def read_inputs(inputs_file):
     params = {}
 
     # Read in the file
-    file_data = None
     with open(inputs_file, 'r') as f:
         file_data = f.readlines()
 

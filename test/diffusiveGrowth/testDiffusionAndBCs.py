@@ -111,8 +111,8 @@ class DiffusiveSolution:
 
         #
 
-        fixed_bc_res = np.array([Ta[0]-self.max_temperature,
-                                 Tb[0]-self.min_temperature])
+        # fixed_bc_res = np.array([Ta[0]-self.max_temperature,
+        #                          Tb[0]-self.min_temperature])
 
         mixed_bc_res = np.array([Ta[0]-self.max_temperature,
                                  self.a*Tb[1] - self.F - self.b*(Tb[0]-self.T_ref)])

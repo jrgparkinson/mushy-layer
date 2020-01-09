@@ -151,7 +151,6 @@ def run_compare(next_folder, this_folder, err_type):
     print('Running compare between this folder %s \n and next folder %s' % (this_folder, next_folder))
 
     # check this folder contains some valid files
-    valid_files = [x for x in os.listdir(this_folder) if '.hdf5' in x]
     final_computed_plt_file = get_final_plot_file(this_folder)
     if not final_computed_plt_file:
         print('No plot files found in this folder')
@@ -235,38 +234,13 @@ def load_error_file(error_file):
 
 def run_chombo_compare(argv):
 
-    figure_number = 8
-    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.04'
-    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t5e-05-hole0.03'
-    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/PorousMushyHole-t0.00015-hole0.04-veryGoodUseThis'
-    #data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/'
-    field = 'Porosity'
-    err_type = 'L2'
-
-    run_analysis = False
+    # Some default options
     include_richardson = True # for problems with no analytic solution
-
-
-
-
     figure_number = 6
-    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/FixedPorousHole-1proc'
     data_folder = shared_storage.get_dir('TestFinal/FixedPorousHole-1proc-minPorosity0.0-GOOD/')
     run_analysis = False
     field = 'xDarcy velocity'
     err_type = 'L2'
-
-    # figure_number = 0
-    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/ConvectionDB-cfl0.17/chi0.4-Da1.0e-06-Ra1.0e+09'
-    # run_analysis = False
-    # field = 'Temperature'
-    # err_type = 'L2'
-
-    # data_folder = '/home/parkinsonjl/mnt/sharedStorage/TestDiffusiveTimescale/NoFlow/'
-    # run_analysis = True
-    # field = 'T err'
-    # err_type = 'Max'
-    # include_richardson = False
 
     try:
         opts, args = getopt.getopt(argv, "f:v:e:r:n:a")
@@ -533,11 +507,7 @@ def run_chombo_compare(argv):
 
         axes[1].set_xlim([0, 4])
         axes[1].set_ylim([0, 1])
-
         axes[1].set_xticks([0, 2, 4])
-
-        xl = axes[1].get_xlim()
-        yl = axes[1].get_ylim()
         axes[1].text(-0.05, 1.03, '(b)')
 
     # set axis positions

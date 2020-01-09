@@ -29,12 +29,8 @@ def latexify(fig_width=None, fig_height=None):
     # Width and max height in inches for IEEE journals taken from
     # computer.org/cms/Computer.org/Journal%20templates/transactions_art_guide.pdf
 
-
-
     default_fig_width = 5.0
 
-
-    max_height_inches = 10.0
     # Pretty sure this is the standard caption font size in latex
     font_size = 9
     linewidth = 1

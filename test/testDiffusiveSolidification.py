@@ -2,14 +2,14 @@
 import os, sys
 from colorama import Fore, Style
 
-from AMRConvergenceTest import runTest
+from AMRConvergenceTest import runTest, ConvergenceTestParams
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
 
 ######################################
 # 1) Diffusive solidification problem
 #######################################
 
-def diffusive_solidification_resolution_specific_params(nz_coarse, ref_rat, max_level, max_refinement):
+def diffusive_solidification_resolution_specific_params(p : ConvergenceTestParams):
     mushyLayerBaseDir = get_mushy_layer_dir()
     params_file = os.path.join(mushyLayerBaseDir,'params/convergenceTest/noFlowConvTest.parameters')
 
@@ -17,10 +17,10 @@ def diffusive_solidification_resolution_specific_params(nz_coarse, ref_rat, max_
     gridFile = ''
 
     nx_coarse = 4
-    params['main.domain_width'] = str(4.0 * float(nx_coarse) / float(nz_coarse))
+    params['main.domain_width'] = str(4.0 * float(nx_coarse) / float(p.nz_coarse))
     linearTgradient = 1.0 / 4.0  # delta T / height
-    params['main.refine_thresh'] = str(linearTgradient * 16.0 / float(nz_coarse))
-    params['main.tag_buffer_size'] = str(int(float(nz_coarse) / 8))
+    params['main.refine_thresh'] = str(linearTgradient * 16.0 / float(p.nz_coarse))
+    params['main.tag_buffer_size'] = str(int(float(p.nz_coarse) / 8))
     params['main.steady_state'] = '1e-8'  # str(1e-4 * pow(32.0/float(nz_coarse),2))
     params['main.max_grid_size'] = '32'
     params['main.max_step'] = 10000
@@ -54,15 +54,9 @@ def testDiffusiveSolidification():
 
     # Run
     extra_params = {'main.debug': 'true'}
-    runTest(dataFolder, physicalProblem, diffusive_solidification_resolution_specific_params,
-            AMRSetup, num_procs, analysis_command, extra_params)
+    runTest(dataFolder, physicalProblem, diffusive_solidification_resolution_specific_params, AMRSetup, num_procs,
+            analysis_command, extra_params)
 
-
-
-def main(argv):
-
-
-    testDiffusiveSolidification()
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    testDiffusiveSolidification()
