@@ -175,7 +175,7 @@ if __name__ == "__main__":
 
     params = {}
     p = set_params(params, Ttop, Tbottom, Si=Si, h=h, d=d, K0=K0,
-                   darcy_brinkman=darcy_brinkman, properties = material_properties, dim=dim,
+                   darcy_brinkman=darcy_brinkman, properties_func = get_sea_ice_material_properties, dim=dim,
                    periodic=periodic)
 
     for key in p:

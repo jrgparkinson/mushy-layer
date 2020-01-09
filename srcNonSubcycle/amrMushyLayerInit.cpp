@@ -1830,7 +1830,7 @@ Real amrMushyLayer::timeDepPorosity(Real x, Real z, Real t)
   t=(t+1e-9)/porosityTimescale;
 
   Real max_x = m_domainSize[0];
-  Real chimney_width = min(0.05, pow(log(1+t/15),1.1)); //0.05
+  Real chimney_width = min(0.05, pow(log1p(t/15),1.1)); //0.05
   Real chimneyOne = 0.25*max_x;
   Real chimneyTwo = 0.75*max_x;
 
