@@ -64,5 +64,5 @@ $ python makeFigures.py
 ```
 Use the matlab script `compileNuV2(base_dir)` to compile all the nusselt numbers, e.g.
 ```matlab
->>compileNuV2('/path/to/TestDir/ConvectionDB-CFL0.1')
+compileNuV2('/path/to/TestDir/ConvectionDB-CFL0.1')
 ```

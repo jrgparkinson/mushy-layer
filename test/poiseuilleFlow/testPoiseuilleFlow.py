@@ -9,6 +9,7 @@ import sys
 import shutil
 
 
+# noinspection PyUnresolvedReferences
 class PoiseuilleSolution():
 
     def __init__(self, x, porosity, permeability, da, body_force):

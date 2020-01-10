@@ -269,8 +269,7 @@ class PltFile:
             # Get level outlines
             polygons = []
             for box in self.levels[level][self.BOXES]:
-                lo_indices = [box[i] for i in range(self.space_dim)]
-                hi_indices = [box[i] for i in range(self.space_dim, 2 * self.space_dim)]
+                lo_indices, hi_indices= self.get_indices(box)
 
                 # 0.5 because cell centred
                 lo_vals = [lev_dx * (0.5 + i) for i in lo_indices]
@@ -333,11 +332,7 @@ class PltFile:
                     # data contains all fields on this level, sort into individual fields
                     comp_offset_start = 0
 
-                    coords = {}
-                    # box_size = ()
-                    for d in range(self.space_dim):
-                        coords_dir = np.arange(lo_indices[d], hi_indices[d] + 1)
-                        coords[self.INDEX_COORDS_NAMES[d]] = coords_dir
+                    coords = self.get_coordinates(lo_indices, hi_indices)
 
                     # Blank dataset for this box, which each component will be added to
                     ds_box = xr.Dataset({}, coords=coords)
@@ -358,9 +353,6 @@ class PltFile:
 
                     ds_boxes.append(ds_box)
 
-
-
-
             else:
 
                 # For chk files, data is sorted by component then by box
@@ -369,11 +361,8 @@ class PltFile:
                 box_offset_scalar = 0
 
                 # num_boxes = len(self.levels[level][self.BOXES])
-
                 for box in self.levels[level][self.BOXES]:
-                    lo_indices = [box[i] for i in range(self.space_dim)]
-                    hi_indices = [box[i] for i in range(self.space_dim, 2 * self.space_dim)]
-
+                    lo_indices, hi_indices = self.get_indices(box)
 
                     n_cells_dir = [hi_indices[d] + 1 - lo_indices[d] for d in range(self.space_dim)]
 
@@ -386,11 +375,7 @@ class PltFile:
                     # data contains all fields on this level, sort into individual fields
                     # comp_offset_start = 0
 
-                    coords = {}
-                    # box_size = ()
-                    for d in range(self.space_dim):
-                        coords_dir = np.arange(lo_indices[d], hi_indices[d] + 1)
-                        coords[self.INDEX_COORDS_NAMES[d]] = coords_dir
+                    coords = self.get_coordinates(lo, hi)
 
                     # Blank dataset for this box, which each component will be added to
                     ds_box = xr.Dataset({}, coords=coords)
@@ -521,6 +506,14 @@ class PltFile:
 
         h5_file.close()
 
+    def get_coordinates(self, lo, hi):
+        coordinates = {}
+        for d in range(self.space_dim):
+            coords_dir = np.arange(lo[d], hi[d] + 1)
+            coordinates[self.INDEX_COORDS_NAMES[d]] = coords_dir
+
+        return coordinates
+
     def get_box_comp_data(self, data_unshaped, level, indices, comp_name, n_cells_dir, coords):
 
         data_box_comp = data_unshaped[indices[0]:indices[1]]
@@ -567,6 +560,11 @@ class PltFile:
 
 
         return xarr_component_box
+
+    def get_indices(self, box):
+        lo = [box[i] for i in range(self.space_dim)]
+        hi = [box[i] for i in range(self.space_dim, 2 * self.space_dim)]
+        return lo, hi
 
     def plot_outlines(self, ax, colors=None):
         """ Plot all level outlines (except level 0)"""
@@ -882,8 +880,6 @@ class PltFile:
         else:
             return field_name
 
-
-
     def compute_diagnostic_vars(self):
         # First get parameters
 
@@ -1100,10 +1096,6 @@ class PltFile:
 
             return num_peaks
 
-
-        return np.nan
-
-
     def compute_mush_liquid_interface(self):
 
 
@@ -1135,8 +1127,10 @@ class PltFile:
                 if self.space_dim == 2:
                     vals = np.argwhere(porosity[ind[0], :] < 1.0)
                 elif self.space_dim == 3:
-
                     vals = np.argwhere(porosity[ind[0], ind[1], :] < 1.0)
+                else:
+                    print('Unknown number of dimensions: %d' % self.space_dim)
+                    sys.exit(-1)
 
                 if vals.any():
                     val = np.amin(vals)

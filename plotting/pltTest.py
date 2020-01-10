@@ -7,9 +7,11 @@ import matplotlib.pyplot as plt
 file_loc = '/home/parkinsonjl/mnt/sharedStorage/optimalStates-restructured/Le200/CR2.000/RaC100/' \
     'pts116-steady/CR2.0RaC100Le200ChiCubedPermeabilitypts116-033512.2d.hdf5'
 
+file_loc = 'plt001142.2d.hdf5'
+
 # file_loc = shared_storage.get_dir('SeaIceGrowth/T-10Outflow/chk135000.2d.hdf5')
 p = PltFile(file_loc, load_data=True)
-p.compute_diagnostic_vars()
+# p.compute_diagnostic_vars()
 
 lev0Dx = p.levels[0][p.DX]
 print('dx = ' + str(lev0Dx))

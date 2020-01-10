@@ -3,7 +3,7 @@ import os
 import sys
 from colorama import Fore, Style
 import getopt
-from AMRConvergenceTest import runTest, ConvergenceTestParams
+from AMRConvergenceTest import runTest
 from BatchJob import BatchJob
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir, check_exec_exists
 

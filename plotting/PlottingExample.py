@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 from PltFile import PltFile
+import sys
 
 plt.close('all')
 # latexify(fig_width=10.0, fig_height=10.0)
@@ -30,6 +31,10 @@ cmap = plt.get_cmap('viridis_r')
 plot_levels = range(0,pf.num_levels)
 # plot_levels = range(1,2)
 
+if not len(plot_levels):
+    print('No data to plot')
+    sys.exit(-1)
+
 print('Plotting porosity')
 for level in plot_levels:
 
@@ -54,7 +59,6 @@ for level in plot_levels:
 # Draw level outlines
 print('Plotting level outlines')
 pf.plot_outlines(ax)
-
 
 # make a color bar
 cbar_porosity = plt.colorbar(img, cmap=cmap, ax=ax)

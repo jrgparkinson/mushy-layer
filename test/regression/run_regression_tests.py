@@ -257,6 +257,7 @@ if __name__ == "__main__":
 
     for test_dir in test_dirs:
 
+        # noinspection PyBroadException
         try:
             full_dir = os.path.join(script_loc, test_dir)
             success = test_folder(full_dir, verbose)

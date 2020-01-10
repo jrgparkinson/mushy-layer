@@ -153,7 +153,7 @@ class BatchJob:
 
         # The commands to execute will look the same regardless of whether you're using SLURM or not
         commands_to_execute = [self.preprocess_command + '\n \n',
-                         'cd ' + self.folder + '; \n \n']
+                         'cd ' + self.folder + ' || exit; \n \n']
 
         if self.custom_command:
             commands_to_execute.append(self.custom_command)
@@ -175,15 +175,16 @@ class BatchJob:
                 exec_dir = os.path.dirname(self.exec_file)
                 print('Exec dir: %s' % exec_dir)
 
-                buil_mush_command = os.path.join(exec_dir, 'buildMushyLayer.sh')
+                build_mush_command = os.path.join(exec_dir, 'buildMushyLayer.sh')
 
                 custom_cmd = 'hs=$HOSTNAME \n' \
                              'if [[ $hs == *"gyre"* ]]; then \n' \
-                             ' %s; \n cd %s ; \n' \
-                             ' %s \n' \
+                             '%s;\n' \
+                             'cd %s || exit; \n' \
+                             '%s \n' \
                              'else\n' \
-                             ' %s\n' \
-                             'fi\n' % (buil_mush_command, self.folder, legacy_run_str, run_str)
+                             '%s\n' \
+                             'fi\n' % (build_mush_command, self.folder, legacy_run_str, run_str)
 
                 commands_to_execute.append(custom_cmd)
 
@@ -209,7 +210,7 @@ class BatchJob:
 
         self.write_batch_file(runFileName)
 
-        cmd = 'cd ' + self.folder + '; ' + self.get_batch_job_command() + ' ' + self.get_run_file(runFileName)
+        cmd = 'cd ' + self.folder + ' || exit; ' + self.get_batch_job_command() + ' ' + self.get_run_file(runFileName)
 
         try:
             result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)

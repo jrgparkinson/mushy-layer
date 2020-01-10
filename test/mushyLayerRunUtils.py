@@ -480,7 +480,7 @@ def check_exec_exists(exec_dir, exec_name, dim=2):
 
     # If executable doesn't exist, warn the user and ask if they want us to try and build it
     print('Error - executable does not exist: %s' % exec_name)
-    response = raw_input('Try and build this executable? (y/n) ')
+    response = input('Try and build this executable? (y/n) ')
 
     if response == 'y':
         cmd = 'cd %s; make all; cd -;' % exec_dir

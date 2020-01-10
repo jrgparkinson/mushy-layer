@@ -52,23 +52,17 @@ class DiffusiveSolution:
         self.cr = cr
         self.st = st
 
+    # noinspection PyUnresolvedReferences
     def compute_solution(self, z):
 
         # z = np.linspace(self.min_z, self.max_z, 100)
 
         if self.method == 'Linear':
-
             if self.V == 0:
-
                 solution = self.max_temperature - z
-
-
-
-            # solution = z
-
-        elif self.method == 'FixedFlux':
-
-            pass
+            else:
+                print('Unable to compute solution for method="linear" and V!=0')
+                sys.exit(-1)
 
         elif self.method == 'Mixed':
 
@@ -81,6 +75,10 @@ class DiffusiveSolution:
 
             res_a = solve_bvp(self.diffusion_equation_function, self.diffusion_eq_bc, z_solve, init_guess)
             solution = res_a.sol(z)[0]
+
+        else:
+            print('Unknown method "%s"' % self.method)
+            sys.exit(-1)
 
         return solution
 
@@ -238,8 +236,17 @@ if __name__ == "__main__":
 
     # Run comparison
     plt_files = [f for f in os.listdir(full_output_folder) if ('LinearDiffusion' in f and '.2d.hdf5' in f)]
-
     plt_files = sorted(plt_files)
+    if not plt_files:
+        print('No data to plot in folder %s' % full_output_folder)
+        sys.exit(-1)
+
+    # get some initial data
+    init_pf = PltFile(os.path.join(full_output_folder, plt_files[0]))
+    init_pf.load_data()
+    T_data = init_pf.get_level_data('Temperature').mean('x').squeeze()
+    z = T_data.coords['y']
+    T_python = analytic_solution.compute_solution(z)
 
     # Set color cycle from colormap
     n = len(plt_files)
@@ -250,7 +257,7 @@ if __name__ == "__main__":
 
     latexify2(5.5, 3.5)
 
-    fig  = plt.figure()
+    fig = plt.figure()
 
     for plot_loc in plt_files:
 
@@ -259,12 +266,9 @@ if __name__ == "__main__":
         T_data = pf.get_level_data('Temperature').mean('x').squeeze()
         z = T_data.coords['y']
 
-        T_python = analytic_solution.compute_solution(z)
-
         plt.plot(z, T_data, label='')
 
         times.append(float('%.1g' % pf.time))
-
 
     plt_python = plt.plot(z, T_python, label='Python', color='red', linestyle='--')
 
@@ -277,9 +281,10 @@ if __name__ == "__main__":
     # Add colorbar for times
     cax_porosity = fig.add_axes([0.2, 0.86, 0.5, 0.03])
     cmap = plt.get_cmap('viridis')
+    # noinspection PyUnresolvedReferences
     norm = mpl.colors.Normalize(vmin=min(times), vmax=max(times))
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    sm.set_array([])
+    sm.set_array(np.array([]))
     cbar = plt.colorbar(sm, cax=cax_porosity, ticks=[min(times), max(times)], orientation='horizontal')
     cax_porosity.xaxis.set_ticks_position('top')
     cax_porosity.xaxis.set_label_position('top')
