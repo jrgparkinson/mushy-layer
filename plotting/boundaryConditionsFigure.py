@@ -8,9 +8,9 @@ import sys
 import getopt
 import os
 
-def make_bc_fig(inputs_file, ndim=2):
+def make_bc_fig(inputs_file_loc, ndim=2):
 
-    inputs = read_inputs(inputs_file)
+    inputs = read_inputs(inputs_file_loc)
 
     n_cells = string_to_array(inputs['main.num_cells'])
     nx = n_cells[0]
@@ -127,7 +127,7 @@ def make_bc_fig(inputs_file, ndim=2):
     dom_width = dom_height * n_cells[0]/n_cells[1]
     ax.text(0.5, 0.85, 'Domain: [%g, %g] with %d x %d cells' % (dom_width, dom_height, n_cells[0], n_cells[1]), horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
 
-    figure_full_path = inputs_file + '-auto-generated-visualisation.pdf'
+    figure_full_path = inputs_file_loc + '-auto-generated-visualisation.pdf'
     print('Saved to %s' % figure_full_path)
     plt.savefig(figure_full_path, format='pdf')
 

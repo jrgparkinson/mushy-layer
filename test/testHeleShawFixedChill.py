@@ -66,20 +66,20 @@ def testHeleShawFixedChill(argv):
     for opt, arg in opts:
         if opt in "-t":
             extra_params['main.max_time'] = float(arg)
-        elif opt in ("-R"):
+        elif opt in "-R":
             extra_params['parameters.rayleighComp'] = float(arg)
-        elif opt in ("-D"):
+        elif opt in "-D":
             extra_params['parameters.darcy'] = float(arg)
-        elif opt in ("-C"):
+        elif opt in "-C":
             extra_params['parameters.compositionRatio'] = float(arg)
-        elif opt in ("-N"):
+        elif opt in "-N":
             extra_params['parameters.nonDimReluctance'] = float(arg)
-        elif opt in ("-P"):
+        elif opt in "-P":
             doPlotFiles = bool(int(arg))
             print('Do plot files: ' + str(doPlotFiles) +  ', arg = ' + str(arg))
             if not doPlotFiles:
                 extra_params['main.plot_interval'] = -1
-        elif opt in ("-A"):
+        elif opt in "-A":
             doAMR = True
 
     base_output_dir = get_base_output_dir()
@@ -117,13 +117,13 @@ def testHeleShawFixedChill(argv):
 
     else:
 
-        Nz_uniform = 256
-        Nz_amr_2 = int(float(Nz_uniform) / 2)
-        Nz_amr_4 = int(float(Nz_uniform) / 4)
-        AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]},
-                    {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_amr_2]},
-                    {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]},
-                    {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]}]
+        # Nz_uniform = 256
+        # Nz_amr_2 = int(float(Nz_uniform) / 2)
+        # Nz_amr_4 = int(float(Nz_uniform) / 4)
+        # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': [Nz_uniform]},
+        #             {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_amr_2]},
+        #             {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]},
+        #             {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [Nz_amr_4]}]
 
         # While testing:
         Nz_uniform = [64]

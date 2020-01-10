@@ -54,7 +54,7 @@ class MushyLayerSimulation:
         self.status = SimulationStatus.UNSTARTED
 
     def determine_status(self):
-        ''' Work out what state the simulation is in '''
+        """ Work out what state the simulation is in """
 
         if not self.folder:
             self.status = SimulationStatus.NONEXISTANT

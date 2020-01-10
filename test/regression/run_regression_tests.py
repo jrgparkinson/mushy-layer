@@ -13,12 +13,12 @@ import mushyLayerRunUtils as utils
 import run_chombo_compare as chcompare
 
 def filter_pout(text_lines):
-    '''
+    """
     Remove wallclock time reporting from pout files so they can be compared sensibly.
     The wallclock time will always vary, so we don't want to include it in the comparison.
     :param text_lines: array of lines of text in the file
     :return: filtered_output: array of lines of text
-    '''
+    """
 
     filtered_output = []
     for line in text_lines:
@@ -35,32 +35,32 @@ def print_status(text):
     sys.stdout.write('%-8s' % text)
     sys.stdout.flush()
 
-def test_folder(test_dir, verbose=False):
-    '''
+def test_folder(test_directory, verbose_output=False):
+    """
     Run the regression test contained within a folder. Expects the folder o have the following files:
     - inputs
     - properties.json
     - at least one file ending with .expected to compare with the computed ouptut,
         e.g. pout.0.expected, or plt000010.2d.hdf5.expected
-    :param test_dir:
+    :param test_directory:
     :return: success - if test was succesful or not
-    '''
-    test_files = os.listdir(test_dir)
+    """
+    test_files = os.listdir(test_directory)
 
     # Check the required files exist
     # if not, skip this test
     if not all(elem in test_files for elem in REQUIRED):
-        if verbose:
-            print('  Required files for conducting a test (%s) not found in %s' % (REQUIRED, test_dir))
+        if verbose_output:
+            print('  Required files for conducting a test (%s) not found in %s' % (REQUIRED, test_directory))
             print('  Skipping test \n')
         else:
-            test_name = test_dir.split('/')[-1]
+            test_name = test_directory.split('/')[-1]
             printl('%-25s    ' % test_name)
             print_status('[Void]')
         return False
 
     # Load properties
-    with open(os.path.join(test_dir, PROPERTIES_FILE)) as json_file:
+    with open(os.path.join(test_directory, PROPERTIES_FILE)) as json_file:
         properties = json.load(json_file)
 
     # print('==Running test: %s==' % properties['name'])
@@ -71,7 +71,7 @@ def test_folder(test_dir, verbose=False):
     mushy_layer_exec_path = os.path.join(utils.get_mushy_layer_dir(), 'execSubcycle', mushy_layer_exec)
 
     if not os.path.exists(mushy_layer_exec_path):
-        if verbose:
+        if verbose_output:
             print('Could not find mushy layer executable: %s' % mushy_layer_exec_path)
             print('Have you compiled the code for the right number of dimensions?')
             print('Use \'make all DIM=3\' to compile in 3D')
@@ -80,7 +80,7 @@ def test_folder(test_dir, verbose=False):
         return False
 
     # Run test
-    cmd = 'cd %s; mpirun -np %d %s inputs' % (test_dir, properties['proc'], mushy_layer_exec_path)
+    cmd = 'cd %s; mpirun -np %d %s inputs' % (test_directory, properties['proc'], mushy_layer_exec_path)
     # print('Executing: %s' % cmd)
     os.system(cmd)
 
@@ -89,7 +89,7 @@ def test_folder(test_dir, verbose=False):
 
     expected_files = [f for f in test_files if EXPECTED in f]
     if not expected_files:
-        if verbose:
+        if verbose_output:
             print('No expected files to compared against')
         else:
             print_status('[Void]')
@@ -99,9 +99,9 @@ def test_folder(test_dir, verbose=False):
 
         # Check an output file to compare against exists
         test_output_filename = expected_file.replace(EXPECTED, '')
-        test_output_file_path = os.path.join(test_dir, test_output_filename)
+        test_output_file_path = os.path.join(test_directory, test_output_filename)
         if not os.path.exists(test_output_file_path):
-            if verbose:
+            if verbose_output:
                 print('No output file generated to compare against: %s' % test_output_file_path)
             else:
                 print_status('[Failed]')
@@ -112,7 +112,7 @@ def test_folder(test_dir, verbose=False):
             # print('Using chombo compare')
 
             # Make diffs folder if it doesn't exist
-            diffs_folder = os.path.join(test_dir, DIFF_FOLDER)
+            diffs_folder = os.path.join(test_directory, DIFF_FOLDER)
             if not os.path.exists(diffs_folder):
                 os.makedirs(diffs_folder)
 
@@ -122,14 +122,14 @@ def test_folder(test_dir, verbose=False):
             compare_exec = os.path.join(compare_dir, compare_exec)
             # print('Found executable %s ' % compare_exec)
 
-            if not os.path.exists(compare_exec) and verbose:
+            if not os.path.exists(compare_exec) and verbose_output:
                 print('Could not find Chombo compare executable %s' % compare_exec)
                 print('So cannot compare hdf5 output files')
 
-            compare_params_file = os.path.join(test_dir, 'compare.inputs')
+            compare_params_file = os.path.join(test_directory, 'compare.inputs')
 
-            computed_file = os.path.join(test_dir, test_output_file_path)
-            exact_file = os.path.join(test_dir, expected_file)
+            computed_file = os.path.join(test_directory, test_output_file_path)
+            exact_file = os.path.join(test_directory, expected_file)
             error_file = os.path.join(diffs_folder, DIFF + test_output_filename)
             compare_params = {'compare.sameSize': 0,
                               'compare.exactRoot': exact_file,
@@ -164,9 +164,9 @@ def test_folder(test_dir, verbose=False):
                 field_errs = errs[field]
                 # print(field_errs)
                 for err_type in field_errs.keys():
-                    err = field_errs[err_type]
-                    if abs(err) > 1e-10:
-                        if verbose:
+                    this_field_err = field_errs[err_type]
+                    if abs(this_field_err) > 1e-10:
+                        if verbose_output:
                             print('Error in field %s is non-zero' % field)
                             print('See %s and %s for more info' % (new_pout_name, error_file))
                         else:
@@ -174,8 +174,8 @@ def test_folder(test_dir, verbose=False):
                         return False
         else:
             # Assume text file - do a diff
-            text1 = open(os.path.join(test_dir, expected_file)).readlines()
-            text2 = open(os.path.join(test_dir, test_output_file_path)).readlines()
+            text1 = open(os.path.join(test_directory, expected_file)).readlines()
+            text2 = open(os.path.join(test_directory, test_output_file_path)).readlines()
 
             text1 = filter_pout(text1)
             text2 = filter_pout(text2)
@@ -183,7 +183,7 @@ def test_folder(test_dir, verbose=False):
             diff = difflib.unified_diff(text1, text2)
             # diff = difflib.ndiff(text1, text2)
 
-            diff_out_file = os.path.join(test_dir, DIFF + test_output_filename)
+            diff_out_file = os.path.join(test_directory, DIFF + test_output_filename)
 
             with open(diff_out_file, 'w') as diff_file:
                 diff_file.writelines(diff)
@@ -192,7 +192,7 @@ def test_folder(test_dir, verbose=False):
             # print('Diff: %s' % differences)
 
             if differences:
-                if verbose:
+                if verbose_output:
                     print('Differences found in %s' % test_output_file_path)
                     print('For details, see %s' % diff_out_file)
                     print('** Test failed \n')
@@ -240,7 +240,7 @@ if __name__ == "__main__":
             sys.exit()
         elif o in ("-t", "--test"):
             test_dirs = [arg]
-        elif o in ("-v"):
+        elif o in "-v":
             verbose = True
         else:
             print('Unknown command line option: %s' % o)

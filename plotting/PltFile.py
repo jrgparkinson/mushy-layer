@@ -73,8 +73,8 @@ class PltFile:
         m = re.search(prefix_format, self.filename)
 
         if m and m.groups() and len(m.groups()) == 2:
-            self.plot_prefix = m.groups(0)
-            self.frame = m.groups(1)
+            self.plot_prefix = m.group(0)
+            self.frame = m.group(1)
 
         else:
             self.plot_prefix = None
@@ -185,16 +185,16 @@ class PltFile:
             # retained previous code (commented out below) in case I ever want it
             actual_name = name
 
-            self.data[name] = {self.NUM_COMPS: 1}
+            self.data[name] = {self.NUM_COMPS: 1, self.DATA: []}
 
-            self.data[actual_name][self.DATA] = [None] * self.num_levels
+            self.data[actual_name][self.DATA] = [np.nan] * self.num_levels
             self.comp_names.append(actual_name)
 
 
 
         ds_levels = []
 
-        self.levels = [None] * self.num_levels
+        self.levels = [{}] * self.num_levels
         for level in range(0, self.num_levels):
             level_group = h5_file['level_' + str(level)]
 
@@ -257,7 +257,7 @@ class PltFile:
             # Create empty datasets spanning entire domain for each component
             for comp_name in self.comp_names:
                 extended_coords = coords
-                extended_coords['level'] = level
+                extended_coords['level'] = np.array(level)
                 dims = self.INDEX_COORDS_NAMES[:self.space_dim]
                 # dims = dims[::-1]  # reverse list so we have k, j, i etc
                 ds_dom_box[comp_name] = xr.DataArray(blank_data, dims=dims,  # dims=['j', 'i'],
@@ -800,6 +800,15 @@ class PltFile:
         return ld
 
     def scale_slice_transform(self, data, no_reflect=False):
+        """
+
+        :param data:
+        :type data: xr.Dataset
+        :param no_reflect:
+        :type no_reflect: bool
+        :return:
+        """
+
         if self.indices:
             data = data[self.indices]
 
@@ -808,7 +817,7 @@ class PltFile:
             data = np.flip(data, 0)
 
             # reset the x coordinate
-            data = data.assign_coords(x=np.flip(data.x))
+            data = data.assign_coords(x=np.flip(data.coords['x']))
 
         return data
 

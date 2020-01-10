@@ -43,14 +43,14 @@ class DiffusiveSolution:
         self.T_ref = np.nan
         self.F = np.nan
 
-    def set_nonlinear_bcs(self, a, b, T_ref, F, V, cr, st):
+    def set_nonlinear_bcs(self, a, b, T_r, flux, V_frame_advection, conc_ratio, stefan):
         self.a = a
         self.b =b
-        self.T_ref = T_ref
-        self.F = F
-        self.V = V
-        self.cr = cr
-        self.st = st
+        self.T_ref = T_r
+        self.F = flux
+        self.V = V_frame_advection
+        self.cr = conc_ratio
+        self.st = stefan
 
     # noinspection PyUnresolvedReferences
     def compute_solution(self, z):
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     # F = -0.5
 
     analytic_solution = DiffusiveSolution(T_min, T_max, method='Mixed')
-    analytic_solution.set_nonlinear_bcs(a=opt['a'], b=opt['b'], T_ref=opt['Tref'], F=opt['F'], V=opt['V'], cr=cr, st=st)  # this is just a dirichlet BC, data matches well
+    analytic_solution.set_nonlinear_bcs(a=opt['a'], b=opt['b'], T_r=opt['Tref'], flux=opt['F'], V_frame_advection=opt['V'], conc_ratio=cr, stefan=st)  # this is just a dirichlet BC, data matches well
 
     # Now let's run the mushy-layer simulation
     sim_name = 'ImperfectCooling_a%s_b%s_Tref%s_F%s_CR%s_st%s' % (opt['a'], opt['b'], opt['Tref'], opt['F'], cr, st)

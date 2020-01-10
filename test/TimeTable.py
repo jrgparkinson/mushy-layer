@@ -100,10 +100,10 @@ class TimeTable:
 
 
     def get_all_children(self, parent_method_name):
-        '''
+        """
         :param parent_method_name:
         :return: dict of individual parent occurences mapping to their children
-        '''
+        """
 
 
         parent_children = {}
@@ -183,17 +183,8 @@ if __name__ == "__main__":
     call_histories = time_table.get_call_history_for_name(method_name)
 
     for c in call_histories:
-
-        str = ' -> '.join(['%s' % m for m in c])
-        print(str + '\n')
-
-
+        print(' -> '.join(['%s' % m for m in c]) + '\n')
 
     # Compare multiple files
-
     files = []
     tt = [TimeTable(f) for f in files]
-
-    
-
-

@@ -85,7 +85,7 @@ def fixed_porous_resolution_specific_params(p):
 def test_fixed_porous_hole():
 
     base_output_dir = get_base_output_dir()
-    matlab_command = get_matlab_base_command()
+    # matlab_command = get_matlab_base_command()
 
     print(Fore.GREEN + 'Setup tests for (fixed) porous hole' + Style.RESET_ALL)
     physical_problem = 'DBVariablePorosity'

@@ -20,13 +20,13 @@ def get_profiles(folder):
     return ds
 
 
-def get_color(colors, min_time, max_time, time):
+def get_color(colors_arr, min_t, max_t, t):
 
-    interp = (time-min_time)/(max_time-min_time)
+    interp = (t - min_t) / (max_t - min_t)
 
-    index = int(math.floor(len(colors)*interp))
+    index = int(math.floor(len(colors_arr) * interp))
 
-    return colors[index]
+    return colors_arr[index]
 
 
 # Define these
