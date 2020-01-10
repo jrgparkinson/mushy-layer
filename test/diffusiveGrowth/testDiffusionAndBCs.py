@@ -151,16 +151,16 @@ if __name__ == "__main__":
     # Chose some parameter options:
 
     # Options
-    T_min = 4.0
-    T_max = 5.0
+    # T_min = 4.0
+    # T_max = 5.0
     st = 1.0 # stefan number
     cr = 0.5
 
-    opt = {'a': 0.0, 'b': 1.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is just a dirichlet BC, data matches well
-    opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is no flux
-    opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': -1.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr} # this is a fixed flux (negative for cooling)
-    opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.0, 'F': -0.5, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr} # this is a fixed flux and temperature
-    opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.5, 'F': -1.6, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is a fixed flux and temperature
+    # opt = {'a': 0.0, 'b': 1.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is just a dirichlet BC, data matches well
+    # opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is no flux
+    # opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': -1.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr} # this is a fixed flux (negative for cooling)
+    # opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.0, 'F': -0.5, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr} # this is a fixed flux and temperature
+    # opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.5, 'F': -1.6, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is a fixed flux and temperature
 
 
     # Mushy layer solidification:

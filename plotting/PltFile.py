@@ -100,7 +100,7 @@ class PltFile:
         self.domain_size = []
         self.xarr_data = None
         self.level_outlines = []
-
+        self.full_domain_size = None
 
         # Now read all the component names
         self.data = {}
@@ -1147,8 +1147,10 @@ class PltFile:
                 if self.space_dim == 2:
                     vals = np.argwhere(porosity[ind[0], :] < 1e-6)
                 elif self.space_dim == 3:
-
                     vals = np.argwhere(porosity[ind[0], ind[1], :] < 1e-6)
+                else:
+                    print('Unknown dimension: %d' % self.space_dim)
+                    sys.exit(-1)
 
                 if vals.any():
                     val = np.amin(vals)

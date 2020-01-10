@@ -59,7 +59,7 @@ cbar_porosity.set_label(label='Porosity, $\chi$')
 
 T = cf.get_data('Temperature')
 X, Y = cf.get_mesh_grid()
-levels = np.linspace(-0.4, 1.4, 74)
+# levels = np.linspace(-0.4, 1.4, 74)
 delta_t = 20
 t_ref = -23
 T = T*delta_t + t_ref

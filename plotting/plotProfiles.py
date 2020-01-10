@@ -56,26 +56,21 @@ valid_control_times = times_control[times_control > time_warming[0]]
 
 latexify2(3, 3)
 fig2, axes = plt.subplots(2, 1)
-plot_interval = 10
-#num_steps = int(float(len(times))/float(plot_interval))
+# num_steps = int(float(len(times))/float(plot_interval))
 num_steps = len(times_control)
 print('Num timesteps: %d' % num_steps)
 colors = plt.cm.viridis(np.linspace(0,1,num_steps+1))
 
-profile_name = 'Harmonic permeability (min horiz) profile'
-
-profile_name = 'Porosity'
-profile_name= 'Temperature'
-profile_name = 'LiquidSalinity'
-#profile_name = 'Porosity'
-profile_name = 'BulkSalinity'
-profile_name = 'Rm profile'
-
-profile_name = 'Harmonic permeability (min horiz) profile'
-
-profile_name = 'Rm profile no z dependence'
+# profile_name = 'Harmonic permeability (min horiz) profile'
+# profile_name = 'Porosity'
+# profile_name= 'Temperature'
+# profile_name = 'LiquidSalinity'
+# profile_name = 'Porosity'
+# profile_name = 'BulkSalinity'
+# profile_name = 'Rm profile'
+# profile_name = 'Harmonic permeability (min horiz) profile'
+# profile_name = 'Rm profile no z dependence'
 # profile_name = 'Permeability'
-
 profile_name = 'Min Vertical Velocity'
 
 comparison = False

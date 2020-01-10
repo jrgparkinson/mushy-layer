@@ -12,7 +12,7 @@ plt.close('all')
 figure_output_directory = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'plotting')
 figure_name = 'PlottingExample'
 
-data_file =  os.path.join(os.environ['MUSHY_LAYER_DIR'], 'plotting', 'plt001142.2d.hdf5')
+# data_file =  os.path.join(os.environ['MUSHY_LAYER_DIR'], 'plotting', 'plt001142.2d.hdf5')
 # data_file =  os.path.join(os.environ['MUSHY_LAYER_DIR'], 'plotting', 'plt004312.3d.hdf5')
 data_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'matlab', 'ChomboMatlab', 'plt025000.2d.hdf5')
 
@@ -36,6 +36,7 @@ if not len(plot_levels):
     sys.exit(-1)
 
 print('Plotting porosity')
+img = None
 for level in plot_levels:
 
     porosity = pf.get_level_data('Porosity', level)

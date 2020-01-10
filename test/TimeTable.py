@@ -4,7 +4,7 @@ import re
 class TimeTableMethod:
 
     def __init__(self, string_to_parse, parent=None):
-        parts = re.findall('(\s*)\[(\d+)]\s([^\s]*)\s([\d\.]+)\s+[\d\.]+\%\s', string_to_parse)
+        parts = re.findall('(\s*)\[(\d+)]\s([^\s]*)\s([\d.]+)\s+[\d.]+%\s', string_to_parse)
 
         self.parent = parent
         self.valid = False
@@ -165,8 +165,8 @@ if __name__ == "__main__":
 
     time_table = TimeTable(filepath)
 
-    method_name = 'VCAMRPoissonOp2::restrictResidual'
-    method_name = 'AMRLevelMushyLayer::calculateTimeIndAdvectionVel'
+    # method_name = 'VCAMRPoissonOp2::restrictResidual'
+    # method_name = 'AMRLevelMushyLayer::calculateTimeIndAdvectionVel'
     # method_name = 'AMR::timeStep'
     method_name = 'AMRNonLinearMultiCompOp::levelGSRB::BCs'
     parent_children = time_table.get_all_children(method_name)

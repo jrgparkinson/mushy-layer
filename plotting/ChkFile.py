@@ -9,6 +9,8 @@ import os
 from mushyLayerRunUtils import read_inputs
 import sys
 
+
+# noinspection PyUnresolvedReferences
 def compute_channel_properties(porosity, do_plots=False):
     # width = self.prob_domain[2] +1 - self.prob_domain[0]
     width = porosity.shape[1]
@@ -17,7 +19,7 @@ def compute_channel_properties(porosity, do_plots=False):
     # Iterate over porosity field
     cols = porosity.shape[0]
     rows = porosity.shape[1]
-    channels = [None] * cols
+    channels = [np.nan] * cols
     chimney_positions = []
     for j in range(cols):
         # chimneys in row
@@ -166,7 +168,7 @@ class ChkFile:
             #         self.data[name[1:]][NUM_COMPS] = self.data[name[1:]][NUM_COMPS] + 1
             # else:
             #     self.data[name] = {NUM_COMPS: 1}
-            self.data[name] = {self.NUM_COMPS: 1}
+            self.data[name] = {self.NUM_COMPS: 1, self.DATA: []}
             all_names.append(name)
 
         # print(self.data)
@@ -175,7 +177,7 @@ class ChkFile:
         # print('Group level_0 has keys: ' + str(grp0.keys()))
         # print('  and attributes: ' + str(grp0.attrs.keys()))
 
-        self.levels = [None] * self.num_levels
+        self.levels = [{}] * self.num_levels
         for level in range(0, self.num_levels):
             level_group = h5_file['level_' + str(level)]
             group_atts = level_group.attrs
@@ -197,7 +199,7 @@ class ChkFile:
         # Now get the actual data for each field, on each level
         # print('Fields loaded: ' + str(self.data.keys()))
         for comp_name in self.data.keys():
-            self.data[comp_name][self.DATA] = [None] * self.num_levels
+            self.data[comp_name][self.DATA] = [np.nan] * self.num_levels
 
             for level in range(0, self.num_levels):
                 level_group = h5_file['level_' + str(level)]

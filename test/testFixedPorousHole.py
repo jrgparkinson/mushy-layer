@@ -1,10 +1,10 @@
 # Run all convergence tests for the methods paper
-import os, sys
+import os
 from colorama import Fore, Style
 
-from AMRConvergenceTest import runTest, ConvergenceTestParams
+from AMRConvergenceTest import runTest
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
-from makeFigures import fixed_porous_command
+
 
 ##########################################################################
 # 3) Convection in a fixed porous medium with variable porosity

@@ -226,7 +226,6 @@ def make_bc_text(inputs, directory, side):
 
 if __name__ == "__main__":
 
-    inputs_file = '/home/parkinsonjl/mushy-layer/execSubcycle/enceladus/inputs'
     inputs_file = os.path.join(get_data_dir(), 'enceladus/256x128-Rm200-HeatSourceSize0.2-TopBCFixedH-similarToNoFlow/inputs')
 
     arg = sys.argv[1:]
