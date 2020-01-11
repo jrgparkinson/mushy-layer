@@ -10,8 +10,6 @@
 #include "NamespaceHeader.H"
 
 
-
-
 void applyCorrectScalarBC(FArrayBox&      a_state,
                           LevelData<FluxBox>* a_advVel,
                           const Box&      a_valid,
@@ -414,31 +412,21 @@ void InflowOutflowBC(FArrayBox&      a_state,
     }
   } // end if not trying coarsening
 
-  // What if we don't find a data index?
-  if (!matched)
-  {
-    // Can't enforce inflow/outflow, just do dirichlet BCs
+  // If we made it this far, we didn't find a data index
+  // Can't enforce inflow/outflow, just do dirichlet BCs
+  /* There is an issue with the current inflow/outflow BCs - they don't work with multigrid as
+   * advVel is defined on the finest level. We should coarsen advVel to match grid,
+   * or could store a vector identifying which regions are inflow and which are
+   * outflow by their position along the face.
+   *
+   * However, we seem to survive just doing dirichlet BCs on the coarse grid then enforcing inflow/outflow
+   * when we get back to the finest grid
+   *
+   */
 
-    /* There is an issue with the current inflow/outflow BCs - they don't work with multigrid as
-     * advVel is defined on the finest level. We should coarsen advVel to match grid,
-     * or could store a vector identifying which regions are inflow and which are
-     * outflow by their position along the face.
-     *
-     * However, we seem to survive just doing dirichlet BCs on the coarse grid then enforcing inflow/outflow
-     * when we get back to the finest grid
-     *
-     */
-
-    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order, a_comp);
-    //    ConstantNeumBC(a_state, a_valid, a_homogeneous, 0.0, a_dir, a_side, a_dx);
-    return;
-  }
-
-
-  // Shouldn't ever end up here
-  MayDay::Error("Shouldn't be here! (InflowOutflowBC)");
-
-
+  ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order, a_comp);
+  //    ConstantNeumBC(a_state, a_valid, a_homogeneous, 0.0, a_dir, a_side, a_dx);
+  return;
 
 }
 

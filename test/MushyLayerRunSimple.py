@@ -103,7 +103,7 @@ class MushyLayerRunSimple:
 
         # If this isn't specified, don't output plots for each iteration
         # (in case an input file has this option left in)
-        # don't want to generate loads of output unnecessarily 
+        # don't want to generate loads of output unnecessarily
         if 'main.iteration_plot_interval' not in self.parameters:
             self.parameters['main.iteration_plot_interval'] = '-1'
 
@@ -146,8 +146,8 @@ class MushyLayerRunSimple:
         # Merge all dictionary's
         # Important that it's done in this order, so that parameters
         # are overwritten in the correct order. Priority is:
-        # 1) params specified in this python scrupt
-        # 2) params in main.params_file 
+        # 1) params specified in this python script
+        # 2) params in main.params_file
         # 3) params in the inputs file
 
         for key in extra_params.keys():

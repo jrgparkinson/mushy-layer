@@ -130,7 +130,7 @@ def test_folder(test_directory, verbose_output=False):
         # res = subprocess.run([mpi_path, '-n ', str(properties['proc']), ' inputs'], cwd=test_directory)
 
     else:
-        cmd = 'cd %s; %s inputs' % (test_directory, mushy_layer_exec_path)
+        cmd = 'cd %s; %s inputs > pout.N' % (test_directory, mushy_layer_exec_path)
         # res = subprocess.check_output([mushy_layer_exec_path, 'inputs'], cwd=test_directory)
 
     os.system(cmd)

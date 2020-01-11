@@ -143,18 +143,18 @@ def setup(git_build=False):
         print('Could not find lapack/lblas installation')
 
     # Construct example options
-    options = {'DIM': 2,
-               'DEBUG': False,
-               'OPT': True,
-               'CXX': found_cpp_progs[0],
-               'FC': found_fortran[0],
-               'MPI': False,
-               'USE_HDF': True,
-               'HDFINCFLAGS': '-I' + hdf5_path +'/include',
-               'HDFLIBFLAGS': '-L/' + hdf5_path + '/lib - lhdf5 - lz',
-               'flibflags': ['-lblas', '-llapack', '-lgfortran'],
-               'LAPACKLIBS': '-L/usr/lib -L/usr/lib/lapack -L/usr/lib/libblas -llapack -lblas',
-               }
+    # options = {'DIM': 2,
+    #            'DEBUG': False,
+    #            'OPT': True,
+    #            'CXX': found_cpp_progs[0],
+    #            'FC': found_fortran[0],
+    #            'MPI': False,
+    #            'USE_HDF': True,
+    #            'HDFINCFLAGS': '-I' + hdf5_path +'/include',
+    #            'HDFLIBFLAGS': '-L/' + hdf5_path + '/lib - lhdf5 - lz',
+    #            'flibflags': ['-lblas', '-llapack', '-lgfortran'],
+    #            'LAPACKLIBS': '-L/usr/lib -L/usr/lib/lapack -L/usr/lib/libblas -llapack -lblas',
+    #            }
 
 
 if __name__ == "__main__":

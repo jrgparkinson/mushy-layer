@@ -174,9 +174,9 @@ The first should point to your hdf5 installation.
 4.  Set Chombo as a dependency of mushy layer. Open the project properties for the Mushy Layer project (right click in the project window->properties). Choose 'Project references' on the left and select your Chombo project.
 
 5.  Setup build profile for mushy layer. Go to C/C++ build->Environment Variables and check that the same environment variables you set for the Chombo project are also here. Now go to C/C++ build and, under the Builder settings tab, set the build directory to `${workspace_loc:/MushyLayer}/execSubcycle/`. When you use this build profile, you will create an executable using the default options in your Make.defs.local file.
- 
+
 6.  Create a debugging build profile. Also on the C/C++ build page, at the top hit 'Manage Configurations' then 'New'. Set the name to something like 'Mushy Layer Debug', and copy settings from the default configuration. Then select the debug configuration on the C/C++ build page, untick 'Use default build command' and enter `make DEBUG=TRUE OPT=FALSE`. When you use this build profile, you will force the compiler to use the DEBUG flags and not use the OPT flags. This creates and executable suitable for debugging with.
- 
+
 7.  Check everything works so far. Build the project using both the configurations we've created via Project->Build all. Use Project->Build Configurations-Set active to change between build configurations.
 
 8.  Create a debug configuration. Now Eclipse knows how to build your project, but you haven't explicitly told it where the executable file is located, or what options it should be run with. From the top menu, go Run->Debug configurations. Click the little 'New Debug configuration' icon (top left), give it a name, and for C/C++ application navigate to the DEBUG version of your compiled codes e.g. `mushyLayer2d.Linux.64.mpiCC.gfortran.DEBUG.MPI.ex`. For Build configuration, choose the debug configuration you just created. Now go to the Arguments tab and enter the name of the inputs file you'll want to use for your debugging (you'll probably find you change this a lot). Make sure the Working Directory at the bottom is set to `${workspace_loc:MushyLayer}/execSubcycle`. Now go to the Environment tab and set

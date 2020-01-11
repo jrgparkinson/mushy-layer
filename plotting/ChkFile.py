@@ -81,8 +81,8 @@ def compute_channel_properties(porosity, do_plots=False):
 
     average_chan_positions = []
     rel_chan_positions = []
-    for i in range(0, len(long_enough_chimneys)):
-        average_chan_positions.append(np.mean(long_enough_chimneys[i]))
+    for chimney in long_enough_chimneys:
+        average_chan_positions.append(np.mean(chimney))
         rel_chan_positions.append(average_chan_positions[-1] / width)
 
     num_channels = len(long_enough_chimneys)
