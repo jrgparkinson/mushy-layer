@@ -16,7 +16,7 @@ env:
   HDF5_PATH: /home/runner/hdf5-dir
   LD_LIBRARY_PATH: /home/runner/hdf5-dir
   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
-  REGRESSIONS_PATH: /home/runner/work/mushy-layer/mushy-layer/test/regressions
+  REGRESSIONS_PATH: /home/runner/work/mushy-layer/mushy-layer/test/regression
 
 jobs:
   build:
@@ -67,7 +67,7 @@ jobs:
       id: cache-hdf5v2
       uses: actions/cache@v1
       with:
-        path: /home/runner/hdf5-dir
+        path: ${{ env.HDF5_PATH }}
         key: ${{ runner.os }}-hdf5v2
 
     - name: Download and install HDF5
@@ -85,7 +85,7 @@ jobs:
       id: cache-chombov2
       uses: actions/cache@v1
       with:
-        path: /home/runner/chombo
+        path: ${{ env.CHOMBO_ROOT }}
         key: ${{ runner.os }}-chombov2
 
     - name: Download Chombo
