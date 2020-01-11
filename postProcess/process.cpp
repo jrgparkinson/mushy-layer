@@ -50,8 +50,6 @@ int main(int argc, char* argv[])
   char* in_file = argv[1];
   ParmParse pp(argc-2, argv+2, nullptr, in_file);
 
-
-
 #ifdef CH_MPI
   MPI_Barrier(Chombo_MPI::comm);
 #endif
@@ -147,8 +145,6 @@ int main(int argc, char* argv[])
     getAMRHierarchy(chkFile, amrlevels, finest_level, header);
 
     time[file_i] = amrlevels[0]->time();
-
-    const ProblemDomain oldLev0Domain = amrlevels[0]->problemDomain();
 
     // If we haven't loaded the advection velocity, calculate it
     if (!amrlevels[0]->loadAdvVel())

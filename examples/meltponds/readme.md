@@ -46,5 +46,3 @@ bc.velHi=6 9 0 # pressure head top bc
 main.plot_period=0.00002
 ```
 We increase the enthalpy boundary at the top of the domain in the vertical direction, specify the pressure head, change velocity boundary condition at the top of the domain to use this pressure head, and make the plotting period more frequent (as we now have much stronger flow, so smaller timesteps).
-
-

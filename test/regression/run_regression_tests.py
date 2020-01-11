@@ -13,6 +13,7 @@ import sys
 import mushyLayerRunUtils
 import run_chombo_compare as chcompare
 
+
 class Logger():
 
     def __init__(self, log_file_path):
@@ -100,7 +101,12 @@ def test_folder(test_directory, verbose_output=False):
         return False, 'Failed'
 
     # Run test
-    cmd = 'cd %s; mpirun -np %d %s inputs' % (test_directory, properties['proc'], mushy_layer_exec_path)
+    mpi = subprocess.check_output(['which', 'mpirun'])
+    if mpi:
+        mpi_path = str(mpi.decode()).strip()
+        cmd = 'cd %s; %s -np %d %s inputs' % (test_directory, mpi_path, properties['proc'], mushy_layer_exec_path)
+    else:
+        cmd = 'cd %s; %d %s inputs' % (test_directory, properties['proc'], mushy_layer_exec_path)
     # logger.log('Executing: %s' % cmd)
     os.system(cmd)
 
