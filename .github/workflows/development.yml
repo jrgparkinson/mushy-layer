@@ -112,7 +112,8 @@ jobs:
             $CHOMBO_HOME/mk/Make.defs.local
           cd $CHOMBO_HOME
           make lib DIM=2
-          make lib DIM=3
+          
+# make lib DIM=3
 
       - name: Compile ChomboCompare
         run: |
@@ -124,7 +125,8 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/execSubcycle
           make all DIM=2
-          make all DIM=3
+
+# make all DIM=3
 
 
       # Do regression tests

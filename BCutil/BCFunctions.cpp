@@ -354,26 +354,26 @@ void InflowOutflowBC(FArrayBox&      a_state,
 //      }
 //    }
 
-    advVelDir.define(a_valid, 1);
-    advVelDir.setVal(0.0);
+//    advVelDir.define(a_valid, 1);
+//    advVelDir.setVal(0.0);
+//
+//    CoarseAverage average;
+//    for (BoxIterator bit((*a_advVel)[dit].box()); bit.ok(); ++bit)
+//    {
+//      IntVect ivFine = bit();
+//      IntVect ivCoarse = ivFine;
+//      ivCoarse.coarsen(refRat);
+//      if (a_valid.contains(ivCoarse))
+//      {
+//        advVelDir(ivCoarse) += 0.5*(*a_advVel)[dit][a_dir](ivFine);
+//      }
+//    }
+//
+//  }
 
-    CoarseAverage average;
-    for (BoxIterator bit((*a_advVel)[dit].box()); bit.ok(); ++bit)
-    {
-      IntVect ivFine = bit();
-      IntVect ivCoarse = ivFine;
-      ivCoarse.coarsen(refRat);
-      if (a_valid.contains(ivCoarse))
-      {
-        advVelDir(ivCoarse) += 0.5*(*a_advVel)[dit][a_dir](ivFine);
-      }
-    }
-
-  }
-
-  else
-  {
-    CH_TIME("InflowOutflowBC::findAdvVel");
+//  else
+//  {
+//    CH_TIME("InflowOutflowBC::findAdvVel");
 
     DataIterator dit = a_advVel->dataIterator();
 
@@ -405,7 +405,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
         return;
       }
     }
-  } // end if not trying coarsening
+//  } // end if not trying coarsening
 
   // If we made it this far, we didn't find a data index
   // Can't enforce inflow/outflow, just do dirichlet BCs
