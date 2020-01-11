@@ -53,9 +53,15 @@ if __name__ == "__main__":
                       os.path.join(get_script_path(), 'plotting')]
 
     print('Checking PYTHONPATH')
+
+    # Initialise PYTHONPATH if it doesn't exist
+    if 'PYTHONPATH' not in os.environ:
+        os.environ['PYTHONPATH'] = ''
+
     for required_path in required_paths:
-        if 'PYTHONPATH' not in os.environ or required_path not in os.environ['PYTHONPATH']:
+        if required_path not in os.environ['PYTHONPATH']:
             os.environ['PYTHONPATH'] += ':' + required_path
+
     print_var('PYTHONPATH', git_build)
 
     # Setup MUSHY_LAYER_DIR
