@@ -43,13 +43,17 @@ jobs:
       - name: Install python dependencies
         run: pip install -r requirements.txt
 
-      - name: Run regressions
+      - name: Setup environmental variables
         run: |
-          cd $GITHUB_WORKSPACE/test/regression
           echo ::set-env name=PYTHONPATH::path
           echo "$PYTHONPATH"
           echo ::set-env name=PYTHONPATH::$(echo $PYTHONPATH):/home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
           echo "$PYTHONPATH"
+
+      - name: Run regressions
+        run: |
+          echo "$PYTHONPATH"
+          cd $GITHUB_WORKSPACE/test/regression
           python run_regression_tests.py
 
 
