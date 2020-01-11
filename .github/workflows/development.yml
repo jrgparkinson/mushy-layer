@@ -74,36 +74,36 @@ jobs:
         make
         make install
         
-    - name: Cache Chombo
-      id: cache-chombov2
-      uses: actions/cache@v1
-      with:
-        path: /home/runner/chombo
-        key: ${{ runner.os }}-chombov2
+    # - name: Cache Chombo
+    #   id: cache-chombov2
+    #   uses: actions/cache@v1
+    #   with:
+    #     path: /home/runner/chombo
+    #     key: ${{ runner.os }}-chombov2
 
-    - name: Download Chombo
-      if: steps.cache-chombov2.outputs.cache-hit != 'true'
-      run: svn --username ${{ secrets.SVN_USERNAME }} --password ${{ secrets.SVN_PASSWORD }} co https://anag-repo.lbl.gov/svn/Chombo/release/3.2  $CHOMBO_ROOT
+    # - name: Download Chombo
+    #   if: steps.cache-chombov2.outputs.cache-hit != 'true'
+    #   run: svn --username ${{ secrets.SVN_USERNAME }} --password ${{ secrets.SVN_PASSWORD }} co https://anag-repo.lbl.gov/svn/Chombo/release/3.2  $CHOMBO_ROOT
 
 
-    - name: Verify 
-      run: |
-        echo "$HDF5_PATH:"
-        ls $HDF5_PATH
-        echo "---------------------------"
-        echo "$CHOMBO_HOME"
-        ls $CHOMBO_HOME
+    # - name: Verify 
+    #   run: |
+    #     echo "$HDF5_PATH:"
+    #     ls $HDF5_PATH
+    #     echo "---------------------------"
+    #     echo "$CHOMBO_HOME"
+    #     ls $CHOMBO_HOME
            
-    - name: Install Chombo
-      run: |
-        cp $GITHUB_WORKSPACE/mk/Make.defs.local.github $CHOMBO_HOME/mk/Make.defs.local
-        cd $CHOMBO_HOME
-        make lib
+    # - name: Install Chombo
+    #   run: |
+    #     cp $GITHUB_WORKSPACE/mk/Make.defs.local.github $CHOMBO_HOME/mk/Make.defs.local
+    #     cd $CHOMBO_HOME
+    #     make lib
 
-    - name: Build mushy-layer
-      run: |
-        cd $GITHUB_WORKSPACE/execSubcycle
-        make all
+    # - name: Build mushy-layer
+    #   run: |
+    #     cd $GITHUB_WORKSPACE/execSubcycle
+    #     make all
         
   regression:
     name: Regression tests
