@@ -1857,6 +1857,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   a_phi_new.exchange();
 
 #ifdef CH_FORK
+  BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister>* baseLevBE = nullptr;
   if (m_opt.timeIntegrationOrder == 2)
   {
     baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*m_enthalpySalinityTGA));
@@ -1868,7 +1869,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
   if (baseLevBE != nullptr)
   {
     exitStatus = baseLevBE->exitStatus();
-    residual = baseLevBE->finalResidual();
+    Real residual = baseLevBE->finalResidual();
     int num_iter =  baseLevBE->numMGiterations();
 
     pout() << "  HC solve       (level " << m_level << "): exit status " << exitStatus << ", solver residual = " << residual << ", num MG iterations = " << num_iter << endl;

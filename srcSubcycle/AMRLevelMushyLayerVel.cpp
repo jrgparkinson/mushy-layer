@@ -19,15 +19,12 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   LevelData<FArrayBox> src(m_grids, SpaceDim, ivGhost);
   LevelData<FArrayBox> vel(m_grids, SpaceDim, advectionGhost);
 
-  DataIterator dit = m_grids.dataIterator();
-
   // The pressure scale is permeability for darcy flow,
   // and porosity for darcy-brinkman
 
   RefCountedPtr<LevelData<FluxBox> > crsePressureScaleEdgePtr, pressureScaleEdgePtr;
   RefCountedPtr<LevelData<FArrayBox> > crsePressureScalePtr, pressureScalePtr;
   RefCountedPtr<LevelData<FArrayBox> > crsePressurePtr, pressurePtr;
-  AMRLevelMushyLayer* amrMLcrse = getCoarserLevel();
 
   LevelData<FluxBox>* velocityBCVals = new LevelData<FluxBox>(m_grids, 1, a_advVel.ghostVect());
   LevelData<FluxBox> gradP(m_grids, 1, IntVect::Zero);
@@ -61,19 +58,13 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     Side::LoHiSide side = Side::Lo;
     int idir = 1;
 
-    if (idir == velComp)
-    {
-      toRegion.surroundingNodes(idir);
-      int coord = toRegion.sideEnd(side)[idir];
-      toRegion.setRange(idir, coord);
+    toRegion.surroundingNodes(idir);
+    int coord = toRegion.sideEnd(side)[idir];
+    toRegion.setRange(idir, coord);
 
-    }
-    else
-    {
-      toRegion.surroundingNodes(velComp);
-      toRegion = adjCellBox(toRegion, idir, side, 1);
-
-    }
+    // Note, if idir != velComp:
+    toRegion.surroundingNodes(velComp);
+    toRegion = adjCellBox(toRegion, idir, side, 1);
 
     toRegion &= v_box;
 
@@ -97,6 +88,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
   // if a coarser level exists, will need coarse-level data for the projection boundary conditions
   if (m_level > 0)
   {
+    AMRLevelMushyLayer* amrMLcrse = getCoarserLevel();
     const DisjointBoxLayout& crseGrids = amrMLcrse->m_grids;
     crsePressurePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(crseGrids, 1));
 
@@ -126,8 +118,6 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     pressureScalePtr = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(m_grids,1,IntVect::Unit));
     fillScalars(*pressureScalePtr, time, m_pressureScaleVar, true);
   }
-
-  IntVect ghost = IntVect::Unit;
 
   LevelData<FluxBox> gradPhi(m_grids, 1);
 
@@ -1109,11 +1099,11 @@ void AMRLevelMushyLayer::computePredictedVelocities(
         for (int dir = 0; dir < SpaceDim; dir++)
         {
           FArrayBox& this_U_chi_Dir = U_chi_predicted[dir];
-          FArrayBox& thisAdvVelDir = thisAdvVel[dir];
-          FArrayBox& porosityDir = porosityFace[dit][dir];
 
           if (dir == velComp)
           {
+            FArrayBox& thisAdvVelDir = thisAdvVel[dir];
+
             // normal direction -- copy from advVel->uHalf
             // srcComp is always 0, since advVel only has
             // one component
@@ -1135,6 +1125,8 @@ void AMRLevelMushyLayer::computePredictedVelocities(
           } // end if dir is velcomp
           else
           {
+            FArrayBox& porosityDir = porosityFace[dit][dir];
+
             // add MAC correction to traced velocities so they are (roughly) divergence free
             // if we are advecting u/chi, need to divide correction by chi too
 
@@ -1379,32 +1371,32 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
         if (this->isVelocityTimeDependent())
         {
 
-        if (m_opt.timeIntegrationOrder == 1)
-        {
-          UstarBE[comp]->updateSoln(UstarComp, UoldComp, compSrc,
-                                    &(*fineFluxRegPtr), &(*crseFluxRegPtr),
-                                    UoldCrseComp, UstarCrseComp,
-                                    old_time,  old_crseTime, new_crseTime,
-                                    a_dt, m_level, false, comp); // False - don't zero phi
+          if (m_opt.timeIntegrationOrder == 1)
+          {
+            UstarBE[comp]->updateSoln(UstarComp, UoldComp, compSrc,
+                                      fineFluxRegPtr, crseFluxRegPtr,
+                                      UoldCrseComp, UstarCrseComp,
+                                      old_time,  old_crseTime, new_crseTime,
+                                      a_dt, m_level, false, comp); // False - don't zero phi
 
 #ifdef CH_FORK
-          exitStatus = UstarBE[comp]->exitStatus();
-          resid = UstarBE[comp]->finalResidual();
+            exitStatus = UstarBE[comp]->exitStatus();
+            resid = UstarBE[comp]->finalResidual();
 #endif
 
-        }
-        else
-        {
-          UstarTGA[comp]->updateSoln(UstarComp, UoldComp, compSrc,
-                                     &(*fineFluxRegPtr), &(*crseFluxRegPtr),
-                                     UoldCrseComp, UstarCrseComp,
-                                     old_time, old_crseTime, new_crseTime,
-                                     a_dt, m_level, false, comp);  // False - don't zero phi
+          }
+          else
+          {
+            UstarTGA[comp]->updateSoln(UstarComp, UoldComp, compSrc,
+                                       fineFluxRegPtr, crseFluxRegPtr,
+                                       UoldCrseComp, UstarCrseComp,
+                                       old_time, old_crseTime, new_crseTime,
+                                       a_dt, m_level, false, comp);  // False - don't zero phi
 #ifdef CH_FORK
-          exitStatus = UstarTGA[comp]->exitStatus();
-          resid = UstarTGA[comp]->finalResidual();
+            exitStatus = UstarTGA[comp]->exitStatus();
+            resid = UstarTGA[comp]->finalResidual();
 #endif
-        }
+          }
 
         }
         else
@@ -1415,10 +1407,7 @@ void AMRLevelMushyLayer::computeUstar(LevelData<FArrayBox>& a_UdelU,
           m_uStarAMRMG[comp]->solve(UstarVectComp, rhsVectComp, 0, 0, false, false);
         }
 
-        pout() << " Component " << comp << ": residual = " << resid;
-
-
-
+        pout() << " Component " << comp << ": residual = " << resid << " exit status: " << exitStatus;
       } // end loop over components
 
       pout () << endl;
@@ -1484,22 +1473,18 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   fillScalars(pressureScale, src_time, m_pressureScaleVar, true);
 
   LevelData<FArrayBox> *crseVelPtr = nullptr;
-  AMRLevelMushyLayer* amrMushyLayerCoarserPtr;
-
   fillVectorField(velOld, src_time, m_fluidVel, true, true);
 
   if (m_level > 0)
   {
-    amrMushyLayerCoarserPtr = getCoarserLevel();
-    crseVelPtr = new LevelData<FArrayBox>(amrMushyLayerCoarserPtr->m_grids, SpaceDim, IntVect::Unit);
-    amrMushyLayerCoarserPtr->fillVectorField(*crseVelPtr, src_time, m_fluidVel, true);
+    crseVelPtr = new LevelData<FArrayBox>(getCoarserLevel()->m_grids, SpaceDim, IntVect::Unit);
+    getCoarserLevel()->fillVectorField(*crseVelPtr, src_time, m_fluidVel, true);
   }
 
   setVelZero(velOld, m_opt.advVelsrcChiLimit);
 
   //Apply BCs to grad(P) term - extrapolation
   DataIterator dit = m_grids.dataIterator();
-  BCHolder bcExtrap = m_physBCPtr->extrapFuncBC();
 
   //  m_projection.gradPiBCs(pressure, true);
   fillPressureSrcTerm(pressure, pressureScale, src_time-m_dt/2,
@@ -1510,50 +1495,14 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   bool darcySrc = m_opt.advVelDarcySrc ;
   bool viscousSrc = m_opt.advVelViscousSrc;
 
-//  if (m_time <= m_opt.skipTrickySourceTerm)
-//  {
-//    pout() << "AMRLevelMushyLayer::computeAdvectionVelSourceTerm - time = " << m_time << " < " << m_opt.skipTrickySourceTerm;
-//    pout() << ", skipping darcy and viscous src terms";
-//    darcySrc = false;
-//    viscousSrc = false;
-//  }
-
   //Calculate Laplacian(U)
   if (m_parameters.isViscous())
   {
-//    bool recomputeLapVel = true;
-
-//    if (m_level > 0 && m_opt.advSrcAllowLaggedLapVel)
-//    {
-//      amrMushyLayerCoarserPtr = getCoarserLevel();
-//      Real crseOldTime = amrMushyLayerCoarserPtr->time() - amrMushyLayerCoarserPtr->dt();
-//      Real thisOldTime = m_time-m_dt ;
-//
-//      // Don't recompute lap(u) if this is the second subcycled step - issues with CF BCs
-//      if (abs(thisOldTime- crseOldTime) > TIME_EPS)
-//      {
-//        recomputeLapVel = false;
-//        pout() << "Using old lap(U) in advection vel source term" << endl;
-//      }
-//    }
-
-//    if (recomputeLapVel)
-//    {
       computeLapVel(viscous, velOld, crseVelPtr);
       for (dit.reset(); dit.ok(); ++dit)
       {
         (*m_vectorNew[VectorVars::m_advSrcLapU])[dit].copy(viscous[dit]);
       }
-
-//    }
-//    else
-//    {
-//      for (dit.reset(); dit.ok(); ++dit)
-//      {
-//        viscous[dit].copy((*m_vectorNew[VectorVars::m_advSrcLapU])[dit]);
-//      }
-//    }
-
   }
   else
   {
@@ -1564,9 +1513,6 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
   }
 
   fillBuoyancy(buoyancy, temperature, liquidConc, porosity);
-  //  fillBuoyancy(buoyancy, src_time);
-
-
 
   for (dit.reset(); dit.ok(); ++dit)
   {
@@ -1618,8 +1564,6 @@ void AMRLevelMushyLayer::computeAdvectionVelSourceTerm(LevelData<FArrayBox>& a_s
     {
       a_src[dit] -= darcy[dit];
     }
-
-
 
   } // end dataiterator
 

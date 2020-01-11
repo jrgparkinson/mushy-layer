@@ -668,14 +668,13 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
   // const cast:  OK because we're changing ghost cells only
   LevelData<FArrayBox>& phiFineRef = ( LevelData<FArrayBox>&)a_phiFine;
 
-  AMRNonLinearMultiCompOp* finerAMRPOp = (AMRNonLinearMultiCompOp*) a_finerOp;
+  AMRNonLinearMultiCompOp* finerAMRPOp = static_cast<AMRNonLinearMultiCompOp*>(a_finerOp);
   QuadCFInterp& quadCFI = finerAMRPOp->m_interpWithCoarser;
 
   quadCFI.coarseFineInterp(phiFineRef, a_phi);
   // I'm pretty sure this is not necessary. bvs -- flux calculations use
   // outer ghost cells, but not inner ones
   // phiFineRef.exchange(a_phiFine.interval());
-  IntVect phiGhost = phiFineRef.ghostVect();
   int ncomps = a_phiFine.nComp();
 
   CH_TIMER("AMRNonLinearMultiCompOp::reflux::incrementFine", t3);
@@ -762,7 +761,7 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
 
   // has to be its own object because the finer operator
   // owns an interpolator and we have no way of getting to it
-  AMRNonLinearMultiCompOp* finerAMRPOp = (AMRNonLinearMultiCompOp*) a_finerOp;
+  AMRNonLinearMultiCompOp* finerAMRPOp = static_cast<AMRNonLinearMultiCompOp*> (a_finerOp);
   QuadCFInterp& quadCFI = finerAMRPOp->m_interpWithCoarser;
 
   quadCFI.coarseFineInterp(p, a_phi);
@@ -1242,7 +1241,7 @@ setTime(Real a_time)
 //-----------------------------------------------------------------------
 
 // Factory
-AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory()
+AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory() : m_numComp(2)
 {
   setDefaultValues();
 }

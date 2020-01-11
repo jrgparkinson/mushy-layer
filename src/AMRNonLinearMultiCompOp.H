@@ -42,6 +42,8 @@ public:
     m_time = -1;
     m_FAS = false;
     m_params = nullptr;
+    m_apply_bcs_to_diagnostic_var = true;
+    m_superOptimised = false;
 }
 
   ///

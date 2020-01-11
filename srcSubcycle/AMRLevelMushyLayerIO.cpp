@@ -891,8 +891,7 @@ void AMRLevelMushyLayer::computeVorticity()
   // but is necessary to ensure that boundary
   // conditions are properly set.
   LevelData<FArrayBox>* velPtr = &(*m_vectorNew[VectorVars::m_fluidVel]);
-  LevelData<FArrayBox>& vel =
-      *(const_cast<LevelData<FArrayBox>*>(&*velPtr));
+  LevelData<FArrayBox>& vel = *(const_cast<LevelData<FArrayBox>*>(velPtr));
 
   const DisjointBoxLayout& grids = vel.getBoxes();
 

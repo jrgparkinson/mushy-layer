@@ -471,24 +471,16 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
 
   // Compute liquid, mushy and inbetween cells - these will be useful
-  IntVectSet liquidCells;
   IntVectSet mushyCells;
   IntVectSet shrunkMushyCells;
-  IntVectSet marginalCells;
 
   for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
   {
     for (BoxIterator bit(m_grids[dit]); bit.ok(); ++bit)
     {
-      if ((*m_scalarNew[ScalarVars::m_porosity])[dit](bit()) == 1.0)
-      {
-        liquidCells |= bit();
-      }
-      else if ((*m_scalarNew[ScalarVars::m_porosity])[dit](bit()) > m_opt.taggingMarginalPorosityLimit)
-      {
-        marginalCells |= bit();
-      }
-      else
+      Real porosity = (*m_scalarNew[ScalarVars::m_porosity])[dit](bit());
+      if (porosity < m_opt.taggingMarginalPorosityLimit
+          && porosity > 0.0)
       {
         mushyCells |= bit();
       }
@@ -797,34 +789,11 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
   else
   {
-
     if (s_verbosity >= 2)
     {
       pout() << "AMRLevelMushyLayer::tagCells - custom tagging criteria, tagging mushy cells " << endl;
     }
-
-    // Option 1: my custom tagging criteria
-    // we want to resolve the mush-liquid boundaries and plumes
-
-    // Tag all cells where undivided porosity gradient is > 0.1
-    Real lev0Dx = m_dx;
-    AMRLevelMushyLayer* ml = this;
-    while(ml)
-    {
-      lev0Dx = ml->m_dx;
-      ml = ml->getCoarserLevel();
-    }
-
-    //    Real gradientCondition = lev0Dx * 1.0; // was 3.2
-    //    tagCellsVar(localTags, gradientCondition, 0, m_porosity, -1);
-
-
-    //    localTags &= liquidCells;
-    //    localTags |= mushyCells;
     localTags |= mushyCells;
-
-    // Also tag all cells where U > Ra_C/4 (i.e. high velocity)
-    //tagCellsVar(localTags, m_parameters.rayleighComposition/4, 1, -1, m_advectionVel);
   }
 
   if (m_opt.onlyTagPorousCells)
@@ -1283,7 +1252,6 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
   IntVect iv_ghost = m_scalarNew[0]->ghostVect();
   DisjointBoxLayout old_grids = m_scalarNew[0]->disjointBoxLayout();
 
-  DataIterator ditNew = m_grids.dataIterator();
   DataIterator ditOld = old_grids.dataIterator();
 
   scalarNew_OldGrids.resize(m_numScalarVars);
@@ -1456,7 +1424,6 @@ void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, Probl
   RefCountedPtr<LevelData<FArrayBox> > previousScal, previousVect;
   LevelData<FluxBox> prevAdvVel;
 
-  IntVect advectionGhost = m_numGhostAdvection*IntVect::Unit;
   IntVect ivGhost = 4*IntVect::Unit;
 
   Interval scalInterval(0,0);
@@ -1610,7 +1577,6 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       }
     }
 
-    bool homoBC = false;
     if (m_opt.project_initial_vel)
     {
       // NB this doesn't calculate pressure, just corrects velocity
@@ -1619,30 +1585,14 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
         writeAMRHierarchy("regrid1.hdf5");
       }
 
-      level0Proj.initialVelocityProject(amrVel, amrPorosityFace, amrPorosity, homoBC);
+      level0Proj.initialVelocityProject(amrVel, amrPorosityFace, amrPorosity,
+                                        false); // inhomogenous BC
       if (m_opt.makeRegridPlots)
       {
         writeAMRHierarchy("regrid2.hdf5");
       }
     }
 
-
-    thisLevelData = this;
-
-    // need to reset boundary conditions here
-//    for (int lev = 0; lev < numLevels; lev++)
-//    {
-//      const ProblemDomain& levelDomain = thisLevelData->problemDomain();
-//      Real levelDx = thisLevelData->m_dx;
-//      LevelData<FArrayBox>& thisAmrVel = *amrVel[lev];
-//      const DisjointBoxLayout& thisLevelGrids = thisAmrVel.getBoxes();
-//      velBC.applyBCs(thisAmrVel, thisLevelGrids, levelDomain, levelDx,
-//                     false); // inhomogeneous
-//      if (thisLevelData->m_finer_level_ptr != nullptr)
-//      {
-//        thisLevelData = dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
-//      }
-//    }
     setVelBCs(numLevels, amrVel, velBC);
 
     updateEnthalpyVariables();

@@ -15,6 +15,8 @@ env:
   CHOMBO_HOME: /home/runner/chombo/lib
   HDF5_PATH: /home/runner/hdf5-dir
   LD_LIBRARY_PATH: /home/runner/hdf5-dir
+  PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
+  REGRESSIONS_PATH: /home/runner/work/mushy-layer/mushy-layer/test/regressions
 
 jobs:
   build:
@@ -131,7 +133,8 @@ jobs:
 
     - name: Setup for regressions
       run: |
-        echo ::set-env name=PYTHONPATH::$(echo $PYTHONPATH):/home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
+        cd $GITHUB_WORKSPACE
+        python install.py -g
 
     - name: Run regressions
       run: |
@@ -142,7 +145,7 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: test-results
-        path: ./
+        path: ${{ env.REGRESSIONS_PATH }}
 
     
 

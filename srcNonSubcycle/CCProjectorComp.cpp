@@ -231,6 +231,10 @@ CCProjectorComp::CCProjectorComp()
 	m_finest_level = false;
 	finest_level = -1;
 	m_physBCPtr = nullptr;
+	m_bottomSolver = nullptr;
+	m_relaxBottomSolver = nullptr;
+	num_ghost = 1;
+	m_level = 0;
 	m_bottomSolverLevel = nullptr;
 	m_limitSolverCoarsening = false;
 	m_amrDx = Vector<Real>(1,1);
