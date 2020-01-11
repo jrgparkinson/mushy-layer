@@ -123,7 +123,13 @@ def test_folder(test_directory, verbose_output=False):
     else:
         cmd = 'cd %s; %s inputs' % (test_directory, mushy_layer_exec_path)
     # logger.log('Executing: %s' % cmd)
-    os.system(cmd)
+    # os.system(cmd)
+    try:
+        res = subprocess.check_output([mushy_layer_exec_path, 'inputs'], cwd=test_directory)
+    except subprocess.CalledProcessError:
+        logger.log('Exception')
+
+
 
     # Compare output against the expected output
     # logger.log('Test files: %s' % test_files)
