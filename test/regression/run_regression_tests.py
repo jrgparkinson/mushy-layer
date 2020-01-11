@@ -126,14 +126,15 @@ def test_folder(test_directory, verbose_output=False):
     # try:
     if mpi is not None:
         cmd = 'cd %s; %s -np %d %s inputs' % (test_directory, mpi_path, properties['proc'], mushy_layer_exec_path)
+        os.system(cmd)
         # mpi_path = 'mpirun'
         # res = subprocess.run([mpi_path, '-n ', str(properties['proc']), ' inputs'], cwd=test_directory)
 
     else:
         cmd = 'cd %s; %s inputs > pout.N' % (test_directory, mushy_layer_exec_path)
-        # res = subprocess.check_output([mushy_layer_exec_path, 'inputs'], cwd=test_directory)
+        res = subprocess.check_output([mushy_layer_exec_path, 'inputs'], cwd=test_directory)
 
-    os.system(cmd)
+    # os.system(cmd)
 
     # except subprocess.CalledProcessError:
     #     logger.logl('[Exception]')
