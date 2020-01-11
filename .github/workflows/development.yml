@@ -142,7 +142,7 @@ jobs:
          python install.py
          cd test/regression
          echo "$PYTHONPATH"
-         python run_regression_tests.py
+         python run_regression_tests.py -g
 
     - uses: actions/upload-artifact@v1
       with:
