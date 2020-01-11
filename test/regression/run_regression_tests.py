@@ -18,14 +18,21 @@ class Logger():
 
     def __init__(self, log_file_path):
         self.log_file = open(log_file_path, 'w+')
+        self.verbose = False
 
-    def log(self, text):
-        print(text)
+    def set_verbose(self, v):
+        self.verbose = v
+
+    def log(self, text, console_display=False):
+        if self.verbose or console_display:
+            print(text)
+
         self.log_file.write(text + '\n')
 
-    def logl(self, text):
-        sys.stdout.write(text)
-        sys.stdout.flush()
+    def logl(self, text, console_display=False):
+        if self.verbose or console_display:
+            sys.stdout.write(text)
+            sys.stdout.flush()
 
         self.log_file.write(text)
 
@@ -73,29 +80,30 @@ def test_folder(test_directory, verbose_output=False):
     :return: success - if test was succesful or not
     """
 
-    if verbose_output:
-        logger.log('Processing folder "%s"' % test_directory)
+    logger.log('Processing folder "%s"' % test_directory)
 
     test_files = os.listdir(test_directory)
 
-    if verbose_output:
-        logger.log('Initial files in folder ' + str(test_files))
+    logger.log('Initial files in folder ' + str(test_files))
 
     # Check the required files exist
     # if not, skip this test
     if not all(elem in test_files for elem in REQUIRED):
-        if verbose_output:
-            logger.log('  Required files for conducting a test (%s) not found in %s' % (REQUIRED, test_directory))
-            logger.log('  Skipping test \n')
-        else:
-            test_name = test_directory.split('/')[-1]
-            logger.logl('%-25s    ' % test_name)
-            logger.log_void()
+        test_name = test_directory.split('/')[-1]
+        logger.logl('%-25s    ' % test_name, console_display=True)
+
+        logger.log('  Required files for conducting a test (%s) not found in %s' % (REQUIRED, test_directory))
+        logger.log('  Skipping test \n')
+
+        logger.log_void()
         return False, 'Void'
 
     # Load properties
     with open(os.path.join(test_directory, PROPERTIES_FILE)) as json_file:
         properties = json.load(json_file)
+
+    # logger.log('==Running test: %s==' % properties['name'])
+    logger.logl('%-25s    ' % properties['name'], console_display=True)
 
     try:
         mpi = subprocess.check_output(['which', 'mpiruna'])
@@ -109,9 +117,6 @@ def test_folder(test_directory, verbose_output=False):
         logger.log_void()
         return False, 'Void'
 
-    # logger.log('==Running test: %s==' % properties['name'])
-    logger.logl('%-25s    ' % properties['name'])
-
     # Get correct executable
     # mushy_layer_exec = mushyLayerRunUtils.get_executable(dim=properties['dim'])
     # mushy_layer_exec_path = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'execSubcycle', mushy_layer_exec)
@@ -120,12 +125,11 @@ def test_folder(test_directory, verbose_output=False):
     mushy_layer_exec_path = mushyLayerRunUtils.get_executable_name(exec_dir, exec_name=exec_name, return_full_path=True)
 
     if not os.path.exists(mushy_layer_exec_path):
-        if verbose_output:
-            logger.log('\n**Could not find mushy layer executable: %s' % mushy_layer_exec_path)
-            logger.log('**Have you compiled the code for the right number of dimensions?')
-            logger.logl('**Use \'make all DIM=3\' to compile in 3D    ')
-        else:
-            logger.log_failed()
+        logger.log('\n**Could not find mushy layer executable: %s' % mushy_layer_exec_path)
+        logger.log('**Have you compiled the code for the right number of dimensions?')
+        logger.logl('**Use \'make all DIM=3\' to compile in 3D    ')
+
+        logger.log_failed()
         return False, 'Failed'
 
     # Run test
@@ -138,10 +142,10 @@ def test_folder(test_directory, verbose_output=False):
 
     else:
         cmd = 'cd %s; %s inputs > pout.0' % (test_directory, mushy_layer_exec_path)
+        logger.log(cmd)
         res = subprocess.check_output(cmd, shell=True)
 
-        if verbose_output:
-            logger.logl('Response: "%s"' % str(res.decode()))
+        logger.logl('Response: "%s"' % str(res.decode()))
 
     # os.system(cmd)
 
@@ -157,25 +161,20 @@ def test_folder(test_directory, verbose_output=False):
 
     expected_files = [f for f in test_files if EXPECTED in f]
     if not expected_files:
-        if verbose_output:
-            logger.log('No expected files to compared against')
-        else:
-            logger.log_void()
+        logger.log('No expected files to compared against')
+        logger.log_void()
         return False, 'Void'
 
+    failed_test = False
     for expected_file in expected_files:
-
-        if verbose_output:
-            logger.log('Expected file: %s' % expected_file)
+        logger.log('Expected file: %s' % expected_file)
 
         # Check an output file to compare against exists
         test_output_filename = expected_file.replace(EXPECTED, '')
         test_output_file_path = os.path.join(test_directory, test_output_filename)
         if not os.path.exists(test_output_file_path):
-            if verbose_output:
-                logger.log('No output file generated to compare against: %s' % test_output_file_path)
-            else:
-                logger.log_failed()
+            logger.log('No output file generated to compare against: %s' % test_output_file_path)
+            logger.log_failed()
             return False, 'Failed'
 
         if '.hdf5' in expected_file:
@@ -186,8 +185,7 @@ def test_folder(test_directory, verbose_output=False):
             diffs_folder = os.path.join(test_directory, DIFF_FOLDER)
             if not os.path.exists(diffs_folder):
                 os.makedirs(diffs_folder)
-                if verbose_output:
-                    logger.log('Making folder %s' % diffs_folder)
+                logger.log('Making folder %s' % diffs_folder)
 
             chombo_dir = os.environ['CHOMBO_HOME']
             compare_dir = os.path.join(chombo_dir, 'util', 'ChomboCompare')
@@ -195,7 +193,7 @@ def test_folder(test_directory, verbose_output=False):
             compare_exec = os.path.join(compare_dir, compare_exec)
             # logger.log('Found executable %s ' % compare_exec)
 
-            if not os.path.exists(compare_exec) and verbose_output:
+            if not os.path.exists(compare_exec):
                 logger.log('Could not find Chombo compare executable %s' % compare_exec)
                 logger.log('So cannot compare hdf5 output files')
 
@@ -215,24 +213,16 @@ def test_folder(test_directory, verbose_output=False):
             mushyLayerRunUtils.write_inputs(compare_params_file, compare_params)
             cmd = 'cd %s ; %s %s > pout.0' % (diffs_folder, compare_exec, compare_params_file)
 
-            if verbose_output:
-                logger.log('Executing: %s' % cmd)
-            # This prints the console output, which can be messy:
-            # os.system(cmd)
-
-            # This doesn't print the console output, which is cleaner
-            with open(os.devnull, 'wb') as devnull:
-                res = subprocess.check_call(cmd, shell=True, stderr=subprocess.STDOUT)
-
-                if verbose_output:
-                    logger.log('Compare command run, response: %s' % res)
+            logger.log('Executing: %s' % cmd)
+            res = subprocess.check_call(cmd, shell=True, stderr=subprocess.STDOUT)
+            logger.log('Compare command run, response: %s' % res)
 
             # Rename pout.0 in case we make lots
             old_pout_name = os.path.join(diffs_folder, 'pout.0')
             new_pout_name = os.path.join(diffs_folder, 'pout-%s.0' % test_output_filename)
             # logger.log('Rename %s to %s' % (old_pout_name, new_pout_name))
             if not os.path.exists(old_pout_name):
-                logger.log('Cannot find %s' % old_pout_name)
+                logger.log('Cannot find %s' % old_pout_name, console_display=True)
 
             os.rename(old_pout_name, new_pout_name)
 
@@ -246,12 +236,11 @@ def test_folder(test_directory, verbose_output=False):
                 for err_type in field_errs.keys():
                     this_field_err = field_errs[err_type]
                     if abs(this_field_err) > 1e-10:
-                        if verbose_output:
-                            logger.log('Error in field %s is non-zero' % field)
-                            logger.log('See %s and %s for more info' % (new_pout_name, error_file))
-                        else:
-                            logger.log_failed()
-                        return False, 'Failed'
+                        logger.log('Error in field %s is non-zero' % field)
+                        logger.log('See %s and %s for more info' % (new_pout_name, error_file))
+                        # logger.log_failed()
+                        # return False, 'Failed'
+                        failed_test = True
         else:
             # Assume text file - do a diff
             text1 = open(os.path.join(test_directory, expected_file)).readlines()
@@ -272,20 +261,23 @@ def test_folder(test_directory, verbose_output=False):
             # logger.log('Diff: %s' % differences)
 
             if differences:
-                if verbose_output:
-                    logger.log('Differences found in %s' % test_output_file_path)
-                    logger.log('For details, see %s' % diff_out_file)
-                    logger.log('** Test failed \n')
-                else:
-                    logger.log_failed()
-                return False, 'Failed'
+                logger.log('Differences found in %s' % test_output_file_path)
+                logger.log('For details, see %s' % diff_out_file)
+                logger.log('** Test failed \n')
+                # logger.log_failed()
+                # return False, 'Failed'
+                failed_test = True
 
-    logger.log_ok()
-    return True, 'OK'
+    if failed_test:
+        logger.log_failed()
+        return False, 'Failed'
+    else:
+        logger.log_ok()
+        return True, 'OK'
 
 
 def usage():
-    logger.log('python run_regression_tests.py [-t <test_dir>] [-v verbose] ')
+    logger.log('python run_regression_tests.py [-t <test_dir>] [-v verbose] ', console_display=True)
 
 
 if __name__ == "__main__":
@@ -313,7 +305,7 @@ if __name__ == "__main__":
         opts, args = getopt.getopt(sys.argv[1:], "ht:v", ["help", "test="])
     except getopt.GetoptError as err:
         # print help information and exit:
-        logger.log(str(err))  # will print something like "option -a not recognized"
+        logger.log(str(err), console_display=True)  # will print something like "option -a not recognized"
         usage()
         sys.exit(2)
     for o, arg in opts:
@@ -325,10 +317,11 @@ if __name__ == "__main__":
         elif o in "-v":
             verbose = True
         else:
-            logger.log('Unknown command line option: %s' % o)
+            logger.log('Unknown command line option: %s' % o, console_display=True)
             sys.exit(-1)
 
-    logger.log('Tests to run: ' + ','.join(test_dirs))
+    logger.set_verbose(verbose)
+    logger.log('Tests to run: ' + ','.join(test_dirs), console_display=True)
 
     # Containers to collate passed/failed tests
     failed_tests = []
@@ -348,16 +341,13 @@ if __name__ == "__main__":
             success, status = test_folder(full_dir, verbose)
         except Exception as e:
 
-            if verbose:
-                logger.log('**Error running test**')
-                logger.error(traceback.format_exc())
-            else:
-                logger.log_failed()
+            logger.error(traceback.format_exc())
+            logger.log_failed()
             success = False
 
         # Timing
         timings.append(time.time())
-        logger.log(' (%.3g seconds)' % (timings[-1] - timings[-2]))
+        logger.log(' (%.3g seconds)' % (timings[-1] - timings[-2]), console_display=True)
 
         if success:
             passed_tests.append(test_dir)
@@ -366,19 +356,19 @@ if __name__ == "__main__":
 
         test_results[test_dir] = status
 
-    logger.log('')
-    logger.log('==========================================================')
-    logger.log('------------------------ Summary -------------------------')
+    logger.log('', console_display=True)
+    logger.log('==========================================================', console_display=True)
+    logger.log('------------------------ Summary -------------------------', console_display=True)
 
     # Report tests
     num_passed = len(passed_tests)
     num_failed = len(failed_tests)
-    logger.log('Tests passed (%d/%d): %s' % (num_passed, num_passed + num_failed, ','.join(passed_tests)))
-    logger.log('Tests failed (%d/%d): %s' % (num_failed, num_passed + num_failed, ','.join(failed_tests)))
+    logger.log('Tests passed (%d/%d): %s' % (num_passed, num_passed + num_failed, ','.join(passed_tests)), console_display=True)
+    logger.log('Tests failed (%d/%d): %s' % (num_failed, num_passed + num_failed, ','.join(failed_tests)), console_display=True)
 
     # Timing
     timings.append(time.time())
-    logger.log('Total runtime: %.3g seconds' % (timings[-1] - timings[0]))
+    logger.log('Total runtime: %.3g seconds' % (timings[-1] - timings[0]), console_display=True)
 
     # Give a bad exit if we failed a test
     # Actually, don't do this as it stops the rest of the job from running
