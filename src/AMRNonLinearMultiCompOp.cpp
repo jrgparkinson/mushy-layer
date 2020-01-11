@@ -491,11 +491,13 @@ void AMRNonLinearMultiCompOp::prolongIncrement(LevelData<FArrayBox>&       a_phi
       const IntVect& iv = region.smallEnd();
       IntVect civ=coarsen(iv, 2);
 
+      // refinement of two as this is multigrid
+      int refinement = 2;
 
       FORT_PROLONG_2(CHF_FRA_SHIFT(phi, iv),
                      CHF_CONST_FRA_SHIFT(coarse, civ),
                      CHF_BOX_SHIFT(region, iv),
-                     CHF_CONST_INT(2));  // refinement of two as this is multigrid
+                     CHF_CONST_INT(refinement));
 
           }
   }//end pragma

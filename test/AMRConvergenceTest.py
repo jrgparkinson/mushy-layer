@@ -321,6 +321,9 @@ def run_test(base_dir, physical_problem, resolution_specific_params, amr_setup, 
 
             s = BatchJob(base_dir, job_name, '', 4)
 
+            # If queuing system can't be found, try and run commands manually (will be slow)
+            s.allow_manual_run = True
+
             s.set_dependency(job_ids)
             s.set_custom_command(analysis_command)
 

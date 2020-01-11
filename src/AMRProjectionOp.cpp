@@ -94,13 +94,14 @@ void AMRProjectionOp::prolongIncrement(LevelData<FArrayBox>&       a_phiThisLeve
         const IntVect& iv = region.smallEnd();
         IntVect civ=coarsen(iv, 2);
 
-           FORT_PROLONG(CHF_FRA_SHIFT(phi, iv),
-                                     CHF_CONST_FRA_SHIFT(coarse, civ),
-                                     CHF_BOX_SHIFT(region, iv),
-                                     CHF_CONST_INT(2)); //refinement ratio of 2 (as this is multigrid)
+        // refinement of two as this is multigrid
+        int refinement = 2;
+
+        FORT_PROLONG(CHF_FRA_SHIFT(phi, iv),
+                     CHF_CONST_FRA_SHIFT(coarse, civ),
+                     CHF_BOX_SHIFT(region, iv),
+                     CHF_CONST_INT(refinement)); //refinement ratio of 2 (as this is multigrid)
       }
-
-
   }//end pragma
 }
 
