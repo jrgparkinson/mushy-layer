@@ -40,7 +40,7 @@ def get_data_dir():
 def add_params(default_params, extra_params):
     """ Add params from extra_params to defaultParams """
 
-    for k, v in extra_params.iteritems():
+    for k, v in extra_params.items():
         default_params[k] = v
 
     return default_params
@@ -451,8 +451,9 @@ def string_to_array(string, conversion=None):
     if isinstance(string, list):
         return string
 
+    # Default: convert to list of ints
     if not conversion:
-        conversion = lambda x: int(x)
+        conversion = int
 
     parts = string.split(' ')
     array = [conversion(i) for i in parts]

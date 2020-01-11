@@ -37,6 +37,8 @@ class BatchJob:
         self.partitions = ['shared', 'priority-ocean']
         self.exclude = None
 
+        self.commands_to_execute = None
+
         # Default setup: all tasks on one node
         # This will fail for large numbers of processors - need to implement 
         # some clever load balancing
@@ -203,6 +205,8 @@ class BatchJob:
 
         fh.close()
 
+        self.commands_to_execute = commands_to_execute
+
     def run_task(self, run_file_name='run.sh'):
         """
         This method will write out a batch file for the slurm queuing system, then run it.
@@ -233,6 +237,17 @@ class BatchJob:
         except subprocess.CalledProcessError:
             print(Fore.RED)
             print("Unable to run command, maybe SLURM isn't installed? You'll need to run it manually; \n %s" % cmd)
+            print(self.commands_to_execute)
+            print(Fore.BLUE)
+            answer = input('Would you like to try and run it now automatically? (y/n) ')
+            print(Fore.RESET)
+            if answer == 'y':
+                for cmd in self.commands_to_execute:
+                    cmd = cmd.replace('\n', '')
+                    print(cmd)
+                    os.system(cmd)
+                print('------------------------- Completed ----------------------------------------')
+
             print(Fore.RESET)
 
     def get_run_file(self, run_file_name):

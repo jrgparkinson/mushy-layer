@@ -93,17 +93,7 @@ class MushyLayerRunSimple:
             print('Run already done, skipping \n \n')
             return -1
 
-        # this_run_directory = self.get_most_recent_directory(run_name)
-
         output_folder = join(self.base_output_dir, this_run_directory)
-
-        # exit_status = self.run_model(self.parameters['main.num_cells'],
-        #                             join(self.base_output_dir, this_run_directory),
-        #                             False)
-
-        #     return exit_status
-        #
-        # def run_model(self,  output_folder):
 
         # Perform various checks on the inputs
 

@@ -90,17 +90,9 @@ def test_fixed_porous_hole():
     physical_problem = 'DBVariablePorosity'
     data_folder = os.path.join(base_output_dir, 'FixedPorousHole-1proc-minPorosity%s' % get_min_porosity())
 
-    nz_uniform = [16, 32, 64, 128, 256, 512]
-    amr_setup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': nz_uniform},
-                 {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [16, 32, 64, 128]},
-                 {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]},
-                 {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
-
-    # Nzs 	  = [16, 32, 64]
-    num_procs = [1] * len(nz_uniform)  # [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
+    amr_setup, num_procs = get_setup()
 
     # Setup up the post processing command
-
     # uniform_prefix = 'Uniform-DBVariablePorosity-'
     python_compare_file = os.path.join(get_mushy_layer_dir(), 'test', 'run_chombo_compare.py')
     chombo_compare_analyse = 'python %s -f %s -a -v \'xDarcy velocity\' ' \
@@ -115,6 +107,16 @@ def test_fixed_porous_hole():
     extra_params = {}
     run_test(data_folder, physical_problem, fixed_porous_resolution_specific_params, amr_setup, num_procs,
              analysis_command, extra_params)
+
+
+def get_setup():
+    nz_uniform = [16, 32, 64, 128, 256, 512]
+    amr_setup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': nz_uniform},
+                 {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [16, 32, 64, 128]},
+                 {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]},
+                 {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
+    num_procs = [1] * len(nz_uniform)  # [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
+    return amr_setup, num_procs
 
 
 if __name__ == "__main__":

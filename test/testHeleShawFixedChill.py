@@ -55,7 +55,7 @@ def test_hele_shaw_fixed_chill(argv):
 
     try:
 
-        opts, args = getopt.getopt(argv, "t:R:D:C:P:N:A")
+        opts, _ = getopt.getopt(argv, "t:R:D:C:P:N:A")
     except getopt.GetoptError as err:
         print(str(err))
         print(

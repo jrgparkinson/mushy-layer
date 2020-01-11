@@ -17,6 +17,7 @@ env:
   LD_LIBRARY_PATH: /home/runner/hdf5-dir
   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
   REGRESSIONS_PATH: /home/runner/work/mushy-layer/mushy-layer/test/regression
+  TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test
 
 jobs:
   build:
@@ -166,3 +167,16 @@ jobs:
         with:
           name: test-results
           path: ${{ env.REGRESSIONS_PATH }}
+
+        # Now try and run one of the functional tests
+        # (the others will take too long or need MATLAB)
+      - name: Run Method Paper Tests
+        run: |
+          cd $GITHUB_WORKSPACE/test
+          python test_porous_mushy_hole.py
+
+      - uses: actions/upload-artifact@v1
+        name: Upload method test results
+        with:
+          name: method-paper-results
+          path: ${{ env.TEST_PATH }}

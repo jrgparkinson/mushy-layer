@@ -183,7 +183,7 @@ def run_test(base_dir, physical_problem, resolution_specific_params, amr_setup, 
 
             # Any extra params we may have
             if extra_params:
-                for k, v in extra_params.iteritems():
+                for k, v in extra_params.items():
                     params[k] = v
 
             # numCellsAMR = str(nx_coarse) + ' ' + str(nz_coarse) + '  8'
@@ -324,7 +324,6 @@ def run_test(base_dir, physical_problem, resolution_specific_params, amr_setup, 
             s.set_dependency(job_ids)
             s.set_custom_command(analysis_command)
 
-            # s.write_slurm_file(runAnalysisName)
             s.run_task(run_analysis_name)
             print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
