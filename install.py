@@ -3,6 +3,7 @@ import sys
 import subprocess
 import getopt
 
+
 def usage():
     print('python install.py -g <if from github actions>')
 
@@ -17,6 +18,7 @@ def print_var(var_name, is_git):
 def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
+
 def program_exists(program):
 
     process = subprocess.Popen(['which', program],
@@ -26,6 +28,7 @@ def program_exists(program):
         return True
     else:
         return False
+
 
 if __name__ == "__main__":
 
@@ -49,6 +52,7 @@ if __name__ == "__main__":
     required_paths = [os.path.join(get_script_path(), 'test'),
                       os.path.join(get_script_path(), 'plotting')]
 
+    print('Checking PYTHONPATH')
     for required_path in required_paths:
         if 'PYTHONPATH' not in os.environ or required_path not in os.environ['PYTHONPATH']:
             os.environ['PYTHONPATH'] += ':' + required_path
