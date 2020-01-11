@@ -9,7 +9,7 @@ on:
 #   # * is a special character in YAML so you have to quote this string
 #   # run at 23:59 every day
 #   - cron:  '59 23 * * *'
-
+#   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
 
 env:
   CHOMBO_ROOT: /home/runner/chombo
@@ -17,7 +17,7 @@ env:
   HDF5_PATH: /home/runner/hdf5-dir
   LD_LIBRARY_PATH: /home/runner/hdf5-dir
   TEST_RESULTS: /home/runner/work/mushy-layer/mushy-layer/test/results
-  
+
 
 jobs:
   build:
@@ -46,7 +46,9 @@ jobs:
       - name: Run regressions
         run: |
           cd $GITHUB_WORKSPACE/test/regression
-          echo "::set-env name=PYTHONPATH::$(echo '$PYTHONPATH:/home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting:')"
+          echo ::set-env name=PYTHONPATH::path
+          echo "$PYTHONPATH"
+          echo ::set-env name=PYTHONPATH::$(echo $PYTHONPATH):/home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
           echo "$PYTHONPATH"
           python run_regression_tests.py
 
