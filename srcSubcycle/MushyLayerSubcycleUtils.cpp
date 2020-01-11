@@ -1303,14 +1303,12 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
       for (int i=0; i < amrLev.size(); i++)
       {
         amrLev[i]->time(resetTime);
-
       }
       pout() << "Set time = " << resetTime << endl;
 #else
       MayDay::Warning("Unable to reset time as you're not using the forked version of Chombo, and therefore your AMR class doesn't have a cur_time() method");
 #endif
     }
-
 
   }
   else if (predefinedGrids)
@@ -1323,9 +1321,6 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
     // initialize hierarchy of levels
     a_amr.setupForNewAMRRun();
   }
-
-
-
 
 }
 

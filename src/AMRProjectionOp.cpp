@@ -309,10 +309,10 @@ MGLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::MGnewOp(const ProblemD
         }
 #ifdef CH_FORK
       else if (m_coefficient_average_type == CoarseAverage::geometric)
-             {
-               averager.averageToCoarseGeometric(*aCoef, *(m_aCoef[ref]));
-               faceAverager.averageToCoarseGeometric(*bCoef, *(m_bCoef[ref]));
-             }
+      {
+        averager.averageToCoarseGeometric(*aCoef, *(m_aCoef[ref]));
+        faceAverager.averageToCoarseGeometric(*bCoef, *(m_bCoef[ref]));
+      }
 #endif
       else
         {

@@ -15,6 +15,8 @@ def get_base_output_dir():
         base_output_dir = '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/TestDevelopment-19Dec/'
     elif 'atmlxlap005' in socket.gethostname():
         base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
+    elif 'MUSHY_LAYER_TEST_PATH' in os.environ:
+        base_output_dir = os.environ['MUSHY_LAYER_TEST_PATH']
 
     if base_output_dir == '':
         this_file = os.path.realpath(__file__)
