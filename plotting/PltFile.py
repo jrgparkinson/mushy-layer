@@ -987,8 +987,8 @@ class PltFile:
             ds_porosity = enthalpy_ds.copy(deep=True).rename('Porosity')
             ds_porosity.values = porosity
 
-            ds_T = enthalpy_ds.copy(deep=True).rename('Temperature')
-            ds_T.values = temperature
+            ds_temperature = enthalpy_ds.copy(deep=True).rename('Temperature')
+            ds_temperature.values = temperature
 
             ds_sl = enthalpy_ds.copy(deep=True).rename('Liquid concentration')
             ds_sl.values = liquid_salinity
@@ -998,7 +998,7 @@ class PltFile:
 
 
             self.ds_levels[level]['Porosity'] = ds_porosity
-            self.ds_levels[level]['Temperature'] = ds_T
+            self.ds_levels[level]['Temperature'] = ds_temperature
             self.ds_levels[level]['Liquid concentration'] = ds_sl
             self.ds_levels[level]['Solid concentration'] = ds_ss
 

@@ -9,7 +9,7 @@ import time
 import getopt, sys
 
 # Two imports from the directory above this one - make sure /path/to/mushy-layer/test is in your python path
-import mushyLayerRunUtils as utils
+import mushyLayerRunUtils
 import run_chombo_compare as chcompare
 
 def filter_pout(text_lines):
@@ -67,8 +67,8 @@ def test_folder(test_directory, verbose_output=False):
     printl('%-25s    ' % properties['name'])
 
     # Get correct executable
-    mushy_layer_exec = utils.get_executable(dim=properties['dim'])
-    mushy_layer_exec_path = os.path.join(utils.get_mushy_layer_dir(), 'execSubcycle', mushy_layer_exec)
+    mushy_layer_exec = mushyLayerRunUtils.get_executable(dim=properties['dim'])
+    mushy_layer_exec_path = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'execSubcycle', mushy_layer_exec)
 
     if not os.path.exists(mushy_layer_exec_path):
         if verbose_output:
@@ -118,7 +118,7 @@ def test_folder(test_directory, verbose_output=False):
 
             chombo_dir = os.environ['CHOMBO_HOME']
             compare_dir = os.path.join(chombo_dir, 'lib', 'util', 'ChomboCompare')
-            compare_exec = utils.get_executable_name(compare_dir, 'compare%dd' % properties['dim'])
+            compare_exec = mushyLayerRunUtils.get_executable_name(compare_dir, 'compare%dd' % properties['dim'])
             compare_exec = os.path.join(compare_dir, compare_exec)
             # print('Found executable %s ' % compare_exec)
 
@@ -139,7 +139,7 @@ def test_folder(test_directory, verbose_output=False):
                               'compare.HOaverage': 0,
                               'compare.no_average_var': 'T err'}
 
-            utils.write_inputs(compare_params_file, compare_params)
+            mushyLayerRunUtils.write_inputs(compare_params_file, compare_params)
             cmd = 'cd %s ; %s %s  > /dev/null' % (diffs_folder, compare_exec, compare_params_file)
 
             # print('Executing: %s' % cmd)

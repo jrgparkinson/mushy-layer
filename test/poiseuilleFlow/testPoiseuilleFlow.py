@@ -12,20 +12,20 @@ import shutil
 # noinspection PyUnresolvedReferences
 class PoiseuilleSolution:
 
-    def __init__(self, x, porosity, permeability, da, body_force):
+    def __init__(self, x_sol, porosity_sol, permeability_sol, da, body_force):
         """
         :param da: darcy number, scalar
         :param body_force: body_force, scalar
-        :param permeability: value of the permeability, scalar or vector
-        :param porosity: value of the porosity, scalar or vector
-        :param x: x values on which to compute the solution
+        :param permeability_sol: value of the permeability, scalar or vector
+        :param porosity_sol: value of the porosity, scalar or vector
+        :param x_sol: x values on which to compute the solution
         """
 
         self.da = da
         self.body_force = body_force
-        self.permeability = permeability
-        self.porosity = porosity
-        self.x = x
+        self.permeability = permeability_sol
+        self.porosity = porosity_sol
+        self.x = x_sol
 
     def compute_solution(self):
         """
@@ -39,23 +39,23 @@ class PoiseuilleSolution:
         res = solve_bvp(self.ode, self.bc, self.x, v_init)
 
         # Get the vertical velocity out of the result
-        v = res.sol(self.x)[0]
-        return v
+        v_analytic = res.sol(self.x)[0]
+        return v_analytic
 
-    def ode(self, x, v):
+    def ode(self, x_ode, v_ode):
         """ Define ODE:
             v'' = (porosity/permeability)*(1/da)*v - porosity(x)*body_force
         which becomes
             v0' = v1
             v1'  = (porosity/permeability)*(1/da)v0 - porosity(x)*body_force
 
-            :param x: x positions in the domain
-            :param v: current vertical velocity
+            :param x_ode: x positions in the domain
+            :param v_ode: current vertical velocity
             :return: expression of ODE
             """
-        chi = np.interp(x, self.x, self.porosity)
-        perm = np.interp(x, self.x, self.permeability)
-        return np.vstack((v[1], (chi / perm) * (1 / self.da) * v[0] - chi * self.body_force))
+        chi = np.interp(x_ode, self.x, self.porosity)
+        perm = np.interp(x_ode, self.x, self.permeability)
+        return np.vstack((v_ode[1], (chi / perm) * (1 / self.da) * v_ode[0] - chi * self.body_force))
 
     @staticmethod
     def bc(va, vb):
@@ -70,13 +70,13 @@ class PoiseuilleSolution:
 def base_inputs():
 
     test_dir = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'test/poiseuilleFlow')
-    inputs = mushyLayerRunUtils.read_inputs(os.path.join(test_dir, 'inputs'))
+    default_inputs = mushyLayerRunUtils.read_inputs(os.path.join(test_dir, 'inputs'))
 
-    inputs['main.min_time'] = 0.2
-    inputs['main.max_time'] = 3.0
-    inputs['main.steady_state'] = 1e-5
+    default_inputs['main.min_time'] = 0.2
+    default_inputs['main.max_time'] = 3.0
+    default_inputs['main.steady_state'] = 1e-5
 
-    return inputs
+    return default_inputs
 
 if __name__ == "__main__":
 

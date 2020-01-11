@@ -24,9 +24,9 @@ def dimensional_salinity(s, c_ref=230.0, delta_c=200.0):
 
 
 def dimensional_temperature(T, T_ref=-23.0, delta_t=20.0):
-    dim_T = T * delta_t + T_ref
+    dim_temperature = T * delta_t + T_ref
 
-    return dim_T
+    return dim_temperature
 
 def dimensional_velocity(vel, length_scale=1.0):
     heat_diffusivity = 1.25e-7

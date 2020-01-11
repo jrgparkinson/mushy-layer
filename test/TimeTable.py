@@ -3,10 +3,10 @@ import re
 
 class TimeTableMethod:
 
-    def __init__(self, string_to_parse, parent=None):
+    def __init__(self, string_to_parse, parent_el=None):
         parts = re.findall('(\s*)\[(\d+)]\s([^\s]*)\s([\d.]+)\s+[\d.]+%\s', string_to_parse)
 
-        self.parent = parent
+        self.parent = parent_el
         self.valid = False
 
         if parts:
@@ -30,8 +30,8 @@ class TimeTableMethod:
 
 class TimeTable:
 
-    def __init__(self, filepath):
-        self.filepath = filepath
+    def __init__(self, file_path):
+        self.filepath = file_path
 
         self.methods = []
 
@@ -105,24 +105,22 @@ class TimeTable:
         :return: dict of individual parent occurences mapping to their children
         """
 
-
-        parent_children = {}
+        parent_children_items = {}
 
         for m in self.methods:
             if m.parent and m.parent.name == parent_method_name:
                 # children.append(m)
-                if m.parent not in list(parent_children.keys()):
-                    parent_children[m.parent] = []
+                if m.parent not in list(parent_children_items.keys()):
+                    parent_children_items[m.parent] = []
 
-                parent_children[m.parent].append(m)
+                parent_children_items[m.parent].append(m)
 
+        return parent_children_items
 
-        return parent_children
-
-    def total_time_in_method(self, method_name):
+    def total_time_in_method(self, a_method_name):
         total_time = 0
         for m in self.methods:
-            if m.name == method_name:
+            if m.name == a_method_name:
                 total_time = total_time + m.time
 
         return total_time
@@ -146,12 +144,12 @@ class TimeTable:
         return call_history
 
 
-    def get_call_history_for_name(self, method_name):
+    def get_call_history_for_name(self, a_method_name):
 
         call_history = []
 
         for m in self.methods:
-            if m.name == method_name:
+            if m.name == a_method_name:
                 call_history.append(self.get_call_history_for_id(m.id))
 
         return call_history

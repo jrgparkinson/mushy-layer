@@ -2,7 +2,7 @@
 import os
 from colorama import Fore, Style
 
-from AMRConvergenceTest import runTest
+from AMRConvergenceTest import run_test
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
 
 
@@ -113,8 +113,8 @@ def test_fixed_porous_hole():
 
     # Run
     extra_params = {}
-    runTest(data_folder, physical_problem, fixed_porous_resolution_specific_params, amr_setup, num_procs,
-            analysis_command, extra_params)
+    run_test(data_folder, physical_problem, fixed_porous_resolution_specific_params, amr_setup, num_procs,
+             analysis_command, extra_params)
 
 if __name__ == "__main__":
     test_fixed_porous_hole()

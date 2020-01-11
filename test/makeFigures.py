@@ -85,8 +85,8 @@ def make_figures():
 
    
     # Write out as a script then run that
-    scriptFile = os.path.join(base_output_dir, 'makeFigureScript.m')
-    f = open(scriptFile, "w")
+    script_file = os.path.join(base_output_dir, 'makeFigureScript.m')
+    f = open(script_file, "w")
     full_matlab_command = "set(groot, 'defaultAxesFontName', 'Latin Modern Math');\n" \
                           "set(groot, 'defaultTextFontName', 'Latin Modern Math');\n" + full_matlab_command
     f.write(full_matlab_command)

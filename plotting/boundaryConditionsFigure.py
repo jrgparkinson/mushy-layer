@@ -139,7 +139,7 @@ def make_bc_text(inputs, directory, side):
     scalar_options = ['Dirichlet', 'Neumann', 'InflowOutflow', 'OnlyInflow', 'Robin', 'VariableFlux',
                       'FixedTemperature', 'TemperatureFlux', 'TemperatureFluxRadation']
     scalars = {'enthalpy': 'H', 'bulkConcentration': '\Theta', 'vel': '\mathbf{U}'}
-    BC_TYPES = {'bulkConcentration': scalar_options,
+    bc_types = {'bulkConcentration': scalar_options,
                 'enthalpy': scalar_options,
                 'vel': ['$\mathbf{U} = 0$', 'Inflow',
                         'Outflow',
@@ -169,7 +169,7 @@ def make_bc_text(inputs, directory, side):
         bc_type = string_to_array(inputs[bc_type_name])
         bc_type_this_dir = bc_type[directory]
 
-        bc_type_description = BC_TYPES[v][bc_type_this_dir]
+        bc_type_description = bc_types[v][bc_type_this_dir]
 
         # Now we know what the BC is, need to display it sensibly
 

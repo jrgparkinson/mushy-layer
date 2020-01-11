@@ -5,6 +5,7 @@ import subprocess
 import re
 from colorama import Fore
 
+
 class BatchJob:
     """
     Class to create and run batch jobs through a queueing system.
@@ -145,15 +146,15 @@ class BatchJob:
                             int(self.tasks_per_node)) + '         # How many tasks on each node' + '\n',
                         '#SBATCH --ntasks-per-socket=' + str(int(self.tasks_per_socket)) +
                         '        # How many tasks on each CPU or socket (not sure what this really means)' + '\n',
-                        '#SBATCH --distribution=cyclic:cyclic # Distribute tasks cyclically on nodes and sockets' + '\n',
+                        '#SBATCH --distribution=cyclic:cyclic '
+                        '# Distribute tasks cyclically on nodes and sockets' + '\n',
                         '# Memory usage (MB)' + '\n', '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
                         '#SBATCH --output=' + os.path.join(self.folder,
-                                                           'sbatch%j.out') + '   # Standard output and error log' + '\n']
-
+                                                           'sbatch%j.out') + ' # Standard output and error log' + '\n']
 
         # The commands to execute will look the same regardless of whether you're using SLURM or not
         commands_to_execute = [self.preprocess_command + '\n \n',
-                         'cd ' + self.folder + ' || exit; \n \n']
+                               'cd ' + self.folder + ' || exit; \n \n']
 
         if self.custom_command:
             commands_to_execute.append(self.custom_command)
@@ -216,15 +217,15 @@ class BatchJob:
             result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
             print(result)
 
-            job_id_search = re.findall('Submitted batch job (\d+)', result)
+            job_id_search = re.findall(r'Submitted batch job (\d+)', result)
 
             if job_id_search:
                 self.job_id = int(job_id_search[0])
 
             # Make a file in the output folder stating the slurm job id
-            F = open(os.path.join(self.folder, 'jobid'), 'w')
-            F.write(str(self.job_id))
-            F.close()
+            slurm_id_file = open(os.path.join(self.folder, 'jobid'), 'w')
+            slurm_id_file.write(str(self.job_id))
+            slurm_id_file.close()
 
             # Pause briefly in case submitting lots of slurm jobs
             time.sleep(0.5)

@@ -53,13 +53,13 @@ class DiffusiveSolution:
         self.st = stefan
 
     # noinspection PyUnresolvedReferences
-    def compute_solution(self, z):
+    def compute_solution(self, z_sol):
 
         # z = np.linspace(self.min_z, self.max_z, 100)
 
         if self.method == 'Linear':
             if self.V == 0:
-                solution = self.max_temperature - z
+                solution = self.max_temperature - z_sol
             else:
                 print('Unable to compute solution for method="linear" and V!=0')
                 sys.exit(-1)
@@ -74,7 +74,7 @@ class DiffusiveSolution:
             init_guess = np.zeros((2, z_solve.size))
 
             res_a = solve_bvp(self.diffusion_equation_function, self.diffusion_eq_bc, z_solve, init_guess)
-            solution = res_a.sol(z)[0]
+            solution = res_a.sol(z_sol)[0]
 
         else:
             print('Unknown method "%s"' % self.method)
@@ -130,14 +130,14 @@ class DiffusiveSolution:
 def base_inputs():
 
     test_dir = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'test/diffusiveGrowth')
-    inputs = mushyLayerRunUtils.read_inputs(os.path.join(test_dir, 'inputs'))
+    default_inputs = mushyLayerRunUtils.read_inputs(os.path.join(test_dir, 'inputs'))
 
-    inputs['main.min_time'] = 0.5
-    inputs['main.max_time'] = 3.0
-    inputs['main.steady_state'] = 1e-8
+    default_inputs['main.min_time'] = 0.5
+    default_inputs['main.max_time'] = 3.0
+    default_inputs['main.steady_state'] = 1e-8
 
 
-    return inputs
+    return default_inputs
 
 if __name__ == "__main__":
 

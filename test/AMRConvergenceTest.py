@@ -127,14 +127,14 @@ def amr_convergence_test(params, full_output_dir, nzs, num_procs=1, num_restarts
     return dependencies
 
 
-def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, num_procs, analysis_command='',
-            extra_params=None, numRestarts=0, restart_from_low_res=False):
+def run_test(base_dir, physical_problem, resolution_specific_params, AMRSetup, num_procs, analysis_command='',
+             extra_params=None, numRestarts=0, restart_from_low_res=False):
     """ Driver for the AMRConvergenceTest class """
 
     # base_dir should be e.g.
     # '/network/group/aopp/oceans/AW002_PARKINSON_MUSH/Test/AMRConvergenceTestNoFlow'
 
-    mushyLayerBaseDir = os.path.abspath(os.pardir)
+    mushy_layer_base_dir = os.path.abspath(os.pardir)
 
     all_params = []
 
@@ -143,35 +143,35 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
     for setup in AMRSetup:
         max_level = setup['max_level']
         ref_rat = max(setup['ref_rat'], 1)
-        Nzs = setup['Nzs']
+        nzs = setup['Nzs']
 
-        runTypes = ['uniform']
+        run_types = ['uniform']
         if 'run_types' in setup:
-            runTypes = setup['run_types']
+            run_types = setup['run_types']
 
         # finestRefinement = pow(ref_rat, max_level)
-        maxRefinement = ref_rat ** max_level
+        max_refinement = ref_rat ** max_level
         # output_dir = ''
-        Nz_i = -1
+        nz_i = -1
 
         # Construct the params files
-        for nz_coarse in Nzs:
+        for nz_coarse in nzs:
 
-            Nz_i = Nz_i + 1
+            nz_i = nz_i + 1
 
-            res_params = ConvergenceTestParams(nz_coarse, ref_rat, max_level, maxRefinement)
-            nx_coarse, params, gridFile = resolution_specific_params(res_params)
+            res_params = ConvergenceTestParams(nz_coarse, ref_rat, max_level, max_refinement)
+            nx_coarse, params, grid_file = resolution_specific_params(res_params)
 
             # Default options
             if nx_coarse == -1:
                 print('Trying to convert to an array: ' + str(params['main.num_cells']))
-                gridPts = string_to_array(params['main.num_cells'])
+                grid_pts = string_to_array(params['main.num_cells'])
 
-                aspectRatio = gridPts[0] / gridPts[1]
-                nx_coarse = aspectRatio * nz_coarse
+                aspect_ratio = grid_pts[0] / grid_pts[1]
+                nx_coarse = aspect_ratio * nz_coarse
 
-            if not gridFile:
-                gridFile = mushyLayerBaseDir + '/grids/middle/' + str(nz_coarse) + 'x' + str(nz_coarse)
+            if not grid_file:
+                grid_file = mushy_layer_base_dir + '/grids/middle/' + str(nz_coarse) + 'x' + str(nz_coarse)
 
             # Turn slope limiting off unless we've requested it
             if 'main.use_limiting' not in params:
@@ -187,47 +187,47 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
                     params[k] = v
 
             # numCellsAMR = str(nx_coarse) + ' ' + str(nz_coarse) + '  8'
-            numCellsAMR = [int(nx_coarse), int(nz_coarse), 8]
+            num_cells_amr = [int(nx_coarse), int(nz_coarse), 8]
 
             # gridFileQuarter = mushyLayerBaseDir + '/grids/rightQuarter/' + str(nx_coarse) + 'x' + str(nz_coarse)
-            gridFileThreeLevels = mushyLayerBaseDir + '/grids/rightHalfThreeLevel/' + str(nx_coarse) + 'x' + str(
+            grid_file_three_levels = mushy_layer_base_dir + '/grids/rightHalfThreeLevel/' + str(nx_coarse) + 'x' + str(
                 nz_coarse)
             # numCellsUniform = str(nx_coarse * finestRefinement) + ' ' + str(nz_coarse * finestRefinement) + '  8'
             # numCellsUniform = str(nx_coarse) + ' ' + str(nz_coarse) + '  8'
-            numCellsUniform = [int(nx_coarse), int(nz_coarse), 8]
+            num_cells_uniform = [int(nx_coarse), int(nz_coarse), 8]
 
             # params['main.gridfile'] = gridFile
-            params['main.num_cells'] = numCellsAMR
+            params['main.num_cells'] = num_cells_amr
             params['main.max_level'] = str(max_level)
             params['main.ref_ratio'] = str(ref_rat) + ' ' + str(ref_rat) + ' ' + str(ref_rat)
 
-            num_proc = num_procs[Nz_i]
+            num_proc = num_procs[nz_i]
             params['num_proc'] = num_proc
 
             if num_proc > 1:
-                optimalGrid = float(nx_coarse) / (float(num_proc) / 2.0)
+                optimal_grid = float(nx_coarse) / (float(num_proc) / 2.0)
 
                 # print('Initial optimal grid guess: %d' % optimalGrid)
 
                 # increase to next power of 2
-                while not is_power_of_two(optimalGrid):
-                    optimalGrid = optimalGrid + 1
+                while not is_power_of_two(optimal_grid):
+                    optimal_grid = optimal_grid + 1
 
                 # print('Final optimal grid guess: %d' % optimalGrid)
 
-                maxGrid = max(16, optimalGrid)
+                max_grid = max(16, optimal_grid)
                 # grid size must be greater than the blocking factor
-                maxGrid = max(maxGrid, 2 * int(params['main.block_factor']))
-                params['main.max_grid_size'] = str(int(maxGrid))
+                max_grid = max(max_grid, 2 * int(params['main.block_factor']))
+                params['main.max_grid_size'] = str(int(max_grid))
 
             # Now construct vector different param sets
             param_sets = []
 
             # Run 1: uniform mesh
-            if 'uniform' in runTypes:
+            if 'uniform' in run_types:
                 p0 = dict(params)
                 p0['main.max_level'] = '0'
-                p0['main.num_cells'] = numCellsUniform
+                p0['main.num_cells'] = num_cells_uniform
                 p0['run_name'] = 'Uniform'
                 p0['concise_run_name'] = 'Uniform'
                 p0['projection.eta'] = 0.0
@@ -235,7 +235,7 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
                 param_sets.append(p0)
 
             # This should do the job for AMR simulations
-            if 'amr' in runTypes:
+            if 'amr' in run_types:
                 p1 = dict(params)
                 p1['main.reflux_scalar'] = '1'
                 p1['main.use_subcycling'] = '1'
@@ -250,28 +250,28 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
                 param_sets.append(p1)
 
             # Variable mesh
-            if 'variable' in runTypes and max_level == 1:
+            if 'variable' in run_types and max_level == 1:
                 p2 = dict(params)
                 p2['main.reflux_scalar'] = '1'
                 p2['main.use_subcycling'] = '1'
                 p2['main.refluxType'] = '2'
                 p2['projection.eta'] = '0.95'
 
-                p2['main.gridfile'] = gridFile
+                p2['main.gridfile'] = grid_file
                 p2['run_name'] = 'VM-Subcycle-Reflux-Freestream' + str(p2['projection.eta']) + '-MaxLevel' + str(
                     max_level)
                 p2['concise_run_name'] = 'VM'
 
                 param_sets.append(p2)
 
-            if 'variable' in runTypes and max_level == 2:
+            if 'variable' in run_types and max_level == 2:
                 p3 = dict(params)
                 p3['main.reflux_scalar'] = '1'
                 p3['main.use_subcycling'] = '1'
                 p3['main.refluxType'] = '2'
                 p3['projection.eta'] = '0.95'
 
-                p3['main.gridfile'] = gridFileThreeLevels
+                p3['main.gridfile'] = grid_file_three_levels
                 p3['run_name'] = 'VM-Subcycle-Reflux-Freestream' + str(p3['projection.eta']) + '-MaxLevel' + str(
                     max_level)
                 p3['concise_run_name'] = 'VM'
@@ -302,7 +302,7 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
         # full_output_dir = os.path.join(base_dir, output_dir)
         full_output_dir = base_dir
 
-        these_job_ids = amr_convergence_test(all_params, full_output_dir, Nzs, num_procs, numRestarts,
+        these_job_ids = amr_convergence_test(all_params, full_output_dir, nzs, num_procs, numRestarts,
                                              restart_from_low_res)
 
         # Concatenate lists
@@ -311,21 +311,21 @@ def runTest(base_dir, physical_problem, resolution_specific_params, AMRSetup, nu
     # Once all these runs have been submitted, submit the analysis job
     print('analysis command: %s' % analysis_command)
     if analysis_command:
-        runAnalysisName = 'runAnalysis.sh'
+        run_analysis_name = 'runAnalysis.sh'
 
         # Don't redo analysis - we may be waiting on runs to finish
-        if os.path.exists(os.path.join(base_dir, runAnalysisName)):
+        if os.path.exists(os.path.join(base_dir, run_analysis_name)):
             print(Fore.YELLOW + 'Analysis job already submitted \n' + Fore.RESET)
         else:
-            jobName = physical_problem + '-analysis'
+            job_name = physical_problem + '-analysis'
 
-            s = BatchJob(base_dir, jobName, '', 4)
+            s = BatchJob(base_dir, job_name, '', 4)
 
             s.set_dependency(job_ids)
             s.set_custom_command(analysis_command)
 
             # s.write_slurm_file(runAnalysisName)
-            s.run_task(runAnalysisName)
+            s.run_task(run_analysis_name)
             print(Fore.GREEN + 'Submitted analysis job \n' + Fore.RESET)
 
     return job_ids

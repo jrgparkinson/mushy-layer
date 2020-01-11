@@ -150,13 +150,13 @@ class MushyLayerRunSimple:
         params_key = 'main.params_file'
 
         #inputsParams = read_inputs(inputs_file)
-        inputsParams = {}
+        inputs_params = {}
         
-        extraParams = {}
+        extra_params = {}
         if params_key in self.parameters:
-            extraParams = read_inputs(self.parameters[params_key])
-        elif params_key in inputsParams:
-            extraParams = read_inputs(inputsParams[params_key])
+            extra_params = read_inputs(self.parameters[params_key])
+        elif params_key in inputs_params:
+            extra_params = read_inputs(inputs_params[params_key])
 
         # Merge all dictionary's
         # Important that it's done in this order, so that parameters
@@ -165,13 +165,13 @@ class MushyLayerRunSimple:
         # 2) params in main.params_file 
         # 3) params in the inputs file
 
-        for key in extraParams.keys():
+        for key in extra_params.keys():
             if key not in self.parameters:
-                self.parameters[key] = extraParams[key]
+                self.parameters[key] = extra_params[key]
 
-        for key in inputsParams.keys():
+        for key in inputs_params.keys():
             if key not in self.parameters:
-                self.parameters[key] = inputsParams[key]
+                self.parameters[key] = inputs_params[key]
 
 
         # If we have Kozeny-Carman permeability, make sure we have hele-shaw cell to limit the max permeability
