@@ -115,12 +115,12 @@ def setup(git_build=False):
                 hdf5_path = install_path_response
 
             url= 'https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz'
-            response = subprocess.run(['wget', url])
-            response = subprocess.run(['tar', '-zxvf', 'hdf5-1.8.21.tar.gz'])
-            response = subprocess.run(['cd', 'hdf5-1.8.21'])
-            response = subprocess.run(['./ configure', '--prefix=', hdf5_path])
-            response = subprocess.run(['make'])
-            response = subprocess.run(['make', 'install'])
+            subprocess.check_call(['wget', url])
+            subprocess.check_call(['tar', '-zxvf', 'hdf5-1.8.21.tar.gz'])
+            subprocess.check_call(['cd', 'hdf5-1.8.21'])
+            subprocess.check_call(['./ configure', '--prefix=', hdf5_path])
+            subprocess.check_call(['make'])
+            subprocess.check_call(['make', 'install'])
 
             os.environ['LD_LIBRARY_PATH'] += ':' + hdf5_path
             print_var('LD_LIBRARY_PATH', git_build)

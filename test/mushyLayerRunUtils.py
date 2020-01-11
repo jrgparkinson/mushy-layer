@@ -443,13 +443,16 @@ def is_power_of_two(n):
         return False
 
 
-def string_to_array(string, conversion=lambda x: int(x)):
+def string_to_array(string, conversion=None):
     """ Convert a string separated by spaces to an array, i.e.
     a b c -> [a,b,c]
      """
 
     if isinstance(string, list):
         return string
+
+    if not conversion:
+        conversion = lambda x: int(x)
 
     parts = string.split(' ')
     array = [conversion(i) for i in parts]

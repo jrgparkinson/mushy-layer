@@ -1092,7 +1092,7 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
 
   if (taggingVar >= 0)
   {
-    m_scalarNew[taggingVar]->exchange(Interval(0, 1 - 1));
+    m_scalarNew[taggingVar]->exchange(Interval(0, 0));
   }
 
   if (taggingVectorVar > 0)

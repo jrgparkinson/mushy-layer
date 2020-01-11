@@ -851,9 +851,6 @@ void AMRLevelMushyLayer::addHeatSource(LevelData<FArrayBox>& src)
   //    ppHeatSource.query("depth", gaussian_heat_source_depth);
       ppHeatSource.query("xpos", gaussian_heat_source_xpos);
 
-      // enthalpy is in the first component of the source term
-      int Hcomp = 0;
-
       if (gaussian_heat_source_size != 0.0)
       {
         for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
@@ -864,7 +861,8 @@ void AMRLevelMushyLayer::addHeatSource(LevelData<FArrayBox>& src)
             RealVect loc;
             ::getLocation(iv, loc, m_dx);
 
-            src[dit](iv, Hcomp) = gaussian_heat_source_size/(gaussian_heat_source_width*sqrt(2*M_PI))
+            // Set the 0th component (enthalpy)
+            src[dit](iv, 0) = gaussian_heat_source_size/(gaussian_heat_source_width*sqrt(2*M_PI))
                 * exp(-0.5*pow((loc[0]-gaussian_heat_source_xpos)/gaussian_heat_source_width, 2))
                 * 0.5*(1 + tanh(10*(loc[1]-(m_domainHeight-gaussian_heat_source_depth) ) ));
 

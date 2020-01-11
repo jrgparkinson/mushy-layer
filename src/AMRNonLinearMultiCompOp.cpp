@@ -477,7 +477,6 @@ void AMRNonLinearMultiCompOp::prolongIncrement(LevelData<FArrayBox>&       a_phi
   CH_TIME("AMRNonLinearMultiCompOp::prolongIncrement");
 
   DisjointBoxLayout dbl = a_phiThisLevel.disjointBoxLayout();
-  int mgref = 2; //this is a multigrid func
   DataIterator dit = a_phiThisLevel.dataIterator();
   int nbox=dit.size();
 
@@ -496,7 +495,7 @@ void AMRNonLinearMultiCompOp::prolongIncrement(LevelData<FArrayBox>&       a_phi
       FORT_PROLONG_2(CHF_FRA_SHIFT(phi, iv),
                      CHF_CONST_FRA_SHIFT(coarse, civ),
                      CHF_BOX_SHIFT(region, iv),
-                     CHF_CONST_INT(mgref));
+                     CHF_CONST_INT(2));  // refinement of two as this is multigrid
 
           }
   }//end pragma
@@ -1183,7 +1182,7 @@ void AMRNonLinearMultiCompOp::getFlux(FArrayBox&       a_flux,
   // need to convert this to temperature, liquid concentration to calculate diffusive flux
   FArrayBox derivedVar(a_data.box(), a_data.nComp());
 
-  AMRNonLinearMultiCompOp* op = (AMRNonLinearMultiCompOp*)this;
+  AMRNonLinearMultiCompOp* op = static_cast<AMRNonLinearMultiCompOp>(this);
   op->computeDiffusedVar(derivedVar, a_data, a_dit);
 
   // const FArrayBox& diffusedVar = a_data;
@@ -1241,7 +1240,7 @@ setTime(Real a_time)
 //-----------------------------------------------------------------------
 
 // Factory
-AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory() : m_numComp(2)
+AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory() : m_FAS(true), m_numComp(2)
 {
   setDefaultValues();
 }

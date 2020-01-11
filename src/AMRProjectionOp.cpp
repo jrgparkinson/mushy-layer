@@ -80,7 +80,6 @@ void AMRProjectionOp::prolongIncrement(LevelData<FArrayBox>&       a_phiThisLeve
   CH_TIME("AMRProjectionOp::prolongIncrement");
 
   DisjointBoxLayout dbl = a_phiThisLevel.disjointBoxLayout();
-  int mgref = 2; //this is a multigrid func
   DataIterator dit = a_phiThisLevel.dataIterator();
   int nbox=dit.size();
 
@@ -95,20 +94,10 @@ void AMRProjectionOp::prolongIncrement(LevelData<FArrayBox>&       a_phiThisLeve
         const IntVect& iv = region.smallEnd();
         IntVect civ=coarsen(iv, 2);
 
-//        FORT_PROLONG_2(CHF_FRA_SHIFT(phi, iv),
-//                     CHF_CONST_FRA_SHIFT(coarse, civ),
-//                     CHF_BOX_SHIFT(region, iv),
-//                     CHF_CONST_INT(mgref));
-
-//        FORT_PROLONG_JP(CHF_FRA_SHIFT(phi, iv),
-//                             CHF_CONST_FRA_SHIFT(coarse, civ),
-//                             CHF_BOX_SHIFT(region, iv),
-//                             CHF_CONST_INT(mgref));
-
            FORT_PROLONG(CHF_FRA_SHIFT(phi, iv),
                                      CHF_CONST_FRA_SHIFT(coarse, civ),
                                      CHF_BOX_SHIFT(region, iv),
-                                     CHF_CONST_INT(mgref));
+                                     CHF_CONST_INT(2)); //refinement ratio of 2 (as this is multigrid)
       }
 
 

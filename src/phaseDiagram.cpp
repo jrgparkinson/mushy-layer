@@ -273,7 +273,7 @@ Real computePorosity(Real H, Real C, Real compositionRatio, Real specificHeatRat
                                Real thetaEutectic, Real ThetaEutectic)
 {
   Real H_e, H_s, H_l, porosity;
-  H_e = H_s = H_l = porosity = BASEFAB_REAL_SETVAL;
+  H_e = H_s = H_l = BASEFAB_REAL_SETVAL;
 
   ::computeBoundingEnergy(H_e, C, H_s, H_l, H_e, heatCapacityRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
 
@@ -284,14 +284,12 @@ Real computePorosity(Real H, Real C, Real compositionRatio, Real specificHeatRat
   else if (H > H_s && H <= H_e)
   {
     porosity = (H-thetaEutectic*specificHeatRatio)/(stefan + thetaEutectic*(1-specificHeatRatio));
-
   }
   else if (H > H_e && H < H_l)
   {
 
     porosity = computePorosityMushyLayer( H,  C,  compositionRatio,  specificHeatRatio,
                                           stefan,  waterDistributionCoeff);
-
   }
   else
   {

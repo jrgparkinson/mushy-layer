@@ -162,6 +162,7 @@ jobs:
           python run_regression_tests.py -v
 
       - uses: actions/upload-artifact@v1
+        name: Upload test results
         with:
           name: test-results
           path: ${{ env.REGRESSIONS_PATH }}

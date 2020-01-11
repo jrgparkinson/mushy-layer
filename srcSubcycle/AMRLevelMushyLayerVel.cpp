@@ -1743,7 +1743,6 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
 {
   // Get coarse pointer if necessary
   LevelData<FArrayBox> crseOldVel;
-  AMRLevelMushyLayer* amrMLcrse;
   int srcGhost = src.ghostVect()[0];
 
   bool pressureSrc = m_usePrevPressureForUStar;
@@ -1754,18 +1753,11 @@ void AMRLevelMushyLayer::computeUstarSrc(LevelData<FArrayBox>& src,
     pressureSrc = m_opt.CCPressureSrc;
   }
 
-//  if (m_time <= m_opt.skipTrickySourceTerm)
-//  {
-//    pout() << "AMRLevelMushyLayer::computeUstarSrc - time = " << m_time << " < " << m_opt.skipTrickySourceTerm;
-//    pout() << ", skipping advection src term";
-//    advSrc = false;
-//  }
-
   Real oldTime = m_time - m_dt;
 
   if (m_level > 0)
   {
-    amrMLcrse = getCoarserLevel();
+    AMRLevelMushyLayer* amrMLcrse = getCoarserLevel();
 
     crseOldVel.define(amrMLcrse->m_grids, SpaceDim,
                       srcGhost * IntVect::Unit);

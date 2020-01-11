@@ -628,7 +628,6 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
   // for now, hardwire to simplest single-component case
   CH_assert(a_div.nComp() == 1);
   CH_assert(a_u.nComp() == SpaceDim);
-  int comp = 0;
 
   // first do coarse-level BC's
   if (a_uCrsePtr != nullptr)
@@ -676,6 +675,7 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
     }
 
     // subtract coarse-level data from fluxReg
+    const Interval comps(0,0);
 
     DataIterator dit = a_div.dataIterator();
     // iterate over coarse boxes
@@ -683,7 +683,6 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
     {
       FluxBox& thisFlux = uEdge[dit()];
       Real scale = 1.0;
-      const Interval comps(comp,comp);
       // iterate over directions
       for (int dir=0; dir<SpaceDim; dir++)
       {
@@ -701,7 +700,6 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
     FArrayBox cellData;
     FArrayBox edgeData;
     Real scale = 1.0;
-    const Interval comps(comp,comp);
 
     for (ditFine.reset(); ditFine.ok(); ++ditFine)
     {
