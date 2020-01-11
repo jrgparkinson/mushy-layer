@@ -17,8 +17,7 @@ env:
   HDF5_PATH: /home/runner/hdf5-dir
   LD_LIBRARY_PATH: /home/runner/hdf5-dir
   TEST_RESULTS: /home/runner/work/mushy-layer/mushy-layer/test/results
-  PYTHONPATH: todo
-
+  PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
 
 jobs:
   build:
@@ -46,12 +45,10 @@ jobs:
 
       - name: Run regressions
         run: |
-          cd $GITHUB_WORKSPACE
-          echo ::set-env name=PYTHONPATH::$(echo "$PYTHONPATH:/home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting:")
-          cd test/regression
+          cd $GITHUB_WORKSPACE/test/regression
           echo "$PYTHONPATH"
           python run_regression_tests.py
 
 
-
+#         echo ::set-env name=PYTHONPATH::$(echo "$PYTHONPATH:/home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting:")
 #         python install.py -g
