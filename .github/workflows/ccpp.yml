@@ -124,10 +124,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Setup test output
-      run: |
-        mkdir -p $TEST_RESULTS
-        echo hello > $TEST_RESULTS/world.txt
+#     - name: Setup test output
+#       run: |
+#         mkdir -p $TEST_RESULTS
+#         echo hello > $TEST_RESULTS/world.txt
 
     - name: Run regressions
       run: |
@@ -137,7 +137,7 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: test-results
-        path: $GITHUB_WORKSPACE/test/results/
+        path: $GITHUB_WORKSPACE/test/regression/
 
     
 
