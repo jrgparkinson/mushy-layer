@@ -25,6 +25,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
 
+    steps:
     - name: Set up Python 3.6
       uses: actions/setup-python@v1
       with:
@@ -41,10 +42,10 @@ jobs:
     - name: Install python dependencies
       run: pip install -r requirements.txt
 
-	- name: Run regressions
-      run: |
-         cd $GITHUB_WORKSPACE
-         python install.py -g
-         cd test/regression
-         echo "$PYTHONPATH"
-         python run_regression_tests.py
+  	- name: Run regressions
+        run: |
+           cd $GITHUB_WORKSPACE
+           python install.py -g
+           cd test/regression
+           echo "$PYTHONPATH"
+           python run_regression_tests.py
