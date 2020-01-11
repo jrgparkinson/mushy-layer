@@ -108,7 +108,6 @@ jobs:
         make lib
 
     - name: Compile ChomboCompare
-      run: |
         cd $CHOMBO_HOME/util/ChomboCompare
         make compare
 
@@ -147,6 +146,13 @@ jobs:
         echo "$PYTHONPATH"
         cd $GITHUB_WORKSPACE/test/regression
         python run_regression_tests.py
+
+# Rerun with verbosity
+
+    - if: failure()
+      run: |
+        cd $GITHUB_WORKSPACE/test/regression
+        python run_regression_tests.py -v
 
     - uses: actions/upload-artifact@v1
       with:
