@@ -14,7 +14,7 @@ env:
   CHOMBO_ROOT: /home/runner/chombo
   CHOMBO_HOME: /home/runner/chombo/lib
   HDF5_PATH: /home/runner/hdf5-dir
-  LD_LIBRARY_PATH: /home/runner/hdf5-dir
+  LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
   REGRESSIONS_PATH: /home/runner/work/mushy-layer/mushy-layer/test/regression
   TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test
@@ -33,7 +33,7 @@ jobs:
           echo ::set-env name=CHOMBO_ROOT::$(echo $HOME)/chombo
           echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
           echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
-            $(echo $HDF5_PATH)
+            $(echo $HDF5_PATH)/lib
 
       - name: Info
         run: |

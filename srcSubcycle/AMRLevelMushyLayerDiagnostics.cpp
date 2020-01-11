@@ -269,9 +269,9 @@ void AMRLevelMushyLayer::computeDiagnostics()
         Box b = m_grids[dit];
         b &= vertBox;
 
-        FArrayBox& vel = (*m_vectorNew[VectorVars::m_fluidVel])[dit];
         if (b.size() >= IntVect::Unit)
         {
+          FArrayBox& vel = (*m_vectorNew[VectorVars::m_fluidVel])[dit];
           maxHorizVel = max(maxHorizVel, vel.max(b, 0));
         }
       }
@@ -302,8 +302,6 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
     // Compute increments to solute flux on each level
     int numComp = 2;
-
-    IntVect fluxGhost = IntVect::Zero;
 
     LevelData<FluxBox> totalFlux(m_grids, numComp, IntVect::Unit);
     getTotalFlux(totalFlux);

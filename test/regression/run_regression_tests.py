@@ -34,7 +34,7 @@ class Logger():
         self.log_status(Fore.RED + '[Failed]' + Fore.RESET)
 
     def log_ok(self):
-        self.log_status(Fore.GREEN + '[OK]' + Fore.RESET)
+        self.log_status(Fore.LIGHTGREEN_EX + '[OK]' + Fore.RESET)
 
     def log_void(self):
         self.log_status(Fore.YELLOW + '[Void]' + Fore.RESET)

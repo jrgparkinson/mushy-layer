@@ -12,7 +12,7 @@ def create_refined_restart(argv):
     refinement = ''
 
     try:
-        opts, args = getopt.getopt(argv, "n:p:r:")
+        opts, _ = getopt.getopt(argv, "n:p:r:")
     except getopt.GetoptError as err:
         print(str(err))
         print('create_refined_restart.py -n<new folder> -p<previous dir>'

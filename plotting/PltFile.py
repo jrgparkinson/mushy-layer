@@ -362,7 +362,7 @@ class PltFile:
                     # data contains all fields on this level, sort into individual fields
                     # comp_offset_start = 0
 
-                    coords = self.get_coordinates(lo, hi)
+                    coords = self.get_coordinates(lo_indices, hi_indices)
 
                     # Blank dataset for this box, which each component will be added to
                     ds_box = xr.Dataset({}, coords=coords)
@@ -916,7 +916,7 @@ class PltFile:
             #     for i in range(rows):
 
             # replaced loop over [j,i] with loop over [idx] for 3D compatibility
-            for idx, value in np.ndenumerate(enthalpy):
+            for idx, _ in np.ndenumerate(enthalpy):
                 if enthalpy[idx] <= enthalpy_solidus[idx]:
                     porosity[idx] = 0.0
                     temperature[idx] = enthalpy[idx] / cp

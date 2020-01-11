@@ -2242,7 +2242,6 @@ void Projector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
     Vector<LevelData<FArrayBox>* > newLambda(a_lambda.size());
 
     Vector<int> nRefFineVect(a_lambda.size());
-    levelProjPtr = this;
     for (int lev=m_level; lev<=finestLevel; lev++)
     {
       if (lev < finestLevel)

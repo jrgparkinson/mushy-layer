@@ -1242,7 +1242,7 @@ setTime(Real a_time)
 //-----------------------------------------------------------------------
 
 // Factory
-AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory() : m_FAS(true), m_numComp(2)
+AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory() : m_relaxMode(1), m_FAS(true), m_numComp(2), m_superOptimised(false)
 {
   setDefaultValues();
 }

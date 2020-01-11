@@ -397,7 +397,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
       // If this advection velocity box contains information relating to this state, apply BCs
       if (advVelBox.contains(stateBox))
       {
-        matched = true;
+        //        matched = true;
 
         // Extrapolation for outflow, dirichlet for inflow
 

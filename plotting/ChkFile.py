@@ -56,9 +56,9 @@ def compute_channel_properties(porosity, do_plots=False):
             if chimneys_in_row == 0:
                 continue
 
-            for chimney_i in range(0, len(chimney_positions)):
+            for chimney_i, chimney_pos in enumerate(chimney_positions):
                 if chimney_i < len(chimney_pos_row):
-                    chimney_positions[chimney_i].append(chimney_pos_row[chimney_i])
+                    chimney_pos.append(chimney_pos_row[chimney_i])
 
             # Now, add extra rows to chimneyPositions vector if needed
             for chimney_i in range(len(chimney_positions), chimneys_in_row):
@@ -68,14 +68,14 @@ def compute_channel_properties(porosity, do_plots=False):
     # print(str(chimney_positions))
     # Filter out short channels
     chimney_lengths = []
-    for chimney_i in range(0, len(chimney_positions)):
-        chimney_lengths.append(float(len(chimney_positions[chimney_i])))
+    for chimney in chimney_positions:
+        chimney_lengths.append(float(len(chimney)))
 
     av_chim_length = np.mean(chimney_lengths)
     long_enough_chimneys = []
-    for chimney_i in range(0, len(chimney_positions)):
-        if len(chimney_positions[chimney_i]) > av_chim_length / 2:
-            long_enough_chimneys.append(chimney_positions[chimney_i])
+    for chimney in chimney_positions:
+        if len(chimney) > av_chim_length / 2:
+            long_enough_chimneys.append(chimney)
 
     # print(str(long_enough_chimneys))
 

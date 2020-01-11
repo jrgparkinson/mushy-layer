@@ -188,7 +188,7 @@ def run_chombo_compare(argv):
     figure_output_directory = None
 
     try:
-        opts, args = getopt.getopt(argv, "f:v:e:r:n:a")
+        opts, _ = getopt.getopt(argv, "f:v:e:r:n:a")
     except getopt.GetoptError as err:
         print(str(err))
         print('run_chombo_compare.py -f <folder> -a<run analysis> -v <variable to consider> -e < err type> '

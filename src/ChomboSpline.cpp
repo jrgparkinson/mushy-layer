@@ -115,11 +115,10 @@ std::vector<Real> band_matrix::r_solve(const std::vector<Real>& b) const
 {
     assert( this->dim()==(int)b.size() );
     std::vector<Real> x(this->dim());
-    int j_stop;
     Real sum;
     for(int i=this->dim()-1; i>=0; i--) {
         sum=0;
-        j_stop=std::min(this->dim()-1,i+this->num_upper());
+        int j_stop=std::min(this->dim()-1,i+this->num_upper());
         for(int j=i+1; j<=j_stop; j++) sum += this->operator()(i,j)*x[j];
         x[i]=( b[i] - sum ) / this->operator()(i,i);
     }

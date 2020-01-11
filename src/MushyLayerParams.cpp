@@ -792,15 +792,8 @@ void MushyLayerParams::getParameters()
   ppBio.query("activeTracerInitVal", activeTracerInitVal);
   ppBio.query("passiveTracerInitVal", passiveTracerInitVal);
 
-
-
-
-  //Print out parameters
-  bool printParams = false;
-  if (printParams)
-  {
-    printParameters();
-  }
+  // uncomment to print the parameters
+  //  printParameters();
 }
 
 void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool required)
@@ -864,7 +857,7 @@ void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool req
         {
           temp[idir] = 0;
         }
-        else if (temp_str[idir] == "inflow")
+        else if (temp_str[idir] == "inflowVelocity")
         {
           temp[idir] = 1;
         }

@@ -38,13 +38,11 @@ class BatchJob:
         self.exclude = None
 
         self.allow_manual_run = False
-
         self.commands_to_execute = None
 
         # Default setup: all tasks on one node
         # This will fail for large numbers of processors - need to implement 
         # some clever load balancing
-
         # Always fix this
         self.cpu_per_task = 1
 
