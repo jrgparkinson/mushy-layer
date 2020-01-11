@@ -21,6 +21,7 @@ env:
 
 jobs:
   build:
+    name: Build
 
     runs-on: ubuntu-latest
 
@@ -104,7 +105,11 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/execSubcycle
         make all
-
+        
+  regression:
+    name: Regression tests
+    
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -119,12 +124,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - run: mkdir -p $TEST_RESULTS
-
-    - run: echo hello > $TEST_RESULTS/world.txt
+    - name: Setup test output
+      run: |
+        mkdir -p $TEST_RESULTS
+        echo hello > $TEST_RESULTS/world.txt
 
     - name: Run regressions
-       run: |
+      run: |
          cd test/regression
          python run_regression_tests.py
 
