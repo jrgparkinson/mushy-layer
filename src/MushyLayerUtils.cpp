@@ -576,24 +576,16 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
   {
     IntVect iv = bit();
     RealVect loc;
-    getLocation(iv, loc, a_dx);
-    Real x = loc[0];
-    Real z = loc[1];
+    Real x, y, zz;
+    getLocation(iv, a_dx, x, y, zz);
 
     Real solidFraction = solidFractionFAB(iv,0);
 
-    // Make sure this isn't 0
-    //    Real minSolidFractionAllowed = 1e-8;
-    //    solidFraction = max(solidFraction, minSolidFractionAllowed);
-
     Real liquidFraction = (1-solidFraction);
     Real permeability;
-//    Real referencePerm = params.referencePermeability;
 
     if(params.permeabilityFunction == PermeabilityFunctions::m_permeabilityXSquared)
     {
-//      permeability = x*x;
-
       Real scale = 0.1;
 
       // Creates a channel of high permeability in the middle of the domain
@@ -604,9 +596,9 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
 
       // Two permeability holes in the left and right of the domain
       scale = 0.03;
-      Real zScale = 0.12;
-      permeability = exp(-pow(x-0.2,2)/scale)*exp(-pow(z-0.5,2)/zScale);
-      permeability = permeability + exp(-pow(x-0.8,2)/scale)*exp(-pow(z-0.5,2)/zScale);
+      Real yScale = 0.12;
+      permeability = exp(-pow(x-0.2,2)/scale)*exp(-pow(y-0.5,2)/yScale);
+      permeability = permeability + exp(-pow(x-0.8,2)/scale)*exp(-pow(y-0.5,2)/yScale);
       permeability = 1-permeability;
 
       //Block flow at the boundaries
@@ -621,15 +613,27 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
 
     else
     {
-      //			MayDay::Error("amrMushyLayer::calculatePermeability() - Unknown permeability function");
       permeability = params.calculatePermeability(liquidFraction);
     }
 
-
     permeabilityFAB(iv, 0) = permeability;
 
-
   } //box iterator
+}
+
+void getLocation(const IntVect iv, const Real a_dx, Real& x, Real& y, Real& z, const RealVect ccOffset)
+{
+  RealVect scaledOffset = ccOffset*a_dx;
+  RealVect loc = iv;
+  loc *= a_dx;
+  loc += scaledOffset;
+
+  x = loc[0];
+  y = loc[1];
+  if (SpaceDim == 3)
+  {
+    z = loc[2];
+  }
 }
 
 void getLocation(const IntVect iv, RealVect& loc, const Real a_dx, const RealVect ccOffset)

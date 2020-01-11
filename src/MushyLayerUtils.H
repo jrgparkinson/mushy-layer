@@ -114,6 +114,14 @@ calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionFAB,
 void getLocation(const IntVect iv, RealVect& loc, const Real a_dx,
 		const RealVect ccOffset = 0.5*RealVect::Unit);
 
+/// Get location in domain
+/**
+ * default offset is for cell centred points.
+ * note that ccOffset should be 0, 0.5 or 1 in each direction
+ */
+void getLocation(const IntVect iv, const Real a_dx, Real& x, Real& y, Real& z,
+                 const RealVect ccOffset = 0.5*RealVect::Unit);
+
 /// Initial data for burgers problem benchmark
 Real burgersPeriodicInit(Real x, Real y, int dir, MushyLayerParams params);
 
@@ -130,18 +138,11 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain, string
 /// Check if string is also an integer
 bool is_integer(const std::string& s);
 
-//void
-//timeInterpWithGhostCells(LevelData<FArrayBox>& a_dest, Real a_time,
-//		const LevelData<FArrayBox>& a_old_phi, Real a_old_time,
-//		const LevelData<FArrayBox>& a_new_phi, Real a_new_time,
-//		const Interval& a_src_comps, const Interval& a_dest_comps);
-
-
-//void
-//timeInterpWithGhostCells(LevelData<FArrayBox>& a_dest, Real a_time,
-//		const LevelData<FArrayBox>& a_old_phi, Real a_old_time,
-//		const LevelData<FArrayBox>& a_new_phi, Real a_new_time,
-//		const Interval& a_src_comps = Interval(0,0));
+/// Create data structures for holding phase boundaries
+void createPhaseBoundaryStructures(const int lev, const Vector<DisjointBoxLayout>& grids, const IntVect ivGhost,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpySolidus,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyEutectic,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyLiquidus);
 
 
 #include "NamespaceFooter.H"

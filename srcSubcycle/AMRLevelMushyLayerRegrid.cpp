@@ -1630,19 +1630,20 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
     thisLevelData = this;
 
     // need to reset boundary conditions here
-    for (int lev = 0; lev < numLevels; lev++)
-    {
-      const ProblemDomain& levelDomain = thisLevelData->problemDomain();
-      Real levelDx = thisLevelData->m_dx;
-      LevelData<FArrayBox>& thisAmrVel = *amrVel[lev];
-      const DisjointBoxLayout& thisLevelGrids = thisAmrVel.getBoxes();
-      velBC.applyBCs(thisAmrVel, thisLevelGrids, levelDomain, levelDx,
-                     false); // inhomogeneous
-      if (thisLevelData->m_finer_level_ptr != nullptr)
-      {
-        thisLevelData = dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
-      }
-    }
+//    for (int lev = 0; lev < numLevels; lev++)
+//    {
+//      const ProblemDomain& levelDomain = thisLevelData->problemDomain();
+//      Real levelDx = thisLevelData->m_dx;
+//      LevelData<FArrayBox>& thisAmrVel = *amrVel[lev];
+//      const DisjointBoxLayout& thisLevelGrids = thisAmrVel.getBoxes();
+//      velBC.applyBCs(thisAmrVel, thisLevelGrids, levelDomain, levelDx,
+//                     false); // inhomogeneous
+//      if (thisLevelData->m_finer_level_ptr != nullptr)
+//      {
+//        thisLevelData = dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
+//      }
+//    }
+    setVelBCs(numLevels, amrVel, velBC);
 
     updateEnthalpyVariables();
     updateEnthalpyVariablesOld();

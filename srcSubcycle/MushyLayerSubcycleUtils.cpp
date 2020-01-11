@@ -1338,5 +1338,15 @@ bool is_integer(const std::string& s)
 
 
 
+void createPhaseBoundaryStructures(const int lev, const Vector<DisjointBoxLayout>& grids, const IntVect ivGhost,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpySolidus,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyEutectic,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyLiquidus)
+{
+  enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+  enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+  enthalpyEutectic[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+}
+
 
 #include "NamespaceFooter.H"

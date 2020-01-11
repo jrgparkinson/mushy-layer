@@ -310,6 +310,9 @@ public:
   /// Things to do after initialization
   virtual void postInitialize();
 
+  /// Apply velocity BCs to AMR velocity
+  void setVelBCs(const int numLevels, Vector<LevelData<FArrayBox>*>& amrVel, VelBCHolder& velBC);
+
 #ifdef CH_USE_HDF5
   /// Write checkpoint header
   virtual void writeCheckpointHeader(HDF5Handle& a_handle) const;
@@ -853,6 +856,10 @@ protected:
 
   /// Calculate analytic solution to this problem (if possible)
   void calculateAnalyticSolns(bool enforceSolutions = true);
+
+  /// Copy analytic solution to primary variables and compute diagnostic variables from them
+  void applyAnalyticSolution(LevelData<FArrayBox>& enthalpyAnalytic,
+                             LevelData<FArrayBox>& bulkCAnalytic);
 
   /// Set fixed porosity
   void setPorosity(FArrayBox& a_porosity);

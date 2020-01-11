@@ -413,11 +413,11 @@ private:
 	/// cell spacing
 	Real m_dx;
 
-	/// current time
-	Real m_time;
-
 	/// Is this object defined?
 	bool m_defined;
+
+	/// current time
+	Real m_time;
 
 	/// Pointer to advection velocity
 	LevelData<FluxBox>* m_advVel;

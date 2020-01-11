@@ -1110,9 +1110,8 @@ Real AMRLevelMushyLayer::doHCreflux()
     porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, ivGhost));
     aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], numComps, ivGhost));
 
-    enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-    enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-    enthalpyEutectic[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+    createPhaseBoundaryStructures(lev, grids, ivGhost, enthalpySolidus, enthalpyEutectic, enthalpyLiquidus);
+
     HC[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], numComps, ivGhost));
 
     amrML->fillHC(*HC[lev], m_time);

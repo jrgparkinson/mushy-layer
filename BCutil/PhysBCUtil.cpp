@@ -4060,8 +4060,8 @@ LevelData<FluxBox>*  PhysBCUtil::getAdvVel()
 
 PhysBCUtil::PhysBCUtil() : m_dx(-1),
     m_defined(false),
-    m_advVel(nullptr),
-    m_time(0)
+    m_time(0),
+    m_advVel(nullptr)
 { }
 
 // ---------------------------------------------------------------
@@ -4109,8 +4109,8 @@ PhysBCUtil::operator= (const PhysBCUtil& rhs)
 PhysBCUtil::PhysBCUtil(const PhysBCUtil& rhs) :   m_loBC(rhs.m_loBC),
     m_hiBC(rhs.m_hiBC),
     m_dx(rhs.m_dx),
-    m_time(rhs.m_time),
     m_defined(false),
+    m_time(rhs.m_time),
     m_advVel(nullptr)
 { }
 
