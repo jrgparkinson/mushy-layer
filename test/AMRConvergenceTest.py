@@ -127,8 +127,8 @@ def amr_convergence_test(params, full_output_dir, nzs, num_procs=1, num_restarts
     return dependencies
 
 
-def run_test(base_dir, physical_problem, resolution_specific_params, AMRSetup, num_procs, analysis_command='',
-             extra_params=None, numRestarts=0, restart_from_low_res=False):
+def run_test(base_dir, physical_problem, resolution_specific_params, amr_setup, num_procs, analysis_command='',
+             extra_params=None, num_restarts=0, restart_from_low_res=False):
     """ Driver for the AMRConvergenceTest class """
 
     # base_dir should be e.g.
@@ -140,7 +140,7 @@ def run_test(base_dir, physical_problem, resolution_specific_params, AMRSetup, n
 
     job_ids = []
 
-    for setup in AMRSetup:
+    for setup in amr_setup:
         max_level = setup['max_level']
         ref_rat = max(setup['ref_rat'], 1)
         nzs = setup['Nzs']
@@ -302,7 +302,7 @@ def run_test(base_dir, physical_problem, resolution_specific_params, AMRSetup, n
         # full_output_dir = os.path.join(base_dir, output_dir)
         full_output_dir = base_dir
 
-        these_job_ids = amr_convergence_test(all_params, full_output_dir, nzs, num_procs, numRestarts,
+        these_job_ids = amr_convergence_test(all_params, full_output_dir, nzs, num_procs, num_restarts,
                                              restart_from_low_res)
 
         # Concatenate lists

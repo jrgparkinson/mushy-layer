@@ -17,8 +17,8 @@ def dimensional_salinity(s, c_ref=230.0, delta_c=200.0):
     return dim_s
 
 
-def dimensional_temperature(T, T_ref=-23.0, delta_t=20.0):
-    dim_temperature = T * delta_t + T_ref
+def dimensional_temperature(temperature, reference_temperature=-23.0, delta_t=20.0):
+    dim_temperature = temperature * delta_t + reference_temperature
 
     return dim_temperature
 

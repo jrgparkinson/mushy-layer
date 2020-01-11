@@ -1,13 +1,12 @@
-from plotting.PltFile import latexify
+from PltFile import latexify
 from mushyLayerRunUtils import write_inputs, get_executable_name, get_final_plot_file
 import getopt
 import os
 import re
 import numpy as np
 import sys
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+import matplotlib as mpl
+mpl.use('Agg')
 
 
 def format_field_name(field):
@@ -355,7 +354,7 @@ def run_chombo_compare(argv):
     latexify(fig_width=6.0, fig_height=2.5)
 
     # Make left axes wider
-    fig, axes = plt.subplots(1, 2)  # gridspec_kw={'width_ratios':[2,1]}
+    fig, axes = mpl.pyplot.plt.subplots(1, 2)  # gridspec_kw={'width_ratios':[2,1]}
 
     if include_richardson:
         key_order = ['Single-level Richardson', 'Single-level 512 difference']
@@ -469,9 +468,9 @@ def run_chombo_compare(argv):
     filename = filename.replace(' ', '_')  # remove spaces
     figure_full_path = os.path.join(figure_output_directory, filename)
     print('Saving as %s' % figure_full_path)
-    plt.savefig(figure_full_path, format='eps')
+    mpl.pyplot.plt.savefig(figure_full_path, format='eps')
 
-    plt.show()
+    mpl.pyplot.plt.show()
 
 
 if __name__ == "__main__":

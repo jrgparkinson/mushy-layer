@@ -1,4 +1,4 @@
-from plotting.PltFile import PltFile
+from PltFile import PltFile, latexify2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_bvp
@@ -9,7 +9,6 @@ import test.mushyLayerRunUtils as mushyLayerRunUtils
 import subprocess
 import sys
 import shutil
-from PltFile import latexify2
 
 
 # This script is for testing that the mushy-layer code correctly solves diffusion problems correctly
@@ -41,12 +40,12 @@ class DiffusiveSolution:
         self.T_ref = np.nan
         self.F = np.nan
 
-    def set_nonlinear_bcs(self, a, b, T_r, flux, V_frame_advection, conc_ratio, stefan):
+    def set_nonlinear_bcs(self, a, b, reference_temperature, flux, frame_advection_velocity, conc_ratio, stefan):
         self.a = a
         self.b = b
-        self.T_ref = T_r
+        self.T_ref = reference_temperature
         self.F = flux
-        self.V = V_frame_advection
+        self.V = frame_advection_velocity
         self.cr = conc_ratio
         self.st = stefan
 
@@ -80,7 +79,7 @@ class DiffusiveSolution:
 
         return solution
 
-    def diffusion_equation_function(self, x, T):
+    def diffusion_equation_function(self, x, temperature):
         # For solving d^T/dz^2 - V*(dT/dz + dchi/dz) = 0
 
         # Define T_0 = T, T_1 = dT_0/dz
@@ -94,19 +93,19 @@ class DiffusiveSolution:
 
         # Assuming either liquid or mushy
 
-        chi = np.minimum(1.0, self.cr / (self.cr - T[0]))
+        chi = np.minimum(1.0, self.cr / (self.cr - temperature[0]))
 
         # if chi < 1:
-        dchi_dz = T[1] * (self.cr / np.power(self.cr - T[0], 2))
+        dchi_dz = temperature[1] * (self.cr / np.power(self.cr - temperature[0], 2))
         # else:
         dchi_dz[chi == 1.0] = 0.0
 
         # dchi_dz = 0
 
-        return np.vstack((T[1],
-                          self.V * (T[1] + self.st * dchi_dz)))
+        return np.vstack((temperature[1],
+                          self.V * (temperature[1] + self.st * dchi_dz)))
 
-    def diffusion_eq_bc(self, Ta, Tb):
+    def diffusion_eq_bc(self, temperature_left_boundary, temperature_right_boundary):
         # Current BCs:
         # T(z=0) = min_temperature
         # T(z=1) = max_temperature
@@ -119,8 +118,9 @@ class DiffusiveSolution:
         # fixed_bc_res = np.array([Ta[0]-self.max_temperature,
         #                          Tb[0]-self.min_temperature])
 
-        mixed_bc_res = np.array([Ta[0] - self.max_temperature,
-                                 self.a * Tb[1] - self.F - self.b * (Tb[0] - self.T_ref)])
+        mixed_bc_res = np.array([temperature_left_boundary[0] - self.max_temperature,
+                                 self.a * temperature_right_boundary[1] - self.F
+                                 - self.b * (temperature_right_boundary[0] - self.T_ref)])
 
         return mixed_bc_res
 
@@ -190,8 +190,8 @@ if __name__ == "__main__":
     analytic_solution = DiffusiveSolution(T_min, T_max, method='Mixed')
 
     # this is just a dirichlet BC, data matches well
-    analytic_solution.set_nonlinear_bcs(a=opt['a'], b=opt['b'], T_r=opt['Tref'], flux=opt['F'],
-                                        V_frame_advection=opt['V'], conc_ratio=cr, stefan=st)
+    analytic_solution.set_nonlinear_bcs(a=opt['a'], b=opt['b'], reference_temperature=opt['Tref'], flux=opt['F'],
+                                        frame_advection_velocity=opt['V'], conc_ratio=cr, stefan=st)
 
     # Now let's run the mushy-layer simulation
     sim_name = 'ImperfectCooling_a%s_b%s_Tref%s_F%s_CR%s_st%s' % (opt['a'], opt['b'], opt['Tref'], opt['F'], cr, st)

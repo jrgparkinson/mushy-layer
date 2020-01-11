@@ -312,14 +312,14 @@ def read_inputs(inputs_file):
     return params
 
 
-def write_inputs(location, params, ignore_list=None, doSort=True):
+def write_inputs(location, params, ignore_list=None, do_sort=True):
     """
      Write out a set of parameters to an inputs file
     """
     output_file = ''
 
     key_list = list(params.keys())
-    if doSort:
+    if do_sort:
         key_list.sort()
 
     for key in key_list:

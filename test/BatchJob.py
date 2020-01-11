@@ -100,9 +100,9 @@ class BatchJob:
     def set_exec_file(self, exec_file):
         self.exec_file = exec_file
 
-    def write_batch_file(self, runFileName='run.sh', inputs_file_name='inputs'):
+    def write_batch_file(self, run_file_name='run.sh', inputs_file_name='inputs'):
 
-        fh = open(self.get_run_file(runFileName), 'w+')
+        fh = open(self.get_run_file(run_file_name), 'w+')
 
         # Get time limit in the format days-hours:mins:secs
         days, remainder = divmod(self.time_limit, 1)
@@ -203,15 +203,15 @@ class BatchJob:
 
         fh.close()
 
-    def run_task(self, runFileName='run.sh'):
+    def run_task(self, run_file_name='run.sh'):
         """
         This method will write out a batch file for the slurm queuing system, then run it.
         If you don't have slurm, you'll need to rewrite this method
         """
 
-        self.write_batch_file(runFileName)
+        self.write_batch_file(run_file_name)
 
-        cmd = 'cd ' + self.folder + ' || exit; ' + self.get_batch_job_command() + ' ' + self.get_run_file(runFileName)
+        cmd = 'cd ' + self.folder + ' || exit; ' + self.get_batch_job_command() + ' ' + self.get_run_file(run_file_name)
 
         try:
             result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
@@ -235,5 +235,5 @@ class BatchJob:
             print("Unable to run command, maybe SLURM isn't installed? You'll need to run it manually; \n %s" % cmd)
             print(Fore.RESET)
 
-    def get_run_file(self, runFileName):
-        return os.path.join(self.folder, runFileName)
+    def get_run_file(self, run_file_name):
+        return os.path.join(self.folder, run_file_name)
