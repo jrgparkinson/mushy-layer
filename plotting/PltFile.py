@@ -16,8 +16,8 @@ from scipy.signal import find_peaks
 from skimage.feature import peak_local_max
 from itertools import product
 
-def compute_z(porosity_slice, y_slice, porosity):
 
+def compute_z(porosity_slice, y_slice, porosity):
     # valid_cells = np.argwhere(porosity_slice < porosity)
     #
     # j_ml_above = min(valid_cells)
@@ -52,13 +52,13 @@ class PltFile:
 
     python_index_ordering = True
 
-    FIELD_LABEL = {'Porosity': '$\chi$',
-                   'Bulk concentration': '$\Theta$',
-                   'Liquid concentration': '$\Theta_l$',
-                   'Permeability': '$\Pi$',
+    FIELD_LABEL = {'Porosity': r'$\chi$',
+                   'Bulk concentration': r'$\Theta$',
+                   'Liquid concentration': r'$\Theta_l$',
+                   'Permeability': r'$\Pi$',
                    'xAdvection velocity': '$u$',
                    'yAdvection velocity': '$w$',
-                   'streamfunction': '$\psi$'}
+                   'streamfunction': r'$\psi$'}
 
     def __init__(self, filename, load_data=False, inputs_file='inputs'):
         self.is_plot_file = False
@@ -69,7 +69,7 @@ class PltFile:
         self.filename = filename
 
         # Get the plot prefix and frame number assuming a format
-        prefix_format = '(.*)-(\d+)\.2d\.hdf5'
+        prefix_format = r'(.*)-(\d+)\.2d\.hdf5'
         m = re.search(prefix_format, self.filename)
 
         if m and m.groups() and len(m.groups()) == 2:
@@ -105,7 +105,6 @@ class PltFile:
         # Now read all the component names
         self.data = {}
 
-
         # get inputs
         output_folder = os.path.abspath(os.path.join(self.filename, '..'))
         inputs_file_loc = os.path.join(output_folder, inputs_file)
@@ -140,8 +139,6 @@ class PltFile:
 
         self.data_loaded = False
 
-
-
     # noinspection PyUnresolvedReferences
     def load_data_native(self, zero_x=False):
 
@@ -155,7 +152,6 @@ class PltFile:
         # Get all the different bits of data from the file
         # print(h5File)
 
-        
         chombo_group = h5_file['Chombo_global']
         global_attrs = chombo_group.attrs
 
@@ -190,8 +186,6 @@ class PltFile:
             self.data[actual_name][self.DATA] = [np.nan] * self.num_levels
             self.comp_names.append(actual_name)
 
-
-
         ds_levels = []
 
         self.levels = [{}] * self.num_levels
@@ -205,7 +199,7 @@ class PltFile:
 
             group_atts = level_group.attrs
             boxes = level_group['boxes']
-            lev_dx =  group_atts['dx']
+            lev_dx = group_atts['dx']
             self.levels[level] = {self.DX: lev_dx, self.DT: group_atts['dt'],
                                   self.REF_RATIO: group_atts['ref_ratio'], self.BOXES: list(boxes)}
 
@@ -223,8 +217,6 @@ class PltFile:
                 for i in range(self.space_dim, self.space_dim + self.space_dim):
                     self.full_domain_size[i] = self.full_domain_size[i] + lev_dx
                     # self.fullDomainSize[3] = self.fullDomainSize[3] + lev_dx
-
-
 
             # Create a box which spans the whole domain
             # Initialise with a box spanning the whole domain, then add data where it exists
@@ -265,11 +257,10 @@ class PltFile:
 
             ds_boxes = [ds_dom_box]
 
-
             # Get level outlines
             polygons = []
             for box in self.levels[level][self.BOXES]:
-                lo_indices, hi_indices= self.get_indices(box)
+                lo_indices, hi_indices = self.get_indices(box)
 
                 # 0.5 because cell centred
                 lo_vals = [lev_dx * (0.5 + i) for i in lo_indices]
@@ -296,7 +287,6 @@ class PltFile:
             for comp_name in self.data.keys():
                 num_comps = num_comps + self.data[comp_name][self.NUM_COMPS]
 
-
             # Now get the  data for each field, on each level
 
             if self.is_plot_file:
@@ -314,14 +304,11 @@ class PltFile:
 
                 data_unshaped = data[()]
 
-
-
                 offset = 0
 
                 for box in self.levels[level][self.BOXES]:
                     lo_indices = [box[i] for i in range(self.space_dim)]
                     hi_indices = [box[i] for i in range(self.space_dim, 2 * self.space_dim)]
-
 
                     n_cells_dir = [hi_indices[d] + 1 - lo_indices[d] for d in range(self.space_dim)]
 
@@ -338,15 +325,15 @@ class PltFile:
                     ds_box = xr.Dataset({}, coords=coords)
 
                     for comp_name in self.comp_names:
-
                         # print('Num cells in a box: ' + str(num_box_cells))
                         comp_offset_finish = comp_offset_start + num_box_cells
 
-                        indices = [offset+comp_offset_start, offset + comp_offset_finish]
+                        indices = [offset + comp_offset_start, offset + comp_offset_finish]
 
                         comp_offset_start = comp_offset_finish
 
-                        ds_box[comp_name] = self.get_box_comp_data(data_unshaped, level, indices, comp_name, n_cells_dir, coords)
+                        ds_box[comp_name] = self.get_box_comp_data(data_unshaped, level,
+                                                                   indices, comp_name, n_cells_dir, coords)
 
                     # Move onto next box
                     offset = offset + num_cells
@@ -380,14 +367,12 @@ class PltFile:
                     # Blank dataset for this box, which each component will be added to
                     ds_box = xr.Dataset({}, coords=coords)
 
-
-
                     for comp_name in self.comp_names:
                         component = 0
 
                         # Need to get data differently if this is a vector
                         is_vector = (comp_name[0] == 'x' or comp_name[0] == 'y' or comp_name[
-                            0] == 'z' and  sum([comp_name[1:] in x for x in self.comp_names]) == self.space_dim)
+                            0] == 'z' and sum([comp_name[1:] in x for x in self.comp_names]) == self.space_dim)
                         if is_vector:
                             if comp_name[0] == 'x':
                                 component = 0
@@ -410,26 +395,25 @@ class PltFile:
 
                         data_unshaped = data[()]
 
-
-
                         # print('Num cells in a box: ' + str(num_box_cells))
-                        #comp_offset_finish = comp_offset_start + num_box_cells
+                        # comp_offset_finish = comp_offset_start + num_box_cells
 
-                        component_offset = 0 # this is just 0 because we only get data for this component
+                        component_offset = 0  # this is just 0 because we only get data for this component
 
                         # For vectors, we may have an offset?
                         if num_comps > 1:
-                            component_offset = component*num_box_cells
+                            component_offset = component * num_box_cells
 
                         # start_index = component_offset + box_offset
-                        start_index = box_offset_scalar*num_comps + component_offset
+                        start_index = box_offset_scalar * num_comps + component_offset
                         end_index = start_index + num_box_cells
 
                         indices = [start_index, end_index]
 
-                        #comp_offset_start = comp_offset_finish
+                        # comp_offset_start = comp_offset_finish
 
-                        ds_box[comp_name] = self.get_box_comp_data(data_unshaped, level, indices, comp_name, n_cells_dir, coords)
+                        ds_box[comp_name] = self.get_box_comp_data(data_unshaped, level,
+                                                                   indices, comp_name, n_cells_dir, coords)
 
                         # component_offset = component_offset + (num_box_cells*num_comps)
 
@@ -438,8 +422,6 @@ class PltFile:
 
                     ds_boxes.append(ds_box)
 
-
-
             # ds_level = xr.merge(ds_boxes)
 
             # ds_level = xr.auto_combine(ds_boxes[1:])
@@ -447,11 +429,10 @@ class PltFile:
             # Update will replace in place
             first_box = 1
             ds_level = ds_boxes[first_box]
-            for b in ds_boxes[first_box+1:]:
-
+            for b in ds_boxes[first_box + 1:]:
                 # b = b.transpose()
 
-                ds_level =  ds_level.combine_first(b)
+                ds_level = ds_level.combine_first(b)
                 # ds_level = ds_level.update(b)
 
             # Debugging:
@@ -474,13 +455,12 @@ class PltFile:
             # else:
             #     ds_level = xr.auto_combine(ds_boxes[1:])
 
-
             # Create x,y,z, coordinates
             x_y_coords_names = ['x', 'y', 'z']
 
             for d in range(self.space_dim):
                 # Factor of 0.5 accounts for cell centering
-                ds_level.coords[x_y_coords_names[d]] = (ds_level.coords[self.INDEX_COORDS_NAMES[d]] + 0.5)* lev_dx
+                ds_level.coords[x_y_coords_names[d]] = (ds_level.coords[self.INDEX_COORDS_NAMES[d]] + 0.5) * lev_dx
             # ds_level.coords['x'] = ds_level.coords['i'] * lev_dx
             # ds_level.coords['y'] = ds_level.coords['j'] * lev_dx
 
@@ -492,15 +472,12 @@ class PltFile:
                 ds_level = ds_level.swap_dims({self.INDEX_COORDS_NAMES[d]: x_y_coords_names[d]})
 
             # ds_level = ds_level.swap_dims({'i': 'x'})
-            #ds_level = ds_level.swap_dims({'j': 'y'})
+            # ds_level = ds_level.swap_dims({'j': 'y'})
 
-
-            #TODO: should level be an attribute or co-ordinate? need to try with actual AMR data
-            ds_level.attrs['level'] =  level
-
+            # TODO: should level be an attribute or co-ordinate? need to try with actual AMR data
+            ds_level.attrs['level'] = level
 
             ds_levels.append(ds_level)
-
 
         self.ds_levels = ds_levels
 
@@ -552,12 +529,9 @@ class PltFile:
             reshaped_data = reshaped_data.transpose()
             # dim_list = dim_list[::-1]
 
-
         xarr_component_box = xr.DataArray(reshaped_data, dims=dim_list,  # ['j', 'i'],
                                           coords=extended_coords,  # {'i': i_box, 'j': j_box, 'level': level},
                                           attrs={'field_type': field_type})
-
-
 
         return xarr_component_box
 
@@ -589,14 +563,13 @@ class PltFile:
         # Shrink outline slightly
 
         # outline
-        #outline = outline.scale(0.99, 0.99)
+        # outline = outline.scale(0.99, 0.99)
         # dx = self.levels[level][self.DX]
-        #domain = Polygon([(dx, dx), (1-dx, dx), (1-dx, 1-dx), (dx, 1-dx)])
-        #intersect = gpd.sjoin(domain, outline, how="inner", op='intersection')
-        #intersect.plot(ax=ax, edgecolor=ec, facecolor=[1,1,1,0], linewidth=2.0)
+        # domain = Polygon([(dx, dx), (1-dx, dx), (1-dx, 1-dx), (dx, 1-dx)])
+        # intersect = gpd.sjoin(domain, outline, how="inner", op='intersection')
+        # intersect.plot(ax=ax, edgecolor=ec, facecolor=[1,1,1,0], linewidth=2.0)
 
-
-        outline = outline.scale(0.99,0.99)
+        outline = outline.scale(0.99, 0.99)
         outline.plot(ax=ax, edgecolor=ec, facecolor=[1, 1, 1, 0], linewidth=3.0)
 
     def channel_properties(self, do_plots=False):
@@ -623,21 +596,20 @@ class PltFile:
 
         return x, y
 
-
     @staticmethod
     def get_mesh_grid_xarray(arr, grow=False):
         x = np.array(arr.coords['x'])
         y = np.array(arr.coords['y'])
 
-        dx = float(x[1]-x[0])
-        dy = float(y[1]-y[0])
+        dx = float(x[1] - x[0])
+        dy = float(y[1] - y[0])
 
         if grow:
-            x = np.append(x, [float(x[-1])+dx])
-            y = np.append(y, [float(y[-1])+dy])
+            x = np.append(x, [float(x[-1]) + dx])
+            y = np.append(y, [float(y[-1]) + dy])
 
-            x = x-dx/2
-            y = y-dx/2
+            x = x - dx / 2
+            y = y - dx / 2
 
         return x, y
 
@@ -670,11 +642,11 @@ class PltFile:
         dx = np.abs(x_coords[1] - x_coords[0])
 
         if extend_grid:
-            extend = dx/2
+            extend = dx / 2
         else:
             extend = 0
-        y, x = np.mgrid[slice(min(x_coords)-extend, max(x_coords)+extend, dx),
-                        slice(min(y_coords)-extend, max(y_coords)+extend, dx)]
+        y, x = np.mgrid[slice(min(x_coords) - extend, max(x_coords) + extend, dx),
+                        slice(min(y_coords) - extend, max(y_coords) + extend, dx)]
 
         coord_max = [(grid_size[i] + 1) * dx for i in range(0, self.space_dim)]
         grid_spacing = [coord_max[i] / grid_size[i] for i in range(0, self.space_dim)]
@@ -696,10 +668,7 @@ class PltFile:
 
             return x, y, z
 
-
         else:
-
-
             if rotate_dims:
                 y_new = x.transpose()
                 x_new = y.transpose()
@@ -736,7 +705,7 @@ class PltFile:
 
         if self.data_load_method == self.YT:
             pass
-            #TODO: write this
+            # TODO: write this
 
         if not self.data_loaded:
             print('Data not loaded')
@@ -758,7 +727,7 @@ class PltFile:
         if self.data_load_method == self.XARRAY:
 
             # ds_lev = self.ds_amr.sel(level=level)
-            #ds_lev = self.ds_levels[level].sel(level=level)
+            # ds_lev = self.ds_levels[level].sel(level=level)
             ds_lev = self.ds_levels[level]
 
             ld = ds_lev[field]
@@ -766,13 +735,11 @@ class PltFile:
             # Set covered cells to NaN
             # This is really slow, I'm sure there's a faster way
             if valid_only and level < self.num_levels - 1:
-
-
                 coarseness = self.levels[level][self.REF_RATIO]
-                fine_level = np.array(self.ds_levels[level+1][field])
-                temp = fine_level.reshape((fine_level.shape[0]// coarseness, coarseness,
+                fine_level = np.array(self.ds_levels[level + 1][field])
+                temp = fine_level.reshape((fine_level.shape[0] // coarseness, coarseness,
                                            fine_level.shape[1] // coarseness, coarseness))
-                coarse_fine = np.sum(temp, axis=(1,3))
+                coarse_fine = np.sum(temp, axis=(1, 3))
 
                 isnan = np.isnan(coarse_fine)
                 # ld = ld.where(isnan == True)
@@ -871,7 +838,6 @@ class PltFile:
 
         return field_arr
 
-
     def set_scale_slice_transform(self, indices, reflect=False):
         """ Describe how to extract data """
         self.indices = indices
@@ -880,7 +846,6 @@ class PltFile:
     def reset_scale_slice_transform(self):
         self.indices = None
         self.reflect = None
-
 
     def get_field_label(self, field_name):
 
@@ -905,7 +870,6 @@ class PltFile:
             pc = 1e-5
 
         theta_eutectic = 0.0
-
 
         for level in range(0, self.num_levels):
             enthalpy_ds = self.get_level_data('Enthalpy', level)
@@ -935,7 +899,6 @@ class PltFile:
             # Now compute bounding energies
             print('Computing bounding energy')
             for idx, _ in np.ndenumerate(enthalpy):
-
                 eutectic_porosity = (conc_ratio + bulk_salinity[idx]) / (theta_eutectic + conc_ratio)
                 enthalpy_eutectic[idx] = eutectic_porosity * (stefan + theta_eutectic * (1 - cp)) + cp * theta_eutectic
                 enthalpy_solidus[idx] = cp * (theta_eutectic + max(0.0, (-bulk_salinity[idx] - conc_ratio) / pc))
@@ -996,12 +959,10 @@ class PltFile:
             ds_ss = enthalpy_ds.copy(deep=True).rename('Solid concentration')
             ds_ss.values = solid_salinity
 
-
             self.ds_levels[level]['Porosity'] = ds_porosity
             self.ds_levels[level]['Temperature'] = ds_temperature
             self.ds_levels[level]['Liquid concentration'] = ds_sl
             self.ds_levels[level]['Solid concentration'] = ds_ss
-
 
             # available_comps = list(self.ds_levels[0].keys())
             # print('Available comps: %s' % str(available_comps))
@@ -1038,13 +999,12 @@ class PltFile:
 
         return total_permeability
 
-
     def num_channels(self, z_ml):
 
         bulk_salinity = self.get_level_data('Bulk concentration')
 
         peak_height_scaling = 2.0
-        separation = 5 # minimum pixel separation
+        separation = 5  # minimum pixel separation
 
         # dom = self.prob_domain
         # min_length = min(dom)
@@ -1054,7 +1014,7 @@ class PltFile:
 
             separation = 5  # minimum pixel separation
 
-            bulk_s_slice = bulk_salinity.sel(y = z_ml, method='nearest')
+            bulk_s_slice = bulk_salinity.sel(y=z_ml, method='nearest')
             vel_slice = np.array(self.get_level_data('yDarcy velocity').sel(y=z_ml, method='nearest'))
             slice_arr = np.array(bulk_s_slice) * vel_slice
 
@@ -1074,22 +1034,21 @@ class PltFile:
             # plt.tight_layout()
             # plt.show()
 
-
             return num_peaks
         else:
 
-
-            bulk_s_slice = bulk_salinity.sel(z = z_ml, method='nearest')
+            bulk_s_slice = bulk_salinity.sel(z=z_ml, method='nearest')
 
             vel_slice = np.array(self.get_level_data('zDarcy velocity').sel(z=z_ml, method='nearest'))
 
-            slice_arr = np.array(bulk_s_slice)*vel_slice
+            slice_arr = np.array(bulk_s_slice) * vel_slice
             # slice_arr = slice_arr - slice_arr.min()
 
             peak_height = float(slice_arr.max()) / peak_height_scaling
             # print('threshold_abs = %s' % peak_height)
 
-            coordinates = peak_local_max(slice_arr, min_distance=separation, threshold_abs=peak_height, exclude_border=False)
+            coordinates = peak_local_max(slice_arr, min_distance=separation,
+                                         threshold_abs=peak_height, exclude_border=False)
 
             num_peaks = len(coordinates)
 
@@ -1107,7 +1066,6 @@ class PltFile:
 
     def compute_mush_liquid_interface(self):
 
-
         porosity = self.get_level_data('Porosity')
         if self.space_dim == 2:
             z = porosity.coords['y']
@@ -1124,7 +1082,8 @@ class PltFile:
             # Start from the bottom of the domain and trace cells upwards until we hit mushy cells
 
             # Rather than highest liquid cell, consider lowest mushy cell
-            iterate_shape = porosity.shape[:-1]  # iterate over everything but vertical index (which is in the last index)
+            # iterate over everything but vertical index (which is in the last index)
+            iterate_shape = porosity.shape[:-1]
             import itertools
             liquid_z_indices = []
             # for ix in np.arange(0, s[1]):
@@ -1176,9 +1135,7 @@ class PltFile:
             else:
                 median_liquid_boundary = 0
 
-
             # height = abs(dx * float(median_eutectic_boundary - median_liquid_boundary))
-
 
             z_interface = z[median_liquid_boundary]
             # ice_ocean_boundary_cell = int(median_liquid_boundary)
@@ -1186,7 +1143,6 @@ class PltFile:
             # If there's a mushy layer, compute confinement depth
             # confinment_depth = dx * (np.max(liquid_z_indices) - ice_ocean_interface)
             # data['channel_confinement_depth'] = confinment_depth
-
 
         return z_interface
 
@@ -1214,7 +1170,6 @@ def latexify(fig_width=None, fig_height=None):
     font_size = 9
     linewidth = 1
 
-
     if fig_width is None:
         # fig_width = 3.39 if columns == 1 else 6.9  # width in inches
         fig_width = default_fig_width
@@ -1231,7 +1186,7 @@ def latexify(fig_width=None, fig_height=None):
               'text.usetex': True, 'figure.figsize': [fig_width, fig_height], 'font.family': 'serif', 'backend': 'ps'}
 
     if 'osx' in socket.gethostname():
-        #params['text.usetex'] = False
+        # params['text.usetex'] = False
         params['pgf.texsystem'] = 'pdflatex'
         os.environ['PATH'] = os.environ['PATH'] + ':/Library/TeX/texbin/:/usr/local/bin/'
 

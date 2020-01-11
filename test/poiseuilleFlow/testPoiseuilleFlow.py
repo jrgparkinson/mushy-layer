@@ -67,8 +67,8 @@ class PoiseuilleSolution:
         """
         return np.array([va[0], vb[0]])
 
-def base_inputs():
 
+def base_inputs():
     test_dir = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'test/poiseuilleFlow')
     default_inputs = mushyLayerRunUtils.read_inputs(os.path.join(test_dir, 'inputs'))
 
@@ -77,6 +77,7 @@ def base_inputs():
     default_inputs['main.steady_state'] = 1e-5
 
     return default_inputs
+
 
 if __name__ == "__main__":
 
@@ -95,13 +96,13 @@ if __name__ == "__main__":
     # Chose some parameter options:
     porosity_functions = ['Constant', 'Linear', 'Gaussian', 'GaussianSinusodial']
     permeability_functions = ['Pure fluid', 'Cubic', 'Kozeny', 'Log', 'Xsquare',
-                              'Porosity' # set permeability = porosity
+                              'Porosity'  # set permeability = porosity
                               ]
 
     opts = {'da': 0.01,  # darcy number
-            'F': 100, # magnitude of body force which drives flow
-            'porosity_function': 2, # see porosity_functions above
-            'permeability_function': 1 # see permeability functions above
+            'F': 100,  # magnitude of body force which drives flow
+            'porosity_function': 2,  # see porosity_functions above
+            'permeability_function': 1  # see permeability functions above
             }
 
     # Now let's run the mushy-layer simulation
@@ -113,7 +114,7 @@ if __name__ == "__main__":
 
     full_output_folder = os.path.join(base_dir, sim_name)
     figure_output_paths = [os.path.join(full_output_folder, 'errorComparison'),
-    os.path.join(base_dir, sim_name)]
+                           os.path.join(base_dir, sim_name)]
 
     if os.path.exists(full_output_folder):
         print('Output directory already exists: %s' % full_output_folder)
@@ -149,7 +150,7 @@ if __name__ == "__main__":
 
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     process.wait()
-    print (process.returncode)
+    print(process.returncode)
 
     print('Finished running simulation')
 
@@ -163,7 +164,7 @@ if __name__ == "__main__":
 
     # Create the figure window
     latexify2(7.5, 3.5)
-    fig, axes  = plt.subplots(1, 2)
+    fig, axes = plt.subplots(1, 2)
     ax_list = axes.flatten()
     ax_left = ax_list[0]
 
@@ -194,9 +195,9 @@ if __name__ == "__main__":
 
     # Add legend
     lns = plt_computed + plt_python + plt_err
-    labs = [l.get_label() for l in lns]
+    labs = [line.get_label() for line in lns]
     ax_left.legend(lns, labs,
-                   loc='lower center', bbox_to_anchor=(0.5, 1.0)) #, loc=0
+                   loc='lower center', bbox_to_anchor=(0.5, 1.0))  # , loc=0
 
     # Fix axis positioning
     ax_left.set_zorder(1)  # make it on top
@@ -214,15 +215,15 @@ if __name__ == "__main__":
     plt_porosity = ax.plot(x, porosity, label='Porosity', color='blue', linestyle='-')
 
     ax.set_xlabel('$x$')
-    ax.set_ylabel('Porosity, $\chi$')
+    ax.set_ylabel(r'Porosity, $\chi$')
 
     ax_perm = ax.twinx()
     plt_permeability = ax_perm.plot(x, permeability, label='Permeability', color='red', linestyle='-')
-    ax_perm.set_ylabel('Permeability, $\Pi$')
+    ax_perm.set_ylabel(r'Permeability, $\Pi$')
     ax.set_position(ax_pos_right)
 
     lns = plt_porosity + plt_permeability
-    labs = [l.get_label() for l in lns]
+    labs = [line.get_label() for line in lns]
     ax.legend(lns, labs, loc='lower center', bbox_to_anchor=(0.5, 1.0))
 
     # Save figure
@@ -233,4 +234,3 @@ if __name__ == "__main__":
 
     # Display figure to the screen
     plt.show()
-

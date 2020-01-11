@@ -5,7 +5,8 @@ from colorama import Fore, Style
 import getopt
 from AMRConvergenceTest import run_test
 from BatchJob import BatchJob
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir, check_exec_exists
+from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir, \
+    check_exec_exists
 
 
 ######################################
@@ -27,18 +28,20 @@ def uniform_porous_resolution_specific_params(p):
     params['main.tag_buffer_size'] = str(max(2, int(float(p.nz_coarse) / 8)))
 
     # Make sure we don't split up the grids as there's currently a bug in Chombo with higher order advection methods
-    params['main.max_grid_size'] = int(p.nz_coarse*2)
+    params['main.max_grid_size'] = int(p.nz_coarse * 2)
 
     return nx_coarse, params, grid_file
+
 
 def get_default_cfl():
     cfl = 0.1
     return cfl
 
+
 def test_uniform_porous_convection(argv):
     # Default vals:
     cfl = get_default_cfl()
-    nz_uniform = 64 # don't do uniform mesh simulations by default
+    nz_uniform = 64  # don't do uniform mesh simulations by default
     nz_vm = 64
     chi = 0.4
     bc_accuracy = 2
@@ -53,7 +56,8 @@ def test_uniform_porous_convection(argv):
     except getopt.GetoptError as err:
         print(str(err))
         print('test_uniform_porous_convection.py -n<num uniform mesh grid points> -v<num variable mesh points>'
-              ' -c<cfl> -p <chi> -b <BC accuracy> -u <u del u method> -a <advection method> -d<fixed darcy> -r<fixed Ra>')
+              ' -c<cfl> -p <chi> -b <BC accuracy> -u <u del u method> -a <advection method> '
+              '-d<fixed darcy> -r<fixed Ra>')
         sys.exit(2)
 
     for opt, arg in opts:
@@ -94,11 +98,11 @@ def test_uniform_porous_convection(argv):
 
     amr_setup = []
     if nz_uniform > 0:
-        amr_setup.append({'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'], 'Nzs': [int(nz_uniform/2), nz_uniform, 2*nz_uniform]})
+        amr_setup.append({'max_level': 0, 'ref_rat': 2, 'run_types': ['uniform'],
+                          'Nzs': [int(nz_uniform / 2), nz_uniform, 2 * nz_uniform]})
 
     if nz_vm > 0:
-
-        these_nzs = [nz_vm, 2*nz_vm, 4*nz_vm]
+        these_nzs = [nz_vm, 2 * nz_vm, 4 * nz_vm]
         amr_setup.append({'max_level': 1, 'ref_rat': 2, 'run_types': ['variable'], 'Nzs': these_nzs})
 
     num_procs = [1, 1, 1]
@@ -124,7 +128,7 @@ def test_uniform_porous_convection(argv):
             da_ra_vals = [{'Da': fixed_da, 'RaT': [fixed_ra], 'lebars': [float('NaN')]}]
         elif fixed_da == 1e-6:
             da_ra_vals = [{'Da': 1e-6, 'RaT': [1e7, 1e8, 1e9],
-                           'lebars': [1.08, 3.07, 12.9]} ]
+                           'lebars': [1.08, 3.07, 12.9]}]
         elif fixed_da == 1e-2:
             da_ra_vals = [{'Da': 1e-2, 'RaT': [1e3, 1e4, 1e5, 5e5],
                            'lebars': [1.01, 1.41, 3.17, 5.24]}]
@@ -154,10 +158,10 @@ def test_uniform_porous_convection(argv):
             extra_params['main.plot_interval'] = -1
             extra_params['main.plot_period'] = 0.05
             extra_params['main.checkpoint_interval'] = 2000
-            
+
             # this is for testing purposes
             # extra_params['main.max_step'] = 10
-           
+
             if chi < 1.0:
                 extra_params['parameters.darcy'] = da * pow(1 - chi, 2) / pow(chi, 3.0)
             else:
@@ -173,14 +177,15 @@ def test_uniform_porous_convection(argv):
             this_data_folder = os.path.join(base_data_folder, output_dir)
             job_ids = run_test(this_data_folder, physical_problem, uniform_porous_resolution_specific_params, amr_setup,
                                num_procs, '', extra_params, restart_from_low_res=False)
-            
+
             all_job_ids = all_job_ids + job_ids
 
         ra_str_vals = [ra_format % a for a in da_ra['RaT']]
         ra_str = '{\'' + '\',\''.join(ra_str_vals) + '\'}'
 
-        analysis_command = analysis_command + ' compileNu(\'' + base_data_folder + '\', \'' + chi_str + '\', \'' + da_str + '\', ' + ra_str + ', ' + str(
-            nz_uniform) + ', ' + str(nz_vm) + ', [' + ','.join(nu_lebars) + ']);'
+        analysis_command += ' compileNu(\'' + base_data_folder + '\', \'' \
+                            + chi_str + '\', \'' + da_str + '\', ' + ra_str + ', ' \
+                            + str(nz_uniform) + ', ' + str(nz_vm) + ', [' + ','.join(nu_lebars) + ']);'
 
         # Now do analysis
     analysis_command = analysis_command + ' exit; " '

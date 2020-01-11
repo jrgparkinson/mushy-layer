@@ -8,9 +8,9 @@ import matplotlib as mpl
 import re
 import math
 
-def get_profiles(folder):
 
-    nc_files = [f for f in os.listdir(folder) if re.match('^chk.*\.nc$', f)]
+def get_profiles(folder):
+    nc_files = [f for f in os.listdir(folder) if re.match(r'^chk.*\.nc$', f)]
 
     full_paths = [os.path.join(folder, x) for x in nc_files]
     dfs = [xr.open_dataset(f) for f in full_paths]
@@ -21,7 +21,6 @@ def get_profiles(folder):
 
 
 def get_color(colors_arr, min_t, max_t, t):
-
     interp = (t - min_t) / (max_t - min_t)
 
     index = int(math.floor(len(colors_arr) * interp))
@@ -36,7 +35,6 @@ warming_folder = ''
 profiles_control = get_profiles(control_folder)
 profiles_warming = get_profiles(warming_folder)
 
-
 print(profiles_control)
 
 rm_profile_control = profiles_control['Rm profile']
@@ -48,7 +46,6 @@ z = rm_profile_control.coords['z']
 
 time_warming = np.array(profiles_warming['Porosity'].coords['t'])
 
-
 dim_times_control = dimensional_time(times_control)
 dim_times_warming = dimensional_time(times_control)
 
@@ -59,7 +56,7 @@ fig2, axes = plt.subplots(2, 1)
 # num_steps = int(float(len(times))/float(plot_interval))
 num_steps = len(times_control)
 print('Num timesteps: %d' % num_steps)
-colors = plt.cm.viridis(np.linspace(0,1,num_steps+1))
+colors = plt.cm.viridis(np.linspace(0, 1, num_steps + 1))
 
 # profile_name = 'Harmonic permeability (min horiz) profile'
 # profile_name = 'Porosity'
@@ -101,7 +98,6 @@ if comparison:
 
         profile = profiles_control[profile_name].sel(t=time)
 
-
         if 'Salinity' in profile_name:
             profile = dimensional_salinity(profile)
         elif 'Temperature' in profile_name:
@@ -110,11 +106,11 @@ if comparison:
         this_color = get_color(colors, min_time, max_time, time)
 
         axes[1].plot(profile, z, linestyle=':', label='$t=%.5g$' % dim_times_control[i], color=this_color)
- 
+
         i = i + 1
 
 plot_interval = 10
-for i in range(30, len(time_warming)-1):
+for i in range(30, len(time_warming) - 1):
 
     if not i % plot_interval == 0:
         continue
@@ -123,7 +119,7 @@ for i in range(30, len(time_warming)-1):
 
     # rm_time = rm_profile_.sel(t=time)
     # temperature_time = temperature_profile_control.sel(t=time)
-    
+
     if profile_name not in profiles_warming.keys():
         continue
 
@@ -136,8 +132,7 @@ for i in range(30, len(time_warming)-1):
 
     this_color = get_color(colors, min_time, max_time, time)
 
-
-    axes[1].plot(profile, z, color=this_color)   #label='$t=%.5g$' % dim_times_warming[i], 
+    axes[1].plot(profile, z, color=this_color)  # label='$t=%.5g$' % dim_times_warming[i],
 
     i = i + 1
 
@@ -147,7 +142,6 @@ axes[1].set_ylim([0.6, 1.0])
 # axes[0].title(profile_name)
 axes[1].set_ylabel('$z$')
 axes[1].set_xlabel(profile_name)
-
 
 norm = mpl.colors.Normalize(vmin=dimensional_time(min_time), vmax=dimensional_time(max_time))
 cb1 = mpl.colorbar.ColorbarBase(axes[0], cmap=mpl.cm.viridis, orientation='horizontal', norm=norm)
@@ -167,7 +161,7 @@ if comparison:
     fig_name = fig_name + '_comparison'
 
 figure_full_path = os.path.join(figure_output_directory, fig_name + '.jpg')
-plt.savefig(figure_full_path,  format='jpg', dpi=800)
+plt.savefig(figure_full_path, format='jpg', dpi=800)
 print('Saved figure to %s' % figure_full_path)
 
 plt.show()

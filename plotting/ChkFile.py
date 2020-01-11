@@ -107,8 +107,8 @@ def compute_channel_properties(porosity, do_plots=False):
 
     return [num_channels, rel_chan_positions]
 
-class ChkFile:
 
+class ChkFile:
     NUM_COMPS = 'num_comps'
     DATA = 'data'
     DX = 'dx'
@@ -130,7 +130,6 @@ class ChkFile:
             return
 
         self.inputs = read_inputs(inputs_loc)
-
 
         h5_file = h5py.File(self.filename, 'r')
 
@@ -209,7 +208,8 @@ class ChkFile:
                 component = 0
 
                 # Need to get data differently if this is a vector
-                is_vector =  (comp_name[0] == 'x' or comp_name[0] == 'y' or comp_name[0] == 'z' and comp_name in all_names)
+                is_vector = (comp_name[0] == 'x' or comp_name[0] == 'y' or comp_name[0] == 'z'
+                             and comp_name in all_names)
                 if is_vector:
                     if comp_name[0] == 'x':
                         component = 0
@@ -255,9 +255,9 @@ class ChkFile:
                     # print(str(numCells))
                     data_box = data_unshaped[offset:offset + num_cells]
 
-                    comp_offset = num_comp_cells*component
+                    comp_offset = num_comp_cells * component
 
-                    data_comp_box = data_box[comp_offset:comp_offset+num_comp_cells]
+                    data_comp_box = data_box[comp_offset:comp_offset + num_comp_cells]
 
                     reshaped_data = data_comp_box.reshape((num_rows, num_cols))
                     # reshaped_data = data_comp_box.reshape((num_cols, num_rows))
@@ -362,7 +362,6 @@ class ChkFile:
         for box_i in range(0, len(self.levels[0]['boxes'])):
             box = self.levels[0]['boxes'][box_i]
 
-
             level_0_data_box = self.data[var_name]['data'][0][box_i]
 
             # ND version:
@@ -385,7 +384,7 @@ class ChkFile:
             #     for j in range(0, box[3] + 1 - box[1]):
             #         level_0_data_box[j][i] = lev0dat[j + joffset][i + ioffset]
 
-    def get_data(self, var_name, rotate_dims = False):
+    def get_data(self, var_name, rotate_dims=False):
         # Reconstruct level 0 data as single np array
 
         # N dimensional version:
@@ -412,7 +411,6 @@ class ChkFile:
         if rotate_dims:
             lev0_dat = np.array(lev0_dat).transpose()
 
-
         # width = self.prob_domain[2] + 1 - self.prob_domain[0]
         # height = self.prob_domain[3] + 1 - self.prob_domain[1]
         #
@@ -431,16 +429,12 @@ class ChkFile:
         #         for j in range(0, box[3] + 1 - box[1]):
         #             lev0_dat[j + joffset][i + ioffset] = lev0_dat_box[j][i]
 
-
-
-
         return lev0_dat
 
     def channel_properties(self, do_plots=False):
         porosity = self.get_data('Porosity')
 
         return compute_channel_properties(porosity, do_plots)
-
 
     def get_mesh_grid(self, level=0, rotate_dims=False):
 
@@ -463,8 +457,8 @@ class ChkFile:
         # y, x = np.mgrid[slice(0, x_max, grid_dx),
         #                 slice(0, y_max, grid_dy)]
 
-        y, x = np.mgrid[slice(dx/2, x_max-dx/2, dx),
-                        slice(dy/2, y_max-dy/2, dy)]
+        y, x = np.mgrid[slice(dx / 2, x_max - dx / 2, dx),
+                        slice(dy / 2, y_max - dy / 2, dy)]
 
         if rotate_dims:
             y_new = x.transpose()
@@ -473,32 +467,27 @@ class ChkFile:
             x = x_new
             y = y_new
 
-
-
-
         return x, y
 
-
-    def get_permeability(self, permeability_function='kozeny', rotate_dims = False):
+    def get_permeability(self, permeability_function='kozeny', rotate_dims=False):
 
         porosity = self.get_data('Porosity', rotate_dims)
 
         if permeability_function == 'kozeny':
 
             # Cap max porosity just below one to avoid dividing by 0
-            porosity = np.clip(porosity, 0, 1-10**(-10))
+            porosity = np.clip(porosity, 0, 1 - 10 ** (-10))
 
-            liquid_permeability = porosity**3 / (1-porosity)**2
+            liquid_permeability = porosity ** 3 / (1 - porosity) ** 2
 
-            hele_shaw_permeability = 1/float(self.inputs['parameters.nonDimReluctance'])
+            hele_shaw_permeability = 1 / float(self.inputs['parameters.nonDimReluctance'])
 
-            total_permeability = (hele_shaw_permeability**(-1) + liquid_permeability**(-1))**(-1)
+            total_permeability = (hele_shaw_permeability ** (-1) + liquid_permeability ** (-1)) ** (-1)
 
         elif permeability_function == 'cubic':
-            total_permeability = porosity**3
+            total_permeability = porosity ** 3
 
         else:
             total_permeability = 1.0
-
 
         return total_permeability

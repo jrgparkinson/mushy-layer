@@ -6,11 +6,13 @@ import subprocess
 import traceback
 import logging
 import time
-import getopt, sys
+import getopt
+import sys
 
 # Two imports from the directory above this one - make sure /path/to/mushy-layer/test is in your python path
 import mushyLayerRunUtils
 import run_chombo_compare as chcompare
+
 
 def filter_pout(text_lines):
     """
@@ -22,18 +24,21 @@ def filter_pout(text_lines):
 
     filtered_output = []
     for line in text_lines:
-        new_line =  re.sub('wallclocktime = \d+\.\d+e[+-]\d+\s?\n', '', line)
+        new_line = re.sub(r'wallclocktime = \d+\.\d+e[+-]\d+\s?\n', '', line)
         filtered_output.append(new_line)
 
     return filtered_output
+
 
 def printl(text):
     sys.stdout.write(text)
     sys.stdout.flush()
 
+
 def print_status(text):
     sys.stdout.write('%-8s' % text)
     sys.stdout.flush()
+
 
 def test_folder(test_directory, verbose_output=False):
     """
@@ -207,11 +212,12 @@ def test_folder(test_directory, verbose_output=False):
 def usage():
     print('python run_regression_tests.py [-t <test_dir>] [-v verbose] ')
 
+
 if __name__ == "__main__":
 
     timings = [time.time()]
 
-    ## Initial setup
+    # Initial setup
 
     # Constants
     EXPECTED = '.expected'
@@ -252,7 +258,7 @@ if __name__ == "__main__":
     failed_tests = []
     passed_tests = []
 
-    #Timing
+    # Timing
     timings.append(time.time())
 
     for test_dir in test_dirs:
@@ -282,14 +288,13 @@ if __name__ == "__main__":
             # print('**Test failed** \n')
             failed_tests.append(test_dir)
 
-
     print('==========================================================')
     print('------------------------ Summary -------------------------')
 
     # Report tests
     num_passed = len(passed_tests)
     num_failed = len(failed_tests)
-    print('Tests passed (%d/%d): %s' % (num_passed, num_passed+num_failed, ','.join(passed_tests)))
+    print('Tests passed (%d/%d): %s' % (num_passed, num_passed + num_failed, ','.join(passed_tests)))
     print('Tests failed (%d/%d): %s' % (num_failed, num_passed + num_failed, ','.join(failed_tests)))
 
     # Timing

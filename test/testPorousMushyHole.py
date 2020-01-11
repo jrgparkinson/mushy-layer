@@ -18,7 +18,7 @@ from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, rea
 
 def porous_mushy_hole_resolution_specific_params(p):
     mushy_layer_base_dir = get_mushy_layer_dir()
-    params_file = os.path.join(mushy_layer_base_dir,'params/convergenceTest/porousMushyHole.parameters')
+    params_file = os.path.join(mushy_layer_base_dir, 'params/convergenceTest/porousMushyHole.parameters')
 
     params = read_inputs(params_file)
 
@@ -37,23 +37,23 @@ def porous_mushy_hole_resolution_specific_params(p):
     coarsest_nx = 8
     dt = float(coarsest_dt) * float(coarsest_nx) / float(nx_coarse)
     params['main.fixed_dt'] = dt  # dt
-    params['main.plot_period'] = float(params['main.max_time'])/4  # produce same number of plot files per run (4)
+    params['main.plot_period'] = float(params['main.max_time']) / 4  # produce same number of plot files per run (4)
 
     # Check this dt will go into max_time an integer number of times
     # If it doesn't, different simulations will be integrated for different lengths of time which can be an issue
     # when we come to comparing them (they won't be the same)
-    num_steps = float(params['main.max_time'])/dt
+    num_steps = float(params['main.max_time']) / dt
     if not num_steps.is_integer():
         print(Fore.RED + 'WARNING: dt is not an integer division of max time')
 
     regrid_int = int(math.ceil(float(p.nz_coarse) / 16.0))
     regrid_int = max(regrid_int, 1)
 
-    params['main.refine_thresh'] = float(params['main.radius']) * 10.0 / float(p.nz_coarse)  # 0.05*64.0/float(nz_coarse)
+    params['main.refine_thresh'] = float(params['main.radius']) * 10.0 / float(p.nz_coarse)
 
     bf = max(int(nx_coarse / 4), 4)
 
-    max_grid_size = 1024 #bf * 2
+    max_grid_size = 1024  # bf * 2
     gbs = max(bf / 8, 2)
 
     params['main.block_factor'] = str(bf)
@@ -64,8 +64,8 @@ def porous_mushy_hole_resolution_specific_params(p):
 
     return nx_coarse, params, grid_file
 
-def test_porous_mushy_hole(argv):
 
+def test_porous_mushy_hole(argv):
     # Defaults:
     max_time = 1.5e-4
     hole_radius = 0.04
@@ -89,22 +89,22 @@ def test_porous_mushy_hole(argv):
     print(Fore.GREEN + 'Setup tests for porous mushy hole' + Style.RESET_ALL)
     physical_problem = 'PorousMushyHole'
     # data_folder = os.path.join(base_output_dir, 'PorousMushyHole-t' + str(max_time) + '-hole' + str(hole_radius) )
-    min_concentration = -5.0 # default -5
+    min_concentration = -5.0  # default -5
     folder_name = 'PorousMushyHole-t%s-minC%s' % (max_time, min_concentration)
     data_folder = os.path.join(base_output_dir, folder_name)
 
     nz_uniform = [16, 32, 64, 128, 256, 512]
     amr_setup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': nz_uniform},
-                {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [16, 32, 64, 128]},
-                {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]},
-                {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
+                 {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [16, 32, 64, 128]},
+                 {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]},
+                 {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
 
     # While testing:
-   # nz_uniform = [16, 32, 64]
-   # amr_setup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': nz_uniform}]
+    # nz_uniform = [16, 32, 64]
+    # amr_setup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': nz_uniform}]
 
     # Nzs 	  = [16, 32, 64]
-    #num_procs = [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
+    # num_procs = [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
     num_procs = [1] * len(nz_uniform)
 
     # Setup up the post processing command
@@ -113,28 +113,28 @@ def test_porous_mushy_hole(argv):
     # uniform_prefix = 'Uniform-' + physicalProblem + '-'
 
     python_compare_file = os.path.join(get_mushy_layer_dir(), 'test', 'run_chombo_compare.py')
-    chombo_compare_analyse ='python %s -f %s -a -v Porosity -e L2 -r True -n 8 -d %s \n \n' % (python_compare_file,
-                                                                                               data_folder,
-                                                                                               base_output_dir)
+    chombo_compare_analyse = 'python %s -f %s -a -v Porosity -e L2 -r True -n 8 -d %s \n \n' % (python_compare_file,
+                                                                                                data_folder,
+                                                                                                base_output_dir)
 
     # make_figures  = 'Fig7PorousHole(\'' + data_folder + '\', \'' + data_folder + '\')'
     make_figures = porous_hole_command(folder_name=folder_name)
-    #analyse_in_matlab = 'analyseVariablePorosityTest(\'' + data_folder + '\', [' + ','.join([str(a) for a in nz_uniform]) + '],' \
+    # analyse_in_matlab = 'analyseVariablePorosityTest(\'' + data_folder
+    # + '\', [' + ','.join([str(a) for a in nz_uniform]) + '],' \
     # 'true, true, \'' + uniform_prefix + '\', \'Porosity\', \'L2\');'
 
-    analysis_command = chombo_compare_analyse + '\n\n' + \
-                       matlab_command + ' " %s; exit;"' % make_figures
+    # analysis_command = chombo_compare_analyse + '\n\n' + \
+    #                    matlab_command + ' " %s; exit;"' % make_figures
+    analysis_command = '%s\n\n%s" %s; exit;"' % (chombo_compare_analyse, matlab_command, make_figures)
 
     # Run
-    extra_params = {'main.max_time':max_time,
+    extra_params = {'main.max_time': max_time,
                     'main.radius': hole_radius,
-                    'bc.bulkConcentrationHiVal' : [-1, min_concentration]}
+                    'bc.bulkConcentrationHiVal': [-1, min_concentration]}
 
     run_test(data_folder, physical_problem, porous_mushy_hole_resolution_specific_params, amr_setup, num_procs,
              analysis_command, extra_params)
 
+
 if __name__ == "__main__":
     test_porous_mushy_hole(sys.argv[1:])
-
-
-

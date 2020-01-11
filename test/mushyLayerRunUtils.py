@@ -17,9 +17,9 @@ def get_base_output_dir():
         base_output_dir = '/home/parkinsonjl/mushy-layer/test/output/'
 
     if base_output_dir == '':
-
         this_file = os.path.realpath(__file__)
-        print('You need to set the output directory for test problems in the get_base_output_dir() method in %s' % this_file)
+        print('You need to set the output directory for test problems '
+              'in the get_base_output_dir() method in %s' % this_file)
         sys.exit(-1)
 
     if not os.path.exists(base_output_dir):
@@ -27,14 +27,15 @@ def get_base_output_dir():
 
     return base_output_dir
 
-def get_data_dir():
 
+def get_data_dir():
     if socket.gethostname() == 'atmlxlap005':
         return '/home/parkinsonjl/mnt/sharedStorage/'
     else:
         this_file = os.path.realpath(__file__)
         print('No data dir defined in %s : get_data_dir()' % this_file)
         sys.exit(-1)
+
 
 def add_params(default_params, extra_params):
     """ Add params from extra_params to defaultParams """
@@ -60,7 +61,6 @@ def get_matlab_base_command():
                                              '\n\n' \
                                              'matlab -nodisplay -nosplash -nodesktop -r'
 
-
     return matlab_command
 
 
@@ -80,8 +80,8 @@ def get_current_vcs_revision():
     # For git:
     repo_version = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
 
-    
     return repo_version
+
 
 def get_mushy_layer_dir():
     """
@@ -89,13 +89,13 @@ def get_mushy_layer_dir():
     :return:  full path to mushy-layer/
     """
 
-    #if 'MUSHY_LAYER_DIR' in os
+    # if 'MUSHY_LAYER_DIR' in os
     this_file_path = os.path.realpath(__file__)
     par_dir = os.path.dirname(this_file_path)
     mushy_layer_dir = os.path.dirname(par_dir)
 
-    #dir = os.environ['MUSHY_LAYER_DIR']
-    #dir = '/home/parkinsonj/mushy-layer/'
+    # dir = os.environ['MUSHY_LAYER_DIR']
+    # dir = '/home/parkinsonj/mushy-layer/'
 
     return mushy_layer_dir
 
@@ -122,7 +122,7 @@ def get_executable_name(exec_dir='', exec_name='mushyLayer2d', return_full_path=
      Independent of the architecture (i.e. will find for different C++ compilers, fortran versions etc.) """
 
     if not exec_dir:
-        mushy_layer_dir = get_mushy_layer_dir() # previously: os.path.dirname(os.path.dirname(__file__))
+        mushy_layer_dir = get_mushy_layer_dir()  # previously: os.path.dirname(os.path.dirname(__file__))
         exec_dir = os.path.join(mushy_layer_dir, 'execSubcycle')
 
     # Get files in exec dir starting with mushyLayer2d and ending with ex
@@ -163,13 +163,12 @@ def get_executable_name(exec_dir='', exec_name='mushyLayer2d', return_full_path=
     else:
         exec_file = possible_exec_files[1]
 
-
     # Can also specify the file manually
     # exec = 'mushyLayer2d.Linux.64.mpiCC.gfortran.OPT.MPI.ex'
 
     # Sanity check
     if not os.path.exists(os.path.join(exec_dir, exec_file)):
-        print('Executable ' + exec_file +' not found in directory ' + exec_dir)
+        print('Executable ' + exec_file + ' not found in directory ' + exec_dir)
         sys.exit(0)
 
     if return_full_path:
@@ -203,7 +202,7 @@ def construct_run_name(params):
                     'parameters.darcy': '%.1e',
                     'parameters.nonDimReluctance': '%.1e',
                     'parameters.bottomEnthalpy': '%1.2f'}
-                       
+
     if 'parameters.rayleighComp' in params:
         if float(params['parameters.rayleighComp']) > 1000:
             param_format['parameters.rayleighComp'] = '%.1e'
@@ -211,10 +210,10 @@ def construct_run_name(params):
             param_format['parameters.rayleighComp'] = '%d'
 
     permeability_functions = ['UniformPermeability',
-                             'ChiCubedPermeability',
-                             'KozenyPermeability',
-                             'LogPermeability',
-                             'CustomPermeability']
+                              'ChiCubedPermeability',
+                              'KozenyPermeability',
+                              'LogPermeability',
+                              'CustomPermeability']
 
     run_name = ''
 
@@ -227,12 +226,12 @@ def construct_run_name(params):
         else:
             # Don't know how to handle this. Just do nothing.
             pass
-            
+
     if float(params['parameters.darcy']) > 0:
-            run_name = run_name + long_to_short_name['parameters.darcy'] \
-                       + param_format['parameters.darcy'] % float(params['parameters.darcy'])
-            run_name = run_name + long_to_short_name['parameters.nonDimReluctance'] \
-                       + param_format['parameters.nonDimReluctance'] % float(params['parameters.nonDimReluctance'])
+        da = param_format['parameters.darcy'] % float(params['parameters.darcy'])
+        rel = param_format['parameters.nonDimReluctance'] % float(params['parameters.nonDimReluctance'])
+        run_name += long_to_short_name['parameters.darcy'] + da
+        run_name += long_to_short_name['parameters.nonDimReluctance'] + rel
 
     # params which don't follow the same format
 
@@ -244,11 +243,10 @@ def construct_run_name(params):
         run_name = run_name + '_sponge_'
 
     # grid resolution
-    cells =params['main.num_cells'].split(' ')
+    cells = params['main.num_cells'].split(' ')
     grid_res = int(cells[0])
     run_name = run_name + "pts" + str(grid_res)
 
-        
     return run_name
 
 
@@ -261,7 +259,8 @@ def isfloat(value):
         return True
     except ValueError:
         return False
-    
+
+
 def isint(value):
     """
     Determines if value is an integer
@@ -272,7 +271,8 @@ def isint(value):
         return True
     except ValueError:
         return False
-    
+
+
 def read_inputs(inputs_file):
     """ Load up an inputs file and parse it into a dictionary """
 
@@ -289,9 +289,9 @@ def read_inputs(inputs_file):
             continue
 
         # Remove anything after a #
-        line = re.sub('#[^\n]*[\n]', '', line)
+        line = re.sub(r'#[^\n]*[\n]', '', line)
 
-        parts = re.findall('^([^=]*)=(.*)$', line)
+        parts = re.findall(r'^([^=]*)=(.*)$', line)
 
         # parts = line.split('=')
         # if len(parts) > 1:
@@ -307,12 +307,12 @@ def read_inputs(inputs_file):
                 val = float(val)
 
             params[key] = val
-            
+
     # print(params)
     return params
 
 
-def write_inputs(location, params, ignore_list = None, doSort=True):
+def write_inputs(location, params, ignore_list=None, doSort=True):
     """
      Write out a set of parameters to an inputs file
     """
@@ -321,18 +321,17 @@ def write_inputs(location, params, ignore_list = None, doSort=True):
     key_list = list(params.keys())
     if doSort:
         key_list.sort()
-    
+
     for key in key_list:
         if not ignore_list or key not in ignore_list:
-            
+
             if isinstance(params[key], list):
                 key_val = ' '.join([str(a) for a in params[key]])
-                
+
             else:
                 key_val = str(params[key])
 
-            output_file = output_file + '\n' + \
-                key + '=' + key_val
+            output_file += '\n' + key + '=' + key_val
 
     with open(location, 'w') as f:
         f.write(output_file)
@@ -346,7 +345,7 @@ def has_reached_steady_state(folder):
 
     if os.path.exists(time_table_file):
         return True
-        
+
 
 def time_since_folder_updated(directory):
     """
@@ -356,7 +355,7 @@ def time_since_folder_updated(directory):
     for filename in os.listdir(directory):
         this_time_diff = time_since_file_updated(os.path.join(directory, filename))
         smallest_t = min(smallest_t, this_time_diff)
-        
+
     return smallest_t
 
 
@@ -365,11 +364,12 @@ def time_since_file_updated(filename):
 
     current_t = time.time()
     t = os.path.getmtime(filename)
-        
+
     this_time_diff = abs(current_t - t)
-    
+
     return this_time_diff
-    
+
+
 def get_restart_file(most_recent_path):
     """
     Get the most recent (largest frame number) checkpoint file in a directory, which can then be used
@@ -377,15 +377,15 @@ def get_restart_file(most_recent_path):
     """
 
     restart_file = ''
-    
+
     chk_files = [f for f in os.listdir(most_recent_path) if len(f) > 4 and f[:3] == 'chk']
-    
+
     # print('Chk files in ' + most_recent_path + ': ')
     # print(chk_files)
 
     if len(chk_files) > 0:
         restart_file = chk_files[-1]
-        
+
     print('Found ' + str(len(chk_files)) + ' checkpoint files, most recent: ' + restart_file)
 
     return restart_file
@@ -393,13 +393,13 @@ def get_restart_file(most_recent_path):
 
 def get_final_plot_file(directory):
     """ Get the most recent (largest frame) plot file in a directory """
-    files_dir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
+    files_dir = [f for f in os.listdir(directory) if (os.path.isfile(os.path.join(directory, f)))]
     plt_files = []
     # print(files_dir)
     for f in files_dir:
 
         # Match if it doesn't start with chk, and finished like 01234.2d.hdf5
-        pattern = '^(?!chk.*$).*\d+\.\dd\.hdf5'
+        pattern = r'^(?!chk.*$).*\d+\.\dd\.hdf5'
         if re.match(pattern, f):
             plt_files.append(f)
 
@@ -414,13 +414,13 @@ def get_final_plot_file(directory):
 def get_final_chk_file(directory):
     """ Get the most recent (largest frame) checkpoint file in a directory """
 
-    files_dir = [f for f in os.listdir(directory)  if (os.path.isfile(os.path.join(directory, f))) ]
+    files_dir = [f for f in os.listdir(directory) if (os.path.isfile(os.path.join(directory, f)))]
     plt_files = []
 
     for f in files_dir:
 
         # Match if file starts with chk and ends in [frame number].2d.hdf5
-        pattern = '^chk.*\d+\.\dd\.hdf5'
+        pattern = r'^chk.*\d+\.\dd\.hdf5'
 
         if re.match(pattern, f):
             plt_files.append(f)
@@ -435,15 +435,15 @@ def get_final_chk_file(directory):
 
 def is_power_of_two(n):
     """ Determine if a number if a power of 2 """
-    test = math.log(n)/math.log(2)
-    
+    test = math.log(n) / math.log(2)
+
     if round(test) == test:
         return True
     else:
         return False
 
 
-def string_to_array(string, conversion = lambda x:int(x)):
+def string_to_array(string, conversion=lambda x: int(x)):
     """ Convert a string separated by spaces to an array, i.e.
     a b c -> [a,b,c]
      """
@@ -463,7 +463,6 @@ def array_to_string(array):
     str_array = [str(a) for a in array]
     string = ' '.join(str_array)
     return string
-
 
 
 def check_exec_exists(exec_dir, exec_name, dim=2):
@@ -493,10 +492,6 @@ def check_exec_exists(exec_dir, exec_name, dim=2):
             print('Unable to build the executable, please try yourself manually before running the test problems.')
             return False
 
-
-
     print('Please build the executable yourself before running the test problems.')
 
     return False
-
-

@@ -3,7 +3,7 @@ import os
 from colorama import Fore, Style
 
 from AMRConvergenceTest import run_test
-from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_mushy_layer_dir
+from mushyLayerRunUtils import get_base_output_dir, read_inputs, get_mushy_layer_dir
 
 
 ##########################################################################
@@ -12,6 +12,7 @@ from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, rea
 
 def get_min_porosity():
     return 0.05  # 0.05
+
 
 def fixed_porous_resolution_specific_params(p):
     """
@@ -72,7 +73,7 @@ def fixed_porous_resolution_specific_params(p):
     params['main.regrid_interval'] = str(regrid_int) + ' ' + str(regrid_int) + ' ' + str(regrid_int)
     params['main.max_grid_size'] = str(max_grid_size)  # Must be greater than block factor
 
-    chi = str(get_min_porosity()) # '0.05'
+    chi = str(get_min_porosity())  # '0.05'
     params['bc.porosityHiVal'] = chi + ' ' + chi  # 0.4 0.4
     params['bc.porosityLoVal'] = chi + ' ' + chi
 
@@ -81,9 +82,7 @@ def fixed_porous_resolution_specific_params(p):
     return nx_coarse, params, grid_file
 
 
-
 def test_fixed_porous_hole():
-
     base_output_dir = get_base_output_dir()
     # matlab_command = get_matlab_base_command()
 
@@ -98,15 +97,16 @@ def test_fixed_porous_hole():
                  {'max_level': 1, 'ref_rat': 4, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
 
     # Nzs 	  = [16, 32, 64]
-    num_procs = [1] * len(nz_uniform) #[1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
+    num_procs = [1] * len(nz_uniform)  # [1, 1, 1, 4, 4, 4]  # Needs to be as long as the longest Nzs
 
     # Setup up the post processing command
 
     # uniform_prefix = 'Uniform-DBVariablePorosity-'
     python_compare_file = os.path.join(get_mushy_layer_dir(), 'test', 'run_chombo_compare.py')
-    chombo_compare_analyse ='python %s -f %s -a -v \'xDarcy velocity\' -e L2 -r True -n 6 -d %s \n \n' % (python_compare_file,
-                                                                                                          data_folder,
-                                                                                                          base_output_dir)
+    chombo_compare_analyse = 'python %s -f %s -a -v \'xDarcy velocity\' ' \
+                             '-e L2 -r True -n 6 -d %s \n \n' % (python_compare_file,
+                                                                 data_folder,
+                                                                 base_output_dir)
 
     # Just do analysis - make figures manually once we know the sidewall problem has also finished
     analysis_command = chombo_compare_analyse
@@ -115,6 +115,7 @@ def test_fixed_porous_hole():
     extra_params = {}
     run_test(data_folder, physical_problem, fixed_porous_resolution_specific_params, amr_setup, num_procs,
              analysis_command, extra_params)
+
 
 if __name__ == "__main__":
     test_fixed_porous_hole()

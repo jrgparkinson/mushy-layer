@@ -29,9 +29,10 @@ def hele_shaw_resolution_specific_params(p):
     params = read_inputs(params_file)
     nx_coarse = -1
 
-    grid_file = '' # mushyLayerBaseDir + '/grids/topMiddle/' + str(nx_coarse) + 'x' + str(nz_coarse)
+    grid_file = ''  # mushyLayerBaseDir + '/grids/topMiddle/' + str(nx_coarse) + 'x' + str(nz_coarse)
 
     return nx_coarse, params, grid_file
+
 
 def test_hele_shaw_fixed_chill(argv):
     mushy_layer_base_dir = os.path.abspath(os.pardir)
@@ -49,7 +50,7 @@ def test_hele_shaw_fixed_chill(argv):
 
     do_amr = True
 
-    #Pr = 10.0  # fix this for now
+    # Pr = 10.0  # fix this for now
     periodic = False
 
     try:
@@ -76,7 +77,7 @@ def test_hele_shaw_fixed_chill(argv):
             extra_params['parameters.nonDimReluctance'] = float(arg)
         elif opt in "-P":
             do_plot_files = bool(int(arg))
-            print('Do plot files: ' + str(do_plot_files) +  ', arg = ' + str(arg))
+            print('Do plot files: ' + str(do_plot_files) + ', arg = ' + str(arg))
             if not do_plot_files:
                 extra_params['main.plot_interval'] = -1
         elif opt in "-A":
@@ -87,10 +88,10 @@ def test_hele_shaw_fixed_chill(argv):
     print(Fore.GREEN + 'Setup tests for fixed chill in a Hele-Shaw cell' + Style.RESET_ALL)
     physical_problem = 'FixedChill'
     folder_name = "FixedChill-t%1.1e-Ra%.0e-Da%1.1e-C%1.2f-Rel%1.1e" % (extra_params['main.max_time'],
-                                                                       extra_params['parameters.rayleighComp'],
-                                                                       extra_params['parameters.darcy'],
-                                                                       extra_params['parameters.compositionRatio'],
-                                                                       extra_params['parameters.nonDimReluctance'])
+                                                                        extra_params['parameters.rayleighComp'],
+                                                                        extra_params['parameters.darcy'],
+                                                                        extra_params['parameters.compositionRatio'],
+                                                                        extra_params['parameters.nonDimReluctance'])
     if periodic:
         folder_name = folder_name + '-periodic'
     data_folder = os.path.join(base_output_dir, folder_name)
@@ -103,7 +104,7 @@ def test_hele_shaw_fixed_chill(argv):
 
         num_proc = 1
         default_params['concise_run_name'] = folder_name
-        
+
         default_params = add_params(default_params, extra_params)
 
         # Overwrite default params with any extra params we've specified
@@ -112,7 +113,8 @@ def test_hele_shaw_fixed_chill(argv):
         allow_restarts = False
         s = BatchJob('', default_params['concise_run_name'], '', num_proc)
         s.set_post_process(analysis_command)
-        ml_run = MushyLayerRunSimple(base_output_dir, num_proc, default_params, s, allow_restarts, get_executable_name())
+        ml_run = MushyLayerRunSimple(base_output_dir, num_proc, default_params, s, allow_restarts,
+                                     get_executable_name())
         ml_run.single_run(folder_name)
 
     else:
@@ -140,6 +142,6 @@ def test_hele_shaw_fixed_chill(argv):
         run_test(data_folder, physical_problem, hele_shaw_resolution_specific_params, amr_setup, num_procs,
                  analysis_command, extra_params, 0)
 
+
 if __name__ == "__main__":
     test_hele_shaw_fixed_chill(sys.argv[1:])
-

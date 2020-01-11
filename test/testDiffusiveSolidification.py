@@ -17,7 +17,7 @@ def diffusive_solidification_resolution_specific_params(p):
     :return:
     """
     mushy_layer_base_dir = get_mushy_layer_dir()
-    params_file = os.path.join(mushy_layer_base_dir,'params/convergenceTest/noFlowConvTest.parameters')
+    params_file = os.path.join(mushy_layer_base_dir, 'params/convergenceTest/noFlowConvTest.parameters')
 
     params = read_inputs(params_file)
     grid_file = ''
@@ -32,12 +32,10 @@ def diffusive_solidification_resolution_specific_params(p):
     params['main.max_step'] = 10000
     params['main.debug'] = 'true'  # make sure we output things like Temperature error
 
-
     return nx_coarse, params, grid_file
 
 
 def test_diffusive_solidification():
-
     base_output_dir = get_base_output_dir()
     matlab_command = get_matlab_base_command()
 
@@ -45,8 +43,8 @@ def test_diffusive_solidification():
 
     physical_problem = 'noFlow'
     amr_setup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform'], 'Nzs': [8, 16, 32, 64, 128, 256]},
-                {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64, 128]},
-                {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
+                 {'max_level': 1, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64, 128]},
+                 {'max_level': 2, 'ref_rat': 2, 'run_types': ['amr'], 'Nzs': [8, 16, 32, 64]}]
     # While testing:
     # AMRSetup = [{'max_level': 0, 'ref_rat': 1, 'run_types': ['uniform']}];
 

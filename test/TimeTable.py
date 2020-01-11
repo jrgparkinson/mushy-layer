@@ -1,10 +1,11 @@
 import os
 import re
 
+
 class TimeTableMethod:
 
     def __init__(self, string_to_parse, parent_el=None):
-        parts = re.findall('(\s*)\[(\d+)]\s([^\s]*)\s([\d.]+)\s+[\d.]+%\s', string_to_parse)
+        parts = re.findall(r'(\s*)\[(\d+)]\s([^\s]*)\s([\d.]+)\s+[\d.]+%\s', string_to_parse)
 
         self.parent = parent_el
         self.valid = False
@@ -20,13 +21,13 @@ class TimeTableMethod:
         # else:
         #     print('Could not parse: %s' % string_to_parse)
 
-
     def __repr__(self):
         # return '%s/%s' % (self.parent, self.name)
         return self.name
 
     def long_desc(self):
         return '[%d] %s (%s)' % (self.id, self.name, self.time)
+
 
 class TimeTable:
 
@@ -36,8 +37,6 @@ class TimeTable:
         self.methods = []
 
         self.parse_file()
-
-
 
     def parse_file(self):
 
@@ -49,14 +48,13 @@ class TimeTable:
                 # print(file_contents)
 
                 # Split into methods
-                # matches = re.findall('[\-]+\n([^\-])', file_contents)
+                # matches = re.findall(r'[\-]+\n([^\-])', file_contents)
 
                 # Find the second [0] tag
                 parts = file_contents.split('[0]')
                 second_half = parts[2]
                 lines = second_half.split('\n')
                 # print(lines)
-
 
                 main_method = TimeTableMethod('[0]' + lines[0])
                 current_parent = main_method
@@ -88,16 +86,13 @@ class TimeTable:
 
                     prev_method = method
 
-
                 # for method in self.methods[0:5]:
                 #     print('%s' % method)
-
 
                 # for line in f.readlines():
                 #
                 #     # New methods start with '['
                 #     if line[0] == '-':
-
 
     def get_all_children(self, parent_method_name):
         """
@@ -143,7 +138,6 @@ class TimeTable:
 
         return call_history
 
-
     def get_call_history_for_name(self, a_method_name):
 
         call_history = []
@@ -153,8 +147,6 @@ class TimeTable:
                 call_history.append(self.get_call_history_for_id(m.id))
 
         return call_history
-
-
 
 
 if __name__ == "__main__":

@@ -21,12 +21,10 @@ from PltFile import latexify2
 #  c) plot the two solutions along with the error in the final mushy-layer simulation
 
 class DiffusiveSolution:
-
     a = 0
     b = 0
     T_ref = 0
     F = 0
-
 
     def __init__(self, min_temperature, max_temperature, method='Linear'):
 
@@ -45,7 +43,7 @@ class DiffusiveSolution:
 
     def set_nonlinear_bcs(self, a, b, T_r, flux, V_frame_advection, conc_ratio, stefan):
         self.a = a
-        self.b =b
+        self.b = b
         self.T_ref = T_r
         self.F = flux
         self.V = V_frame_advection
@@ -96,17 +94,17 @@ class DiffusiveSolution:
 
         # Assuming either liquid or mushy
 
-        chi = np.minimum(1.0, self.cr/(self.cr-T[0]))
+        chi = np.minimum(1.0, self.cr / (self.cr - T[0]))
 
-        #if chi < 1:
-        dchi_dz = T[1]*(self.cr/np.power(self.cr-T[0], 2))
-        #else:
-        dchi_dz[chi==1.0] = 0.0
+        # if chi < 1:
+        dchi_dz = T[1] * (self.cr / np.power(self.cr - T[0], 2))
+        # else:
+        dchi_dz[chi == 1.0] = 0.0
 
         # dchi_dz = 0
 
         return np.vstack((T[1],
-                          self.V * (T[1] + self.st*dchi_dz)))
+                          self.V * (T[1] + self.st * dchi_dz)))
 
     def diffusion_eq_bc(self, Ta, Tb):
         # Current BCs:
@@ -121,14 +119,13 @@ class DiffusiveSolution:
         # fixed_bc_res = np.array([Ta[0]-self.max_temperature,
         #                          Tb[0]-self.min_temperature])
 
-        mixed_bc_res = np.array([Ta[0]-self.max_temperature,
-                                 self.a*Tb[1] - self.F - self.b*(Tb[0]-self.T_ref)])
+        mixed_bc_res = np.array([Ta[0] - self.max_temperature,
+                                 self.a * Tb[1] - self.F - self.b * (Tb[0] - self.T_ref)])
 
         return mixed_bc_res
 
 
 def base_inputs():
-
     test_dir = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'test/diffusiveGrowth')
     default_inputs = mushyLayerRunUtils.read_inputs(os.path.join(test_dir, 'inputs'))
 
@@ -136,8 +133,8 @@ def base_inputs():
     default_inputs['main.max_time'] = 3.0
     default_inputs['main.steady_state'] = 1e-8
 
-
     return default_inputs
+
 
 if __name__ == "__main__":
 
@@ -153,15 +150,23 @@ if __name__ == "__main__":
     # Options
     # T_min = 4.0
     # T_max = 5.0
-    st = 1.0 # stefan number
+    st = 1.0  # stefan number
     cr = 0.5
 
-    # opt = {'a': 0.0, 'b': 1.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is just a dirichlet BC, data matches well
-    # opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is no flux
-    # opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': -1.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr} # this is a fixed flux (negative for cooling)
-    # opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.0, 'F': -0.5, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr} # this is a fixed flux and temperature
-    # opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.5, 'F': -1.6, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is a fixed flux and temperature
+    # this is just a dirichlet BC, data matches well
+    # opt = {'a': 0.0, 'b': 1.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
 
+    # this is no flux
+    # opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
+
+    # this is a fixed flux (negative for cooling)
+    # opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': -1.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
+
+    # this is a fixed flux and temperature
+    # opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.0, 'F': -0.5, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
+
+    # this is a fixed flux and temperature
+    # opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.5, 'F': -1.6, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
 
     # Mushy layer solidification:
     T_min = -0.8
@@ -183,14 +188,17 @@ if __name__ == "__main__":
     # F = -0.5
 
     analytic_solution = DiffusiveSolution(T_min, T_max, method='Mixed')
-    analytic_solution.set_nonlinear_bcs(a=opt['a'], b=opt['b'], T_r=opt['Tref'], flux=opt['F'], V_frame_advection=opt['V'], conc_ratio=cr, stefan=st)  # this is just a dirichlet BC, data matches well
+
+    # this is just a dirichlet BC, data matches well
+    analytic_solution.set_nonlinear_bcs(a=opt['a'], b=opt['b'], T_r=opt['Tref'], flux=opt['F'],
+                                        V_frame_advection=opt['V'], conc_ratio=cr, stefan=st)
 
     # Now let's run the mushy-layer simulation
     sim_name = 'ImperfectCooling_a%s_b%s_Tref%s_F%s_CR%s_st%s' % (opt['a'], opt['b'], opt['Tref'], opt['F'], cr, st)
 
     full_output_folder = os.path.join(base_dir, sim_name)
     figure_output_paths = [os.path.join(full_output_folder, 'errorComparison'),
-    os.path.join(base_dir, sim_name)]
+                           os.path.join(base_dir, sim_name)]
 
     if os.path.exists(full_output_folder):
         print('Output directory already exists: %s' % full_output_folder)
@@ -230,7 +238,7 @@ if __name__ == "__main__":
 
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     process.wait()
-    print (process.returncode)
+    print(process.returncode)
 
     print('Finished')
 
@@ -260,7 +268,6 @@ if __name__ == "__main__":
     fig = plt.figure()
 
     for plot_loc in plt_files:
-
         pf = PltFile(os.path.join(full_output_folder, plot_loc))
         pf.load_data()
         T_data = pf.get_level_data('Temperature').mean('x').squeeze()
@@ -277,7 +284,6 @@ if __name__ == "__main__":
     ax.set_xlabel('$z$')
     ax.set_ylabel('$T$')
 
-
     # Add colorbar for times
     cax_porosity = fig.add_axes([0.2, 0.86, 0.5, 0.03])
     cmap = plt.get_cmap('viridis')
@@ -289,7 +295,6 @@ if __name__ == "__main__":
     cax_porosity.xaxis.set_ticks_position('top')
     cax_porosity.xaxis.set_label_position('top')
     cbar.set_label('$t$', labelpad=-3)
-
 
     ax.set_xlim([0, 1])
 
@@ -303,7 +308,7 @@ if __name__ == "__main__":
 
     # Add legend
     lns = plt_python + plt_err
-    labs = [l.get_label() for l in lns]
+    labs = [line.get_label() for line in lns]
     ax.legend(lns, labs, loc=0)
 
     # Sort axis positioning
@@ -322,4 +327,3 @@ if __name__ == "__main__":
         plt.savefig(fig_name, format='eps')
 
     plt.show()
-
