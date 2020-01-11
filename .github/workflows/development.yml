@@ -108,6 +108,7 @@ jobs:
         make lib
 
     - name: Compile ChomboCompare
+      run: |
         cd $CHOMBO_HOME/util/ChomboCompare
         make compare
 
