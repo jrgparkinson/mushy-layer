@@ -3,22 +3,18 @@ name: Development
 on:
   push:
     branches:
-      - 'master'
+      - '*'
 
 # schedule:
 #   # * is a special character in YAML so you have to quote this string
 #   # run at 23:59 every day
 #   - cron:  '59 23 * * *'
 
-
 env:
   CHOMBO_ROOT: /home/runner/chombo
   CHOMBO_HOME: /home/runner/chombo/lib
   HDF5_PATH: /home/runner/hdf5-dir
   LD_LIBRARY_PATH: /home/runner/hdf5-dir
-  TEST_RESULTS: /home/runner/work/mushy-layer/mushy-layer/test/results
-  PYTHONPATH: todo
-
 
 jobs:
   build:
@@ -27,6 +23,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+
+    - name: Setup environmental variables
+      run: |
+        echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
+        echo ::set-env name=CHOMBO_ROOT::$(echo $HOME)/chombo
+        echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
+        echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):$(echo $HDF5_PATH)
+
     - name: Info
       run: |
         echo $CHOMBO_HOME
@@ -120,29 +124,20 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
+          ${{ runner.os }}-
 
     - name: Install python dependencies
       run: pip install -r requirements.txt
 
-          # run: |
-          #   cd $GITHUB_WORKSPACE
-          #   ls
-          #   python -m pip install --upgrade pip
-          #   pip install -r requirements.txt
-            
-
-#     - name: Setup test output
-#       run: |
-#         mkdir -p $TEST_RESULTS
-#         echo hello > $TEST_RESULTS/world.txt
+    - name: Setup for regressions
+      run: |
+        echo ::set-env name=PYTHONPATH::$(echo $PYTHONPATH):/home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
 
     - name: Run regressions
       run: |
-         cd $GITHUB_WORKSPACE
-         python install.py -g
-         cd test/regression
-         echo "$PYTHONPATH"
-         python run_regression_tests.py
+        echo "$PYTHONPATH"
+        cd $GITHUB_WORKSPACE/test/regression
+        python run_regression_tests.py
 
     - uses: actions/upload-artifact@v1
       with:
