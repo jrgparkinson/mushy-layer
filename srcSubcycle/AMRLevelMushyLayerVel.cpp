@@ -54,7 +54,7 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     Box toRegion(valid);
 
     // Setting BC for vertical velocity (component = 1) in vertical direction (idir=1) on low side.
-    int velComp = 1;
+//    int velComp = 1;
     Side::LoHiSide side = Side::Lo;
     int idir = 1;
 

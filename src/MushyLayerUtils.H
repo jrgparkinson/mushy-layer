@@ -109,6 +109,10 @@ void
 calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionFAB,
 		MushyLayerParams& params, Real a_dx);
 
+/// Get a vector of x, y, and z components appropriate for the number of dimensions
+void
+getDirString (Vector<string>& dirString);
+
 /// Calculate the permeability - moved to MushyLayerParams
 //Real calculatePermeability(Real liquidFraction,
 //		MushyLayerParams& params);

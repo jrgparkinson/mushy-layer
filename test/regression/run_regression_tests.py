@@ -8,6 +8,7 @@ import logging
 import time
 import getopt
 import sys
+from colorama import Fore
 
 # Two imports from the directory above this one - make sure /path/to/mushy-layer/test is in your python path
 import mushyLayerRunUtils
@@ -28,6 +29,15 @@ class Logger():
         sys.stdout.flush()
 
         self.log_file.write(text)
+
+    def log_failed(self):
+        self.log_status(Fore.RED + '[Failed]' + Fore.RESET)
+
+    def log_ok(self):
+        self.log_status(Fore.GREEN + '[OK]' + Fore.RESET)
+
+    def log_void(self):
+        self.log_status(Fore.YELLOW + '[Void]' + Fore.RESET)
 
     def log_status(self, text):
         formatted = '%-8s' % text
@@ -74,7 +84,7 @@ def test_folder(test_directory, verbose_output=False):
         else:
             test_name = test_directory.split('/')[-1]
             logger.logl('%-25s    ' % test_name)
-            logger.log_status('[Void]')
+            logger.log_void()
         return False, 'Void'
 
     # Load properties
@@ -97,7 +107,7 @@ def test_folder(test_directory, verbose_output=False):
             logger.log('**Have you compiled the code for the right number of dimensions?')
             logger.logl('**Use \'make all DIM=3\' to compile in 3D    ')
         else:
-            logger.log_status('[Failed]')
+            logger.log_failed()
         return False, 'Failed'
 
     # Run test
@@ -106,12 +116,13 @@ def test_folder(test_directory, verbose_output=False):
         mpi_path = str(mpi.decode()).strip()
     except subprocess.CalledProcessError:
         mpi = None
+        mpi_path = None
 
-    if mpi is not None and mpi_path:
+    if mpi is not None:
         cmd = 'cd %s; %s -np %d %s inputs' % (test_directory, mpi_path, properties['proc'], mushy_layer_exec_path)
     else:
         cmd = 'cd %s; %s inputs' % (test_directory, mushy_layer_exec_path)
-    logger.log('Executing: %s' % cmd)
+    # logger.log('Executing: %s' % cmd)
     os.system(cmd)
 
     # Compare output against the expected output
@@ -122,7 +133,7 @@ def test_folder(test_directory, verbose_output=False):
         if verbose_output:
             logger.log('No expected files to compared against')
         else:
-            logger.log_status('[Void]')
+            logger.log_void()
         return False, 'Void'
 
     for expected_file in expected_files:
@@ -134,7 +145,7 @@ def test_folder(test_directory, verbose_output=False):
             if verbose_output:
                 logger.log('No output file generated to compare against: %s' % test_output_file_path)
             else:
-                logger.log_status('[Failed]')
+                logger.log_failed()
             return False, 'Failed'
 
         if '.hdf5' in expected_file:
@@ -161,7 +172,7 @@ def test_folder(test_directory, verbose_output=False):
             computed_file = os.path.join(test_directory, test_output_file_path)
             exact_file = os.path.join(test_directory, expected_file)
             error_file = os.path.join(diffs_folder, DIFF + test_output_filename)
-            compare_params = {'compare.sameSize': 0,
+            compare_params = {'compare.sameSize': 1,
                               'compare.exactRoot': exact_file,
                               'compare.computedRoot': computed_file,
                               'compare.errorRoot': error_file,
@@ -172,7 +183,8 @@ def test_folder(test_directory, verbose_output=False):
             mushyLayerRunUtils.write_inputs(compare_params_file, compare_params)
             cmd = 'cd %s ; %s %s  > /dev/null' % (diffs_folder, compare_exec, compare_params_file)
 
-            # logger.log('Executing: %s' % cmd)
+            if verbose_output:
+                logger.log('Executing: %s' % cmd)
             # This prints the console output, which can be messy:
             # os.system(cmd)
 
@@ -200,7 +212,7 @@ def test_folder(test_directory, verbose_output=False):
                             logger.log('Error in field %s is non-zero' % field)
                             logger.log('See %s and %s for more info' % (new_pout_name, error_file))
                         else:
-                            logger.log_status('[Failed]')
+                            logger.log_failed()
                         return False, 'Failed'
         else:
             # Assume text file - do a diff
@@ -227,10 +239,10 @@ def test_folder(test_directory, verbose_output=False):
                     logger.log('For details, see %s' % diff_out_file)
                     logger.log('** Test failed \n')
                 else:
-                    logger.log_status('[Failed]')
+                    logger.log_failed()
                 return False, 'Failed'
 
-    logger.log_status('[OK]')
+    logger.log_ok()
     return True, 'OK'
 
 
@@ -301,7 +313,7 @@ if __name__ == "__main__":
                 logger.log('**Error running test**')
                 logging.error(traceback.format_exc())
             else:
-                logger.log_status('[Failed]')
+                logger.log_failed()
             success = False
 
         # Timing

@@ -3265,7 +3265,6 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
     }
 
     // need to set physical boundary conditions here
-    const DisjointBoxLayout& levelGrids = a_vector.getBoxes();
 
     // If we don't know how to set BCs for this variable, don't bother
     if (a_var == m_Ustar || a_var==m_UpreProjection || a_var == m_advUstar || a_var == m_advUpreProjection

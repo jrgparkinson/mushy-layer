@@ -424,7 +424,7 @@ void getVectorVarNames(Vector<string>& varNames,
 }
 
 void
-getDirString (const Vector<string>& dirString)
+getDirString (Vector<string>& dirString)
 {
   dirString[0] = string ("x");
   if (SpaceDim == 2) {

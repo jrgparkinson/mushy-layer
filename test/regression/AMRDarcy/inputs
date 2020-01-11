@@ -15,21 +15,24 @@ main.max_grid_size=64
 # Timestepping
 main.max_dt=1 # need this for some reason else initialization goes crazy
 main.max_time = 1.0
-main.max_step = 100
+main.max_step = 128
 main.cfl=0.2
 main.max_init_dt = 2e-4
-main.fixed_dt=1e-4
+# main.fixed_dt=2e-4
 
 #AMR
 main.max_level=2  # max level = 0 -> no refinement
 main.ref_ratio = 2 2
-main.regrid_interval = 16 32
-projection.eta=0.45
+main.regrid_interval = 32 64
+projection.eta=0.8
 main.max_dt_growth=1.001
-main.refine_thresh = 0.1
+main.refine_thresh = 0.01
 regrid.onlyTagPorousCells=true
 regrid.porousCellsShrink=3
-main.grid_buffer_size = 2
+main.grid_buffer_size = 4
+main.tag_buffer_size=4 4 2
+main.fill_ratio=0.9
+main.block_factor=8
 
 ## Dynamics:
 parameters.heleShaw=true
@@ -40,8 +43,7 @@ main.verbosity=2
 projector.verbosity=0
 
 # Data output frequency
-#main.plot_period = 0.01
-main.plot_interval=25
+main.plot_interval=32
 main.plot_prefix=plt
 main.checkpoint_interval=1000
 main.output_folder=.
@@ -61,7 +63,7 @@ parameters.darcy=0
 parameters.prandtl=0
 parameters.heleShawPermeability=8.33
 parameters.stefan=3.98
-parameters.compositionRatio=1.15
+parameters.compositionRatio=2.0
 parameters.lewis=200
 parameters.heatConductivityRatio=4.24
 parameters.specificHeatRatio=0.529
@@ -84,5 +86,5 @@ bc.velLo=0  3
 #bc.scalarLo=1  0
 
 # Test with weaker flow/greater channel spacing to see how AMR does in the horizontal direction
-parameters.rayleighComp=200
-parameters.heleShawPermeability=4.0
+parameters.rayleighComp=400
+parameters.heleShawPermeability=2.0
