@@ -139,10 +139,10 @@ jobs:
     - name: Run regressions
       run: |
          cd $GITHUB_WORKSPACE
-         python install.py
+         python install.py -g
          cd test/regression
          echo "$PYTHONPATH"
-         python run_regression_tests.py -g
+         python run_regression_tests.py
 
     - uses: actions/upload-artifact@v1
       with:
