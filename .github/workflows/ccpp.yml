@@ -22,7 +22,6 @@ env:
 jobs:
   build:
     name: Build
-
     runs-on: ubuntu-latest
 
     steps:
@@ -108,7 +107,7 @@ jobs:
         
   regression:
     name: Regression tests
-    
+    needs: build    
     runs-on: ubuntu-latest
 
     steps:
@@ -131,13 +130,13 @@ jobs:
 
     - name: Run regressions
       run: |
-         cd test/regression
+         cd $GITHUB_WORKSPACE/test/regression
          python run_regression_tests.py
 
     - uses: actions/upload-artifact@v1
       with:
         name: test-results
-        path: $GITHUB_WORKSPACE/test/regression/
+        path: ./
 
     
 
