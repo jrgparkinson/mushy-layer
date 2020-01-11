@@ -252,7 +252,6 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelDa
 
   VCAMRPoissonOp2Factory* vcop = new VCAMRPoissonOp2Factory(); //new AMRScalarDiffusionOp();
   vcop->define(m_problem_domain, grids, ref_rat, dx, bc, alpha, aCoef, beta, bCoef);
-  RefCountedPtr<VCAMRPoissonOp2Factory> VCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcop);
 
   LevelData<FArrayBox> *crseVar = nullptr;
 

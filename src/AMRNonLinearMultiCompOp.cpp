@@ -1242,7 +1242,9 @@ setTime(Real a_time)
 //-----------------------------------------------------------------------
 
 // Factory
-AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory() : m_relaxMode(1), m_FAS(true), m_numComp(2), m_superOptimised(false)
+AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory() : m_coefficient_average_type(0),
+    m_apply_bcs_to_diagnostic_var(true), m_alpha(-1), m_beta(-1),
+    m_params(nullptr), m_relaxMode(1), m_FAS(true), m_numComp(2), m_superOptimised(false)
 {
   setDefaultValues();
 }

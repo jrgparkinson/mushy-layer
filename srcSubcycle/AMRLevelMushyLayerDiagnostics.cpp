@@ -234,13 +234,12 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
       for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
       {
-        FArrayBox& vel = (*m_vectorNew[VectorVars::m_fluidVel])[dit];
-
         Box b = m_grids[dit];
         b &= horizBox;
 
         if (b.size() >= IntVect::Unit)
         {
+          FArrayBox& vel = (*m_vectorNew[VectorVars::m_fluidVel])[dit];
           maxVertVel = max(maxVertVel, vel.max(b, 1));
         }
       }

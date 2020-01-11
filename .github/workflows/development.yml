@@ -163,7 +163,7 @@ jobs:
         name: Run regressions with more ouput
         run: |
           cd $GITHUB_WORKSPACE/test/regression
-          python run_regression_tests.py -v
+          python run_regression_tests.py -v -t darcy
 
 
       - uses: actions/upload-artifact@v1

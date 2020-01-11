@@ -329,35 +329,30 @@ void InflowOutflowBC(FArrayBox&      a_state,
     return;
   }
 
-  bool matched = false;
-
-
   FArrayBox advVelDir;
 
   // Don't currently do this
-  bool tryCoarsening = false;
-  if (tryCoarsening)
-  {
-    int refRat = a_dx/fine_dx;
-
-    DataIterator dit = a_advVel->dataIterator();
-    //    pout() << "valid box: " << a_valid << endl;
-
-    for (dit.reset(); dit.ok(); ++dit)
-    {
-      const Box& advVelBox = (*a_advVel)[dit].box();
-      Box coarsenableBox(advVelBox);
-      coarsenableBox.coarsen(refRat);
-      //      pout() << "advVeBox: " << advVelBox << endl;
-
-      if (coarsenableBox.contains(a_valid))
-      {
-        //        pout() << "advVel contains valid" << endl;
-        matched = true;
-        break;
-      }
-    }
-
+//  bool tryCoarsening = false;
+//  if (tryCoarsening)
+//  {
+//    int refRat = a_dx/fine_dx;
+//
+//    DataIterator dit = a_advVel->dataIterator();
+//    //    pout() << "valid box: " << a_valid << endl;
+//
+//    for (dit.reset(); dit.ok(); ++dit)
+//    {
+//      const Box& advVelBox = (*a_advVel)[dit].box();
+//      Box coarsenableBox(advVelBox);
+//      coarsenableBox.coarsen(refRat);
+//      //      pout() << "advVeBox: " << advVelBox << endl;
+//
+//      if (coarsenableBox.contains(a_valid))
+//      {
+//        //        pout() << "advVel contains valid" << endl;
+//        break;
+//      }
+//    }
 
     advVelDir.define(a_valid, 1);
     advVelDir.setVal(0.0);
