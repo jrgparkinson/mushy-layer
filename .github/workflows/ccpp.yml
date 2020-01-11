@@ -1,6 +1,9 @@
 name: Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - development
 
 # schedule:
 #   # * is a special character in YAML so you have to quote this string
@@ -97,38 +100,38 @@ jobs:
         cd $CHOMBO_HOME
         make lib
 
-    - name: Build mushy mushy-layer
+    - name: Build mushy-layer
       run: |
         cd $GITHUB_WORKSPACE/execSubcycle
         make all
 
 
-    # steps:
-    # - uses: actions/checkout@v1
-    # - name: Set up Python 3.6
-    #   uses: actions/setup-python@v1
-    #   with:
-    #     python-version: 3.6
-    # - name: Install dependencies
-    #   run: |
-    #     cd $GITHUB_WORKSPACE
-    #     ls
-    #     python -m pip install --upgrade pip
-    #     pip install -r requirements.txt
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6
+    - name: Install dependencies
+      run: |
+        cd $GITHUB_WORKSPACE
+        ls
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-    # - run: mkdir -p $TEST_RESULTS
+    - run: mkdir -p $TEST_RESULTS
 
-    # - run: echo hello > $TEST_RESULTS/world.txt
+    - run: echo hello > $TEST_RESULTS/world.txt
 
-    # - name: Run regressions
-    #    run: |
-    #      cd test/regression
-    #      python run_regression_tests.py
+    - name: Run regressions
+       run: |
+         cd test/regression
+         python run_regression_tests.py
 
-    # - uses: actions/upload-artifact@v1
-    #   with:
-    #     name: test-results
-    #     path: $GITHUB_WORKSPACE/test/results/
+    - uses: actions/upload-artifact@v1
+      with:
+        name: test-results
+        path: $GITHUB_WORKSPACE/test/results/
 
     
 
