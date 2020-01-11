@@ -144,11 +144,13 @@ Within the `advance(..)` method, the key pieces are:
 For those new to this code/Chombo, here are some tips:
 
 *   An AMRLevelMushyLayer object exists on a particular level of refinement. You can access the coarser and finer levels via `getCoarserLevel()`, `getFinerLevel()`.
+
 *   During a timestep, `m_time` is the new time ($t^{n+1} = t^n + \Delta t$).
+
 *   Scalar and vector fields are stored in arrays `m_scalarNew`, `m_vectorNew`, indexed by the field name, i.e. enthalpy on a level of refinement is `m_scalarNew[ScalarVars::m_enthalpy]`
+
 *   When using scalar and vector fields, you can ensure all the boundary conditions and ghost cells are filled by calling `fillScalars(..)`, e.g.
 ` fillScalars(*m_scalarNew[ScalarVars::m_enthalpy], m_time, ScalarVars::m_enthalpy);`
-
 
 ## Eclipse + Chombo + Mushy Layer
 [Eclipse](https://www.eclipse.org/downloads/packages/release/2018-12/r/eclipse-ide-cc-developers) is an Integrated Development Environment (IDE). In short, it is a powerful code editor (syntax highlighting, advanced find/replace) which also understands the structure of a program. For codes like this one which are spread over multiple files in multiple folders, and use external libraries, it is invaluable. Useful features include:
@@ -161,23 +163,23 @@ In short, it's a bit like MATLAB (but for C++).
 
 Setting up Eclipse with the Mushy Layer is not difficult, but also requires quite a few steps (should take 30 mins, but took me many hours to work them all out from scratch). The following steps should do the job. We assume that you are already able to compile and run the Mushy Layer code.
 
- 1. Create a new project for the Chombo code. Go File->New->Makefile project with existing code. Click Browse and navigate to your /chombo/lib directory	then hit ok. Give the project a suitable name and choose the Linux GCC toolchain.
+1. Create a new project for the Chombo code. Go File->New->Makefile project with existing code. Click Browse and navigate to your /chombo/lib directory	then hit ok. Give the project a suitable name and choose the Linux GCC toolchain.
  
- 2. We now need to tell eclipse how to build the Chombo code. Eclipse may not inherit your environmental variables, so you'll need to define these explicitly. To do this, right click on your project in the project window (usually on the left of the screen), choose Properties, and then navigate to C/C++ Build->Environment. Add 
+2. We now need to tell eclipse how to build the Chombo code. Eclipse may not inherit your environmental variables, so you'll need to define these explicitly. To do this, right click on your project in the project window (usually on the left of the screen), choose Properties, and then navigate to C/C++ Build->Environment. Add 
 `LD_LIBRARY_PATH = /usr/local/hdf5-1.8.21p-v18/lib:`
 The first should point to your hdf5 installation.
 
- 3. Create a new project for your mushy layer code . As before, go File->New->Makefile project with existing code. Set the code location to `/path/to/mushy-layer`, and choose a sensible name (we went for 'MushyLayer'). Again choose the Linux GCC toolchain.
+3. Create a new project for your mushy layer code . As before, go File->New->Makefile project with existing code. Set the code location to `/path/to/mushy-layer`, and choose a sensible name (we went for 'MushyLayer'). Again choose the Linux GCC toolchain.
  
- 4. Set Chombo as a dependency of mushy layer. Open the project properties for the Mushy Layer project (right click in the project window->properties). Choose 'Project references' on the left and select your Chombo project.
+4. Set Chombo as a dependency of mushy layer. Open the project properties for the Mushy Layer project (right click in the project window->properties). Choose 'Project references' on the left and select your Chombo project.
+
+5. Setup build profile for mushy layer. Go to C/C++ build->Environment Variables and check that the same environment variables you set for the Chombo project are also here. Now go to C/C++ build and, under the Builder settings tab, set the build directory to `${workspace_loc:/MushyLayer}/execSubcycle/`. When you use this build profile, you will create an executable using the default options in your Make.defs.local file.
  
- 5. Setup build profile for mushy layer. Go to C/C++ build->Environment Variables and check that the same environment variables you set for the Chombo project are also here. Now go to C/C++ build and, under the Builder settings tab, set the build directory to `${workspace_loc:/MushyLayer}/execSubcycle/`. When you use this build profile, you will create an executable using the default options in your Make.defs.local file.
+6. Create a debugging build profile. Also on the C/C++ build page, at the top hit 'Manage Configurations' then 'New'. Set the name to something like 'Mushy Layer Debug', and copy settings from the default configuration. Then select the debug configuration on the C/C++ build page, untick 'Use default build command' and enter `make DEBUG=TRUE OPT=FALSE`. When you use this build profile, you will force the compiler to use the DEBUG flags and not use the OPT flags. This creates and executable suitable for debugging with.
  
- 6. Create a debugging build profile. Also on the C/C++ build page, at the top hit 'Manage Configurations' then 'New'. Set the name to something like 'Mushy Layer Debug', and copy settings from the default configuration. Then select the debug configuration on the C/C++ build page, untick 'Use default build command' and enter `make DEBUG=TRUE OPT=FALSE`. When you use this build profile, you will force the compiler to use the DEBUG flags and not use the OPT flags. This creates and executable suitable for debugging with.
- 
- 7. Check everything works so far. Build the project using both the configurations we've created via Project->Build all. Use Project->Build Configurations-Set active to change between build configurations.
- 
- 8. Create a debug configuration. Now Eclipse knows how to build your project, but you haven't explicitly told it where the executable file is located, or what options it should be run with. From the top menu, go Run->Debug configurations. Click the little 'New Debug configuration' icon (top left), give it a name, and for C/C++ application navigate to the DEBUG version of your compiled codes e.g. `mushyLayer2d.Linux.64.mpiCC.gfortran.DEBUG.MPI.ex`. For Build configuration, choose the debug configuration you just created. Now go to the Arguments tab and enter the name of the inputs file you'll want to use for your debugging (you'll probably find you change this a lot). Make sure the Working Directory at the bottom is set to `${workspace_loc:MushyLayer}/execSubcycle`. Now go to the Environment tab and set
+7. Check everything works so far. Build the project using both the configurations we've created via Project->Build all. Use Project->Build Configurations-Set active to change between build configurations.
+
+8. Create a debug configuration. Now Eclipse knows how to build your project, but you haven't explicitly told it where the executable file is located, or what options it should be run with. From the top menu, go Run->Debug configurations. Click the little 'New Debug configuration' icon (top left), give it a name, and for C/C++ application navigate to the DEBUG version of your compiled codes e.g. `mushyLayer2d.Linux.64.mpiCC.gfortran.DEBUG.MPI.ex`. For Build configuration, choose the debug configuration you just created. Now go to the Arguments tab and enter the name of the inputs file you'll want to use for your debugging (you'll probably find you change this a lot). Make sure the Working Directory at the bottom is set to `${workspace_loc:MushyLayer}/execSubcycle`. Now go to the Environment tab and set
 `CH_TIMER=1` - this makes sure chombo produces timing output from simulations, which can be useful.
 `VISITHOME=/path/to/visit2.12.0/src` - this allows Eclipse to find your installation of Visit (if you've installed Visit) so it can be used for debugging. (your visit installation is likely in a different place)
 `LD_LIBRARY_PATH=/usr/local/hdf5-1.8.21p-v18/lib:` - make sure Eclipse can find HDF5. (your hdf5 installation is likely in a different place)
@@ -205,9 +207,3 @@ Other useful options available for viewing data include
 *   `p m_time` return the value of any variable (you can also hover over a variable in the editor window).
 
 There are probably more, and these are documented in the ChomboDesign.pdf document.
-
-
-
- 
-
-

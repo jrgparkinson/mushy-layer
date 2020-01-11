@@ -62,13 +62,13 @@ void AMRLevelMushyLayer::getHierarchyAndGrids(
   a_refRat.resize(nlevels);
   a_grids.resize(nlevels);
 
-  AMRLevelMushyLayer* coarsestLevel = (AMRLevelMushyLayer*) (hierarchy[0]);
+  AMRLevelMushyLayer* coarsestLevel = static_cast<AMRLevelMushyLayer*> (hierarchy[0]);
   a_lev0Dx = coarsestLevel->m_dx;
   a_lev0Dom = coarsestLevel->m_problem_domain;
 
   for (int ilev = 0; ilev < nlevels; ilev++)
   {
-    AMRLevelMushyLayer* adLevel = (AMRLevelMushyLayer*) (hierarchy[ilev]);
+    AMRLevelMushyLayer* adLevel = static_cast<AMRLevelMushyLayer*> (hierarchy[ilev]);
 
     a_hierarchy[ilev] = adLevel;
     a_grids[ilev] = adLevel->m_grids;
@@ -180,11 +180,6 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
       }
   }
 
-  // Stop worrying about this for now
-  bool Tstalled = false;
-  bool Cstalled = false;
-  bool Ustalled = false;
-
   bool metricConverged = false;
   // For some simulations, steady state can be defined by some other metric
 
@@ -205,7 +200,7 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   bool hasConverged = false;
 
   bool velConverged = m_opt.ignoreVelocitySteadyState || Unorm < m_opt.steadyStateCondition;
-  bool velStalled = m_opt.ignoreVelocitySteadyState || Ustalled;
+  bool velStalled = m_opt.ignoreVelocitySteadyState;
 
   bool Tconverged = Tnorm < m_opt.steadyStateCondition;
   bool Cconverged = Cnorm < m_opt.steadyStateCondition;
@@ -223,17 +218,15 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
     pout() << "Steady state reached (all fields converged)" << endl;
     hasConverged = true; // converged
   }
-  else if (metricConverged)
-  {
-    pout() << "Steady state reached (metric converged)" << endl;
-    hasConverged = true; // converged
-  }
-  else if (Tstalled
-      && Cstalled
-      && velStalled
+  else if (velStalled
       && metricConverged)
   {
     pout() << "Steady state reached (all fields nearly converged and metric converged)" << endl;
+    hasConverged = true; // converged
+  }
+  else if (metricConverged)
+  {
+    pout() << "Steady state reached (metric converged)" << endl;
     hasConverged = true; // converged
   }
   else
@@ -788,21 +781,20 @@ Real AMRLevelMushyLayer::advance()
       {
         pout() << "Ignoring all solver fails." << endl;
       }
-
       else
       {
         // Alternative way of restarting - set this to true to just do this timestep again
         // with half the dt. The trouble is we still output a bad file from this timestep which is annoying
         m_timestepFailed = true;
 
-        Vector<string> failedReasons(9);
+        Vector<string> failedReasons(99, "Unknown error");
 
         failedReasons[4] = "Solver hang";
         failedReasons[8] = "Norm not reduced enough";
         failedReasons[2] = "Reached iter max";
         failedReasons[1] = "Initial norm not reduced enough";
 
-        pout() << "Solver failed. Exit status: " << exitStatus << endl;
+        pout() << "Solver failed. Exit status: " << exitStatus << "(" << failedReasons[exitStatus] << ")" << endl;
 
       }
 
@@ -1842,76 +1834,19 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
   Real old_time = m_time-m_dt;
 
-  BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister>* baseLevBE = nullptr;
-
   if (m_opt.timeIntegrationOrder == 2)
   {
-    //       MayDay::Error("multiCompAdvectDiffuse - TGA not implemented yet");
-    //exitStatus = TGAUpdateScalar(a_var, a_src, converged);
-
     m_enthalpySalinityTGA->updateSoln(a_phi_new,
                                       a_phi_old, full_src, finerFRPtr, coarserFRPtr,
                                       coarserDataOldPtr, coarserDataNewPtr, old_time, tCoarserOld,
                                       tCoarserNew, m_dt, m_level, false); //false - don't zero phi
-
-    baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*m_enthalpySalinityTGA));
   }
   else
   {
-
-//    if (m_opt.noMultigrid)
-//    {
-//      a_phi_old.copyTo(a_phi_new);
-//
-//      LevelData<FArrayBox> thisSrc(m_grids, 2, IntVect::Unit);
-//      full_src.copyTo(thisSrc);
-//      for (DataIterator dit = thisSrc.dataIterator(); dit.ok(); ++dit)
-//      {
-//        thisSrc[dit].mult(m_dt);
-//        thisSrc[dit].plus(a_phi_old[dit]);
-//      }
-//
-//      for (int i=0; i < m_opt.noMultigridIter; i++)
-//      {
-//
-//        // Need to define solvers first and foremost
-//        //        defineSolvers(m_time);
-//
-//        // Try replacing with single level relax solver
-//        RefCountedPtr<AMRNonLinearMultiCompOp> amrpop = RefCountedPtr<AMRNonLinearMultiCompOp>(
-//            (AMRNonLinearMultiCompOp*) m_HCOpFact->AMRnewOp(m_problem_domain));
-//
-//        // Solving (1-dt Op) HC^{n+1} = HC^{n}
-//        amrpop->setAlphaAndBeta(1.0, -m_dt);
-//
-//        LevelData<FArrayBox> a_res(m_grids, 2, IntVect::Unit);
-//
-//        amrpop->relax(a_phi_new, thisSrc, 1000);
-//
-//        amrpop->residual(a_res, a_phi_new, thisSrc, false);
-//        Real maxRes = ::computeNorm(a_res, nullptr, 1, m_dx, Interval(0, 1), 0);
-//        pout() << "  Max residual = " << maxRes << endl;
-//
-//        if (maxRes < 1e-10)
-//        {
-//          pout() << "   Converged " << endl;
-//          break;
-//
-//        }
-//
-//      }
-//    }
-//    else
-//    {
-
-      m_enthalpySalinityBE->updateSoln(a_phi_new,
-                                       a_phi_old, full_src, finerFRPtr, coarserFRPtr,
-                                       coarserDataOldPtr, coarserDataNewPtr, old_time, tCoarserOld,
-                                       tCoarserNew, m_dt, m_level, false); //false - don't zero phi
-
-      baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*m_enthalpySalinityBE));
-//    }
-
+    m_enthalpySalinityBE->updateSoln(a_phi_new,
+                                     a_phi_old, full_src, finerFRPtr, coarserFRPtr,
+                                     coarserDataOldPtr, coarserDataNewPtr, old_time, tCoarserOld,
+                                     tCoarserNew, m_dt, m_level, false); //false - don't zero phi
   }
 
   if (s_verbosity > 5)
@@ -1921,16 +1856,21 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
   a_phi_new.exchange();
 
-  Real residual = 0;
-
 #ifdef CH_FORK
+  if (m_opt.timeIntegrationOrder == 2)
+  {
+    baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*m_enthalpySalinityTGA));
+  }
+  else
+  {
+    baseLevBE = dynamic_cast<BaseLevelHeatSolver<LevelData<FArrayBox>, FluxBox, LevelFluxRegister> * > (&(*m_enthalpySalinityBE));
+  }
   if (baseLevBE != nullptr)
   {
     exitStatus = baseLevBE->exitStatus();
     residual = baseLevBE->finalResidual();
     int num_iter =  baseLevBE->numMGiterations();
 
-    //           MAC Projection (level
     pout() << "  HC solve       (level " << m_level << "): exit status " << exitStatus << ", solver residual = " << residual << ", num MG iterations = " << num_iter << endl;
 
   }
@@ -1948,7 +1888,6 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     delete coarserDataOldPtr;
     coarserDataOldPtr = nullptr;
   }
-
 
   return exitStatus;
 }
@@ -2010,7 +1949,6 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
 
   CH_assert(edgeScalTotal.nComp() == numComp);
 
-  IntVect ghostVect = IntVect::Unit;
   IntVect fluxGhostVect = edgeScalTotal.ghostVect();
 
   LevelData<FluxBox> edgeScalFluidAdv(m_grids, numComp, fluxGhostVect);
@@ -3299,10 +3237,13 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
         if (abs(a_time - crse_old_time) < TIME_EPS)
         {
           crse_time_interp_coeff = 0.0;
-        } else if (abs(a_time - crse_new_time) < TIME_EPS)
+        }
+        else if (abs(a_time - crse_new_time) < TIME_EPS)
         {
           crse_time_interp_coeff = 1.0;
-        } else {
+        }
+        else
+        {
           crse_time_interp_coeff = (a_time - crse_old_time) / crse_dt;
         }
 
@@ -3327,25 +3268,8 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
     // need to set physical boundary conditions here
     const DisjointBoxLayout& levelGrids = a_vector.getBoxes();
 
-    // Changing U and U/chi to other BCs, as these ones were filling interior CF ghost cells
-    if (1==0)
-    {
-      if (m_parameters.isViscous())
-      {
-
-        // This BC fills all ghost cells, which is what we want
-        BCHolder bc = m_physBCPtr->extrapolationFuncBC();
-        DataIterator dit = a_vector.dataIterator();
-        for (dit.reset(); dit.ok(); ++dit)
-        {
-          bc(a_vector[dit], levelGrids[dit], m_problem_domain, m_dx, false); // not homogeneous
-        }
-      } else {
-        VelBCHolder velBC(m_physBCPtr->tracingVelFuncBC());
-        velBC.applyBCs(a_vector, levelGrids, m_problem_domain, m_dx, false); // inhomogeneous
-      }
-    }
-    else if (a_var == m_Ustar || a_var==m_UpreProjection || a_var == m_advUstar || a_var == m_advUpreProjection
+    // If we don't know how to set BCs for this variable, don't bother
+    if (a_var == m_Ustar || a_var==m_UpreProjection || a_var == m_advUstar || a_var == m_advUpreProjection
         || a_var == m_fluidVel or a_var == m_U_porosity)
     {
       for (int idir = 0; idir < SpaceDim; idir++)
@@ -3362,13 +3286,8 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
                     false); // not homogeneous
         }
       }
-
-    } else {
-      // Don't know how to set BCs for this variable, don't bother
     }
-
   }
-
   a_vector.exchange();
 }
 

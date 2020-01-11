@@ -7,6 +7,7 @@ import numpy as np
 import sys
 import matplotlib as mpl
 mpl.use('Agg')
+import matplotlib.pyplot as plt
 
 
 def format_field_name(field):
@@ -354,7 +355,7 @@ def run_chombo_compare(argv):
     latexify(fig_width=6.0, fig_height=2.5)
 
     # Make left axes wider
-    fig, axes = mpl.pyplot.plt.subplots(1, 2)  # gridspec_kw={'width_ratios':[2,1]}
+    _, axes = plt.subplots(1, 2)  # gridspec_kw={'width_ratios':[2,1]}
 
     if include_richardson:
         key_order = ['Single-level Richardson', 'Single-level 512 difference']
@@ -468,9 +469,9 @@ def run_chombo_compare(argv):
     filename = filename.replace(' ', '_')  # remove spaces
     figure_full_path = os.path.join(figure_output_directory, filename)
     print('Saving as %s' % figure_full_path)
-    mpl.pyplot.plt.savefig(figure_full_path, format='eps')
+    plt.savefig(figure_full_path, format='eps')
 
-    mpl.pyplot.plt.show()
+    plt.show()
 
 
 if __name__ == "__main__":
