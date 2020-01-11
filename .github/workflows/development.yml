@@ -164,10 +164,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/test/regression
           python run_regression_tests.py -v
-        uses: actions/upload-artifact@v1
-        with:
-          name: test-results
-          path: ${{ env.REGRESSIONS_PATH }}
+
 
       - uses: actions/upload-artifact@v1
         name: Upload test results
