@@ -17,6 +17,7 @@ env:
   HDF5_PATH: /home/runner/hdf5-dir
   LD_LIBRARY_PATH: /home/runner/hdf5-dir
   TEST_RESULTS: /home/runner/work/mushy-layer/mushy-layer/test/results
+  PYTHONPATH: todo
 
 
 jobs:
@@ -100,10 +101,10 @@ jobs:
         cd $CHOMBO_HOME
         make lib
 
-    # - name: Build mushy-layer
-    #   run: |
-    #     cd $GITHUB_WORKSPACE/execSubcycle
-    #     make all
+    - name: Build mushy-layer
+      run: |
+        cd $GITHUB_WORKSPACE/execSubcycle
+        make all
         
   regression:
     name: Regression tests
@@ -122,6 +123,7 @@ jobs:
         ls
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        python install.py
 
 #     - name: Setup test output
 #       run: |
