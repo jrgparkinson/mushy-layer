@@ -59,6 +59,7 @@ if __name__ == "__main__":
     print_var('PYTHONPATH', git_build)
 
     # Setup MUSHY_LAYER_DIR
+    print('Checking MUSHY_LAYER_DIR')
     if 'MUSHY_LAYER_DIR' not in os.environ:
         os.environ['MUSHY_LAYER_DIR'] = get_script_path()
     print_var('MUSHY_LAYER_DIR', git_build)
