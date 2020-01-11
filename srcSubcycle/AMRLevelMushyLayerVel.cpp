@@ -63,8 +63,8 @@ void AMRLevelMushyLayer::calculateTimeIndAdvectionVel(Real time, LevelData<FluxB
     toRegion.setRange(idir, coord);
 
     // Note, if idir != velComp:
-    toRegion.surroundingNodes(velComp);
-    toRegion = adjCellBox(toRegion, idir, side, 1);
+//    toRegion.surroundingNodes(velComp);
+//    toRegion = adjCellBox(toRegion, idir, side, 1);
 
     toRegion &= v_box;
 

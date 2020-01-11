@@ -893,7 +893,8 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
     createPhaseBoundaryStructures(lev, grids, ivGhost, enthalpySolidus, enthalpyEutectic, enthalpyLiquidus);
 
     // Can only fill these at the current level or coarser
-    bool secondOrder = true; // Should probably use quadratic CF interp here
+    // Should probably use quadratic CF interp here
+    bool secondOrder = true;
 
     // Only fill at levels which have reached m_time
     // in general, than means this level and coarser
@@ -1623,9 +1624,7 @@ void AMRLevelMushyLayer::addVortex(RealVect center, Real strength, Real radius)
 {
   DataIterator dit = m_grids.dataIterator();
 
-  Real r = 0;
-  Real theta = 0;
-  Real u_theta;
+  Real u_theta, r, theta, y_x, x_rel;
 
   for (dit.reset(); dit.ok(); ++dit)
   {
@@ -1638,10 +1637,10 @@ void AMRLevelMushyLayer::addVortex(RealVect center, Real strength, Real radius)
       Real x, y, z;
       getLocation(iv, m_dx, x, y, z);
 
-      Real x_rel = x-center[0];
+      x_rel = x-center[0];
 
       r = sqrt(pow(x-center[0], 2) + pow(y-center[1], 2));
-      Real y_x = (y-center[1])/(x-center[0]);
+      y_x = (y-center[1])/(x-center[0]);
       theta = atan(y_x);
 
       // Compute velocity in polar coords
@@ -2773,8 +2772,6 @@ void AMRLevelMushyLayer::postInitialize()
     }
 
 
-    thisLevelData = this;
-
     // need to reset boundary conditions here
     setVelBCs(numLevels, amrVel, velBC);
 
@@ -2785,7 +2782,6 @@ void AMRLevelMushyLayer::postInitialize()
         pout() << "AMRlevelMushyLayer::postInitialize - initialize pressures" << endl;
       }
 
-//      if (solvingFullDarcyBrinkman())
       if (this->doVelocityAdvection())
       {
         Real dtInit = computeDtInit(numLevels-1);
@@ -3108,11 +3104,9 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     thisMLPtr = this;
     for (int lev = lbase; lev <= finest_level; lev++)
     {
-
-      bool dontReplacePressure = true;
-
       if (m_opt.initResetStates)
       {
+        bool dontReplacePressure = true;
         thisMLPtr->restartTimestepFromBackup(dontReplacePressure); // refill 'new' states
       }
       thisMLPtr->time(cur_time);
@@ -3193,9 +3187,7 @@ void AMRLevelMushyLayer::initializeLevelPressure(Real a_currentTime,
   m_time = new_time;
   m_dt = a_dtInit;
 
-  // We're not going to bother doing refluxing after initialisation,
-  // do doesn't really matter if we store FR updates or not
-  bool doFRupdates = false;
+
 
   // Computes advection velocities, and CC velocities if applicable
   if (solvingFullDarcyBrinkman())
@@ -3207,7 +3199,9 @@ void AMRLevelMushyLayer::initializeLevelPressure(Real a_currentTime,
     computeAdvectionVelocities(advectionSourceTerm);
 
     // Just initialising so don't advect/diffuse any scalars here
-    computeCCvelocity(advectionSourceTerm, m_time-m_dt, m_dt, doFRupdates, m_opt.init_compute_uDelu);
+    computeCCvelocity(advectionSourceTerm, m_time-m_dt, m_dt,
+                      false, // Don't do Flux Reg updates as we don't reflux after init
+                      m_opt.init_compute_uDelu);
 
   }
   else

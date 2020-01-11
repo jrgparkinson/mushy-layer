@@ -101,16 +101,21 @@ jobs:
         echo "$CHOMBO_HOME"
         ls $CHOMBO_HOME
            
-    - name: Install Chombo
+    - name: Compile Chombo
       run: |
         cp $GITHUB_WORKSPACE/mk/Make.defs.local.github $CHOMBO_HOME/mk/Make.defs.local
         cd $CHOMBO_HOME
         make lib
 
-    - name: Build mushy-layer
+    - name: Compile ChomboCompare
+        cd $CHOMBO_HOME/util/ChomboCompare
+        make compare
+
+    - name: Compile mushy-layer
       run: |
         cd $GITHUB_WORKSPACE/execSubcycle
         make all
+
 
 # Now do regression tests
 

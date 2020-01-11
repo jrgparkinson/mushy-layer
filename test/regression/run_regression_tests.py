@@ -13,6 +13,28 @@ import sys
 import mushyLayerRunUtils
 import run_chombo_compare as chcompare
 
+class Logger():
+
+    def __init__(self, log_file_path):
+        self.log_file = open(log_file_path, 'w+')
+
+    def log(self, text):
+        print(text)
+        self.log_file.write(text + '\n')
+
+    def logl(self, text):
+        sys.stdout.write(text)
+        sys.stdout.flush()
+
+        self.log_file.write(text)
+
+    def log_status(self, text):
+        formatted = '%-8s' % text
+        sys.stdout.write(formatted)
+        sys.stdout.flush()
+
+        self.log_file.write(formatted)
+
 
 def filter_pout(text_lines):
     """
@@ -28,16 +50,6 @@ def filter_pout(text_lines):
         filtered_output.append(new_line)
 
     return filtered_output
-
-
-def printl(text):
-    sys.stdout.write(text)
-    sys.stdout.flush()
-
-
-def print_status(text):
-    sys.stdout.write('%-8s' % text)
-    sys.stdout.flush()
 
 
 def test_folder(test_directory, verbose_output=False):
@@ -56,20 +68,20 @@ def test_folder(test_directory, verbose_output=False):
     # if not, skip this test
     if not all(elem in test_files for elem in REQUIRED):
         if verbose_output:
-            print('  Required files for conducting a test (%s) not found in %s' % (REQUIRED, test_directory))
-            print('  Skipping test \n')
+            logger.log('  Required files for conducting a test (%s) not found in %s' % (REQUIRED, test_directory))
+            logger.log('  Skipping test \n')
         else:
             test_name = test_directory.split('/')[-1]
-            printl('%-25s    ' % test_name)
-            print_status('[Void]')
-        return False
+            logger.logl('%-25s    ' % test_name)
+            logger.log_status('[Void]')
+        return False, 'Void'
 
     # Load properties
     with open(os.path.join(test_directory, PROPERTIES_FILE)) as json_file:
         properties = json.load(json_file)
 
-    # print('==Running test: %s==' % properties['name'])
-    printl('%-25s    ' % properties['name'])
+    # logger.log('==Running test: %s==' % properties['name'])
+    logger.logl('%-25s    ' % properties['name'])
 
     # Get correct executable
     mushy_layer_exec = mushyLayerRunUtils.get_executable(dim=properties['dim'])
@@ -77,28 +89,28 @@ def test_folder(test_directory, verbose_output=False):
 
     if not os.path.exists(mushy_layer_exec_path):
         if verbose_output:
-            print('Could not find mushy layer executable: %s' % mushy_layer_exec_path)
-            print('Have you compiled the code for the right number of dimensions?')
-            print('Use \'make all DIM=3\' to compile in 3D')
+            logger.log('Could not find mushy layer executable: %s' % mushy_layer_exec_path)
+            logger.log('Have you compiled the code for the right number of dimensions?')
+            logger.log('Use \'make all DIM=3\' to compile in 3D')
         else:
-            print_status('[Failed]')
-        return False
+            logger.log_status('[Failed]')
+        return False, 'Failed'
 
     # Run test
     cmd = 'cd %s; mpirun -np %d %s inputs' % (test_directory, properties['proc'], mushy_layer_exec_path)
-    # print('Executing: %s' % cmd)
+    # logger.log('Executing: %s' % cmd)
     os.system(cmd)
 
     # Compare output against the expected output
-    # print('Test files: %s' % test_files)
+    # logger.log('Test files: %s' % test_files)
 
     expected_files = [f for f in test_files if EXPECTED in f]
     if not expected_files:
         if verbose_output:
-            print('No expected files to compared against')
+            logger.log('No expected files to compared against')
         else:
-            print_status('[Void]')
-        return False
+            logger.log_status('[Void]')
+        return False, 'Void'
 
     for expected_file in expected_files:
 
@@ -107,14 +119,14 @@ def test_folder(test_directory, verbose_output=False):
         test_output_file_path = os.path.join(test_directory, test_output_filename)
         if not os.path.exists(test_output_file_path):
             if verbose_output:
-                print('No output file generated to compare against: %s' % test_output_file_path)
+                logger.log('No output file generated to compare against: %s' % test_output_file_path)
             else:
-                print_status('[Failed]')
-            return False
+                logger.log_status('[Failed]')
+            return False, 'Failed'
 
         if '.hdf5' in expected_file:
             # Do chombo compare
-            # print('Using chombo compare')
+            # logger.log('Using chombo compare')
 
             # Make diffs folder if it doesn't exist
             diffs_folder = os.path.join(test_directory, DIFF_FOLDER)
@@ -122,14 +134,14 @@ def test_folder(test_directory, verbose_output=False):
                 os.makedirs(diffs_folder)
 
             chombo_dir = os.environ['CHOMBO_HOME']
-            compare_dir = os.path.join(chombo_dir, 'lib', 'util', 'ChomboCompare')
+            compare_dir = os.path.join(chombo_dir, 'util', 'ChomboCompare')
             compare_exec = mushyLayerRunUtils.get_executable_name(compare_dir, 'compare%dd' % properties['dim'])
             compare_exec = os.path.join(compare_dir, compare_exec)
-            # print('Found executable %s ' % compare_exec)
+            # logger.log('Found executable %s ' % compare_exec)
 
             if not os.path.exists(compare_exec) and verbose_output:
-                print('Could not find Chombo compare executable %s' % compare_exec)
-                print('So cannot compare hdf5 output files')
+                logger.log('Could not find Chombo compare executable %s' % compare_exec)
+                logger.log('So cannot compare hdf5 output files')
 
             compare_params_file = os.path.join(test_directory, 'compare.inputs')
 
@@ -147,7 +159,7 @@ def test_folder(test_directory, verbose_output=False):
             mushyLayerRunUtils.write_inputs(compare_params_file, compare_params)
             cmd = 'cd %s ; %s %s  > /dev/null' % (diffs_folder, compare_exec, compare_params_file)
 
-            # print('Executing: %s' % cmd)
+            # logger.log('Executing: %s' % cmd)
             # This prints the console output, which can be messy:
             # os.system(cmd)
 
@@ -158,25 +170,25 @@ def test_folder(test_directory, verbose_output=False):
             # Rename pout.0 in case we make lots
             old_pout_name = os.path.join(diffs_folder, 'pout.0')
             new_pout_name = os.path.join(diffs_folder, 'pout-%s.0' % test_output_filename)
-            # print('Rename %s to %s' % (old_pout_name, new_pout_name))
+            # logger.log('Rename %s to %s' % (old_pout_name, new_pout_name))
             os.rename(old_pout_name, new_pout_name)
 
             # Now check the output diff
             errs = chcompare.load_error_file(new_pout_name)
-            # print(errs)
+            # logger.log(errs)
 
             for field in errs.keys():
                 field_errs = errs[field]
-                # print(field_errs)
+                # logger.log(field_errs)
                 for err_type in field_errs.keys():
                     this_field_err = field_errs[err_type]
                     if abs(this_field_err) > 1e-10:
                         if verbose_output:
-                            print('Error in field %s is non-zero' % field)
-                            print('See %s and %s for more info' % (new_pout_name, error_file))
+                            logger.log('Error in field %s is non-zero' % field)
+                            logger.log('See %s and %s for more info' % (new_pout_name, error_file))
                         else:
-                            print_status('[Failed]')
-                        return False
+                            logger.log_status('[Failed]')
+                        return False, 'Failed'
         else:
             # Assume text file - do a diff
             text1 = open(os.path.join(test_directory, expected_file)).readlines()
@@ -194,23 +206,23 @@ def test_folder(test_directory, verbose_output=False):
                 diff_file.writelines(diff)
 
             differences = [line for line in diff]
-            # print('Diff: %s' % differences)
+            # logger.log('Diff: %s' % differences)
 
             if differences:
                 if verbose_output:
-                    print('Differences found in %s' % test_output_file_path)
-                    print('For details, see %s' % diff_out_file)
-                    print('** Test failed \n')
+                    logger.log('Differences found in %s' % test_output_file_path)
+                    logger.log('For details, see %s' % diff_out_file)
+                    logger.log('** Test failed \n')
                 else:
-                    print_status('[Failed]')
-                return False
+                    logger.log_status('[Failed]')
+                return False, 'Failed'
 
-    print_status('[OK]')
-    return True
+    logger.log_status('[OK]')
+    return True, 'OK'
 
 
 def usage():
-    print('python run_regression_tests.py [-t <test_dir>] [-v verbose] ')
+    logger.log('python run_regression_tests.py [-t <test_dir>] [-v verbose] ')
 
 
 if __name__ == "__main__":
@@ -228,6 +240,7 @@ if __name__ == "__main__":
 
     # Get full path to this script
     script_loc = os.path.dirname(os.path.realpath(__file__))
+    logger = Logger(os.path.join(script_loc, 'regression.log'))
 
     # By default assume every subdirectory is a test
     test_dirs = [f for f in os.listdir(script_loc) if os.path.isdir(os.path.join(script_loc, f))]
@@ -237,7 +250,7 @@ if __name__ == "__main__":
         opts, args = getopt.getopt(sys.argv[1:], "ht:v", ["help", "test="])
     except getopt.GetoptError as err:
         # print help information and exit:
-        print(err)  # will print something like "option -a not recognized"
+        logger.log(str(err))  # will print something like "option -a not recognized"
         usage()
         sys.exit(2)
     for o, arg in opts:
@@ -249,54 +262,61 @@ if __name__ == "__main__":
         elif o in "-v":
             verbose = True
         else:
-            print('Unknown command line option: %s' % o)
+            logger.log('Unknown command line option: %s' % o)
             sys.exit(-1)
 
-    print('Tests to run: ' + ','.join(test_dirs))
+    logger.log('Tests to run: ' + ','.join(test_dirs))
 
     # Containers to collate passed/failed tests
     failed_tests = []
     passed_tests = []
+    test_results = {}
 
     # Timing
     timings.append(time.time())
 
     for test_dir in test_dirs:
+        status = 'Failed'
 
         # noinspection PyBroadException
         try:
             full_dir = os.path.join(script_loc, test_dir)
-            success = test_folder(full_dir, verbose)
+            success, status = test_folder(full_dir, verbose)
 
             # Timing
             timings.append(time.time())
-            print(' (%.3g seconds)' % (timings[-1] - timings[-2]))
+            logger.log(' (%.3g seconds)' % (timings[-1] - timings[-2]))
 
         except Exception as e:
 
             if verbose:
-                print('**Error running test**')
+                logger.log('**Error running test**')
                 logging.error(traceback.format_exc())
             else:
-                print_status('[Failed]')
+                logger.log_status('[Failed]')
             success = False
 
         if success:
-            # print('**Test passed** \n')
             passed_tests.append(test_dir)
         else:
-            # print('**Test failed** \n')
             failed_tests.append(test_dir)
 
-    print('==========================================================')
-    print('------------------------ Summary -------------------------')
+        test_results[test_dir] = status
+
+    logger.log('')
+    logger.log('==========================================================')
+    logger.log('------------------------ Summary -------------------------')
 
     # Report tests
     num_passed = len(passed_tests)
     num_failed = len(failed_tests)
-    print('Tests passed (%d/%d): %s' % (num_passed, num_passed + num_failed, ','.join(passed_tests)))
-    print('Tests failed (%d/%d): %s' % (num_failed, num_passed + num_failed, ','.join(failed_tests)))
+    logger.log('Tests passed (%d/%d): %s' % (num_passed, num_passed + num_failed, ','.join(passed_tests)))
+    logger.log('Tests failed (%d/%d): %s' % (num_failed, num_passed + num_failed, ','.join(failed_tests)))
 
     # Timing
     timings.append(time.time())
-    print('Total runtime: %.3g seconds' % (timings[-1] - timings[0]))
+    logger.log('Total runtime: %.3g seconds' % (timings[-1] - timings[0]))
+
+    # Give a bad exit if we failed a test
+    if num_failed > 0:
+        sys.exit(1)
