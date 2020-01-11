@@ -6,7 +6,7 @@
 ebase = mushyLayer
 
 # the location of the Chombo "lib" directory
-CHOMBO_HOME = ../../chombofork/lib
+#CHOMBO_HOME = ../../chombofork/lib
 # Compile with chombo trunk to check everything will work for other users
 #CHOMBO_HOME = ../../Chombo-trunk/lib 
 
