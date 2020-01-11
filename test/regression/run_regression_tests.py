@@ -216,7 +216,7 @@ def test_folder(test_directory, verbose_output=False):
 
             # This doesn't print the console output, which is cleaner
             with open(os.devnull, 'wb') as devnull:
-                res = subprocess.check_call(cmd, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
+                res = subprocess.check_call(cmd, shell=True, stderr=subprocess.STDOUT)
                 print('Compare command run, response: %s' % res)
 
             # Rename pout.0 in case we make lots
