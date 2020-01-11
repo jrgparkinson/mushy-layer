@@ -2,7 +2,7 @@ import os
 import xarray as xr
 import matplotlib.pyplot as plt
 import numpy as np
-from nondimensionalisation import *
+from nondimensionalisation import dimensional_salinity, dimensional_temperature, dimensional_time
 from PltFile import latexify2
 import matplotlib as mpl
 import re
@@ -26,6 +26,15 @@ def get_color(colors_arr, min_t, max_t, t):
     index = int(math.floor(len(colors_arr) * interp))
 
     return colors_arr[index]
+
+
+def get_dimensional(profs, time, prof_name):
+    prof = profs[prof_name].sel(t=time)
+    if 'Salinity' in prof_name:
+        prof = dimensional_salinity(prof)
+    elif 'Temperature' in prof_name:
+        prof = dimensional_temperature(prof)
+    return prof
 
 
 # Define these
@@ -83,26 +92,18 @@ plot_interval_time = 0.001
 
 if comparison:
 
-    for i in range(0, len(times_control)):
+    for i, time in enumerate(times_control):
 
-        if times_control[i] < min_time or times_control[i] > max_time:
+        if time < min_time or time > max_time:
             continue
 
         if not i % plot_interval == 0:
             continue
 
-        time = times_control[i]
-
         rm_time = rm_profile_control.sel(t=time)
         temperature_time = temperature_profile_control.sel(t=time)
 
-        profile = profiles_control[profile_name].sel(t=time)
-
-        if 'Salinity' in profile_name:
-            profile = dimensional_salinity(profile)
-        elif 'Temperature' in profile_name:
-            profile = dimensional_temperature(profile)
-
+        profile = get_dimensional(profiles_control, time, profile_name)
         this_color = get_color(colors, min_time, max_time, time)
 
         axes[1].plot(profile, z, linestyle=':', label='$t=%.5g$' % dim_times_control[i], color=this_color)
@@ -117,19 +118,10 @@ for i in range(30, len(time_warming) - 1):
 
     time = time_warming[i]
 
-    # rm_time = rm_profile_.sel(t=time)
-    # temperature_time = temperature_profile_control.sel(t=time)
-
     if profile_name not in profiles_warming.keys():
         continue
 
-    profile = profiles_warming[profile_name].sel(t=time)
-
-    if 'Salinity' in profile_name:
-        profile = dimensional_salinity(profile)
-    elif 'Temperature' in profile_name:
-        profile = dimensional_temperature(profile)
-
+    profile = get_dimensional(profiles_warming, time, profile_name)
     this_color = get_color(colors, min_time, max_time, time)
 
     axes[1].plot(profile, z, color=this_color)  # label='$t=%.5g$' % dim_times_warming[i],

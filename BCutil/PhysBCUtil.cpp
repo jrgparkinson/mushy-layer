@@ -909,18 +909,19 @@ public:
   /// Component of velocity to apply BCs to
   int m_comp;
 
+  /// Order of spatial accuracy
+  int m_order;
+
   // Default constructor
   BasicFluxExtrapBCFunction()
   :
-    m_comp(-1)
+    m_comp(-1), m_order(2)
   {
   }
 
   /// Full constructor
-  BasicFluxExtrapBCFunction(
-      int  a_comp)
-  :
-    m_comp(a_comp)
+  explicit BasicFluxExtrapBCFunction(int  a_comp)
+  : m_comp(a_comp), m_order(2)
   {
   }
   /// Apply BC
@@ -930,8 +931,6 @@ public:
                           Real                 a_dx,
                           bool                 a_homogeneous)
   {
-
-    int order = 2;
 
     // a_state is FACE-centered, now in m_comp direction;
     // a_valid is CELL-centered
@@ -953,7 +952,7 @@ public:
             {
 
               ExtraBC(a_state, a_valid,
-                      idir, side, order, m_comp);
+                      idir, side, m_order, m_comp);
               //						  ExtrapBC(  a_state, a_valid,  idir,   side, order);
 
             } // if ends match
@@ -990,6 +989,9 @@ public:
   /// Velocity values to enforce on the domain boundaries
   LevelData<FluxBox>* m_velBCvals;
 
+  /// Stick with 1st order for stability
+  int m_order;
+
   /// Full constructor
   BasicECVelBCFunction(bool a_isHomogeneous,
                        bool a_isViscous,
@@ -1001,7 +1003,8 @@ public:
                                                                                              a_params),
                                                                                              m_isViscous(a_isViscous),
                                                                                              m_interval(a_interval),
-                                                                                             m_velBCvals(a_velocityBCVals)
+                                                                                             m_velBCvals(a_velocityBCVals),
+                                                                                             m_order(1)
   {
   }
 
@@ -1012,8 +1015,7 @@ public:
                   Real                 a_dx,
                   bool                 a_homogeneous)
   {
-    // Stick with 1st order for stability
-    int order = 1;
+
 
     // a_state is FACE-centered, now in m_comp direction;
     // a_valid is CELL-centered
@@ -1080,13 +1082,13 @@ public:
                       DiriBC(a_state, validFace, a_dx,
                              a_homogeneous,
                              BCValueHolder(zeroFunc),
-                             idir, side, order);
+                             idir, side, m_order);
                     }
                     else // inviscid
                     {
-                      order  = 2;
                       ExtraBC(a_state, a_valid,
-                              idir, side, order);
+                              idir, side,
+                              2); // second order BCs here
                     }
                   } // end if tangential
                   break;
@@ -1111,7 +1113,7 @@ public:
                     DiriBC(a_state, validFace, a_dx,
                            a_homogeneous,
                            BCValueHolder(zeroFunc),
-                           idir, side, order);
+                           idir, side, m_order);
 
                   }
                   break;
@@ -1123,17 +1125,12 @@ public:
                   // always no-flow
                   if (idir == m_comp)
                   {
-                    //                                      DiriEdgeBC(a_state, a_valid, a_dx,
-                    //                                                 a_homogeneous,
-                    //                                                 BCValueHolder(zeroFunc),
-                    //                                                 idir, side);
 
                     DiriEdgeVariableBC(a_state, a_valid, a_dx,
                                        a_homogeneous,
                                        BCValueHolder(inflowBCValueFunc),
                                        idir, side);
 
-                    //                    int temp=0;
                   }
                   else
                   {
@@ -1156,14 +1153,15 @@ public:
                       DiriBC(a_state, validFace, a_dx,
                              a_homogeneous,
                              BCValueHolder(zeroFunc),
-                             idir, side, order);
+                             idir, side, m_order);
                     }
                     else // inviscid
                     {
-                      order  = 2;
+
                       ExtraBC(a_state, a_valid,
-                              idir, side, order, m_comp);
-                      //                                                                          ExtrapBC(  a_state, a_valid,  idir,   side, order);
+                              idir, side,
+                              2, // second order BCs here
+                              m_comp);
                     }
                   } // end if tangential
 
@@ -1270,7 +1268,7 @@ public:
                     DiriBC(a_state, validFace, a_dx,
                            a_homogeneous,
                            BCValueHolder(zeroFunc),
-                           idir, side, order);
+                           idir, side, m_order);
                   }
                   //
 
@@ -1337,9 +1335,8 @@ public:
   {
   }
   /// Full constructor
-  ExtrapolationBCFunction(bool a_isDefined, int a_order=0)
-  :
-    m_isDefined(a_isDefined), m_order(a_order)
+  explicit ExtrapolationBCFunction(bool a_isDefined, int a_order=0)
+  : m_isDefined(a_isDefined), m_order(a_order)
   {
   }
   /// Apply BC

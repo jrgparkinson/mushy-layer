@@ -21,7 +21,7 @@ def get_script_path():
 
 def program_exists(program):
 
-    process = subprocess.Popen(['which', program],
+    process = subprocess.run(['which', program],
                                 stdout=subprocess.PIPE)
     if process.stdout.readline():
         print('Found %s' % program)
@@ -65,7 +65,7 @@ def setup(git_build=False):
 
     for cmd in required_commands:
         try:
-            process = subprocess.Popen(['which', cmd],
+            process = subprocess.run(['which', cmd],
                              stdout=subprocess.PIPE)
             output = process.stdout.readline()
             if output:
@@ -115,12 +115,12 @@ def setup(git_build=False):
                 hdf5_path = install_path_response
 
             url= 'https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz'
-            response = subprocess.Popen(['wget', url])
-            response = subprocess.Popen(['tar', '-zxvf', 'hdf5-1.8.21.tar.gz'])
-            response = subprocess.Popen(['cd', 'hdf5-1.8.21'])
-            response = subprocess.Popen(['./ configure', '--prefix=', hdf5_path])
-            response = subprocess.Popen(['make'])
-            response = subprocess.Popen(['make', 'install'])
+            response = subprocess.run(['wget', url])
+            response = subprocess.run(['tar', '-zxvf', 'hdf5-1.8.21.tar.gz'])
+            response = subprocess.run(['cd', 'hdf5-1.8.21'])
+            response = subprocess.run(['./ configure', '--prefix=', hdf5_path])
+            response = subprocess.run(['make'])
+            response = subprocess.run(['make', 'install'])
 
             os.environ['LD_LIBRARY_PATH'] += ':' + hdf5_path
             print_var('LD_LIBRARY_PATH', git_build)
@@ -132,7 +132,7 @@ def setup(git_build=False):
     # Check llapack
     # locate libblas.so
     installed = False
-    proc = subprocess.Popen(['apt-cache', 'policy', 'liblapack3'])
+    proc = subprocess.run(['apt-cache', 'policy', 'liblapack3'])
     for line in iter(proc.stdout.readline, ''):
         if 'Installed' in line.decode():
             installed = True
