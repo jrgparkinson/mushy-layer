@@ -93,7 +93,7 @@ jobs:
            
     - name: Install Chombo
       run: |
-        cp /home/runner/work/phd/phd/Make.defs.local.github $CHOMBO_HOME/mk/Make.defs.local
+        cp $GITHUB_WORKSPACE/mk/Make.defs.local.github $CHOMBO_HOME/mk/Make.defs.local
         cd $CHOMBO_HOME
         make lib
 
