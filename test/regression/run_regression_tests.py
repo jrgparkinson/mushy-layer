@@ -4,7 +4,6 @@ import json
 import difflib
 import subprocess
 import traceback
-import logging
 import time
 import getopt
 import sys
@@ -74,7 +73,13 @@ def test_folder(test_directory, verbose_output=False):
     :return: success - if test was succesful or not
     """
 
+    if verbose_output:
+        logger.log('Processing folder "%s"' % test_directory)
+
     test_files = os.listdir(test_directory)
+
+    if verbose_output:
+        logger.log('Initial files in folder ' + str(test_files))
 
     # Check the required files exist
     # if not, skip this test
@@ -135,7 +140,8 @@ def test_folder(test_directory, verbose_output=False):
         cmd = 'cd %s; %s inputs > pout.0' % (test_directory, mushy_layer_exec_path)
         res = subprocess.check_output(cmd, shell=True)
 
-        print('Response: "%s"' % str(res.decode()))
+        if verbose_output:
+            logger.logl('Response: "%s"' % str(res.decode()))
 
     # os.system(cmd)
 
@@ -217,7 +223,9 @@ def test_folder(test_directory, verbose_output=False):
             # This doesn't print the console output, which is cleaner
             with open(os.devnull, 'wb') as devnull:
                 res = subprocess.check_call(cmd, shell=True, stderr=subprocess.STDOUT)
-                print('Compare command run, response: %s' % res)
+
+                if verbose_output:
+                    logger.log('Compare command run, response: %s' % res)
 
             # Rename pout.0 in case we make lots
             old_pout_name = os.path.join(diffs_folder, 'pout.0')
@@ -331,6 +339,7 @@ if __name__ == "__main__":
     timings.append(time.time())
 
     for test_dir in test_dirs:
+
         status = 'Failed'
 
         # noinspection PyBroadException
@@ -341,7 +350,7 @@ if __name__ == "__main__":
 
             if verbose:
                 logger.log('**Error running test**')
-                logging.error(traceback.format_exc())
+                logger.error(traceback.format_exc())
             else:
                 logger.log_failed()
             success = False
@@ -372,5 +381,6 @@ if __name__ == "__main__":
     logger.log('Total runtime: %.3g seconds' % (timings[-1] - timings[0]))
 
     # Give a bad exit if we failed a test
-    if num_failed > 0:
-        sys.exit(1)
+    # Actually, don't do this as it stops the rest of the job from running
+    # if num_failed > 0:
+    #     sys.exit(1)
