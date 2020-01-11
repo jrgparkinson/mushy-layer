@@ -84,14 +84,17 @@ def test_folder(test_directory, verbose_output=False):
     logger.logl('%-25s    ' % properties['name'])
 
     # Get correct executable
-    mushy_layer_exec = mushyLayerRunUtils.get_executable(dim=properties['dim'])
-    mushy_layer_exec_path = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'execSubcycle', mushy_layer_exec)
+    # mushy_layer_exec = mushyLayerRunUtils.get_executable(dim=properties['dim'])
+    # mushy_layer_exec_path = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'execSubcycle', mushy_layer_exec)
+    exec_name = 'mushyLayer%dd' % properties['dim']
+    exec_dir = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'execSubcycle')
+    mushy_layer_exec_path = mushyLayerRunUtils.get_executable_name(exec_dir, exec_name=exec_name, return_full_path=True)
 
     if not os.path.exists(mushy_layer_exec_path):
         if verbose_output:
-            logger.log('Could not find mushy layer executable: %s' % mushy_layer_exec_path)
-            logger.log('Have you compiled the code for the right number of dimensions?')
-            logger.log('Use \'make all DIM=3\' to compile in 3D')
+            logger.log('\n**Could not find mushy layer executable: %s' % mushy_layer_exec_path)
+            logger.log('**Have you compiled the code for the right number of dimensions?')
+            logger.logl('**Use \'make all DIM=3\' to compile in 3D    ')
         else:
             logger.log_status('[Failed]')
         return False, 'Failed'

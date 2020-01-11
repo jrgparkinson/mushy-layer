@@ -80,7 +80,7 @@ jobs:
         ./configure --prefix=$HDF5_PATH
         make
         make install
-        
+
     - name: Cache Chombo
       id: cache-chombov2
       uses: actions/cache@v1
@@ -93,14 +93,14 @@ jobs:
       run: svn --username ${{ secrets.SVN_USERNAME }} --password ${{ secrets.SVN_PASSWORD }} co https://anag-repo.lbl.gov/svn/Chombo/release/3.2  $CHOMBO_ROOT
 
 
-    - name: Verify 
+    - name: Verify
       run: |
         echo "$HDF5_PATH:"
         ls $HDF5_PATH
         echo "---------------------------"
         echo "$CHOMBO_HOME"
         ls $CHOMBO_HOME
-           
+
     - name: Compile Chombo
       run: |
         cp $GITHUB_WORKSPACE/mk/Make.defs.local.github $CHOMBO_HOME/mk/Make.defs.local
@@ -151,6 +151,7 @@ jobs:
 # Rerun with verbosity
 
     - if: failure()
+      name: Run regressions with more ouput
       run: |
         cd $GITHUB_WORKSPACE/test/regression
         python run_regression_tests.py -v
@@ -159,6 +160,3 @@ jobs:
       with:
         name: test-results
         path: ${{ env.REGRESSIONS_PATH }}
-
-    
-
