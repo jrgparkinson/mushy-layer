@@ -5,7 +5,7 @@
 ebase = process
 
 ## location of 'lib' directory
-CHOMBO_HOME = ../../chombofork/lib
+#CHOMBO_HOME = ../../chombofork/lib
 
 
 include ../mk/Make.defs.MushyLayer

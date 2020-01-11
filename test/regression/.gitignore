@@ -2,3 +2,4 @@
 **.0
 !*.expected
 **.inputs
+*.log
