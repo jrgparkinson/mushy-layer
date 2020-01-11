@@ -1,0 +1,50 @@
+name: RegressionTest
+
+on:
+  push:
+    branches:
+      - '*'
+
+# schedule:
+#   # * is a special character in YAML so you have to quote this string
+#   # run at 23:59 every day
+#   - cron:  '59 23 * * *'
+
+
+env:
+  CHOMBO_ROOT: /home/runner/chombo
+  CHOMBO_HOME: /home/runner/chombo/lib
+  HDF5_PATH: /home/runner/hdf5-dir
+  LD_LIBRARY_PATH: /home/runner/hdf5-dir
+  TEST_RESULTS: /home/runner/work/mushy-layer/mushy-layer/test/results
+  PYTHONPATH: todo
+
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6
+
+    - name: Cache pip
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install python dependencies
+      run: pip install -r requirements.txt
+
+	- name: Run regressions
+      run: |
+         cd $GITHUB_WORKSPACE
+         python install.py -g
+         cd test/regression
+         echo "$PYTHONPATH"
+         python run_regression_tests.py

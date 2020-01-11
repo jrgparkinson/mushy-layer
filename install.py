@@ -9,7 +9,7 @@ def usage():
 
 def print_var(var_name, is_git):
     if is_git:
-        print("::set-env name=" + var_name + ":{}".format(os.environ[var_name]))
+        print("::set-env name=" + var_name + "::{}".format(os.environ[var_name]))
     else:
         print('%s=%s' % (var_name, os.environ[var_name]))
 
@@ -29,7 +29,8 @@ def program_exists(program):
 
 if __name__ == "__main__":
 
-    git_build = False
+    git_build = 'GITHUB_WORKSPACE' in os.environ
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], "g")
     except getopt.GetoptError as err:
@@ -40,6 +41,9 @@ if __name__ == "__main__":
     for o, a in opts:
         if o == "-g":
             git_build = True
+
+    if git_build:
+        print('Building from GitHub')
 
     # Add folders to PYTHONPATH
     required_paths = [os.path.join(get_script_path(), 'test'),
@@ -76,7 +80,8 @@ if __name__ == "__main__":
 
     # Also need a c++ compiler, and some sort of make
     cpp_progs = ['g++', 'mpiCC', 'icc', 'xIC']
-    if not [program_exists(p) for p in cpp_progs]:
+    found_cpp_progs = [p for p in cpp_progs if program_exists(p)]
+    if not found_cpp_progs:
         print('Warning - could not find a c++ compiler (looked for %s)' % ','.join(cpp_progs))
 
     make_progs = ['make', 'cmake', 'gmake']
@@ -84,7 +89,8 @@ if __name__ == "__main__":
         print('Warning - could not find a make program (looked for %s)' % ','.join(make_progs))
 
     fortran_progs = ['gfortran', 'g95', 'g97', 'f90', 'f95', 'f77', 'pgf77', 'pgf90', 'ifc']
-    if not [program_exists(p) for p in fortran_progs]:
+    found_fortran = [f for f in fortran_progs if program_exists(f)]
+    if not found_fortran:
         print('Warning - could not find a Fortran compiler (looked for %s)' % ','.join(fortran_progs))
 
     lib_paths = []
@@ -98,25 +104,62 @@ if __name__ == "__main__":
             hdf5_path = lib
             break
 
-    hdf5_path = False
-
     if hdf5_path:
         print('Found hdf5: %s ' % hdf5_path)
     else:
-        install_hdf5 = input('Cannot find hdf5. Download and install now? (y/n) ')
+        print('Cannot find hdf5. If you have already installed it, please ensure it is on your LD_LIBRARY_PATH')
+        install_hdf5 = input('Download and install HDF5 now? (y/n) ')
         if install_hdf5 == 'y':
             parent_folder = os.path.dirname(os.environ['MUSHY_LAYER_DIR'])
-            install_path = os.path.join(parent_folder, 'hdf5')
-            install_path_response = input('Enter install path, or hit enter to accept [%s]' % install_path)
+            hdf5_path = os.path.join(parent_folder, 'hdf5')
+            install_path_response = input('Enter install path, or hit enter to accept [%s]' % hdf5_path)
             if install_path_response:
-                install_path = install_path_response
+                hdf5_path = install_path_response
 
             url= 'https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz'
             response = subprocess.Popen(['wget', url])
             response = subprocess.Popen(['tar', '-zxvf', 'hdf5-1.8.21.tar.gz'])
             response = subprocess.Popen(['cd', 'hdf5-1.8.21'])
-            response = subprocess.Popen(['./ configure', '--prefix=', install_path])
+            response = subprocess.Popen(['./ configure', '--prefix=', hdf5_path])
             response = subprocess.Popen(['make'])
             response = subprocess.Popen(['make', 'install'])
+
+            os.environ['LD_LIBRARY_PATH'] += ':' + hdf5_path
+            print_var('LD_LIBRARY_PATH', git_build)
+
+    shell = os.environ['SHELL']
+    print('Your shell is: %s, add environmental variables to '
+          '~/.%src for future ease of use' % (shell, shell.replace('/bin/', '')))
+
+    # Check llapack
+    # locate libblas.so
+    installed = False
+    proc = subprocess.Popen(['apt-cache', 'policy', 'liblapack3'])
+    for line in iter(proc.stdout.readline, ''):
+        if 'Installed' in line.decode():
+            installed = True
+
+    if installed:
+        print('Found liblapack3')
+    else:
+        print('Could not find lapack/lblas installation')
+
+    # Construct example options
+    options = {'DIM': 2,
+               'DEBUG': False,
+               'OPT': True,
+               'CXX': found_cpp_progs[0],
+               'FC': found_fortran[0],
+               'MPI': False,
+               'USE_HDF': True,
+               'HDFINCFLAGS': '-I' + hdf5_path +'/include',
+               'HDFLIBFLAGS': '-L/' + hdf5_path + '/lib - lhdf5 - lz',
+               'flibflags': ['-lblas', '-llapack', '-lgfortran'],
+               'LAPACKLIBS': '-L/usr/lib -L/usr/lib/lapack -L/usr/lib/libblas -llapack -lblas',
+               }
+
+
+
+
 
 
