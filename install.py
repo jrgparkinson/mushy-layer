@@ -10,7 +10,7 @@ def usage():
 
 def print_var(var_name, is_git):
     if is_git:
-        print("::set-env name=" + var_name + "::{}".format(os.environ[var_name]))
+        print("echo ::set-env name=" + var_name + "::{}".format(os.environ[var_name]))
     else:
         print('%s=%s' % (var_name, os.environ[var_name]))
 

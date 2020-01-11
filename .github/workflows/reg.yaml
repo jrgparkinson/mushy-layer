@@ -39,16 +39,15 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+            ${{ runner.os }}-
 
       - name: Install python dependencies
         run: pip install -r requirements.txt
 
-      - name: Setup environmental variables
+      - name: Setup for regressions
         run: |
-          echo ::set-env name=PYTHONPATH::path
-          echo "$PYTHONPATH"
-          echo ::set-env name=PYTHONPATH::$(echo $PYTHONPATH):/home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
-          echo "$PYTHONPATH"
+          cd $GITHUB_WORKSPACE
+          python install.py -g
 
       - name: Run regressions
         run: |
@@ -57,5 +56,6 @@ jobs:
           python run_regression_tests.py
 
 
-        
+#         echo ::set-env name=PYTHONPATH::$(echo $PYTHONPATH):/home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
+# echo "$PYTHONPATH"
 #         python install.py -g
