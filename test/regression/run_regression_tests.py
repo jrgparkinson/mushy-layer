@@ -132,8 +132,8 @@ def test_folder(test_directory, verbose_output=False):
         # res = subprocess.run([mpi_path, '-n ', str(properties['proc']), ' inputs'], cwd=test_directory)
 
     else:
-        cmd = 'cd %s; %s inputs > pout.N' % (test_directory, mushy_layer_exec_path)
-        res = subprocess.check_output([mushy_layer_exec_path, 'inputs'], cwd=test_directory)
+        cmd = 'cd %s; %s inputs > pout.0' % (test_directory, mushy_layer_exec_path)
+        res = subprocess.check_output(cmd, shell=True)
 
         print('Response: "%s"' % str(res.decode()))
 
@@ -207,7 +207,7 @@ def test_folder(test_directory, verbose_output=False):
                               'compare.no_average_var': 'T err'}
 
             mushyLayerRunUtils.write_inputs(compare_params_file, compare_params)
-            cmd = 'cd %s ; %s %s' % (diffs_folder, compare_exec, compare_params_file)
+            cmd = 'cd %s ; %s %s > pout.0' % (diffs_folder, compare_exec, compare_params_file)
 
             if verbose_output:
                 logger.log('Executing: %s' % cmd)
