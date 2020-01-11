@@ -79,6 +79,7 @@ def get_current_vcs_revision():
 
     # For git:
     repo_version = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
+    repo_version = repo_version.decode()
 
     return repo_version
 

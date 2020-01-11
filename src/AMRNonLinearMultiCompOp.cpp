@@ -1184,7 +1184,7 @@ void AMRNonLinearMultiCompOp::getFlux(FArrayBox&       a_flux,
   // need to convert this to temperature, liquid concentration to calculate diffusive flux
   FArrayBox derivedVar(a_data.box(), a_data.nComp());
 
-  AMRNonLinearMultiCompOp* op = static_cast<AMRNonLinearMultiCompOp>(this);
+  AMRNonLinearMultiCompOp* op = const_cast<AMRNonLinearMultiCompOp*> (this);
   op->computeDiffusedVar(derivedVar, a_data, a_dit);
 
   // const FArrayBox& diffusedVar = a_data;

@@ -494,16 +494,19 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   shiftedTags.shift(shiftVect);
   shrunkMushyCells &= shiftedTags;
 
-  // Recover original cells
-  shrunkMushyCells.shift(-shiftVect);
-  for (int i=0; i < m_opt.porousCellsShrink-1; i++)
+  if (!shrunkMushyCells.isEmpty())
   {
-    shrunkMushyCells.growHi(SpaceDim-1);
-
-    // Grow horizontally to get around some edge effects
-    for (int horizontal_dir = 0; horizontal_dir < SpaceDim-1; horizontal_dir++)
+    // Recover original cells
+    shrunkMushyCells.shift(-shiftVect);
+    for (int i=0; i < m_opt.porousCellsShrink-1; i++)
     {
-      shrunkMushyCells.growHi(horizontal_dir);
+      shrunkMushyCells.growHi(SpaceDim-1);
+
+      // Grow horizontally to get around some edge effects
+      for (int horizontal_dir = 0; horizontal_dir < SpaceDim-1; horizontal_dir++)
+      {
+        shrunkMushyCells.growHi(horizontal_dir);
+      }
     }
   }
 

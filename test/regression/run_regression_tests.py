@@ -285,11 +285,6 @@ if __name__ == "__main__":
         try:
             full_dir = os.path.join(script_loc, test_dir)
             success, status = test_folder(full_dir, verbose)
-
-            # Timing
-            timings.append(time.time())
-            logger.log(' (%.3g seconds)' % (timings[-1] - timings[-2]))
-
         except Exception as e:
 
             if verbose:
@@ -298,6 +293,10 @@ if __name__ == "__main__":
             else:
                 logger.log_status('[Failed]')
             success = False
+
+        # Timing
+        timings.append(time.time())
+        logger.log(' (%.3g seconds)' % (timings[-1] - timings[-2]))
 
         if success:
             passed_tests.append(test_dir)

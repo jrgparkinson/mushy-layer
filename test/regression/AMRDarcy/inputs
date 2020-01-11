@@ -15,21 +15,21 @@ main.max_grid_size=64
 # Timestepping
 main.max_dt=1 # need this for some reason else initialization goes crazy
 main.max_time = 1.0
-main.max_step = 500
+main.max_step = 100
 main.cfl=0.2
 main.max_init_dt = 2e-4
+main.fixed_dt=1e-4
 
 #AMR
 main.max_level=2  # max level = 0 -> no refinement
 main.ref_ratio = 2 2
-main.regrid_interval = 16 64
-main.refine_thresh = 0.02
-projection.eta=0.45 # no freestream correction for uniform mesh case
+main.regrid_interval = 16 32
+projection.eta=0.45
 main.max_dt_growth=1.001
 main.refine_thresh = 0.1
 regrid.onlyTagPorousCells=true
 regrid.porousCellsShrink=3
-main.grid_buffer_size = 4
+main.grid_buffer_size = 2
 
 ## Dynamics:
 parameters.heleShaw=true
@@ -41,7 +41,7 @@ projector.verbosity=0
 
 # Data output frequency
 #main.plot_period = 0.01
-main.plot_interval=8
+main.plot_interval=25
 main.plot_prefix=plt
 main.checkpoint_interval=1000
 main.output_folder=.
