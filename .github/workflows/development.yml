@@ -119,7 +119,7 @@ jobs:
         run: |
           cd $CHOMBO_HOME/util/ChomboCompare
           make compare DIM=2
-          
+
 # make compare DIM=3
 
       - name: Compile mushy-layer
@@ -180,7 +180,7 @@ jobs:
       - name: Run Method Paper Tests
         run: |
           cd $GITHUB_WORKSPACE/test
-          python test_porous_mushy_hole.py
+          python testPorousMushyHole.py
 
       - uses: actions/upload-artifact@v1
         name: Upload method test results

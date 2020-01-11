@@ -14,6 +14,10 @@ import mushyLayerRunUtils
 import run_chombo_compare as chcompare
 
 
+# Error tolerance for two data files to be considered equal
+err_tolerance = 1e-10
+
+
 class Logger():
 
     def __init__(self, log_file_path):
@@ -235,7 +239,7 @@ def test_folder(test_directory, verbose_output=False):
                 # logger.log(field_errs)
                 for err_type in field_errs.keys():
                     this_field_err = field_errs[err_type]
-                    if abs(this_field_err) > 1e-10:
+                    if abs(this_field_err) > err_tolerance:
                         logger.log('Error in field %s is non-zero' % field)
                         logger.log('See %s and %s for more info' % (new_pout_name, error_file))
                         # logger.log_failed()
