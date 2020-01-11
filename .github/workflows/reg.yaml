@@ -16,7 +16,7 @@ env:
   CHOMBO_HOME: /home/runner/chombo/lib
   HDF5_PATH: /home/runner/hdf5-dir
   LD_LIBRARY_PATH: /home/runner/hdf5-dir
-  TEST_RESULTS: /home/runner/work/mushy-layer/mushy-layer/test/results
+  PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
 
 
 jobs:
