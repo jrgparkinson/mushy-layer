@@ -42,7 +42,7 @@ jobs:
       - name: Install python dependencies
         run: pip install -r requirements.txt
 
-    - name: Run regressions
+      - name: Run regressions
         run: |
           cd $GITHUB_WORKSPACE
           python install.py -g
