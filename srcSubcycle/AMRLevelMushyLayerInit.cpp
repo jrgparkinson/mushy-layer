@@ -892,10 +892,6 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
 
     createPhaseBoundaryStructures(lev, grids, ivGhost, enthalpySolidus, enthalpyEutectic, enthalpyLiquidus);
 
-    // Can only fill these at the current level or coarser
-    // Should probably use quadratic CF interp here
-    bool secondOrder = true;
-
     // Only fill at levels which have reached m_time
     // in general, than means this level and coarser
     // however in postTimeStep(), all finer levels will have reached m_time too
@@ -907,6 +903,10 @@ void AMRLevelMushyLayer::defineSolvers(Real a_time)
       //      Real a_time = m_time;
       // NO! setup solvers at the start of a timestep so have to use fields at a_time-dt
       // else we can't set up the
+
+      // Can only fill these at the current level or coarser
+      // Should probably use quadratic CF interp here
+      bool secondOrder = true;
 
       amrML->fillScalarFace(*porosityFace[lev], a_time, ScalarVars::m_porosity, true, secondOrder);
 
@@ -2670,10 +2670,10 @@ void AMRLevelMushyLayer::postInitialize()
       }
     }
 
-    bool homoBC = false;
     if (m_opt.project_initial_vel)
     {
-      level0Proj.initialVelocityProject(amrVel, amrPorosityFace, amrPorosity, homoBC);
+      level0Proj.initialVelocityProject(amrVel, amrPorosityFace, amrPorosity,
+                                        false); // inhmogeneous BCs
     }
 
     // Compute initial volume discrepancy correction

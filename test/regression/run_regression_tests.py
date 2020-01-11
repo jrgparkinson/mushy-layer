@@ -101,13 +101,17 @@ def test_folder(test_directory, verbose_output=False):
         return False, 'Failed'
 
     # Run test
-    mpi = subprocess.check_output(['which', 'mpirun'])
-    if mpi:
+    try:
+        mpi = subprocess.check_output(['which', 'mpiruna'])
         mpi_path = str(mpi.decode()).strip()
+    except subprocess.CalledProcessError:
+        mpi = None
+
+    if mpi is not None and mpi_path:
         cmd = 'cd %s; %s -np %d %s inputs' % (test_directory, mpi_path, properties['proc'], mushy_layer_exec_path)
     else:
-        cmd = 'cd %s; %d %s inputs' % (test_directory, properties['proc'], mushy_layer_exec_path)
-    # logger.log('Executing: %s' % cmd)
+        cmd = 'cd %s; %s inputs' % (test_directory, mushy_layer_exec_path)
+    logger.log('Executing: %s' % cmd)
     os.system(cmd)
 
     # Compare output against the expected output

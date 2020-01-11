@@ -226,7 +226,6 @@ Divergence::compDivergenceMAC(LevelData<FArrayBox>& a_div,
 
   // for now, hardwire to simple single-component case
   CH_assert(a_div.nComp() == 1);
-  int comp = 0;
 
   // now adjust for effect of finer level (if applicable)
   if (a_uEdgeFinePtr != nullptr)
@@ -243,7 +242,7 @@ Divergence::compDivergenceMAC(LevelData<FArrayBox>& a_div,
       FluxBox& thisFlux = a_uEdge[dit()];
       Real scale = 1.0;
 
-      const Interval compInterval(comp,comp);
+      const Interval compInterval(0,0);
       // iterate over directions
       for (int dir=0; dir<SpaceDim; dir++)
       {
@@ -261,7 +260,7 @@ Divergence::compDivergenceMAC(LevelData<FArrayBox>& a_div,
     {
       FluxBox& thisFineFlux = uEdgeFine[ditFine()];
       Real scale = 1.0;
-      Interval srcComps(comp,comp);
+      Interval srcComps(0,0);
       // iterate over directions
       for (int dir=0; dir<SpaceDim; dir++)
       {

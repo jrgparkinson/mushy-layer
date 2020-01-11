@@ -31,8 +31,15 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
                        Side::LoHiSide side = Side::Lo);
 
 /// Compute nusselt number
+/**
+ *
+ * dir: direction to compute nu in i.e. \f$x\f$ direction means compute \f$dT/dx\d$
+ * NusseltType: 0 = global average, 1 = sides (default)
+ *
+ */
 Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& vel,
-                    Real a_dx, MushyLayerParams a_params, Real a_domWidth, Real a_domHeight);
+                    Real a_dx, MushyLayerParams a_params, Real a_domWidth, Real a_domHeight,
+                    int dir=0, int NusseltType=1);
 
 /// Compute the largest value and retain it's sign
 /**
@@ -133,7 +140,8 @@ Real stokesDarcyInit(Real x, Real y, int dir, const MushyLayerParams& params);
 
 /// Read in fixed grids
 extern bool
-getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain, string gridfileParam = "gridfile");
+getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
+              string gridfileParam = "gridfile", int verbosity = 3);
 
 /// Check if string is also an integer
 bool is_integer(const std::string& s);

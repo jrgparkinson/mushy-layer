@@ -167,33 +167,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
         Real thisNu = 0;
 
-
-        // Either use the explicity discretization, or the advective fluxes computed by our algorithm
-        // both seem to give very similar results (equal to around 4 significant figures)
-        bool useExplicitDiscretization = false;
-
-        if (useExplicitDiscretization)
-        {
-          FArrayBox& U = m_advVel[dit][0];
-          FArrayBox& T = (*m_scalarNew[ScalarVars::m_temperature])[dit];
-          Box TBox = T.box();
-
-          // Check if we can get cells from the box to the right
-          // note that b is face centred, so we only have to shift by 1/2
-          Box bRight(b);
-          bRight.enclosedCells(0);
-          if (TBox.contains(bRight))
-          {
-            for (BoxIterator bit(b); bit.ok(); ++bit)
-            {
-              IntVect iv = bit();
-              IntVect ivUp = iv + BASISV(0);
-              Real cellNu = U(iv)*( T(ivUp) + T(iv))/2 - ( T(ivUp) - T(iv))/m_dx ;
-              thisNu += cellNu;
-            }
-          }
-        }
-        else if (numBoxCells > 0)
+        if (numBoxCells > 0)
         {
           FArrayBox& fluidFluxFAB = fluidFlux[dit][0];
           horizFlux.minus(fluidFluxFAB);
@@ -632,7 +606,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
     Real averageSl = averageOverLiquidRegion(ScalarVars::m_liquidConcentration);
 
 
-    int y_0 = round(averagedSalinity.size()*0.2*(1-1));
+    int y_0 = 0.0;
     int y_1 = round(averagedSalinity.size()*0.2*(2-1));
     int y_2 = round(averagedSalinity.size()*0.2*(3-1));
     int y_3 = round(averagedSalinity.size()*0.2*(4-1));

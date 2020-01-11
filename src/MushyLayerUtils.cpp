@@ -248,19 +248,13 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
 }
 
 Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& vel,
-                    Real a_dx, MushyLayerParams a_params, Real a_domWidth, Real a_domHeight)
+                    Real a_dx, MushyLayerParams a_params, Real a_domWidth, Real a_domHeight,
+                    int dir, int NusseltType)
 {
   Real Nu = 0;
   DisjointBoxLayout grids = T.disjointBoxLayout();
   LevelData<FArrayBox> gradT(grids, SpaceDim);
   LevelData<FluxBox> gradTedge(grids, 1);
-
-  // 0 = global average, 1 = sides
-  int NusseltType = 1;
-
-  //which direction to compute nu in
-  // i.e. x direction means compute dT/dx
-  int dir = 0;
 
   Real sideLength;
   if (dir == 0)
@@ -420,22 +414,25 @@ void getVectorVarNames(Vector<string>& varNames,
   {
     int startComp = startPos + (a_var*2);
     Vector<string> dirString(SpaceDim);
-    dirString[0] = string("x");
-    if (SpaceDim == 2)
-    {
-      dirString[1] = string("y");
-    }
-    else if(SpaceDim == 3)
-    {
-      dirString[1] = string("y");
-      dirString[2] = string("z");
-    }
+    getDirString (dirString);
 
     for (int dir = 0; dir<SpaceDim; dir++)
     {
-      //varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") + dirString[dir];
       varNames[startComp+dir] = dirString[dir] + vectorVarNames[a_var];
     }
+  }
+}
+
+void
+getDirString (const Vector<string>& dirString)
+{
+  dirString[0] = string ("x");
+  if (SpaceDim == 2) {
+    dirString[1] = string ("y");
+  }
+  else if (SpaceDim == 3) {
+    dirString[1] = string ("y");
+    dirString[2] = string ("z");
   }
 }
 
@@ -450,17 +447,7 @@ void getChkVectorVarNames(Vector<string>& chkVectorVarNames,
 
     int startComp = (i*SpaceDim);
     Vector<string> dirString(SpaceDim);
-    dirString[0] = string("x");
-    if (SpaceDim == 2)
-    {
-      dirString[1] = string("y");
-    }
-    else if(SpaceDim == 3)
-    {
-      dirString[1] = string("y");
-      dirString[2] = string("z");
-    }
-
+    getDirString (dirString);
     for (int dir = 0; dir<SpaceDim; dir++)
     {
       //varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") + dirString[dir];
@@ -483,28 +470,6 @@ void getVarNames(Vector<string>& varNames,
   //Then vector vars
   getVectorVarNames(varNames, numVectorVars, vectorVarNames,
                     numScalarVars); // initial offset
-  //  Interval vecSrcComps(0, SpaceDim-1);
-  //  for (int a_var = 0; a_var<numVectorVars; a_var++)
-  //  {
-  //    int startComp = numScalarVars + (a_var*2);
-  //    Vector<string> dirString(SpaceDim);
-  //    dirString[0] = string("x");
-  //    if (SpaceDim == 2)
-  //    {
-  //      dirString[1] = string("y");
-  //    }
-  //    else if(SpaceDim == 3)
-  //    {
-  //      dirString[1] = string("y");
-  //      dirString[2] = string("z");
-  //    }
-  //
-  //    for (int dir = 0; dir<SpaceDim; dir++)
-  //    {
-  //      //varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") + dirString[dir];
-  //      varNames[startComp+dir] = dirString[dir] + vectorVarNames[a_var];
-  //    }
-  //  }
 }
 
 void getVarNames(Vector<string>& varNames,
@@ -528,20 +493,10 @@ void getVarNames(Vector<string>& varNames,
   {
     int startComp = numScalarVars + (a_var*SpaceDim);
     Vector<string> dirString(SpaceDim);
-    dirString[0] = string("x");
-    if (SpaceDim == 2)
-    {
-      dirString[1] = string("y");
-    }
-    else if(SpaceDim == 3)
-    {
-      dirString[1] = string("y");
-      dirString[2] = string("z");
-    }
+    getDirString (dirString);
 
     for (int dir = 0; dir<SpaceDim; dir++)
     {
-      //varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") + dirString[dir];
       varNames[startComp+dir] = dirString[dir] + vectorVarNames[vectorVars[a_var]];
     }
   }

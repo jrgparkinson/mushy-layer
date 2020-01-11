@@ -1192,10 +1192,7 @@ Real AMRLevelMushyLayer::doHCreflux()
   else if (m_opt.refluxMethod == RefluxMethod::NonlinearReflux)
   {
     // nonlinear reflux
-    BCHolder temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC(homogeneous);
     EdgeVelBCHolder porosityEdgeBC(m_physBCPtr->porosityFaceBC());
-
-
 
     // Calculate modified diffusion coefficient
     /*

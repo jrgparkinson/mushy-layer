@@ -1118,13 +1118,13 @@ defineAMR(AMR&                                          a_amr,
 }
 
 bool
-getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain, string gridfileParam)
+getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
+              string gridfileParam, int verbosity)
 {
 
   //  pout() << "getFixedGrids" << endl;
 
   ParmParse ppMain("main");
-  int verbosity = 3;
 
   int max_level;
   int max_grid_size;

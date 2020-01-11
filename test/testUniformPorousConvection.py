@@ -52,7 +52,7 @@ def test_uniform_porous_convection(argv):
     fixed_ra = -1.0
 
     try:
-        opts, args = getopt.getopt(argv, "n:v:c:p:b:u:a:d:r:")
+        opts, _ = getopt.getopt(argv, "n:v:c:p:b:u:a:d:r:")
     except getopt.GetoptError as err:
         print(str(err))
         print('test_uniform_porous_convection.py -n<num uniform mesh grid points> -v<num variable mesh points>'

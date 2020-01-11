@@ -1012,29 +1012,6 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     LevelData<FArrayBox> rhsInterior(interiorGrids, 1);
     MACrhs().copyTo(rhsInterior);
 
-    Box domBox = m_domain.domainBox();
-
-//    for (DataIterator dit = rhsInterior.dataIterator(); dit.ok(); ++dit)
-//    {
-//      SideIterator sit;
-//      for (sit.reset(); sit.ok(); ++sit)
-//      {
-//        Side::LoHiSide side = sit();
-//
-//        for (int dir=0; dir < SpaceDim; dir++)
-//        {
-//          int boxSize = 5;
-//          Box zeroBox = adjCellBox(domBox, dir, side, boxSize);
-//          zeroBox.shift(dir, -boxSize);
-//
-//          Box stateBox = rhsInterior[dit].box();
-//
-//          zeroBox &= stateBox;
-//          rhsInterior[dit].setVal(0.0, zeroBox, 0);
-//        }
-//      }
-//    }
-
     Real sumRHSInterior = ::computeSum(rhsInterior, finerGridsPtr,
                                        nRefFine, m_dx, MACrhs().interval());
     pout() << "  MAC projection (level " << m_level << ") -- sum(interior RHS) = " << sumRHSInterior << endl;
@@ -2280,10 +2257,8 @@ void Projector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
     }
 
     // Compute lambda-1
-    levelProjPtr = this;
     for (int lev = m_level; lev<vectorSize; lev++)
     {
-
       LevelData<FArrayBox>& oldLambda = *(a_lambda[lev]);
 
       DataIterator dit = oldLambda.dataIterator();
