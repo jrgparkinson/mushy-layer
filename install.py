@@ -30,20 +30,7 @@ def program_exists(program):
         return False
 
 
-if __name__ == "__main__":
-
-    git_build = 'GITHUB_WORKSPACE' in os.environ
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "g")
-    except getopt.GetoptError as err:
-        # print help information and exit:
-        print(str(err))  # will print something like "option -a not recognized"
-        usage()
-        sys.exit(2)
-    for o, a in opts:
-        if o == "-g":
-            git_build = True
+def setup(git_build=False):
 
     if git_build:
         print('Building from GitHub')
@@ -71,7 +58,7 @@ if __name__ == "__main__":
     print_var('MUSHY_LAYER_DIR', git_build)
 
     if git_build:
-        sys.exit(-1)
+        return
 
     # Check for required software
     required_commands = ['perl', 'csh']
@@ -170,7 +157,19 @@ if __name__ == "__main__":
                }
 
 
+if __name__ == "__main__":
 
+    git_build = 'GITHUB_WORKSPACE' in os.environ
 
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "g")
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print(str(err))  # will print something like "option -a not recognized"
+        usage()
+        sys.exit(2)
+    for o, a in opts:
+        if o == "-g":
+            git_build = True
 
-
+    setup(git_build)
