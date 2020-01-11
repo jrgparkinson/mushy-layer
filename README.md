@@ -164,13 +164,13 @@ In short, it's a bit like MATLAB (but for C++).
 Setting up Eclipse with the Mushy Layer is not difficult, but also requires quite a few steps (should take 30 mins, but took me many hours to work them all out from scratch). The following steps should do the job. We assume that you are already able to compile and run the Mushy Layer code.
 
 1.  Create a new project for the Chombo code. Go File->New->Makefile project with existing code. Click Browse and navigate to your /chombo/lib directory	then hit ok. Give the project a suitable name and choose the Linux GCC toolchain.
- 
+
 2.  We now need to tell eclipse how to build the Chombo code. Eclipse may not inherit your environmental variables, so you'll need to define these explicitly. To do this, right click on your project in the project window (usually on the left of the screen), choose Properties, and then navigate to C/C++ Build->Environment. Add 
 `LD_LIBRARY_PATH = /usr/local/hdf5-1.8.21p-v18/lib:`
 The first should point to your hdf5 installation.
 
 3.  Create a new project for your mushy layer code . As before, go File->New->Makefile project with existing code. Set the code location to `/path/to/mushy-layer`, and choose a sensible name (we went for 'MushyLayer'). Again choose the Linux GCC toolchain.
- 
+
 4.  Set Chombo as a dependency of mushy layer. Open the project properties for the Mushy Layer project (right click in the project window->properties). Choose 'Project references' on the left and select your Chombo project.
 
 5.  Setup build profile for mushy layer. Go to C/C++ build->Environment Variables and check that the same environment variables you set for the Chombo project are also here. Now go to C/C++ build and, under the Builder settings tab, set the build directory to `${workspace_loc:/MushyLayer}/execSubcycle/`. When you use this build profile, you will create an executable using the default options in your Make.defs.local file.

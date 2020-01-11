@@ -129,57 +129,61 @@ jobs:
 
       # Do regression tests
 
-      # - name: Set up Python 3.6
-      #   uses: actions/setup-python@v1
-      #   with:
-      #     python-version: 3.6
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
 
-      # - name: Cache pip
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-      #       ${{ runner.os }}-
+      - name: Cache pip
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
 
-      # - name: Install python dependencies
-      #   run: pip install -r requirements.txt
+      - name: Install python dependencies
+        run: pip install -r requirements.txt
 
-      # - name: Setup for regressions
-      #   run: |
-      #     cd $GITHUB_WORKSPACE
-      #     python install.py -g
+      - name: Setup for regressions
+        run: |
+          cd $GITHUB_WORKSPACE
+          python install.py -g
 
-      # - name: Run regressions
-      #   run: |
-      #     echo "$PYTHONPATH"
-      #     cd $GITHUB_WORKSPACE/test/regression
-      #     python run_regression_tests.py
+      - name: Run regressions
+        run: |
+          echo "$PYTHONPATH"
+          cd $GITHUB_WORKSPACE/test/regression
+          python run_regression_tests.py
 
-      #  # Rerun with higher verbosity if there was a failure
+       # Rerun with higher verbosity if there was a failure and also upload
 
-      # - if: failure()
-      #   name: Run regressions with more ouput
-      #   run: |
-      #     cd $GITHUB_WORKSPACE/test/regression
-      #     python run_regression_tests.py -v
+      - if: failure()
+        name: Run regressions with more ouput
+        run: |
+          cd $GITHUB_WORKSPACE/test/regression
+          python run_regression_tests.py -v
+        uses: actions/upload-artifact@v1
+        with:
+          name: test-results
+          path: ${{ env.REGRESSIONS_PATH }}
 
-      # - uses: actions/upload-artifact@v1
-      #   name: Upload test results
-      #   with:
-      #     name: test-results
-      #     path: ${{ env.REGRESSIONS_PATH }}
+      - uses: actions/upload-artifact@v1
+        name: Upload test results
+        with:
+          name: test-results
+          path: ${{ env.REGRESSIONS_PATH }}
 
-      #   # Now try and run one of the functional tests
-      #   # (the others will take too long or need MATLAB)
-      # - name: Run Method Paper Tests
-      #   run: |
-      #     cd $GITHUB_WORKSPACE/test
-      #     python test_porous_mushy_hole.py
+        # Now try and run one of the functional tests
+        # (the others will take too long or need MATLAB)
+      - name: Run Method Paper Tests
+        run: |
+          cd $GITHUB_WORKSPACE/test
+          python test_porous_mushy_hole.py
 
-      # - uses: actions/upload-artifact@v1
-      #   name: Upload method test results
-      #   with:
-      #     name: method-paper-results
-      #     path: ${{ env.TEST_PATH }}
+      - uses: actions/upload-artifact@v1
+        name: Upload method test results
+        with:
+          name: method-paper-results
+          path: ${{ env.TEST_PATH }}
