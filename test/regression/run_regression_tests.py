@@ -73,6 +73,7 @@ def test_folder(test_directory, verbose_output=False):
     :param test_directory:
     :return: success - if test was succesful or not
     """
+
     test_files = os.listdir(test_directory)
 
     # Check the required files exist
@@ -134,6 +135,8 @@ def test_folder(test_directory, verbose_output=False):
         cmd = 'cd %s; %s inputs > pout.N' % (test_directory, mushy_layer_exec_path)
         res = subprocess.check_output([mushy_layer_exec_path, 'inputs'], cwd=test_directory)
 
+        print('Response: "%s"' % str(res.decode()))
+
     # os.system(cmd)
 
     # except subprocess.CalledProcessError:
@@ -156,6 +159,9 @@ def test_folder(test_directory, verbose_output=False):
 
     for expected_file in expected_files:
 
+        if verbose_output:
+            logger.log('Expected file: %s' % expected_file)
+
         # Check an output file to compare against exists
         test_output_filename = expected_file.replace(EXPECTED, '')
         test_output_file_path = os.path.join(test_directory, test_output_filename)
@@ -174,6 +180,8 @@ def test_folder(test_directory, verbose_output=False):
             diffs_folder = os.path.join(test_directory, DIFF_FOLDER)
             if not os.path.exists(diffs_folder):
                 os.makedirs(diffs_folder)
+                if verbose_output:
+                    logger.log('Making folder %s' % diffs_folder)
 
             chombo_dir = os.environ['CHOMBO_HOME']
             compare_dir = os.path.join(chombo_dir, 'util', 'ChomboCompare')
@@ -199,7 +207,7 @@ def test_folder(test_directory, verbose_output=False):
                               'compare.no_average_var': 'T err'}
 
             mushyLayerRunUtils.write_inputs(compare_params_file, compare_params)
-            cmd = 'cd %s ; %s %s  > /dev/null' % (diffs_folder, compare_exec, compare_params_file)
+            cmd = 'cd %s ; %s %s' % (diffs_folder, compare_exec, compare_params_file)
 
             if verbose_output:
                 logger.log('Executing: %s' % cmd)
@@ -208,12 +216,16 @@ def test_folder(test_directory, verbose_output=False):
 
             # This doesn't print the console output, which is cleaner
             with open(os.devnull, 'wb') as devnull:
-                subprocess.check_call(cmd, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
+                res = subprocess.check_call(cmd, shell=True, stdout=devnull, stderr=subprocess.STDOUT)
+                print('Compare command run, response: %s' % res)
 
             # Rename pout.0 in case we make lots
             old_pout_name = os.path.join(diffs_folder, 'pout.0')
             new_pout_name = os.path.join(diffs_folder, 'pout-%s.0' % test_output_filename)
             # logger.log('Rename %s to %s' % (old_pout_name, new_pout_name))
+            if not os.path.exists(old_pout_name):
+                logger.log('Cannot find %s' % old_pout_name)
+
             os.rename(old_pout_name, new_pout_name)
 
             # Now check the output diff
