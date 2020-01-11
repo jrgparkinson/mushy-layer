@@ -91,6 +91,18 @@ def test_folder(test_directory, verbose_output=False):
     with open(os.path.join(test_directory, PROPERTIES_FILE)) as json_file:
         properties = json.load(json_file)
 
+    try:
+        mpi = subprocess.check_output(['which', 'mpiruna'])
+        mpi_path = str(mpi.decode()).strip()
+    except subprocess.CalledProcessError:
+        mpi = None
+        mpi_path = None
+
+    # Skip if parallel test and no mpirun
+    if properties['proc'] > 1 and mpi is None:
+        logger.log_void()
+        return False, 'Void'
+
     # logger.log('==Running test: %s==' % properties['name'])
     logger.logl('%-25s    ' % properties['name'])
 
@@ -111,23 +123,22 @@ def test_folder(test_directory, verbose_output=False):
         return False, 'Failed'
 
     # Run test
-    try:
-        mpi = subprocess.check_output(['which', 'mpiruna'])
-        mpi_path = str(mpi.decode()).strip()
-    except subprocess.CalledProcessError:
-        mpi = None
-        mpi_path = None
-
+    # try:
     if mpi is not None:
         cmd = 'cd %s; %s -np %d %s inputs' % (test_directory, mpi_path, properties['proc'], mushy_layer_exec_path)
+        # mpi_path = 'mpirun'
+        # res = subprocess.run([mpi_path, '-n ', str(properties['proc']), ' inputs'], cwd=test_directory)
+
     else:
         cmd = 'cd %s; %s inputs' % (test_directory, mushy_layer_exec_path)
-    # logger.log('Executing: %s' % cmd)
-    # os.system(cmd)
-    try:
-        res = subprocess.check_output([mushy_layer_exec_path, 'inputs'], cwd=test_directory)
-    except subprocess.CalledProcessError:
-        logger.log('Exception')
+        # res = subprocess.check_output([mushy_layer_exec_path, 'inputs'], cwd=test_directory)
+
+    os.system(cmd)
+
+    # except subprocess.CalledProcessError:
+    #     logger.logl('[Exception]')
+    #     logger.log_failed()
+    #     return False, 'Failed'
 
 
 
