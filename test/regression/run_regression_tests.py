@@ -375,6 +375,5 @@ if __name__ == "__main__":
     logger.log('Total runtime: %.3g seconds' % (timings[-1] - timings[0]), console_display=True)
 
     # Give a bad exit if we failed a test
-    # Actually, don't do this as it stops the rest of the job from running
-    # if num_failed > 0:
-    #     sys.exit(1)
+    if num_failed > 0:
+        sys.exit(1)

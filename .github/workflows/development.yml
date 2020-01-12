@@ -147,7 +147,7 @@ jobs:
       - name: Install python dependencies
         run: pip install -r requirements.txt
 
-      - name: Setup for regressions
+      - name: Setup for tests
         run: |
           cd $GITHUB_WORKSPACE
           python install.py -g
@@ -158,6 +158,7 @@ jobs:
           cd $GITHUB_WORKSPACE/test/regression
           python run_regression_tests.py
 
+
        # Rerun with higher verbosity if there was a failure and also upload
 
       - if: failure()
@@ -166,15 +167,23 @@ jobs:
           cd $GITHUB_WORKSPACE/test/regression
           python run_regression_tests.py -v -t darcy
 
+      # Assume verbose output will also fail
+      - if: failure()
+        uses: actions/upload-artifact@v1
+        name: Upload test results
+        with:
+          name: test-results
+          path: ${{ env.REGRESSIONS_PATH }}
 
+      # Standard upload
       - uses: actions/upload-artifact@v1
         name: Upload test results
         with:
           name: test-results
           path: ${{ env.REGRESSIONS_PATH }}
 
-        # Now try and run one of the functional tests
-        # (the others will take too long or need MATLAB)
+      # Now try and run one of the functional tests
+      # (the others will take too long or need MATLAB)
       - name: Run Method Paper Tests
         run: |
           cd $GITHUB_WORKSPACE/test
@@ -185,3 +194,5 @@ jobs:
         with:
           name: method-paper-results
           path: ${{ env.MUSHY_LAYER_TEST_PATH }}
+
+
