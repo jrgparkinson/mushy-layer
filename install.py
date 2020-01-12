@@ -35,6 +35,9 @@ def setup(git_build=False):
     if git_build:
         print('Building from GitHub')
 
+    # Get Chombo to do performance timing
+    os.environ['CH_TIMER'] = 1
+
     # Add folders to PYTHONPATH
     required_paths = [os.path.join(get_script_path(), 'test'),
                       os.path.join(get_script_path(), 'plotting')]

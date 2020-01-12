@@ -67,7 +67,7 @@ def filter_pout(text_lines):
 
     filtered_output = []
     for line in text_lines:
-        new_line = re.sub(r'wallclocktime = \d+\.\d+e[+-]\d+\s?\n', '', line)
+        new_line = re.sub(r' wallclocktime = \d+\.\d+e[+-]\d+\s?\n', '', line)
         filtered_output.append(new_line)
 
     return filtered_output
