@@ -19,6 +19,7 @@ env:
   REGRESSIONS_PATH: /home/runner/work/mushy-layer/mushy-layer/test/regression
   TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test
   MUSHY_LAYER_TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test/output
+  CH_TIMER: 1
 
 jobs:
   build:
