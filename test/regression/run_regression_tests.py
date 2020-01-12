@@ -70,6 +70,10 @@ def filter_pout(text_lines):
         new_line = re.sub(r' wallclocktime = \d+\.\d+e[+-]\d+\s?\n', '', line)
         filtered_output.append(new_line)
 
+        # Once we've had the 'total number of points updated' line, stop processing
+        if 'total number of points updated = ' in line:
+            break
+
     return filtered_output
 
 
