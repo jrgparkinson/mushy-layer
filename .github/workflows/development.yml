@@ -155,8 +155,11 @@ jobs:
 
       - name: Run regressions
         run: |
-          echo "PYTHONPATH: $PYTHONPATH"
-          echo "CH_TIMER: $CH_TIMER"
+          echo "--------------"
+          echo $PYTHONPATH
+          echo "--------------"
+          echo $CH_TIMER
+          echo "--------------"
           cd $GITHUB_WORKSPACE/test/regression
           python run_regression_tests.py
 
