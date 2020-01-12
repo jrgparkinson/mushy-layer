@@ -8,6 +8,7 @@ import time
 import getopt
 import sys
 from colorama import Fore
+import pandas as pd
 
 # Two imports from the directory above this one - make sure /path/to/mushy-layer/test is in your python path
 import mushyLayerRunUtils
@@ -249,6 +250,23 @@ def test_folder(test_directory, verbose_output=False):
                         # logger.log_failed()
                         # return False, 'Failed'
                         failed_test = True
+
+        elif '.csv' in expected_file:
+            data = pd.read_csv(os.path.join(test_directory, test_output_file_path))
+            data_expected = pd.read_csv(os.path.join(test_directory, expected_file))
+
+            data_keys = data.keys()
+
+            for key in data_expected.keys():
+                if key not in data_keys:
+                    logger.log('Key not found: %s' % key, verbose_output)
+                    failed_test = True
+                    break
+
+                value_diff = float(abs(data[key] - data_expected[key]))
+                if value_diff > 1e-5:
+                    logger.log('Error in field %s = %.2g' % (key, value_diff), verbose_output)
+                    failed_test = True
         else:
             # Assume text file - do a diff
             text1 = open(os.path.join(test_directory, expected_file)).readlines()
@@ -271,10 +289,10 @@ def test_folder(test_directory, verbose_output=False):
             if differences:
                 logger.log('Differences found in %s' % test_output_file_path)
                 logger.log('For details, see %s' % diff_out_file)
-                logger.log('** Test failed \n')
+                # logger.log('** Test failed \n')
                 # logger.log_failed()
                 # return False, 'Failed'
-                failed_test = True
+                # failed_test = True
 
     if failed_test:
         logger.log_failed()
