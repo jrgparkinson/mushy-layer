@@ -18,7 +18,7 @@ class BatchJob:
     postprocess_command = ''
 
     def __init__(self, folder, jobname, exec_file, num_proc=1, time_limit=7.0, memory_limit=4000, num_nodes=0,
-                 mpi_run=True):
+                 mpi_run=None):
 
         self.jobname = jobname
         self.folder = folder
@@ -27,7 +27,12 @@ class BatchJob:
         self.exec_file = exec_file
         self.time_limit = time_limit  # Measured in days
         self.memory_limit = memory_limit  # in MB
-        self.mpi_run = mpi_run
+
+        mpi_exists = subprocess.check_output(['which', 'mpirun'])
+        if mpi_exists:
+            self.mpi_run = True
+        else:
+            self.mpi_run = False
 
         self.preprocess_command = ''
         self.dependency = []
@@ -257,5 +262,6 @@ class BatchJob:
         for cmd in self.commands_to_execute:
             cmd = cmd.replace('\n', '')
             print(cmd)
-            os.system(cmd)
+            subprocess.run(cmd + ' > pout.0 ', shell=True)
+            # os.system(cmd)
         print('------------------------- Completed ----------------------------------------')

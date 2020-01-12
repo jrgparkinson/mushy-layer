@@ -187,4 +187,4 @@ jobs:
         name: Upload method test results
         with:
           name: method-paper-results
-          path: ${{ env.TEST_PATH }}
+          path: ${{ env.MUSHY_LAYER_TEST_PATH }}
