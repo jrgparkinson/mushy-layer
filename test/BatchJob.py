@@ -32,7 +32,7 @@ class BatchJob:
             mpi_exists = subprocess.check_output(['which', 'mpirun'])
         except subprocess.CalledProcessError:
             mpi_exists = False
-            
+
         if mpi_exists:
             self.mpi_run = True
         else:

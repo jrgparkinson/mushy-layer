@@ -255,14 +255,14 @@ def test_folder(test_directory, verbose_output=False):
 
             diff = difflib.unified_diff(text1, text2)
             # diff = difflib.ndiff(text1, text2)
+            differences = [line for line in diff]
 
             diff_out_file = os.path.join(test_directory, DIFF + test_output_filename)
 
             with open(diff_out_file, 'w') as diff_file:
-                diff_file.writelines(diff)
+                diff_file.writelines(differences)
 
-            differences = [line for line in diff]
-            # logger.log('Diff: %s' % differences)
+            logger.log('Diff: %s' % differences)
 
             if differences:
                 logger.log('Differences found in %s' % test_output_file_path)
