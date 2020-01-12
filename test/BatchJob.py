@@ -28,7 +28,11 @@ class BatchJob:
         self.time_limit = time_limit  # Measured in days
         self.memory_limit = memory_limit  # in MB
 
-        mpi_exists = subprocess.check_output(['which', 'mpirun'])
+        try:
+            mpi_exists = subprocess.check_output(['which', 'mpirun'])
+        except subprocess.CalledProcessError:
+            mpi_exists = False
+            
         if mpi_exists:
             self.mpi_run = True
         else:
