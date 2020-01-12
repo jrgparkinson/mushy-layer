@@ -66,6 +66,7 @@ def test_porous_mushy_hole(argv):
     # Defaults:
     max_time = 1.5e-4
     hole_radius = 0.04
+    plot_interval = None
 
     try:
         opts, _ = getopt.getopt(argv, "t:h:")
@@ -79,6 +80,8 @@ def test_porous_mushy_hole(argv):
             max_time = float(arg)
         elif opt in "-h":
             hole_radius = float(arg)
+        elif opt in "-p":
+            plot_interval = int(arg)
 
     base_output_dir = get_base_output_dir()
     matlab_command = get_matlab_base_command()
@@ -104,6 +107,9 @@ def test_porous_mushy_hole(argv):
     extra_params = {'main.max_time': max_time,
                     'main.radius': hole_radius,
                     'bc.bulkConcentrationHiVal': [-1, min_concentration]}
+
+    if plot_interval:
+        extra_params['main.plot_interval'] = plot_interval
 
     run_test(data_folder, physical_problem, porous_mushy_hole_resolution_specific_params, amr_setup, num_procs,
              analysis_command, extra_params)

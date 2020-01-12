@@ -184,15 +184,15 @@ jobs:
 
       # Now try and run one of the functional tests
       # (the others will take too long or need MATLAB)
+      # Plot interval of -1 to produce less output (only final plot files)
       - name: Run Method Paper Tests
         run: |
           cd $GITHUB_WORKSPACE/test
-          python testPorousMushyHole.py
+          python testPorousMushyHole.py -p -1
 
       - uses: actions/upload-artifact@v1
         name: Upload method test results
         with:
           name: method-paper-results
           path: ${{ env.MUSHY_LAYER_TEST_PATH }}
-
 
