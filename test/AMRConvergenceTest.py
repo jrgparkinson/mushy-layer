@@ -89,6 +89,7 @@ def amr_convergence_test(params, full_output_dir, nzs, num_procs=1, num_restarts
 
         # Don't need output dir or exec dir here, MushyLayerRun will fill these in
         s = BatchJob('', p['concise_run_name'], '', num_proc)
+        s.allow_manual_run = True
 
         if restart_from_low_res:
             python_file = os.path.join(get_mushy_layer_dir(), 'test', 'create_refined_restart.py')
