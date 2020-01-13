@@ -3,3 +3,4 @@
 !*.expected
 **.inputs
 *.log
+diff*
