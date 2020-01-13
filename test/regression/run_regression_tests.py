@@ -265,9 +265,15 @@ def test_folder(test_directory, verbose_output=False):
                     failed_test = True
                     break
 
+                tolerance = 1e-5
                 value_diff = float(data[key] - data_expected[key])
+
+                # Compute relative different for large values
+                if abs(data_expected[key]) > tolerance:
+                    value_diff = value_diff/data_expected[key]
+
                 diff[key] = value_diff
-                if abs(value_diff) > 1e-5:
+                if abs(value_diff) > tolerance:
                     logger.log('Error in field %s = %.2g' % (key, value_diff), verbose_output)
                     failed_test = True
 

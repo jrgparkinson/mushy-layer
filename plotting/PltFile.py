@@ -62,19 +62,24 @@ class PltFile:
 
     def __init__(self, filename, load_data=False, inputs_file='inputs'):
         self.is_plot_file = False
+        self.defined = False
         if not os.path.exists(filename):
             print('PltFile: file does not exist %s ' % filename)
             return
 
+        self.defined = True
+
         self.filename = filename
 
         # Get the plot prefix and frame number assuming a format
-        prefix_format = r'(.*)-(\d+)\.2d\.hdf5'
-        m = re.search(prefix_format, self.filename)
+        prefix_format = r'([^\d\/]*)(\d+)\.\dd\.hdf5'
+        plot_file_name = self.filename
+
+        m = re.search(prefix_format, plot_file_name)
 
         if m and m.groups() and len(m.groups()) == 2:
-            self.plot_prefix = m.group(0)
-            self.frame = m.group(1)
+            self.plot_prefix = m.group(1)
+            self.frame = int(m.group(2))
 
         else:
             self.plot_prefix = None
@@ -135,8 +140,7 @@ class PltFile:
     #     self.ds = yt.load(self.filename)
 
     def unload_data(self):
-        del self.ds_levels
-
+        self.ds_levels = []
         self.data_loaded = False
 
     # noinspection PyUnresolvedReferences
