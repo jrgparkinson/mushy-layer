@@ -168,7 +168,7 @@ def test_folder(test_directory, verbose_output=False):
     # Compare output against the expected output
     # logger.log('Test files: %s' % test_files)
 
-    expected_files = [f for f in test_files if EXPECTED in f]
+    expected_files = [f for f in test_files if EXPECTED in f and DIFF not in f]
     if not expected_files:
         logger.log('No expected files to compared against')
         logger.log_void()
@@ -256,6 +256,8 @@ def test_folder(test_directory, verbose_output=False):
             data_expected = pd.read_csv(os.path.join(test_directory, expected_file))
 
             data_keys = data.keys()
+            
+            diff = data.copy()
 
             for key in data_expected.keys():
                 if key not in data_keys:
@@ -263,10 +265,14 @@ def test_folder(test_directory, verbose_output=False):
                     failed_test = True
                     break
 
-                value_diff = float(abs(data[key] - data_expected[key]))
-                if value_diff > 1e-5:
+                value_diff = float(data[key] - data_expected[key])
+                diff[key] = value_diff
+                if abs(value_diff) > 1e-5:
                     logger.log('Error in field %s = %.2g' % (key, value_diff), verbose_output)
                     failed_test = True
+
+            diff.to_csv(os.path.join(test_directory, 'diff-%s' % expected_file))
+
         else:
             # Assume text file - do a diff
             text1 = open(os.path.join(test_directory, expected_file)).readlines()
@@ -366,8 +372,7 @@ if __name__ == "__main__":
             full_dir = os.path.join(script_loc, test_dir)
             success, status = test_folder(full_dir, verbose)
         except Exception as e:
-
-            logger.error(traceback.format_exc())
+            logger.log(traceback.format_exc())
             logger.log_failed()
             success = False
 
