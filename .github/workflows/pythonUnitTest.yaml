@@ -18,54 +18,70 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Setup environmental variables
-        run: |
-          echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
-          echo ::set-env name=CHOMBO_ROOT::$(echo $HOME)/chombo
-          echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
-          echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
-            $(echo $HDF5_PATH)/lib
-
-      - name: Info
-        run: |
-          echo $CHOMBO_HOME
-          echo $HOME
-          echo $LD_LIBRARY_PATH
-          echo $GITHUB_WORKSPACE
-
-      # Do regression tests
-
-      - name: Set up Python 3.6
-        uses: actions/setup-python@v1
+      - uses: actions/checkout@v2
+        name: Checkout master
         with:
-          python-version: 3.6
+          ref: master
+          path: mushy-layer-master
 
-      - name: Cache pip
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-
-
-      - name: Install python dependencies
-        run: pip install -r requirements.txt
-
-      - name: Setup for tests
-        run: |
-          cd $GITHUB_WORKSPACE
-          python install.py -g
-
-      - name: Run Unit Tests
+      - name: Publish coverage
         run: |
           cd $UNIT_TEST_PATH
-          coverage run testPltFile.py
-          coverage html
+          touch index.html
+          git config --global user.name 'jparkinson'
+          git config --global user.email 'jamie.parkinson@gmail.com'
+          git add index.html
+          git commit -m "Unittest coverage"
+          git push
 
-      - uses: actions/upload-artifact@v1
-        name: Upload unit test results
-        with:
-          name: python-unit-test-results
-          path: ${{ env.UNIT_TEST_PATH }}
+      # - name: Setup environmental variables
+      #   run: |
+      #     echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
+      #     echo ::set-env name=CHOMBO_ROOT::$(echo $HOME)/chombo
+      #     echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
+      #     echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
+      #       $(echo $HDF5_PATH)/lib
+
+      # - name: Info
+      #   run: |
+      #     echo $CHOMBO_HOME
+      #     echo $HOME
+      #     echo $LD_LIBRARY_PATH
+      #     echo $GITHUB_WORKSPACE
+
+      # # Do regression tests
+
+      # - name: Set up Python 3.6
+      #   uses: actions/setup-python@v1
+      #   with:
+      #     python-version: 3.6
+
+      # - name: Cache pip
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: ~/.cache/pip
+      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pip-
+      #       ${{ runner.os }}-
+
+      # - name: Install python dependencies
+      #   run: pip install -r requirements.txt
+
+      # - name: Setup for tests
+      #   run: |
+      #     cd $GITHUB_WORKSPACE
+      #     python install.py -g
+
+      # - name: Run Unit Tests
+      #   run: |
+      #     cd $UNIT_TEST_PATH
+      #     coverage run testPltFile.py
+      #     coverage html
+
+      # - uses: actions/upload-artifact@v1
+      #   name: Upload unit test results
+      #   with:
+      #     name: python-unit-test-results
+      #     path: ${{ env.UNIT_TEST_PATH }}
 
