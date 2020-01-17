@@ -3,7 +3,7 @@ name: Python Unit Tests
 on:
   push:
     branches:
-      - 'master'
+      - 'development'
 
 env:
   LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
@@ -94,10 +94,10 @@ jobs:
           git commit -m "Unittest coverage"
           git push
 
-      # - name: Request Github Pages build job
-      #   run: >-
-      #     curl -L -X POST 
-      #     -H "Content-Type: application/json"
-      #     -H "Authorization: token ${{ secrets.GH_PAT}}"
-      #     "https://api.github.com/repos/${{ github.repository }}/pages/builds"
+      - name: Request Github Pages build job
+        run: >-
+          curl -L -X POST 
+          -H "Content-Type: application/json"
+          -H "Authorization: token ${{ secrets.GITHUB_PAT}}"
+          "https://api.github.com/repos/${{ github.repository }}/pages/builds"
 
