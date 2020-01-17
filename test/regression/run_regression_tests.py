@@ -265,7 +265,7 @@ def test_folder(test_directory, verbose_output=False):
                     failed_test = True
                     break
 
-                tolerance = 1e-8
+                tolerance = 1e-5
                 expected_value = data_expected[key].iloc[0]
                 value_diff = float(data[key].iloc[0] - data_expected[key])
 

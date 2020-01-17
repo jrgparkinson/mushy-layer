@@ -1,2 +1,3 @@
 coverage_html_report
 !*.hdf5
+!inputs
