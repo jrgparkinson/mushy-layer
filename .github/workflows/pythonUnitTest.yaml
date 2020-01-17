@@ -23,7 +23,7 @@ jobs:
         name: Checkout master
         with:
           ref: master
-          path: mushy-layer-master
+          path: /home/runner/work/mushy-layer-master
 
       - name: Publish coverage
         run: |
@@ -31,7 +31,7 @@ jobs:
           ls
           cd /home/runner/work/mushy-layer-master
           ls
-          cd mushy-layer-master/test/unit
+          cd test/unit
           ls
           touch index.html
           git config --global user.name 'jparkinson'
