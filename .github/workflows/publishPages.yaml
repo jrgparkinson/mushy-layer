@@ -1,15 +1,26 @@
-name: Build and Deploy
+name: Publish pages
 on: [push]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-
-    - name: Build and Deploy
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+    - uses: actions/checkout@v2
+      name: Checkout master
       with:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BRANCH: master # The branch the action should deploy to.
-        FOLDER: . # The folder the action should deploy.
+        ref: master
+        path: master
+
+    - name: Publish
+      uses: crazy-max/ghaction-github-pages@v1
+      with:
+        target_branch: gh-pages
+        build_dir: public
+      env:
+        GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+
+    # - name: Build and Deploy
+    #   uses: JamesIves/github-pages-deploy-action@releases/v3
+    #   with:
+    #     ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    #     BRANCH: master # The branch the action should deploy to.
+    #     FOLDER: . # The folder the action should deploy.
