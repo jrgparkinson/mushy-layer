@@ -79,6 +79,7 @@ class PltFile:
         self.comp_names = []
         self.levels = []
         self.time = -1
+        self.frame = -1
         self.prob_domain = None
         self.domain_size = []
         self.xarr_data = None
