@@ -399,10 +399,16 @@ if __name__ == "__main__":
     logger.log('------------------------ Summary -------------------------', console_display=True)
 
     # Report tests
+    void_tests = [k for (k, v) in test_results.items() if v == 'Void']
+    passed_tests = [k for (k, v) in test_results.items() if v == 'OK']
+    failed_tests = [k for (k, v) in test_results.items() if v == 'Failed']
     num_passed = len(passed_tests)
     num_failed = len(failed_tests)
-    logger.log('Tests passed (%d/%d): %s' % (num_passed, num_passed + num_failed, ','.join(passed_tests)), console_display=True)
-    logger.log('Tests failed (%d/%d): %s' % (num_failed, num_passed + num_failed, ','.join(failed_tests)), console_display=True)
+    num_tests = len(test_results)
+    logger.log('Tests passed (%d/%d): %s' % (num_passed, num_tests, ','.join(passed_tests)), console_display=True)
+    logger.log('Tests failed (%d/%d): %s' % (num_failed, num_tests, ','.join(failed_tests)), console_display=True)
+    logger.log('Tests void (%d/%d): %s' % (len(void_tests), num_tests, ','.join(void_tests)),
+               console_display=True)
 
     # Timing
     timings.append(time.time())

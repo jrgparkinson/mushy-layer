@@ -9,6 +9,7 @@ env:
   LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
   UNIT_TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test/unit
+  UNIT_TEST_PATH_MASTER: /home/runner/work/mushy-layer/mushy-layer/test/unit
 
 jobs:
   build:
@@ -26,7 +27,10 @@ jobs:
 
       - name: Publish coverage
         run: |
-          cd $UNIT_TEST_PATH
+          cd /home/runner/work/mushy-layer
+          ls
+          cd mushy-layer-master/test/unit
+          ls
           touch index.html
           git config --global user.name 'jparkinson'
           git config --global user.email 'jamie.parkinson@gmail.com'
