@@ -25,8 +25,6 @@ jobs:
           ref: master
           path: master
 
-      
-
       - name: Setup environmental variables
         run: |
           echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
@@ -34,6 +32,12 @@ jobs:
           echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
           echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
             $(echo $HDF5_PATH)/lib
+
+      - name: Setup latex
+        run: |
+          whereis latex
+          sudo aptitude install texlive-fonts-recommended texlive-fonts-extra
+          sudo apt-get install dvipng
 
       - name: Info
         run: |
@@ -78,11 +82,10 @@ jobs:
           name: python-unit-test-results
           path: ${{ env.UNIT_TEST_PATH }}
 
-
-
       - name: Publish coverage
         run: |
-          cd coverage_html_report
+          ls
+          cd $UNIT_TEST_PATH/coverage_html_report
           cp .* $UNIT_TEST_PUBLISH -r
           cd $UNIT_TEST_PUBLISH
           git config --global user.name 'jparkinson'
