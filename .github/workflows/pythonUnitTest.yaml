@@ -86,7 +86,7 @@ jobs:
         run: |
           ls
           cd $UNIT_TEST_PATH/coverage_html_report
-          cp .* $UNIT_TEST_PUBLISH -r
+          cp . $UNIT_TEST_PUBLISH -r
           cd $UNIT_TEST_PUBLISH
           git config --global user.name 'jparkinson'
           git config --global user.email 'jamie.parkinson@gmail.com'
