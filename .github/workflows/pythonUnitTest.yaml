@@ -3,7 +3,7 @@ name: Python Unit Tests
 on:
   push:
     branches:
-      - 'development'
+      - 'master'
 
 env:
   LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
