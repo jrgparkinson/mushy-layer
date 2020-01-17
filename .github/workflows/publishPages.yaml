@@ -13,8 +13,8 @@ jobs:
     - name: Publish
       uses: crazy-max/ghaction-github-pages@v1
       with:
-        target_branch: gh-pages
-        build_dir: public
+        target_branch: master
+        build_dir: .
       env:
         GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
 
