@@ -36,7 +36,7 @@ jobs:
       - name: Setup latex
         run: |
           whereis latex
-          sudo aptitude install texlive-fonts-recommended texlive-fonts-extra
+          sudo apt-get install texlive-fonts-recommended texlive-fonts-extra
           sudo apt-get install dvipng
 
       - name: Info
