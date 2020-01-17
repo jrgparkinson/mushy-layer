@@ -23,13 +23,13 @@ jobs:
         name: Checkout master
         with:
           ref: master
-          path: /home/runner/work/mushy-layer-master
+          path: master
 
       - name: Publish coverage
         run: |
-          cd /home/runner/work/
+          cd /home/runner/work/mushy-layer/mushy-layer
           ls
-          cd /home/runner/work/mushy-layer-master
+          cd /home/runner/work/mushy-layer/mushy-layer/master
           ls
           cd test/unit
           ls
