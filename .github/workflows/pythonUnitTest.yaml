@@ -27,7 +27,9 @@ jobs:
 
       - name: Publish coverage
         run: |
-          cd /home/runner/work/mushy-layer
+          cd /home/runner/work/
+          ls
+          cd /home/runner/work/mushy-layer-master
           ls
           cd mushy-layer-master/test/unit
           ls
