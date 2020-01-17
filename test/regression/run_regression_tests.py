@@ -265,12 +265,13 @@ def test_folder(test_directory, verbose_output=False):
                     failed_test = True
                     break
 
-                tolerance = 1e-5
-                value_diff = float(data[key] - data_expected[key])
+                tolerance = 1e-8
+                expected_value = data_expected[key].iloc[0]
+                value_diff = float(data[key].iloc[0] - data_expected[key])
 
                 # Compute relative different for large values
-                if abs(data_expected[key]) > tolerance:
-                    value_diff = value_diff/data_expected[key]
+                if abs(expected_value) > 1.0:
+                    value_diff = value_diff/expected_value
 
                 diff[key] = value_diff
                 if abs(value_diff) > tolerance:

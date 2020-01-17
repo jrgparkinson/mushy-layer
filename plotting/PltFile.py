@@ -17,14 +17,14 @@ from skimage.feature import peak_local_max
 from itertools import product
 
 
-def compute_z(porosity_slice, y_slice, porosity):
-    # valid_cells = np.argwhere(porosity_slice < porosity)
-    #
-    # j_ml_above = min(valid_cells)
-    #
-    z = np.interp(porosity, porosity_slice, y_slice)
-
-    return z
+# def compute_z(porosity_slice, y_slice, porosity):
+#     # valid_cells = np.argwhere(porosity_slice < porosity)
+#     #
+#     # j_ml_above = min(valid_cells)
+#     #
+#     z = np.interp(porosity, porosity_slice, y_slice)
+#
+#     return z
 
 
 # TODO: Fix: AMR plotting is broken at the moment
@@ -63,28 +63,6 @@ class PltFile:
     def __init__(self, filename, load_data=False, inputs_file='inputs'):
         self.is_plot_file = False
         self.defined = False
-        if not os.path.exists(filename):
-            print('PltFile: file does not exist %s ' % filename)
-            return
-
-        self.defined = True
-
-        self.filename = filename
-
-        # Get the plot prefix and frame number assuming a format
-        prefix_format = r'([^\d\/]*)(\d+)\.\dd\.hdf5'
-        plot_file_name = self.filename
-
-        m = re.search(prefix_format, plot_file_name)
-
-        if m and m.groups() and len(m.groups()) == 2:
-            self.plot_prefix = m.group(1)
-            self.frame = int(m.group(2))
-
-        else:
-            self.plot_prefix = None
-            self.frame = -1
-
         self.data_loaded = False
         self.ds = None
 
@@ -110,6 +88,26 @@ class PltFile:
         # Now read all the component names
         self.data = {}
 
+        if not os.path.exists(filename):
+            print('PltFile: file does not exist "%s"' % filename)
+            return
+        self.filename = filename
+
+        # Get the plot prefix and frame number assuming a format
+        prefix_format = r'([^\d\/]*)(\d+)\.\dd\.hdf5'
+        plot_file_name = self.filename
+
+        m = re.search(prefix_format, plot_file_name)
+
+        if m and m.groups() and len(m.groups()) == 2:
+            self.plot_prefix = m.group(1)
+            self.frame = int(m.group(2))
+
+        else:
+            self.plot_prefix = None
+            self.frame = -1
+
+
         # get inputs
         output_folder = os.path.abspath(os.path.join(self.filename, '..'))
         inputs_file_loc = os.path.join(output_folder, inputs_file)
@@ -118,6 +116,8 @@ class PltFile:
         else:
             print('Cannot find inputs file %s' % inputs_file_loc)
             self.inputs = None
+
+        self.defined = True
 
         if load_data:
             self.load_data()
