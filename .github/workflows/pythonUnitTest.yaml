@@ -9,7 +9,7 @@ env:
   LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
   UNIT_TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test/unit
-  UNIT_TEST_PATH_MASTER: /home/runner/work/mushy-layer/mushy-layer/test/unit
+  UNIT_TEST_PUBLISH: /home/runner/work/mushy-layer/mushy-layer/master/test/unit/coverage/
 
 jobs:
   build:
@@ -25,69 +25,69 @@ jobs:
           ref: master
           path: master
 
+      
+
+      - name: Setup environmental variables
+        run: |
+          echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
+          echo ::set-env name=CHOMBO_ROOT::$(echo $HOME)/chombo
+          echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
+          echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
+            $(echo $HDF5_PATH)/lib
+
+      - name: Info
+        run: |
+          echo $CHOMBO_HOME
+          echo $HOME
+          echo $LD_LIBRARY_PATH
+          echo $GITHUB_WORKSPACE
+
+      # Do regression tests
+
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+
+      - name: Cache pip
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+
+      - name: Install python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Setup for tests
+        run: |
+          cd $GITHUB_WORKSPACE
+          python install.py -g
+
+      - name: Run Unit Tests
+        run: |
+          cd $UNIT_TEST_PATH
+          coverage run testPltFile.py
+          coverage html
+
+      - uses: actions/upload-artifact@v1
+        name: Upload unit test results
+        with:
+          name: python-unit-test-results
+          path: ${{ env.UNIT_TEST_PATH }}
+
+
+
       - name: Publish coverage
         run: |
-          cd /home/runner/work/mushy-layer/mushy-layer
-          ls
-          cd /home/runner/work/mushy-layer/mushy-layer/master
-          ls
-          cd test/unit
-          ls
-          touch index.html
+          cd coverage_html_report
+          cp .* $UNIT_TEST_PUBLISH -r
+          cd $UNIT_TEST_PUBLISH
           git config --global user.name 'jparkinson'
           git config --global user.email 'jamie.parkinson@gmail.com'
-          git add index.html
+          git add .
           git commit -m "Unittest coverage"
           git push
-
-      # - name: Setup environmental variables
-      #   run: |
-      #     echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
-      #     echo ::set-env name=CHOMBO_ROOT::$(echo $HOME)/chombo
-      #     echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
-      #     echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
-      #       $(echo $HDF5_PATH)/lib
-
-      # - name: Info
-      #   run: |
-      #     echo $CHOMBO_HOME
-      #     echo $HOME
-      #     echo $LD_LIBRARY_PATH
-      #     echo $GITHUB_WORKSPACE
-
-      # # Do regression tests
-
-      # - name: Set up Python 3.6
-      #   uses: actions/setup-python@v1
-      #   with:
-      #     python-version: 3.6
-
-      # - name: Cache pip
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-      #       ${{ runner.os }}-
-
-      # - name: Install python dependencies
-      #   run: pip install -r requirements.txt
-
-      # - name: Setup for tests
-      #   run: |
-      #     cd $GITHUB_WORKSPACE
-      #     python install.py -g
-
-      # - name: Run Unit Tests
-      #   run: |
-      #     cd $UNIT_TEST_PATH
-      #     coverage run testPltFile.py
-      #     coverage html
-
-      # - uses: actions/upload-artifact@v1
-      #   name: Upload unit test results
-      #   with:
-      #     name: python-unit-test-results
-      #     path: ${{ env.UNIT_TEST_PATH }}
 
