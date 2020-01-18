@@ -69,7 +69,7 @@ def test_porous_mushy_hole(argv):
     plot_interval = None
 
     try:
-        opts, _ = getopt.getopt(argv, "t:h:")
+        opts, _ = getopt.getopt(argv, "t:h:p:")
     except getopt.GetoptError as err:
         print(str(err))
         print('testPorousMushyHole.py -t<max time> -h<hole radius=0.02>')
