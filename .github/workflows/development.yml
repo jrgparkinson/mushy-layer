@@ -3,7 +3,7 @@ name: Build C++ Code and run Regression Tests
 on:
   push:
     branches:
-      - '*'
+      - 'development'
 
 # schedule:
 #   # * is a special character in YAML so you have to quote this string
