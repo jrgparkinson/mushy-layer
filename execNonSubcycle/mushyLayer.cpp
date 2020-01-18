@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     if(argc < 2) 
       { std::cerr << " usage: " << argv[0] << " <input_file>\n"; exit(0); }
     char* in_file = argv[1];
-    ParmParse pp(argc-2,argv+2,NULL,in_file);
+    ParmParse pp(argc-2,argv+2,nullptr,in_file);
     
     amrMushyLayer amrObject;
 

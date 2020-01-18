@@ -122,9 +122,10 @@ See the [separate document](InitialAndBoundaryConditions.md).
 
 `parameters.heleShaw=true` constrain permeabilities by a Hele-Shaw cell
 
-`parameters.nonDimReluctance=0.1` inverse of the dimensionless Hele-Shaw permeabilty. Smaller means wider hele-shaw gap width. 
+`parameters.nonDimReluctance=0.1` inverse of the dimensionless Hele-Shaw permeabilty. Smaller means wider hele-shaw gap width. Alternatively, you can now specify the dimensionless Hele-Shaw cell permeability e.g. `parameters.heleShawPermeability=10.0`
+ 
 
-`parameters.nonDimVel=0.0` (dimensionless) frame advection velocity
+`parameters.nonDimVel=0.0` dimensionless frame advection velocity
 `parameters.permeabilityFunction=2` mathematical form of the permeability function. Options include:
 0. pureFluid (permeability=1)
 1. cubic (permeability=porosity^3)

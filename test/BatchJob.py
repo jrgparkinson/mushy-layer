@@ -3,6 +3,7 @@ import math
 import time
 import subprocess
 import re
+from colorama import Fore
 
 
 class BatchJob:
@@ -17,7 +18,7 @@ class BatchJob:
     postprocess_command = ''
 
     def __init__(self, folder, jobname, exec_file, num_proc=1, time_limit=7.0, memory_limit=4000, num_nodes=0,
-                 mpi_run=True):
+                 mpi_run=None):
 
         self.jobname = jobname
         self.folder = folder
@@ -26,7 +27,16 @@ class BatchJob:
         self.exec_file = exec_file
         self.time_limit = time_limit  # Measured in days
         self.memory_limit = memory_limit  # in MB
-        self.mpi_run = mpi_run
+
+        try:
+            mpi_exists = subprocess.check_output(['which', 'mpirun'])
+        except subprocess.CalledProcessError:
+            mpi_exists = False
+
+        if mpi_exists:
+            self.mpi_run = True
+        else:
+            self.mpi_run = False
 
         self.preprocess_command = ''
         self.dependency = []
@@ -36,10 +46,12 @@ class BatchJob:
         self.partitions = ['shared', 'priority-ocean']
         self.exclude = None
 
-        # Default setup: all tasks on one node
-        # This will fail for large numbers of processors - need to implement 
-        # some clever load balancing
+        self.allow_manual_run = False
+        self.commands_to_execute = None
 
+        # Default setup: all tasks on one node
+        # This will fail for large numbers of processors - need to implement
+        # some clever load balancing
         # Always fix this
         self.cpu_per_task = 1
 
@@ -69,7 +81,8 @@ class BatchJob:
             print('Reducing memory limit to %1.0f GB per node to avoid exceeding node memory limit. \n' % (
                     self.memory_limit / 1000))
 
-    def get_batch_job_command(self):
+    @staticmethod
+    def get_batch_job_command():
         """ Define the command used to run batch jobs
          change this if you're not using slurm! """
         slurm_command = 'sbatch'
@@ -98,9 +111,9 @@ class BatchJob:
     def set_exec_file(self, exec_file):
         self.exec_file = exec_file
 
-    def write_batch_file(self, runFileName='run.sh', inputs_file_name='inputs'):
+    def write_batch_file(self, run_file_name='run.sh', inputs_file_name='inputs'):
 
-        fh = open(self.get_run_file(runFileName), 'w+')
+        fh = open(self.get_run_file(run_file_name), 'w+')
 
         # Get time limit in the format days-hours:mins:secs
         days, remainder = divmod(self.time_limit, 1)
@@ -133,21 +146,26 @@ class BatchJob:
 
         # If you don't have slurm, this should be different
         slurm_header = ['# Set your minimum acceptable walltime, format: day-hours:minutes:seconds \n',
-                         '#SBATCH --time=' + time_string + '\n', partitions_str, exclude_str,
-                         '# Set name of job shown in squeue' + '\n', '#SBATCH --job-name ' + self.jobname + '\n',
-                         '# Request CPU resources' + '\n', '#SBATCH --ntasks=' + str(int(self.num_proc)) + '                  # Number of MPI ranks' + '\n',
-                         '#SBATCH --cpus-per-task=' + str(int(self.cpu_per_task)) + '            # Number of cores per MPI rank ' + '\n',
-                         '#SBATCH --nodes=' + str(int(self.num_nodes)) + '                    # Number of nodes' + '\n',
-                         '#SBATCH --ntasks-per-node=' + str(int(self.tasks_per_node)) + '         # How many tasks on each node' + '\n',
-                         '#SBATCH --ntasks-per-socket=' + str(int(self.tasks_per_socket)) + '        # How many tasks on each CPU or socket (not sure what this really means)' + '\n',
-                         '#SBATCH --distribution=cyclic:cyclic # Distribute tasks cyclically on nodes and sockets' + '\n',
-                         '# Memory usage (MB)' + '\n', '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
-                         '#SBATCH --output=' + os.path.join(self.folder, 'sbatch%j.out') + '   # Standard output and error log' + '\n']
-
+                        '#SBATCH --time=' + time_string + '\n', partitions_str, exclude_str,
+                        '# Set name of job shown in squeue' + '\n', '#SBATCH --job-name ' + self.jobname + '\n',
+                        '# Request CPU resources' + '\n', '#SBATCH --ntasks=' + str(int(self.num_proc)) +
+                        '                  # Number of MPI ranks' + '\n',
+                        '#SBATCH --cpus-per-task=' + str(
+                            int(self.cpu_per_task)) + '            # Number of cores per MPI rank ' + '\n',
+                        '#SBATCH --nodes=' + str(int(self.num_nodes)) + '                    # Number of nodes' + '\n',
+                        '#SBATCH --ntasks-per-node=' + str(
+                            int(self.tasks_per_node)) + '         # How many tasks on each node' + '\n',
+                        '#SBATCH --ntasks-per-socket=' + str(int(self.tasks_per_socket)) +
+                        '        # How many tasks on each CPU or socket (not sure what this really means)' + '\n',
+                        '#SBATCH --distribution=cyclic:cyclic '
+                        '# Distribute tasks cyclically on nodes and sockets' + '\n',
+                        '# Memory usage (MB)' + '\n', '#SBATCH --mem-per-cpu=' + str(self.memory_limit) + '\n',
+                        '#SBATCH --output=' + os.path.join(self.folder,
+                                                           'sbatch%j.out') + ' # Standard output and error log' + '\n']
 
         # The commands to execute will look the same regardless of whether you're using SLURM or not
         commands_to_execute = [self.preprocess_command + '\n \n',
-                         'cd ' + self.folder + '; \n \n']
+                               'cd ' + self.folder + ' || exit; \n \n']
 
         if self.custom_command:
             commands_to_execute.append(self.custom_command)
@@ -169,15 +187,16 @@ class BatchJob:
                 exec_dir = os.path.dirname(self.exec_file)
                 print('Exec dir: %s' % exec_dir)
 
-                buil_mush_command = os.path.join(exec_dir, 'buildMushyLayer.sh')
+                build_mush_command = os.path.join(exec_dir, 'buildMushyLayer.sh')
 
                 custom_cmd = 'hs=$HOSTNAME \n' \
                              'if [[ $hs == *"gyre"* ]]; then \n' \
-                             ' %s; \n cd %s ; \n' \
-                             ' %s \n' \
+                             '%s;\n' \
+                             'cd %s || exit; \n' \
+                             '%s \n' \
                              'else\n' \
-                             ' %s\n' \
-                             'fi\n' % (buil_mush_command, self.folder, legacy_run_str, run_str)
+                             '%s\n' \
+                             'fi\n' % (build_mush_command, self.folder, legacy_run_str, run_str)
 
                 commands_to_execute.append(custom_cmd)
 
@@ -191,45 +210,62 @@ class BatchJob:
         file_contents.append(dependency_str)
         file_contents.extend(commands_to_execute)
 
-
         fh.writelines(file_contents)
 
         fh.close()
 
-    def run_task(self, runFileName='run.sh'):
+        self.commands_to_execute = commands_to_execute
+
+    def run_task(self, run_file_name='run.sh'):
         """
         This method will write out a batch file for the slurm queuing system, then run it.
         If you don't have slurm, you'll need to rewrite this method
         """
 
-        self.write_batch_file(runFileName)
+        self.write_batch_file(run_file_name)
 
-
-        cmd = 'cd ' + self.folder + '; ' + self.get_batch_job_command() + ' ' + self.get_run_file(runFileName)
-
+        cmd = 'cd ' + self.folder + ' || exit; ' + self.get_batch_job_command() + ' ' + self.get_run_file(run_file_name)
 
         try:
             result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
             print(result)
 
-            job_id_search = re.findall('Submitted batch job (\d+)', result)
+            job_id_search = re.findall(r'Submitted batch job (\d+)', result)
 
             if job_id_search:
                 self.job_id = int(job_id_search[0])
 
             # Make a file in the output folder stating the slurm job id
-            F = open(os.path.join(self.folder, 'jobid'), 'w')
-            F.write(str(self.job_id))
-            F.close()
+            slurm_id_file = open(os.path.join(self.folder, 'jobid'), 'w')
+            slurm_id_file.write(str(self.job_id))
+            slurm_id_file.close()
 
             # Pause briefly in case submitting lots of slurm jobs
             time.sleep(0.5)
 
-        except:
-            print("Unable to run command, maybe SLURM isn't installed? You'll need to run it manually; \n %s" % cmd)
+        except subprocess.CalledProcessError:
 
+            if self.allow_manual_run:
+                self.run_command_manually()
+            else:
+                print(Fore.RED)
+                print("Unable to run command, maybe SLURM isn't installed? You'll need to run it manually; \n %s" % cmd)
+                print(self.commands_to_execute)
+                print(Fore.BLUE)
+                answer = input('Would you like to try and run it now automatically? (y/n) ')
+                print(Fore.RESET)
+                if answer == 'y':
+                    self.run_command_manually()
 
+            print(Fore.RESET)
 
+    def get_run_file(self, run_file_name):
+        return os.path.join(self.folder, run_file_name)
 
-    def get_run_file(self, runFileName):
-        return os.path.join(self.folder, runFileName)
+    def run_command_manually(self):
+        for cmd in self.commands_to_execute:
+            cmd = cmd.replace('\n', '')
+            print(cmd)
+            subprocess.run(cmd + ' > pout.0 ', shell=True)
+            # os.system(cmd)
+        print('------------------------- Completed ----------------------------------------')

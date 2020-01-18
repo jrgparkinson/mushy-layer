@@ -58,14 +58,14 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
 
 
   // loop over levels and compute RHS
-  Vector<LevelData<FArrayBox>*> refluxRHS(finest_level + 1, NULL);
+  Vector<LevelData<FArrayBox>*> refluxRHS(finest_level + 1, nullptr);
   Vector<LevelData<FArrayBox>*> refluxCorr(finest_level + 1,
-                                           NULL);
+                                           nullptr);
   // this is necessary because while solver only can do
   // one component, levelfluxRegister::reflux can only
   // do all of them at once.
   Vector<LevelData<FArrayBox>*> tempRefluxData(finest_level + 1,
-                                               NULL);
+                                               nullptr);
   // loop over levels, allocate storage, set up for AMRMultiGrid
   // solve
   thisMLPtr = this;
@@ -129,7 +129,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
   // for now just do component-wise maxnorm
   // compute norm over all directions and then use for
   // all velocity components (in order to be consistent)
-  Vector<LevelData<FArrayBox>*> vectVel(finest_level + 1, NULL);
+  Vector<LevelData<FArrayBox>*> vectVel(finest_level + 1, nullptr);
   thisMLPtr = this;
   for (int lev = m_level; lev <= finest_level; lev++)
   {
@@ -229,22 +229,22 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
   // clean up storage
   for (int lev = startLev; lev <= finest_level; lev++)
   {
-    if (refluxRHS[lev] != NULL)
+    if (refluxRHS[lev] != nullptr)
     {
       delete refluxRHS[lev];
-      refluxRHS[lev] = NULL;
+      refluxRHS[lev] = nullptr;
     }
 
-    if (refluxCorr[lev] != NULL)
+    if (refluxCorr[lev] != nullptr)
     {
       delete refluxCorr[lev];
-      refluxCorr[lev] = NULL;
+      refluxCorr[lev] = nullptr;
     }
 
-    if (tempRefluxData[lev] != NULL)
+    if (tempRefluxData[lev] != nullptr)
     {
       delete tempRefluxData[lev];
-      tempRefluxData[lev] = NULL;
+      tempRefluxData[lev] = nullptr;
     }
   }
 }
@@ -267,7 +267,7 @@ void AMRLevelMushyLayer::doMomentumReflux(Vector<LevelData<FArrayBox>*>& compVel
 
 void AMRLevelMushyLayer::setAdvVelCentering(Real a_fraction)
 {
-  CH_assert(m_level==0);
+//  CH_assert(m_level==0);
   AMRLevelMushyLayer* mlPtr = this;
   while(mlPtr)
   {
@@ -543,8 +543,8 @@ void AMRLevelMushyLayer::postTimeStep()
 
 
       // now allocate container for composite velocity and lambda
-      Vector<LevelData<FArrayBox>* > compVel(finest_level + 1, NULL);
-      Vector<LevelData<FArrayBox>* > compLambda(finest_level + 1, NULL);
+      Vector<LevelData<FArrayBox>* > compVel(finest_level + 1, nullptr);
+      Vector<LevelData<FArrayBox>* > compLambda(finest_level + 1, nullptr);
       Vector<RefCountedPtr<LevelData<FluxBox> > > compPorosityFace(finest_level + 1);
       Vector<RefCountedPtr<LevelData<FArrayBox> > > compPorosity(finest_level + 1);
 
@@ -705,8 +705,8 @@ void AMRLevelMushyLayer::postTimeStep()
 
 //      if (m_opt.computeFreestreamCorrectionSingleLevel)
 //      {
-//        Vector<LevelData<FArrayBox>* > compVel(1, NULL);
-//        Vector<LevelData<FArrayBox>* > compLambda(1, NULL);
+//        Vector<LevelData<FArrayBox>* > compVel(1, nullptr);
+//        Vector<LevelData<FArrayBox>* > compLambda(1, nullptr);
 //        Vector<RefCountedPtr<LevelData<FluxBox> > > compPorosityFace(1);
 //        Vector<RefCountedPtr<LevelData<FArrayBox> > > compPorosity(1);
 //
@@ -741,7 +741,7 @@ void AMRLevelMushyLayer::postTimeStep()
   if (m_level == 0)
   {
     AMRLevelMushyLayer* AMRmlptr = this;
-    while (AMRmlptr != NULL)
+    while (AMRmlptr != nullptr)
     {
       DataIterator dit = (*AMRmlptr->m_vectorNew[VectorVars::m_fluidVelErr]).dataIterator();
       for (dit.reset(); dit.ok(); ++dit)
@@ -757,7 +757,7 @@ void AMRLevelMushyLayer::postTimeStep()
       // Backup data from this timestep
       AMRmlptr->backupTimestep();
 
-      Real maxU = ::computeNorm(*(AMRmlptr->m_vectorNew[VectorVars::m_fluidVel]), NULL, 1 , m_dx, Interval(0, SpaceDim-1), 0);
+      Real maxU = ::computeNorm(*(AMRmlptr->m_vectorNew[VectorVars::m_fluidVel]), nullptr, 1 , m_dx, Interval(0, SpaceDim-1), 0);
       if (maxU > 1e10)
       {
         pout() << "WARNING - During PostTimestep,  Max U = " << maxU << endl;
@@ -795,11 +795,11 @@ void AMRLevelMushyLayer::doExplicitReflux(int a_var)
   }
   //  AMRLevelMushyLayer* startLevelPtr = thisMLPtr;
 
-  Vector<LevelData<FArrayBox>*> scalRefluxCorr(finest_level + 1,  NULL);
-  Vector<LevelData<FArrayBox>*> scalRefluxRHS(finest_level + 1,   NULL);
-  Vector<LevelData<FArrayBox>*> phiOld(finest_level + 1,   NULL);
-  Vector<LevelData<FArrayBox>*> phiNew(finest_level + 1,   NULL);
-  //  Vector<LevelData<FArrayBox>*> fullRHS(finest_level + 1,   NULL);
+  Vector<LevelData<FArrayBox>*> scalRefluxCorr(finest_level + 1,  nullptr);
+  Vector<LevelData<FArrayBox>*> scalRefluxRHS(finest_level + 1,   nullptr);
+  Vector<LevelData<FArrayBox>*> phiOld(finest_level + 1,   nullptr);
+  Vector<LevelData<FArrayBox>*> phiNew(finest_level + 1,   nullptr);
+  //  Vector<LevelData<FArrayBox>*> fullRHS(finest_level + 1,   nullptr);
 
   // startLev is either m_level, or m_level-1 if that is defined
   for (int lev = startLev; lev <= finest_level; lev++)
@@ -923,16 +923,16 @@ void AMRLevelMushyLayer::doExplicitReflux(int a_var)
   // clean up temporary scalar storage
   for (int lev = 0; lev <= finest_level; lev++)
   {
-    if (scalRefluxRHS[lev] != NULL)
+    if (scalRefluxRHS[lev] != nullptr)
     {
       delete scalRefluxRHS[lev];
-      scalRefluxRHS[lev] = NULL;
+      scalRefluxRHS[lev] = nullptr;
     }
 
-    if (scalRefluxCorr[lev] != NULL)
+    if (scalRefluxCorr[lev] != nullptr)
     {
       delete scalRefluxCorr[lev];
-      scalRefluxCorr[lev] = NULL;
+      scalRefluxCorr[lev] = nullptr;
     }
 
 
@@ -967,13 +967,13 @@ Real AMRLevelMushyLayer::doHCreflux()
   AMRLevelMushyLayer* startLevelPtr = thisMLPtr;
 
 
-  Vector<LevelData<FArrayBox>*> HCRefluxCorr(finest_level + 1, NULL);
-  Vector<LevelData<FArrayBox>*> HCRefluxRHS(finest_level + 1, NULL);
+  Vector<LevelData<FArrayBox>*> HCRefluxCorr(finest_level + 1, nullptr);
+  Vector<LevelData<FArrayBox>*> HCRefluxRHS(finest_level + 1, nullptr);
 
   // Might need these two for nonlinear reflux
-  //  Vector<LevelData<FArrayBox>*> HCOld(finest_level + 1, NULL);
-  //  Vector<LevelData<FArrayBox>*> HCNew(finest_level + 1, NULL);
-  //  Vector<LevelData<FArrayBox>*> fullRHS(finest_level + 1, NULL);
+  //  Vector<LevelData<FArrayBox>*> HCOld(finest_level + 1, nullptr);
+  //  Vector<LevelData<FArrayBox>*> HCNew(finest_level + 1, nullptr);
+  //  Vector<LevelData<FArrayBox>*> fullRHS(finest_level + 1, nullptr);
 
   // startLev is either m_level, or m_level-1 if that is defined
   thisMLPtr = startLevelPtr;
@@ -1110,9 +1110,8 @@ Real AMRLevelMushyLayer::doHCreflux()
     porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, ivGhost));
     aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], numComps, ivGhost));
 
-    enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-    enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-    enthalpyEutectic[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+    createPhaseBoundaryStructures(lev, grids, ivGhost, enthalpySolidus, enthalpyEutectic, enthalpyLiquidus);
+
     HC[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], numComps, ivGhost));
 
     amrML->fillHC(*HC[lev], m_time);
@@ -1193,10 +1192,7 @@ Real AMRLevelMushyLayer::doHCreflux()
   else if (m_opt.refluxMethod == RefluxMethod::NonlinearReflux)
   {
     // nonlinear reflux
-    BCHolder temperature_Sl_BC = m_physBCPtr->temperatureLiquidSalinityBC(homogeneous);
     EdgeVelBCHolder porosityEdgeBC(m_physBCPtr->porosityFaceBC());
-
-
 
     // Calculate modified diffusion coefficient
     /*
@@ -1296,7 +1292,7 @@ Real AMRLevelMushyLayer::doHCreflux()
   for (int ilev = 0; ilev < generic_ops.size(); ilev++)
   {
     ops[ilev] = dynamic_cast<LevelTGAHelmOp<LevelData<FArrayBox>,FluxBox>* >(generic_ops[ilev]);
-    if (ops[ilev]==NULL)
+    if (ops[ilev]==nullptr)
     {
       MayDay::Error("dynamic cast failed---is that operator really a TGAHelmOp?");
     }
@@ -1359,25 +1355,22 @@ Real AMRLevelMushyLayer::doHCreflux()
   } // end loop over levels
 
   // Clean up
-  if (diffusionSolver != NULL)
-  {
-    delete diffusionSolver;
-    diffusionSolver = NULL;
-  }
+  delete diffusionSolver;
+  diffusionSolver = nullptr;
 
   // clean up temporary scalar storage
   for (int lev = 0; lev <= finest_level; lev++)
   {
-    if (HCRefluxRHS[lev] != NULL)
+    if (HCRefluxRHS[lev] != nullptr)
     {
       delete HCRefluxRHS[lev];
-      HCRefluxRHS[lev] = NULL;
+      HCRefluxRHS[lev] = nullptr;
     }
 
-    if (HCRefluxCorr[lev] != NULL)
+    if (HCRefluxCorr[lev] != nullptr)
     {
       delete HCRefluxCorr[lev];
-      HCRefluxCorr[lev] = NULL;
+      HCRefluxCorr[lev] = nullptr;
     }
 
   }

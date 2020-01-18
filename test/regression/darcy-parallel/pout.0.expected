@@ -1,0 +1,296 @@
+Diffusive timescale, advective velocity scale
+ AMR::verbosity  m_verbosity=2
+AMRLevelMushyLayer::initialData - setting initial data on level 0
+AMRLevelMushyLayer::postInitialize on level 0
+  MAC Projection (level 0): exit status = 4, max(div u) = 3.89991e-09, min pressure = 6.59517
+Computing initial VD correction with dt = 1e-09, time = 0
+  MAC Projection (level 0): exit status = 1, max(div u) = 2.16282e-24, min pressure = 6.59517
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.61404e-24, min pressure = 6.59517
+  Pressure init 0, max(div U) = 1.61404e-24
+checkpoint file name = chk000000.2d.hdf5
+plot file name = ./plt000000.2d.hdf5
+ AMRLevelMushyLayer::advance (level = 0, time=0, dt = 1e-05, CFL=4.04252e-16)
+  MAC Projection (level 0): exit status = 1, max(div u) = 3.09469e-24, min pressure = 6.59517
+  HC solve       (level 0): exit status 9, solver residual = 4.3654e-12, num MG iterations = 3
+coarse time step   0  old time = 0.000000e+00  old dt = 1.000000e-05  wallclocktime = 6.54e-02
+ AMRLevelMushyLayer::advance (level = 0, time=1.00000e-05, dt = 1.10000e-05, CFL=4.58233e-16)
+  MAC Projection (level 0): exit status = 1, max(div u) = 6.16032e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 8, solver residual = 2.44595e-11, num MG iterations = 3
+coarse time step   1  old time = 1.000000e-05  old dt = 1.100000e-05  wallclocktime = 7.13e-02
+ AMRLevelMushyLayer::advance (level = 0, time=2.10000e-05, dt = 1.21000e-05, CFL=6.29028e-14)
+  MAC Projection (level 0): exit status = 1, max(div u) = 9.36048e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 1.04805e-13, num MG iterations = 4
+coarse time step   2  old time = 2.100000e-05  old dt = 1.210000e-05  wallclocktime = 7.98e-02
+ AMRLevelMushyLayer::advance (level = 0, time=3.31000e-05, dt = 1.33100e-05, CFL=4.80158e-13)
+  MAC Projection (level 0): exit status = 1, max(div u) = 6.85864e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 8.24230e-13, num MG iterations = 4
+coarse time step   3  old time = 3.310000e-05  old dt = 1.331000e-05  wallclocktime = 4.83e-02
+ AMRLevelMushyLayer::advance (level = 0, time=4.64100e-05, dt = 1.46410e-05, CFL=5.47360e-13)
+  MAC Projection (level 0): exit status = 1, max(div u) = 8.52293e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 5.81846e-12, num MG iterations = 4
+coarse time step   4  old time = 4.641000e-05  old dt = 1.464100e-05  wallclocktime = 3.70e-02
+ AMRLevelMushyLayer::advance (level = 0, time=6.10510e-05, dt = 1.61051e-05, CFL=6.20433e-13)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.07188e-12, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 8, solver residual = 4.33360e-11, num MG iterations = 4
+coarse time step   5  old time = 6.105100e-05  old dt = 1.610510e-05  wallclocktime = 4.96e-02
+ AMRLevelMushyLayer::advance (level = 0, time=7.71561e-05, dt = 1.77156e-05, CFL=7.83171e-13)
+  MAC Projection (level 0): exit status = 1, max(div u) = 8.19479e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 1.17240e-12, num MG iterations = 5
+coarse time step   6  old time = 7.715610e-05  old dt = 1.771561e-05  wallclocktime = 3.88e-02
+ AMRLevelMushyLayer::advance (level = 0, time=9.48717e-05, dt = 1.94872e-05, CFL=1.91782e-12)
+  MAC Projection (level 0): exit status = 1, max(div u) = 5.92812e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 6.57563e-12, num MG iterations = 5
+coarse time step   7  old time = 9.487171e-05  old dt = 1.948717e-05  wallclocktime = 1.34e-01
+ AMRLevelMushyLayer::advance (level = 0, time=1.14359e-04, dt = 2.14359e-05, CFL=1.87899e-12)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.75653e-12, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 2.61080e-11, num MG iterations = 5
+coarse time step   8  old time = 1.143589e-04  old dt = 2.143589e-05  wallclocktime = 1.58e-01
+ AMRLevelMushyLayer::advance (level = 0, time=1.35795e-04, dt = 2.35795e-05, CFL=2.11725e-12)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.28846e-12, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 8, solver residual = 6.76241e-11, num MG iterations = 5
+coarse time step   9  old time = 1.357948e-04  old dt = 2.357948e-05  wallclocktime = 3.55e-02
+ AMRLevelMushyLayer::advance (level = 0, time=1.59374e-04, dt = 2.59374e-05, CFL=2.86311e-12)
+  MAC Projection (level 0): exit status = 1, max(div u) = 9.71242e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 1.29141e-12, num MG iterations = 6
+coarse time step  10  old time = 1.593742e-04  old dt = 2.593742e-05  wallclocktime = 5.64e-02
+ AMRLevelMushyLayer::advance (level = 0, time=1.85312e-04, dt = 2.85312e-05, CFL=4.57754e-12)
+  MAC Projection (level 0): exit status = 1, max(div u) = 8.41589e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 8, solver residual = 9.93921e-11, num MG iterations = 5
+coarse time step  11  old time = 1.853117e-04  old dt = 2.853117e-05  wallclocktime = 1.04e-01
+ AMRLevelMushyLayer::advance (level = 0, time=2.13843e-04, dt = 3.13843e-05, CFL=3.78711e-12)
+  MAC Projection (level 0): exit status = 1, max(div u) = 8.28480e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 8, solver residual = 5.77858e-11, num MG iterations = 5
+coarse time step  12  old time = 2.138428e-04  old dt = 3.138428e-05  wallclocktime = 5.93e-02
+ AMRLevelMushyLayer::advance (level = 0, time=2.45227e-04, dt = 3.45227e-05, CFL=5.01136e-12)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.00021e-12, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 8, solver residual = 5.12523e-11, num MG iterations = 5
+coarse time step  13  old time = 2.452271e-04  old dt = 3.452271e-05  wallclocktime = 6.20e-02
+ AMRLevelMushyLayer::advance (level = 0, time=2.79750e-04, dt = 3.79750e-05, CFL=7.35769e-12)
+  MAC Projection (level 0): exit status = 1, max(div u) = 8.83035e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 6.46327e-12, num MG iterations = 6
+coarse time step  14  old time = 2.797498e-04  old dt = 3.797498e-05  wallclocktime = 4.38e-02
+ AMRLevelMushyLayer::advance (level = 0, time=3.17725e-04, dt = 4.17725e-05, CFL=1.66342e-11)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.10076e-12, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 8, solver residual = 6.05835e-11, num MG iterations = 6
+coarse time step  15  old time = 3.177248e-04  old dt = 4.177248e-05  wallclocktime = 3.98e-02
+ AMRLevelMushyLayer::advance (level = 0, time=3.59497e-04, dt = 4.59497e-05, CFL=2.23525e-11)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.20366e-12, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 1.91944e-11, num MG iterations = 7
+coarse time step  16  old time = 3.594973e-04  old dt = 4.594973e-05  wallclocktime = 4.52e-02
+ AMRLevelMushyLayer::advance (level = 0, time=4.05447e-04, dt = 5.05447e-05, CFL=3.59470e-11)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.37720e-12, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 9, solver residual = 8.88090e-12, num MG iterations = 8
+coarse time step  17  old time = 4.054470e-04  old dt = 5.054470e-05  wallclocktime = 4.70e-02
+ AMRLevelMushyLayer::advance (level = 0, time=4.55992e-04, dt = 5.55992e-05, CFL=4.64430e-11)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.23682e-12, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 8, solver residual = 7.51408e-11, num MG iterations = 8
+coarse time step  18  old time = 4.559917e-04  old dt = 5.559917e-05  wallclocktime = 1.91e-01
+ AMRLevelMushyLayer::advance (level = 0, time=5.11591e-04, dt = 6.11591e-05, CFL=5.66649e-11)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.02610e-12, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 8, solver residual = 4.27298e-11, num MG iterations = 9
+coarse time step  19  old time = 5.115909e-04  old dt = 6.115909e-05  wallclocktime = 8.20e-02
+ AMRLevelMushyLayer::advance (level = 0, time=5.72750e-04, dt = 6.72750e-05, CFL=7.81587e-11)
+  MAC Projection (level 0): exit status = 1, max(div u) = 9.37960e-13, min pressure = 6.59517e+00
+  HC solve       (level 0): exit status 10, solver residual = 2.79030e-11, num MG iterations = 10
+coarse time step  20  old time = 5.727500e-04  old dt = 6.727500e-05  wallclocktime = 6.31e-02
+ AMRLevelMushyLayer::advance (level = 0, time=6.40025e-04, dt = 7.40025e-05, CFL=9.46910e-11)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.02303e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.32556e-10, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  21  old time = 6.400250e-04  old dt = 7.400250e-05  wallclocktime = 4.98e-02
+ AMRLevelMushyLayer::advance (level = 0, time=7.14027e-04, dt = 8.14027e-05, CFL=1.05054e-10)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.06196e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 4.12032e-10, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  22  old time = 7.140275e-04  old dt = 8.140275e-05  wallclocktime = 4.96e-02
+ AMRLevelMushyLayer::advance (level = 0, time=7.95430e-04, dt = 8.95430e-05, CFL=1.32176e-10)
+  MAC Projection (level 0): exit status = 1, max(div u) = 8.02951e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 8.47131e-10, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  23  old time = 7.954302e-04  old dt = 8.954302e-05  wallclocktime = 7.12e-02
+ AMRLevelMushyLayer::advance (level = 0, time=8.84973e-04, dt = 9.84973e-05, CFL=1.91549e-10)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.07386e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.19350e-09, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  24  old time = 8.849733e-04  old dt = 9.849733e-05  wallclocktime = 5.15e-02
+ AMRLevelMushyLayer::advance (level = 0, time=9.83471e-04, dt = 1.08347e-04, CFL=3.31941e-10)
+  MAC Projection (level 0): exit status = 1, max(div u) = 7.15575e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 3.65123e-09, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  25  old time = 9.834706e-04  old dt = 1.083471e-04  wallclocktime = 6.12e-02
+ AMRLevelMushyLayer::advance (level = 0, time=1.09182e-03, dt = 1.19182e-04, CFL=7.74496e-10)
+  MAC Projection (level 0): exit status = 1, max(div u) = 8.00861e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.74683e-08, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  26  old time = 1.091818e-03  old dt = 1.191818e-04  wallclocktime = 4.40e-02
+ AMRLevelMushyLayer::advance (level = 0, time=1.21100e-03, dt = 1.31100e-04, CFL=2.48402e-09)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.30079e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 8.25352e-08, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  27  old time = 1.210999e-03  old dt = 1.310999e-04  wallclocktime = 5.66e-02
+ AMRLevelMushyLayer::advance (level = 0, time=1.34210e-03, dt = 1.44210e-04, CFL=9.88003e-09)
+  MAC Projection (level 0): exit status = 1, max(div u) = 7.92879e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 3.14129e-07, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  28  old time = 1.342099e-03  old dt = 1.442099e-04  wallclocktime = 4.28e-02
+ AMRLevelMushyLayer::advance (level = 0, time=1.48631e-03, dt = 1.58631e-04, CFL=4.04780e-08)
+  MAC Projection (level 0): exit status = 1, max(div u) = 9.71689e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 8.25902e-07, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  29  old time = 1.486309e-03  old dt = 1.586309e-04  wallclocktime = 6.30e-02
+ AMRLevelMushyLayer::advance (level = 0, time=1.64494e-03, dt = 1.74494e-04, CFL=1.51641e-07)
+  MAC Projection (level 0): exit status = 1, max(div u) = 6.75026e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.49434e-06, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  30  old time = 1.644940e-03  old dt = 1.744940e-04  wallclocktime = 4.47e-02
+ AMRLevelMushyLayer::advance (level = 0, time=1.81943e-03, dt = 1.91943e-04, CFL=4.58280e-07)
+  MAC Projection (level 0): exit status = 1, max(div u) = 9.44813e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.52106e-06, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  31  old time = 1.819434e-03  old dt = 1.919434e-04  wallclocktime = 4.36e-02
+ AMRLevelMushyLayer::advance (level = 0, time=2.01138e-03, dt = 2.11138e-04, CFL=1.05535e-06)
+  MAC Projection (level 0): exit status = 1, max(div u) = 5.56664e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.98760e-06, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  32  old time = 2.011378e-03  old dt = 2.111378e-04  wallclocktime = 4.75e-02
+ AMRLevelMushyLayer::advance (level = 0, time=2.22252e-03, dt = 2.32252e-04, CFL=2.52613e-06)
+  MAC Projection (level 0): exit status = 1, max(div u) = 8.43355e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 6.81955e-06, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  33  old time = 2.222515e-03  old dt = 2.322515e-04  wallclocktime = 4.73e-02
+ AMRLevelMushyLayer::advance (level = 0, time=2.45477e-03, dt = 2.55477e-04, CFL=5.91273e-06)
+  MAC Projection (level 0): exit status = 1, max(div u) = 7.94677e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.70104e-05, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  34  old time = 2.454767e-03  old dt = 2.554767e-04  wallclocktime = 4.25e-02
+ AMRLevelMushyLayer::advance (level = 0, time=2.71024e-03, dt = 2.81024e-04, CFL=1.40206e-05)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.63590e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 3.12451e-05, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  35  old time = 2.710244e-03  old dt = 2.810244e-04  wallclocktime = 5.41e-02
+ AMRLevelMushyLayer::advance (level = 0, time=2.99127e-03, dt = 3.09127e-04, CFL=3.33683e-05)
+  MAC Projection (level 0): exit status = 1, max(div u) = 2.25965e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 4.33957e-05, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  36  old time = 2.991268e-03  old dt = 3.091268e-04  wallclocktime = 8.88e-02
+ AMRLevelMushyLayer::advance (level = 0, time=3.30039e-03, dt = 3.40039e-04, CFL=7.80177e-05)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.93437e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 9.32148e-05, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  37  old time = 3.300395e-03  old dt = 3.400395e-04  wallclocktime = 6.24e-02
+ AMRLevelMushyLayer::advance (level = 0, time=3.64043e-03, dt = 3.74043e-04, CFL=2.01527e-04)
+  MAC Projection (level 0): exit status = 1, max(div u) = 9.58345e-13, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.90146e-04, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  38  old time = 3.640434e-03  old dt = 3.740434e-04  wallclocktime = 4.50e-02
+ AMRLevelMushyLayer::advance (level = 0, time=4.01448e-03, dt = 4.11448e-04, CFL=5.43340e-04)
+  MAC Projection (level 0): exit status = 1, max(div u) = 2.04775e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 3.33432e-04, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  39  old time = 4.014478e-03  old dt = 4.114478e-04  wallclocktime = 5.59e-02
+ AMRLevelMushyLayer::advance (level = 0, time=4.42593e-03, dt = 4.52593e-04, CFL=1.49267e-03)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.84119e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 4.16057e-04, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  40  old time = 4.425926e-03  old dt = 4.525926e-04  wallclocktime = 4.32e-02
+ AMRLevelMushyLayer::advance (level = 0, time=4.87852e-03, dt = 4.97852e-04, CFL=3.96456e-03)
+  MAC Projection (level 0): exit status = 1, max(div u) = 2.01253e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 2.86575e-04, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  41  old time = 4.878518e-03  old dt = 4.978518e-04  wallclocktime = 6.43e-02
+ AMRLevelMushyLayer::advance (level = 0, time=5.37637e-03, dt = 5.47637e-04, CFL=1.05194e-02)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.32871e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 7.11421e-04, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  42  old time = 5.376370e-03  old dt = 5.476370e-04  wallclocktime = 4.39e-02
+ AMRLevelMushyLayer::advance (level = 0, time=5.92401e-03, dt = 6.02401e-04, CFL=3.10915e-02)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.64824e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.60356e-03, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  43  old time = 5.924007e-03  old dt = 6.024007e-04  wallclocktime = 5.82e-02
+ AMRLevelMushyLayer::advance (level = 0, time=6.52641e-03, dt = 6.62641e-04, CFL=9.45261e-02)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.58451e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 3.07595e-03, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  44  old time = 6.526408e-03  old dt = 6.626408e-04  wallclocktime = 5.49e-02
+ AMRLevelMushyLayer::advance (level = 0, time=7.18905e-03, dt = 7.28905e-04, CFL=2.84334e-01)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.93268e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 7.82469e-03, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  45  old time = 7.189048e-03  old dt = 7.289048e-04  wallclocktime = 6.01e-02
+ AMRLevelMushyLayer::advance (level = 0, time=7.91795e-03, dt = 4.69604e-04, CFL=5.00000e-01)
+  MAC Projection (level 0): exit status = 1, max(div u) = 1.81899e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 1.69149e-03, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  46  old time = 7.917953e-03  old dt = 4.696041e-04  wallclocktime = 5.43e-02
+ AMRLevelMushyLayer::advance (level = 0, time=8.38756e-03, dt = 1.88977e-04, CFL=5.00000e-01)
+  MAC Projection (level 0): exit status = 1, max(div u) = 3.97904e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 8.89823e-06, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  47  old time = 8.387557e-03  old dt = 1.889771e-04  wallclocktime = 6.46e-02
+ AMRLevelMushyLayer::advance (level = 0, time=8.57653e-03, dt = 1.05653e-04, CFL=5.00000e-01)
+  MAC Projection (level 0): exit status = 1, max(div u) = 3.63798e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 3.86670e-08, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  48  old time = 8.576534e-03  old dt = 1.056527e-04  wallclocktime = 5.14e-02
+ AMRLevelMushyLayer::advance (level = 0, time=8.68219e-03, dt = 1.05293e-04, CFL=5.00000e-01)
+  MAC Projection (level 0): exit status = 1, max(div u) = 3.63798e-12, min pressure = 6.59517e+00
+BaseLevelTGA:: WARNING: solver exitStatus == 2
+  HC solve       (level 0): exit status 2, solver residual = 3.54031e-08, num MG iterations = 10
+Ignoring all solver fails.
+coarse time step  49  old time = 8.682187e-03  old dt = 1.052932e-04  wallclocktime = 6.36e-02
+plot file name = ./plt000051.2d.hdf5
+checkpoint file name = chk000050.2d.hdf5
+number of points updated at level 0 = 204800
+total number of points updated = 204800
+Vector 17DisjointBoxLayout: 400 bytes (0 Mb)
+Vector 6VectorIdE: 256 bytes (0 Mb)
+Vector d: 816 bytes (0 Mb)
+Vector i: 320 bytes (0 Mb)
+Arena 20BasicCCVelBCFunction: 655360 bytes (0 Mb)
+Arena 21BasicExtrapBCFunction: 217936 bytes (0 Mb)
+Arena 39BasicPorosityPermeabilityFaceBCFunction: 918272 bytes (0 Mb)
+Arena 35BasicPorosityPermeabilityBCFunction: 1519992 bytes (1 Mb)
+Arena 16NoFluxBCFunction: 424320 bytes (0 Mb)
+Arena 21AdvectDiffuseScalarBC: 5521968 bytes (5 Mb)
+Arena 23ExtrapolationBCFunction: 4800 bytes (0 Mb)
+Arena 32BasicPressureBCFunctionSubcycled: 232064 bytes (0 Mb)
+Arena 24FreestreamCorrBCFunction: 4080 bytes (0 Mb)
+Arena 22DomainExtrapBCFunction: 210120 bytes (0 Mb)
+Arena 27BasicGradPressureBCFunction: 2040 bytes (0 Mb)
+Arena 16StreamFunctionBC: 103600 bytes (0 Mb)
+Arena 20BasicECVelBCFunction: 218784 bytes (0 Mb)
+Arena 15AMRFASMultiGridI9LevelDataI9FArrayBoxEE: 31200 bytes (0 Mb)
+Arena 12AMRMultiGridI9LevelDataI9FArrayBoxEE: -31200 bytes (0 Mb)
+Arena 10BCFunction: -10033336 bytes (-9 Mb)
+---------------------------------
+Total Unfreed : 1792 bytes (0 Mb)
+peak memory usage: 14142082 bytes (13 Mb)

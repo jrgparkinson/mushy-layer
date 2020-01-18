@@ -622,6 +622,9 @@ struct MushyLayerOptions {
    */
   bool scaleP_CC;
 
+  /// Compute viscous terms explicitly in velocity calculation
+  bool explicitViscousVelSolve;
+
 
 //  bool explicitDarcyTerm;
 
@@ -926,6 +929,16 @@ struct MushyLayerOptions {
   /// Method for refinement
   RefinementMethod refinementMethod;
 
+  /// Turn on to only tags cells where other refinement criteria are met and porosity \f$\chi < 1 \f$
+  bool onlyTagPorousCells;
+
+  /// Filter porous cells to remove anomalies
+  /**
+   * Select all cells with \f$\chi < 1\f$, then shift vertically
+   * by this value and tag only the intersection of the two
+   */
+  int porousCellsShrink;
+
   /// Whether we should tag cells where the fluid velocity (magnitude) is greater than MushyLayerOptions::vel_thresh
   bool tag_velocity;
   
@@ -1102,6 +1115,13 @@ struct MushyLayerOptions {
    * and \f$ L \f$ is the domain width
    */
   bool perturbationSin = false;
+
+  /// Add an initial random perturbation to enthalpy
+  Real initialRandomPerturbation = 0.0;
+
+  /// Turn on to seed random perturbations on different boxes
+  /// to prevent the same 'random' number patterns in each box
+  bool seedRandomPert = true;
 
   /// Porosity value to set if we're using a fixed porosity.
   /**

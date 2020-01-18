@@ -503,7 +503,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   if (doInterior)
   {
     CH_TIME("AMRLevelMushyLayer::fillScalars::interior");
-    if (s_verbosity >= 6)
+    if (s_verbosity >= 9)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - start interior filling, a_time:" << a_time << ", old_time: " << old_time << endl;
     }
@@ -522,7 +522,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
-  if (s_verbosity >= 6)
+  if (s_verbosity >= 10)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - done interior filling" << endl;
   }
@@ -567,7 +567,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       crse_time_interp_coeff = (a_time - crse_old_time) / crse_dt;
     }
 
-    if (s_verbosity >= 5)
+    if (s_verbosity >= 10)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - crse_time_inter_coeff = " << crse_time_interp_coeff << endl;
     }
@@ -630,7 +630,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     if (quadInterp && m_quadCFInterpScalar.isDefined())
     {
       CH_TIME("AMRLevelMushyLayer::fillScalars::quadCFinterp");
-      if (s_verbosity >= 6)
+      if (s_verbosity >= 9)
       {
         pout() << "  AMRLevelMushyLayer::fillScalars - do quad interp" << endl;
       }
@@ -657,7 +657,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   const ProblemDomain& physDomain = problemDomain();
 
   int numGhost = a_scal.ghostVect()[0];
-  if (s_verbosity >= 6)
+  if (s_verbosity >= 10)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - num ghost: " << numGhost << endl;
   }
@@ -667,7 +667,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   {
     CH_TIME("AMRLevelMushyLayer::fillScalars::domainBCs");
 
-    if (s_verbosity >= 5)
+    if (s_verbosity >= 10)
     {
       pout() << "  AMRLevelMushyLayer::fillScalars - do  BCs" << endl;
     }
@@ -684,7 +684,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 10)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - regularisation ops" << endl;
   }
@@ -700,7 +700,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
     if (a_scal.ghostVect()[0] > 0 && m_opt.scalarExchangeCorners)
     {
-      if (s_verbosity >= 5)
+      if (s_verbosity >= 9)
       {
         pout() << "  AMRLevelMushyLayer::fillScalars - corner copier" << endl;
       }
@@ -712,7 +712,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
-  if (s_verbosity >= 5)
+  if (s_verbosity >= 9)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - finished" << endl;
   }
@@ -731,10 +731,21 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
   LevelData<FluxBox> T_face(m_grids, 1, ghost);
   LevelData<FluxBox> C_face(m_grids, 1, ghost);
   LevelData<FluxBox> viscosity_face(m_grids, 1, ghost);
+  LevelData<FluxBox> viscous_velocity_face(m_grids, 1, ghost);
   fillScalarFace(permeability_face, time, ScalarVars::m_permeability,          true, false);
   fillScalarFace(T_face,            time, ScalarVars::m_temperature,           true, false);
   fillScalarFace(C_face,            time, ScalarVars::m_liquidConcentration,   true, false);
   fillScalarFace(viscosity_face,    time, ScalarVars::m_viscosity,             true, false);
+
+  if (m_opt.explicitViscousVelSolve)
+  {
+    LevelData<FArrayBox> viscous(m_grids, SpaceDim, ghost);
+    LevelData<FArrayBox> *crseVelPtr = nullptr;
+
+    computeLapVel(viscous, *m_vectorOld[m_fluidVel], crseVelPtr);
+
+    CellToEdge(viscous, viscous_velocity_face);
+  }
 
 //  int gravityDir = SpaceDim-1;
 
@@ -742,14 +753,10 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
   {
     a_advVel[dit].setVal(0.0);
 
-    FArrayBox& fabVelz = a_advVel[dit][SpaceDim-1]; // for debugging
+    FArrayBox& fabVelz = a_advVel[dit][SpaceDim-1];
 
     fabVelz.plus(T_face[dit][SpaceDim-1],  m_parameters.m_buoyancyTCoeff);
     fabVelz.plus(C_face[dit][SpaceDim-1], -m_parameters.m_buoyancySCoeff);
-
-    // Add the body force
-//    FArrayBox& bodyForce = (*m_vectorNew[VectorVars::m_bodyForce])[dit];
-//    fabVelz.plus(bodyForce, 1, gravityDir, gravityDir, 1);
     fabVelz.plus(m_parameters.body_force);
 
     for (int idir=0; idir<SpaceDim; idir++)
@@ -760,6 +767,12 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
       {
         a_advVel[dit][idir].divide(viscosity_face[dit][idir]);
       }
+
+      if (m_opt.explicitViscousVelSolve)
+      {
+        a_advVel[dit][idir].plus(viscous_velocity_face[dit][idir]);
+      }
+
     }
 
   }

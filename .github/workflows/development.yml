@@ -1,0 +1,203 @@
+name: Build C++ Code and run Regression Tests
+
+on:
+  push:
+    branches:
+      - 'development'
+
+# schedule:
+#   # * is a special character in YAML so you have to quote this string
+#   # run at 23:59 every day
+#   - cron:  '59 23 * * *'
+
+env:
+  CHOMBO_ROOT: /home/runner/chombo
+  CHOMBO_HOME: /home/runner/chombo/lib
+  HDF5_PATH: /home/runner/hdf5-dir
+  LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
+  PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
+  REGRESSIONS_PATH: /home/runner/work/mushy-layer/mushy-layer/test/regression
+  TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test
+  MUSHY_LAYER_TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test/output
+  CH_TIMER: 1
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup environmental variables
+        run: |
+          echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
+          echo ::set-env name=CHOMBO_ROOT::$(echo $HOME)/chombo
+          echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
+          echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
+            $(echo $HDF5_PATH)/lib
+
+      - name: Info
+        run: |
+          echo $CHOMBO_HOME
+          echo $HOME
+          echo $LD_LIBRARY_PATH
+          echo $GITHUB_WORKSPACE
+
+      - name: Install csh
+        run: sudo apt-get install csh
+
+      - name: Install gfortran
+        run: sudo apt-get install gfortran
+
+      - name: Install lbas etc.
+        run: sudo apt-get install libblas-dev liblapack-dev
+
+      - name: Check package versions
+        run: |
+          which gfortran
+          gfortran --version
+
+          which make
+          make --version
+
+          which g++
+          g++ --version
+
+          which perl
+          perl --version
+
+      - name: Cache HDF5
+        id: cache-hdf5v2
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.HDF5_PATH }}
+          key: ${{ runner.os }}-hdf5v2
+
+      - name: Download and install HDF5
+        if: steps.cache-hdf5v2.outputs.cache-hit != 'true'
+        run: |
+          wget https://support.hdfgroup.org/ftp/HDF5/releases/\
+            hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz
+          tar -zxvf hdf5-1.8.21.tar.gz
+          ls
+          cd hdf5-1.8.21
+          ./configure --prefix=$HDF5_PATH
+          make
+          make install
+
+      - name: Cache Chombo
+        id: cache-chombov2
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.CHOMBO_ROOT }}
+          key: ${{ runner.os }}-chombov2
+
+      - name: Download Chombo
+        if: steps.cache-chombov2.outputs.cache-hit != 'true'
+        run: |
+          svn --username ${{ secrets.SVN_USERNAME }} --password \
+            ${{ secrets.SVN_PASSWORD }} co \
+            https://anag-repo.lbl.gov/svn/Chombo/release/3.2  $CHOMBO_ROOT
+
+      - name: Verify
+        run: |
+          echo "$HDF5_PATH:"
+          ls $HDF5_PATH
+          echo "---------------------------"
+          echo "$CHOMBO_HOME"
+          ls $CHOMBO_HOME
+
+      - name: Compile Chombo
+        run: |
+          cp $GITHUB_WORKSPACE/mk/Make.defs.local.github \
+            $CHOMBO_HOME/mk/Make.defs.local
+          cd $CHOMBO_HOME
+          make lib DIM=2
+          make lib DIM=3
+
+      - name: Compile ChomboCompare
+        run: |
+          cd $CHOMBO_HOME/util/ChomboCompare
+          make compare DIM=2
+          make compare DIM=3
+
+      - name: Compile mushy-layer
+        run: |
+          cd $GITHUB_WORKSPACE/execSubcycle
+          make all DIM=2
+          make all DIM=3
+
+
+      # Do regression tests
+
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+
+      - name: Cache pip
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+
+      - name: Install python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Setup for tests
+        run: |
+          cd $GITHUB_WORKSPACE
+          python install.py -g
+
+      - name: Run regressions
+        run: |
+          echo "--------------"
+          echo $PYTHONPATH
+          echo "--------------"
+          echo $CH_TIMER
+          echo "--------------"
+          cd $GITHUB_WORKSPACE/test/regression
+          python run_regression_tests.py
+
+
+       # Rerun with higher verbosity if there was a failure and also upload
+
+      - if: failure()
+        name: Run regressions with more ouput
+        run: |
+          cd $GITHUB_WORKSPACE/test/regression
+          python run_regression_tests.py -v -t darcy
+
+      # Assume verbose output will also fail
+      - if: failure()
+        uses: actions/upload-artifact@v1
+        name: Upload test results
+        with:
+          name: test-results
+          path: ${{ env.REGRESSIONS_PATH }}
+
+      # Standard upload
+      - uses: actions/upload-artifact@v1
+        name: Upload test results
+        with:
+          name: test-results
+          path: ${{ env.REGRESSIONS_PATH }}
+
+      # Now try and run one of the functional tests
+      # (the others will take too long or need MATLAB)
+      # Plot interval of -1 to produce less output (only final plot files)
+      - name: Run Method Paper Tests
+        run: |
+          cd $GITHUB_WORKSPACE/test
+          python testPorousMushyHole.py -p -1
+
+      - uses: actions/upload-artifact@v1
+        name: Upload method test results
+        with:
+          name: method-paper-results
+          path: ${{ env.MUSHY_LAYER_TEST_PATH }}
+

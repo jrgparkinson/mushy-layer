@@ -26,19 +26,19 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
                              LevelData<FArrayBox>& enthalpySolid, LevelData<FArrayBox>& enthalpyLiquid,
                              LevelData<FArrayBox>& enthalpyEutectic,
-                             MushyLayerParams a_params);
+                             const MushyLayerParams& a_params);
 
 /// Update thermodynamic variables \f$ \theta, \chi, \Theta_l, \Theta_s\f$ from \f$H, \Theta\f$ and the phase diagram
 void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
                              LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
-                             MushyLayerParams a_params);
+                             const MushyLayerParams& a_params);
 
 /// Update thermodynamic variables \f$ \theta, \chi, \Theta_l, \Theta_s\f$ from \f$H, \Theta\f$ and the phase diagram
 void updateEnthalpyVariables(LevelData<FArrayBox>& enthalpy, LevelData<FArrayBox>& composition,
                 LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,
                 LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
-                MushyLayerParams m_parameters);
+                const MushyLayerParams& m_parameters);
 
 
 /// Update thermodynamic variables \f$ \theta, \chi, \Theta_l, \Theta_s\f$ from \f$H, \Theta\f$ and the phase diagram
@@ -47,7 +47,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& enthalpy, LevelData<FArrayBox
                 LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
                 LevelData<FArrayBox>& enthalpySolid, LevelData<FArrayBox>& enthalpyLiquid,
                 LevelData<FArrayBox>& enthalpyEutectic,
-                MushyLayerParams m_parameters );
+                const MushyLayerParams& m_parameters );
 
 
 //Real computePorosity(Real H, Real a_C, Real H_s, Real H_l, Real H_e, MushyLayerParams a_params);

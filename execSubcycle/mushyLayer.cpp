@@ -13,6 +13,7 @@
 #include "CH_HDF5.H"
 #include "parstream.H"
 
+
 #include "AMR.H"
 #include "AMRLevelMushyLayerFactory.H"
 #include "DebugDump.H"
@@ -38,22 +39,25 @@ void mushyLayer(const Real& a_stopTime,
 
 //  printRepoVersion();
 
+  // Define the problem domain (size, resolution, and periodicity)
   ProblemDomain prob_domain;
   getProblemDomain(prob_domain);
 
+  // Define the object which
   RefCountedPtr<AMRLevelMushyLayerFactory>  amrg_fact;
   getAMRFactory(amrg_fact);
 
   AMR amr;
   defineAMR(amr, amrg_fact, prob_domain, a_refRat);
 
+  //
   setupAMRForAMRRun(amr, prob_domain);
 
-  // run
+  // run the simulation
   amr.run(a_stopTime,a_nstop);
 
-  // output last pltfile and statistics
-  //cleanup
+  // Output last pltfile and statistics.
+  // Also cleanup everything.
   amr.conclude();
 
 }
@@ -69,7 +73,7 @@ main(int a_argc, char* a_argv[])
 
 
     // Check for an input file
-    char* inFile = NULL;
+    char* inFile = nullptr;
 
     if (a_argc > 1)
       {
@@ -82,33 +86,67 @@ main(int a_argc, char* a_argv[])
         return -1;
       }
     // Parse the command line and the input file (if any)
-    ParmParse pp(a_argc-2,a_argv+2,NULL,inFile);
+    ParmParse pp(a_argc-2,a_argv+2,nullptr,inFile);
 
     ParmParse ppMain("main");
 
 
+    bool stopTimeOrStep = false;
+
     Real stopTime = 0.0;
-    ppMain.get("max_time",stopTime);
+    if (ppMain.contains("max_time"))
+    {
+      ppMain.get("max_time",stopTime);
+      stopTimeOrStep = true;
+    }
+    else
+    {
+      stopTime = 100000.0;
+      pout() << "No max_time given, using max_time = " << stopTime << endl;
+
+    }
 
     Real nstop = 0;
-    ppMain.get("max_step",nstop);
+    if (ppMain.contains("max_step"))
+    {
+      ppMain.get("max_step",nstop);
+      stopTimeOrStep = true;
+    }
+    else
+    {
+      nstop = 9999999;
+      pout() << "No max_step given, using max_step = " << nstop << endl;
+    }
     int nstop_int = round(nstop);
 
+    if (!stopTimeOrStep)
+    {
+      pout() << "Neither max_step or max_time given, please define one of these to decide when to stop the simulation." << endl;
+      MayDay::Error("Quitting as no max_step or max_time");
+    }
+
     int max_level = 0;
-    ppMain.get("max_level",max_level);
+    if (ppMain.contains("max_level"))
+    {
+      ppMain.get("max_level",max_level);
+    }
+    else
+    {
+      pout() << "No max_level give, using max_level = " << max_level << endl;
+    }
+
     int num_read_levels = Max(max_level,1);
     Vector<int> ref_ratios; // (num_read_levels,1);
 
     // Only require ref_ratio to be defined for AMR simulations
     if (max_level > 0)
     {
-      ppMain.getarr("ref_ratio",ref_ratios,0,num_read_levels+1);
+      ppMain.getarr("ref_ratio",ref_ratios,0,num_read_levels);
     }
-    else
-    {
-      // Need a dummy value for uniform mesh simulations
-      ref_ratios.push_back(1);
-    }
+    // AMR expects max_level + 1 values of ref_ratio
+    // so add a dummy value
+    ref_ratios.push_back(1);
+
 
 
     mushyLayer(stopTime, nstop_int, ref_ratios);

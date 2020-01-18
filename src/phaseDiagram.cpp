@@ -34,7 +34,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
                              LevelData<FArrayBox>& enthalpySolid, LevelData<FArrayBox>& enthalpyLiquid,
                              LevelData<FArrayBox>& enthalpyEutectic,
-                             MushyLayerParams a_params)
+                             const MushyLayerParams& a_params)
 {
     DisjointBoxLayout grids = HC.disjointBoxLayout();
     IntVect ghostVect = HC.ghostVect();
@@ -52,7 +52,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
 void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
                              LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
-                             MushyLayerParams a_params)
+                             const MushyLayerParams& a_params)
 {
   DisjointBoxLayout grids = theta.disjointBoxLayout();
   IntVect ghostVect = theta.ghostVect();
@@ -71,7 +71,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& HC,
 void updateEnthalpyVariables(LevelData<FArrayBox>& enthalpy, LevelData<FArrayBox>& composition,
                              LevelData<FArrayBox>& theta, LevelData<FArrayBox>& compositionLiquid,
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
-                             MushyLayerParams a_params)
+                             const MushyLayerParams& a_params)
 {
   DisjointBoxLayout grids = theta.disjointBoxLayout();
   IntVect ghostVect = theta.ghostVect();
@@ -89,7 +89,7 @@ void updateEnthalpyVariables(LevelData<FArrayBox>& enthalpy, LevelData<FArrayBox
                              LevelData<FArrayBox>& compositionSolid, LevelData<FArrayBox>& porosity,
                              LevelData<FArrayBox>& enthalpySolid, LevelData<FArrayBox>& enthalpyLiquid,
                              LevelData<FArrayBox>& enthalpyEutectic,
-                             MushyLayerParams a_params)
+                             const MushyLayerParams& a_params)
 {
   DisjointBoxLayout grids = temperature.disjointBoxLayout();
   IntVect ghostVect = temperature.ghostVect();
@@ -273,25 +273,23 @@ Real computePorosity(Real H, Real C, Real compositionRatio, Real specificHeatRat
                                Real thetaEutectic, Real ThetaEutectic)
 {
   Real H_e, H_s, H_l, porosity;
+  H_e = H_s = H_l = BASEFAB_REAL_SETVAL;
 
   ::computeBoundingEnergy(H_e, C, H_s, H_l, H_e, heatCapacityRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
 
   if (H <= H_s)
   {
-
     porosity = 0.0;
   }
   else if (H > H_s && H <= H_e)
   {
     porosity = (H-thetaEutectic*specificHeatRatio)/(stefan + thetaEutectic*(1-specificHeatRatio));
-
   }
   else if (H > H_e && H < H_l)
   {
 
     porosity = computePorosityMushyLayer( H,  C,  compositionRatio,  specificHeatRatio,
                                           stefan,  waterDistributionCoeff);
-
   }
   else
   {

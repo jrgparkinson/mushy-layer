@@ -62,7 +62,7 @@ DrawPlots()
 # Find the maximum value of the field 'temp'
 Query("Max")
 val = GetQueryOutputValue()
-print "Max value of 'temp' = ", val
+print("Max value of 'temp' = ", val)
 
 SaveWindow()
 

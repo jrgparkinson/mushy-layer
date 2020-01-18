@@ -173,7 +173,7 @@ Divergence::compDivergenceMAC(LevelData<FArrayBox>& a_div,
                               const int a_nRefine,
                               const ProblemDomain& a_dProblem)
 {
-  if (a_uEdgeFinePtr != NULL)
+  if (a_uEdgeFinePtr != nullptr)
   {
     // define a LevelFluxRegister to do coarse-fine mismatch accounting
     const DisjointBoxLayout& dblCrse = a_div.getBoxes();
@@ -226,12 +226,11 @@ Divergence::compDivergenceMAC(LevelData<FArrayBox>& a_div,
 
   // for now, hardwire to simple single-component case
   CH_assert(a_div.nComp() == 1);
-  int comp = 0;
 
   // now adjust for effect of finer level (if applicable)
-  if (a_uEdgeFinePtr != NULL)
+  if (a_uEdgeFinePtr != nullptr)
   {
-    CH_assert(a_fluxRegPtr != NULL);
+    CH_assert(a_fluxRegPtr != nullptr);
     LevelFluxRegister& FR = *a_fluxRegPtr;
     FR.setToZero();
 
@@ -243,7 +242,7 @@ Divergence::compDivergenceMAC(LevelData<FArrayBox>& a_div,
       FluxBox& thisFlux = a_uEdge[dit()];
       Real scale = 1.0;
 
-      const Interval compInterval(comp,comp);
+      const Interval compInterval(0,0);
       // iterate over directions
       for (int dir=0; dir<SpaceDim; dir++)
       {
@@ -261,7 +260,7 @@ Divergence::compDivergenceMAC(LevelData<FArrayBox>& a_div,
     {
       FluxBox& thisFineFlux = uEdgeFine[ditFine()];
       Real scale = 1.0;
-      Interval srcComps(comp,comp);
+      Interval srcComps(0,0);
       // iterate over directions
       for (int dir=0; dir<SpaceDim; dir++)
       {
@@ -312,7 +311,7 @@ Divergence::levelDivergenceCC(LevelData<FArrayBox>& a_div,
   // compute coarse-fine boundary conditions (assume physical ones
   // already done)
 
-  if (a_uCrsePtr != NULL)
+  if (a_uCrsePtr != nullptr)
   {
     if (a_quadInterp)
     {
@@ -346,7 +345,7 @@ Divergence::levelDivergenceCC(LevelData<FArrayBox>& a_div,
                               const Real a_dx)
 {
   QuadCFInterp cfInterp;
-  levelDivergenceCC(a_div, a_u, NULL, a_dx, false, cfInterp);
+  levelDivergenceCC(a_div, a_u, nullptr, a_dx, false, cfInterp);
 }
 
 // ---------------------------------------------------------
@@ -364,7 +363,7 @@ Divergence::levelDivergenceCC(LevelData<FArrayBox>& a_div,
 
 
   // compute coarse-fine BC data
-  if (a_uCrsePtr != NULL)
+  if (a_uCrsePtr != nullptr)
   {
     if (a_quadInterp)
     {
@@ -409,7 +408,7 @@ void Divergence::levelDivergenceCCNew(LevelData<FArrayBox>& a_div,
   CH_assert (a_u.nComp() == SpaceDim);
 
   // compute coarse-fine BC data
-  if (a_uCrsePtr != NULL and a_quadInterp)
+  if (a_uCrsePtr != nullptr and a_quadInterp)
   {
     CH_assert(a_cfInterp.isDefined());
 
@@ -554,7 +553,7 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
   int nComp = 1;
 
   // define coarse-level C/f-BC object
-  if (a_uCrsePtr != NULL)
+  if (a_uCrsePtr != nullptr)
   {
     CH_assert(a_nRefCrse > 0);
 
@@ -564,7 +563,7 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
   }
 
   // define fine-level CF-BC object and flux register
-  if (a_uFinePtr != NULL)
+  if (a_uFinePtr != nullptr)
   {
     CH_assert(a_nRefFine > 0);
 
@@ -628,10 +627,9 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
   // for now, hardwire to simplest single-component case
   CH_assert(a_div.nComp() == 1);
   CH_assert(a_u.nComp() == SpaceDim);
-  int comp = 0;
 
   // first do coarse-level BC's
-  if (a_uCrsePtr != NULL)
+  if (a_uCrsePtr != nullptr)
   {
     if (a_quadInterp)
     {
@@ -654,7 +652,7 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
   levelDivergenceMAC(a_div, uEdge, a_dx);
 
   // if a fine level exists, fix up at C/F interface:
-  if (a_uFinePtr != NULL)
+  if (a_uFinePtr != nullptr)
   {
     // dereference the pointer for convenience
     LevelData<FArrayBox>& uFine = *a_uFinePtr;
@@ -676,6 +674,7 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
     }
 
     // subtract coarse-level data from fluxReg
+    const Interval comps(0,0);
 
     DataIterator dit = a_div.dataIterator();
     // iterate over coarse boxes
@@ -683,7 +682,6 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
     {
       FluxBox& thisFlux = uEdge[dit()];
       Real scale = 1.0;
-      const Interval comps(comp,comp);
       // iterate over directions
       for (int dir=0; dir<SpaceDim; dir++)
       {
@@ -701,7 +699,6 @@ Divergence::compDivergenceCC(LevelData<FArrayBox>& a_div,
     FArrayBox cellData;
     FArrayBox edgeData;
     Real scale = 1.0;
-    const Interval comps(comp,comp);
 
     for (ditFine.reset(); ditFine.ok(); ++ditFine)
     {

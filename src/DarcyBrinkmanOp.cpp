@@ -388,14 +388,13 @@ void DarcyBrinkmanOp::reflux(const LevelData<FArrayBox>&        a_phiFine,
   // const cast:  OK because we're changing ghost cells only
   LevelData<FArrayBox>& phiFineRef = ( LevelData<FArrayBox>&)a_phiFine;
 
-  DarcyBrinkmanOp* finerAMRPOp = (DarcyBrinkmanOp*) a_finerOp;
+  DarcyBrinkmanOp* finerAMRPOp = static_cast<DarcyBrinkmanOp*>(a_finerOp);
   QuadCFInterp& quadCFI = finerAMRPOp->m_interpWithCoarser;
 
   quadCFI.coarseFineInterp(phiFineRef, a_phi);
   // I'm pretty sure this is not necessary. bvs -- flux calculations use
   // outer ghost cells, but not inner ones
   // phiFineRef.exchange(a_phiFine.interval());
-  IntVect phiGhost = phiFineRef.ghostVect();
   int ncomps = a_phiFine.nComp();
 
   CH_TIMER("DarcyBrinkmanOp::reflux::incrementFine", t3);
@@ -1025,7 +1024,7 @@ MGLevelOp<LevelData<FArrayBox> >* DarcyBrinkmanOpFactory::MGnewOp(const ProblemD
 
   if (coarsening > 1 && !m_boxes[ref].coarsenable(coarsening*DarcyBrinkmanOp::s_maxCoarse))
   {
-    return NULL;
+    return nullptr;
   }
 
   dx *= coarsening;
@@ -1046,7 +1045,7 @@ MGLevelOp<LevelData<FArrayBox> >* DarcyBrinkmanOpFactory::MGnewOp(const ProblemD
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 

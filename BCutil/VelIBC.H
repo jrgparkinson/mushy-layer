@@ -88,8 +88,6 @@ public:
   /// Not sure why we have this
   const RealVect& advectionVel() const;
 
-  /// set problem type
-  void probType(const int a_probtype);
 
   /// set boundary value (default is 0)
   void setNormalWallVel(Real a_bcVal, int a_dir,
@@ -112,9 +110,6 @@ public:
                  const int&       a_dir,
                  const Real&      a_time);
 
-  /// accessor
-  int probType() const;
-
 protected:
 
   /// advection velocity field
@@ -132,8 +127,6 @@ protected:
   /// Are BC slope values set?
   bool m_isSlopeValSet;
 
-  /// initial condition type
-  int m_probtype;
 
 };
 

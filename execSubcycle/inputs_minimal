@@ -1,0 +1,95 @@
+# This is a roughly minimal set of inputs for simulating flow and solidification in mushy layers
+# These are the properties which *must* be defined. Lots of other options can also be set,
+# see the online documentation for more information
+
+# Boundary conditions
+main.periodic_bc=0 0 0
+bc.bulkConcentrationHiVal=0 -1
+bc.bulkConcentrationLoVal=0 -1
+bc.enthalpyHiVal=0.0 0.2
+bc.enthalpyLoVal=0.0 6.05 # this (the second value) controls the initial enthalpy (and hence initial temperature)
+bc.scalarHi=1 0 
+bc.scalarLo=1 0 
+bc.velHi=0 0   # velocity BCs: no flow through any of the sides
+bc.velLo=0 0
+
+#bc.velLo = 0 3 # velocity BC which allows inflow/outflow at the bottom
+bc.scalarLo = 1 0 # scalar bc for inflow/outflow at the bottom
+
+bc.temperatureHiVal = 0 0.5 # this controls the temperature at the top of the domain
+bc.temperatureLoVal = 0 1.05
+
+# Domain setup
+main.max_level=0  # max level = 0 -> no refinement
+main.num_cells=64 64 
+main.domain_width=1.0
+main.max_grid_size=32
+
+# Timestepping
+main.max_dt=1 # need this for some reason else initialization goes crazy
+#main.max_step=40
+main.max_time = 1.0
+main.cfl=0.1
+
+
+
+# Parameters
+## Phase diagram:
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.initialComposition=30
+parameters.liquidusSlope=-0.1
+
+# Thermodynamics:
+parameters.compositionRatio=1.18
+parameters.specificHeatRatio=1
+parameters.heatConductivityRatio=1
+parameters.stefan=5
+parameters.lewis=500
+
+## Dynamics:
+parameters.heleShaw=true
+parameters.permeabilityFunction=2
+parameters.heleShawPermeability=10 # this controls the maximum permeability in the pure liquid
+
+### Darcy-Brinkman:
+parameters.darcy=0.01 #5e-3
+parameters.prandtl=5.0
+parameters.rayleighComp=1e5 #5e5
+parameters.rayleighTemp=0
+
+# Darcy-Stokes:
+parameters.darcy=0.0001 #5e-3
+parameters.prandtl=10.0
+parameters.rayleighComp=50000 #5e5
+parameters.rayleighTemp=0
+main.includeInertialTerms=0 # don't solve for inertial terms
+main.doEuler=0
+parameters.heleShawPermeability=1000    # this just needs to be large enough ( > 1/Da) to kill off the darcy term in the liquid
+
+# Darcy-Darcy:
+# Set darcy and prandtl = 0 to solve Darcy's law everywhere (no viscous or inertial terms)
+# parameters.rayleighComp is now the mushy layer Rayleigh number (RaC*Da)
+parameters.darcy=0.0 
+parameters.prandtl=0.0
+parameters.rayleighComp=200 #2000
+parameters.rayleighTemp=0
+main.includeInertialTerms=0 # don't solve for inertial terms
+parameters.heleShawPermeability=5
+
+# Output
+main.verbosity=2
+projector.verbosity=0
+
+# Data output frequency
+main.plot_period = 0.01
+main.plot_interval=10
+main.plot_prefix=plt
+main.output_folder=.
+# Uncomment line below to produce more data output
+main.debug = true
+
+# Velocity solve
+#projection.eta=0.0
+#projection.useIncrementalPressure=1
+

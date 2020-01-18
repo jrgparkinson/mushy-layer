@@ -10,8 +10,6 @@
 #include "NamespaceHeader.H"
 
 
-
-
 void applyCorrectScalarBC(FArrayBox&      a_state,
                           LevelData<FluxBox>* a_advVel,
                           const Box&      a_valid,
@@ -311,7 +309,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
 
   // If no velocity, then we should throw an error
   // however just apply diri BC
-  if (a_advVel == NULL)
+  if (a_advVel == nullptr)
   {
     pout() << "InflowOutflowBC error - haven't specified the velocity field";
     //    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order);
@@ -331,57 +329,51 @@ void InflowOutflowBC(FArrayBox&      a_state,
     return;
   }
 
-  bool matched = false;
-
-
   FArrayBox advVelDir;
 
   // Don't currently do this
-  bool tryCoarsening = false;
-  if (tryCoarsening)
-  {
+//  bool tryCoarsening = false;
+//  if (tryCoarsening)
+//  {
+//    int refRat = a_dx/fine_dx;
+//
+//    DataIterator dit = a_advVel->dataIterator();
+//    //    pout() << "valid box: " << a_valid << endl;
+//
+//    for (dit.reset(); dit.ok(); ++dit)
+//    {
+//      const Box& advVelBox = (*a_advVel)[dit].box();
+//      Box coarsenableBox(advVelBox);
+//      coarsenableBox.coarsen(refRat);
+//      //      pout() << "advVeBox: " << advVelBox << endl;
+//
+//      if (coarsenableBox.contains(a_valid))
+//      {
+//        //        pout() << "advVel contains valid" << endl;
+//        break;
+//      }
+//    }
 
-    int refRat = a_dx/fine_dx;
+//    advVelDir.define(a_valid, 1);
+//    advVelDir.setVal(0.0);
+//
+//    CoarseAverage average;
+//    for (BoxIterator bit((*a_advVel)[dit].box()); bit.ok(); ++bit)
+//    {
+//      IntVect ivFine = bit();
+//      IntVect ivCoarse = ivFine;
+//      ivCoarse.coarsen(refRat);
+//      if (a_valid.contains(ivCoarse))
+//      {
+//        advVelDir(ivCoarse) += 0.5*(*a_advVel)[dit][a_dir](ivFine);
+//      }
+//    }
+//
+//  }
 
-    DataIterator dit = a_advVel->dataIterator();
-    //    pout() << "valid box: " << a_valid << endl;
-
-    for (dit.reset(); dit.ok(); ++dit)
-    {
-      const Box& advVelBox = (*a_advVel)[dit].box();
-      Box coarsenableBox(advVelBox);
-      coarsenableBox.coarsen(refRat);
-      //      pout() << "advVeBox: " << advVelBox << endl;
-
-      if (coarsenableBox.contains(a_valid))
-      {
-        //        pout() << "advVel contains valid" << endl;
-        matched = true;
-        break;
-      }
-    }
-
-
-    advVelDir.define(a_valid, 1);
-    advVelDir.setVal(0.0);
-
-    CoarseAverage average;
-    for (BoxIterator bit((*a_advVel)[dit].box()); bit.ok(); ++bit)
-    {
-      IntVect ivFine = bit();
-      IntVect ivCoarse = ivFine;
-      ivCoarse.coarsen(refRat);
-      if (a_valid.contains(ivCoarse))
-      {
-        advVelDir(ivCoarse) += 0.5*(*a_advVel)[dit][a_dir](ivFine);
-      }
-    }
-
-  }
-
-  else
-  {
-    CH_TIME("InflowOutflowBC::findAdvVel");
+//  else
+//  {
+//    CH_TIME("InflowOutflowBC::findAdvVel");
 
     DataIterator dit = a_advVel->dataIterator();
 
@@ -398,7 +390,7 @@ void InflowOutflowBC(FArrayBox&      a_state,
       // If this advection velocity box contains information relating to this state, apply BCs
       if (advVelBox.contains(stateBox))
       {
-        matched = true;
+        //        matched = true;
 
         // Extrapolation for outflow, dirichlet for inflow
 
@@ -413,33 +405,23 @@ void InflowOutflowBC(FArrayBox&      a_state,
         return;
       }
     }
-  } // end if not trying coarsening
+//  } // end if not trying coarsening
 
-  // What if we don't find a data index?
-  if (!matched)
-  {
-    // Can't enforce inflow/outflow, just do dirichlet BCs
+  // If we made it this far, we didn't find a data index
+  // Can't enforce inflow/outflow, just do dirichlet BCs
+  /* There is an issue with the current inflow/outflow BCs - they don't work with multigrid as
+   * advVel is defined on the finest level. We should coarsen advVel to match grid,
+   * or could store a vector identifying which regions are inflow and which are
+   * outflow by their position along the face.
+   *
+   * However, we seem to survive just doing dirichlet BCs on the coarse grid then enforcing inflow/outflow
+   * when we get back to the finest grid
+   *
+   */
 
-    /* There is an issue with the current inflow/outflow BCs - they don't work with multigrid as
-     * advVel is defined on the finest level. We should coarsen advVel to match grid,
-     * or could store a vector identifying which regions are inflow and which are
-     * outflow by their position along the face.
-     *
-     * However, we seem to survive just doing dirichlet BCs on the coarse grid then enforcing inflow/outflow
-     * when we get back to the finest grid
-     *
-     */
-
-    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order, a_comp);
-    //    ConstantNeumBC(a_state, a_valid, a_homogeneous, 0.0, a_dir, a_side, a_dx);
-    return;
-  }
-
-
-  // Shouldn't ever end up here
-  MayDay::Error("Shouldn't be here! (InflowOutflowBC)");
-
-
+  ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order, a_comp);
+  //    ConstantNeumBC(a_state, a_valid, a_homogeneous, 0.0, a_dir, a_side, a_dx);
+  return;
 
 }
 
