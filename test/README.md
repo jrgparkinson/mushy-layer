@@ -1,7 +1,9 @@
 # Testing
 
 ## Introduction
-This directory contains python scripts for running various test problems which demonstrate the accuracy of the code. 
+This directory contains python scripts for running various test problems which demonstrate the accuracy of the code.
+
+There are also regression tests in `regression` and unit tests for the python code in `unit`. Both of these are run automatically following each push to the repository, with unit test coveraged published `https://jrgparkinson.github.io/mushy-layer/test/unit/coverage/BRANCH-NAME` e.g. [https://jrgparkinson.github.io/mushy-layer/test/unit/coverage/development].
 
 ## Setup
 These tests require the code in `mushy-layer/execSubcycle/` and `mushy-layer/setupNewRun/` to be built.
