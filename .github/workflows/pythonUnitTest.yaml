@@ -23,12 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - uses: actions/checkout@v2
-        name: Checkout master
-        with:
-          ref: master
-          path: master
-
       - name: Setup environmental variables
         run: |
           echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
@@ -87,7 +81,16 @@ jobs:
           name: python-unit-test-results
           path: ${{ env.UNIT_TEST_PATH }}
 
+      - uses: actions/checkout@v2
+        name: Checkout master
+        with:
+          ref: master
+          path: master
+
+      # Allow job to succeed if this fails
+      # as multiple commits may lead to synchronisation issues
       - name: Push coverage to repo
+        continue-on-error: true
         run: |
           ls
           cd $UNIT_TEST_PATH/coverage_html_report
