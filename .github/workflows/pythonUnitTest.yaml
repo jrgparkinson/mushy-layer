@@ -3,7 +3,11 @@ name: Python Unit Tests
 on:
   push:
     branches:
-      - 'development'
+      - '*'
+
+  pull-request:
+    branches:
+      - '*'
 
 env:
   LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
@@ -32,6 +36,7 @@ jobs:
           echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
           echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
             $(echo $HDF5_PATH)/lib
+          echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
 
       - name: Setup latex
         run: |
@@ -86,8 +91,9 @@ jobs:
         run: |
           ls
           cd $UNIT_TEST_PATH/coverage_html_report
-          cp . $UNIT_TEST_PUBLISH -r
-          cd $UNIT_TEST_PUBLISH
+          mkdir -p $UNIT_TEST_PUBLISH/$BRANCH_NAME
+          cp . $UNIT_TEST_PUBLISH/$BRANCH_NAME -r
+          cd $UNIT_TEST_PUBLISH/$BRANCH_NAME
           git config --global user.name 'jparkinson'
           git config --global user.email 'jamie.parkinson@gmail.com'
           git add .
