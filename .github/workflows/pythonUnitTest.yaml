@@ -5,10 +5,6 @@ on:
     branches:
       - '*'
 
-  pull_request:
-    branches:
-      - '*'
-
 env:
   LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
