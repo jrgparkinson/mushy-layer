@@ -133,8 +133,10 @@ jobs:
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
 
+      # Install pip dependencies one at a time
       - name: Install python dependencies
-        run: pip install -r requirements.txt
+         run: cat requirements.txt | xargs -n 1 pip install
+#        run: pip install -r requirements.txt
 
       # Run valgrind
       - name: Run valgrind
