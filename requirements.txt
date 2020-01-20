@@ -25,6 +25,7 @@ ipywidgets==7.4.2
 jedi==0.13.2
 Jinja2==2.10.3
 joblib==0.13.1
+json2table==1.1.5
 jsonschema==2.6.0
 jupyter==1.0.0
 jupyter-client==5.2.4
@@ -72,6 +73,7 @@ terminado==0.8.1
 testpath==0.4.2
 tornado==5.1.1
 traitlets==4.3.2
+valgrind-parser==2.0.3
 wcwidth==0.1.7
 webencodings==0.5.1
 widgetsnbextension==3.4.2

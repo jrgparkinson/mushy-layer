@@ -140,10 +140,11 @@ jobs:
       - name: Run valgrind
         run: |
           cd $GITHUB_WORKSPACE/test/memory_leak
-          python runMemoryChecker.py    
+          python runMemoryChecker.py
+          python valgrind_log_parser.py --valgrind_file valgrind_log.txt
 
       - name: Upload results
         uses: actions/upload-artifact@v1
         with:
-          name: test-results
+          name: valgrind-results
           path: ${{ env.MEMLEAK_PATH }}

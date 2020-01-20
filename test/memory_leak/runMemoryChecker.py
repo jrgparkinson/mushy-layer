@@ -13,6 +13,9 @@ util.write_inputs('inputs', inputs)
 exec_file = util.get_executable_name(exec_name='mushyLayer2d', return_full_path=True)
 
 # , os.path.join(mem_leak_path, 'inputs')
-cmd = 'valgrind --child-silent-after-fork=yes --xml=yes --xml-file=valgrind.xml %s inputs ' % (exec_file)
+cmd = 'valgrind --child-silent-after-fork=yes --xml=yes --xml-file=valgrind.xml --leak-check=full ' \
+      '--show-reachable=yes --log-file=valgrind_log.txt  %s inputs ' % (exec_file)
 print(cmd)
 os.system(cmd)
+
+
