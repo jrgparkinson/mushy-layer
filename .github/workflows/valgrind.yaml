@@ -37,9 +37,6 @@ jobs:
           echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
             $(echo $HDF5_PATH)/lib
 
-          which valgrind
-          whereis valgrind
-
       - name: Info
         run: |
           echo $CHOMBO_HOME
@@ -47,14 +44,8 @@ jobs:
           echo $LD_LIBRARY_PATH
           echo $GITHUB_WORKSPACE
 
-      - name: Install csh
-        run: sudo apt-get install csh
-
-      - name: Install gfortran
-        run: sudo apt-get install gfortran
-
-      - name: Install lbas etc.
-        run: sudo apt-get install libblas-dev liblapack-dev
+      - name: Install csh, valgrind, gfortran, lblas
+        run: sudo apt-get install csh gfortran valgrind  libblas-dev liblapack-dev
 
       - name: Check package versions
         run: |
@@ -69,6 +60,9 @@ jobs:
 
           which perl
           perl --version
+
+          which valgrind
+          valgrind --version
 
       - name: Cache HDF5
         id: cache-hdf5v2
