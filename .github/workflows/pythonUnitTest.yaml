@@ -5,6 +5,9 @@ on:
     branches:
       - '*'
 
+    paths-ignore:
+      - '.github/**'
+
 env:
   LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
