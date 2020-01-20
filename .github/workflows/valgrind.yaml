@@ -150,7 +150,6 @@ jobs:
 
       - name: Upload results
         uses: actions/upload-artifact@v1
-        name: Upload test results
         with:
           name: test-results
           path: ${{ env.MEMLEAK_PATH }}
