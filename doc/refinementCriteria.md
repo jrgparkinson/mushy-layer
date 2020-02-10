@@ -10,17 +10,28 @@ Here is a quick summary of what currently exists/where/how to find it.
 
 The important code is found in `AMRLevelMushyLayerRegrid::tagCells()`. 
 
-The refinement method is determined by `(m_)opt.refinementMethod` and read in MushyLayerSubcycleUtils::getAMRFactory(). Unfortunately it's not as simple as something like main.refineMethod=... due to backward compatibility issues. I think the following list of inputs options/refinement methods is correct, but I haven't tested it all so apologies if not. In each case, the code will only ever use one of these methods (not combinations of them).
+The refinement method is determined by `(m_)opt.refinementMethod` and read in MushyLayerSubcycleUtils::getAMRFactory(). Unfortunately it's not as simple as something like `main.refineMethod=...` due to backward compatibility issues. I think the following list of inputs options/refinement methods is correct, but I haven't tested it all so apologies if not. In each case, the code will only ever use one of these methods (not combinations of them).
 
 * `main.vel_refine_thresh=X` : refine wherever fluid speed exceeds `X`
-* `regrid.tag_channels=1` : try and refine where there are channels according to some hard coded criteria in AMRLevelMushyLayerRegrid::tagCells()
-* `regrid.plume_vel=X` and `regrid.plume_salinity=Y` : refine where velocity exceeds `X` and salinity exceeds `Y`, which can be a good indicator of where channels exists if X and Y are chosen appropriately
-* `main.taggingVar=X` and `main.refine_thresh=Y`: refine where the undivided gradient of some scalar field exceeds `Y`, where X is the index of the scalar field (0=enthalpy, 1=bulk concentration, 2=temperature... according to the order they are defined in ScalarVars - see [https://amr-softball.github.io/doc/html/mushy_layer_opt_8h.html#afcada9fb65a998951da882b5c10191fe])
-* `main.taggingVectorVar=X` and `main.refine_thresh=Y`: like (4) but for vector fields.
-* `regrid.tag_mush_channels=1` : refine wherever porosity < 1 on level 1, then try and refine around channels on higher levels according to some hardcoded criteria.
+e.g.
+```
+main.vel_refine_thresh=5.0
+```
+will tag cells for refinement wherever the fluid speed exceeds `5.0`
+* `regrid.tag_channels=1` : try and refine where there are channels according to some hard coded criteria in `AMRLevelMushyLayerRegrid::tagCells()`
+* `regrid.plume_vel=X` and `regrid.plume_salinity=Y` : refine where velocity exceeds `X` and salinity exceeds `Y`, which can be a good indicator of where channels exists if `X` and `Y` are chosen appropriately
+* `main.taggingVar=X` and `main.refine_thresh=Y`: refine where the undivided gradient of some scalar field exceeds `Y`, where X is the index of the scalar field: 0=enthalpy, 1=bulk concentration, 2=temperature... according to the order they are defined in ScalarVars - see [the Doxygen documentation](https://amr-softball.github.io/doc/html/mushy_layer_opt_8h.html#afcada9fb65a998951da882b5c10191fe)
+e.g.
+```
+main.taggingVar=2  # 2 is the temperature field
+main.refine_thresh=0.1
+```
+tag where the undivided temperature gradient exceeds `0.1`, i.e. where the difference in temperature between two adjacent cells exceeds `0.1`.
+* `main.taggingVectorVar=X` and `main.refine_thresh=Y`: like (4) but for vector fields. To tag on the cell centered fluid velocity use `main.taggingVectorVar=0`, the ID for other fields can be found [here](https://amr-softball.github.io/doc/html/mushy_layer_opt_8h.html#ad67b5b87e24a070e739a68078dcb7520)
+* `regrid.tag_mush_channels=1` : refine wherever `porosity < 1` on level 1, then try and refine around channels on higher levels according to some hardcoded criteria.
 * `regrid.tag_channels_composite=1` : yet another hard coded attempt to refine around channels/mushy regions. Here, we use a single criteria on all levels. 
 
-Each of these options should be mapped to one of the RefinementMethod options listed here: [https://amr-softball.github.io/doc/html/mushy_layer_opt_8h.html#ad767f132740c90bc3329dc12556cd562] within `MushyLayerSubcycleUtils::getAMRFactory()`. There are also a few other extra options which are used in some (by no means all) of these criteria, such as
+Each of these options should be mapped to one of the `RefinementMethod` options listed here: https://amr-softball.github.io/doc/html/mushy_layer_opt_8h.html#ad767f132740c90bc3329dc12556cd562 within `MushyLayerSubcycleUtils::getAMRFactory()`. There are also a few other extra options which are used in some (by no means all) of these criteria, such as
 
 ``` 
 regrid.tagMushLiquidBoundary
@@ -29,4 +40,4 @@ regrid.onlyTagPorousCells
 regrid.porousCellsShrink
 ```
 
-I think these are mostly self explanatory. The last one defines an integer number of cells by which the set of cells that has been tagged for refinement is shrunk and then grown again to stop refining around small artifacts. E.g. if regrid.porousCellsShrink=3 and two adjacent random cells were tagged somewhere in the domain, after shrinking the set of tagged cells by 3 this group would have disappeared. 
+I think these are mostly self explanatory. The last one defines an integer number of cells by which the set of cells that has been tagged for refinement is shrunk and then grown again to stop refining around small artifacts. E.g. if `regrid.porousCellsShrink=3` and two adjacent random cells were tagged somewhere in the domain, after shrinking the set of tagged cells by 3 this group would have disappeared. 
