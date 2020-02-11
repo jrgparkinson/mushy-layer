@@ -38,8 +38,7 @@ jobs:
           echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
           echo ::set-env name=CHOMBO_ROOT::$(echo $HOME)/chombo
           echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
-          echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):\
-            $(echo $HDF5_PATH)/lib
+          echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):$(echo $HDF5_PATH)/lib
 
       - name: Info
         run: |
@@ -81,8 +80,7 @@ jobs:
       - name: Download and install HDF5
         if: steps.cache-hdf5v2.outputs.cache-hit != 'true'
         run: |
-          wget https://support.hdfgroup.org/ftp/HDF5/releases/\
-            hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz
+          wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz
           tar -zxvf hdf5-1.8.21.tar.gz
           ls
           cd hdf5-1.8.21
