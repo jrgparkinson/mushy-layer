@@ -135,7 +135,8 @@ jobs:
 
       # Install pip dependencies one at a time
       - name: Install python dependencies
-         run: cat requirements.txt | xargs -n 1 pip install
+        run: cat requirements.txt | xargs -n 1 pip install
+        
 #        run: pip install -r requirements.txt
 
       # Run valgrind
