@@ -9,7 +9,7 @@ on:
       - '.github/**'
       - '**/workflows/**'
 
-# schedule:
+# schedule: 
 #   # * is a special character in YAML so you have to quote this string
 #   # run at 23:59 every day
 #   - cron:  '59 23 * * *'
