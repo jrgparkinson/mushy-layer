@@ -80,7 +80,8 @@ jobs:
       - name: Download and install HDF5
         if: steps.cache-hdf5v2.outputs.cache-hit != 'true'
         run: |
-          wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz
+          wget 'https://support.hdfgroup.org/ftp/HDF5/releases/hd\
+          f5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz'
           tar -zxvf hdf5-1.8.21.tar.gz
           ls
           cd hdf5-1.8.21
