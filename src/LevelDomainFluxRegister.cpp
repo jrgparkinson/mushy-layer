@@ -12,14 +12,8 @@
 #include "computeSum.H"
 
 LevelDomainFluxRegister::LevelDomainFluxRegister ()
-{
-  m_fineFR = NULL;
-  m_coarseFR = NULL;
-  m_refRat = -1;
-  m_dx = -1;
-  m_defined = false;
-  m_numComp = -1;
-}
+: m_fineFR(nullptr), m_coarseFR(nullptr), m_refRat(-1), m_dx(-1), m_defined(false), m_numComp(-1)
+{ }
 
 LevelDomainFluxRegister::~LevelDomainFluxRegister ()
 {
@@ -165,11 +159,11 @@ Real LevelDomainFluxRegister::getFluxHierarchy(const int a_dir,
 //
 //  if (a_side == Side::Lo)
 //  {
-//    flux= a_scale * computeSum(m_fluxLo, NULL, -1, m_dx, Interval(a_dir, a_dir), 0);
+//    flux= a_scale * computeSum(m_fluxLo, nullptr, -1, m_dx, Interval(a_dir, a_dir), 0);
 //  }
 //  else
 //  {
-//    flux= a_scale * computeSum(m_fluxHi, NULL, -1,  m_dx, Interval(a_dir, a_dir), 0);
+//    flux= a_scale * computeSum(m_fluxHi, nullptr, -1,  m_dx, Interval(a_dir, a_dir), 0);
 //  }
 //
 //  return flux;

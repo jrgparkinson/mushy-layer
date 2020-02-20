@@ -32,7 +32,6 @@ main.max_grid_size=256
 main.plot_interval=-1
 main.plot_period=0.01
 main.plot_prefix=plt
-main.iter_plot_interval=-1
 main.iteration_plot_interval=-1
 main.checkpoint_interval=1000
 main.chk_prefix=chk

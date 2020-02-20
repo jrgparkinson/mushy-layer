@@ -1,11 +1,11 @@
-from PltFile import PltFile
+from PltFile import PltFile, latexify2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_bvp
 import os
 import matplotlib as mpl
 import cycler
-import mushyLayerRunUtils
+import test.mushyLayerRunUtils as mushyLayerRunUtils
 import subprocess
 import sys
 import shutil
@@ -19,34 +19,11 @@ import shutil
 #  b) solve the steady-state problem using the solve_bvp function in scipy.integrate, to find T_{python}(z)
 #  c) plot the two solutions along with the error in the final mushy-layer simulation
 
-def latexify(fig_width=5.0, fig_height=4.0):
-
-    font_size = 12
-
-    params = {'backend': 'ps',
-              'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}'],
-              'axes.labelsize': font_size,  # fontsize for x and y labels (was 10)
-              'axes.titlesize': font_size,
-              'legend.fontsize': font_size,  # was 10
-              'xtick.labelsize': font_size,
-              'ytick.labelsize': font_size,
-              'lines.markersize': 3,
-              'lines.linewidth': 1,
-              'text.usetex': True,
-              'figure.figsize': [fig_width, fig_height],
-              'font.family': 'serif'
-              }
-
-    mpl.rcParams.update(params)
-
-
 class DiffusiveSolution:
-
     a = 0
     b = 0
     T_ref = 0
     F = 0
-
 
     def __init__(self, min_temperature, max_temperature, method='Linear'):
 
@@ -55,32 +32,34 @@ class DiffusiveSolution:
 
         self.method = method
 
-    def set_nonlinear_bcs(self, a, b, T_ref, F, V, cr, st):
-        self.a = a
-        self.b =b
-        self.T_ref = T_ref
-        self.F = F
-        self.V = V
-        self.cr = cr
-        self.st = st
+        self.V = np.nan
+        self.cr = np.nan
+        self.st = np.nan
+        self.a = np.nan
+        self.b = np.nan
+        self.T_ref = np.nan
+        self.F = np.nan
 
-    def compute_solution(self, z):
+    def set_nonlinear_bcs(self, a, b, reference_temperature, flux, frame_advection_velocity, conc_ratio, stefan):
+        self.a = a
+        self.b = b
+        self.T_ref = reference_temperature
+        self.F = flux
+        self.V = frame_advection_velocity
+        self.cr = conc_ratio
+        self.st = stefan
+
+    # noinspection PyUnresolvedReferences
+    def compute_solution(self, z_sol):
 
         # z = np.linspace(self.min_z, self.max_z, 100)
 
         if self.method == 'Linear':
-
             if self.V == 0:
-
-                solution = self.max_temperature - z
-
-
-
-            # solution = z
-
-        elif self.method == 'FixedFlux':
-
-            pass
+                solution = self.max_temperature - z_sol
+            else:
+                print('Unable to compute solution for method="linear" and V!=0')
+                sys.exit(-1)
 
         elif self.method == 'Mixed':
 
@@ -92,11 +71,15 @@ class DiffusiveSolution:
             init_guess = np.zeros((2, z_solve.size))
 
             res_a = solve_bvp(self.diffusion_equation_function, self.diffusion_eq_bc, z_solve, init_guess)
-            solution = res_a.sol(z)[0]
+            solution = res_a.sol(z_sol)[0]
+
+        else:
+            print('Unknown method "%s"' % self.method)
+            sys.exit(-1)
 
         return solution
 
-    def diffusion_equation_function(self, x, T):
+    def diffusion_equation_function(self, x, temperature):
         # For solving d^T/dz^2 - V*(dT/dz + dchi/dz) = 0
 
         # Define T_0 = T, T_1 = dT_0/dz
@@ -110,19 +93,19 @@ class DiffusiveSolution:
 
         # Assuming either liquid or mushy
 
-        chi = np.minimum(1.0, self.cr/(self.cr-T[0]))
+        chi = np.minimum(1.0, self.cr / (self.cr - temperature[0]))
 
-        #if chi < 1:
-        dchi_dz = T[1]*(self.cr/np.power(self.cr-T[0], 2))
-        #else:
-        dchi_dz[chi==1.0] = 0.0
+        # if chi < 1:
+        dchi_dz = temperature[1] * (self.cr / np.power(self.cr - temperature[0], 2))
+        # else:
+        dchi_dz[chi == 1.0] = 0.0
 
         # dchi_dz = 0
 
-        return np.vstack((T[1],
-                          self.V * (T[1] + self.st*dchi_dz)))
+        return np.vstack((temperature[1],
+                          self.V * (temperature[1] + self.st * dchi_dz)))
 
-    def diffusion_eq_bc(self, Ta, Tb):
+    def diffusion_eq_bc(self, temperature_left_boundary, temperature_right_boundary):
         # Current BCs:
         # T(z=0) = min_temperature
         # T(z=1) = max_temperature
@@ -132,51 +115,58 @@ class DiffusiveSolution:
 
         #
 
-        fixed_bc_res = np.array([Ta[0]-self.max_temperature,
-                                 Tb[0]-self.min_temperature])
+        # fixed_bc_res = np.array([Ta[0]-self.max_temperature,
+        #                          Tb[0]-self.min_temperature])
 
-        mixed_bc_res = np.array([Ta[0]-self.max_temperature,
-                                 self.a*Tb[1] - self.F - self.b*(Tb[0]-self.T_ref)])
+        mixed_bc_res = np.array([temperature_left_boundary[0] - self.max_temperature,
+                                 self.a * temperature_right_boundary[1] - self.F
+                                 - self.b * (temperature_right_boundary[0] - self.T_ref)])
 
         return mixed_bc_res
 
 
 def base_inputs():
-
     test_dir = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'test/diffusiveGrowth')
-    inputs = mushyLayerRunUtils.read_inputs(os.path.join(test_dir, 'inputs'))
+    default_inputs = mushyLayerRunUtils.read_inputs(os.path.join(test_dir, 'inputs'))
 
-    inputs['main.min_time'] = 0.5
-    inputs['main.max_time'] = 3.0
-    inputs['main.steady_state'] = 1e-8
+    default_inputs['main.min_time'] = 0.5
+    default_inputs['main.max_time'] = 3.0
+    default_inputs['main.steady_state'] = 1e-8
 
+    return default_inputs
 
-    return inputs
 
 if __name__ == "__main__":
 
-
     # Ensure we can find HDF5 libraries to run mushy layer code
+    hdf5_library_path = '/home/parkinsonjl/soft/hdf5-1.8.21p-new/lib/'
     if 'LD_LIBRARY_PATH' in os.environ:
-        os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ':/home/parkinsonjl/soft/hdf5-1.8.21p-new/lib/'
+        os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ':' + hdf5_library_path
     else:
-        os.environ['LD_LIBRARY_PATH'] = '/home/parkinsonjl/soft/hdf5-1.8.21p-new/lib/'
-
+        os.environ['LD_LIBRARY_PATH'] = hdf5_library_path
 
     # Chose some parameter options:
 
     # Options
-    T_min = 4.0
-    T_max = 5.0
-    st = 1.0 # stefan number
+    # T_min = 4.0
+    # T_max = 5.0
+    st = 1.0  # stefan number
     cr = 0.5
 
-    opt = {'a': 0.0, 'b': 1.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is just a dirichlet BC, data matches well
-    opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is no flux
-    opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': -1.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr} # this is a fixed flux (negative for cooling)
-    opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.0, 'F': -0.5, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr} # this is a fixed flux and temperature
-    opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.5, 'F': -1.6, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}  # this is a fixed flux and temperature
+    # this is just a dirichlet BC, data matches well
+    # opt = {'a': 0.0, 'b': 1.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
 
+    # this is no flux
+    # opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
+
+    # this is a fixed flux (negative for cooling)
+    # opt = {'a': 1.0, 'b': 0.0, 'Tref': 4.0, 'F': -1.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
+
+    # this is a fixed flux and temperature
+    # opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.0, 'F': -0.5, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
+
+    # this is a fixed flux and temperature
+    # opt = {'a': 0.5, 'b': -1.0, 'Tref': 4.5, 'F': -1.6, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
 
     # Mushy layer solidification:
     T_min = -0.8
@@ -198,14 +188,17 @@ if __name__ == "__main__":
     # F = -0.5
 
     analytic_solution = DiffusiveSolution(T_min, T_max, method='Mixed')
-    analytic_solution.set_nonlinear_bcs(a=opt['a'], b=opt['b'], T_ref=opt['Tref'], F=opt['F'], V=opt['V'], cr=cr, st=st)  # this is just a dirichlet BC, data matches well
+
+    # this is just a dirichlet BC, data matches well
+    analytic_solution.set_nonlinear_bcs(a=opt['a'], b=opt['b'], reference_temperature=opt['Tref'], flux=opt['F'],
+                                        frame_advection_velocity=opt['V'], conc_ratio=cr, stefan=st)
 
     # Now let's run the mushy-layer simulation
     sim_name = 'ImperfectCooling_a%s_b%s_Tref%s_F%s_CR%s_st%s' % (opt['a'], opt['b'], opt['Tref'], opt['F'], cr, st)
 
     full_output_folder = os.path.join(base_dir, sim_name)
     figure_output_paths = [os.path.join(full_output_folder, 'errorComparison'),
-    os.path.join(base_dir, sim_name)]
+                           os.path.join(base_dir, sim_name)]
 
     if os.path.exists(full_output_folder):
         print('Output directory already exists: %s' % full_output_folder)
@@ -245,14 +238,23 @@ if __name__ == "__main__":
 
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     process.wait()
-    print (process.returncode)
+    print(process.returncode)
 
     print('Finished')
 
     # Run comparison
     plt_files = [f for f in os.listdir(full_output_folder) if ('LinearDiffusion' in f and '.2d.hdf5' in f)]
-
     plt_files = sorted(plt_files)
+    if not plt_files:
+        print('No data to plot in folder %s' % full_output_folder)
+        sys.exit(-1)
+
+    # get some initial data
+    init_pf = PltFile(os.path.join(full_output_folder, plt_files[0]))
+    init_pf.load_data()
+    T_data = init_pf.get_level_data('Temperature').mean('x').squeeze()
+    z = T_data.coords['y']
+    T_python = analytic_solution.compute_solution(z)
 
     # Set color cycle from colormap
     n = len(plt_files)
@@ -261,23 +263,19 @@ if __name__ == "__main__":
 
     times = []
 
-    latexify(5.5, 3.5)
+    latexify2(5.5, 3.5)
 
-    fig  = plt.figure()
+    fig = plt.figure()
 
     for plot_loc in plt_files:
-
         pf = PltFile(os.path.join(full_output_folder, plot_loc))
         pf.load_data()
         T_data = pf.get_level_data('Temperature').mean('x').squeeze()
         z = T_data.coords['y']
 
-        T_python = analytic_solution.compute_solution(z)
-
         plt.plot(z, T_data, label='')
 
         times.append(float('%.1g' % pf.time))
-
 
     plt_python = plt.plot(z, T_python, label='Python', color='red', linestyle='--')
 
@@ -286,18 +284,17 @@ if __name__ == "__main__":
     ax.set_xlabel('$z$')
     ax.set_ylabel('$T$')
 
-
     # Add colorbar for times
     cax_porosity = fig.add_axes([0.2, 0.86, 0.5, 0.03])
     cmap = plt.get_cmap('viridis')
+    # noinspection PyUnresolvedReferences
     norm = mpl.colors.Normalize(vmin=min(times), vmax=max(times))
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    sm.set_array([])
+    sm.set_array(np.array([]))
     cbar = plt.colorbar(sm, cax=cax_porosity, ticks=[min(times), max(times)], orientation='horizontal')
     cax_porosity.xaxis.set_ticks_position('top')
     cax_porosity.xaxis.set_label_position('top')
     cbar.set_label('$t$', labelpad=-3)
-
 
     ax.set_xlim([0, 1])
 
@@ -311,7 +308,7 @@ if __name__ == "__main__":
 
     # Add legend
     lns = plt_python + plt_err
-    labs = [l.get_label() for l in lns]
+    labs = [line.get_label() for line in lns]
     ax.legend(lns, labs, loc=0)
 
     # Sort axis positioning
@@ -330,4 +327,3 @@ if __name__ == "__main__":
         plt.savefig(fig_name, format='eps')
 
     plt.show()
-

@@ -45,7 +45,6 @@ PhysIBC* VelIBC::new_physIBC()
 {
   VelIBC* retval = new VelIBC();
   retval->m_velocity = m_velocity;
-  retval->m_probtype = m_probtype;
   retval->m_isBCvalSet = m_isBCvalSet;
   retval->m_isSlopeValSet = m_isSlopeValSet;
 
@@ -197,20 +196,6 @@ const RealVect&
 VelIBC::advectionVel() const
 {
   return m_velocity;
-}
-
-// set probtype
-void
-VelIBC::probType(const int a_probtype)
-{
-  m_probtype = a_probtype;
-}
-
-//
-int
-VelIBC::probType() const
-{
-  return m_probtype;
 }
 
 void

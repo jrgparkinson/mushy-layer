@@ -42,12 +42,14 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
 # g = 9.8  ,# gravitational acceleration m/s
 # alpha = 3.87e-5  , # thermal expansion celcius^-1
                darcy_brinkman=False,
-               properties=get_sea_ice_material_properties(),
+               properties_func=get_sea_ice_material_properties,
                dim=2, periodic=True):
     # Physical constants
 
+    properties = properties_func()
 
-    params['dimensional_values'] = '"Ttop=%.3g celcius, Tbottom=%.3g celcius, Si=%.3g g/kg, L=%.3g metres, d=%.3g metres, K0=%.3g m^2"' % (Ttop, Tbottom, Si, h, d, K0)
+    params['dimensional_values'] = '"Ttop=%.3g celcius, Tbottom=%.3g celcius, Si=%.3g g/kg, ' \
+                                   'L=%.3g metres, d=%.3g metres, K0=%.3g m^2"' % (Ttop, Tbottom, Si, h, d, K0)
 
     ##############################
     # Compute quantities derived from our dimensional inputs
@@ -75,7 +77,7 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     RmS = Da*RaS
     Le = 200
     Pr = properties['eta']/(properties['rho_l']*kappa_l)
-    timescale = h**2/kappa_l
+    # timescale = h**2/kappa_l
     St = properties['L'] / (properties['cpl'] * abs(delta_T))
     ThetaTop = (S_top - properties['Se'])/delta_c
     # ThetaTop = -CR
@@ -91,7 +93,6 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     RmT = RaT*Da
 
     heleShawPerm = d**2/(12*K0)
-    reluctance = 1/heleShawPerm
 
     if darcy_brinkman:
         params['parameters.rayleighComp'] = RaS
@@ -121,7 +122,7 @@ def set_params(params, Ttop, Tbottom, S_top = 0.0, Si=30.0, h=1.0, d=1e-4, K0=1e
     #params['bc.bulkConcentrationHiVal']= '0 0'
     #params['bc.bulkConcentrationLoVal']= '0 -1'  # fixed value at bottom boundary
 
-    bc_accuracy = 3 # num significant figures
+    bc_accuracy = 4 # num significant figures
     if dim == 2:
         bc_str = '0 %.' + str(bc_accuracy) +'g'  # 0 in x dir, some val in vertical dir
     else:
@@ -162,9 +163,9 @@ if __name__ == "__main__":
     material_properties = get_sea_ice_material_properties()
     Si = 30.0  # initial salinity (g/kg)
 
-    Ttop = -15  # top temperature (celcius)
+    Ttop = -10 # top temperature (celcius)
     initial_freezing_point = material_properties['liquidusSlope'] * Si
-    Tbottom = initial_freezing_point + 0.1  # ocean temperature - initial freezing point  (celcius)
+    Tbottom = initial_freezing_point + 0.3  # ocean temperature - initial freezing point  (celcius)
 
     h = 1.0  # box depth (m)
     d = 1e-4  # Hele-Shaw gap width (m)
@@ -172,11 +173,9 @@ if __name__ == "__main__":
 
     darcy_brinkman = False
 
-
-
     params = {}
     p = set_params(params, Ttop, Tbottom, Si=Si, h=h, d=d, K0=K0,
-                   darcy_brinkman=darcy_brinkman, properties = material_properties, dim=dim,
+                   darcy_brinkman=darcy_brinkman, properties_func = get_sea_ice_material_properties, dim=dim,
                    periodic=periodic)
 
     for key in p:

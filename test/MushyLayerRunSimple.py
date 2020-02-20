@@ -4,20 +4,20 @@ import math
 from os import listdir
 from os.path import isfile, join, exists
 import socket
-
 from mushyLayerRunUtils import read_inputs, write_inputs, get_current_vcs_revision, get_mushy_layer_dir
 
-""" 
-This class basically just makes the output directory and dumps an input file into it
- It also performs various sanity checks """
+
 class MushyLayerRunSimple:
+    """
+    This class basically just makes the output directory and dumps an input file into it
+    """
 
     def __init__(self, base_output_dir, num_proc, parameters, slurm_job, allow_multiple_dirs, program_name):
-        
+
         self.num_proc = num_proc
         self.parameters = parameters
         self.program_name = program_name
-            
+
         # Allow us to create output dirs -0, -1, -2 etc.
         # If set to false, and the output dir ending -0 already exists,
         # then we won't do the run
@@ -39,19 +39,18 @@ class MushyLayerRunSimple:
         # Choose max grid size sensibly
         max_level = 0
         if 'main.max_level' in parameters:
-                max_level = int(parameters['main.max_level'])
+            max_level = int(parameters['main.max_level'])
 
         if 'main.gridfile' in parameters and max_level > 0 and os.path.exists(parameters['main.gridfile']):
 
             with open(parameters['main.gridfile'], 'r') as f:
-                #all_lines = f.read()
+                # all_lines = f.read()
                 max_box_length = 0.0
-                pattern = '\(\((\d+),(\d+)\) \((\d+),(\d+)\) \((\d+),(\d+)\)\)'
+                pattern = r'\(\((\d+),(\d+)\) \((\d+),(\d+)\) \((\d+),(\d+)\)\)'
 
                 for line in f.readlines():
                     m = re.search(pattern, line)
                     if m:
-
                         # Determine size of box
                         x_lo = int(m.group(1))
                         y_lo = int(m.group(2))
@@ -60,32 +59,30 @@ class MushyLayerRunSimple:
                         z_lo = int(m.group(5))
                         z_hi = int(m.group(6))
 
-                        max_box_length = max(max_box_length, y_hi+1-y_lo)
-                        max_box_length = max(max_box_length, x_hi+1-x_lo)
-                        max_box_length = max(max_box_length, z_hi+1-z_lo)
+                        max_box_length = max(max_box_length, y_hi + 1 - y_lo)
+                        max_box_length = max(max_box_length, x_hi + 1 - x_lo)
+                        max_box_length = max(max_box_length, z_hi + 1 - z_lo)
 
                 # Make sure max_grid_size is at least as big as the largest
                 # box in the specified grid
                 parameters['main.max_grid_size'] = str(max(int(parameters['main.max_grid_size']), max_box_length))
         elif 'main.num_cells' in parameters and 'main.max_grid_size' not in parameters:
-                # want to choose max_grid_size to do parallel stuff most effectively
-                # Want to choose a box size to make the parallel computations most
-                # efficiently
-                if isinstance(parameters['main.num_cells'], basestring):
-                    ncells = parameters['main.num_cells'].split(' ')
-                    grid_res_x = int(ncells[0])
-                    #grid_res_y = int(ncells[0])
-                else:
-                    grid_res_x = parameters['main.num_cells'][0]
+            # want to choose max_grid_size to do parallel stuff most effectively
+            # Want to choose a box size to make the parallel computations most
+            # efficiently
+            if not isinstance(parameters['main.num_cells'], list):
+                ncells = parameters['main.num_cells'].split(' ')
+                grid_res_x = int(ncells[0])
+                # grid_res_y = int(ncells[0])
+            else:
+                grid_res_x = parameters['main.num_cells'][0]
 
-                if math.log(grid_res_x, 2.0) == math.floor(math.log(grid_res_x, 2.0)):
-                        min_box_size = math.sqrt(grid_res_x * grid_res_x / num_proc)
+            if math.log(grid_res_x, 2.0) == math.floor(math.log(grid_res_x, 2.0)):
+                min_box_size = math.sqrt(grid_res_x * grid_res_x / num_proc)
 
-                        # Round this up to the nearest power of 2
-                        min_box_size = int(2**(math.ceil(math.log(min_box_size, 2))))
-                        parameters['main.max_grid_size'] = str(min_box_size)
-                
-                
+                # Round this up to the nearest power of 2
+                min_box_size = int(2 ** (math.ceil(math.log(min_box_size, 2))))
+                parameters['main.max_grid_size'] = str(min_box_size)
 
     def single_run(self, run_name):
 
@@ -94,18 +91,7 @@ class MushyLayerRunSimple:
             print('Run already done, skipping \n \n')
             return -1
 
-        # this_run_directory = self.get_most_recent_directory(run_name)
-
         output_folder = join(self.base_output_dir, this_run_directory)
-
-        # exit_status = self.run_model(self.parameters['main.num_cells'],
-        #                             join(self.base_output_dir, this_run_directory),
-        #                             False)
-
-
-    #     return exit_status
-    #
-    # def run_model(self,  output_folder):
 
         # Perform various checks on the inputs
 
@@ -117,7 +103,7 @@ class MushyLayerRunSimple:
 
         # If this isn't specified, don't output plots for each iteration
         # (in case an input file has this option left in)
-        # don't want to generate loads of output unnecessarily 
+        # don't want to generate loads of output unnecessarily
         if 'main.iteration_plot_interval' not in self.parameters:
             self.parameters['main.iteration_plot_interval'] = '-1'
 
@@ -128,7 +114,6 @@ class MushyLayerRunSimple:
 
         if 'main.max_time' not in self.parameters:
             self.parameters['main.maxTime'] = '9999'
-
 
         # Finished checking inputs
 
@@ -149,39 +134,37 @@ class MushyLayerRunSimple:
         # Read in the file
         params_key = 'main.params_file'
 
-        #inputsParams = read_inputs(inputs_file)
-        inputsParams = {}
-        
-        extraParams = {}
+        # inputsParams = read_inputs(inputs_file)
+        inputs_params = {}
+
+        extra_params = {}
         if params_key in self.parameters:
-            extraParams = read_inputs(self.parameters[params_key])
-        elif params_key in inputsParams:
-            extraParams = read_inputs(inputsParams[params_key])
+            extra_params = read_inputs(self.parameters[params_key])
+        elif params_key in inputs_params:
+            extra_params = read_inputs(inputs_params[params_key])
 
         # Merge all dictionary's
         # Important that it's done in this order, so that parameters
         # are overwritten in the correct order. Priority is:
-        # 1) params specified in this python scrupt
-        # 2) params in main.params_file 
+        # 1) params specified in this python script
+        # 2) params in main.params_file
         # 3) params in the inputs file
 
-        for key in extraParams.keys():
+        for key in extra_params.keys():
             if key not in self.parameters:
-                self.parameters[key] = extraParams[key]
+                self.parameters[key] = extra_params[key]
 
-        for key in inputsParams.keys():
+        for key in inputs_params.keys():
             if key not in self.parameters:
-                self.parameters[key] = inputsParams[key]
-
+                self.parameters[key] = inputs_params[key]
 
         # If we have Kozeny-Carman permeability, make sure we have hele-shaw cell to limit the max permeability
         if self.parameters['parameters.permeabilityFunction'] == 2:
             self.parameters['parameters.heleShaw'] = 'true'
-            
-            
+
         # Let's add another item to the parameters: the code repository version.
         self.parameters['gitRevision'] = get_current_vcs_revision()
-        
+
         # Also add the current machine to the parameter list so we now where each run was done from
         self.parameters['machineCodeIsRunOn'] = socket.gethostname()
 
@@ -191,7 +174,8 @@ class MushyLayerRunSimple:
         # Set remaining parameters on the slurm jobs
         self.slurm_job.folder = output_folder
         self.slurm_job.set_exec_file(os.path.join(self.exec_dir, self.program_name))
-        print('Exec dir: %s, program name: %s, exec file: %s' % ( self.exec_dir, self.program_name, os.path.join(self.exec_dir, self.program_name)) )
+        print('Exec dir: %s, program name: %s, exec file: %s' % (
+            self.exec_dir, self.program_name, os.path.join(self.exec_dir, self.program_name)))
 
         # self.slurm_job.write_slurm_file()
         self.slurm_job.run_task()
@@ -200,12 +184,7 @@ class MushyLayerRunSimple:
 
         return exit_status
 
-
-
-
-    def make_next_dir(self,  basename):
-
-
+    def make_next_dir(self, basename):
 
         if self.allow_multiple_output_dirs:
             # Take some basename, and make the directory basename-(n+1) where
@@ -257,6 +236,3 @@ class MushyLayerRunSimple:
         most_recent_dir = basename + "-" + str(i - 1) + "/"
 
         return most_recent_dir
-
-
-

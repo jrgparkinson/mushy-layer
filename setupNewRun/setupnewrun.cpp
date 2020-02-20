@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
   }
 
   char* in_file = argv[1];
-  ParmParse pp(argc-2, argv+2, NULL, in_file);
+  ParmParse pp(argc-2, argv+2, nullptr, in_file);
 
 
 

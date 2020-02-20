@@ -248,19 +248,13 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
 }
 
 Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& vel,
-                    Real a_dx, MushyLayerParams a_params, Real a_domWidth, Real a_domHeight)
+                    Real a_dx, MushyLayerParams a_params, Real a_domWidth, Real a_domHeight,
+                    int dir, int NusseltType)
 {
   Real Nu = 0;
   DisjointBoxLayout grids = T.disjointBoxLayout();
   LevelData<FArrayBox> gradT(grids, SpaceDim);
   LevelData<FluxBox> gradTedge(grids, 1);
-
-  // 0 = global average, 1 = sides
-  int NusseltType = 1;
-
-  //which direction to compute nu in
-  // i.e. x direction means compute dT/dx
-  int dir = 0;
 
   Real sideLength;
   if (dir == 0)
@@ -420,22 +414,25 @@ void getVectorVarNames(Vector<string>& varNames,
   {
     int startComp = startPos + (a_var*2);
     Vector<string> dirString(SpaceDim);
-    dirString[0] = string("x");
-    if (SpaceDim == 2)
-    {
-      dirString[1] = string("y");
-    }
-    else if(SpaceDim == 3)
-    {
-      dirString[1] = string("y");
-      dirString[2] = string("z");
-    }
+    getDirString (dirString);
 
     for (int dir = 0; dir<SpaceDim; dir++)
     {
-      //varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") + dirString[dir];
       varNames[startComp+dir] = dirString[dir] + vectorVarNames[a_var];
     }
+  }
+}
+
+void
+getDirString (Vector<string>& dirString)
+{
+  dirString[0] = string ("x");
+  if (SpaceDim == 2) {
+    dirString[1] = string ("y");
+  }
+  else if (SpaceDim == 3) {
+    dirString[1] = string ("y");
+    dirString[2] = string ("z");
   }
 }
 
@@ -450,17 +447,7 @@ void getChkVectorVarNames(Vector<string>& chkVectorVarNames,
 
     int startComp = (i*SpaceDim);
     Vector<string> dirString(SpaceDim);
-    dirString[0] = string("x");
-    if (SpaceDim == 2)
-    {
-      dirString[1] = string("y");
-    }
-    else if(SpaceDim == 3)
-    {
-      dirString[1] = string("y");
-      dirString[2] = string("z");
-    }
-
+    getDirString (dirString);
     for (int dir = 0; dir<SpaceDim; dir++)
     {
       //varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") + dirString[dir];
@@ -483,28 +470,6 @@ void getVarNames(Vector<string>& varNames,
   //Then vector vars
   getVectorVarNames(varNames, numVectorVars, vectorVarNames,
                     numScalarVars); // initial offset
-  //  Interval vecSrcComps(0, SpaceDim-1);
-  //  for (int a_var = 0; a_var<numVectorVars; a_var++)
-  //  {
-  //    int startComp = numScalarVars + (a_var*2);
-  //    Vector<string> dirString(SpaceDim);
-  //    dirString[0] = string("x");
-  //    if (SpaceDim == 2)
-  //    {
-  //      dirString[1] = string("y");
-  //    }
-  //    else if(SpaceDim == 3)
-  //    {
-  //      dirString[1] = string("y");
-  //      dirString[2] = string("z");
-  //    }
-  //
-  //    for (int dir = 0; dir<SpaceDim; dir++)
-  //    {
-  //      //varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") + dirString[dir];
-  //      varNames[startComp+dir] = dirString[dir] + vectorVarNames[a_var];
-  //    }
-  //  }
 }
 
 void getVarNames(Vector<string>& varNames,
@@ -528,20 +493,10 @@ void getVarNames(Vector<string>& varNames,
   {
     int startComp = numScalarVars + (a_var*SpaceDim);
     Vector<string> dirString(SpaceDim);
-    dirString[0] = string("x");
-    if (SpaceDim == 2)
-    {
-      dirString[1] = string("y");
-    }
-    else if(SpaceDim == 3)
-    {
-      dirString[1] = string("y");
-      dirString[2] = string("z");
-    }
+    getDirString (dirString);
 
     for (int dir = 0; dir<SpaceDim; dir++)
     {
-      //varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") + dirString[dir];
       varNames[startComp+dir] = dirString[dir] + vectorVarNames[vectorVars[a_var]];
     }
   }
@@ -559,7 +514,7 @@ void printRepoVersion()
   std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
   if (!pipe) throw std::runtime_error("popen() failed!");
   while (!feof(pipe.get())) {
-    if (fgets(buffer.data(), 128, pipe.get()) != NULL)
+    if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
       result += buffer.data();
   }
 
@@ -576,24 +531,16 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
   {
     IntVect iv = bit();
     RealVect loc;
-    getLocation(iv, loc, a_dx);
-    Real x = loc[0];
-    Real z = loc[1];
+    Real x, y, zz;
+    getLocation(iv, a_dx, x, y, zz);
 
     Real solidFraction = solidFractionFAB(iv,0);
 
-    // Make sure this isn't 0
-    //    Real minSolidFractionAllowed = 1e-8;
-    //    solidFraction = max(solidFraction, minSolidFractionAllowed);
-
     Real liquidFraction = (1-solidFraction);
     Real permeability;
-    Real referencePerm = params.referencePermeability;
 
     if(params.permeabilityFunction == PermeabilityFunctions::m_permeabilityXSquared)
     {
-//      permeability = x*x;
-
       Real scale = 0.1;
 
       // Creates a channel of high permeability in the middle of the domain
@@ -604,9 +551,9 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
 
       // Two permeability holes in the left and right of the domain
       scale = 0.03;
-      Real zScale = 0.12;
-      permeability = exp(-pow(x-0.2,2)/scale)*exp(-pow(z-0.5,2)/zScale);
-      permeability = permeability + exp(-pow(x-0.8,2)/scale)*exp(-pow(z-0.5,2)/zScale);
+      Real yScale = 0.12;
+      permeability = exp(-pow(x-0.2,2)/scale)*exp(-pow(y-0.5,2)/yScale);
+      permeability = permeability + exp(-pow(x-0.8,2)/scale)*exp(-pow(y-0.5,2)/yScale);
       permeability = 1-permeability;
 
       //Block flow at the boundaries
@@ -615,21 +562,33 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
 
       if (params.heleShaw)
       {
-        permeability = 1 / (1/params.heleShamPermeability + 1.0/permeability);
+        permeability = 1 / (1/params.heleShawPermeability + 1.0/permeability);
       }
     }
 
     else
     {
-      //			MayDay::Error("amrMushyLayer::calculatePermeability() - Unknown permeability function");
       permeability = params.calculatePermeability(liquidFraction);
     }
 
-
     permeabilityFAB(iv, 0) = permeability;
 
-
   } //box iterator
+}
+
+void getLocation(const IntVect iv, const Real a_dx, Real& x, Real& y, Real& z, const RealVect ccOffset)
+{
+  RealVect scaledOffset = ccOffset*a_dx;
+  RealVect loc = iv;
+  loc *= a_dx;
+  loc += scaledOffset;
+
+  x = loc[0];
+  y = loc[1];
+  if (SpaceDim == 3)
+  {
+    z = loc[2];
+  }
 }
 
 void getLocation(const IntVect iv, RealVect& loc, const Real a_dx, const RealVect ccOffset)
@@ -667,7 +626,7 @@ Real burgersPeriodicInit(Real x, Real y, int dir, MushyLayerParams params)
   }
 }
 
-Real burgersSinInit(Real x, Real y, int dir, MushyLayerParams params)
+Real burgersSinInit(Real x, Real y, int dir, const MushyLayerParams& params)
 {
   if (dir == 1)
   {
@@ -689,7 +648,7 @@ Real burgersSinInit(Real x, Real y, int dir, MushyLayerParams params)
  * periodic in y
  * See latex file for more details
  */
-Real stokesDarcyInit(Real x, Real y, int dir, MushyLayerParams params)
+Real stokesDarcyInit(Real x, Real y, int dir, const MushyLayerParams& params)
 {
 
   if (dir == 1)

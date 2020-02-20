@@ -22,8 +22,8 @@ AdvectionPhysics::AdvectionPhysics():GodunovPhysics()
   m_numPrim = -1;
   m_numFlux = -1;
 
-  m_advVelPtr = NULL;
-  m_cellVelPtr = NULL;
+  m_advVelPtr = nullptr;
+  m_cellVelPtr = nullptr;
 
   // Undefined until these are defined
   m_nCompDefined = false;
@@ -53,7 +53,7 @@ Real AdvectionPhysics::getMaxWaveSpeed(const FArrayBox& a_U,
 
   // note that for this advection problem, the max wavespeed
   // is based entirely on the cell-centered velocity
-  Real maxSpeed = 0.0, speed = 0.0;
+  Real maxSpeed = 0.0, speed;
   for (int dir = 0; dir < SpaceDim; dir++)
     {
       FArrayBox& vel = *m_cellVelPtr;
@@ -184,7 +184,7 @@ void AdvectionPhysics::charValues(FArrayBox&       a_lambda,
   CH_assert(a_lambda.box().contains(a_box));
   CH_assert(a_W.box().contains(a_box));
 
-  CH_assert(m_cellVelPtr != NULL);
+  CH_assert(m_cellVelPtr != nullptr);
   FArrayBox& cellVel = *m_cellVelPtr;
 
   int nComp = a_lambda.nComp();
@@ -224,7 +224,7 @@ void AdvectionPhysics::riemann(FArrayBox&       a_WGdnv,
 
   CH_assert(a_WGdnv.box().contains(a_box));
 
-  CH_assert(m_advVelPtr != NULL);
+  CH_assert(m_advVelPtr != nullptr);
   FluxBox& advVel = *m_advVelPtr;
   // CH_assert(advVel.box().contains(a_box));
 
@@ -380,7 +380,7 @@ AdvectionPhysics::setInflowOutflowVelPtr(FluxBox* a_velPtr)
   AdvectIBC* ibc = dynamic_cast<AdvectIBC*>(m_bc);
 
   // If we've been succesful in casting it
-  if (ibc != NULL)
+  if (ibc != nullptr)
   {
     ibc->setAdvVel(a_velPtr);
   }

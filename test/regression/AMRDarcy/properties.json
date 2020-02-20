@@ -1,0 +1,6 @@
+{ 
+   "name":"(AMR) Darcy flow",
+   "description":"(AMR) Darcy flow in a Hele-Shaw cell for sea ice relevant parameters",
+   "dim":2,
+   "proc":1
+}

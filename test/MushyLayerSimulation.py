@@ -1,19 +1,20 @@
 import os
 from mushyLayerRunUtils import write_inputs
 
+
 class SimulationStatus:
-    NONEXISTANT='Non-existant'
-    UNSTARTED='Unstarted'
-    RUNNING='Running'
-    FINISHED='Finished'
-    CRASHED='Crashed'
+    NONEXISTANT = 'Non-existant'
+    UNSTARTED = 'Unstarted'
+    RUNNING = 'Running'
+    FINISHED = 'Finished'
+    CRASHED = 'Crashed'
+
 
 # This class describes a single, self contained, simulation
 # which exists in it's own folder.
 # It should make it easier to work with simulations from python:
 #  creating them, running them, and analysing them
 class MushyLayerSimulation:
-
     folder = ''
     status = SimulationStatus.NONEXISTANT
     num_proc = 0
@@ -44,7 +45,6 @@ class MushyLayerSimulation:
             print('Unable to make simulation as no inputs have been defined')
             return
 
-
         # Make folder
         os.makedirs(self.folder)
 
@@ -54,7 +54,7 @@ class MushyLayerSimulation:
         self.status = SimulationStatus.UNSTARTED
 
     def determine_status(self):
-        ''' Work out what state the simulation is in '''
+        """ Work out what state the simulation is in """
 
         if not self.folder:
             self.status = SimulationStatus.NONEXISTANT
@@ -78,15 +78,3 @@ class MushyLayerSimulation:
             return
 
         # TODO: determine if simulation finished properly, or crashed
-
-
-
-
-
-
-
-
-
-
-
-

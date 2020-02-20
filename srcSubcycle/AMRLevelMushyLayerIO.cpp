@@ -415,11 +415,11 @@ readCheckpointLevel(HDF5Handle& a_handle)
       else
         isPeriodic[2] = false;);
 
-  m_problem_domain = ProblemDomain(domainBox,isPeriodic);
+  m_problem_domain = ProblemDomain(domainBox, isPeriodic);
 
   // Get the grids
   Vector<Box> grids;
-  const int gridStatus = read(a_handle,grids);
+  const int gridStatus = read(a_handle, grids);
 
   if (gridStatus != 0)
   {
@@ -891,8 +891,7 @@ void AMRLevelMushyLayer::computeVorticity()
   // but is necessary to ensure that boundary
   // conditions are properly set.
   LevelData<FArrayBox>* velPtr = &(*m_vectorNew[VectorVars::m_fluidVel]);
-  LevelData<FArrayBox>& vel =
-      *(const_cast<LevelData<FArrayBox>*>(&*velPtr));
+  LevelData<FArrayBox>& vel = *(const_cast<LevelData<FArrayBox>*>(velPtr));
 
   const DisjointBoxLayout& grids = vel.getBoxes();
 

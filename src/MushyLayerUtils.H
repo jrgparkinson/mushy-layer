@@ -31,8 +31,15 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
                        Side::LoHiSide side = Side::Lo);
 
 /// Compute nusselt number
+/**
+ *
+ * dir: direction to compute nu in i.e. \f$x\f$ direction means compute \f$dT/dx\d$
+ * NusseltType: 0 = global average, 1 = sides (default)
+ *
+ */
 Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& vel,
-                    Real a_dx, MushyLayerParams a_params, Real a_domWidth, Real a_domHeight);
+                    Real a_dx, MushyLayerParams a_params, Real a_domWidth, Real a_domHeight,
+                    int dir=0, int NusseltType=1);
 
 /// Compute the largest value and retain it's sign
 /**
@@ -102,6 +109,10 @@ void
 calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionFAB,
 		MushyLayerParams& params, Real a_dx);
 
+/// Get a vector of x, y, and z components appropriate for the number of dimensions
+void
+getDirString (Vector<string>& dirString);
+
 /// Calculate the permeability - moved to MushyLayerParams
 //Real calculatePermeability(Real liquidFraction,
 //		MushyLayerParams& params);
@@ -114,34 +125,36 @@ calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionFAB,
 void getLocation(const IntVect iv, RealVect& loc, const Real a_dx,
 		const RealVect ccOffset = 0.5*RealVect::Unit);
 
+/// Get location in domain
+/**
+ * default offset is for cell centred points.
+ * note that ccOffset should be 0, 0.5 or 1 in each direction
+ */
+void getLocation(const IntVect iv, const Real a_dx, Real& x, Real& y, Real& z,
+                 const RealVect ccOffset = 0.5*RealVect::Unit);
+
 /// Initial data for burgers problem benchmark
 Real burgersPeriodicInit(Real x, Real y, int dir, MushyLayerParams params);
 
 /// Initial data for burgers problem benchmark
-Real burgersSinInit(Real x, Real y, int dir, MushyLayerParams params);
+Real burgersSinInit(Real x, Real y, int dir, const MushyLayerParams& params);
 
 /// Initial data for Stokes-Darcy channel flow benchmark
-Real stokesDarcyInit(Real x, Real y, int dir, MushyLayerParams params);
+Real stokesDarcyInit(Real x, Real y, int dir, const MushyLayerParams& params);
 
 /// Read in fixed grids
 extern bool
-getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain, string gridfileParam = "gridfile");
+getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
+              string gridfileParam = "gridfile", int verbosity = 3);
 
 /// Check if string is also an integer
 bool is_integer(const std::string& s);
 
-//void
-//timeInterpWithGhostCells(LevelData<FArrayBox>& a_dest, Real a_time,
-//		const LevelData<FArrayBox>& a_old_phi, Real a_old_time,
-//		const LevelData<FArrayBox>& a_new_phi, Real a_new_time,
-//		const Interval& a_src_comps, const Interval& a_dest_comps);
-
-
-//void
-//timeInterpWithGhostCells(LevelData<FArrayBox>& a_dest, Real a_time,
-//		const LevelData<FArrayBox>& a_old_phi, Real a_old_time,
-//		const LevelData<FArrayBox>& a_new_phi, Real a_new_time,
-//		const Interval& a_src_comps = Interval(0,0));
+/// Create data structures for holding phase boundaries
+void createPhaseBoundaryStructures(const int lev, const Vector<DisjointBoxLayout>& grids, const IntVect ivGhost,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpySolidus,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyEutectic,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyLiquidus);
 
 
 #include "NamespaceFooter.H"

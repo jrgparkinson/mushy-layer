@@ -44,7 +44,7 @@ Gradient::levelGradientMAC(LevelData<FluxBox>& a_edgeGrad,
 	QuadCFInterp cfInterpCrse;
 	const DisjointBoxLayout& grids = a_phi.getBoxes();
 
-	if (a_phiCrsePtr != NULL)
+	if (a_phiCrsePtr != nullptr)
 	{
 		// define coarse-fine interpolation operator
 		const DisjointBoxLayout& crseGrids = a_phiCrsePtr->getBoxes();
@@ -80,7 +80,7 @@ Gradient::levelGradientMAC(LevelData<FluxBox>& a_edgeGrad,
 	CH_assert(a_edgeGrad.nComp() >= a_phi.nComp());
 
 	// do coarse-fine BC's
-	if (a_phiCrsePtr != NULL)
+	if (a_phiCrsePtr != nullptr)
 	{
 		const LevelData<FArrayBox>& crseData = *a_phiCrsePtr;
 		CH_assert(a_phi.nComp() == crseData.nComp());
@@ -330,7 +330,7 @@ Gradient::levelGradientCC(LevelData<FArrayBox>& a_grad,
 {
 	QuadCFInterp cfInterpCrse;
 
-	if (a_phiCrsePtr != NULL)
+	if (a_phiCrsePtr != nullptr)
 	{
 		const DisjointBoxLayout& grids = a_phi.getBoxes();
 		const DisjointBoxLayout& crseGrids = a_phiCrsePtr->getBoxes();
@@ -845,7 +845,7 @@ Gradient::compGradientCC(LevelData<FArrayBox>& a_grad,
 {
 	QuadCFInterp cfInterpCrse;
 
-	if (a_phiCrsePtr != NULL)
+	if (a_phiCrsePtr != nullptr)
 	{
 		const DisjointBoxLayout grids = a_phi.getBoxes();
 		const DisjointBoxLayout crseGrids = a_phiCrsePtr->getBoxes();
@@ -915,7 +915,7 @@ Gradient::compGradientCC(LevelData<FArrayBox>& a_grad,
 			a_gridIVS,
 			cfInterpCrse);
 
-	if (a_phiFinePtr != NULL)
+	if (a_phiFinePtr != nullptr)
 	{
 		// do one-sided differencing at interfaces w/ finer levels
 		// loop over this level grids
@@ -1042,7 +1042,7 @@ Gradient::compGradientCC(LevelData<FArrayBox>& a_grad,
 
 	levelGradientMAC(edgeGrad,a_phi, a_dx);
 
-	if (a_phiFinePtr != NULL)
+	if (a_phiFinePtr != nullptr)
 	{
 		// do one-sided differencing at interfaces w/ finer levels
 		// loop over this level grids

@@ -105,10 +105,10 @@ void AMRLevelMushyLayer::computeRadianceIntensity()
 
 void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_src)
 {
-  LevelFluxRegister* coarserFRPtr = NULL;
-  LevelFluxRegister* finerFRPtr = NULL;
-  LevelData<FArrayBox>* coarserDataOldPtr = NULL;
-  LevelData<FArrayBox>* coarserDataNewPtr = NULL;
+  LevelFluxRegister* coarserFRPtr = nullptr;
+  LevelFluxRegister* finerFRPtr = nullptr;
+  LevelData<FArrayBox>* coarserDataOldPtr = nullptr;
+  LevelData<FArrayBox>* coarserDataNewPtr = nullptr;
   Real tCoarserOld, tCoarserNew;
 
   getCoarseScalarDataPointers(a_tracerVar,
@@ -118,8 +118,8 @@ void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_s
 
 //  if (!doFRupdates)
 //  {
-//    coarserFRPtr = NULL;
-//    finerFRPtr = NULL;
+//    coarserFRPtr = nullptr;
+//    finerFRPtr = nullptr;
 //  }
 
   DataIterator dit(m_grids);
@@ -252,12 +252,8 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelDa
 
   VCAMRPoissonOp2Factory* vcop = new VCAMRPoissonOp2Factory(); //new AMRScalarDiffusionOp();
   vcop->define(m_problem_domain, grids, ref_rat, dx, bc, alpha, aCoef, beta, bCoef);
-  RefCountedPtr<VCAMRPoissonOp2Factory> VCOpFact = RefCountedPtr<AMRLevelOpFactory<LevelData<FArrayBox> > >(vcop);
-    RefCountedPtr<VCAMRPoissonOp2> vcamrpop =  RefCountedPtr<VCAMRPoissonOp2>(
-        (VCAMRPoissonOp2*) VCOpFact->AMRnewOp(m_problem_domain) );
 
-
-  LevelData<FArrayBox> *crseVar = NULL;
+  LevelData<FArrayBox> *crseVar = nullptr;
 
   AMRLevelMushyLayer* crseML = getCoarserLevel();
   if (crseML)
@@ -271,11 +267,11 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelDa
   LevelData<FArrayBox> liquidConc;
   computeScalarConcInLiquid(liquidConc, a_scalarBulkConc);
 
-  // This just calls applyOpI if crseHC = NULL, else does CF interpolation
+  // This just calls applyOpI if crseHC = nullptr, else does CF interpolation
 //  amrpop->applyOpMg(a_src, liquidConc, crseVar, false);
   amrpop->applyOp(a_src, liquidConc, false);
 
-//  Real maxSrc = ::computeNorm(a_src, NULL, -1, m_dx);
+//  Real maxSrc = ::computeNorm(a_src, nullptr, -1, m_dx);
 //  pout() << "Max diffusive tracer src = " << maxSrc << endl;
 
   a_src.exchange();

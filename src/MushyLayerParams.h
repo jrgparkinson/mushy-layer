@@ -312,7 +312,7 @@ public:
 	/**
 	 * \f$ \Pi_H = d^2/(12 K_0)\f$. Inverse of nonDimReluctance.
 	 */
-	heleShamPermeability,
+	heleShawPermeability,
 
 
 

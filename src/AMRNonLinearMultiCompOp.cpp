@@ -223,7 +223,7 @@ void AMRNonLinearMultiCompOp::applyOpMg(LevelData<FArrayBox>& a_lhs, LevelData<F
                                         LevelData<FArrayBox>* a_phiCoarse, bool a_homogeneous)
 {
   // Do CF stuff if we have a coarser level that's not just a single grid cell
-  if (a_phiCoarse != NULL)
+  if (a_phiCoarse != nullptr)
   {
     const ProblemDomain& probDomain = a_phiCoarse->disjointBoxLayout().physDomain();
     const Box& domBox = probDomain.domainBox();
@@ -395,7 +395,7 @@ void AMRNonLinearMultiCompOp::restrictResidual(LevelData<FArrayBox>& a_resCoarse
 
   if (m_FAS)
   {
-    if (a_phiCoarse != NULL)
+    if (a_phiCoarse != nullptr)
     {
       // Do inhomo CF bcs
       m_interpWithCoarser.coarseFineInterp(a_phiFine, *a_phiCoarse);
@@ -477,7 +477,6 @@ void AMRNonLinearMultiCompOp::prolongIncrement(LevelData<FArrayBox>&       a_phi
   CH_TIME("AMRNonLinearMultiCompOp::prolongIncrement");
 
   DisjointBoxLayout dbl = a_phiThisLevel.disjointBoxLayout();
-  int mgref = 2; //this is a multigrid func
   DataIterator dit = a_phiThisLevel.dataIterator();
   int nbox=dit.size();
 
@@ -492,11 +491,13 @@ void AMRNonLinearMultiCompOp::prolongIncrement(LevelData<FArrayBox>&       a_phi
       const IntVect& iv = region.smallEnd();
       IntVect civ=coarsen(iv, 2);
 
+      // refinement of two as this is multigrid
+      int refinement = 2;
 
       FORT_PROLONG_2(CHF_FRA_SHIFT(phi, iv),
                      CHF_CONST_FRA_SHIFT(coarse, civ),
                      CHF_BOX_SHIFT(region, iv),
-                     CHF_CONST_INT(mgref));
+                     CHF_CONST_INT(refinement));
 
           }
   }//end pragma
@@ -507,7 +508,7 @@ void AMRNonLinearMultiCompOp::restrictResidual(LevelData<FArrayBox>&       a_res
                                                const LevelData<FArrayBox>& a_rhsFine)
 {
   // default implementation is homogeneous
-  restrictResidual(a_resCoarse, a_phiFine, NULL, a_rhsFine, true);
+  restrictResidual(a_resCoarse, a_phiFine, nullptr, a_rhsFine, true);
 }
 
 void AMRNonLinearMultiCompOp::restrictR(LevelData<FArrayBox>& a_phiCoarse,
@@ -668,14 +669,13 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
   // const cast:  OK because we're changing ghost cells only
   LevelData<FArrayBox>& phiFineRef = ( LevelData<FArrayBox>&)a_phiFine;
 
-  AMRNonLinearMultiCompOp* finerAMRPOp = (AMRNonLinearMultiCompOp*) a_finerOp;
+  AMRNonLinearMultiCompOp* finerAMRPOp = static_cast<AMRNonLinearMultiCompOp*>(a_finerOp);
   QuadCFInterp& quadCFI = finerAMRPOp->m_interpWithCoarser;
 
   quadCFI.coarseFineInterp(phiFineRef, a_phi);
   // I'm pretty sure this is not necessary. bvs -- flux calculations use
   // outer ghost cells, but not inner ones
   // phiFineRef.exchange(a_phiFine.interval());
-  IntVect phiGhost = phiFineRef.ghostVect();
   int ncomps = a_phiFine.nComp();
 
   CH_TIMER("AMRNonLinearMultiCompOp::reflux::incrementFine", t3);
@@ -762,7 +762,7 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
 
   // has to be its own object because the finer operator
   // owns an interpolator and we have no way of getting to it
-  AMRNonLinearMultiCompOp* finerAMRPOp = (AMRNonLinearMultiCompOp*) a_finerOp;
+  AMRNonLinearMultiCompOp* finerAMRPOp = static_cast<AMRNonLinearMultiCompOp*> (a_finerOp);
   QuadCFInterp& quadCFI = finerAMRPOp->m_interpWithCoarser;
 
   quadCFI.coarseFineInterp(p, a_phi);
@@ -1184,7 +1184,7 @@ void AMRNonLinearMultiCompOp::getFlux(FArrayBox&       a_flux,
   // need to convert this to temperature, liquid concentration to calculate diffusive flux
   FArrayBox derivedVar(a_data.box(), a_data.nComp());
 
-  AMRNonLinearMultiCompOp* op = (AMRNonLinearMultiCompOp*)this;
+  AMRNonLinearMultiCompOp* op = const_cast<AMRNonLinearMultiCompOp*> (this);
   op->computeDiffusedVar(derivedVar, a_data, a_dit);
 
   // const FArrayBox& diffusedVar = a_data;
@@ -1242,7 +1242,9 @@ setTime(Real a_time)
 //-----------------------------------------------------------------------
 
 // Factory
-AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory()
+AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory() : m_coefficient_average_type(0),
+    m_apply_bcs_to_diagnostic_var(true), m_alpha(-1), m_beta(-1),
+    m_params(nullptr), m_relaxMode(1), m_FAS(true), m_numComp(2), m_superOptimised(false)
 {
   setDefaultValues();
 }
@@ -1380,7 +1382,7 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
 
   if (coarsening > 1 && !m_boxes[ref].coarsenable(coarsening*AMRNonLinearMultiCompOp::s_maxCoarse))
   {
-    return NULL;
+    return nullptr;
   }
 
   dx *= coarsening;
@@ -1400,7 +1402,7 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
     }
     else
     {
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -1697,6 +1699,8 @@ void AMRNonLinearMultiCompOpFactory::setDefaultValues()
   m_coefficient_average_type = CoarseAverage::arithmetic;
 
   m_superOptimised = false;
+
+  m_numComp = 2;
 }
 //-----------------------------------------------------------------------
 
