@@ -32,6 +32,7 @@ set(h,'Units','Inches');
 h.Position = [2.0 2.0 6.5 2.9];
 % Caption font size is 8pt
 textFontSize = 8;
+labelFontSize=9;
 legendFontSize = 8;
 domainFontSize = 8;
 
@@ -59,7 +60,7 @@ axBCs.XTick = [];
 daspect([1 1 1]);
 
 
-text(0.1, 0.55, {'Eqn''s 3-6 with:', '$St=0, Pr=1$, and', '(b) $\chi=0.4$, or', '(c) $\chi$ given by eq. 40.'}, ...
+text(0.1, 0.55, {'Solve eqs. (3) to (6) with:', '$S=0, Pr=1$, and', '(b) $\chi=0.4$, or', '(c) $\chi$ given by eq. (40).'}, ...
     'FontSize', domainFontSize);
 
 insulatingStr = {'b: $\partial H/\partial x = \partial \Theta / \partial x = 0, \mathbf{U} = 0.$', ...
@@ -79,7 +80,7 @@ annotation('arrow',[0.03 0.03], [0.06 0.16], 'HeadWidth', 5, 'HeadLength', 5);
 text(-0.05, -0.4, '$x$', 'FontSize', textFontSize);
 text(-0.19 , -0.2   , '$z$', 'FontSize', textFontSize);
 
-text(0.04, 0.93, '(a)', 'FontSize', textFontSize);
+text(0.04, 0.93, '(a)', 'FontSize', labelFontSize);
 
 subplot(m, n, 2)
 
@@ -89,15 +90,15 @@ UniformFineSol = getFinalPlotFile(fullfile(dataFolderNu, plotPrefixUniform(NuUni
 makeSubplot(AMRsol, UniformFineSol, [0.35 axBottom 0.3 axHeight])
 
 
-text(0.04, 0.92, '(b)', 'FontSize', textFontSize, 'Color', [0 0 0]);
+text(0.03, 0.92, '(b)', 'FontSize', labelFontSize, 'Color', [0 0 0]);
 %text(-0.2, 1.2, '(b)', 'FontSize', 16);
 
 subplot(m, n, 3);
 
 AMRsol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, ...
-    'AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref2-DBVariablePorosity-32--0'));
+    'AMR-Subcycle-Reflux-Freestream0.99-MaxLevel1-ref2-DBVariablePorosity-32-'));
 UniformFineSol = getFinalPlotFile(fullfile(dataFolderVariablePorosity, ...
-    'Uniform-DBVariablePorosity-64--0'));
+    'Uniform-DBVariablePorosity-64-'));
 
 makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
 
@@ -105,7 +106,7 @@ makeSubplot(AMRsol, UniformFineSol, [0.65 axBottom 0.3 axHeight])
 axErr = gca;
 
  
-text(0.04, 0.92, '(c)', 'FontSize', textFontSize, 'Color', [0 0 0]);
+text(0.02, 0.92, '(c)', 'FontSize', labelFontSize, 'Color', [0 0 0]);
 
 set(h,'Units','Inches');
 pos = get(h,'Position');
@@ -116,6 +117,8 @@ if saveFigure
     fprintf('Saved to %s \n', figureName);
     print(h,[figureName, '.eps'],'-depsc','-r50')
     print(h,[figureName, '.png'],'-dpng','-r1000')
+    print(h,[figureName, '.svg'],'-dsvg','-r0')
+    savefig([figureName, '.fig'])
 end
 
 end
@@ -171,11 +174,11 @@ end
 end
 
 function f = plotPrefixAMR(N)
-f =  ['VM-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-convectionDB-',num2str(N),'--0'];
+f =  ['VM-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-convectionDB-',num2str(N),'-'];
 end
 
 function f = plotPrefixUniform(N)
-f =  ['Uniform-convectionDB-',num2str(N),'--0'];
+f =  ['Uniform-convectionDB-',num2str(N),'-'];
 end
 
 
@@ -204,6 +207,8 @@ end
 %Create smooth psi
 
 
+fprintf('Max psiUniform = %.3g \n', max(max(psiUniform)));
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Psi
@@ -211,13 +216,15 @@ end
 psiUniform = max(psiUniform, 0);
 psi = max(psi, 0);
 % Plot psi uniform because it's smoother
+%psi = psiUniform;
 axPsi = gca;
 %Ncontours = min(10, round(max(max(psiUniform))/1.5e-5));
 %v =  linspace(4e-6,max(max(psiUniform)), Ncontours) ;
 
 %[Cpsi, hpsi] = contour(XUniform,YUniform,psiUniform, v); 
 %[Cpsi, hpsi] = contour(XUniform,YUniform,plot_T); 
-pcolor(X,Y,psi); 
+%pcolor(X,Y,psi); 
+pcolor(XUniform,YUniform, psiUniform);
 
 daspect([1 1 1]);
 
@@ -255,7 +262,8 @@ oldPos = cTemp.Label.Position;
 if onLaptop
     cTempLabelOffset = 1.2;
 else
-    cTempLabelOffset = -0.8;
+%    cTempLabelOffset = -0.8;
+    cTempLabelOffset = -1.0;
 end
 cTemp.Label.Position = [oldPos(1) oldPos(2)+cTempLabelOffset];
 
@@ -324,7 +332,7 @@ hold off
 axTemperature.Visible = 'off';
 
 cPsi.Label.String = '\psi';
-maxPsi = max(max(psi));
+maxPsi = max(max(psiUniform));
 %minPsi = min(min(psi));
 %deltaPsi = maxPsi-minPsi;
 %caxis([minPsi+0.01*deltaPsi maxPsi-0.01*deltaPsi]);

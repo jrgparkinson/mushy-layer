@@ -159,16 +159,15 @@ folders = dir(fullfile(dataFolder, 'AMR-Subcycle-Reflux-Freestream*'));
 
 for i=1:length(folders)
     fname = folders(i).name;
-    if contains(fname, ['-',num2str(N),'--0'])
+    if contains(fname, ['-',num2str(N),'-'])
        f = fname;
        return;
     end
 end
-%f =  ['AMR-Subcycle-Reflux-Freestream0.95-MaxLevel1-ref2-PorousMushyHole-',num2str(N),'--0'];
 end
 
 function f = plotPrefixUniform(N)
-f =  ['Uniform-PorousMushyHole-',num2str(N),'--0'];
+f =  ['Uniform-PorousMushyHole-',num2str(N),'-'];
 end
 
 

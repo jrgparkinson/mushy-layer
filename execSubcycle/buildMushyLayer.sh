@@ -21,7 +21,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo "Building $DIR"
 #cd ~/mushy-layer/execSubcycle/
-cd $MUSHY_LAYER_DIR/execSubcycle/
+cd "$MUSHY_LAYER_DIR/execSubcycle/"
 make all DIM=$D | grep --color -E 'is up to date'
 
 
@@ -29,7 +29,7 @@ cd ../setupNewRun/
 # make clean
 make all DIM=$D | grep --color -E 'is up to date'
 
-cd $MUSHY_LAYER_DIR/postProcess/
+cd "$MUSHY_LAYER_DIR/postProcess/"
 make all DIM=$D | grep --color -E 'is up to date'
 
 

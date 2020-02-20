@@ -80,7 +80,6 @@ void AMRProjectionOp::prolongIncrement(LevelData<FArrayBox>&       a_phiThisLeve
   CH_TIME("AMRProjectionOp::prolongIncrement");
 
   DisjointBoxLayout dbl = a_phiThisLevel.disjointBoxLayout();
-  int mgref = 2; //this is a multigrid func
   DataIterator dit = a_phiThisLevel.dataIterator();
   int nbox=dit.size();
 
@@ -95,23 +94,14 @@ void AMRProjectionOp::prolongIncrement(LevelData<FArrayBox>&       a_phiThisLeve
         const IntVect& iv = region.smallEnd();
         IntVect civ=coarsen(iv, 2);
 
-//        FORT_PROLONG_2(CHF_FRA_SHIFT(phi, iv),
-//                     CHF_CONST_FRA_SHIFT(coarse, civ),
-//                     CHF_BOX_SHIFT(region, iv),
-//                     CHF_CONST_INT(mgref));
+        // refinement of two as this is multigrid
+        int refinement = 2;
 
-//        FORT_PROLONG_JP(CHF_FRA_SHIFT(phi, iv),
-//                             CHF_CONST_FRA_SHIFT(coarse, civ),
-//                             CHF_BOX_SHIFT(region, iv),
-//                             CHF_CONST_INT(mgref));
-
-           FORT_PROLONG(CHF_FRA_SHIFT(phi, iv),
-                                     CHF_CONST_FRA_SHIFT(coarse, civ),
-                                     CHF_BOX_SHIFT(region, iv),
-                                     CHF_CONST_INT(mgref));
+        FORT_PROLONG(CHF_FRA_SHIFT(phi, iv),
+                     CHF_CONST_FRA_SHIFT(coarse, civ),
+                     CHF_BOX_SHIFT(region, iv),
+                     CHF_CONST_INT(refinement)); //refinement ratio of 2 (as this is multigrid)
       }
-
-
   }//end pragma
 }
 
@@ -260,7 +250,7 @@ MGLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::MGnewOp(const ProblemD
 
   if (coarsening > 1 && !m_boxes[ref].coarsenable(coarsening*AMRProjectionOp::s_maxCoarse))
   {
-    return NULL;
+    return nullptr;
   }
 
   dx *= coarsening;
@@ -319,10 +309,10 @@ MGLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::MGnewOp(const ProblemD
         }
 #ifdef CH_FORK
       else if (m_coefficient_average_type == CoarseAverage::geometric)
-             {
-               averager.averageToCoarseGeometric(*aCoef, *(m_aCoef[ref]));
-               faceAverager.averageToCoarseGeometric(*bCoef, *(m_bCoef[ref]));
-             }
+      {
+        averager.averageToCoarseGeometric(*aCoef, *(m_aCoef[ref]));
+        faceAverager.averageToCoarseGeometric(*bCoef, *(m_bCoef[ref]));
+      }
 #endif
       else
         {
@@ -355,7 +345,7 @@ AMRLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::AMRnewOp(const Proble
   // Find number of comps from m_bCoef, which should be defined on at least one level
   for (int lev = 0; lev <m_bCoef.size(); lev++)
   {
-    if (m_bCoef[lev] != NULL)
+    if (m_bCoef[lev] != nullptr)
     {
       nComp = m_bCoef[lev]->nComp();
       break;
@@ -431,7 +421,7 @@ AMRLevelOp<LevelData<FArrayBox> >* AMRProjectionOpFactory::AMRnewOp(const Proble
   newOp->m_aCoef = m_aCoef[ref];
   newOp->m_bCoef = m_bCoef[ref];
 
-  if (newOp->m_aCoef != NULL)
+  if (newOp->m_aCoef != nullptr)
   {
     newOp->computeLambda();
   }

@@ -50,7 +50,7 @@ Mask::buildMask(BaseFab<int>& a_mask, const ProblemDomain& a_dProblem,
     }
 
   // if finer grids exist, set them to "covered"
-  if (a_fineGridsPtr != NULL)
+  if (a_fineGridsPtr != nullptr)
     {
       CH_assert (a_nRefFine > 1);
 

@@ -87,20 +87,20 @@ amrMushyLayer::timeStep()
   Vector<RefCountedPtr<LevelData<FArrayBox> > > H_twoPrev, Theta_twoPrev;
 
 
-  a_thetaNew.resize(m_finest_level+1, NULL);
-  a_thetaOld.resize(m_finest_level+1, NULL);
-  a_thetaNewPrev.resize(m_finest_level+1, NULL);
+  a_thetaNew.resize(m_finest_level+1, nullptr);
+  a_thetaOld.resize(m_finest_level+1, nullptr);
+  a_thetaNewPrev.resize(m_finest_level+1, nullptr);
   Theta_prev.resize(m_finest_level+1);
   H_prev.resize(m_finest_level+1);
   Theta_twoPrev.resize(m_finest_level+1);
   H_twoPrev.resize(m_finest_level+1);
 
-  a_ThetaLNew.resize(m_finest_level+1, NULL);
-  a_ThetaLOld.resize(m_finest_level+1, NULL);
+  a_ThetaLNew.resize(m_finest_level+1, nullptr);
+  a_ThetaLOld.resize(m_finest_level+1, nullptr);
 
   //Keep these in case they're useful for more debugging
-  a_thetaDiff.resize(m_finest_level+1, NULL);
-  a_thetaOldTemp.resize(m_finest_level+1, NULL);
+  a_thetaDiff.resize(m_finest_level+1, nullptr);
+  a_thetaOldTemp.resize(m_finest_level+1, nullptr);
 
   IntVect zeroGhost = IntVect::Zero;
 
@@ -133,14 +133,14 @@ amrMushyLayer::timeStep()
   logMessage(8, "    amrMushyLayer::timestep() - setup solvers");
 
 
-  Vector<LevelData<FArrayBox>* > HC_src(m_finest_level+1,NULL);
-  Vector<LevelData<FArrayBox>* > ThetaLSource(m_finest_level+1,NULL);
-  Vector<LevelData<FArrayBox>* > zeroSource(m_finest_level+1,NULL);
-  Vector<LevelData<FArrayBox>* > ThetaDiffusion(m_finest_level+1,NULL);
-  Vector<LevelData<FArrayBox>* > V_gradH_n(m_finest_level+1,NULL);
+  Vector<LevelData<FArrayBox>* > HC_src(m_finest_level+1,nullptr);
+  Vector<LevelData<FArrayBox>* > ThetaLSource(m_finest_level+1,nullptr);
+  Vector<LevelData<FArrayBox>* > zeroSource(m_finest_level+1,nullptr);
+  Vector<LevelData<FArrayBox>* > ThetaDiffusion(m_finest_level+1,nullptr);
+  Vector<LevelData<FArrayBox>* > V_gradH_n(m_finest_level+1,nullptr);
 
-  Vector<LevelData<FArrayBox>* > V_dThetadz_n(m_finest_level+1,NULL);
-  Vector<LevelData<FArrayBox>* > ThetaDiffusion_n(m_finest_level+1,NULL);
+  Vector<LevelData<FArrayBox>* > V_dThetadz_n(m_finest_level+1,nullptr);
+  Vector<LevelData<FArrayBox>* > ThetaDiffusion_n(m_finest_level+1,nullptr);
 
 
   for (int lev=0; lev<=m_finest_level; lev++)
@@ -294,45 +294,45 @@ amrMushyLayer::timeStep()
   for (int lev=0; lev<=m_finest_level; lev++)
   {
 
-    if (a_thetaNewPrev[lev] != NULL)
+    if (a_thetaNewPrev[lev] != nullptr)
     {
       delete a_thetaNewPrev[lev];
-      a_thetaNewPrev[lev] = NULL;
+      a_thetaNewPrev[lev] = nullptr;
     }
-    if (HC_src[lev] != NULL)
+    if (HC_src[lev] != nullptr)
     {
       delete HC_src[lev];
-      HC_src[lev] = NULL;
+      HC_src[lev] = nullptr;
     }
-    if (zeroSource[lev] != NULL)
+    if (zeroSource[lev] != nullptr)
     {
       delete zeroSource[lev];
-      zeroSource[lev] = NULL;
+      zeroSource[lev] = nullptr;
     }
-    if (ThetaLSource[lev] != NULL)
+    if (ThetaLSource[lev] != nullptr)
     {
       delete ThetaLSource[lev];
-      ThetaLSource[lev] = NULL;
+      ThetaLSource[lev] = nullptr;
     }
-    if (ThetaDiffusion[lev] != NULL)
+    if (ThetaDiffusion[lev] != nullptr)
     {
       delete ThetaDiffusion[lev];
-      ThetaDiffusion[lev] = NULL;
+      ThetaDiffusion[lev] = nullptr;
     }
-    if (V_gradH_n[lev] != NULL)
+    if (V_gradH_n[lev] != nullptr)
     {
       delete V_gradH_n[lev];
-      V_gradH_n[lev] = NULL;
+      V_gradH_n[lev] = nullptr;
     }
-    if (V_dThetadz_n[lev] != NULL)
+    if (V_dThetadz_n[lev] != nullptr)
     {
       delete V_dThetadz_n[lev];
-      V_dThetadz_n[lev] = NULL;
+      V_dThetadz_n[lev] = nullptr;
     }
-    if (ThetaDiffusion_n[lev] != NULL)
+    if (ThetaDiffusion_n[lev] != nullptr)
     {
       delete ThetaDiffusion_n[lev];
-      ThetaDiffusion_n[lev] = NULL;
+      ThetaDiffusion_n[lev] = nullptr;
     }
   }
 
@@ -386,10 +386,10 @@ doImplicitReflux(int a_var, int refluxLevel)
 
   // now do implicit refluxing
   // Vector of pointers to LevelData of FABS
-  Vector<LevelData<FArrayBox>* > refluxCor(m_finest_level+1, NULL);
-  Vector<LevelData<FArrayBox>* > refluxRHS(m_finest_level+1, NULL);
+  Vector<LevelData<FArrayBox>* > refluxCor(m_finest_level+1, nullptr);
+  Vector<LevelData<FArrayBox>* > refluxRHS(m_finest_level+1, nullptr);
   // collectUN: AMR vector containing soln at new time
-  Vector<LevelData<FArrayBox>* > collectUN(m_finest_level+1, NULL);
+  Vector<LevelData<FArrayBox>* > collectUN(m_finest_level+1, nullptr);
 
   // loop over levels, allocate storage, set up for AMRSolve
   // if coarser level exists, define it as well for BCs.
@@ -451,8 +451,8 @@ doImplicitReflux(int a_var, int refluxLevel)
   {
     delete refluxRHS[lev];
     delete refluxCor[lev];
-    refluxRHS[lev] = NULL;
-    refluxCor[lev] = NULL;
+    refluxRHS[lev] = nullptr;
+    refluxCor[lev] = nullptr;
   }
 }
 
@@ -492,12 +492,12 @@ doImplicitVelocityReflux(int m_level)
 {
 
   // loop over levels and compute RHS
-  Vector<LevelData<FArrayBox>* > refluxRHS(m_finest_level+1,NULL);
-  Vector<LevelData<FArrayBox>* > refluxCorr(m_finest_level+1,NULL);
+  Vector<LevelData<FArrayBox>* > refluxRHS(m_finest_level+1,nullptr);
+  Vector<LevelData<FArrayBox>* > refluxCorr(m_finest_level+1,nullptr);
   // this is necessary because while solver only can do
   // one component, levelfluxRegister::reflux can only
   // do all of them at once.
-  Vector<LevelData<FArrayBox>* > tempRefluxData(m_finest_level+1,NULL);
+  Vector<LevelData<FArrayBox>* > tempRefluxData(m_finest_level+1,nullptr);
   // loop over levels, allocate storage, set up for AMRMultiGrid
   // solve
 
@@ -563,7 +563,7 @@ doImplicitVelocityReflux(int m_level)
   // for now just do component-wise maxnorm
   // compute norm over all directions and then use for
   // all velocity components (in order to be consistent)
-  //	Vector<LevelData<FArrayBox>* > vectVel(m_finest_level+1, NULL);
+  //	Vector<LevelData<FArrayBox>* > vectVel(m_finest_level+1, nullptr);
   //	thisNSPtr = this;
   //	for (int lev=m_level; lev<=m_finest_level; lev++)
   //	{
@@ -673,22 +673,22 @@ doImplicitVelocityReflux(int m_level)
   // clean up storage
   for (int lev=startLev; lev<=m_finest_level; lev++)
   {
-    if (refluxRHS[lev] != NULL)
+    if (refluxRHS[lev] != nullptr)
     {
       delete refluxRHS[lev];
-      refluxRHS[lev] = NULL;
+      refluxRHS[lev] = nullptr;
     }
 
-    if (refluxCorr[lev] != NULL)
+    if (refluxCorr[lev] != nullptr)
     {
       delete refluxCorr[lev];
-      refluxCorr[lev] = NULL;
+      refluxCorr[lev] = nullptr;
     }
 
-    if (tempRefluxData[lev] != NULL)
+    if (tempRefluxData[lev] != nullptr)
     {
       delete tempRefluxData[lev];
-      tempRefluxData[lev] = NULL;
+      tempRefluxData[lev] = nullptr;
     }
   }
 }
@@ -923,7 +923,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
 
   advectScalar(m_lambda, zeroSource, m_fluidAdv);
 
-  Vector<LevelData<FArrayBox>* > a_lambda(m_finest_level+1, NULL);
+  Vector<LevelData<FArrayBox>* > a_lambda(m_finest_level+1, nullptr);
   refCountedPtrToPtr(m_scalarNew[ScalarVars::m_lambda], a_lambda);
 
   proj.doLambdaCorrection(m_fluidAdv, a_lambda, m_time, m_dt);*/
@@ -949,7 +949,7 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
 
 
   Vector<LevelData<FluxBox>* > gradPressureEdge;
-  gradPressureEdge.resize(m_finest_level+1, NULL);
+  gradPressureEdge.resize(m_finest_level+1, nullptr);
   for (int lev=0; lev<=m_finest_level; lev++)
   {
     gradPressureEdge[lev] = new LevelData<FluxBox>(m_amrGrids[lev], 1, m_ghostVect - IntVect::Unit);
@@ -982,8 +982,8 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
   doCFInterpTest();
 
   //Calculate div(U)
-  LevelData<FluxBox>* uEdgeFinePtr = NULL;
-  Real* dxFine = NULL;
+  LevelData<FluxBox>* uEdgeFinePtr = nullptr;
+  Real* dxFine = nullptr;
   for (int lev=0; lev<=m_finest_level; lev++)
   {
     if (lev < m_finest_level)
@@ -993,8 +993,8 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
     }
     else
     {
-      uEdgeFinePtr = NULL;
-      dxFine = NULL;
+      uEdgeFinePtr = nullptr;
+      dxFine = nullptr;
     }
     Divergence::compDivergenceMAC(*m_scalarNew[ScalarVars::m_divU][lev], *m_fluidAdv[lev], uEdgeFinePtr,
                                   m_amrDx[lev],
@@ -1009,10 +1009,10 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
 
   // Clean up memory
   for (int lev=0; lev<=m_finest_level; lev++){
-    if(gradPressureEdge[lev]!=NULL)
+    if(gradPressureEdge[lev]!=nullptr)
     {
       delete gradPressureEdge[lev];
-      gradPressureEdge[lev]  = NULL;
+      gradPressureEdge[lev]  = nullptr;
     }
 
 
@@ -1120,7 +1120,7 @@ calculateDiffAtPoint(Vector<RefCountedPtr<LevelData<FArrayBox> > > a_phiNew,
 Real amrMushyLayer::
 calculateMaxDiff(Vector<RefCountedPtr<LevelData<FArrayBox> > > a_phiNew, Vector<RefCountedPtr<LevelData<FArrayBox> > > a_phiOld)
 {
-  Vector<LevelData<FArrayBox>* > diff(m_finest_level+1, NULL);
+  Vector<LevelData<FArrayBox>* > diff(m_finest_level+1, nullptr);
 
   //Calculate difference between two consecutive guesses of theta
   for(int lev=0; lev<=m_finest_level; lev++)
@@ -1168,7 +1168,7 @@ applyBCs(const int a_var, const int lev)
 //  }
 //  else if(a_var == m_theta)
 //  {
-//    bcHolder = m_physBCPtr->BasicthetaFuncBC(a_homogeneous, NULL);
+//    bcHolder = m_physBCPtr->BasicthetaFuncBC(a_homogeneous, nullptr);
 //  }
 //  else if(a_var == m_compositionLiquid)
 //  {
@@ -1299,10 +1299,10 @@ calculateFrameAdvectionGodunov(const int a_var)
   }
   for (int lev=0; lev<=m_finest_level; lev++)
   {
-    if(zeroSource[lev]!=NULL)
+    if(zeroSource[lev]!=nullptr)
     {
       delete zeroSource[lev];
-      zeroSource[lev] = NULL;
+      zeroSource[lev] = nullptr;
     }
   }
 }
@@ -1315,7 +1315,7 @@ calculateFrameAdvection(const int a_var, Vector<LevelData<FArrayBox>* >& a_d_dz,
 {
   CH_TIME("amrMushyLayer::calculateFrameAdvection()");
 
-  Vector<LevelData<FArrayBox>* > gradient(m_finest_level+1,NULL);
+  Vector<LevelData<FArrayBox>* > gradient(m_finest_level+1,nullptr);
 
   for (int lev=0; lev<=m_finest_level; lev++)
   {
@@ -1366,10 +1366,10 @@ calculateFrameAdvection(const int a_var, Vector<LevelData<FArrayBox>* >& a_d_dz,
   //Clean up memory
   for (int lev=0; lev<=m_finest_level; lev++)
   {
-    if (gradient[lev] != NULL)
+    if (gradient[lev] != nullptr)
     {
       delete gradient[lev];
-      gradient[lev] = NULL;
+      gradient[lev] = nullptr;
     }
   }
 }
@@ -1378,7 +1378,7 @@ Vector<LevelData<FArrayBox>* > amrMushyLayer::
 newEmptyPtr()
 {
 
-  Vector<LevelData<FArrayBox>* > phi(m_finest_level+1,NULL);
+  Vector<LevelData<FArrayBox>* > phi(m_finest_level+1,nullptr);
 
   for (int lev=0; lev<=m_finest_level; lev++)
   {
@@ -1489,20 +1489,20 @@ calculateThetaLSourceTerm(Vector<LevelData<FArrayBox>* > V_dThetadz_n, Vector<Le
   //Clean up memory
   for (int lev=0; lev <= m_finest_level; lev++)
   {
-    if (V_dThetadz_nPlusOne[lev] != NULL)
+    if (V_dThetadz_nPlusOne[lev] != nullptr)
     {
       delete V_dThetadz_nPlusOne[lev];
-      V_dThetadz_nPlusOne[lev] = NULL;
+      V_dThetadz_nPlusOne[lev] = nullptr;
     }
-    if (averageThetaL[lev] != NULL)
+    if (averageThetaL[lev] != nullptr)
     {
       delete averageThetaL[lev];
-      averageThetaL[lev] = NULL;
+      averageThetaL[lev] = nullptr;
     }
-    if (ThetaSSource[lev] != NULL)
+    if (ThetaSSource[lev] != nullptr)
     {
       delete ThetaSSource[lev];
-      ThetaSSource[lev] = NULL;
+      ThetaSSource[lev] = nullptr;
     }
 
   }
@@ -1639,10 +1639,10 @@ void
 amrMushyLayer::getFrameAdvection(const int lev)
 {
   //Delete the old data to clean up memory
-  if (m_frameAdv[lev] != NULL)
+  if (m_frameAdv[lev] != nullptr)
   {
     delete m_frameAdv[lev];
-    m_frameAdv[lev] = NULL;
+    m_frameAdv[lev] = nullptr;
   }
 
   // Now create new data
@@ -1733,10 +1733,10 @@ amrMushyLayer::getFluidAdvection(const int lev)
 {
   logMessage(10, "    amrMushyLayerAdvance::getFluidAdvection");
   //Delete the old data to clean up memory
-  if (m_fluidAdv[lev] != NULL)
+  if (m_fluidAdv[lev] != nullptr)
   {
     delete m_fluidAdv[lev];
-    m_fluidAdv[lev] = NULL;
+    m_fluidAdv[lev] = nullptr;
   }
 
   // Now create new data

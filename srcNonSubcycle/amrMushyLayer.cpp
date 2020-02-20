@@ -79,36 +79,36 @@ amrMushyLayer::~amrMushyLayer()
     for (int a_var = 0; a_var<m_numVectorVars; a_var++)
     {
 
-      if (m_vectorOld[a_var][lev] != NULL)
+      if (m_vectorOld[a_var][lev] != nullptr)
       {
         delete m_vectorOld[a_var][lev];
-        m_vectorOld[a_var][lev] = NULL;
+        m_vectorOld[a_var][lev] = nullptr;
       }
 
-      if (m_vectorNew[a_var][lev] != NULL)
+      if (m_vectorNew[a_var][lev] != nullptr)
       {
         delete m_vectorNew[a_var][lev];
-        m_vectorNew[a_var][lev] = NULL;
+        m_vectorNew[a_var][lev] = nullptr;
       }
 
-      if (m_dVector[a_var][lev] != NULL)
+      if (m_dVector[a_var][lev] != nullptr)
       {
         delete m_dVector[a_var][lev];
-        m_dVector[a_var][lev] = NULL;
+        m_dVector[a_var][lev] = nullptr;
       }
 
     }
 
     // Advection
-    if (m_fluidAdv[lev] != NULL)
+    if (m_fluidAdv[lev] != nullptr)
     {
       delete m_fluidAdv[lev];
-      m_fluidAdv[lev] = NULL;
+      m_fluidAdv[lev] = nullptr;
     }
-    if (m_frameAdv[lev] != NULL)
+    if (m_frameAdv[lev] != nullptr)
     {
       delete m_frameAdv[lev];
-      m_frameAdv[lev] = NULL;
+      m_frameAdv[lev] = nullptr;
     }
 
 
@@ -116,10 +116,10 @@ amrMushyLayer::~amrMushyLayer()
 
   //	for (int lev=0; lev<=m_max_level; lev++)
   //	{
-  //		if (m_projection[lev] != NULL)
+  //		if (m_projection[lev] != nullptr)
   //		{
   //			delete m_projection[lev];
-  //			m_projection[lev] = NULL;
+  //			m_projection[lev] = nullptr;
   //		}
   //	}
 
@@ -436,7 +436,7 @@ amrMushyLayer::regrid()
         interpolatorScalar.interpToFine(*new_oldDataPtr, *m_scalarOld[a_var][lev-1]);
 
         // now copy old-grid data into new holder
-        if (old_newDataPtr != NULL)
+        if (old_newDataPtr != nullptr)
         {
           Interval dataComps = new_newDataPtr->interval();
           old_newDataPtr->copyTo(dataComps, *new_newDataPtr, dataComps);
@@ -483,7 +483,7 @@ amrMushyLayer::regrid()
         interpolatorVector.interpToFine(*new_oldDataPtr, *m_vectorOld[a_var][lev-1]);
 
         // now copy old-grid data into new holder
-        if (old_newDataPtr != NULL)
+        if (old_newDataPtr != nullptr)
         {
           Interval dataComps = new_newDataPtr->interval();
           old_newDataPtr->copyTo(dataComps, *new_newDataPtr, dataComps);
@@ -883,8 +883,8 @@ amrMushyLayer::convergedToSteadyState()
   pp.query("convergence_criteria", tolerance);
 
   Vector<LevelData<FArrayBox>* > dthetadt, dThetadt;
-  dthetadt.resize(m_finest_level+1, NULL);
-  dThetadt.resize(m_finest_level+1, NULL);
+  dthetadt.resize(m_finest_level+1, nullptr);
+  dThetadt.resize(m_finest_level+1, nullptr);
 
   for (int lev=0; lev <=m_finest_level; lev++)
   {
@@ -928,16 +928,16 @@ amrMushyLayer::convergedToSteadyState()
   //Clean up memory
   for (int lev=0; lev<=m_finest_level; lev++)
   {
-    if (dThetadt[lev] != NULL)
+    if (dThetadt[lev] != nullptr)
     {
       delete dThetadt[lev];
-      dThetadt[lev] = NULL;
+      dThetadt[lev] = nullptr;
     }
 
-    if (dthetadt[lev] != NULL)
+    if (dthetadt[lev] != nullptr)
     {
       delete dthetadt[lev];
-      dthetadt[lev] = NULL;
+      dthetadt[lev] = nullptr;
     }
   }
 
@@ -969,7 +969,7 @@ refCountedPtrToPtr(Vector<RefCountedPtr<LevelData<FArrayBox> > >& refPtr,
 Vector<LevelData<FArrayBox>*> amrMushyLayer::
 timeCenteredScalar(const int a_var)
 {
-  Vector<LevelData<FArrayBox>*> av(m_finest_level+1,NULL);
+  Vector<LevelData<FArrayBox>*> av(m_finest_level+1,nullptr);
 
   for (int lev=0; lev<=m_finest_level; lev++)
   {
@@ -1008,8 +1008,8 @@ int amrMushyLayer::getRefinementRatio(int coarseLevel)
 }
 
 void amrMushyLayer::interpToFineSolutions(int lev,
-                                          const std::vector<int> scalarVars,
-                                          const std::vector<int> vectorVars)
+                                          const std::vector<int>& scalarVars,
+                                          const std::vector<int>& vectorVars)
 {
   bool averageFromDest = true;
   //For consistency, get level > 0 vars by interpolation

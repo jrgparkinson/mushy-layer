@@ -1,0 +1,90 @@
+# This is a roughly minimal set of inputs for simulating flow and solidification in mushy layers
+# These are the properties which *must* be defined. Lots of other options can also be set,
+# see the online documentation for more information
+
+
+# Domain setup
+main.max_level=0  # max level = 0 -> no refinement
+main.num_cells=64 64
+main.domain_width=1.0
+main.max_grid_size=128
+
+# Timestepping
+main.max_dt=1 # need this for some reason else initialization goes crazy
+main.min_time=0.5
+main.max_time = 1.0
+main.max_step = 1000
+main.cfl=0.1
+main.max_init_dt = 1e-5
+
+# Convection in a fixed porous medium
+parameters.problem_type=3
+parameters.porosityFunction=0 
+bc.porosityHiVal= 1.0 1.0
+bc.porosityLoVal= 1.0 1.0 
+
+## Dynamics:
+parameters.heleShaw=false
+parameters.permeabilityFunction=5
+
+# Output
+main.verbosity=2
+projector.verbosity=0
+
+# Data output frequency
+main.plot_period = 0.1
+main.plot_interval=50
+main.plot_prefix=plt
+main.checkpoint_interval=1000
+main.output_folder=.
+
+# Velocity solve
+projection.eta=0.0 # no freestream correction for uniform mesh case
+projection.useIncrementalPressure=0
+
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.initialComposition=30
+parameters.liquidusSlope=-0.1
+
+parameters.rayleighComp=0
+parameters.rayleighTemp=1e5
+parameters.darcy=0.01
+parameters.prandtl=1.0
+main.includeInertialTerms=0
+#parameters.heleShawPermeability=8.33
+parameters.stefan=0.0
+parameters.compositionRatio=5.0
+parameters.lewis=200
+parameters.heatConductivityRatio=1
+parameters.specificHeatRatio=1
+main.periodic_bc=0  0
+
+bc.bulkConcentrationHiVal=0.0 0.0
+bc.bulkConcentrationLoVal=0.0 0.0
+bc.liquidConcentrationHiVal=0.0 0.0
+bc.liquidConcentrationLoVal=0.0 0.0
+bc.enthalpyHiVal=0.0 0.0
+bc.enthalpyLoVal=1.0 0.0
+bc.scalarHi=0 1
+bc.scalarLo=0 1
+bc.temperatureHiVal=0.0 0.0
+bc.temperatureLoVal=1.0 0.0
+
+#bc.scalarHi=1 0
+#bc.scalarLo=1 0
+#bc.temperatureHiVal=0.0 0.0
+#bc.temperatureLoVal=0.0 1.0
+
+# poiseulle flow
+parameters.rayleighTemp=0.0
+parameters.body_force=10.0
+main.periodic_bc=0 1
+
+bc.velHi=0 0
+bc.velLo=0 0
+
+bc.velHi=0  0   # velocity BCs: no flow through any of the sides
+bc.velLo=0  0
+
+main.debug=1

@@ -581,9 +581,9 @@ private:
   /// cache intvectsets for gradient here (if relevant)
   LayoutData<IntVectSet> m_gradIVS;
 
-  /// ptr to finer-level Projector object (if it exists -- o/w == NULL)
+  /// ptr to finer-level Projector object (if it exists -- o/w == nullptr)
   Projector* m_fineProjPtr;
-  /// ptr to coarser-level Projector (if level == 0, ptr == NULL)
+  /// ptr to coarser-level Projector (if level == 0, ptr == nullptr)
   Projector* m_crseProjPtr;
 
   /// if coarse level exists, refinement ratio down to it

@@ -48,9 +48,7 @@ int main(int argc, char* argv[])
   }
 
   char* in_file = argv[1];
-  ParmParse pp(argc-2, argv+2, NULL, in_file);
-
-
+  ParmParse pp(argc-2, argv+2, nullptr, in_file);
 
 #ifdef CH_MPI
   MPI_Barrier(Chombo_MPI::comm);
@@ -92,7 +90,7 @@ int main(int argc, char* argv[])
   dirp = opendir(inFolder.c_str());
   if (dirp)
   {
-    while ((directory = readdir(dirp)) != NULL)
+    while ((directory = readdir(dirp)) != nullptr)
     {
       string thisFilename = directory->d_name;
       if (thisFilename.find(prefix.c_str()) != std::string::npos)
@@ -147,8 +145,6 @@ int main(int argc, char* argv[])
     getAMRHierarchy(chkFile, amrlevels, finest_level, header);
 
     time[file_i] = amrlevels[0]->time();
-
-    const ProblemDomain oldLev0Domain = amrlevels[0]->problemDomain();
 
     // If we haven't loaded the advection velocity, calculate it
     if (!amrlevels[0]->loadAdvVel())
@@ -225,7 +221,7 @@ int main(int argc, char* argv[])
     for (int lev = finest_level; lev >=0 ; lev--)
         {
           delete amrlevels[lev];
-          amrlevels[lev] = NULL;
+          amrlevels[lev] = nullptr;
         }
   }
 

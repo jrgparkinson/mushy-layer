@@ -205,10 +205,10 @@ int CCProjectorComp::verbosity() const
 void CCProjectorComp::setPhysBC(PhysBCUtil& a_bc)
 {
 	//Don't do this - we don't own it!
-	//  if (m_physBCPtr != NULL)
+	//  if (m_physBCPtr != nullptr)
 	//    {
 	//      delete m_physBCPtr;
-	//      m_physBCPtr = NULL;
+	//      m_physBCPtr = nullptr;
 	//    }
 	//  m_physBCPtr = a_bc.newPhysBCUtil();
 	m_physBCPtr = (&a_bc);
@@ -230,8 +230,12 @@ CCProjectorComp::CCProjectorComp()
 	// have to initialize this to _something_!
 	m_finest_level = false;
 	finest_level = -1;
-	m_physBCPtr = NULL;
-	m_bottomSolverLevel = NULL;
+	m_physBCPtr = nullptr;
+	m_bottomSolver = nullptr;
+	m_relaxBottomSolver = nullptr;
+	num_ghost = 1;
+	m_level = 0;
+	m_bottomSolverLevel = nullptr;
 	m_limitSolverCoarsening = false;
 	m_amrDx = Vector<Real>(1,1);
 }
@@ -242,53 +246,53 @@ void CCProjectorComp::undefine()
 {
 	for (int lev=0; lev <=finest_level; lev++)
 	{
-		if(m_pressure[lev] != NULL)
+		if(m_pressure[lev] != nullptr)
 		{
 			delete m_pressure[lev];
-			//				m_pressure[lev] = NULL;
+			//				m_pressure[lev] = nullptr;
 		}
 
-		if(m_gradPressure[lev] != NULL)
+		if(m_gradPressure[lev] != nullptr)
 		{
 			delete m_gradPressure[lev];
-			//				m_gradPressure[lev] = NULL;
+			//				m_gradPressure[lev] = nullptr;
 		}
-		if(m_phi[lev] != NULL)
+		if(m_phi[lev] != nullptr)
 		{
 			delete m_phi[lev];
-			//				m_phi[lev] = NULL;
+			//				m_phi[lev] = nullptr;
 		}
-		if(m_divUstar[lev] != NULL)
+		if(m_divUstar[lev] != nullptr)
 		{
 			delete m_divUstar[lev];
-			//				m_divUstar[lev] = NULL;
+			//				m_divUstar[lev] = nullptr;
 		}
 
-		if(m_amrGradIVS[lev] != NULL)
+		if(m_amrGradIVS[lev] != nullptr)
 		{
 			delete m_amrGradIVS[lev];
-			//				m_amrGradIVS[lev] = NULL;
+			//				m_amrGradIVS[lev] = nullptr;
 		}
-		if(m_eLambda[lev] != NULL)
+		if(m_eLambda[lev] != nullptr)
 		{
 			delete m_eLambda[lev];
 		}
-		if(m_grad_eLambda[lev] != NULL)
+		if(m_grad_eLambda[lev] != nullptr)
 		{
 			delete m_grad_eLambda[lev];
 		}
-		if(m_eSync[lev] != NULL)
+		if(m_eSync[lev] != nullptr)
 		{
 			delete m_eSync[lev];
 		}
-		if(m_gradPressureEdge[lev] != NULL)
+		if(m_gradPressureEdge[lev] != nullptr)
 		{
 			delete m_gradPressureEdge[lev];
 		}
 
 	}
 
-	if (m_bottomSolver!=NULL)
+	if (m_bottomSolver!=nullptr)
 	{
 		delete m_bottomSolver;
 	}
@@ -300,16 +304,16 @@ void CCProjectorComp::undefine()
 CCProjectorComp::~CCProjectorComp()
 {
 	//We don't own this! It belongs to amrMushyLayer
-	//  if (m_physBCPtr != NULL)
+	//  if (m_physBCPtr != nullptr)
 	//    {
 	//      delete m_physBCPtr;
-	//      m_physBCPtr = NULL;
+	//      m_physBCPtr = nullptr;
 	//    }
 
-	//	if(m_bottomSolverLevel != NULL)
+	//	if(m_bottomSolverLevel != nullptr)
 	//	{
 	//		delete m_bottomSolverLevel;
-	//		m_bottomSolverLevel = NULL;
+	//		m_bottomSolverLevel = nullptr;
 	//	}
 
 
@@ -350,20 +354,20 @@ CCProjectorComp::define(const Vector<DisjointBoxLayout>& a_amrGrids,
 	IntVect smallGhostVect((num_ghost-1)*IntVect::Unit); // Grad Pressure should have less ghost cells than pressure
 	int numLevels = a_finest_level + 1;
 
-	m_amrCFInterps.resize(numLevels, NULL);
-	m_amrFillPatchFace.resize(numLevels, NULL);
+	m_amrCFInterps.resize(numLevels, nullptr);
+	m_amrFillPatchFace.resize(numLevels, nullptr);
 
 	m_permeability.resize(numLevels);
 
-	m_amrGradIVS.resize(numLevels, NULL);
-	m_pressure.resize(numLevels, NULL);
-	m_gradPressure.resize(numLevels, NULL);
-	m_gradPressureEdge.resize(numLevels, NULL);
-	m_grad_eLambda.resize(numLevels, NULL);
-	m_eLambda.resize(numLevels, NULL);
-	m_eSync.resize(numLevels, NULL);
-	m_phi.resize(numLevels, NULL);
-	m_divUstar.resize(numLevels, NULL);
+	m_amrGradIVS.resize(numLevels, nullptr);
+	m_pressure.resize(numLevels, nullptr);
+	m_gradPressure.resize(numLevels, nullptr);
+	m_gradPressureEdge.resize(numLevels, nullptr);
+	m_grad_eLambda.resize(numLevels, nullptr);
+	m_eLambda.resize(numLevels, nullptr);
+	m_eSync.resize(numLevels, nullptr);
+	m_phi.resize(numLevels, nullptr);
+	m_divUstar.resize(numLevels, nullptr);
 
 	m_theta = a_theta;
 
@@ -577,8 +581,8 @@ CCProjectorComp::gradPhiComp(Vector<RefCountedPtr<LevelData<FluxBox> > >& a_grad
 {
 	//	Gradient::levelGradientMAC(a_gradPhi, m_phi, m_dx);
 	MayDay::Error("gradPhiComp - not implemented");
-	//	LevelData<FArrayBox>* a_phiCrsePtr = NULL;
-	//	LevelData<FArrayBox>* a_phiFinePtr = NULL;
+	//	LevelData<FArrayBox>* a_phiCrsePtr = nullptr;
+	//	LevelData<FArrayBox>* a_phiFinePtr = nullptr;
 	//
 	//	for (int lev=0; lev <= finest_level; lev++)
 	//	{
@@ -634,7 +638,7 @@ void CCProjectorComp::gradPi(LevelData<FArrayBox>& a_gradPi) const
 void CCProjectorComp::grad_eSync(LevelData<FArrayBox>& a_grad_eSync) const
 {
 	MayDay::Error("grad_eSync not implemented");
-	//	if (m_fineProjPtr != NULL)
+	//	if (m_fineProjPtr != nullptr)
 	//	{
 	//		const LevelData<FArrayBox>& fine_eSync = m_fineProjPtr->eSync();
 	//		int nRefFine = m_fineProjPtr->nRefCrse();
@@ -669,10 +673,10 @@ void CCProjectorComp::levelMacProject(LevelData<FluxBox>& a_uEdge,
 	//
 	//	Divergence::levelDivergenceMAC(MacRHS, a_uEdge, m_dx);
 	//
-	//	LevelData<FArrayBox>* crseBCPtr = NULL;
+	//	LevelData<FArrayBox>* crseBCPtr = nullptr;
 	//	Real CFscale = 0.5*a_dt;
 	//
-	//	if (m_crseProjPtr != NULL)
+	//	if (m_crseProjPtr != nullptr)
 	//	{
 	//		// coarse-fine BC is 0.5*dt*(coarse Pi)
 	//		const DisjointBoxLayout crseGrids = m_crseProjPtr->getBoxes();
@@ -693,7 +697,7 @@ void CCProjectorComp::levelMacProject(LevelData<FluxBox>& a_uEdge,
 	//	// report sum(rhs)
 	//	if (s_verbosity >= 2)
 	//	{
-	//		DisjointBoxLayout* finerGridsPtr = NULL;
+	//		DisjointBoxLayout* finerGridsPtr = nullptr;
 	//		int nRefFine = -1;
 	//		Real sumRHS = computeSum(MacRHS, finerGridsPtr,
 	//				nRefFine, m_dx, MacRHS.interval());
@@ -734,10 +738,10 @@ void CCProjectorComp::levelMacProject(LevelData<FluxBox>& a_uEdge,
 	//
 	//applyMacCorrection(a_uEdge, CFscale);
 	//
-	//if (crseBCPtr != NULL)
+	//if (crseBCPtr != nullptr)
 	//{
 	//	delete crseBCPtr;
-	//	crseBCPtr = NULL;
+	//	crseBCPtr = nullptr;
 	//}
 	// that should be it!
 }
@@ -754,7 +758,7 @@ void CCProjectorComp::applyMacCorrection(LevelData<FluxBox>& a_uEdge,
 	//		const DisjointBoxLayout& levelGrids = a_uEdge.getBoxes();
 	//		LevelData<FluxBox> gradPhi(levelGrids,1);
 	//
-	//		LevelData<FArrayBox>* crseBCDataPtr=NULL;
+	//		LevelData<FArrayBox>* crseBCDataPtr=nullptr;
 	//		// should C/F BC's already be set? assume not and reset them here
 	////		if (lev > 0)
 	////		{
@@ -797,10 +801,10 @@ void CCProjectorComp::applyMacCorrection(LevelData<FluxBox>& a_uEdge,
 	//			}
 	//		}
 	//
-	////		if (crseBCDataPtr!=NULL)
+	////		if (crseBCDataPtr!=nullptr)
 	////		{
 	////			delete crseBCDataPtr;
-	////			crseBCDataPtr = NULL;
+	////			crseBCDataPtr = nullptr;
 	////		}
 }
 
@@ -811,7 +815,7 @@ void CCProjectorComp::LevelProject(LevelData<FArrayBox>& a_velocity,
 {
 	//todo - write this
 
-	//	LevelData<FArrayBox>* crseDataPtr=NULL;
+	//	LevelData<FArrayBox>* crseDataPtr=nullptr;
 	//	LevelData<FArrayBox> levelProjRHS(getBoxes(),1);
 	//
 	//	// just to be safe.  proper place for this may be outside this function
@@ -822,8 +826,8 @@ void CCProjectorComp::LevelProject(LevelData<FArrayBox>& a_velocity,
 	//	{
 	//		if (doQuadInterp())
 	//		{
-	//			CH_assert(a_crseVelPtr != NULL);
-	//			CH_assert(m_crseProjPtr != NULL);
+	//			CH_assert(a_crseVelPtr != nullptr);
+	//			CH_assert(m_crseProjPtr != nullptr);
 	//
 	//			// will need to add dt*gradPi from crse vel.
 	//			const DisjointBoxLayout& crseLevelGrids = m_crseProjPtr->getBoxes();
@@ -859,7 +863,7 @@ void CCProjectorComp::LevelProject(LevelData<FArrayBox>& a_velocity,
 	//	} // end if coarser level exists
 	//
 	//	QuadCFInterp velCFInterp;
-	//	if (doQuadInterp() && m_crseProjPtr != NULL)
+	//	if (doQuadInterp() && m_crseProjPtr != nullptr)
 	//	{
 	//		// define two-component CF-interp object for velocities
 	//		velCFInterp.define(a_velocity.getBoxes(),
@@ -883,13 +887,13 @@ void CCProjectorComp::LevelProject(LevelData<FArrayBox>& a_velocity,
 	//	}
 	//
 	//	// set up coarse BC's for solve, then solve
-	//	const LevelData<FArrayBox>* crsePiPtr = NULL;
-	//	if (m_crseProjPtr != NULL) crsePiPtr = &(m_crseProjPtr->Pi());
+	//	const LevelData<FArrayBox>* crsePiPtr = nullptr;
+	//	if (m_crseProjPtr != nullptr) crsePiPtr = &(m_crseProjPtr->Pi());
 	//
 	//	// report sum(rhs)
 	//	if (s_verbosity >= 2)
 	//	{
-	//		DisjointBoxLayout* finerGridsPtr = NULL;
+	//		DisjointBoxLayout* finerGridsPtr = nullptr;
 	//		int nRefFine = -1;
 	//		Real sumRHS = computeSum(levelProjRHS, finerGridsPtr,
 	//				nRefFine, m_dx, levelProjRHS.interval());
@@ -913,13 +917,13 @@ void CCProjectorComp::LevelProject(LevelData<FArrayBox>& a_velocity,
 	//				false); // not homogeneous
 	//	}
 	//
-	//	if (m_crseProjPtr != NULL)
+	//	if (m_crseProjPtr != nullptr)
 	//	{
 	//		// reapply coarse-fine BC's here if necessary
 	//		m_cfInterp.coarseFineInterp(m_Pi, *crsePiPtr);
 	//		// also clean up after ourselves!
 	//		delete crseDataPtr;
-	//		crseDataPtr = NULL;
+	//		crseDataPtr = nullptr;
 	//
 	//	}
 	//
@@ -1030,14 +1034,14 @@ void CCProjectorComp::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocit
 	//			// set up temp storage
 	//			int vectorSize = a_velocity.size();
 	//
-	//			Vector<LevelData<FArrayBox>* > syncRHS(vectorSize,NULL);
-	//			Vector<LevelData<FArrayBox>* > syncCorr(vectorSize,NULL);
+	//			Vector<LevelData<FArrayBox>* > syncRHS(vectorSize,nullptr);
+	//			Vector<LevelData<FArrayBox>* > syncCorr(vectorSize,nullptr);
 	//
 	//			int finestLevel = finest_level;
 	//
 	//			// this is a bogus leveldata pointer for the composite divergences
-	//			LevelData<FArrayBox>* crseVelPtr=NULL;
-	//			LevelData<FArrayBox>* fineVelPtr = NULL;
+	//			LevelData<FArrayBox>* crseVelPtr=nullptr;
+	//			LevelData<FArrayBox>* fineVelPtr = nullptr;
 	//
 	//			// loop over levels to allocate storage and compute RHS
 	//			for (int lev = m_level; lev<= finestLevel; lev++)
@@ -1060,7 +1064,7 @@ void CCProjectorComp::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocit
 	//				}
 	//				else
 	//				{
-	//					fineVelPtr = NULL;
+	//					fineVelPtr = nullptr;
 	//				}
 	//
 	//				// do exchange here
@@ -1146,7 +1150,7 @@ void CCProjectorComp::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocit
 	//
 	//			// now apply sync correction
 	//			Real scale = 1.0;
-	//			LevelData<FArrayBox>* crseCorrPtr = NULL;
+	//			LevelData<FArrayBox>* crseCorrPtr = nullptr;
 	//			if (m_level > 0) crseCorrPtr = syncCorr[m_level-1];
 	//
 	//			applySyncCorrection(a_velocity, scale, crseCorrPtr);
@@ -1174,7 +1178,7 @@ void CCProjectorComp::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocit
 	//			for (int lev= m_level; lev<=finestLevel; lev++)
 	//			{
 	//				delete syncRHS[lev];
-	//				syncRHS[lev] = NULL;
+	//				syncRHS[lev] = nullptr;
 	//			}
 	//		} // end if do sync in the first place
 
@@ -1192,7 +1196,7 @@ void CCProjectorComp::applySyncCorrection(Vector<LevelData<FArrayBox>* >& a_velo
 	//		const DisjointBoxLayout& levelGrids = getBoxes();
 	//
 	//		LevelData<FArrayBox> levelGradCorr(levelGrids, SpaceDim);
-	//		LevelData<FArrayBox>* fineCorrPtr = NULL;
+	//		LevelData<FArrayBox>* fineCorrPtr = nullptr;
 	//		int nRefFine = -1;
 	//
 	//		if (!isFinestLevel())
@@ -1384,13 +1388,13 @@ void CCProjectorComp::computeGrad_eLambda()
 		//		{
 		//			QuadCFInterp interp;
 		//			Gradient::levelGradientMAC(*m_grad_eLambda[lev], *m_eLambda[lev],
-		//					NULL, m_amrDx[lev],
+		//					nullptr, m_amrDx[lev],
 		//					*m_amrGradIVS[lev],
 		//					interp);
 		//		}
 
-		LevelData<FArrayBox>* a_phiCrse = NULL;
-		LevelData<FArrayBox>* a_phiFine = NULL;
+		LevelData<FArrayBox>* a_phiCrse = nullptr;
+		LevelData<FArrayBox>* a_phiFine = nullptr;
 		int a_nRefFine;
 
 		if (lev > 0)
@@ -1466,7 +1470,7 @@ void CCProjectorComp::initialLevelProject(LevelData<FArrayBox>& a_velocity,
 		const Real a_newTime, const Real a_dt)
 {
 	MayDay::Error("initialLevelProject - not implemented");
-	//	LevelData<FArrayBox>* crseDataPtr=NULL;
+	//	LevelData<FArrayBox>* crseDataPtr=nullptr;
 	//	LevelData<FArrayBox> levelProjRHS(getBoxes(),1);
 	//
 	//	// do coarse-fine BC
@@ -1474,8 +1478,8 @@ void CCProjectorComp::initialLevelProject(LevelData<FArrayBox>& a_velocity,
 	//	{
 	//		if (doQuadInterp())
 	//		{
-	//			CH_assert(a_crseVelPtr != NULL);
-	//			CH_assert(m_crseProjPtr != NULL);
+	//			CH_assert(a_crseVelPtr != nullptr);
+	//			CH_assert(m_crseProjPtr != nullptr);
 	//
 	//			// will need to add dt*gradPi to crse vel
 	//			const DisjointBoxLayout& crseLevelGrids = m_crseProjPtr->getBoxes();
@@ -1525,13 +1529,13 @@ void CCProjectorComp::initialLevelProject(LevelData<FArrayBox>& a_velocity,
 	//	}
 	//
 	//	// set up coarse BC's for solve, then solve
-	//	const LevelData<FArrayBox>* crsePiPtr = NULL;
-	//	if (m_crseProjPtr != NULL) crsePiPtr = &(m_crseProjPtr->Pi());
+	//	const LevelData<FArrayBox>* crsePiPtr = nullptr;
+	//	if (m_crseProjPtr != nullptr) crsePiPtr = &(m_crseProjPtr->Pi());
 	//
 	//	// now solve for Pi
 	//	solveMGlevel(m_Pi, crsePiPtr, levelProjRHS);
 	//
-	//	if (m_crseProjPtr != NULL)
+	//	if (m_crseProjPtr != nullptr)
 	//	{
 	//		// reapply coarse-fine BC's here if necessary
 	//		m_cfInterp.coarseFineInterp(m_Pi, *crsePiPtr);
@@ -1558,10 +1562,10 @@ void CCProjectorComp::initialLevelProject(LevelData<FArrayBox>& a_velocity,
 	//	correctCCVelocities(a_velocity,dtScale);
 	//
 	//	// clean up storage
-	//	if (crseDataPtr!=NULL)
+	//	if (crseDataPtr!=nullptr)
 	//	{
 	//		delete crseDataPtr;
-	//		crseDataPtr=NULL;
+	//		crseDataPtr=nullptr;
 	//	}
 }
 
@@ -1674,16 +1678,16 @@ void CCProjectorComp::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_v
 	//	// set up temp storage
 	//	int vectorSize = a_vel.size();
 	//
-	//	Vector<LevelData<FArrayBox>* > projRHS(vectorSize,NULL);
-	//	Vector<LevelData<FArrayBox>* > projCorr(vectorSize,NULL);
+	//	Vector<LevelData<FArrayBox>* > projRHS(vectorSize,nullptr);
+	//	Vector<LevelData<FArrayBox>* > projCorr(vectorSize,nullptr);
 	//
 	//	CCProjectorComp* levelProjPtr = this;
 	//
 	//	int finestLevel = vectorSize - 1;
 	//
 	//	// this is a bogus levelData pointer for the composite divergence
-	//	LevelData<FArrayBox>* crseVelPtr = NULL;
-	//	LevelData<FArrayBox>* fineVelPtr = NULL;
+	//	LevelData<FArrayBox>* crseVelPtr = nullptr;
+	//	LevelData<FArrayBox>* fineVelPtr = nullptr;
 	//	Vector<int> nRefFineVect(vectorSize, -1);
 	//
 	//	// loop over levels to allocate storage and compute RHS
@@ -1710,7 +1714,7 @@ void CCProjectorComp::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_v
 	//		}
 	//		else
 	//		{
-	//			fineVelPtr = NULL;
+	//			fineVelPtr = nullptr;
 	//		}
 	//		nRefFineVect[lev] = nRefFine;
 	//
@@ -1730,10 +1734,10 @@ void CCProjectorComp::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_v
 	//
 	//	// take care of C/F Boundary condition for lBase
 	//
-	//	LevelData<FArrayBox>* crseBCPtr = NULL;
+	//	LevelData<FArrayBox>* crseBCPtr = nullptr;
 	//	if (m_level > 0)
 	//	{
-	//		CH_assert(m_crseProjPtr != NULL);
+	//		CH_assert(m_crseProjPtr != nullptr);
 	//		if (a_homogeneousCFBC)
 	//		{
 	//			// need to define coarse BC and set to 0
@@ -1810,13 +1814,13 @@ void CCProjectorComp::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_v
 	//	for (int lev=m_level; lev<=finestLevel; lev++)
 	//	{
 	//		delete projRHS[lev];
-	//		projRHS[lev] = NULL;
+	//		projRHS[lev] = nullptr;
 	//	}
 	//
-	//	if (crseBCPtr != NULL)
+	//	if (crseBCPtr != nullptr)
 	//	{
 	//		delete crseBCPtr;
-	//		crseBCPtr = NULL;
+	//		crseBCPtr = nullptr;
 	//	}
 }
 
@@ -1964,7 +1968,7 @@ void CCProjectorComp::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
 
 	ProblemDomain baseDomain(m_amrDomains[lev]); // on this level
 	int numSolverLevels;
-	if (a_crseGridsPtr != NULL)
+	if (a_crseGridsPtr != nullptr)
 	{ // coarser level exists:  define solver on two levels
 		numSolverLevels = 2;
 		// this returns a null domain for me:
@@ -2028,10 +2032,10 @@ void CCProjectorComp::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
 	// But m_bottomSolver is a protected field of AMRMultiGrid.
 
 	//Delete previous bottom solver -- Kris R.
-	if(m_bottomSolverLevel != NULL)
+	if(m_bottomSolverLevel != nullptr)
 	{
 		delete m_bottomSolverLevel;
-		m_bottomSolverLevel = NULL;
+		m_bottomSolverLevel = nullptr;
 	}
 
 	//		RelaxSolver<LevelData<FArrayBox> >* newBottomPtr = new RelaxSolver<LevelData<FArrayBox> >;
@@ -2071,13 +2075,13 @@ void CCProjectorComp::solveMGlevel(LevelData<FArrayBox>&   a_phi,
 	LevelData<FArrayBox>& rhsRef =
 			const_cast< LevelData<FArrayBox>& >(a_rhs);
 	int maxLevel;
-	if (a_phiCoarsePtr != NULL)
+	if (a_phiCoarsePtr != nullptr)
 	{
 		maxLevel = 1;
 		LevelData<FArrayBox>* phiCoarsePtrRef =
 				const_cast< LevelData<FArrayBox>* >(a_phiCoarsePtr);
 		phiVect.push_back(phiCoarsePtrRef);
-		rhsVect.push_back(NULL); // I don't think this will be used
+		rhsVect.push_back(nullptr); // I don't think this will be used
 	}
 	else
 	{
@@ -2100,17 +2104,12 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 		const Vector<LevelData<FArrayBox> *> a_Ustar,
 		const int order)
 {
-	bool enforceUstar = false;
-	bool enforceDivUstar = false;
-	bool enforceP = false;
-	bool enforceGradP = false;
-	bool enforceUstarEdge = false;
 	Real rayleighTemp = 100; Real perturbation = 0.1;
 
 	EdgeVelBCHolder edgeVelBC(m_physBCPtr->edgeVelFuncBC(false));
 
 	Vector<LevelData<FluxBox>*> a_UstarFace;
-	a_UstarFace.resize(finest_level+1, NULL);
+	a_UstarFace.resize(finest_level+1, nullptr);
 
 	for (int lev=0; lev<=finest_level; lev++)
 	{
@@ -2122,89 +2121,16 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 							false); // inhomogeneous
 	}
 
-	if (enforceUstar)
-	{
-		for (int lev=0; lev<=finest_level; lev++)
-		{
-			for (DataIterator dit = a_Ustar[lev]->dataIterator(); dit.ok(); ++dit)
-			{
-				Box b = (*a_Ustar[lev])[dit].box();
-				Box interiorBox = b;
-				//					interiorBox.grow(-(num_ghost+1));
-
-				b.grow(-num_ghost);
-				int idir=1;
-
-				Box lo = adjCellLo(b, idir);
-				Box hi = adjCellHi(b, idir);
-
-				// Fill ghost cells in y direction
-				for (BoxIterator bit=BoxIterator(lo); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-
-					Real v_i = (*a_Ustar[lev])[dit](iv, idir);
-					Real v_ii = (*a_Ustar[lev])[dit](iv + BASISV(idir), idir);
-					Real v_iii = (*a_Ustar[lev])[dit](iv + 2*BASISV(idir), idir);
-
-					(*a_Ustar[lev])[dit](iv - BASISV(idir), 0) = 3*(v_i - v_ii) + v_iii;
-				}
-
-				for (BoxIterator bit=BoxIterator(hi); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-
-					Real v_i = (*a_Ustar[lev])[dit](iv, idir);
-					Real v_ii = (*a_Ustar[lev])[dit](iv - BASISV(idir), idir);
-					Real v_iii = (*a_Ustar[lev])[dit](iv -  2*BASISV(idir), idir);
-
-					(*a_Ustar[lev])[dit](iv + BASISV(idir), 0) = 3*(v_i - v_ii) + v_iii;
-				}
-
-
-				b.grow(num_ghost);
-
-				FArrayBox err(b, 1);
-				err.copy((*a_Ustar[lev])[dit], 1, 0, 1);
-
-				for (BoxIterator bit(b); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-
-					//Only fills ghost cells for now
-					//						if (!interiorBox.contains(iv))
-					//						{
-
-					RealVect loc = iv;
-					loc *= m_amrDx[lev];
-					loc += 0.5*m_amrDx[lev]*RealVect::Unit;
-					Real x = loc[0];
-					Real y = loc[1];
-
-
-					(*a_Ustar[lev])[dit](iv, 0) = 0;
-					(*a_Ustar[lev])[dit](iv, 1) = rayleighTemp * (y + perturbation*cos(M_PI*(x))*sin(M_PI*(y)));
-
-					err(iv, 0) -= rayleighTemp * (y + perturbation*cos(M_PI*(x))*sin(M_PI*(y)));
-					//						}
-
-				}
-
-//				int temp=0;
-			}
-		}
-
-	}
 
 	//First calculate div(U^*)
 	LevelData<FArrayBox>* a_uCrsePtr;
 //	LevelData<FArrayBox>* a_uFinePtr;
-	LevelData<FluxBox>* a_uFaceFinePtr = NULL;
-	Real* dxFine = NULL;
+	LevelData<FluxBox>* a_uFaceFinePtr = nullptr;
+	Real* dxFine = nullptr;
 
 	for (int lev=0; lev<=finest_level; lev++)
 	{
-		a_uCrsePtr = NULL; // a_uFinePtr = NULL;
+		a_uCrsePtr = nullptr; // a_uFinePtr = nullptr;
 		int refFine = 2; //refCrse = 2,
 
 		if (lev > 0)
@@ -2222,7 +2148,7 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 		}
 		else
 		{
-			 a_uFaceFinePtr = NULL;
+			 a_uFaceFinePtr = nullptr;
 		}
 
 
@@ -2241,93 +2167,15 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 
 	}
 
-	if (enforceDivUstar)
-	{
-		for (int lev=0; lev<=finest_level; lev++)
-		{
-			for (DataIterator dit = m_divUstar[lev]->dataIterator(); dit.ok(); ++dit)
-			{
-				Box b = (*m_divUstar[lev])[dit].box();
-				FArrayBox err(b, 1);
-				for (BoxIterator bit(b); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-					RealVect loc = iv;
-					loc *= m_amrDx[lev];
-					loc += 0.5*m_amrDx[lev]*RealVect::Unit;
-					Real x = loc[0];
-					Real y = loc[1];
-					Real div = rayleighTemp *(-1+perturbation*M_PI*cos(M_PI*(x))*cos(M_PI*(y)));
-
-					err(iv, 0) = (*m_divUstar[lev])[dit](iv, 0) - div;
-
-					(*m_divUstar[lev])[dit](iv, 0) =  div;
-				}
-
-//				int temp=0;
-			}
-		}
-	}
 
 	//Then solve for Pressure
 
-	// Initialise to zero
-	//todo - remove this!
-//	for (int lev = 0; lev <= finest_level; lev++)
-//	{
-//		setValLevel(*m_pressure[lev], 0.0);
-//	}
 
 	Real sum = computeSum(m_divUstar, m_refinement_ratios, m_amrDx[0]);
 	pout() << "     CCProjectorComp - sum of div(U^*) = " << sum << endl;
-
-//	for (DataIterator dit = m_pressure[0]->dataIterator(); dit.ok(); ++dit)
-//				{
-//					FArrayBox& divU = (*m_divUstar[0])[dit];
-//					FluxBox& perm = (*m_permeability[0])[dit];
-//					int temp=0;
-//
-//				}
+		}
 
 	m_solverMG.solve(m_pressure, m_divUstar, finest_level, 0, false);
-
-	if (enforceP)
-	{
-		for (int lev=0; lev<=finest_level; lev++)
-		{
-			for (DataIterator dit = m_pressure[lev]->dataIterator(); dit.ok(); ++dit)
-			{
-				Box b = (*m_pressure[lev])[dit].box();
-				for (BoxIterator bit(b); bit.ok(); ++bit)
-				{
-					IntVect iv = bit();
-					RealVect loc = iv;
-					loc *= m_amrDx[lev];
-					loc += 0.5*m_amrDx[lev]*RealVect::Unit;
-					Real x = loc[0];
-					Real y = loc[1];
-					(*m_pressure[lev])[dit](iv,0) = rayleighTemp *(y-0.5*y*y - (perturbation/(2*M_PI))*cos(M_PI*(x))*cos(M_PI*(y)));
-				}
-			}
-		}
-	}
-
-	//Enforce physical BCs on Pressure
-	//	BCHolder bcHolder = m_physBCPtr->gradMacPressureFuncBC();
-	//	for (int lev=0; lev<=finest_level; lev++)
-	//	{
-	//	  const DisjointBoxLayout& levelGrids = m_amrGrids[lev];
-	//
-	//	  DataIterator dit = m_pressure[lev]->dataIterator();
-	//	  for (dit.reset(); dit.ok(); ++dit)
-	//	    {
-	//	      bcHolder.operator()((*m_pressure[lev])[dit],
-	//	                          levelGrids[dit],
-	//	                          m_amrDomains[lev],
-	//	                          m_amrDx[lev],
-	//	                          false); // not homogeneous
-	//	    }
-	//	}
 
 
 	//Then take grad(P)
@@ -2338,8 +2186,8 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 		//						 *m_pressure[lev],
 		//				    				m_amrDx[lev]);
 
-		LevelData<FArrayBox>* a_phiCrse = NULL;
-		LevelData<FArrayBox>* a_phiFine = NULL;
+		LevelData<FArrayBox>* a_phiCrse = nullptr;
+		LevelData<FArrayBox>* a_phiFine = nullptr;
 		int a_nRefFine; //a_nRefCrse
 
 		if (lev > 0)
@@ -2355,80 +2203,26 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 
 		//		Box domBox = m_amrDomains[lev].domainBox();
 
-		Gradient::compGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
-				&*a_phiCrse, &*a_phiFine, m_amrDx[lev], a_nRefFine,
-				*m_amrGradIVS[lev], *m_amrCFInterps[lev]);
+		if (a_phiFine)
+		{
+                  Gradient::compGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
+                                  &*a_phiCrse, &*a_phiFine, m_amrDx[lev], a_nRefFine,
+                                  *m_amrGradIVS[lev], *m_amrCFInterps[lev]);
+		}
+		else if (a_phiCrse)
+		{
+		  Gradient::levelGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
+		                             a_phiCrse, m_amrDx[lev],
+		                             *m_amrGradIVS[lev], *m_amrCFInterps[lev]);
+		}
+		else
+		{
+		  Gradient::levelGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
+		                             m_amrDx[lev]);
+		}
 
-		//		Gradient::levelGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
-		//						&*a_phiCrse, m_amrDx[lev],
-		//						*m_amrGradIVS[lev], *m_amrCFInterps[lev]);
-
-		//		Gradient::levelGradientMAC(*m_gradPressureEdge[lev], *m_pressure[lev],
-		//							m_amrDx[lev]);
-
-		//		Gradient::levelGradientMACNew(*m_gradPressureEdge[lev], *m_pressure[lev], m_amrDx[lev]);
-
-		//m_amrDomains[lev]);
-
-
-//		for (DataIterator dit = m_gradPressureEdge[lev]->dataIterator(); dit.ok(); ++dit)
-//		{
-//
-//			FluxBox& gradP = (*m_gradPressureEdge[lev])[dit];
-//
-//
-//			int temp=0;
-//
-//		}
 
 	} // end loop over levels
-
-
-	//todo - remove testing - enforcing analytic grad(P)
-	if (enforceGradP)
-	{
-		for (int lev=0; lev<=finest_level; lev++)
-		{
-			for (DataIterator dit = m_gradPressure[lev]->dataIterator(); dit.ok(); ++dit)
-			{
-
-				//				Box b = (*m_gradPressure[lev])[dit].box();
-
-				for (int idir=0; idir<SpaceDim; idir++)
-				{
-					Box b = (*m_gradPressureEdge[lev])[dit][idir].box();
-
-
-					for (BoxIterator bit(b); bit.ok(); ++bit)
-					{
-						IntVect iv = bit();
-						RealVect loc = iv;
-						loc *= m_amrDx[lev];
-						loc += 0.5*m_amrDx[lev]*RealVect::Unit;
-						Real xEdge = loc[0];
-						Real yEdge = loc[1];
-
-
-
-						Real gradPedge = 0;
-						if (idir == 0)
-						{
-							xEdge = xEdge - m_amrDx[lev]/2;
-							gradPedge = rayleighTemp *(0.5*perturbation*sin(M_PI*(xEdge))*cos(M_PI*(yEdge)));
-						}
-						else if (idir == 1)
-						{
-							yEdge = yEdge - m_amrDx[lev]/2;
-							gradPedge = rayleighTemp *(1-yEdge+0.5*perturbation*cos(M_PI*(xEdge))*sin(M_PI*(yEdge)));
-						}
-						(*m_gradPressureEdge[lev])[dit][idir](iv,0) = gradPedge;
-
-					}
-				}
-//				int temp=0;
-			}
-		}
-	} // end if enforce grad(P)
 
 
 
@@ -2540,10 +2334,10 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 	for (int lev=0; lev<=m_finest_level; lev++)
 	{
 
-		if(a_UstarFace[lev] != NULL)
+		if(a_UstarFace[lev] != nullptr)
 		{
 			delete a_UstarFace[lev];
-			a_UstarFace[lev]= NULL;
+			a_UstarFace[lev]= nullptr;
 		}
 	}
 }

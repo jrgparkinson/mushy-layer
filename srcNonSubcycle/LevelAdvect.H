@@ -48,7 +48,7 @@ public:
     m_numGhost = 0;
     m_normalPredOrder = 1;
     m_numCons = 1;
-    m_advectPhysics = NULL;
+    m_advectPhysics = nullptr;
     m_artificialViscosity = -1;
     m_useFourthOrderSlopes = false;
     m_usePrimLimiting = false;

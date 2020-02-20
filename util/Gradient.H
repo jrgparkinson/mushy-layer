@@ -29,7 +29,7 @@ class Gradient
 public:
 
   /// computes cell-centered level-operator gradient of cell-centered phi
-  /** if phiCrse != NULL, does coarse-fine boundary
+  /** if phiCrse != nullptr, does coarse-fine boundary
       conditions for phi (quadratic interpolation) */
   static void levelGradientCC(
                               ///
@@ -46,7 +46,7 @@ public:
                               const ProblemDomain& a_dProblem);
 
   ///computes cell-centered level-operator gradient of cell-centered phi
-  /** if phiCrse != NULL, does coarse-fine boundary
+  /** if phiCrse != nullptr, does coarse-fine boundary
       conditions for phi (quadratic interpolation).  This (deprecated)
       interface uses a Box instead of a ProblemDomain */
   static void levelGradientCC(
@@ -64,7 +64,7 @@ public:
                               const Box& a_dProblem);
 
   /// computes cell-centered level-operator gradient of cell-centered phi
-  /** if phiCrse != NULL, does coarse-fine boundary
+  /** if phiCrse != nullptr, does coarse-fine boundary
       conditions for phi (quadratic C/F interpolation); predefined
       QuadCFInterp object is passed in for efficiency */
   static void levelGradientCC(
@@ -172,7 +172,7 @@ public:
   /// computes cell-centered composite gradient of cell centered phi
   /**
       Uses same coarse-level C/F BC's as LevelGradientCC, if phiFinePtr !=
-      NULL, then also uses one-sided differencing to compute gradient
+      nullptr, then also uses one-sided differencing to compute gradient
       on coarse side of coarse-fine interface. */
   static void compGradientCC(
                              ///
@@ -195,7 +195,7 @@ public:
   /// computes cell-centered composite gradient of cell centered phi
   /**
       uses same coarse-level C/F BC's as LevelGradientCC, if phiFinePtr !=
-      NULL, then also uses one-sided differencing to compute gradient
+      nullptr, then also uses one-sided differencing to compute gradient
       on coarse side of coarse-fine interface. This (deprecated)
       interface uses a Box instead of a ProblemDomain */
   static void compGradientCC(
@@ -219,7 +219,7 @@ public:
   /// computes cell-centered composite gradient of cell-centered phi
   /**
       uses same coarse-level C/F BC's as LevelGradientCC, if phiFinePtr !=
-      NULL, then also uses one-sided differencing to compute gradient
+      nullptr, then also uses one-sided differencing to compute gradient
       on coarse side of coarse-fine interface. A predefined QuadCFInterp
       is also passed in for efficiency.  Note that no fine QuadCFInterp
       is necessary because we use one-sided differencing for coarse
@@ -248,7 +248,7 @@ public:
   /// computes cell-centered composite gradient of cell-centered phi
   /**
       uses same coarse-level C/F BC's as LevelGradientCC, if phiFinePtr !=
-      NULL, then also uses one-sided differencing to compute gradient
+      nullptr, then also uses one-sided differencing to compute gradient
       on coarse side of coarse-fine interface. A predefined QuadCFInterp
       is also passed in for efficiency.  Note that no fine QuadCFInterp
       is necessary because we use one-sided differencing for coarse
@@ -278,7 +278,7 @@ public:
   /// computes cell-centered composite gradient of cell-centered phi
   /**
       this one assumes that all ghost-cell values have already been set;
-      if phiFinePtr != NULL, then also uses one-sided differencing to compute
+      if phiFinePtr != nullptr, then also uses one-sided differencing to compute
       gradient on coarse side of corarse-fine interface.  note that gradient
       is only really defined in valid regions of grids. */
   static void compGradientCC(
@@ -297,7 +297,7 @@ public:
 
   /// computes cell-centered composite gradient of cell-centered phi
   /**  this one assumes that all ghost-cell values have already been set;
-       if phiFinePtr != NULL, then also uses one-sided differencing to
+       if phiFinePtr != nullptr, then also uses one-sided differencing to
        compute gradient on coarse side of corarse-fine interface.
        note that gradient is only really defined in valid regions of
        grids. This (deprecated) interface uses a Box instead of a
@@ -317,7 +317,7 @@ public:
                              const Box& a_dProblem);
 
   /// computes edge-centered level-operator gradient of cell-centered phi
-  /** if phiCrsePtr != NULL, does quadratic interpolation
+  /** if phiCrsePtr != nullptr, does quadratic interpolation
       to compute coarse-fine boundary conditions for phi */
   static void levelGradientMAC(
                                ///
@@ -334,7 +334,7 @@ public:
                                const ProblemDomain& a_dProblem);
 
   /// computes edge-centered level-operator gradient of cell-centered phi
-  /** if phiCrsePtr != NULL, does quadratic interpolation
+  /** if phiCrsePtr != nullptr, does quadratic interpolation
       to compute coarse-fine boundary conditions for phi. This (deprecated)
       interface uses a Box instead of a ProblemDomain */
   static void levelGradientMAC(
@@ -353,7 +353,7 @@ public:
 
   /// computes edge-centered level-operator gradient of cell-centered phi
   /**
-     if phiCrsePtr != NULL, does quadratic interpolation
+     if phiCrsePtr != nullptr, does quadratic interpolation
      to compute coarse-fine boundary conditions for phi.  A predefined
      QuadCFInterp object is passed in for efficiency */
   static void levelGradientMAC(
@@ -388,7 +388,7 @@ public:
 			const Real a_dx);
 
   /// computes edge-centered composite gradient of cell-centered phi
-  /** if phiCrsePtr != NULL, does quadratic interpolation to compute
+  /** if phiCrsePtr != nullptr, does quadratic interpolation to compute
       coarse-fine boundary conditions for phi; since the edge between
       this level and finer levels is not considered to be a part of
       this level, there is no fine-level coarse-fine BC.  because of this,
@@ -413,7 +413,7 @@ public:
                               const Box& a_dProblem);
 
   /// computes edge-centered composite gradient of cell-centered phi
-  /**  if phiCrsePtr != NULL, does quadratic interpolation to compute
+  /**  if phiCrsePtr != nullptr, does quadratic interpolation to compute
        coarse-fine boundary conditions for phi; since the edge between
        this level and finer levels is not considered to be a part of
        this level, there is no fine-level coarse-fine BC.  because of
@@ -438,7 +438,7 @@ public:
                               const ProblemDomain& a_dProblem);
 
   /// computes edge-centered composite gradient of cell-centered phi
-  /** if phiCrsePtr != NULL, does quadratic interpolation to compute
+  /** if phiCrsePtr != nullptr, does quadratic interpolation to compute
       coarse-fine boundary conditions for phi; since the edge between
       this level and finer levels is not considered to be a part of
       this level, there is no fine-level coarse-fine BC.  because of

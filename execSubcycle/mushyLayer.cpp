@@ -73,7 +73,7 @@ main(int a_argc, char* a_argv[])
 
 
     // Check for an input file
-    char* inFile = NULL;
+    char* inFile = nullptr;
 
     if (a_argc > 1)
       {
@@ -86,7 +86,7 @@ main(int a_argc, char* a_argv[])
         return -1;
       }
     // Parse the command line and the input file (if any)
-    ParmParse pp(a_argc-2,a_argv+2,NULL,inFile);
+    ParmParse pp(a_argc-2,a_argv+2,nullptr,inFile);
 
     ParmParse ppMain("main");
 
@@ -141,13 +141,12 @@ main(int a_argc, char* a_argv[])
     // Only require ref_ratio to be defined for AMR simulations
     if (max_level > 0)
     {
-      ppMain.getarr("ref_ratio",ref_ratios,0,num_read_levels+1);
+      ppMain.getarr("ref_ratio",ref_ratios,0,num_read_levels);
     }
-    else
-    {
-      // Need a dummy value for uniform mesh simulations
-      ref_ratios.push_back(1);
-    }
+    // AMR expects max_level + 1 values of ref_ratio
+    // so add a dummy value
+    ref_ratios.push_back(1);
+
 
 
     mushyLayer(stopTime, nstop_int, ref_ratios);

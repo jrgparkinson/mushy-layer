@@ -212,6 +212,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.scaleP_CC = opt.scaleP_MAC;
   ppProjection.query("scaleCCPressure", opt.scaleP_CC);
 
+  opt.explicitViscousVelSolve = false;
+  ppMain.query("explicitViscousVelSolve", opt.explicitViscousVelSolve);
+
   opt.projection_verbosity = 0;
   ppProjection.query("verbosity", opt.projection_verbosity);
 
@@ -265,24 +268,11 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.initAnalyticVel=false;
   ppMain.query("initAnalyticVel", opt.initAnalyticVel);
 
-
-
-
   opt.useOldAdvVel = false;
   ppMain.query("useOldAdvVelForTracing", opt.useOldAdvVel);
 
-//  opt.lapVelNumSmooth = 0;
-//  ppMain.query("lapVelNumSmooth", opt.lapVelNumSmooth);
-//
-//  opt.lapVelSmoothScale = 0.0;
-//  ppMain.query("lapVelSmoothScale", opt.lapVelSmoothScale);
-
   opt.CCVelSrcTermCentering = 0.5;
   ppMain.query("vel_src_centering", opt.CCVelSrcTermCentering);
-
-//  opt.advSrcAllowLaggedLapVel = false;
-//  ppAdvsrc.query("allow_lagged_lap_vel", opt.advSrcAllowLaggedLapVel);
-
 
   opt.advVelPressureSrc = false;
   opt.advVelDarcySrc = true;
@@ -491,35 +481,50 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppRegrid.query("tag_channels", opt.tag_channels);
 
 
+  // Default refinement is for mushy layer simulations with channels
+  opt.refinementMethod =  RefinementMethod::tagMushChannels;
 
   if (opt.tag_velocity)
-    {
+  {
+    pout() << "Refinement method: tag fluid speed" << endl;
     opt.refinementMethod = RefinementMethod::tagSpeed;
-    }
+  }
   else if (opt.tag_channels)
   {
+    pout() << "Refinement method: tag channels" << endl;
     opt.refinementMethod = RefinementMethod::tagChannels;
   }
   else if (opt.tag_plume_mush)
   {
+    pout() << "Refinement method: tag plume mush" << endl;
     opt.refinementMethod = RefinementMethod::tagPlumeMush;
   }
   else if (opt.taggingVar > -1)
   {
+    pout() << "Refinement method: tag scalar field" << endl;
     opt.refinementMethod = RefinementMethod::tagScalar;
   }
   else if (opt.taggingVectorVar > -1)
   {
+    pout() << "Refinement method: tag vector" << endl;
     opt.refinementMethod = RefinementMethod::tagVector;
   }
   else if (ppRegrid.contains("tag_mush_channels"))
   {
+    pout() << "Refinement method: tag_mush_channes" << endl;
     opt.refinementMethod = RefinementMethod::tagMushChannels;
   }
   else if (ppRegrid.contains("tag_channels_composite"))
   {
+    pout() << "Refinement method: tag_channels_composite" << endl;
     opt.refinementMethod = RefinementMethod::tagMushChannelsCompositeCriteria;
   }
+
+  opt.onlyTagPorousCells = false;
+  ppRegrid.query("onlyTagPorousCells", opt.onlyTagPorousCells);
+
+  opt.porousCellsShrink = 0;
+  ppRegrid.query("porousCellsShrink", opt.porousCellsShrink);
 
   opt.taggingMarginalPorosityLimit = 1.0;
   ppRegrid.query("marginalPorosityLimit", opt.taggingMarginalPorosityLimit);
@@ -807,6 +812,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.initialRandomPerturbation=false;
   ppMain.query("initialRandomPerturbation", opt.initialRandomPerturbation);
+
+  opt.seedRandomPert = true;
+  ppMain.query("seedRandomPert", opt.seedRandomPert);
 
   opt.maxRestartWavenumbers = 50;
   ppMain.query("maxRestartWavenumber", opt.maxRestartWavenumbers);
@@ -1110,13 +1118,13 @@ defineAMR(AMR&                                          a_amr,
 }
 
 bool
-getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain, string gridfileParam)
+getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
+              string gridfileParam, int verbosity)
 {
 
   //  pout() << "getFixedGrids" << endl;
 
   ParmParse ppMain("main");
-  int verbosity = 3;
 
   int max_level;
   int max_grid_size;
@@ -1295,14 +1303,12 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
       for (int i=0; i < amrLev.size(); i++)
       {
         amrLev[i]->time(resetTime);
-
       }
       pout() << "Set time = " << resetTime << endl;
 #else
       MayDay::Warning("Unable to reset time as you're not using the forked version of Chombo, and therefore your AMR class doesn't have a cur_time() method");
 #endif
     }
-
 
   }
   else if (predefinedGrids)
@@ -1316,9 +1322,6 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
     a_amr.setupForNewAMRRun();
   }
 
-
-
-
 }
 
 bool is_integer(const std::string& s)
@@ -1329,6 +1332,16 @@ bool is_integer(const std::string& s)
 }
 
 
+
+void createPhaseBoundaryStructures(const int lev, const Vector<DisjointBoxLayout>& grids, const IntVect ivGhost,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpySolidus,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyEutectic,
+                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyLiquidus)
+{
+  enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+  enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+  enthalpyEutectic[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+}
 
 
 #include "NamespaceFooter.H"

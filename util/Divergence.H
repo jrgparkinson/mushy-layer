@@ -27,7 +27,7 @@ class Divergence
 public:
 
   /** computes cell-centered level-operator divergence of
-      cell-centered vector field u; if uCrse != NULL, does coarse-fine
+      cell-centered vector field u; if uCrse != nullptr, does coarse-fine
       boundary conditions for u -- if  quadInterp == true, uses quadratic
       coarse-fine boundary conditions, otherwise, use extrap BC's */
   static void levelDivergenceCC(
@@ -47,7 +47,7 @@ public:
                                 const bool a_quadInterp);
 
   /** computes cell-centered level-operator divergence of
-      cell-centered vector field u; if uCrse != NULL, does coarse-fine
+      cell-centered vector field u; if uCrse != nullptr, does coarse-fine
       boundary conditions for u -- if  quadInterp == true, uses quadratic
       coarse-fine boundary conditions, otherwise, use extrap BC's.
       This (deprecated) interface uses a Box instead of a ProblemDomain. */
@@ -68,7 +68,7 @@ public:
                                 const bool a_quadInterp);
 
   /** computes cell-centered level-operator divergence of
-      cell-centered vector field u; if uCrse != NULL, does coarse-fine
+      cell-centered vector field u; if uCrse != nullptr, does coarse-fine
       boundary conditions for u -- if  quadInterp == true, uses quadratic
       coarse-fine boundary conditions, otherwise, use extrap BC's.  This
       one takes a pre-allocated QuadCFInterp object as an argument */
@@ -97,7 +97,7 @@ public:
 
    *
    * computes cell-centered level-operator divergence of
-      cell-centered vector field u; if uCrse != NULL, does coarse-fine
+      cell-centered vector field u; if uCrse != nullptr, does coarse-fine
       boundary conditions for u -- if  quadInterp == true, uses quadratic
       coarse-fine boundary conditions, otherwise, use extrap BC's.  This
       one takes a pre-allocated QuadCFInterp object as an argument */
@@ -118,7 +118,7 @@ public:
 
   /** computes cell-centered composite-operator divergence
       of cell-centered vector field u; uses same coarse-fine BC's as
-      levelDivergenceCC -- if uFine != NULL, also does flux-matching
+      levelDivergenceCC -- if uFine != nullptr, also does flux-matching
       BC with finer level uFine, using same coarse-fine BC's as used
       for coarse level BC.
       NOTE - this expects 1 (one) ghost cell!*/
@@ -144,7 +144,7 @@ public:
 
   /** computes cell-centered composite-operator divergence
       of cell-centered vector field u; uses same coarse-fine BC's as
-      levelDivergenceCC -- if uFine != NULL, also does flux-matching
+      levelDivergenceCC -- if uFine != nullptr, also does flux-matching
       BC with finer level uFine, using same coarse-fine BC's as used
       for coarse level BC. This (deprecated) interface uses a Box instead
       of a ProblemDomain */
@@ -170,7 +170,7 @@ public:
 
   /** computes cell-centered composite-operator divergence
       of cell-centered vector field u; uses same coarse-fine BC's as
-      levelDivergenceCC -- if uFine != NULL, also does flux-matching
+      levelDivergenceCC -- if uFine != nullptr, also does flux-matching
       BC with finer level uFine, using same coarse-fine BC's as used
       for coarse level BC. In this one, pre-allocated LevelFluxRegister
       and QuadCFInterp objects are passed in as an argument (saves
@@ -203,7 +203,7 @@ public:
 
   /** computes cell-centered composite-operator divergence
       of cell-centered vector field u; uses same coarse-fine BC's as
-      levelDivergenceCC -- if uFine != NULL, also does flux-matching
+      levelDivergenceCC -- if uFine != nullptr, also does flux-matching
       BC with finer level uFine, using same coarse-fine BC's as used
       for coarse level BC. In this one, pre-allocated LevelFluxRegister
       and QuadCFInterp objects are passed in as an argument (saves

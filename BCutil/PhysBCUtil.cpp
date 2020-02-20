@@ -191,7 +191,7 @@ public:
   PressureInflowValueFunction()
   :
     m_value(0), m_nComp(0), m_inflowValue(0.0), m_plumeStart(0.0), m_plumeEnd(0.0),
-    m_params(NULL)
+    m_params(nullptr)
   {
   }
 
@@ -269,7 +269,7 @@ public:
   /// Default constructor
   AbstractScalarBCFunction()
   :
-    m_isDefined(false), m_homogeneous(false), m_advVel(NULL), m_dx(-1), m_interval(Interval(0,0))
+    m_isDefined(false), m_homogeneous(false), m_advVel(nullptr), m_dx(-1), m_interval(Interval(0,0))
   {
   }
 
@@ -367,7 +367,7 @@ public:
       }
 
       delete[] value;
-      value = NULL;
+      value = nullptr;
     }
   }
 
@@ -536,13 +536,12 @@ public:
                         Vector<Vector<Real> >&  a_customHiBCVal) : AbstractScalarBCFunction(a_isDefined,
                                                                                             a_params, a_homogeneous,
                                                                                             a_advVel, a_dx, a_interval),
-                                                                                            m_plumeVal(a_plumeVals)
-  {
-    m_customLoBC = a_customLoBC;
-    m_customHiBC = a_customHiBC;
-    m_customLoBCVal = a_customLoBCVal;
-    m_customHiBCVal = a_customHiBCVal;
-  }
+                                                                                            m_plumeVal(a_plumeVals),
+                                                                                            m_customLoBC(a_customLoBC),
+                                                                                            m_customHiBC(a_customHiBC),
+                                                                                            m_customLoBCVal(a_customLoBCVal),
+                                                                                            m_customHiBCVal(a_customHiBCVal)
+  { }
 
   virtual void operator()(FArrayBox&           a_state,
                           const Box&           a_valid,
@@ -910,18 +909,19 @@ public:
   /// Component of velocity to apply BCs to
   int m_comp;
 
+  /// Order of spatial accuracy
+  int m_order;
+
   // Default constructor
   BasicFluxExtrapBCFunction()
   :
-    m_comp(-1)
+    m_comp(-1), m_order(2)
   {
   }
 
   /// Full constructor
-  BasicFluxExtrapBCFunction(
-      int  a_comp)
-  :
-    m_comp(a_comp)
+  explicit BasicFluxExtrapBCFunction(int  a_comp)
+  : m_comp(a_comp), m_order(2)
   {
   }
   /// Apply BC
@@ -931,8 +931,6 @@ public:
                           Real                 a_dx,
                           bool                 a_homogeneous)
   {
-
-    int order = 2;
 
     // a_state is FACE-centered, now in m_comp direction;
     // a_valid is CELL-centered
@@ -954,7 +952,7 @@ public:
             {
 
               ExtraBC(a_state, a_valid,
-                      idir, side, order, m_comp);
+                      idir, side, m_order, m_comp);
               //						  ExtrapBC(  a_state, a_valid,  idir,   side, order);
 
             } // if ends match
@@ -991,18 +989,22 @@ public:
   /// Velocity values to enforce on the domain boundaries
   LevelData<FluxBox>* m_velBCvals;
 
+  /// Stick with 1st order for stability
+  int m_order;
+
   /// Full constructor
   BasicECVelBCFunction(bool a_isHomogeneous,
                        bool a_isViscous,
                        int  a_comp,
                        const Interval& a_interval,
                        MushyLayerParams a_params,
-                       LevelData<FluxBox>* a_velocityBCVals = NULL) : AbstractFaceBCFunction(a_isHomogeneous,
+                       LevelData<FluxBox>* a_velocityBCVals = nullptr) : AbstractFaceBCFunction(a_isHomogeneous,
                                                                                              a_comp,
                                                                                              a_params),
                                                                                              m_isViscous(a_isViscous),
                                                                                              m_interval(a_interval),
-                                                                                             m_velBCvals(a_velocityBCVals)
+                                                                                             m_velBCvals(a_velocityBCVals),
+                                                                                             m_order(1)
   {
   }
 
@@ -1013,8 +1015,7 @@ public:
                   Real                 a_dx,
                   bool                 a_homogeneous)
   {
-    // Stick with 1st order for stability
-    int order = 1;
+
 
     // a_state is FACE-centered, now in m_comp direction;
     // a_valid is CELL-centered
@@ -1081,13 +1082,13 @@ public:
                       DiriBC(a_state, validFace, a_dx,
                              a_homogeneous,
                              BCValueHolder(zeroFunc),
-                             idir, side, order);
+                             idir, side, m_order);
                     }
                     else // inviscid
                     {
-                      order  = 2;
                       ExtraBC(a_state, a_valid,
-                              idir, side, order);
+                              idir, side,
+                              2); // second order BCs here
                     }
                   } // end if tangential
                   break;
@@ -1112,7 +1113,7 @@ public:
                     DiriBC(a_state, validFace, a_dx,
                            a_homogeneous,
                            BCValueHolder(zeroFunc),
-                           idir, side, order);
+                           idir, side, m_order);
 
                   }
                   break;
@@ -1124,17 +1125,12 @@ public:
                   // always no-flow
                   if (idir == m_comp)
                   {
-                    //                                      DiriEdgeBC(a_state, a_valid, a_dx,
-                    //                                                 a_homogeneous,
-                    //                                                 BCValueHolder(zeroFunc),
-                    //                                                 idir, side);
 
                     DiriEdgeVariableBC(a_state, a_valid, a_dx,
                                        a_homogeneous,
                                        BCValueHolder(inflowBCValueFunc),
                                        idir, side);
 
-                    //                    int temp=0;
                   }
                   else
                   {
@@ -1157,14 +1153,15 @@ public:
                       DiriBC(a_state, validFace, a_dx,
                              a_homogeneous,
                              BCValueHolder(zeroFunc),
-                             idir, side, order);
+                             idir, side, m_order);
                     }
                     else // inviscid
                     {
-                      order  = 2;
+
                       ExtraBC(a_state, a_valid,
-                              idir, side, order, m_comp);
-                      //                                                                          ExtrapBC(  a_state, a_valid,  idir,   side, order);
+                              idir, side,
+                              2, // second order BCs here
+                              m_comp);
                     }
                   } // end if tangential
 
@@ -1188,8 +1185,8 @@ public:
                   // Need to find the correct dataiterator
                   DataIterator dit = m_velBCvals->dataIterator();
 
-                  //                  FluxBox* velBCVals = NULL;
-                  FArrayBox* velBCValComp = NULL;
+                  //                  FluxBox* velBCVals = nullptr;
+                  FArrayBox* velBCValComp = nullptr;
 
                   Box domBox2(domainBox);
                   domBox2.surroundingNodes(idir);
@@ -1218,7 +1215,7 @@ public:
 
                   }
 
-                  if (velBCValComp != NULL)
+                  if (velBCValComp != nullptr)
                   {
 
                     Box toRegion(a_valid);
@@ -1271,7 +1268,7 @@ public:
                     DiriBC(a_state, validFace, a_dx,
                            a_homogeneous,
                            BCValueHolder(zeroFunc),
-                           idir, side, order);
+                           idir, side, m_order);
                   }
                   //
 
@@ -1338,9 +1335,8 @@ public:
   {
   }
   /// Full constructor
-  ExtrapolationBCFunction(bool a_isDefined, int a_order=0)
-  :
-    m_isDefined(a_isDefined), m_order(a_order)
+  explicit ExtrapolationBCFunction(bool a_isDefined, int a_order=0)
+  : m_isDefined(a_isDefined), m_order(a_order)
   {
   }
   /// Apply BC
@@ -1969,15 +1965,13 @@ public:
   ):
     AbstractFaceBCFunction(a_isHomogeneous,
                            a_comp,
-                           a_params)
+                           a_params) , m_plumeVal(a_plumeVal),
+                           m_bcTypeLo(a_bcTypeLo),
+                           m_bcTypeHi(a_bcTypeHi),
+                           m_bcValLo(a_bcValLo),
+                           m_bcValHi(a_bcValHi)
 
-  {
-    m_plumeVal = a_plumeVal;
-    m_bcTypeLo = a_bcTypeLo;
-    m_bcTypeHi = a_bcTypeHi;
-    m_bcValLo = a_bcValLo;
-    m_bcValHi = a_bcValHi;
-  }
+  {  }
 
   /// Apply BC
   void operator()(FArrayBox&           a_state,
@@ -4061,18 +4055,17 @@ LevelData<FluxBox>*  PhysBCUtil::getAdvVel()
   return m_advVel;
 }
 
-PhysBCUtil::PhysBCUtil()
-{
-  m_dx = -1;
-  m_defined = false;
-  m_advVel = NULL;
-  m_time = 0;
-}
+PhysBCUtil::PhysBCUtil() : m_dx(-1),
+    m_defined(false),
+    m_time(0),
+    m_advVel(nullptr)
+{ }
 
 // ---------------------------------------------------------------
 PhysBCUtil::PhysBCUtil(MushyLayerParams a_params, Real a_dx)
 {
   //  pout() << "PhysBCUtil::PhysBCUtil" << endl;
+  m_advVel = nullptr;
 
   // initialize to bogus values
   for (int idir=0; idir<SpaceDim; idir++)
@@ -4105,19 +4098,18 @@ PhysBCUtil::operator= (const PhysBCUtil& rhs)
 {
   m_loBC = rhs.m_loBC;
   m_hiBC = rhs.m_hiBC;
+  m_advVel = rhs.m_advVel;
   return *this;
 }
 
 // ---------------------------------------------------------------
-PhysBCUtil::PhysBCUtil(const PhysBCUtil& rhs)
-{
-  m_loBC = rhs.m_loBC;
-  m_hiBC = rhs.m_hiBC;
-  m_dx = rhs.m_dx;
-  m_time = rhs.m_time;
-  m_defined = false;
-  m_advVel = NULL;
-}
+PhysBCUtil::PhysBCUtil(const PhysBCUtil& rhs) :   m_loBC(rhs.m_loBC),
+    m_hiBC(rhs.m_hiBC),
+    m_dx(rhs.m_dx),
+    m_defined(false),
+    m_time(rhs.m_time),
+    m_advVel(nullptr)
+{ }
 
 // ---------------------------------------------------------------
 void
