@@ -6,7 +6,12 @@
 ebase = mushyLayer
 
 # the location of the Chombo "lib" directory
+ifeq ($(NERSC_HOST),cori) 
+CHOMBO_HOME = ../../Chombo/lib
+else
 CHOMBO_HOME = ../../chombofork/lib
+endif
+
 # Compile with chombo trunk to check everything will work for other users
 #CHOMBO_HOME = ../../Chombo-trunk/lib 
 
