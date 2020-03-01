@@ -3691,8 +3691,9 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxAbsMismatch);
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxBottom);
       diagsToPrint.push_back(DiagnosticNames::diag_heatFluxTop);
-      diagsToPrint.push_back(DiagnosticNames::diag_chimneySpacing);
-      diagsToPrint.push_back(DiagnosticNames::diag_chimneyWidth);
+      // Chimney spacing isn't computed, stop writing out NAN values
+//      diagsToPrint.push_back(DiagnosticNames::diag_chimneySpacing);
+//      diagsToPrint.push_back(DiagnosticNames::diag_chimneyWidth);
       diagsToPrint.push_back(DiagnosticNames::diag_HorizAvSalinity0);
       diagsToPrint.push_back(DiagnosticNames::diag_HorizAvSalinity20);
       diagsToPrint.push_back(DiagnosticNames::diag_HorizAvSalinity40);

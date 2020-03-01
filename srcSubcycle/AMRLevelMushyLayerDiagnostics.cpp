@@ -632,40 +632,43 @@ void AMRLevelMushyLayer::computeDiagnostics()
   if (calcDiagnostics
         && m_diagnostics.diagnosticIsIncluded(DiagnosticNames::diag_mushyAverageBulkConc))
     {
-    Real mushAvBulkC = 0.0;
-    Real mushAvPorosity = 0.0;
-    Real mushVol = 0.0;
-    int numMushyCells = 0;
+
+    Real mushVol;
+    Real mushAvBulkC = averageOverMushyRegion(ScalarVars::m_bulkConcentration, mushVol);
+//    Real mushAvBulkC = 0.0;
+    Real mushAvPorosity = averageOverMushyRegion(ScalarVars::m_porosity, mushVol);
+
+//    int numMushyCells = 0;
 
 //    int lo_j = m_problem_domain.domainBox().smallEnd()[1];
 
-    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
-    {
-      FArrayBox& porosity = (*m_scalarNew[ScalarVars::m_porosity])[dit];
-      FArrayBox& bulkConc = (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit];
+//    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+//    {
+//      FArrayBox& porosity = (*m_scalarNew[ScalarVars::m_porosity])[dit];
+//      FArrayBox& bulkConc = (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit];
+//
+//      for (BoxIterator bit = BoxIterator(m_grids[dit]); bit.ok(); ++bit)
+//      {
+//        IntVect iv = bit();
+//        RealVect loc;
+//        ::getLocation(iv, loc, m_dx);
+//
+//        bool is_sea_ice = loc[1] > (m_domainHeight-depth);
+//
+//        if (is_sea_ice)
+//        {
+//          numMushyCells++;
+//          mushAvBulkC += bulkConc(iv);
+//          mushAvPorosity += porosity(iv);
+//        }
+//      }
+//    }
+//    mushAvBulkC = mushAvBulkC / numMushyCells;
+//    mushAvPorosity = mushAvPorosity / numMushyCells;
+//    mushVol = numMushyCells*m_dx*m_dx;
 
-      for (BoxIterator bit = BoxIterator(m_grids[dit]); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-
-        RealVect loc;
-         ::getLocation(iv, loc, m_dx);
-
-//        bool is_sea_ice = (iv[1] - lo_j) > depth_i;
-         bool is_sea_ice = loc[1] > (m_domainHeight-depth);
-
-//        if (porosity(iv) < 1.0)
-        if (is_sea_ice)
-        {
-          numMushyCells++;
-          mushAvBulkC += bulkConc(iv);
-          mushAvPorosity += porosity(iv);
-        }
-      }
-    }
-    mushAvBulkC = mushAvBulkC / numMushyCells;
-    mushAvPorosity = mushAvPorosity / numMushyCells;
-    mushVol = numMushyCells*m_dx*m_dx;
+    // Convert mush volume in number of cells to physical volume (in dimensionless units)
+    mushVol *= pow(m_dx, SpaceDim);
 
     m_diagnostics.addDiagnostic(DiagnosticNames::diag_mushyAverageBulkConc, m_time, mushAvBulkC);
     m_diagnostics.addDiagnostic(DiagnosticNames::diag_mushyAveragePorosity, m_time, mushAvPorosity);
@@ -701,7 +704,6 @@ Real AMRLevelMushyLayer::computeMushDepth(Real a_porosity_criteria)
       depth = (averagedPorosity.size()-depth_i)*m_dx;
       break;
     }
-
   }
 
   return depth;

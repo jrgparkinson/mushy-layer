@@ -64,6 +64,7 @@
 #include "phaseDiagram.H"
 #include "AMRNonLinearMultiCompOp.H"
 #include "mushyLayerOpt.h"
+#include "PorosityFilterFunction.H"
 
 // Fortran files
 #include "AdvectUtilF_F.H"
@@ -566,6 +567,12 @@ protected:
 
   /// Compute average value of some scalar field over the liquid region of the domain
   Real averageOverLiquidRegion(int a_var);
+
+  /// Computer average value of some scalar field over the region of the domain where 0 < porosity < 1
+  Real averageOverMushyRegion(int a_var, Real& vol);
+
+  /// Average over region defined by filter function
+  Real averageOverFilterRegion(int a_var, PorosityFilterFunction* filter, Real& vol);
 
   /// Compute the intensity of light from the surface at each point in the domain
   void computeRadianceIntensity();
