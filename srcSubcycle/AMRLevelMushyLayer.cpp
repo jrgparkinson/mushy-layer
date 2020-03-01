@@ -2496,13 +2496,11 @@ void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
 Real AMRLevelMushyLayer::averageOverFilterRegion(int a_var, PorosityFilterFunction* filter, Real& vol)
 {
   Real average = 0;
-  vol = 0;
+  int numCells = 0;
 
   // Need to be careful to do this right in parallel
 
   Box domBox = m_problem_domain.domainBox();
-
-  Vector<Real> allAveraged(numProc(), 0.0);
 
   for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
   {
@@ -2516,33 +2514,51 @@ Real AMRLevelMushyLayer::averageOverFilterRegion(int a_var, PorosityFilterFuncti
       if ((*filter)((*m_scalarNew[ScalarVars::m_porosity])[dit](iv)))
       {
         average += (*m_scalarNew[a_var])[dit](iv);
-        vol += 1;
+        numCells += 1;
       }
     }
   }
 
-  average /= vol;
+  pout() << "averageOverFilterRegion sum=" << average << ", vol=" << vol;
+
+  // avoid NaN values in case of no cells matching criteria
+  if (numCells == 0)
+  {
+    average = 0.0;
+  }
+  else
+  {
+    average /= numCells;
+  }
+
+  pout() << ", average=" << average << endl;
 
   //  pout() << "HorizontallyAverage - got local averages, now broadcast/gather" << endl;
 
   // Broadcast/gather to compute averages over whole domain
   int srcProc = 0;
 
+  Vector<Real> allAveraged(numProc(), 0.0);
+  Vector<int> allNumCells(numProc(), 0.0);
   gather(allAveraged, average, srcProc);
+  gather(allNumCells, numCells, srcProc);
 
   Real globalAverage = 0;
+  Real globalSumNumCells = 0;
 
   if (procID() == srcProc)
   {
     for (int ivec = 0; ivec<numProc(); ivec++)
     {
       globalAverage += allAveraged[ivec]/numProc();
+      globalSumNumCells += allNumCells[ivec];
     }
-
-
   }
 
   broadcast(globalAverage, srcProc);
+  broadcast(globalSumNumCells, srcProc);
+
+  vol = globalSumNumCells;
 
   return globalAverage;
 }
