@@ -2246,22 +2246,24 @@ void AMRLevelMushyLayer::addPerturbation(int a_var, Real alpha, int waveNumber, 
     randsk[i] = ((double) rand()/ (RAND_MAX));
   }
 
-  for (DataIterator dit = m_scalarNew[a_var]->dataIterator(); dit.ok(); ++dit)
-  {
-    Box b = (*m_scalarNew[a_var])[dit].box();
-    b &= m_problem_domain.domainBox();
-
-    // Seed the random number generator in each box separately
+    // Seed the random number generator in each processor separately
     if (m_opt.seedRandomPert)
     {
       // need to ensure that (a) we don't multiply by zero indexes 
       // (hence the offsets), and (b) we force a different seed for 
       // each box. (hence the dit().datInd bit). Otherwise we see pattern
       // matching in different boxes
-      Real seed = std::time(0)*(procID()+0.5)*(dit().datInd()+0.5);
+      Real seed = std::time(0)*(procID()+1);
       pout() << "Seeding random number with " << seed << " on processor " << procID() << endl;
       srand(seed);
     }
+
+
+  
+  for (DataIterator dit = m_scalarNew[a_var]->dataIterator(); dit.ok(); ++dit)
+  {
+    Box b = (*m_scalarNew[a_var])[dit].box();
+    b &= m_problem_domain.domainBox();
 
     for (BoxIterator bit(b); bit.ok(); ++bit)
     {
