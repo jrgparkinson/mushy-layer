@@ -81,31 +81,31 @@ jobs:
           name: python-unit-test-results
           path: ${{ env.UNIT_TEST_PATH }}
 
-      - uses: actions/checkout@v2
-        name: Checkout master
-        with:
-          ref: master
-          path: master
+      # - uses: actions/checkout@v2
+      #   name: Checkout master
+      #   with:
+      #     ref: master
+      #     path: master
 
       # Allow job to succeed if this fails
       # as multiple commits may lead to synchronisation issues
-      - name: Push coverage to repo
-        continue-on-error: true
-        run: |
-          ls
-          cd $UNIT_TEST_PATH/coverage_html_report
-          mkdir -p $UNIT_TEST_PUBLISH/$BRANCH_NAME
-          cp . $UNIT_TEST_PUBLISH/$BRANCH_NAME -r
-          cd $UNIT_TEST_PUBLISH/$BRANCH_NAME
-          git config --global user.name 'jparkinson'
-          git config --global user.email 'jamie.parkinson@gmail.com'
-          git add .
-          git commit -m "Unittest coverage"
-          git push
+      # - name: Push coverage to repo
+      #   continue-on-error: true
+      #   run: |
+      #     ls
+      #     cd $UNIT_TEST_PATH/coverage_html_report
+      #     mkdir -p $UNIT_TEST_PUBLISH/$BRANCH_NAME
+      #     cp . $UNIT_TEST_PUBLISH/$BRANCH_NAME -r
+      #     cd $UNIT_TEST_PUBLISH/$BRANCH_NAME
+      #     git config --global user.name 'jparkinson'
+      #     git config --global user.email 'jamie.parkinson@gmail.com'
+      #     git add .
+      #     git commit -m "Unittest coverage"
+      #     git push
 
-      - name: Request Github Pages build job
-        run: >-
-          curl -L -X POST 
-          -H "Content-Type: application/json"
-          -H "Authorization: token ${{ secrets.GITHUB_PAT}}"
-          "https://api.github.com/repos/${{ github.repository }}/pages/builds"
+      # - name: Request Github Pages build job
+      #   run: >-
+      #     curl -L -X POST 
+      #     -H "Content-Type: application/json"
+      #     -H "Authorization: token ${{ secrets.GITHUB_PAT}}"
+      #     "https://api.github.com/repos/${{ github.repository }}/pages/builds"
