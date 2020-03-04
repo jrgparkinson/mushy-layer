@@ -186,8 +186,13 @@ jobs:
         uses: actions/upload-artifact@v1
         name: Upload test results
         with:
-          name: test-results
-          path: ${{ env.REGRESSIONS_PATH }}
+          name: temp
+          path: /home/runner/work/_temp/
+
+
+      # with:
+      #     name: test-results
+      #     path: ${{ env.REGRESSIONS_PATH }}
 
       # Standard upload
       - uses: actions/upload-artifact@v1
@@ -195,6 +200,13 @@ jobs:
         with:
           name: test-results
           path: ${{ env.REGRESSIONS_PATH }}
+
+      # Upload temp data for debugging
+      # - uses: actions/upload-artifact@v1
+      #   name: Upload temp data
+      #   with:
+      #     name: temp
+      #     path: /home/runner/work/_temp/
 
       # Now try and run one of the functional tests
       # (the others will take too long or need MATLAB)
