@@ -3,20 +3,19 @@ name: Build C++ Code and run Regression Tests
 on:
   push:
     branches:
-      - 'development'
+      - '*'
+
+    paths-ignore:
+      - '.github/**'
+      - '**/workflows/**'
+
   pull_request:
     branches:
-      - 'development'
-      - master
+      - '*'
 
-#    paths-ignore:
-#      - '.github/**'
-#      - '**/workflows/**'
-
-# schedule: 
-#   # * is a special character in YAML so you have to quote this string
-#   # run at 23:59 every day
-#   - cron:  '59 23 * * *'
+    paths-ignore:
+      - '.github/**'
+      - '**/workflows/**'
 
 env:
   CHOMBO_ROOT: /home/runner/chombo
@@ -175,6 +174,10 @@ jobs:
       - if: failure()
         name: Run regressions with more ouput
         run: |
+          cd $GITHUB_WORKSPACE/test/regression
+          mkdir debug
+          cd debug
+          $GITHUB_WORKSPACE/execSubcycle/mushyLayer2d.Linux.64.g++.gfortran.OPT.ex ../darcy/inputs
           cd $GITHUB_WORKSPACE/test/regression
           python run_regression_tests.py -v -t darcy
 

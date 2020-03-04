@@ -2491,14 +2491,10 @@ void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
 
 }
 
-
-
 Real AMRLevelMushyLayer::averageOverFilterRegion(int a_var, PorosityFilterFunction* filter, Real& vol)
 {
   Real average = 0;
   int numCells = 0;
-
-  // Need to be careful to do this right in parallel
 
   Box domBox = m_problem_domain.domainBox();
 
@@ -2510,7 +2506,6 @@ Real AMRLevelMushyLayer::averageOverFilterRegion(int a_var, PorosityFilterFuncti
     for (BoxIterator bit(box); bit.ok(); ++bit)
     {
       IntVect iv = bit();
-//      if ((*m_scalarNew[ScalarVars::m_porosity])[dit](iv) > 0.999)
       if ((*filter)((*m_scalarNew[ScalarVars::m_porosity])[dit](iv)))
       {
         average += (*m_scalarNew[a_var])[dit](iv);
@@ -2519,7 +2514,7 @@ Real AMRLevelMushyLayer::averageOverFilterRegion(int a_var, PorosityFilterFuncti
     }
   }
 
-  pout() << "averageOverFilterRegion sum=" << average << ", vol=" << vol;
+//  pout() << "averageOverFilterRegion sum=" << average << ", vol=" << vol;
 
   // avoid NaN values in case of no cells matching criteria
   if (numCells == 0)
@@ -2539,7 +2534,7 @@ Real AMRLevelMushyLayer::averageOverFilterRegion(int a_var, PorosityFilterFuncti
   int srcProc = 0;
 
   Vector<Real> allAveraged(numProc(), 0.0);
-  Vector<int> allNumCells(numProc(), 0.0);
+  Vector<int> allNumCells(numProc(), 0);
   gather(allAveraged, average, srcProc);
   gather(allNumCells, numCells, srcProc);
 
