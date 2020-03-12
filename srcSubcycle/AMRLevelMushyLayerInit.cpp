@@ -3624,6 +3624,10 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
       }
     }
 
+    // since calculatePermeability is only called on level 0 above, 
+    // do it again here
+    calculatePermeability();
+
     // Only do this on level 0 to ensure all other levels are setup
     if (m_level == 0)
     {
