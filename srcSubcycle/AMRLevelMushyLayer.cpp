@@ -2422,6 +2422,64 @@ bool AMRLevelMushyLayer::finestLevel()
   return !hasFinerLevel();
 }
 
+void AMRLevelMushyLayer::computeDiagnosticSoluteFluxes()
+{
+  // Compute increments to solute flux on each level
+  int numComp = 2;
+
+  LevelData<FluxBox> totalFlux(m_grids, numComp, IntVect::Unit);
+  getTotalFlux(totalFlux);
+
+  LevelData<FluxBox> totalFluxNoGhost(m_grids, numComp, IntVect::Zero);
+  totalFlux.copyTo(totalFluxNoGhost);
+
+  // new way of keeping track of fluxes (on level 0)
+  if (m_level == 0)
+  {
+    Real scale = (1/m_dx)*m_dt;
+    m_heatDomainFluxRegister.incrFlux(totalFluxNoGhost, scale, 0);
+    m_saltDomainFluxRegister.incrFlux(totalFluxNoGhost, scale, 1);
+  }
+
+  // Calculate horizontally averaged fluxes
+  LevelData<FArrayBox> averageFrameFlux(m_grids, numComp);
+  LevelData<FArrayBox> averageAdvectiveFlux(m_grids, numComp);
+  LevelData<FArrayBox> averageDiffusiveFlux(m_grids, numComp);
+  LevelData<FArrayBox> averageVerticalFlux(m_grids, numComp);
+
+  horizontallyAverage(averageVerticalFlux, totalFluxNoGhost);
+
+  // Copy across for writing to plot files
+  averageVerticalFlux.copyTo(Interval(0, 0), *m_scalarNew[ScalarVars::m_averageHeatFlux], Interval(0,0));
+  averageVerticalFlux.copyTo(Interval(1, 1), *m_scalarNew[ScalarVars::m_averageVerticalFlux], Interval(0,0));
+
+  // Also want solute flux at each point in space written out
+  int soluteComp = 1;
+  for (DataIterator dit = totalFlux.dataIterator(); dit.ok(); ++dit)
+  {
+    FluxBox& flux = totalFlux[dit];
+    FArrayBox& fab = flux[SpaceDim-1];
+    Box b = flux.box();
+
+    b.growDir(1, Side::Hi, -1); // need this because we also grab the flux in the cell one up
+
+    Box b2 = (*m_scalarNew[ScalarVars::m_verticalFlux])[dit].box();
+    b &= b2; // ensure we don't try and fill cells which don't exist
+    for (BoxIterator bit(b); bit.ok(); ++bit)
+    {
+      IntVect iv = bit();
+      IntVect ivUp = iv + BASISV(1);
+      (*m_scalarNew[ScalarVars::m_verticalFlux])[dit](iv) = 0.5*(fab(iv, soluteComp) + fab(ivUp, soluteComp));
+    }
+  }
+}
+
+void AMRLevelMushyLayer::computeTotalFlux()
+{
+  int numComp = 2;
+  LevelData<FluxBox> temp(m_grids, numComp, IntVect::Unit);
+  getTotalFlux(temp);
+}
 
 void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
 {
@@ -2434,7 +2492,6 @@ void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
   RefCountedPtr<AMRNonLinearMultiCompOp> HCOp = RefCountedPtr<AMRNonLinearMultiCompOp>(
       (AMRNonLinearMultiCompOp*)this->m_HCOpFact->AMRnewOp(m_problem_domain));
 
-
   LevelData<FArrayBox> HC(m_grids, numComp, fluxGhost + IntVect::Unit); // Need one more ghost cell than the flux
   fillHC(HC, m_time);
 
@@ -2442,9 +2499,6 @@ void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
   for (DataIterator dit = m_scalarNew[ScalarVars::m_enthalpy]->dataIterator(); dit.ok(); ++dit)
   {
     HCOp->getFlux(diffusiveTSlFlux[dit], HC, diffusiveTSlFlux[dit].box(), dit(), 1.0);
-
-    // Copy the vertical component to an farray box
-    //    (*m_scalarNew[ScalarVars::m_FsVertDiffusion])[dit].copy(diffusiveTSlFlux[dit], 1, 0, 1);
 
     EdgeToCell(diffusiveTSlFlux[dit], 1, (*m_scalarNew[ScalarVars::m_FsVertDiffusion])[dit], 0, 1);
     (*m_scalarNew[ScalarVars::m_FsVertDiffusion])[dit].mult(-1);
@@ -2455,13 +2509,10 @@ void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
 
   }
 
-
-
+  LevelData<FArrayBox>& tempDebug = *m_scalarNew[ScalarVars::m_FsVertDiffusion];
 
   // Set F = F_{fluid} + F_{frame}
   computeTotalAdvectiveFluxes(totalFlux);
-
-
 
   for (DataIterator dit = m_scalarNew[ScalarVars::m_bulkConcentration]->dataIterator(); dit.ok(); ++dit)
   {

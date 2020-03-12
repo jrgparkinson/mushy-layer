@@ -619,6 +619,14 @@ protected:
   /// Calculate advective + diffusive flux
   void getTotalFlux(LevelData<FluxBox>& totalFlux);
 
+  /// Compute the total solute flux
+  /**
+   * Computes the diffusive flux and then combine with the already computed advective fluxes
+   */
+  void computeTotalFlux();
+
+  void computeDiagnosticSoluteFluxes();
+
   /// Compute \f$ \nabla^2 \mathbf{U} \f$
   void computeLapVel(LevelData<FArrayBox>& a_lapVel,
                      LevelData<FArrayBox>& a_vel,
