@@ -290,7 +290,6 @@ void AMRLevelMushyLayer::computeDiagnostics()
       m_diagnostics.addDiagnostic(DiagnosticNames::diag_maxUhalf, m_time, globalMaxVertVel);
 
     }
-
   }
 
 
@@ -340,6 +339,8 @@ void AMRLevelMushyLayer::computeDiagnostics()
         ml->m_scalarNew[ScalarVars::m_FsVertDiffusion]->copyTo(*Fs_vert_diffusion[lev]);
         ml->m_scalarNew[ScalarVars::m_FsVertFluid]->copyTo(*Fs_vert_fluid[lev]);
         ml->m_scalarNew[ScalarVars::m_FsVertFrame]->copyTo(*Fs_vert_frame[lev]);
+
+        LevelData<FArrayBox>& temp = *horizAvFs[lev];
 
         ml = ml->getFinerLevel();
 

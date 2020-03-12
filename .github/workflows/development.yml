@@ -50,6 +50,9 @@ jobs:
           echo $LD_LIBRARY_PATH
           echo $GITHUB_WORKSPACE
 
+      - name: Update package list
+        run: sudo apt-get update
+
       - name: Install csh
         run: sudo apt-get install csh
 
