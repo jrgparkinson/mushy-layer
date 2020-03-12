@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from PltFile import latexify
+from MushyPltFile import latexify
 import os
 import numpy as np
 from ChkFile import ChkFile

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-from PltFile import PltFile
+from MushyPltFile import MushyPltFile
 import sys
 
 plt.close('all')
@@ -17,7 +17,7 @@ figure_name = 'PlottingExample'
 data_file = os.path.join(os.environ['MUSHY_LAYER_DIR'], 'matlab', 'ChomboMatlab', 'plt025000.2d.hdf5')
 
 # Get data
-pf = PltFile(data_file)
+pf = MushyPltFile(data_file)
 pf.load_data()
 
 # Start making plot
