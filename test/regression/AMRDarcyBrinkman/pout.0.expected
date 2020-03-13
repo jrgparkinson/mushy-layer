@@ -20,165 +20,261 @@ plot file name = ./plt000000.2d.hdf5
   MAC Projection (#1 on level 0), exit status = 1, max(div u) = 9.094947e-13
   U* solve  Component 0: residual = 0.000000e+00 exit status: -1 Component 1: residual = 0.000000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.094387e-02
-coarse time step   0  old time = 0.000000e+00  old dt = 1.000000e-04  wallclocktime = 2.64e-02
+, average=-9.999920e-01
+, average=0.000000e+00
+, average=0.000000e+00
+coarse time step   0  old time = 0.000000e+00  old dt = 1.000000e-04  wallclocktime = 2.17e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.00000e-04, dt = 1.00000e-04, CFL=1.17740e-16)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.95530e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 2.81319e-01
-coarse time step   1  old time = 1.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.63e-02
+, average=-9.99984e-01
+, average=0.00000e+00
+, average=0.00000e+00
+coarse time step   1  old time = 1.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.44e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.00000e-04, dt = 1.00000e-04, CFL=5.07643e-05)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.06594e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 5.36818e-01
-coarse time step   2  old time = 2.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.66e-02
+, average=-9.99976e-01
+, average=0.00000e+00
+, average=0.00000e+00
+coarse time step   2  old time = 2.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.46e-02
  AMRLevelMushyLayer::advance (level = 0, time=3.00000e-04, dt = 1.00000e-04, CFL=9.77457e-05)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.99864e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.14111e-01
-coarse time step   3  old time = 3.000000e-04  old dt = 1.000000e-04  wallclocktime = 2.35e-02
+, average=-9.99968e-01
+, average=0.00000e+00
+, average=0.00000e+00
+coarse time step   3  old time = 3.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.46e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.00000e-04, dt = 1.00000e-04, CFL=1.49167e-04)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.57789e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 1.09962e+00
-coarse time step   4  old time = 4.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.75e-02
+, average=-9.99960e-01
+, average=0.00000e+00
+, average=0.00000e+00
+coarse time step   4  old time = 4.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.48e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.00000e-04, dt = 1.00000e-04, CFL=2.02655e-04)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.45009e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 3.60290e+00
-coarse time step   5  old time = 5.000000e-04  old dt = 1.000000e-04  wallclocktime = 2.16e-02
+, average=-1.00000e+00
+, average=-9.99233e-01
+, average=9.96506e-01
+coarse time step   5  old time = 5.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.47e-02
  AMRLevelMushyLayer::advance (level = 0, time=6.00000e-04, dt = 1.00000e-04, CFL=6.50013e-04)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.81024e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 1.18540e+01
-coarse time step   6  old time = 6.000000e-04  old dt = 1.000000e-04  wallclocktime = 2.09e-02
+, average=-1.00000e+00
+, average=-9.99107e-01
+, average=9.89281e-01
+coarse time step   6  old time = 6.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.55e-02
  AMRLevelMushyLayer::advance (level = 0, time=7.00000e-04, dt = 1.00000e-04, CFL=2.12571e-03)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.89031e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 2.53194e+01
-coarse time step   7  old time = 7.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.86e-02
+, average=-1.00000e+00
+, average=-9.98984e-01
+, average=9.82142e-01
+coarse time step   7  old time = 7.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.56e-02
  AMRLevelMushyLayer::advance (level = 0, time=8.00000e-04, dt = 1.00000e-04, CFL=4.53486e-03)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.20689e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 4.11416e+01
-coarse time step   8  old time = 8.000000e-04  old dt = 1.000000e-04  wallclocktime = 2.79e-02
+, average=-9.99999e-01
+, average=-9.98863e-01
+, average=9.75091e-01
+coarse time step   8  old time = 8.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.55e-02
  AMRLevelMushyLayer::advance (level = 0, time=9.00000e-04, dt = 1.00000e-04, CFL=7.36254e-03)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.70649e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 5.79338e+01
-coarse time step   9  old time = 9.000000e-04  old dt = 1.000000e-04  wallclocktime = 2.68e-02
+, average=-9.99999e-01
+, average=-9.98746e-01
+, average=9.68127e-01
+coarse time step   9  old time = 9.000000e-04  old dt = 1.000000e-04  wallclocktime = 1.56e-02
 plot file name = ./plt000010.2d.hdf5
  AMRLevelMushyLayer::advance (level = 0, time=1.00000e-03, dt = 1.00000e-04, CFL=1.03548e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.49563e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 7.51242e+01
-coarse time step  10  old time = 1.000000e-03  old dt = 1.000000e-04  wallclocktime = 2.59e-02
+, average=-9.99998e-01
+, average=-9.98633e-01
+, average=9.61250e-01
+coarse time step  10  old time = 1.000000e-03  old dt = 1.000000e-04  wallclocktime = 1.74e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.10000e-03, dt = 1.00000e-04, CFL=1.34009e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.88121e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 9.24774e+01
-coarse time step  11  old time = 1.100000e-03  old dt = 1.000000e-04  wallclocktime = 1.91e-02
+, average=-9.99998e-01
+, average=-9.98517e-01
+, average=9.54454e-01
+coarse time step  11  old time = 1.100000e-03  old dt = 1.000000e-04  wallclocktime = 1.55e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.20000e-03, dt = 1.00000e-04, CFL=1.64455e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.09104e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 1.09888e+02
-coarse time step  12  old time = 1.200000e-03  old dt = 1.000000e-04  wallclocktime = 1.91e-02
+, average=-9.99997e-01
+, average=-9.98403e-01
+, average=9.47746e-01
+coarse time step  12  old time = 1.200000e-03  old dt = 1.000000e-04  wallclocktime = 2.00e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.30000e-03, dt = 1.00000e-04, CFL=1.94666e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.21094e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 1.27299e+02
-coarse time step  13  old time = 1.300000e-03  old dt = 1.000000e-04  wallclocktime = 1.80e-02
+, average=-9.99997e-01
+, average=-9.98291e-01
+, average=9.41124e-01
+coarse time step  13  old time = 1.300000e-03  old dt = 1.000000e-04  wallclocktime = 1.54e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.40000e-03, dt = 1.00000e-04, CFL=2.24528e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.53118e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 1.44671e+02
-coarse time step  14  old time = 1.400000e-03  old dt = 1.000000e-04  wallclocktime = 2.21e-02
+, average=-9.99996e-01
+, average=-9.98181e-01
+, average=9.34590e-01
+coarse time step  14  old time = 1.400000e-03  old dt = 1.000000e-04  wallclocktime = 1.57e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.50000e-03, dt = 1.00000e-04, CFL=2.53976e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 6.31268e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 1.61974e+02
-coarse time step  15  old time = 1.500000e-03  old dt = 1.000000e-04  wallclocktime = 2.12e-02
+, average=-9.99995e-01
+, average=-9.98074e-01
+, average=9.28143e-01
+coarse time step  15  old time = 1.500000e-03  old dt = 1.000000e-04  wallclocktime = 1.58e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.60000e-03, dt = 1.00000e-04, CFL=2.82968e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.47020e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 1.79177e+02
-coarse time step  16  old time = 1.600000e-03  old dt = 1.000000e-04  wallclocktime = 1.87e-02
+, average=-9.99995e-01
+, average=-9.97969e-01
+, average=9.21783e-01
+coarse time step  16  old time = 1.600000e-03  old dt = 1.000000e-04  wallclocktime = 1.53e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.70000e-03, dt = 1.00000e-04, CFL=3.11464e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.85996e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 1.96252e+02
-coarse time step  17  old time = 1.700000e-03  old dt = 1.000000e-04  wallclocktime = 1.86e-02
+, average=-9.99994e-01
+, average=-9.97866e-01
+, average=9.15510e-01
+coarse time step  17  old time = 1.700000e-03  old dt = 1.000000e-04  wallclocktime = 1.54e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.80000e-03, dt = 1.00000e-04, CFL=3.39432e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.82366e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 2.13173e+02
-coarse time step  18  old time = 1.800000e-03  old dt = 1.000000e-04  wallclocktime = 1.64e-02
+, average=-9.99993e-01
+, average=-9.97766e-01
+, average=9.09325e-01
+coarse time step  18  old time = 1.800000e-03  old dt = 1.000000e-04  wallclocktime = 1.93e-02
  AMRLevelMushyLayer::advance (level = 0, time=1.90000e-03, dt = 1.00000e-04, CFL=3.66839e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 6.01030e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 2.29912e+02
-coarse time step  19  old time = 1.900000e-03  old dt = 1.000000e-04  wallclocktime = 1.68e-02
+, average=-9.99992e-01
+, average=-9.97669e-01
+, average=9.03225e-01
+coarse time step  19  old time = 1.900000e-03  old dt = 1.000000e-04  wallclocktime = 1.69e-02
 plot file name = ./plt000020.2d.hdf5
  AMRLevelMushyLayer::advance (level = 0, time=2.00000e-03, dt = 1.00000e-04, CFL=3.93656e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.56957e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 2.46444e+02
-coarse time step  20  old time = 2.000000e-03  old dt = 1.000000e-04  wallclocktime = 1.75e-02
+, average=-9.99990e-01
+, average=-9.97574e-01
+, average=8.97213e-01
+coarse time step  20  old time = 2.000000e-03  old dt = 1.000000e-04  wallclocktime = 1.73e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.10000e-03, dt = 1.00000e-04, CFL=4.19857e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.03612e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 2.62744e+02
+, average=-9.99989e-01
+, average=-9.97482e-01
+, average=8.91286e-01
 coarse time step  21  old time = 2.100000e-03  old dt = 1.000000e-04  wallclocktime = 1.57e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.20000e-03, dt = 1.00000e-04, CFL=4.45415e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.32075e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 2.78786e+02
-coarse time step  22  old time = 2.200000e-03  old dt = 1.000000e-04  wallclocktime = 1.58e-02
+, average=-9.99988e-01
+, average=-9.97392e-01
+, average=8.85445e-01
+coarse time step  22  old time = 2.200000e-03  old dt = 1.000000e-04  wallclocktime = 1.52e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.30000e-03, dt = 1.00000e-04, CFL=4.70307e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.21894e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 2.94549e+02
-coarse time step  23  old time = 2.300000e-03  old dt = 1.000000e-04  wallclocktime = 1.76e-02
+, average=-9.99986e-01
+, average=-9.97306e-01
+, average=8.79689e-01
+coarse time step  23  old time = 2.300000e-03  old dt = 1.000000e-04  wallclocktime = 1.57e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.40000e-03, dt = 1.00000e-04, CFL=4.94511e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.24086e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 3.10009e+02
-coarse time step  24  old time = 2.400000e-03  old dt = 1.000000e-04  wallclocktime = 1.65e-02
+, average=-9.99984e-01
+, average=-9.97222e-01
+, average=8.74018e-01
+coarse time step  24  old time = 2.400000e-03  old dt = 1.000000e-04  wallclocktime = 1.98e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.50000e-03, dt = 1.00000e-04, CFL=5.18007e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.59437e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 3.25147e+02
-coarse time step  25  old time = 2.500000e-03  old dt = 1.000000e-04  wallclocktime = 1.70e-02
+, average=-9.99982e-01
+, average=-9.97141e-01
+, average=8.68431e-01
+coarse time step  25  old time = 2.500000e-03  old dt = 1.000000e-04  wallclocktime = 1.51e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.60000e-03, dt = 1.00000e-04, CFL=5.40812e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.44631e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 3.39943e+02
-coarse time step  26  old time = 2.600000e-03  old dt = 1.000000e-04  wallclocktime = 2.03e-02
+, average=-9.99980e-01
+, average=-9.97064e-01
+, average=8.62928e-01
+coarse time step  26  old time = 2.600000e-03  old dt = 1.000000e-04  wallclocktime = 1.53e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.70000e-03, dt = 1.00000e-04, CFL=5.63154e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.88907e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 3.54380e+02
-coarse time step  27  old time = 2.700000e-03  old dt = 1.000000e-04  wallclocktime = 1.91e-02
+, average=-9.99978e-01
+, average=-9.96989e-01
+, average=8.57508e-01
+coarse time step  27  old time = 2.700000e-03  old dt = 1.000000e-04  wallclocktime = 1.55e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.80000e-03, dt = 1.00000e-04, CFL=5.84800e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 6.74971e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 3.68442e+02
-coarse time step  28  old time = 2.800000e-03  old dt = 1.000000e-04  wallclocktime = 1.90e-02
+, average=-9.99976e-01
+, average=-9.96916e-01
+, average=8.52170e-01
+coarse time step  28  old time = 2.800000e-03  old dt = 1.000000e-04  wallclocktime = 1.80e-02
  AMRLevelMushyLayer::advance (level = 0, time=2.90000e-03, dt = 1.00000e-04, CFL=6.05725e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 6.31672e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 3.82116e+02
-coarse time step  29  old time = 2.900000e-03  old dt = 1.000000e-04  wallclocktime = 1.93e-02
+, average=-9.99974e-01
+, average=-9.96847e-01
+, average=8.46915e-01
+coarse time step  29  old time = 2.900000e-03  old dt = 1.000000e-04  wallclocktime = 1.63e-02
  AMRLevelMushyLayer::advance (level = 0, time=3.00000e-03, dt = 1.00000e-04, CFL=6.25914e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.31863e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 3.95387e+02
-coarse time step  30  old time = 3.000000e-03  old dt = 1.000000e-04  wallclocktime = 1.88e-02
+, average=-9.99971e-01
+, average=-9.96780e-01
+, average=8.41741e-01
+coarse time step  30  old time = 3.000000e-03  old dt = 1.000000e-04  wallclocktime = 1.57e-02
 plot file name = ./plt000031.2d.hdf5
  AMRLevelMushyLayer::advance (level = 0, time=3.10000e-03, dt = 1.00000e-04, CFL=6.45380e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 6.41265e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 4.08243e+02
-coarse time step  31  old time = 3.100000e-03  old dt = 1.000000e-04  wallclocktime = 2.31e-02
+, average=-9.99968e-01
+, average=-9.96717e-01
+, average=8.36647e-01
+coarse time step  31  old time = 3.100000e-03  old dt = 1.000000e-04  wallclocktime = 1.82e-02
 AMR::regrid(0)
 AMR::regrid: base level = 0
 AMRLevelMushyLayer::tagCells - refine mush channels - 0
@@ -207,7 +303,10 @@ Sum(RHS) for IVP solve = 4.44089e-16
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.13386e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -6.64758e-17 (current time 3.30000e-03)
-coarse time step  32  old time = 3.200000e-03  old dt = 1.000000e-04  wallclocktime = 1.23e-01
+, average=-9.99967e-01
+, average=-9.96566e-01
+, average=8.26978e-01
+coarse time step  32  old time = 3.200000e-03  old dt = 1.000000e-04  wallclocktime = 1.25e-01
  AMRLevelMushyLayer::advance (level = 0, time=3.30000e-03, dt = 1.00000e-04, CFL=2.40976e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.32152e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -221,7 +320,10 @@ coarse time step  32  old time = 3.200000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00324e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -6.38475e-17 (current time 3.40000e-03)
-coarse time step  33  old time = 3.300000e-03  old dt = 1.000000e-04  wallclocktime = 8.17e-02
+, average=-9.99965e-01
+, average=-9.96430e-01
+, average=8.17901e-01
+coarse time step  33  old time = 3.300000e-03  old dt = 1.000000e-04  wallclocktime = 7.45e-02
  AMRLevelMushyLayer::advance (level = 0, time=3.40000e-03, dt = 1.00000e-04, CFL=2.64387e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.40440e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -235,7 +337,10 @@ coarse time step  33  old time = 3.300000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 7.99571e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -6.85566e-17 (current time 3.50000e-03)
-coarse time step  34  old time = 3.400000e-03  old dt = 1.000000e-04  wallclocktime = 7.90e-02
+, average=-9.99964e-01
+, average=-9.96299e-01
+, average=8.09364e-01
+coarse time step  34  old time = 3.400000e-03  old dt = 1.000000e-04  wallclocktime = 7.12e-02
  AMRLevelMushyLayer::advance (level = 0, time=3.50000e-03, dt = 1.00000e-04, CFL=2.08472e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.98446e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -249,7 +354,10 @@ coarse time step  34  old time = 3.400000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 7.99840e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -6.69139e-17 (current time 3.60000e-03)
-coarse time step  35  old time = 3.500000e-03  old dt = 1.000000e-04  wallclocktime = 7.26e-02
+, average=-9.99962e-01
+, average=-9.96172e-01
+, average=8.01321e-01
+coarse time step  35  old time = 3.500000e-03  old dt = 1.000000e-04  wallclocktime = 7.08e-02
  AMRLevelMushyLayer::advance (level = 0, time=3.60000e-03, dt = 1.00000e-04, CFL=2.19460e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.91429e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -263,7 +371,10 @@ coarse time step  35  old time = 3.500000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 7.99967e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -6.91042e-17 (current time 3.70000e-03)
-coarse time step  36  old time = 3.600000e-03  old dt = 1.000000e-04  wallclocktime = 7.62e-02
+, average=-9.99961e-01
+, average=-9.96050e-01
+, average=7.93730e-01
+coarse time step  36  old time = 3.600000e-03  old dt = 1.000000e-04  wallclocktime = 7.07e-02
  AMRLevelMushyLayer::advance (level = 0, time=3.70000e-03, dt = 1.00000e-04, CFL=2.34051e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.85377e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -277,7 +388,10 @@ coarse time step  36  old time = 3.600000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00015e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -7.24992e-17 (current time 3.80000e-03)
-coarse time step  37  old time = 3.700000e-03  old dt = 1.000000e-04  wallclocktime = 7.34e-02
+, average=-9.99959e-01
+, average=-9.95935e-01
+, average=7.86556e-01
+coarse time step  37  old time = 3.700000e-03  old dt = 1.000000e-04  wallclocktime = 8.80e-02
  AMRLevelMushyLayer::advance (level = 0, time=3.80000e-03, dt = 1.00000e-04, CFL=2.47348e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.61906e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -291,7 +405,10 @@ coarse time step  37  old time = 3.700000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00038e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -7.51275e-17 (current time 3.90000e-03)
-coarse time step  38  old time = 3.800000e-03  old dt = 1.000000e-04  wallclocktime = 8.41e-02
+, average=-9.99957e-01
+, average=-9.95829e-01
+, average=7.79766e-01
+coarse time step  38  old time = 3.800000e-03  old dt = 1.000000e-04  wallclocktime = 7.51e-02
  AMRLevelMushyLayer::advance (level = 0, time=3.90000e-03, dt = 1.00000e-04, CFL=2.59761e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.45018e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -305,7 +422,10 @@ coarse time step  38  old time = 3.800000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00048e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -7.31563e-17 (current time 4.00000e-03)
-coarse time step  39  old time = 3.900000e-03  old dt = 1.000000e-04  wallclocktime = 9.18e-02
+, average=-9.99955e-01
+, average=-9.95731e-01
+, average=7.73330e-01
+coarse time step  39  old time = 3.900000e-03  old dt = 1.000000e-04  wallclocktime = 7.55e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.00000e-03, dt = 1.00000e-04, CFL=2.71644e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.62583e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -319,7 +439,10 @@ coarse time step  39  old time = 3.900000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00054e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -8.04938e-17 (current time 4.10000e-03)
-coarse time step  40  old time = 4.000000e-03  old dt = 1.000000e-04  wallclocktime = 8.83e-02
+, average=-9.99953e-01
+, average=-9.95644e-01
+, average=7.67219e-01
+coarse time step  40  old time = 4.000000e-03  old dt = 1.000000e-04  wallclocktime = 7.15e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.10000e-03, dt = 1.00000e-04, CFL=2.83451e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.01288e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -333,7 +456,10 @@ coarse time step  40  old time = 4.000000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00060e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -7.68798e-17 (current time 4.20000e-03)
-coarse time step  41  old time = 4.100000e-03  old dt = 1.000000e-04  wallclocktime = 7.77e-02
+, average=-9.99950e-01
+, average=-9.95572e-01
+, average=7.61409e-01
+coarse time step  41  old time = 4.100000e-03  old dt = 1.000000e-04  wallclocktime = 7.10e-02
 plot file name = ./plt000042.2d.hdf5
  AMRLevelMushyLayer::advance (level = 0, time=4.20000e-03, dt = 1.00000e-04, CFL=2.95104e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.16476e-12
@@ -348,7 +474,10 @@ plot file name = ./plt000042.2d.hdf5
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00073e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -8.10414e-17 (current time 4.30000e-03)
-coarse time step  42  old time = 4.200000e-03  old dt = 1.000000e-04  wallclocktime = 8.41e-02
+, average=-9.99946e-01
+, average=-9.95518e-01
+, average=7.55874e-01
+coarse time step  42  old time = 4.200000e-03  old dt = 1.000000e-04  wallclocktime = 7.25e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.30000e-03, dt = 1.00000e-04, CFL=3.06797e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.88035e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -362,7 +491,10 @@ coarse time step  42  old time = 4.200000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00086e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -8.31222e-17 (current time 4.40000e-03)
-coarse time step  43  old time = 4.300000e-03  old dt = 1.000000e-04  wallclocktime = 9.38e-02
+, average=-9.99940e-01
+, average=-9.95487e-01
+, average=7.50594e-01
+coarse time step  43  old time = 4.300000e-03  old dt = 1.000000e-04  wallclocktime = 7.34e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.40000e-03, dt = 1.00000e-04, CFL=3.18592e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.12076e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -376,7 +508,10 @@ coarse time step  43  old time = 4.300000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00102e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -8.68457e-17 (current time 4.50000e-03)
-coarse time step  44  old time = 4.400000e-03  old dt = 1.000000e-04  wallclocktime = 7.63e-02
+, average=-9.99934e-01
+, average=-9.95478e-01
+, average=7.45545e-01
+coarse time step  44  old time = 4.400000e-03  old dt = 1.000000e-04  wallclocktime = 7.36e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.50000e-03, dt = 1.00000e-04, CFL=3.30504e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.57334e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -390,7 +525,10 @@ coarse time step  44  old time = 4.400000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00117e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -8.85979e-17 (current time 4.60000e-03)
-coarse time step  45  old time = 4.500000e-03  old dt = 1.000000e-04  wallclocktime = 7.71e-02
+, average=-9.99925e-01
+, average=-9.95501e-01
+, average=7.40710e-01
+coarse time step  45  old time = 4.500000e-03  old dt = 1.000000e-04  wallclocktime = 7.03e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.60000e-03, dt = 1.00000e-04, CFL=3.42637e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.78395e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -404,7 +542,10 @@ coarse time step  45  old time = 4.500000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00132e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -9.18834e-17 (current time 4.70000e-03)
-coarse time step  46  old time = 4.600000e-03  old dt = 1.000000e-04  wallclocktime = 7.26e-02
+, average=-9.99913e-01
+, average=-9.95592e-01
+, average=7.36068e-01
+coarse time step  46  old time = 4.600000e-03  old dt = 1.000000e-04  wallclocktime = 7.47e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.70000e-03, dt = 1.00000e-04, CFL=3.55305e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.14246e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -418,7 +559,10 @@ coarse time step  46  old time = 4.600000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00127e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.02068e-16 (current time 4.80000e-03)
-coarse time step  47  old time = 4.700000e-03  old dt = 1.000000e-04  wallclocktime = 8.73e-02
+, average=-9.99896e-01
+, average=-9.95743e-01
+, average=7.31609e-01
+coarse time step  47  old time = 4.700000e-03  old dt = 1.000000e-04  wallclocktime = 7.13e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.80000e-03, dt = 1.00000e-04, CFL=3.64854e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.81682e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -432,7 +576,10 @@ coarse time step  47  old time = 4.700000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00170e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.05135e-16 (current time 4.90000e-03)
-coarse time step  48  old time = 4.800000e-03  old dt = 1.000000e-04  wallclocktime = 9.00e-02
+, average=-9.99875e-01
+, average=-9.95968e-01
+, average=7.27321e-01
+coarse time step  48  old time = 4.800000e-03  old dt = 1.000000e-04  wallclocktime = 7.03e-02
  AMRLevelMushyLayer::advance (level = 0, time=4.90000e-03, dt = 1.00000e-04, CFL=3.78614e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.84590e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -446,7 +593,10 @@ coarse time step  48  old time = 4.800000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00202e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.10501e-16 (current time 5.00000e-03)
-coarse time step  49  old time = 4.900000e-03  old dt = 1.000000e-04  wallclocktime = 1.11e-01
+, average=-9.99848e-01
+, average=-9.96279e-01
+, average=7.23191e-01
+coarse time step  49  old time = 4.900000e-03  old dt = 1.000000e-04  wallclocktime = 7.01e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.00000e-03, dt = 1.00000e-04, CFL=3.92562e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.70698e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -460,7 +610,10 @@ coarse time step  49  old time = 4.900000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00248e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.15977e-16 (current time 5.10000e-03)
-coarse time step  50  old time = 5.000000e-03  old dt = 1.000000e-04  wallclocktime = 9.52e-02
+, average=-9.99814e-01
+, average=-9.96695e-01
+, average=7.19208e-01
+coarse time step  50  old time = 5.000000e-03  old dt = 1.000000e-04  wallclocktime = 7.73e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.10000e-03, dt = 1.00000e-04, CFL=4.07739e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.63274e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -474,7 +627,10 @@ coarse time step  50  old time = 5.000000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00278e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.12582e-16 (current time 5.20000e-03)
-coarse time step  51  old time = 5.100000e-03  old dt = 1.000000e-04  wallclocktime = 9.30e-02
+, average=-9.99771e-01
+, average=-9.97247e-01
+, average=7.15355e-01
+coarse time step  51  old time = 5.100000e-03  old dt = 1.000000e-04  wallclocktime = 7.15e-02
 plot file name = ./plt000052.2d.hdf5
  AMRLevelMushyLayer::advance (level = 0, time=5.20000e-03, dt = 1.00000e-04, CFL=4.23244e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 6.53344e-12
@@ -489,7 +645,10 @@ plot file name = ./plt000052.2d.hdf5
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00303e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.13129e-16 (current time 5.30000e-03)
-coarse time step  52  old time = 5.200000e-03  old dt = 1.000000e-04  wallclocktime = 1.00e-01
+, average=-9.99718e-01
+, average=-9.97955e-01
+, average=7.11615e-01
+coarse time step  52  old time = 5.200000e-03  old dt = 1.000000e-04  wallclocktime = 7.77e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.30000e-03, dt = 1.00000e-04, CFL=4.39369e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.54747e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -503,7 +662,10 @@ coarse time step  52  old time = 5.200000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00386e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.14006e-16 (current time 5.40000e-03)
-coarse time step  53  old time = 5.300000e-03  old dt = 1.000000e-04  wallclocktime = 9.83e-02
+, average=-9.99651e-01
+, average=-9.98865e-01
+, average=7.07964e-01
+coarse time step  53  old time = 5.300000e-03  old dt = 1.000000e-04  wallclocktime = 7.50e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.40000e-03, dt = 1.00000e-04, CFL=4.55911e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.03994e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -517,7 +679,10 @@ coarse time step  53  old time = 5.300000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00460e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.20138e-16 (current time 5.50000e-03)
-coarse time step  54  old time = 5.400000e-03  old dt = 1.000000e-04  wallclocktime = 9.76e-02
+, average=-9.99562e-01
+, average=-9.99395e-01
+, average=7.37207e-01
+coarse time step  54  old time = 5.400000e-03  old dt = 1.000000e-04  wallclocktime = 7.67e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.50000e-03, dt = 1.00000e-04, CFL=4.73155e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.62750e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -531,7 +696,10 @@ coarse time step  54  old time = 5.400000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00566e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.19700e-16 (current time 5.60000e-03)
-coarse time step  55  old time = 5.500000e-03  old dt = 1.000000e-04  wallclocktime = 9.72e-02
+, average=-9.99516e-01
+, average=-1.00058e+00
+, average=7.33868e-01
+coarse time step  55  old time = 5.500000e-03  old dt = 1.000000e-04  wallclocktime = 7.18e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.60000e-03, dt = 1.00000e-04, CFL=4.91599e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.57066e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -545,7 +713,10 @@ coarse time step  55  old time = 5.500000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00725e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.21891e-16 (current time 5.70000e-03)
-coarse time step  56  old time = 5.600000e-03  old dt = 1.000000e-04  wallclocktime = 9.13e-02
+, average=-9.99399e-01
+, average=-1.00206e+00
+, average=7.30530e-01
+coarse time step  56  old time = 5.600000e-03  old dt = 1.000000e-04  wallclocktime = 7.05e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.70000e-03, dt = 1.00000e-04, CFL=5.10142e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.76289e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -559,7 +730,10 @@ coarse time step  56  old time = 5.600000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00919e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.27257e-16 (current time 5.80000e-03)
-coarse time step  57  old time = 5.700000e-03  old dt = 1.000000e-04  wallclocktime = 9.02e-02
+, average=-9.99256e-01
+, average=-1.00388e+00
+, average=7.27153e-01
+coarse time step  57  old time = 5.700000e-03  old dt = 1.000000e-04  wallclocktime = 7.62e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.80000e-03, dt = 1.00000e-04, CFL=5.29399e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.76961e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -573,7 +747,10 @@ coarse time step  57  old time = 5.700000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00934e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.31418e-16 (current time 5.90000e-03)
-coarse time step  58  old time = 5.800000e-03  old dt = 1.000000e-04  wallclocktime = 8.83e-02
+, average=-9.99072e-01
+, average=-1.00279e+00
+, average=7.73890e-01
+coarse time step  58  old time = 5.800000e-03  old dt = 1.000000e-04  wallclocktime = 7.63e-02
  AMRLevelMushyLayer::advance (level = 0, time=5.90000e-03, dt = 1.00000e-04, CFL=5.46913e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.01055e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -587,7 +764,10 @@ coarse time step  58  old time = 5.800000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.01067e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.26600e-16 (current time 6.00000e-03)
-coarse time step  59  old time = 5.900000e-03  old dt = 1.000000e-04  wallclocktime = 8.20e-02
+, average=-9.99066e-01
+, average=-9.95270e-01
+, average=8.31848e-01
+coarse time step  59  old time = 5.900000e-03  old dt = 1.000000e-04  wallclocktime = 7.74e-02
  AMRLevelMushyLayer::advance (level = 0, time=6.00000e-03, dt = 1.00000e-04, CFL=4.86733e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 6.50857e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -601,7 +781,10 @@ coarse time step  59  old time = 5.900000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.01106e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.30542e-16 (current time 6.10000e-03)
-coarse time step  60  old time = 6.000000e-03  old dt = 1.000000e-04  wallclocktime = 8.66e-02
+, average=-9.99172e-01
+, average=-1.00290e+00
+, average=8.17182e-01
+coarse time step  60  old time = 6.000000e-03  old dt = 1.000000e-04  wallclocktime = 7.84e-02
  AMRLevelMushyLayer::advance (level = 0, time=6.10000e-03, dt = 1.00000e-04, CFL=5.05973e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.00222e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -615,7 +798,10 @@ coarse time step  60  old time = 6.000000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.01228e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.30871e-16 (current time 6.20000e-03)
-coarse time step  61  old time = 6.100000e-03  old dt = 1.000000e-04  wallclocktime = 8.25e-02
+, average=-9.99039e-01
+, average=-1.00379e+00
+, average=8.14455e-01
+coarse time step  61  old time = 6.100000e-03  old dt = 1.000000e-04  wallclocktime = 7.86e-02
 plot file name = ./plt000062.2d.hdf5
  AMRLevelMushyLayer::advance (level = 0, time=6.20000e-03, dt = 1.00000e-04, CFL=5.24846e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.00222e-12
@@ -630,7 +816,10 @@ plot file name = ./plt000062.2d.hdf5
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.01428e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.30980e-16 (current time 6.30000e-03)
-coarse time step  62  old time = 6.200000e-03  old dt = 1.000000e-04  wallclocktime = 8.53e-02
+, average=-9.98916e-01
+, average=-1.00475e+00
+, average=8.11648e-01
+coarse time step  62  old time = 6.200000e-03  old dt = 1.000000e-04  wallclocktime = 7.60e-02
  AMRLevelMushyLayer::advance (level = 0, time=6.30000e-03, dt = 1.00000e-04, CFL=5.43182e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 6.42331e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -644,7 +833,10 @@ coarse time step  62  old time = 6.200000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.01773e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = -1.33937e-16 (current time 6.40000e-03)
-coarse time step  63  old time = 6.300000e-03  old dt = 1.000000e-04  wallclocktime = 9.07e-02
+, average=-9.98786e-01
+, average=-1.00575e+00
+, average=8.08755e-01
+coarse time step  63  old time = 6.300000e-03  old dt = 1.000000e-04  wallclocktime = 7.48e-02
 AMR::regrid(0)
 AMR::regrid: base level = 0
 AMRLevelMushyLayer::tagCells - refine mush channels - 0
@@ -695,7 +887,10 @@ Sum(RHS) for IVP solve = 1.45717e-16
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.23625e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.69267e-06 (current time 6.50000e-03)
-coarse time step  64  old time = 6.400000e-03  old dt = 1.000000e-04  wallclocktime = 4.55e-01
+, average=-9.98689e-01
+, average=-1.00655e+00
+, average=8.05515e-01
+coarse time step  64  old time = 6.400000e-03  old dt = 1.000000e-04  wallclocktime = 4.71e-01
  AMRLevelMushyLayer::advance (level = 0, time=6.50000e-03, dt = 1.00000e-04, CFL=8.79584e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.28644e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -726,7 +921,10 @@ coarse time step  64  old time = 6.400000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00767e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.66666e-06 (current time 6.60000e-03)
-coarse time step  65  old time = 6.500000e-03  old dt = 1.000000e-04  wallclocktime = 3.13e-01
+, average=-9.98587e-01
+, average=-1.00732e+00
+, average=8.02433e-01
+coarse time step  65  old time = 6.500000e-03  old dt = 1.000000e-04  wallclocktime = 3.36e-01
  AMRLevelMushyLayer::advance (level = 0, time=6.60000e-03, dt = 1.00000e-04, CFL=3.99092e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.22959e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -757,7 +955,10 @@ coarse time step  65  old time = 6.500000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00439e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.67220e-06 (current time 6.70000e-03)
-coarse time step  66  old time = 6.600000e-03  old dt = 1.000000e-04  wallclocktime = 3.28e-01
+, average=-9.97607e-01
+, average=-1.00806e+00
+, average=7.99441e-01
+coarse time step  66  old time = 6.600000e-03  old dt = 1.000000e-04  wallclocktime = 4.03e-01
  AMRLevelMushyLayer::advance (level = 0, time=6.70000e-03, dt = 1.00000e-04, CFL=4.21037e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.80249e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -788,7 +989,10 @@ coarse time step  66  old time = 6.600000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00460e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.67200e-06 (current time 6.80000e-03)
-coarse time step  67  old time = 6.700000e-03  old dt = 1.000000e-04  wallclocktime = 3.29e-01
+, average=-9.97426e-01
+, average=-1.00877e+00
+, average=7.96504e-01
+coarse time step  67  old time = 6.700000e-03  old dt = 1.000000e-04  wallclocktime = 4.66e-01
  AMRLevelMushyLayer::advance (level = 0, time=6.80000e-03, dt = 1.00000e-04, CFL=4.40443e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.91172e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -819,7 +1023,10 @@ coarse time step  67  old time = 6.700000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00568e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.67035e-06 (current time 6.90000e-03)
-coarse time step  68  old time = 6.800000e-03  old dt = 1.000000e-04  wallclocktime = 3.50e-01
+, average=-9.97240e-01
+, average=-1.01974e+00
+, average=7.77646e-01
+coarse time step  68  old time = 6.800000e-03  old dt = 1.000000e-04  wallclocktime = 5.97e-01
  AMRLevelMushyLayer::advance (level = 0, time=6.90000e-03, dt = 1.00000e-04, CFL=4.59192e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.77485e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -850,7 +1057,10 @@ coarse time step  68  old time = 6.800000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00733e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.66858e-06 (current time 7.00000e-03)
-coarse time step  69  old time = 6.900000e-03  old dt = 1.000000e-04  wallclocktime = 3.10e-01
+, average=-9.94953e-01
+, average=-1.02135e+00
+, average=7.74440e-01
+coarse time step  69  old time = 6.900000e-03  old dt = 1.000000e-04  wallclocktime = 5.37e-01
  AMRLevelMushyLayer::advance (level = 0, time=7.00000e-03, dt = 1.00000e-04, CFL=4.95309e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.03064e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -881,7 +1091,10 @@ coarse time step  69  old time = 6.900000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.00960e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.66655e-06 (current time 7.10000e-03)
-coarse time step  70  old time = 7.000000e-03  old dt = 1.000000e-04  wallclocktime = 3.11e-01
+, average=-9.94442e-01
+, average=-1.04854e+00
+, average=7.51847e-01
+coarse time step  70  old time = 7.000000e-03  old dt = 1.000000e-04  wallclocktime = 5.59e-01
  AMRLevelMushyLayer::advance (level = 0, time=7.10000e-03, dt = 1.00000e-04, CFL=5.35309e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.28033e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -912,7 +1125,10 @@ coarse time step  70  old time = 7.000000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.01228e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.66404e-06 (current time 7.20000e-03)
-coarse time step  71  old time = 7.100000e-03  old dt = 1.000000e-04  wallclocktime = 4.08e-01
+, average=-9.93910e-01
+, average=-1.05362e+00
+, average=7.48004e-01
+coarse time step  71  old time = 7.100000e-03  old dt = 1.000000e-04  wallclocktime = 6.45e-01
 plot file name = ./plt000072.2d.hdf5
  AMRLevelMushyLayer::advance (level = 0, time=7.20000e-03, dt = 1.00000e-04, CFL=5.73878e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.74962e-12
@@ -944,7 +1160,10 @@ plot file name = ./plt000072.2d.hdf5
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.01602e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.66065e-06 (current time 7.30000e-03)
-coarse time step  72  old time = 7.200000e-03  old dt = 1.000000e-04  wallclocktime = 3.03e-01
+, average=-9.93368e-01
+, average=-1.05880e+00
+, average=7.44159e-01
+coarse time step  72  old time = 7.200000e-03  old dt = 1.000000e-04  wallclocktime = 6.11e-01
  AMRLevelMushyLayer::advance (level = 0, time=7.30000e-03, dt = 1.00000e-04, CFL=6.07161e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.29177e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -975,7 +1194,10 @@ coarse time step  72  old time = 7.200000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.02145e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.65557e-06 (current time 7.40000e-03)
-coarse time step  73  old time = 7.300000e-03  old dt = 1.000000e-04  wallclocktime = 3.08e-01
+, average=-9.90630e-01
+, average=-1.06405e+00
+, average=7.40319e-01
+coarse time step  73  old time = 7.300000e-03  old dt = 1.000000e-04  wallclocktime = 6.18e-01
  AMRLevelMushyLayer::advance (level = 0, time=7.40000e-03, dt = 1.00000e-04, CFL=6.31570e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.51381e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1006,7 +1228,10 @@ coarse time step  73  old time = 7.300000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.02978e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.64705e-06 (current time 7.50000e-03)
-coarse time step  74  old time = 7.400000e-03  old dt = 1.000000e-04  wallclocktime = 3.64e-01
+, average=-9.89926e-01
+, average=-1.11235e+00
+, average=6.83619e-01
+coarse time step  74  old time = 7.400000e-03  old dt = 1.000000e-04  wallclocktime = 5.81e-01
  AMRLevelMushyLayer::advance (level = 0, time=7.50000e-03, dt = 1.00000e-04, CFL=6.44007e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.21394e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1037,7 +1262,10 @@ coarse time step  74  old time = 7.400000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.04260e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.63340e-06 (current time 7.60000e-03)
-coarse time step  75  old time = 7.500000e-03  old dt = 1.000000e-04  wallclocktime = 3.48e-01
+, average=-9.89224e-01
+, average=-1.12056e+00
+, average=6.78777e-01
+coarse time step  75  old time = 7.500000e-03  old dt = 1.000000e-04  wallclocktime = 5.74e-01
  AMRLevelMushyLayer::advance (level = 0, time=7.60000e-03, dt = 1.00000e-04, CFL=6.75777e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.49338e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1068,7 +1296,10 @@ coarse time step  75  old time = 7.500000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.06192e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.61479e-06 (current time 7.70000e-03)
-coarse time step  76  old time = 7.600000e-03  old dt = 1.000000e-04  wallclocktime = 3.41e-01
+, average=-9.88536e-01
+, average=-1.12860e+00
+, average=6.73951e-01
+coarse time step  76  old time = 7.600000e-03  old dt = 1.000000e-04  wallclocktime = 5.25e-01
  AMRLevelMushyLayer::advance (level = 0, time=7.70000e-03, dt = 1.00000e-04, CFL=7.06622e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.92761e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1099,7 +1330,10 @@ coarse time step  76  old time = 7.600000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.08807e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.58314e-06 (current time 7.80000e-03)
-coarse time step  77  old time = 7.700000e-03  old dt = 1.000000e-04  wallclocktime = 3.36e-01
+, average=-9.88346e-01
+, average=-1.11263e+00
+, average=6.99171e-01
+coarse time step  77  old time = 7.700000e-03  old dt = 1.000000e-04  wallclocktime = 5.59e-01
  AMRLevelMushyLayer::advance (level = 0, time=7.80000e-03, dt = 1.00000e-04, CFL=7.25402e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.02853e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1130,7 +1364,10 @@ coarse time step  77  old time = 7.700000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.11653e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.53646e-06 (current time 7.90000e-03)
-coarse time step  78  old time = 7.800000e-03  old dt = 1.000000e-04  wallclocktime = 3.20e-01
+, average=-9.89304e-01
+, average=-1.09771e+00
+, average=7.20086e-01
+coarse time step  78  old time = 7.800000e-03  old dt = 1.000000e-04  wallclocktime = 6.05e-01
  AMRLevelMushyLayer::advance (level = 0, time=7.90000e-03, dt = 1.00000e-04, CFL=7.30879e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.71800e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1161,7 +1398,10 @@ coarse time step  78  old time = 7.800000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.13257e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.46452e-06 (current time 8.00000e-03)
-coarse time step  79  old time = 7.900000e-03  old dt = 1.000000e-04  wallclocktime = 3.19e-01
+, average=-9.88465e-01
+, average=-1.09717e+00
+, average=7.27335e-01
+coarse time step  79  old time = 7.900000e-03  old dt = 1.000000e-04  wallclocktime = 5.34e-01
  AMRLevelMushyLayer::advance (level = 0, time=8.00000e-03, dt = 1.00000e-04, CFL=7.91596e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.59819e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1192,7 +1432,10 @@ coarse time step  79  old time = 7.900000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.14072e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.36733e-06 (current time 8.10000e-03)
-coarse time step  80  old time = 8.000000e-03  old dt = 1.000000e-04  wallclocktime = 3.18e-01
+, average=-9.88049e-01
+, average=-1.09648e+00
+, average=7.34065e-01
+coarse time step  80  old time = 8.000000e-03  old dt = 1.000000e-04  wallclocktime = 5.40e-01
  AMRLevelMushyLayer::advance (level = 0, time=8.10000e-03, dt = 1.00000e-04, CFL=8.78960e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.28644e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1223,7 +1466,10 @@ coarse time step  80  old time = 8.000000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.23979e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.23953e-06 (current time 8.20000e-03)
-coarse time step  81  old time = 8.100000e-03  old dt = 1.000000e-04  wallclocktime = 3.34e-01
+, average=-9.87675e-01
+, average=-1.10351e+00
+, average=7.30399e-01
+coarse time step  81  old time = 8.100000e-03  old dt = 1.000000e-04  wallclocktime = 5.46e-01
 plot file name = ./plt000082.2d.hdf5
  AMRLevelMushyLayer::advance (level = 0, time=8.20000e-03, dt = 1.00000e-04, CFL=9.66023e-02)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.11591e-12
@@ -1255,7 +1501,10 @@ plot file name = ./plt000082.2d.hdf5
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.53772e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.08051e-06 (current time 8.30000e-03)
-coarse time step  82  old time = 8.200000e-03  old dt = 1.000000e-04  wallclocktime = 3.52e-01
+, average=-9.86941e-01
+, average=-1.10979e+00
+, average=7.26871e-01
+coarse time step  82  old time = 8.200000e-03  old dt = 1.000000e-04  wallclocktime = 5.22e-01
  AMRLevelMushyLayer::advance (level = 0, time=8.30000e-03, dt = 1.00000e-04, CFL=1.04969e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.03064e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1286,7 +1535,10 @@ coarse time step  82  old time = 8.200000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.81032e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.01629e-06 (current time 8.40000e-03)
-coarse time step  83  old time = 8.300000e-03  old dt = 1.000000e-04  wallclocktime = 3.74e-01
+, average=-9.86315e-01
+, average=-1.11528e+00
+, average=7.23468e-01
+coarse time step  83  old time = 8.300000e-03  old dt = 1.000000e-04  wallclocktime = 5.34e-01
  AMRLevelMushyLayer::advance (level = 0, time=8.40000e-03, dt = 1.00000e-04, CFL=1.12843e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.34328e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1317,7 +1569,10 @@ coarse time step  83  old time = 8.300000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.61838e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.24781e-06 (current time 8.50000e-03)
-coarse time step  84  old time = 8.400000e-03  old dt = 1.000000e-04  wallclocktime = 3.77e-01
+, average=-9.85803e-01
+, average=-1.10103e+00
+, average=7.40108e-01
+coarse time step  84  old time = 8.400000e-03  old dt = 1.000000e-04  wallclocktime = 5.29e-01
  AMRLevelMushyLayer::advance (level = 0, time=8.50000e-03, dt = 1.00000e-04, CFL=1.20262e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.58131e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1348,7 +1603,10 @@ coarse time step  84  old time = 8.400000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 7.90156e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.47873e-06 (current time 8.60000e-03)
-coarse time step  85  old time = 8.500000e-03  old dt = 1.000000e-04  wallclocktime = 3.74e-01
+, average=-9.86452e-01
+, average=-1.10552e+00
+, average=7.37089e-01
+coarse time step  85  old time = 8.500000e-03  old dt = 1.000000e-04  wallclocktime = 5.49e-01
  AMRLevelMushyLayer::advance (level = 0, time=8.60000e-03, dt = 1.00000e-04, CFL=1.29039e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 6.61160e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1379,7 +1637,10 @@ coarse time step  85  old time = 8.500000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 7.89042e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 6.87452e-06 (current time 8.70000e-03)
-coarse time step  86  old time = 8.600000e-03  old dt = 1.000000e-04  wallclocktime = 3.79e-01
+, average=-9.85947e-01
+, average=-1.08906e+00
+, average=7.51844e-01
+coarse time step  86  old time = 8.600000e-03  old dt = 1.000000e-04  wallclocktime = 4.97e-01
  AMRLevelMushyLayer::advance (level = 0, time=8.70000e-03, dt = 1.00000e-04, CFL=1.33797e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.45697e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1410,7 +1671,10 @@ coarse time step  86  old time = 8.600000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 7.88871e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 5.87493e-06 (current time 8.80000e-03)
-coarse time step  87  old time = 8.700000e-03  old dt = 1.000000e-04  wallclocktime = 4.38e-01
+, average=-9.86904e-01
+, average=-1.09358e+00
+, average=7.49036e-01
+coarse time step  87  old time = 8.700000e-03  old dt = 1.000000e-04  wallclocktime = 4.87e-01
  AMRLevelMushyLayer::advance (level = 0, time=8.80000e-03, dt = 1.00000e-04, CFL=1.38245e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.57776e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1441,7 +1705,10 @@ coarse time step  87  old time = 8.700000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 7.91880e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 6.04515e-06 (current time 8.90000e-03)
-coarse time step  88  old time = 8.800000e-03  old dt = 1.000000e-04  wallclocktime = 4.09e-01
+, average=-9.86294e-01
+, average=-1.09781e+00
+, average=7.46331e-01
+coarse time step  88  old time = 8.800000e-03  old dt = 1.000000e-04  wallclocktime = 5.36e-01
  AMRLevelMushyLayer::advance (level = 0, time=8.90000e-03, dt = 1.00000e-04, CFL=1.41748e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.00222e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1472,7 +1739,10 @@ coarse time step  88  old time = 8.800000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 7.96403e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 7.29483e-06 (current time 9.00000e-03)
-coarse time step  89  old time = 8.900000e-03  old dt = 1.000000e-04  wallclocktime = 3.83e-01
+, average=-9.85746e-01
+, average=-1.10175e+00
+, average=7.43735e-01
+coarse time step  89  old time = 8.900000e-03  old dt = 1.000000e-04  wallclocktime = 5.11e-01
  AMRLevelMushyLayer::advance (level = 0, time=9.00000e-03, dt = 1.00000e-04, CFL=1.43735e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.57066e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1503,7 +1773,10 @@ coarse time step  89  old time = 8.900000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.02920e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 9.14325e-06 (current time 9.10000e-03)
-coarse time step  90  old time = 9.000000e-03  old dt = 1.000000e-04  wallclocktime = 4.17e-01
+, average=-9.85414e-01
+, average=-1.10540e+00
+, average=7.41258e-01
+coarse time step  90  old time = 9.000000e-03  old dt = 1.000000e-04  wallclocktime = 4.85e-01
  AMRLevelMushyLayer::advance (level = 0, time=9.10000e-03, dt = 1.00000e-04, CFL=1.51968e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.22959e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1534,7 +1807,10 @@ coarse time step  90  old time = 9.000000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.18824e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 1.11588e-05 (current time 9.20000e-03)
-coarse time step  91  old time = 9.100000e-03  old dt = 1.000000e-04  wallclocktime = 4.43e-01
+, average=-9.85124e-01
+, average=-1.11511e+00
+, average=7.20121e-01
+coarse time step  91  old time = 9.100000e-03  old dt = 1.000000e-04  wallclocktime = 5.07e-01
  AMRLevelMushyLayer::advance (level = 0, time=9.20000e-03, dt = 1.00000e-04, CFL=1.62240e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.34328e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1565,7 +1841,10 @@ coarse time step  91  old time = 9.100000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.45096e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 1.31152e-05 (current time 9.30000e-03)
-coarse time step  92  old time = 9.200000e-03  old dt = 1.000000e-04  wallclocktime = 4.17e-01
+, average=-9.84698e-01
+, average=-1.11853e+00
+, average=7.17514e-01
+coarse time step  92  old time = 9.200000e-03  old dt = 1.000000e-04  wallclocktime = 4.90e-01
 plot file name = ./plt000093.2d.hdf5
  AMRLevelMushyLayer::advance (level = 0, time=9.30000e-03, dt = 1.00000e-04, CFL=1.75193e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.61142e-12
@@ -1597,7 +1876,10 @@ plot file name = ./plt000093.2d.hdf5
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.63938e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 1.47532e-05 (current time 9.40000e-03)
-coarse time step  93  old time = 9.300000e-03  old dt = 1.000000e-04  wallclocktime = 3.93e-01
+, average=-9.84316e-01
+, average=-1.12171e+00
+, average=7.15008e-01
+coarse time step  93  old time = 9.300000e-03  old dt = 1.000000e-04  wallclocktime = 5.67e-01
  AMRLevelMushyLayer::advance (level = 0, time=9.40000e-03, dt = 1.00000e-04, CFL=1.87007e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.94014e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1628,7 +1910,10 @@ coarse time step  93  old time = 9.300000e-03  old dt = 1.000000e-04  wallclockt
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.44139e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 1.63226e-05 (current time 9.50000e-03)
-coarse time step  94  old time = 9.400000e-03  old dt = 1.000000e-04  wallclocktime = 3.60e-01
+, average=-9.83988e-01
+, average=-1.12469e+00
+, average=7.12596e-01
+coarse time step  94  old time = 9.400000e-03  old dt = 1.000000e-04  wallclocktime = 5.39e-01
  AMRLevelMushyLayer::advance (level = 0, time=9.50000e-03, dt = 1.00000e-04, CFL=1.97608e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.22959e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1663,7 +1948,10 @@ WARNING: new max(U) = 1.28726e+02 means that CFL = 2.05961e-01 which may be unst
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.39488e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 1.73892e-05 (current time 9.60000e-03)
-coarse time step  95  old time = 9.500000e-03  old dt = 1.000000e-04  wallclocktime = 3.54e-01
+, average=-9.83673e-01
+, average=-1.12751e+00
+, average=7.10266e-01
+coarse time step  95  old time = 9.500000e-03  old dt = 1.000000e-04  wallclocktime = 5.02e-01
 AMR::regrid(0)
 AMR::regrid: base level = 0
 AMRLevelMushyLayer::tagCells - refine mush channels - 0
@@ -1720,7 +2008,10 @@ WARNING: new max(U) = 1.64765e+02 means that CFL = 2.63624e-01 which may be unst
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.13270e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 1.26643e-05 (current time 9.70000e-03)
-coarse time step  96  old time = 9.600000e-03  old dt = 1.000000e-04  wallclocktime = 8.74e-01
+, average=-9.83331e-01
+, average=-1.13021e+00
+, average=7.08021e-01
+coarse time step  96  old time = 9.600000e-03  old dt = 1.000000e-04  wallclocktime = 1.26e+00
  AMRLevelMushyLayer::advance (level = 0, time=9.70000e-03, dt = 1.00000e-04, CFL=2.11424e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 5.03420e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1757,7 +2048,10 @@ WARNING: new max(U) = 1.35080e+02 means that CFL = 2.16128e-01 which may be unst
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.04474e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 1.09621e-05 (current time 9.80000e-03)
-coarse time step  97  old time = 9.700000e-03  old dt = 1.000000e-04  wallclocktime = 7.68e-01
+, average=-9.83006e-01
+, average=-1.13280e+00
+, average=7.05846e-01
+coarse time step  97  old time = 9.700000e-03  old dt = 1.000000e-04  wallclocktime = 1.06e+00
  AMRLevelMushyLayer::advance (level = 0, time=9.80000e-03, dt = 1.00000e-04, CFL=2.13207e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.88853e-12
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
@@ -1794,7 +2088,10 @@ WARNING: new max(U) = 1.35663e+02 means that CFL = 2.17061e-01 which may be unst
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.05070e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 9.86072e-06 (current time 9.90000e-03)
-coarse time step  98  old time = 9.800000e-03  old dt = 1.000000e-04  wallclocktime = 7.23e-01
+, average=-9.82690e-01
+, average=-1.13532e+00
+, average=7.03731e-01
+coarse time step  98  old time = 9.800000e-03  old dt = 1.000000e-04  wallclocktime = 1.14e+00
  AMRLevelMushyLayer::advance (level = 0, time=9.90000e-03, dt = 1.00000e-04, CFL=2.20722e-01)
   MAC Projection (#1 on level 0), exit status = 4, max(div u) = 4.61853e-12
 WARNING: new max(U) = 1.25918e+02 means that CFL = 2.01469e-01 which may be unstable
@@ -1832,7 +2129,10 @@ WARNING: new max(U) = 1.37001e+02 means that CFL = 2.19202e-01 which may be unst
   U* solve  Component 0: residual = 0.00000e+00 exit status: -1 Component 1: residual = 0.00000e+00 exit status: -1
   CCProjection: max(div(U)) = 8.06359e+03
   Sum(RHS) for VD solve on level 0 (divided by eta) = 8.66436e-06 (current time 1.00000e-02)
-coarse time step  99  old time = 9.900000e-03  old dt = 1.000000e-04  wallclocktime = 7.52e-01
+, average=-9.82385e-01
+, average=-1.13775e+00
+, average=7.01688e-01
+coarse time step  99  old time = 9.900000e-03  old dt = 1.000000e-04  wallclocktime = 1.17e+00
 plot file name = ./plt000100.2d.hdf5
 checkpoint file name = ./chk000100.2d.hdf5
 number of points updated at level 0 = 25600
@@ -1852,8 +2152,8 @@ Arena 20BasicCCVelBCFunction: 24850432 bytes (23 Mb)
 Arena 39BasicPorosityPermeabilityFaceBCFunction: 26743040 bytes (25 Mb)
 Arena 35BasicPorosityPermeabilityBCFunction: 46782720 bytes (44 Mb)
 Arena 16NoFluxBCFunction: 7144080 bytes (6 Mb)
-Arena 21AdvectDiffuseScalarBC: 41019696 bytes (39 Mb)
-Arena 23ExtrapolationBCFunction: 32400 bytes (0 Mb)
+Arena 21AdvectDiffuseScalarBC: 54117072 bytes (51 Mb)
+Arena 23ExtrapolationBCFunction: 47184 bytes (0 Mb)
 Arena 32BasicPressureBCFunctionSubcycled: 3534832 bytes (3 Mb)
 Arena 24FreestreamCorrBCFunction: 660960 bytes (0 Mb)
 Arena 22DomainExtrapBCFunction: 3139560 bytes (2 Mb)
@@ -1870,8 +2170,8 @@ Arena 6VectorIS_ISt4pairIi11LayoutIndexEEE: 40 bytes (0 Mb)
 Arena 17AMRLevelOpFactoryI9LevelDataI9FArrayBoxEE: -298752 bytes (0 Mb)
 Arena 15AMRFASMultiGridI9LevelDataI9FArrayBoxEE: 228344 bytes (0 Mb)
 Arena 12AMRMultiGridI9LevelDataI9FArrayBoxEE: -228344 bytes (0 Mb)
-Arena 10BCFunction: -158943320 bytes (-151 Mb)
+Arena 10BCFunction: -172055480 bytes (-164 Mb)
 Arena 6VectorI11LayoutIndexE: 8720 bytes (0 Mb)
 ---------------------------------
 Total Unfreed : 263990 bytes (0 Mb)
-peak memory usage: 177882424 bytes (169 Mb)
+peak memory usage: 190994568 bytes (182 Mb)
