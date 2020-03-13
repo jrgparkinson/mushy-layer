@@ -3,7 +3,7 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import numpy as np
 from nondimensionalisation import dimensional_salinity, dimensional_temperature, dimensional_time
-from PltFile import latexify2
+from MushyPltFile import latexify2
 import matplotlib as mpl
 import re
 import math

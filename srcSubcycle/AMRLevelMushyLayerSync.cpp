@@ -484,37 +484,6 @@ void AMRLevelMushyLayer::postTimeStep()
           {
             pout() << "Max(lambda-1) = " << maxLambda << endl;
           }
-
-          //          m_diagnostics.addDiagnostic(m_diagnostics.m_lambda_err, m_time, maxLambda);
-
-//          if (m_opt.variable_eta_factor != 1.0)
-//          {
-//            Real newEta = m_projection.etaLambda();
-//
-//            Real maxEta = maxAllowedEta();
-//
-//
-//            if (maxLambda > m_maxLambda)
-//            {
-//              newEta = newEta*m_opt.variable_eta_factor;
-//            }
-//            else
-//            {
-//              newEta = newEta/m_opt.variable_eta_factor;
-//            }
-//
-//            m_maxLambda = maxLambda;
-//
-//            newEta = max(newEta, m_opt.minEta);
-//            newEta = min(newEta, maxEta);
-//
-//            if (s_verbosity >= 3)
-//            {
-//              pout() << "New eta = " << newEta << endl;
-//            }
-//
-//            setEta(newEta);
-//          }
         }
 
         if (m_opt.reflux_enthalpy || m_opt.reflux_concentration)
@@ -702,19 +671,6 @@ void AMRLevelMushyLayer::postTimeStep()
 
       Interval velComps = m_vectorNew[VectorVars::m_fluidVel]->interval();
       m_vectorNew[VectorVars::m_fluidVel]->exchange(velComps);
-
-//      if (m_opt.computeFreestreamCorrectionSingleLevel)
-//      {
-//        Vector<LevelData<FArrayBox>* > compVel(1, nullptr);
-//        Vector<LevelData<FArrayBox>* > compLambda(1, nullptr);
-//        Vector<RefCountedPtr<LevelData<FluxBox> > > compPorosityFace(1);
-//        Vector<RefCountedPtr<LevelData<FArrayBox> > > compPorosity(1);
-//
-//        fillAMRLambda(compLambda);
-//        fillAMRVelPorosity(compVel, compPorosityFace,compPorosity);
-//
-//        m_projection.doSyncOperations(compVel, compLambda, compPorosityFace, compPorosity, m_time, m_dt);
-//      }
 
     } // end if level = 0
 

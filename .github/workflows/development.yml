@@ -3,20 +3,19 @@ name: Build C++ Code and run Regression Tests
 on:
   push:
     branches:
-      - 'development'
+      - '*'
+
+    paths-ignore:
+      - '.github/**'
+      - '**/workflows/**'
+
   pull_request:
     branches:
-      - 'development'
-      - master
+      - '*'
 
-#    paths-ignore:
-#      - '.github/**'
-#      - '**/workflows/**'
-
-# schedule: 
-#   # * is a special character in YAML so you have to quote this string
-#   # run at 23:59 every day
-#   - cron:  '59 23 * * *'
+    paths-ignore:
+      - '.github/**'
+      - '**/workflows/**'
 
 env:
   CHOMBO_ROOT: /home/runner/chombo
@@ -50,6 +49,9 @@ jobs:
           echo $HOME
           echo $LD_LIBRARY_PATH
           echo $GITHUB_WORKSPACE
+
+      - name: Update package list
+        run: sudo apt-get update
 
       - name: Install csh
         run: sudo apt-get install csh
@@ -176,6 +178,10 @@ jobs:
         name: Run regressions with more ouput
         run: |
           cd $GITHUB_WORKSPACE/test/regression
+          mkdir debug
+          cd debug
+          $GITHUB_WORKSPACE/execSubcycle/mushyLayer2d.Linux.64.g++.gfortran.OPT.ex ../darcy/inputs
+          cd $GITHUB_WORKSPACE/test/regression
           python run_regression_tests.py -v -t darcy
 
       # Assume verbose output will also fail
@@ -183,8 +189,13 @@ jobs:
         uses: actions/upload-artifact@v1
         name: Upload test results
         with:
-          name: test-results
-          path: ${{ env.REGRESSIONS_PATH }}
+          name: temp
+          path: /home/runner/work/_temp/
+
+
+      # with:
+      #     name: test-results
+      #     path: ${{ env.REGRESSIONS_PATH }}
 
       # Standard upload
       - uses: actions/upload-artifact@v1
@@ -192,6 +203,13 @@ jobs:
         with:
           name: test-results
           path: ${{ env.REGRESSIONS_PATH }}
+
+      # Upload temp data for debugging
+      # - uses: actions/upload-artifact@v1
+      #   name: Upload temp data
+      #   with:
+      #     name: temp
+      #     path: /home/runner/work/_temp/
 
       # Now try and run one of the functional tests
       # (the others will take too long or need MATLAB)

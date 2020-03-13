@@ -1,7 +1,7 @@
 # import matplotlib
 # matplotlib.use('Agg')
 
-from PltFile import PltFile
+from MushyPltFile import MushyPltFile
 import matplotlib.pyplot as plt
 
 # file_loc = '/home/parkinsonjl/mnt/sharedStorage/optimalStates-restructured/Le200/CR2.000/RaC100/' \
@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 file_loc = 'plt001142.2d.hdf5'
 
 # file_loc = shared_storage.get_dir('SeaIceGrowth/T-10Outflow/chk135000.2d.hdf5')
-p = PltFile(file_loc, load_data=True)
+p = MushyPltFile(file_loc, load_data=True)
 # p.compute_diagnostic_vars()
 
 lev0Dx = p.levels[0][p.DX]

@@ -1,4 +1,4 @@
-from PltFile import PltFile, latexify2
+from MushyPltFile import MushyPltFile, latexify2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_bvp
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     ax_left = ax_list[0]
 
     # Get the computed solution
-    computed_solution = PltFile(os.path.join(full_output_folder, plt_files[-1]), load_data=True)
+    computed_solution = MushyPltFile(os.path.join(full_output_folder, plt_files[-1]), load_data=True)
     v = computed_solution.get_level_data('yAdvection velocity').mean('y').squeeze()
     x = v.coords['x']
     porosity = computed_solution.get_level_data('Porosity').mean('y').squeeze()

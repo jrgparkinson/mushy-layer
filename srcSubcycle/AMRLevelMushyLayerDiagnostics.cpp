@@ -290,7 +290,6 @@ void AMRLevelMushyLayer::computeDiagnostics()
       m_diagnostics.addDiagnostic(DiagnosticNames::diag_maxUhalf, m_time, globalMaxVertVel);
 
     }
-
   }
 
 
@@ -299,58 +298,13 @@ void AMRLevelMushyLayer::computeDiagnostics()
     CH_TIME("AMRLevelMushyLayer::computeDiagnostics::computeSoluteFluxes");
 
 
-    // Compute increments to solute flux on each level
-    int numComp = 2;
-
-    LevelData<FluxBox> totalFlux(m_grids, numComp, IntVect::Unit);
-    getTotalFlux(totalFlux);
-
-    LevelData<FluxBox> totalFluxNoGhost(m_grids, numComp, IntVect::Zero);
-    totalFlux.copyTo(totalFluxNoGhost);
-
-    // new way of keeping track of fluxes
-    Real scale = (1/m_dx)*m_dt;
-
-    m_heatDomainFluxRegister.incrFlux(totalFluxNoGhost, scale, 0);
-    m_saltDomainFluxRegister.incrFlux(totalFluxNoGhost, scale, 1);
-
-    // Calculate horizontally averaged fluxes
-    LevelData<FArrayBox> averageFrameFlux(m_grids, numComp);
-    LevelData<FArrayBox> averageAdvectiveFlux(m_grids, numComp);
-    LevelData<FArrayBox> averageDiffusiveFlux(m_grids, numComp);
-    LevelData<FArrayBox> averageVerticalFlux(m_grids, numComp);
-
-    horizontallyAverage(averageVerticalFlux, totalFluxNoGhost);
-
-    // Copy across for writing to plot files
-    averageVerticalFlux.copyTo(Interval(0, 0), *m_scalarNew[ScalarVars::m_averageHeatFlux], Interval(0,0));
-    averageVerticalFlux.copyTo(Interval(1, 1), *m_scalarNew[ScalarVars::m_averageVerticalFlux], Interval(0,0));
-
-
-
-    // Also want solute flux at each point in space written out
-    int soluteComp = 1;
-    for (DataIterator dit = totalFlux.dataIterator(); dit.ok(); ++dit)
+    AMRLevelMushyLayer* ml = getCoarsestLevel();
+    for (int lev = 0; lev < nLevels; lev++)
     {
-      FluxBox& flux = totalFlux[dit];
-      FArrayBox& fab = flux[SpaceDim-1];
-      Box b = flux.box();
-
-      b.growDir(1, Side::Hi, -1); // need this because we also grab the flux in the cell one up
-
-      Box b2 = (*m_scalarNew[ScalarVars::m_verticalFlux])[dit].box();
-      b &= b2; // ensure we don't try and fill cells which don't exist
-      for (BoxIterator bit(b); bit.ok(); ++bit)
-      {
-        IntVect iv = bit();
-        IntVect ivUp = iv + BASISV(1);
-        (*m_scalarNew[ScalarVars::m_verticalFlux])[dit](iv) = 0.5*(fab(iv, soluteComp) + fab(ivUp, soluteComp));
-      }
+      ml->computeDiagnosticSoluteFluxes();
+      ml = ml->getFinerLevel();
     }
 
-
-    if (m_level == 0)
-    {
       // Need to calculate:
       // 1. Sum of new bulk salinity over valid regions
       // 2. Sum of old bulk salinity over valid regions
@@ -367,10 +321,13 @@ void AMRLevelMushyLayer::computeDiagnostics()
       Fs_vert_fluid.resize(nLevels);
       Fs_vert_frame.resize(nLevels);
 
-      AMRLevelMushyLayer* ml = this;
+      ml = this;
 
-      for(int lev = 0; lev < nLevels; lev++)
+      for (int lev = 0; lev < nLevels; lev++)
       {
+        // Make sure fluxes are computed on this level
+        ml->computeTotalFlux();
+
         S_new[lev] = ml->m_scalarNew[ScalarVars::m_bulkConcentration];
         H_new[lev] = ml->m_scalarNew[ScalarVars::m_enthalpy];
         horizAvFs[lev] = new LevelData<FArrayBox>(ml->m_grids, 1, IntVect::Zero); // no ghost vector
@@ -382,6 +339,8 @@ void AMRLevelMushyLayer::computeDiagnostics()
         ml->m_scalarNew[ScalarVars::m_FsVertDiffusion]->copyTo(*Fs_vert_diffusion[lev]);
         ml->m_scalarNew[ScalarVars::m_FsVertFluid]->copyTo(*Fs_vert_fluid[lev]);
         ml->m_scalarNew[ScalarVars::m_FsVertFrame]->copyTo(*Fs_vert_frame[lev]);
+
+        LevelData<FArrayBox>& temp = *horizAvFs[lev];
 
         ml = ml->getFinerLevel();
 
@@ -538,7 +497,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
 
       }
 
-    } // end if level 0
+
 
   } // end if we care about solute fluxes
 

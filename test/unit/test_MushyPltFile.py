@@ -1,5 +1,5 @@
 import unittest
-from PltFile import PltFile, latexify, latexify2
+from MushyPltFile import MushyPltFile, latexify, latexify2
 import matplotlib.pyplot as plt
 
 class TestPltFile(unittest.TestCase):
@@ -11,11 +11,11 @@ class TestPltFile(unittest.TestCase):
     def test_load(self):
 
         # Test loading a file that doesn't exist
-        pf = PltFile('file that does not exist')
+        pf = MushyPltFile('file that does not exist')
         self.assertEqual(pf.defined, False)
 
         # Test loading a file that does exist
-        pf = PltFile(self.DATA_FILE, load_data=True)
+        pf = MushyPltFile(self.DATA_FILE, load_data=True)
         self.assertEqual(pf.num_levels, 3)
         self.assertEqual(pf.plot_prefix, 'plt')
         self.assertEqual(pf.frame, 100)
@@ -38,19 +38,19 @@ class TestPltFile(unittest.TestCase):
         self.assertEqual(pf.data_loaded, False)
 
 
-        pf_no_name = PltFile('data/pltnoframe.2d.hdf5')
+        pf_no_name = MushyPltFile('data/pltnoframe.2d.hdf5')
         self.assertEqual(pf_no_name.frame, -1)
 
-        pf_no_inputs = PltFile('data/plt000100.2d.hdf5', inputs_file='does not exist')
+        pf_no_inputs = MushyPltFile('data/plt000100.2d.hdf5', inputs_file='does not exist')
         self.assertIsNone(pf_no_inputs.inputs)
 
         # Checkpoint files
-        cf = PltFile(self.CHK_DATA_FILE, load_data=True)
+        cf = MushyPltFile(self.CHK_DATA_FILE, load_data=True)
 
 
 
     def test_plotting(self):
-        pf = PltFile(self.DATA_FILE)
+        pf = MushyPltFile(self.DATA_FILE)
         pf.load_data(zero_x=True)
         porosity = pf.get_level_data('Porosity')
         latexify()
@@ -67,13 +67,13 @@ class TestPltFile(unittest.TestCase):
         pf.plot_field('Porosity')
 
     def test_diagnostics(self):
-        pf = PltFile(self.DATA_FILE, load_data=True)
+        pf = MushyPltFile(self.DATA_FILE, load_data=True)
 
         pf.compute_diagnostic_vars()
 
         pf.compute_mush_liquid_interface()
 
-        properties = pf.channel_properties()
+        # properties = pf.channel_properties()
 
         num_channels = pf.num_channels(0.9)
         self.assertEqual(num_channels, 2)
@@ -89,7 +89,7 @@ class TestPltFile(unittest.TestCase):
         self.assertEqual(permeability, 1.0)
 
     def test_3d(self):
-        pf = PltFile(self.DATA_FILE_3D, load_data=True)
+        pf = MushyPltFile(self.DATA_FILE_3D, load_data=True)
 
         porosity = pf.get_level_data('Porosity')
         coords = porosity.coords
@@ -105,7 +105,7 @@ class TestPltFile(unittest.TestCase):
 
 
     def test_static_methods(self):
-        pf = PltFile(self.DATA_FILE, load_data=True)
+        pf = MushyPltFile(self.DATA_FILE, load_data=True)
 
         x,y = pf.get_mesh_grid()
         self.assertEqual(len(x), 16)
@@ -114,7 +114,7 @@ class TestPltFile(unittest.TestCase):
         self.assertEqual(len(x), 15)
 
         porosity = pf.get_level_data('Porosity')
-        x,y = PltFile.get_mesh_grid_n(porosity)
+        x,y = MushyPltFile.get_mesh_grid_n(porosity)
         self.assertEqual(len(x), 16)
 
 

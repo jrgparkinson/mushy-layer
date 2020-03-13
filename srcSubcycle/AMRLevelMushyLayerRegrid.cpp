@@ -1055,9 +1055,9 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
                                      int taggingVectorVar,
                                      TaggingMethod taggingMethod,int comp)
 {
-  const DisjointBoxLayout& levelDomain =
-      m_scalarNew[0]->disjointBoxLayout();
-  // If there is a coarser level interpolate undefined ghost cells
+  const DisjointBoxLayout& levelDomain = m_scalarNew[0]->disjointBoxLayout();
+
+  // If there is a coarser level, interpolate to fill undefined ghost cells
   if (m_hasCoarser)
   {
     const AMRLevelMushyLayer* amrGodCoarserPtr = getCoarserLevel();
@@ -1074,7 +1074,6 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
                      *amrGodCoarserPtr->m_scalarNew[taggingVar],
                      *amrGodCoarserPtr->m_scalarNew[taggingVar], 1.0, 0, 0, 1);
     }
-
     if (taggingVectorVar >=0)
     {
       PiecewiseLinearFillPatch pwl(levelDomain,
@@ -1109,9 +1108,9 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
   {
     const Box& b = levelDomain[dit()];
     FArrayBox gradFab(b, SpaceDim);
-    //const FArrayBox& UFab = (*m_scalarNew[taggingVar])[dit()];
     FArrayBox UFab((*m_scalarNew[0])[dit()].box(), 1);
     UFab.setVal(0.0);
+
     if (taggingVar >= 0)
     {
       UFab.plus((*m_scalarNew[taggingVar])[dit()]);
@@ -1129,8 +1128,6 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
         UFab.plus((*m_vectorNew[taggingVectorVar])[dit()], comp, 0);
       }
     }
-
-
 
     FArrayBox taggingMetricFab(b, 1);
 

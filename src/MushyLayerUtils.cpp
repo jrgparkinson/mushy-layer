@@ -414,7 +414,7 @@ void getVectorVarNames(Vector<string>& varNames,
   {
     int startComp = startPos + (a_var*2);
     Vector<string> dirString(SpaceDim);
-    getDirString (dirString);
+    getDirString(dirString);
 
     for (int dir = 0; dir<SpaceDim; dir++)
     {

@@ -1,4 +1,19 @@
+#3-D:
+bc.bulkConcentrationHi=1 1 0
+bc.bulkConcentrationHiVal=-1 -1 -1
+bc.bulkConcentrationLo=1 1 1
+bc.bulkConcentrationLoVal=-1 -1 -1
+bc.enthalpyHiVal=0.0  0.0 2.5
+bc.enthalpyLoVal=0.0 0.0  6.3
+bc.scalarHi=1  1 0
+bc.scalarLo=1  1 1
+bc.velHi=0 0 0
+bc.velLo=0 0 0
+main.periodic_bc=0 0 0
 
+
+
+# 2-D:
 bc.bulkConcentrationHi=1  0
 bc.bulkConcentrationHiVal=-1 -1 -1
 bc.bulkConcentrationLo=1 1
@@ -11,6 +26,7 @@ bc.velHi=0 0 0
 bc.velLo=0 0 0
 main.periodic_bc=0 0 0
 
+####################################################
 machineCodeIsRunOn=atmlxmaster
 main.block_factor=8
 main.cfl=0.1
@@ -28,20 +44,20 @@ main.initial_cfl=0.01
 main.iteration_plot_interval=-1
 main.max_dt=1000.0
 main.max_dt_growth=1.01
-main.max_grid_size=16
+main.max_grid_size=32
 main.max_init_dt=1e-2
 main.max_level=2
 main.max_step=800000
 main.max_grid_size=32
-main.max_time=0.3
-main.min_time=0.3
+main.max_time=2.0
+main.min_time=0.5
 main.max_level=0
 main.min_time=0.02
 main.nondimensionalisation=0
-main.num_cells=32 32 32
+main.num_cells=64 64 32
 main.output_folder=.
-main.plot_interval=25
-main.plot_period=0.005
+main.plot_interval=50
+#main.plot_period=0.005
 main.plot_prefix=plt
 main.printAccelDt=0
 main.project_initial_vel=true
@@ -62,7 +78,7 @@ main.use_limiting=0
 main.use_subcycling=1
 main.verbosity=2
 parameters.K=1
-parameters.compositionRatio=1.2
+parameters.compositionRatio=5.0
 parameters.eutecticComposition=230
 parameters.eutecticTemp=-23
 parameters.heatConductivityRatio=1
@@ -72,21 +88,32 @@ parameters.lewis=200
 parameters.liquidusSlope=-0.1
 parameters.heleShawPermeability=10000.0
 parameters.nonDimVel=0.0
-parameters.permeabilityFunction=2
+parameters.permeabilityFunction=1  # 1-cubic, 2-kozeny
 parameters.problem_type=0
 parameters.rayleighTemp=0.0
 parameters.specificHeatRatio=1
 parameters.stefan=5.0
 parameters.waterDistributionCoeff=1e-5
-projection.eta=0.99
+projection.eta=0.0
 projection.numSmoothDown=2
 projection.numSmoothUp=8
 regrid.compositeChannelTagging=true
 regrid.marginalPorosityLimit=0.99
 
-main.doEuler=0 # turns off inertial terms, so we just solve stokes flow in the liquid
-parameters.rayleighComp=100.0
-parameters.darcy=0.01
-parameters.prandtl=10.0
+main.doEuler=1 # turns off inertial terms, so we just solve stokes flow in the liquid
+main.includeInertialTerms=0
+parameters.rayleighComp=1000.0
+
+# This should really just be darcy like flow
+parameters.darcy=0.1
+parameters.prandtl=0.1
+parameters.permeabilityFunction=1  # 1-cubic, 2-kozeny
+parameters.heleShawPermeability=1.0
+
+main.periodic_bc=0 0 0
 
 
+main.addSubtractGradP=1
+# main.explicitViscousVelSolve=1
+# main.fixed_dt=1e-6
+main.debug=true

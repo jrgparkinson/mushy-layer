@@ -72,14 +72,16 @@ jobs:
       - name: Run Unit Tests
         run: |
           cd $UNIT_TEST_PATH
-          coverage run testPltFile.py
-          coverage html
+          py.test
 
-      - uses: actions/upload-artifact@v1
-        name: Upload unit test results
-        with:
-          name: python-unit-test-results
-          path: ${{ env.UNIT_TEST_PATH }}
+#          coverage run testPltFile.py
+#          coverage html
+
+      # - uses: actions/upload-artifact@v1
+      #   name: Upload unit test results
+      #   with:
+      #     name: python-unit-test-results
+      #     path: ${{ env.UNIT_TEST_PATH }}
 
       # - uses: actions/checkout@v2
       #   name: Checkout master

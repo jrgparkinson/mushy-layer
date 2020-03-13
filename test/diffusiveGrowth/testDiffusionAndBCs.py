@@ -1,4 +1,4 @@
-from PltFile import PltFile, latexify2
+from MushyPltFile import MushyPltFile, latexify2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_bvp
@@ -250,7 +250,7 @@ if __name__ == "__main__":
         sys.exit(-1)
 
     # get some initial data
-    init_pf = PltFile(os.path.join(full_output_folder, plt_files[0]))
+    init_pf = MushyPltFile(os.path.join(full_output_folder, plt_files[0]))
     init_pf.load_data()
     T_data = init_pf.get_level_data('Temperature').mean('x').squeeze()
     z = T_data.coords['y']
@@ -268,7 +268,7 @@ if __name__ == "__main__":
     fig = plt.figure()
 
     for plot_loc in plt_files:
-        pf = PltFile(os.path.join(full_output_folder, plot_loc))
+        pf = MushyPltFile(os.path.join(full_output_folder, plot_loc))
         pf.load_data()
         T_data = pf.get_level_data('Temperature').mean('x').squeeze()
         z = T_data.coords['y']

@@ -3,7 +3,8 @@ import os
 from colorama import Fore
 from MushyLayerRunSimple import MushyLayerRunSimple
 from mushyLayerRunUtils import get_restart_file, get_executable_name, \
-    get_final_chk_file, get_mushy_layer_dir, is_power_of_two, string_to_array
+    get_final_chk_file, get_mushy_layer_dir
+from chombopy.inputs import is_power_of_two, string_to_array
 from BatchJob import BatchJob
 
 
