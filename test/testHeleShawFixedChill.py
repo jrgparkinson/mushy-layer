@@ -10,7 +10,8 @@ from BatchJob import BatchJob
 from MushyLayerRunSimple import MushyLayerRunSimple
 from makeFigures import fixed_chill_command
 from mushyLayerRunUtils import get_base_output_dir, get_matlab_base_command, read_inputs, get_executable_name, \
-    get_mushy_layer_dir, add_params
+    get_mushy_layer_dir
+from chombopy.inputs import add_params
 
 
 ##########################################################################
