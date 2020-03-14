@@ -169,7 +169,9 @@ jobs:
           echo $CH_TIMER
           echo "--------------"
           cd $GITHUB_WORKSPACE/test/regression
-          python run_regression_tests.py
+          py.test
+          
+#      python run_regression_tests.py
 
 
        # Rerun with higher verbosity if there was a failure and also upload

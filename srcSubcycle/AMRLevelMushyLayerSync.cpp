@@ -383,13 +383,10 @@ void AMRLevelMushyLayer::postTimeStep()
         }
 
         mlPtr = mlPtr->getFinerLevel();
-        //        mlPtr->dt(-mlPtr->m_dt);
-
       }
 
       return;
     }
-
 
     // Grow m_adv_vel_centering
     m_adv_vel_centering = m_adv_vel_centering*m_opt.adv_vel_centering_growth;
@@ -402,7 +399,6 @@ void AMRLevelMushyLayer::postTimeStep()
     {
       pout() << "Set adv vel centering = " << m_adv_vel_centering << endl;
     }
-
 
   } // end if level = 0
 
