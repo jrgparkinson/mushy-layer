@@ -317,10 +317,20 @@ class MushyPltFile(PltFile):
             # ice_ocean_boundary_cell = int(median_liquid_boundary)
 
             # If there's a mushy layer, compute confinement depth
-            # confinment_depth = dx * (np.max(liquid_z_indices) - ice_ocean_interface)
+            # confinement_depth = dx * (np.max(liquid_z_indices) - ice_ocean_interface)
             # data['channel_confinement_depth'] = confinment_depth
 
         return z_interface
+
+    def skip_component_import_names(self):
+        # Some of my files have wierd xEnthalpy yEnthalpy fields, which we should skip
+        return ["xEnthalpy", "yEnthalpy"]
+
+    def should_negate_field_upon_reflection(self, field):
+        if field[0] == "x" or field == "streamfunction":
+            return True
+
+        return False
 
 
 def latexify(fig_width=None, fig_height=None):
