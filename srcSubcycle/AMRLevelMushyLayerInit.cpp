@@ -3668,6 +3668,7 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
   Vector<DiagnosticNames> diagsToPrint;
   diagsToPrint.push_back(DiagnosticNames::diag_time);
   diagsToPrint.push_back(DiagnosticNames::diag_dt);
+  diagsToPrint.push_back(DiagnosticNames::diag_timestep);
 
   diagsToPrint.push_back(DiagnosticNames::diag_dSdt);
   diagsToPrint.push_back(DiagnosticNames::diag_dUdt);

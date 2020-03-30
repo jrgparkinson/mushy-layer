@@ -168,6 +168,8 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
         m_diagnostics.addDiagnostic(DiagnosticNames::diag_dSdt, m_time, Cnorm);
         m_diagnostics.addDiagnostic(DiagnosticNames::diag_dUdt, m_time, Unorm);
 
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_timestep, m_time, AMR::s_step);
+
         // Can print diagnostics now if on processor 0
         bool printDiagnostics = (m_level == 0 && procID() ==0 ); // only print results on proc 0
         if (printDiagnostics)

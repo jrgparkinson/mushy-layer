@@ -24,6 +24,7 @@
 enum DiagnosticNames{
   diag_time,
   diag_dt,
+  diag_timestep,
 
   diag_averageVerticalSaltFlux,
   diag_L2FsVertDiffusion,

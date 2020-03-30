@@ -3,7 +3,7 @@ name: Build C++ Code and run Regression Tests
 on:
   push:
     branches:
-      - '*'
+      - 'master'
 
     paths-ignore:
       - '.github/**'
@@ -11,7 +11,7 @@ on:
 
   pull_request:
     branches:
-      - '*'
+      - 'master'
 
     paths-ignore:
       - '.github/**'
