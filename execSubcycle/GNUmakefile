@@ -5,15 +5,7 @@
 # the base name(s) of the application(s) in this directory
 ebase = mushyLayer
 
-# the location of the Chombo "lib" directory
-#CHOMBO_HOME = ../../chombofork/lib
-# Compile with chombo trunk to check everything will work for other users
-#CHOMBO_HOME = ../../Chombo-trunk/lib 
-
-
-
 include ../mk/Make.defs.MushyLayer
-
 
 include $(CHOMBO_HOME)/mk/Make.defs
 include $(CHOMBO_HOME)/mk/Make.defs.config
