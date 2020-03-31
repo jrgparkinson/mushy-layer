@@ -86,14 +86,20 @@ def test_folder(test_directory, verbose_output=False):
     - at least one file ending with .expected to compare with the computed ouptut,
         e.g. pout.0.expected, or plt000010.2d.hdf5.expected
     :param test_directory:
-    :return: success - if test was succesful or not
+    :return: success - if test was successful or not
     """
 
     logger.log('Processing folder "%s"' % test_directory)
 
+    remove_existing_diffs_cmd = 'rm %s/diff-*' % test_directory
+    logger.log('Remove existing diffs: ' + remove_existing_diffs_cmd)
+    os.system(remove_existing_diffs_cmd)
+
     test_files = os.listdir(test_directory)
 
     logger.log('Initial files in folder ' + str(test_files))
+
+
 
     # Check the required files exist
     # if not, skip this test

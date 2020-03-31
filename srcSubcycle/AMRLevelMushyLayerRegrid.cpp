@@ -515,7 +515,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
     if (s_verbosity >= 2)
     {
-      pout() << "AMRLevelMushyLayer::tagCells - tag velocity >  " << m_opt.vel_thresh << endl;
+      pout() << "AMRLevelMushyLayer::tagCells - tag fluid speed >  " << m_opt.vel_thresh << endl;
     }
 
     tagCellsVar(localTags, m_opt.vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
@@ -1170,9 +1170,7 @@ void AMRLevelMushyLayer::tagCellsVar(IntVectSet& localTags, Real refineThresh,
       // Just compare the actual field, but make negative (so we refine where the field is negative).
       taggingMetricFab.copy(UFab);
       taggingMetricFab.mult(-1);
-
     }
-
 
     // Tag where gradient exceeds threshold
     BoxIterator bit(b);

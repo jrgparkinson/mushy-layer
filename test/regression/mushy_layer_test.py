@@ -81,6 +81,9 @@ class MushyLayerTest():
 def compare_diagnostics(data, data_expected, tolerance=1e-5):
     data_keys = data.keys()
 
+    LOGGER.info('data: ' + data.to_string())
+    LOGGER.info('data_expected: ' + data_expected.to_string())
+
     # diff = data.copy()
     # diff.to_csv(os.path.join(test_directory, 'diff-%s' % expected_file))
 
