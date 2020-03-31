@@ -2,7 +2,7 @@ asn1crypto==0.24.0
 attrs==19.3.0
 backcall==0.1.0
 bcrypt==3.1.6
-bleach==3.1.0
+bleach==3.1.1
 cffi==1.11.5
 chombopy
 Click==7.0
@@ -42,7 +42,7 @@ munch==2.5.0
 nbconvert==5.4.0
 nbformat==4.4.0
 networkx==2.4
-notebook==5.7.4
+notebook==5.7.8
 numpy==1.16.0
 pandas==0.24.0
 pandocfilters==1.4.2

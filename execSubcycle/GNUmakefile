@@ -5,6 +5,12 @@
 # the base name(s) of the application(s) in this directory
 ebase = mushyLayer
 
+# the location of the Chombo "lib" directory
+# Assume CHOMBO_HOME is already set on anything other than cori
+ifeq ($(NERSC_HOST),cori) 
+CHOMBO_HOME = ../../Chombo/lib
+endif
+
 include ../mk/Make.defs.MushyLayer
 
 include $(CHOMBO_HOME)/mk/Make.defs
