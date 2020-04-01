@@ -3004,9 +3004,21 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     cur_time = m_opt.restart_new_time;
   }
 
-  //  Real dtLevel;
-  //  Real dtInit = 10000000.0;
   Real max_dtInit = 0.5*computeDtInit(finest_level);
+//  if (thisMLPtr->hasCoarserLevel())
+//  {
+//    // Ensure dt does not exceed that on finer level
+//    Real crseDt = getCoarserLevel()->dt();
+//    Real crseOldTime = getCoarserLevel()->time() - crseDt;
+//    Real crseNewTime = getCoarserLevel()->time();
+//    max_dtInit = min(max_dtInit, (m_time - crseOldTime - getCoarserLevel()->dt()));
+//
+//    Real interp = getCoarseTimeInterpCoeff(m_time + max_dtInit);
+//
+//    Real a = 0;
+//  }
+//  max_dtInit = 0.5*max_dtInit;
+
   if (dtInit < 0)
   {
     dtInit = computeDtInit(finest_level);
@@ -3051,11 +3063,7 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   int lbase = thisMLPtr->m_level;
   for (int iter = 0; iter < m_opt.num_init_passes; iter++)
   {
-    // Set dt for this init step
-//    if (m_opt.increaseDt)
-//    {
-      dtInit = min(dtInit*2, max_dtInit);
-//    }
+    dtInit = min(dtInit, max_dtInit);
     thisMLPtr = this;
     for (int lev = m_level; lev <= finest_level; lev++)
     {
@@ -3077,12 +3085,14 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
 
       bool doLambdaReflux = true;
 
-
       // Also advect lambda to see how this behaves
       thisMLPtr->advectLambda(doLambdaReflux);
 
       // Get plot fields
       thisMLPtr->getExtraPlotFields();
+
+      // Make sure 'old' fields are filled so finer levels can use them for interpolation
+      thisMLPtr->copyNewToOldStates();
 
       thisMLPtr = thisMLPtr->getFinerLevel();
     }
@@ -3614,8 +3624,13 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     {
       if (solvingFullDarcyBrinkman())
       {
-        initializeGlobalPressure(m_dt,
-                                 false); // not initialising, but restarting
+        // This is just wrong - need to do the init thing
+//        initializeGlobalPressure(m_dt/2, // halve the timestep to avoid overstepping finer levels
+//                                 false); // not initialising, but restarting
+        if (m_level == 0)
+        {
+          initializeGlobalPressure(m_dt, false);
+        }
       }
       else
       {
@@ -3663,6 +3678,7 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
   Vector<DiagnosticNames> diagsToPrint;
   diagsToPrint.push_back(DiagnosticNames::diag_time);
   diagsToPrint.push_back(DiagnosticNames::diag_dt);
+  diagsToPrint.push_back(DiagnosticNames::diag_timestep);
 
   diagsToPrint.push_back(DiagnosticNames::diag_dSdt);
   diagsToPrint.push_back(DiagnosticNames::diag_dUdt);

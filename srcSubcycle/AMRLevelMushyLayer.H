@@ -949,6 +949,8 @@ protected:
   void fillVectorField(LevelData<FArrayBox>& a_vector, Real a_time, int a_var,
                        bool doInterior=false, bool quadInterp=false);
 
+  /// Get coarse time interpolation coefficient
+  Real getCoarseTimeInterpCoeff(Real a_time);
 
   /// Fill ghost cells of scalar field
   void fillScalars(LevelData<FArrayBox>& a_scal,

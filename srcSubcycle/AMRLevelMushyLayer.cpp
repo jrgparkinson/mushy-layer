@@ -168,6 +168,8 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
         m_diagnostics.addDiagnostic(DiagnosticNames::diag_dSdt, m_time, Cnorm);
         m_diagnostics.addDiagnostic(DiagnosticNames::diag_dUdt, m_time, Unorm);
 
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_timestep, m_time, AMR::s_step);
+
         // Can print diagnostics now if on processor 0
         bool printDiagnostics = (m_level == 0 && procID() ==0 ); // only print results on proc 0
         if (printDiagnostics)
@@ -1506,13 +1508,11 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
           ivFluxBox = iv;
         }
 
-        //averaged[y_i-y_init] += fluxDir(iv, comp)*m_dx/m_opt.domainWidth;
+
         averaged[y_i-y_init] += fluxDir(ivFluxBox, comp)*m_dx/m_opt.domainWidth;
 
       }
     }
-
-    //  pout() << endl;
 
     // Broadcast/gather to compute averages over whole domain
     int srcProc = 0;
@@ -1530,13 +1530,6 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
     }
 
     broadcast(globalAveraged, srcProc);
-
-    //  pout() << averaged << endl;
-    //    if (s_verbosity > 10)
-    //    {
-    //      pout() << "Processor ID: " << procID() << endl;
-    //      pout() << "solute fluxes: " << globalAveraged << endl;
-    //    }
 
     for (DataIterator dit = a_averaged.dataIterator(); dit.ok(); ++dit)
     {
@@ -2084,8 +2077,6 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
                             0,0,numComp);
 
     // Also copy the vertical component to an farray box
-    //    (*m_scalarNew[ScalarVars::m_FsVertFluid])[dit].copy(edgeScalFluidAdv[dit], 1, 0, 1);
-    //    (*m_scalarNew[ScalarVars::m_FsVertFrame])[dit].copy(edgeScalFrameAdvection[dit], 1, 0, 1);
     EdgeToCell(edgeScalFluidAdv[dit], 1, (*m_scalarNew[ScalarVars::m_FsVertFluid])[dit], 0, 1);
     EdgeToCell(edgeScalFrameAdvection[dit], 1, (*m_scalarNew[ScalarVars::m_FsVertFrame])[dit], 0, 1);
 

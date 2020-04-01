@@ -1,4 +1,5 @@
 **.hdf5
+!restart.*.hdf5
 **.0
 !*.expected
 **.inputs

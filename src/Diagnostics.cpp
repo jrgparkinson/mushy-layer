@@ -22,6 +22,7 @@ Diagnostics::Diagnostics ()
   }
 
   m_diagnosticNames[DiagnosticNames::diag_dt] = "dt";
+  m_diagnosticNames[DiagnosticNames::diag_timestep] = "timestep";
   m_diagnosticNames[DiagnosticNames::diag_Nu] = "Nusselt";
   m_diagnosticNames[DiagnosticNames::diag_NuLeft] = "NusseltLeft";
   m_diagnosticNames[DiagnosticNames::diag_NuMiddle] = "NusseltMiddle";

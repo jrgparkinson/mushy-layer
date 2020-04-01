@@ -482,6 +482,33 @@ void AMRLevelMushyLayer::fillScalarFace(LevelData<FluxBox>& a_scal, Real a_time,
   }
 
 }
+
+Real AMRLevelMushyLayer::getCoarseTimeInterpCoeff(Real a_time)
+{
+
+  Real crse_new_time = getCoarserLevel()->m_time;
+  Real crse_dt = getCoarserLevel()->dt();
+  Real crse_old_time = crse_new_time - crse_dt;
+  Real crse_time_interp_coeff;
+
+  // check for "essentially 0 or 1"
+  if (abs(a_time - crse_old_time) < TIME_EPS)
+  {
+    crse_time_interp_coeff = 0.0;
+  }
+  else if (abs(a_time - crse_new_time) < TIME_EPS)
+  {
+    crse_time_interp_coeff = 1.0;
+  }
+  else
+  {
+    crse_time_interp_coeff = (a_time - crse_old_time) / crse_dt;
+  }
+
+  CH_assert (crse_time_interp_coeff >= 0.);
+  CH_assert (crse_time_interp_coeff <= 1.);
+  return crse_time_interp_coeff;
+}
 // Fill a single component of a scalar field
 void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
                                      const int a_var, bool doInterior, bool quadInterp, int a_comp, bool apply_bcs)
@@ -548,24 +575,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     //    const ProblemDomain& crseDomain = crseLevel.problemDomain();
     //    int nRefCrse = crseLevel.refRatio();
 
-    Real crse_new_time = crseLevel.m_time;
-    Real crse_dt = crseLevel.dt();
-    Real crse_old_time = crse_new_time - crse_dt;
-    Real crse_time_interp_coeff;
-
-    // check for "essentially 0 or 1"
-    if (abs(a_time - crse_old_time) < TIME_EPS)
-    {
-      crse_time_interp_coeff = 0.0;
-    }
-    else if (abs(a_time - crse_new_time) < TIME_EPS)
-    {
-      crse_time_interp_coeff = 1.0;
-    }
-    else
-    {
-      crse_time_interp_coeff = (a_time - crse_old_time) / crse_dt;
-    }
+    Real crse_time_interp_coeff = getCoarseTimeInterpCoeff(a_time);
 
     if (s_verbosity >= 10)
     {
@@ -636,6 +646,9 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       }
 
       LevelData<FArrayBox> avCrseScal(crseGrids, 1, oldCrseScal.ghostVect());
+      Real crse_new_time = getCoarserLevel()->m_time;
+        Real crse_dt = getCoarserLevel()->dt();
+        Real crse_old_time = crse_new_time - crse_dt;
       ::timeInterp(avCrseScal, a_time, oldCrseScal, crse_old_time, newCrseScal, crse_new_time, Interval(0,0));
 
       if (s_verbosity >= 6)

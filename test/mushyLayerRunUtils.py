@@ -5,7 +5,7 @@ import math
 import sys
 import subprocess
 import socket
-
+import chombopy.inputs as inputs
 
 def get_base_output_dir():
     """ Define the full path to the directory where the output of running test problems should go """
@@ -254,6 +254,7 @@ def construct_run_name(params):
 def read_inputs(inputs_file):
     """ Load up an inputs file and parse it into a dictionary """
     print('read_inputs has moved!')
+    return inputs.read_inputs(inputs_file)
     # params = {}
     #
     # # Read in the file
@@ -294,7 +295,8 @@ def write_inputs(location, params, ignore_list=None, do_sort=True):
     """
      Write out a set of parameters to an inputs file
     """
-    print('write_inputs has moved!')
+    # print('write_inputs has moved!')
+    inputs.write_inputs(location, params, ignore_list, do_sort)
     # output_file = ''
     #
     # key_list = list(params.keys())
