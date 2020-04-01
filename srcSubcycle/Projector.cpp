@@ -1893,15 +1893,11 @@ void Projector::doPostRegridOps(Vector<LevelData<FArrayBox>* >& a_lambda,
                                   Vector<RefCountedPtr<LevelData<FluxBox> > >& a_porosity,
                                   const Real a_dt, const Real a_time, const Real a_etaScale)
 {
-  //
-
-
   AMRMultiGrid<LevelData<FArrayBox> >* bigSolverPtr = new
       AMRMultiGrid<LevelData<FArrayBox> >;
 
   defineMultiGrid(*bigSolverPtr, a_lambda, a_porosity, true); // true - freestream solve
 
-  // for inviscid flow, only do this
   // now do freestream preservation solve
   m_etaLambda *= a_etaScale;
   computeVDCorrection(a_lambda, a_porosity, a_time, a_dt, *bigSolverPtr);
