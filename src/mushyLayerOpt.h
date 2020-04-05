@@ -1022,6 +1022,9 @@ struct MushyLayerOptions {
    */
   Real regrid_eta_scale;
 
+  /// Whether to reflux lambda before recomputing freestream correction after regridding
+  bool regrid_reflux_lambda;
+
   /// Whether or not to do some smoothing after regridding
    bool do_postRegrid_smoothing;
 
