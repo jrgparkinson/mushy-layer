@@ -337,11 +337,6 @@ void AMRLevelMushyLayer::postTimeStep()
         }
       }
 
-      // We now have the finest level
-//      Real alpha = 0.1; // Some empirically chosen multiplier (must be < 1)
-//      Real maxU =  mlPtr->getMaxVelocity();
-      //    m_opt.minDt = alpha*m_initial_dt_multiplier*mlPtr->m_dx/maxU;
-
       if (s_verbosity > 2)
       {
         pout() << "Timestep failed min dt = " << m_opt.minDt << endl;
@@ -718,6 +713,46 @@ void AMRLevelMushyLayer::postTimeStep()
 
       AMRmlptr = AMRmlptr->getFinerLevel();
     }
+  }
+
+  // Now that everything else is done, can write out diagnostics on level 0
+  bool printAllLevels = true;
+  ParmParse pp("diagnostics");
+  pp.query("print_all_levels", printAllLevels);
+
+  if (m_opt.computeDiagnostics
+      && (m_level == 0 || printAllLevels))
+  {
+
+    // If a diagnostic period has been declared, check this time has passed since we last produced diagnostics
+      if (m_opt.diagnostics_period > 0 &&
+          m_time - m_prev_diag_output < m_opt.diagnostics_period)
+      {
+        // do nothing
+
+      }
+      else
+      {
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_timestep, m_time, AMR::s_step);
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dt, m_time, m_dt);
+
+        Real Tnorm = convergedToSteadyState(ScalarVars::m_enthalpy);
+        Real Cnorm = convergedToSteadyState(ScalarVars::m_bulkConcentration);
+        Real Unorm =  convergedToSteadyState(m_fluidVel, true);
+
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dTdt, m_time, Tnorm);
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dSdt, m_time, Cnorm);
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dUdt, m_time, Unorm);
+
+        // Can print diagnostics now if on processor 0
+        bool printDiagnostics = (procID() == 0 );
+        if (printDiagnostics)
+        {
+          m_diagnostics.printDiagnostics(m_time);
+        }
+
+        m_prev_diag_output = m_time;
+      }
   }
 }
 

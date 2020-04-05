@@ -2237,17 +2237,18 @@ void Projector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
 
     Vector<LevelData<FArrayBox>* > newLambda(a_lambda.size());
 
-    Vector<int> nRefFineVect(a_lambda.size());
+    Vector<int> nRefFineVect(a_lambda.size(), 2); // default value=2
+    levelProjPtr = this;
+
+    // Fill vector of ref ratios to the finer level
+    // We only store the ref ratio to the coarser level, so have to do this in a slightly backwards way
     for (int lev=m_level; lev<=finestLevel; lev++)
     {
-      if (lev < finestLevel)
+      if (lev > 0)
       {
-        nRefFineVect[lev] = levelProjPtr->fineProjPtr()->nRefCrse();
+        nRefFineVect[lev-1] = levelProjPtr->nRefCrse();
       }
-      else
-      {
-        nRefFineVect[lev] = 1;
-      }
+
       levelProjPtr = levelProjPtr->fineProjPtr();
     }
 
@@ -2339,9 +2340,10 @@ void Projector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
 
     Interval sumComps(0,0);
     m_sumVDrhs =  computeSum(a_lambda, nRefFineVect, m_dx, sumComps, m_level);
+    Real maxLambda = ::computeNorm(a_lambda, nRefFineVect, m_dx, sumComps, m_level);
     m_sumVDrhs = m_sumVDrhs/m_etaLambda;
     pout() << "  Sum(RHS) for VD solve on level " << m_level << " (divided by eta) = "
-        << setiosflags(ios::scientific) << m_sumVDrhs << " (current time " <<a_newTime << ")" <<  endl;
+        << setiosflags(ios::scientific) << m_sumVDrhs << " (current time " <<a_newTime << "), max|lambda| = " << maxLambda <<  endl;
     // now solve
 
     a_solver.solve(VDCorr, newLambda,
@@ -2698,7 +2700,7 @@ void Projector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
                                          Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_porosity,
                                          bool a_homogeneousCFBC)
 {
-  CH_assert(m_level==0);
+//  CH_assert(m_level==0);
 
   // first need to define solver
   AMRMultiGrid<LevelData<FArrayBox> > bigSolver;

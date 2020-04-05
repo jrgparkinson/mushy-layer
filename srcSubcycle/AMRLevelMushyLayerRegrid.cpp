@@ -1220,22 +1220,17 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
   if (new_grids.sameBoxes(m_grids))
   {
     m_newGrids_different = false;
-    return;
   }
 
-  // Check if old grids existed
-//  if (m_grids.size() == 0)
-//  {
-//    if (s_verbosity >= 2)
-//    {
-//      pout() << "AMRLevelMushyLayer::regrid - this is a new level" << endl;
-//    }
-//    m_newLevel = true;
-//  }
+  pout() << "  New grids are different (time = " << m_time << ")? " << m_newGrids_different << endl;
 
   if (m_newGrids_different)
   {
     m_level_grids = a_newGrids;
+  }
+  else
+  {
+    return;
   }
 
   // Save original grids and load balance
@@ -1345,6 +1340,14 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
                                   *(amrMushyLayerCoarserPtr->m_scalarNew[scalarVar]));
         scalarInterp.interpToFine(*m_scalarOld[scalarVar],
                                   *(amrMushyLayerCoarserPtr->m_scalarOld[scalarVar]));
+      }
+
+      ParmParse pp("regrid");
+      bool initLambdaOne = false;
+      pp.query("init_lambda_one", initLambdaOne);
+      if (scalarVar == ScalarVars::m_lambda && initLambdaOne)
+      {
+        setValLevel(*m_scalarNew[scalarVar], 1.0);
       }
 
     }
@@ -1478,22 +1481,138 @@ void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, Probl
 
 void AMRLevelMushyLayer::postRegrid(int a_base_level)
 {
+  int methodVersion = 0;
+  ParmParse pp("regrid");
+  pp.query("post_method", methodVersion);
+
+  if (methodVersion == 0)
+  {
+    postRegridOld(a_base_level);
+  }
+  else
+  {
+    postRegridNew(a_base_level);
+  }
+}
+
+void AMRLevelMushyLayer::postRegridNew(int a_base_level)
+{
+
+  // Don't run method if this isn't the finest level, or this is the base level
+  if (!finestLevel() || m_level == a_base_level)
+  {
+    return;
+  }
+
+  pout() << "postRegridNew between base level " << a_base_level << " and current level " << m_level << endl;
+  pout() << "     level " << m_level << ": time=" << m_time << ", dt=" << m_dt << endl;
+  pout() << "     level " << getCoarserLevel()->m_level << ": time=" << getCoarserLevel()->m_time << ", dt=" << getCoarserLevel()->m_dt << endl;
+
+  // Get the mushy layer object for the base level
+  AMRLevelMushyLayer* ml_base = this;
+  while (ml_base->level() > a_base_level)
+  {
+    ml_base = ml_base->getCoarserLevel();
+  }
+
+  CH_assert(ml_base->level() == a_base_level);
+
+  // Fill AMR data
+  int numLevels = m_level + 1;
+
+  Vector<LevelData<FArrayBox>*> amrVel(numLevels);
+  Vector<LevelData<FArrayBox>*> amrLambda(numLevels);
+  Vector<RefCountedPtr<LevelData<FluxBox> > > amrPorosityFace(numLevels);
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > amrPorosity(numLevels);
+
+  fillAMRVelPorosity(amrVel, amrPorosityFace, amrPorosity);
+  fillAMRLambda(amrLambda);
+
+  Vector<int> nRef;
+  AMRLevelMushyLayer* mlTemp = getCoarsestLevel();
+  while (mlTemp)
+  {
+    nRef.push_back(mlTemp->m_ref_ratio);
+    mlTemp = mlTemp->getFinerLevel();
+  }
+
+  Projector& base_projection = ml_base->m_projection;
+  Real base_dt = ml_base->dt();
+
+  // Fill BCs
+  AMRLevelMushyLayer* thisLevelData = ml_base;
+
+  VelBCHolder velBC(m_physBCPtr->uStarFuncBC(m_opt.viscousBCs));
+
+  for (int lev = a_base_level; lev <= m_level; lev++)
+  {
+    const ProblemDomain& levelDomain = thisLevelData->problemDomain();
+    Real levelDx = thisLevelData->m_dx;
+    LevelData<FArrayBox>& thisAmrVel = *amrVel[lev];
+    const DisjointBoxLayout& thisLevelGrids = thisAmrVel.getBoxes();
+    velBC.applyBCs(thisAmrVel, thisLevelGrids, levelDomain, levelDx,
+                   false); // inhomogeneous
+
+    // This deals with periodic BCs
+    thisAmrVel.exchange();
+
+    if (thisLevelData->m_finer_level_ptr != nullptr)
+    {
+      thisLevelData =
+          dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
+    }
+  }
+
+  bool homogeneousCFBC = true;
+  base_projection.initialVelocityProject(amrVel, amrPorosityFace, amrPorosity, homogeneousCFBC);
+
+  Real maxLambda = ::computeNorm(amrLambda, nRef, getCoarsestLevel()->dx(), Interval(0,0), 0, getCoarsestLevel()->m_level) - 1.0;
+  m_diagnostics.addDiagnostic(DiagnosticNames::diag_postRegridLambda, m_time+m_dt, maxLambda);
+  Real crseNewTime =getCoarsestLevel()->m_time + getCoarsestLevel()->m_dt;
+  getCoarsestLevel()->m_diagnostics.addDiagnostic(DiagnosticNames::diag_postRegridLambda, crseNewTime, maxLambda);
+  pout() << "PostRegrid(level " << m_level <<", time " << m_time <<") - max|Lambda| = " << maxLambda << endl;
+
+  base_projection.doPostRegridOps(amrLambda,amrPorosityFace,
+                                  base_dt,m_time, 1.0);
+
+  // Reset BCs
+  thisLevelData = ml_base;
+  for (int lev = a_base_level; lev <= m_level; lev++)
+    {
+      const ProblemDomain& levelDomain = thisLevelData->problemDomain();
+      Real levelDx = thisLevelData->m_dx;
+      LevelData<FArrayBox>& thisAmrVel = *amrVel[lev];
+      const DisjointBoxLayout& thisLevelGrids = thisAmrVel.getBoxes();
+      velBC.applyBCs(thisAmrVel, thisLevelGrids, levelDomain, levelDx,
+                     false); // inhomogeneous
+
+      // This deals with periodic BCs
+      thisAmrVel.exchange();
+
+      if (thisLevelData->m_finer_level_ptr != nullptr)
+      {
+        thisLevelData =
+            dynamic_cast<AMRLevelMushyLayer*>(thisLevelData->m_finer_level_ptr);
+      }
+    }
+
+  if (m_opt.initialize_pressures)
+  {
+    ml_base->initializeGlobalPressureNew();
+  }
+
+  // Sanity checking
+  pout() << "postRegridNew (level " << m_level << ") finished. time=" << m_time << ", dt=" << m_dt << endl;
+
+
+}
+
+void AMRLevelMushyLayer::postRegridOld(int a_base_level)
+{
   if (s_verbosity >= 3)
   {
     pout() << "AMRLevelMushyLayer::postRegrid (level " << m_level << ")" << endl;
   }
-
-  // Check div(u)
-//  AMRLevelMushyLayer* thisLevelData = this;
-//  while (thisLevelData)
-//  {
-//    thisLevelData->calculateTimeIndAdvectionVel(m_time, thisLevelData->m_advVel);
-//    Divergence::levelDivergenceMAC(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv],thisLevelData->m_advVel, m_dx);
-//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], nullptr, 1, thisLevelData->dx(), Interval(0,0));
-//    pout() << "PostRegrid(level " << thisLevelData->level() << ") -- max(div(u)) = " << maxDivU <<  endl;
-//
-//    thisLevelData = thisLevelData->getFinerLevel();
-//  }
 
   // If the new grids are no different to old grids, don't do anything
   // Need to check across all levels
@@ -1681,7 +1800,6 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
             thisLevelData->computeAllVelocities(true);
             thisLevelData->advectLambda(true);
 
-
             tlev = tlev + dtLev;
 
           }
@@ -1703,7 +1821,10 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
       }
 
       // Reflux Lambda to compute VD correction
-      AMRRefluxLambda();
+      if (m_opt.regrid_reflux_lambda)
+      {
+        AMRRefluxLambda();
+      }
 
       if (m_opt.makeRegridPlots)
       {
@@ -1712,6 +1833,19 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
       fillAMRVelPorosity(amrVel, amrPorosityFace, amrPorosity);
       fillAMRLambda(amrLambda);
+
+      Vector<int> nRef;
+      AMRLevelMushyLayer* mlTemp = getCoarsestLevel();
+      while (mlTemp)
+      {
+        nRef.push_back(mlTemp->m_ref_ratio);
+        mlTemp = mlTemp->getFinerLevel();
+      }
+
+      Real maxLambda = ::computeNorm(amrLambda, nRef, getCoarsestLevel()->dx(), Interval(0,0), 0, getCoarsestLevel()->m_level)-1.0;
+      m_diagnostics.addDiagnostic(DiagnosticNames::diag_postRegridLambda, m_time, maxLambda);
+      Real crseNewTime =getCoarsestLevel()->m_time + getCoarsestLevel()->m_dt;
+      getCoarsestLevel()->m_diagnostics.addDiagnostic(DiagnosticNames::diag_postRegridLambda, crseNewTime, maxLambda);
 
       level0Proj.doPostRegridOps(amrLambda,amrPorosityFace,dtInit,m_time, m_opt.regrid_eta_scale);
 
@@ -1738,18 +1872,6 @@ void AMRLevelMushyLayer::postRegrid(int a_base_level)
 
   } // end if level 0 and doing projection
 
-  // Check div(u)
-//  thisLevelData = this;
-//  while (thisLevelData)
-//  {
-//    thisLevelData->calculateTimeIndAdvectionVel(m_time, thisLevelData->m_advVel);
-//    Divergence::levelDivergenceMAC(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv],thisLevelData->m_advVel, m_dx);
-//    Real  maxDivU = ::computeNorm(*thisLevelData->m_scalarNew[ScalarVars::m_divUadv], nullptr, 1, thisLevelData->dx(), Interval(0,0));
-//    pout() << "PostRegrid(level " << thisLevelData->level() << ") -- max(div(u)) = " << maxDivU <<  endl;
-//
-//    thisLevelData = thisLevelData->getFinerLevel();
-//  }
-
 }
 
 void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
@@ -1773,178 +1895,3 @@ void AMRLevelMushyLayer::fillAMRLambda(Vector<LevelData<FArrayBox>*>& amrLambda)
     }
   }
 }
-
-//void
-//AMRLevelMushyLayer::smoothVelocityField(int a_lbase)
-//{
-//  // in this function, we take the filpatched fields stored in
-//  // the old-time storage (which have been modified to contain
-//  // s - mu*lap(s) in the regrid() function and perform an
-//  // elliptic solve which should result in a smoothed s
-//
-//  // first need to loop over levels and put together amr storage
-//  // this should be called on the lbase level
-//  CH_assert (m_level == a_lbase);
-//  CH_assert (m_regrid_smoothing_done);
-//
-//  AMRLevelMushyLayer* thisMLPtr = this;
-//  while (!thisMLPtr->finestLevel())
-//  {
-//    thisMLPtr = thisMLPtr->getFinerLevel();
-//  }
-//  CH_assert (thisMLPtr->finestLevel());
-//  int finest_level = thisMLPtr->m_level;
-//
-//  thisMLPtr = this;
-//  int startLev = m_level;
-//  if (m_level > 0)
-//  {
-//    startLev = m_level-1;
-//    thisMLPtr = thisMLPtr->getCoarserLevel();
-//  }
-//
-//  // now set up multilevel stuff
-//  Vector<LevelData<FArrayBox>*> oldS(finest_level+1, nullptr);
-//  Vector<LevelData<FArrayBox>*> newS(finest_level+1, nullptr);
-//  Vector<DisjointBoxLayout> amrGrids(finest_level+1);
-//  Vector<int> amrRefRatios(finest_level+1,0);
-//  Vector<Real> amrDx(finest_level+1,0);
-//  Vector<ProblemDomain> amrDomains(finest_level+1);
-//  // also will need to avg down new stuff
-//  Vector<CoarseAverage*> amrAvgDown(finest_level+1,nullptr);
-//
-//  // loop over levels, allocate temp storage for velocities,
-//  // set up for amrsolves
-//  for (int lev=startLev; lev<=finest_level; lev++)
-//  {
-//    const DisjointBoxLayout& levelGrids = thisMLPtr->m_grids;
-//    // since AMRSolver can only handle one component at a
-//    // time, need to allocate temp space to copy stuff
-//    // into, and then back out of to compute Laplacian
-//    IntVect ghostVect(D_DECL(1,1,1));
-//    newS[lev] = new LevelData<FArrayBox>(levelGrids, 1, ghostVect);
-//    oldS[lev] = new LevelData<FArrayBox>(levelGrids,1,ghostVect);
-//
-//    amrGrids[lev] = levelGrids;
-//    amrRefRatios[lev] = thisMLPtr->refRatio();
-//    amrDx[lev] = thisMLPtr->m_dx;
-//    amrDomains[lev] = thisMLPtr->problemDomain();
-//    thisMLPtr = thisMLPtr->getFinerLevel();
-//    if (lev>startLev)
-//    {
-//      amrAvgDown[lev] = new CoarseAverage(levelGrids,1,
-//                                          amrRefRatios[lev-1]);
-//    }
-//  }
-//
-//  AMRPoissonOpFactory localPoissonOpFactory;
-//
-//  defineRegridAMROp(localPoissonOpFactory, amrGrids,
-//                    amrDomains, amrDx,
-//                    amrRefRatios, m_level);
-//
-//  RelaxSolver<LevelData<FArrayBox> > bottomSolver;
-//  bottomSolver.m_verbosity = s_verbosity;
-//
-//  AMRMultiGrid<LevelData<FArrayBox> > streamSolver;
-//  streamSolver.define(amrDomains[0],
-//                      localPoissonOpFactory,
-//                      &bottomSolver,
-//                      finest_level+1);
-//  streamSolver.m_verbosity = s_verbosity;
-//  streamSolver.m_eps = 1e-10;
-//
-//  // now loop over velocity components
-//  if (m_isViscous)
-//  {
-//    for (int dir=0; dir<SpaceDim; ++dir)
-//    {
-//      Interval velComps(dir,dir);
-//      Interval tempComps(0,0);
-//      thisMLPtr = this;
-//      if (startLev<m_level) thisMLPtr = thisMLPtr->getCoarserLevel();
-//      for (int lev=startLev; lev<=finest_level; lev++)
-//      {
-//        thisMLPtr->m_vectorOld[VectorVars::m_fluidVel]->copyTo(velComps, *oldS[lev], tempComps);
-//        // do this as initial guess?
-//        thisMLPtr->m_vectorOld[VectorVars::m_fluidVel]->copyTo(velComps, *newS[lev], tempComps);
-//        thisMLPtr = thisMLPtr->getFinerLevel();
-//      }
-//
-//      // now do elliptic solve
-//      // last two args are max level and base level
-//      streamSolver.solve(newS, oldS, finest_level, m_level,
-//                         true); // initialize newS to zero (converted AMRSolver)
-//
-//      // average new s down to invalid regions
-//      for (int lev=finest_level; lev>startLev; lev--)
-//      {
-//        amrAvgDown[lev]->averageToCoarse(*newS[lev-1], *newS[lev]);
-//      }
-//
-//      // now copy back to new velocity field
-//      thisMLPtr = this;
-//      for (int lev=m_level; lev <= finest_level; lev++)
-//      {
-//        newS[lev]->copyTo(tempComps, *thisMLPtr->m_vectorNew[VectorVars::m_fluidVel], velComps);
-//
-//        thisMLPtr = thisMLPtr->getFinerLevel();
-//      }
-//    } // end loop over velocity components
-//
-//  }// end if viscous
-//
-//  // since scalars won't need temp storge, clean it up here
-//  for (int lev=startLev; lev<= finest_level; lev++)
-//  {
-//    if (newS[lev] != nullptr)
-//    {
-//      delete newS[lev];
-//      newS[lev] = nullptr;
-//    }
-//    if (oldS[lev] != nullptr)
-//    {
-//      delete oldS[lev];
-//      oldS[lev] = nullptr;
-//    }
-//  }
-//
-//  // now do scalars
-//  for (int scalComp=0; scalComp < m_numScalarVars; scalComp++)
-//  {
-//    // only do this if scalar is diffused
-//    if (m_scalarDiffusionCoeffs[scalComp] > 0)
-//    {
-//      thisMLPtr =this;
-//      for (int lev=startLev; lev <= finest_level; lev++)
-//      {
-//        newS[lev] = thisMLPtr->m_scalarNew[scalComp];
-//        oldS[lev] = thisMLPtr->m_scalarOld[scalComp];
-//        thisMLPtr = thisMLPtr->getFinerLevel();
-//      }
-//
-//      // last two args are max level and base level
-//      streamSolver.solve(newS, oldS, finest_level, m_level,
-//                         true); // initialize newS to zero (converted AMRSolver)
-//
-//      // now do averaging down
-//      for (int lev=finest_level; lev>m_level; lev--)
-//      {
-//        amrAvgDown[lev]->averageToCoarse(*newS[lev-1], *newS[lev]);
-//      }
-//    }  // end if this scalar is diffused
-//  }  // end loop over scalars
-//
-//  // finally, loop over levels, clean up storage, and reset boolean
-//  thisMLPtr = this;
-//  for (int lev=m_level; lev<= finest_level; lev++)
-//  {
-//    if (amrAvgDown[lev] != nullptr)
-//    {
-//      delete amrAvgDown[lev];
-//      amrAvgDown[lev] = nullptr;
-//    }
-//    thisMLPtr->m_regrid_smoothing_done = false;
-//    thisMLPtr = thisMLPtr->getFinerLevel();
-//  }
-//}

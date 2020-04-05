@@ -27,11 +27,17 @@ class MushyLayerTest():
             self.properties = json.load(json_file)
 
         try:
-            self.mpi = subprocess.check_output(['which', 'mpiruna'])
+            self.mpi = subprocess.check_output(['which', 'mpirun'])
             self.mpi_path = str(self.mpi.decode()).strip()
         except subprocess.CalledProcessError:
             self.mpi = None
             self.mpi_path = None
+
+        # Remove existing output files
+        if os.path.exists('diagnostics.csv'):
+            os.remove(os.path.join(self.test_folder, 'diagnostics.csv'))
+        if os.path.exists('diagnosticsLatest.csv'):
+            os.remove(os.path.join(self.test_folder, 'diagnosticsLatest.csv'))
 
     def run(self):
         # Skip if parallel test and no mpirun

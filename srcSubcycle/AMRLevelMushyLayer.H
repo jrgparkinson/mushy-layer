@@ -239,6 +239,9 @@ public:
   /// Operations to execute after we've done regridding
   virtual void postRegrid(int a_base_level);
 
+  void postRegridNew(int a_base_level);
+  void postRegridOld(int a_base_level);
+
   /// Create structures to hold data
   void createDataStructures();
 
@@ -901,6 +904,9 @@ protected:
 
   /// Initialize pressure across all levels
   void initializeGlobalPressure(Real dtInit=-1, bool init=true);
+
+  /// Init global pressure on this level and all finer levels
+  void initializeGlobalPressureNew();
 
   /// Compute initial advection velocities
   void computeInitAdvectionVel();

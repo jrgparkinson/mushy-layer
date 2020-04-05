@@ -489,6 +489,7 @@ void AMRLevelMushyLayer::computeDiagnostics()
     Real maxVel = getMaxVelocity();
     m_diagnostics.addDiagnostic(DiagnosticNames::diag_maxVel, m_time, maxVel);
 
+
     Vector<int> nRef;
 
     AMRLevelMushyLayer* ml = this;
@@ -512,8 +513,11 @@ void AMRLevelMushyLayer::computeDiagnostics()
       }
     }
 
-    Real sumLambda = ::computeNorm(amrLambda,nRef,m_dx, Interval(0,0), 2, m_level) ;
-    Real maxLambda = ::computeMax(amrLambda, nRef, Interval(0,0), m_level); //::computeSum(amrLambda,nRef,m_dx, Interval(0,0), m_level);
+    Real sumLambda = ::computeNorm(amrLambda,nRef, m_dx, Interval(0,0), 2, m_level) ;
+    Real maxLambda = ::computeNorm(amrLambda, nRef, m_dx, Interval(0,0), 0, m_level); //::computeSum(amrLambda,nRef,m_dx, Interval(0,0), m_level);
+
+    Real maxFreestreamCorr = ::computeNorm(*m_vectorNew[VectorVars::m_freestreamCorrection], nullptr, 1, m_dx, Interval(0, SpaceDim-1), 0);
+    m_diagnostics.addDiagnostic(DiagnosticNames::diag_maxFreestreamCorrection, m_time, maxFreestreamCorr);
 
     m_diagnostics.addDiagnostic(DiagnosticNames::diag_maxLambda, m_time, maxLambda);
     m_diagnostics.addDiagnostic(DiagnosticNames::diag_sumLambda, m_time, sumLambda);
