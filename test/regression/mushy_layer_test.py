@@ -93,17 +93,24 @@ def compare_diagnostics(data, data_expected, tolerance=1e-5):
     # diff = data.copy()
     # diff.to_csv(os.path.join(test_directory, 'diff-%s' % expected_file))
 
+    unequal_diags = []
+
     for key in data_expected.keys():
         assert key in data_keys, 'Checking all diagnostics are present in both files'
 
         expected_value = data_expected[key].iloc[0]
-        value_diff = float(data[key].iloc[0] - data_expected[key])
+        actual_value = data[key].iloc[0]
+        value_diff = float(actual_value - data_expected[key])
 
         # Compute relative different for large values
         if abs(expected_value) > 1.0:
             value_diff = value_diff / expected_value
 
-        assert abs(value_diff) < tolerance, 'Comparing diagnostic: %s' % key
+            LOGGER.debug('Comparing diagnostic: %s. Expected=%.3g, actual=%.3g' % (key, expected_value, actual_value))
+            if abs(value_diff) > tolerance:
+                unequal_diags.append(key)
+
+    assert unequal_diags == [], "These diagnostics were not the same as the expected values."
 
 
 # Compare pout files

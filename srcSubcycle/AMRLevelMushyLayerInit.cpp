@@ -2972,9 +2972,55 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
 
 void AMRLevelMushyLayer::initializeGlobalPressureNew()
 {
-  // TODO write this properly - see AMRINS
-  pout() << "WARNING! initialiseGlobalPressure following postRegrid not implemented yet" << endl;
+  pout() << "initialiseGlobalPressureNew (level " << m_level << ")" << endl;
+
+  int finest_level = getFinestLevel();
+
+  // first compute dtInit
+    Real cur_time = m_time;
+  // also save dt for each level so it can be reset later
+  Vector<Real> dtSave(finest_level+1, 1.0e8);
+  Real dtLevel;
+  Real dtInit = 10000000.0;
+  AMRLevelMushyLayer* thisMLptr = this;
+  for (int lev=m_level; lev<=finest_level; lev++)
+  {
+    dtSave[lev] = thisMLptr->m_dt;
+    dtLevel = thisMLptr->computeDt();
+    if (dtLevel < dtInit) dtInit = dtLevel;
+    thisMLptr = thisMLptr->getFinerLevel();
+  }
+  dtInit *= 0.5;
+
+
+  // pressures should already be initialized to first
+  // guess (most likely 0)
+
+  // now loop through levels and compute estimate of pressure
+  for (int iter = 0; iter < m_opt.num_init_passes; iter++)
+  {
+    int lbase = m_level;
+
+    thisMLptr = this;
+
+    for (int lev = lbase; lev <= finest_level; lev++) {
+      thisMLptr->backupTimestep();
+      thisMLptr->defineSolvers(cur_time);  // Nonlinear solves  must be defined at the appropriate point in time
+      thisMLptr->initializeLevelPressure(cur_time, dtInit);
+      thisMLptr = thisMLptr->getFinerLevel ();
+    }
+
+    // now reset times and dt
+    thisMLptr = this;
+    for (int lev = lbase; lev <= finest_level; lev++) {
+      thisMLptr->restartTimestepFromBackup(true); // true - don't replace pressure
+      thisMLptr->time(cur_time);
+      thisMLptr->dt (dtSave[lev]);
+      thisMLptr = thisMLptr->getFinerLevel ();
+    }
+  } // end loop over init passes
 }
+
 
 // -------------------------------------------------------------
 // this function manages the pressure initialization after

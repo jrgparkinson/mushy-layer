@@ -1481,9 +1481,12 @@ void AMRLevelMushyLayer::refine(Real ref_ratio, DisjointBoxLayout a_grids, Probl
 
 void AMRLevelMushyLayer::postRegrid(int a_base_level)
 {
-  int methodVersion = 0;
+  int methodVersion = 1;
   ParmParse pp("regrid");
   pp.query("post_method", methodVersion);
+
+  // Create data structures for new grids
+  levelSetup();
 
   if (methodVersion == 0)
   {
