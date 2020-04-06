@@ -153,35 +153,6 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   Real Cnorm = convergedToSteadyState(ScalarVars::m_bulkConcentration);
   Real Unorm =  convergedToSteadyState(m_fluidVel, true);
 
-  if (m_opt.computeDiagnostics)
-  {
-    // If a diagnostic period has been declared, check this time has passed since we last produced diagnostics
-      if (m_opt.diagnostics_period > 0 &&
-          m_time - m_prev_diag_output < m_opt.diagnostics_period)
-      {
-        // do nothing
-      }
-      else
-      {
-
-        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dTdt, m_time, Tnorm);
-        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dSdt, m_time, Cnorm);
-        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dUdt, m_time, Unorm);
-
-        m_diagnostics.addDiagnostic(DiagnosticNames::diag_timestep, m_time, AMR::s_step);
-
-        // Can print diagnostics now if on processor 0
-        bool printDiagnostics = (m_level == 0 && procID() ==0 ); // only print results on proc 0
-        if (printDiagnostics)
-        {
-          m_diagnostics.addDiagnostic(DiagnosticNames::diag_dt, m_time, m_dt);
-          m_diagnostics.printDiagnostics(m_time);
-        }
-
-        m_prev_diag_output = m_time;
-      }
-  }
-
   bool metricConverged = false;
   // For some simulations, steady state can be defined by some other metric
 
@@ -193,7 +164,6 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
     {
       metricConverged = metricConverged || m_diagnostics.movingAverageHasConverged(DiagnosticNames::diag_Nu, m_time, m_dt);
     }
-
   }
 
   // Two ways we can 'converge':
@@ -472,23 +442,6 @@ void AMRLevelMushyLayer::copyNewToOldStates()
     pout() << "AMRLevelMushyLayer::copyNewToOldStates(" << m_time << " to " << m_time-m_dt << ") " << endl;
   }
 
-  // Before we do this, populate d(porosity)/dt, which we need for computing advection update source terms
-  // We actually don't use d(porosity)/dt any more, so stop doing this
-  /*
-  LevelData<FArrayBox> porosity_new(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
-  LevelData<FArrayBox> porosity_old(m_dPorosity_dt.disjointBoxLayout(), 1, m_dPorosity_dt.ghostVect());
-
-  fillScalars(porosity_new, m_time, m_porosity, true, true);
-  fillScalars(porosity_old, m_time-m_dt, m_porosity, true, true);
-
-  for (DataIterator dit = m_dPorosity_dt.dataIterator(); dit.ok(); ++dit)
-  {
-    m_dPorosity_dt[dit].copy(porosity_new[dit]);
-    m_dPorosity_dt[dit].minus(porosity_old[dit]);
-    m_dPorosity_dt[dit].mult(1/m_dt);
-  }
-   */
-
   // Copy the new to the old
   // Old now contains values at n, new will contain values at n+1 eventually
   for (int a_scalarVar = 0; a_scalarVar < m_numScalarVars; a_scalarVar++)
@@ -579,6 +532,7 @@ Real AMRLevelMushyLayer::advance()
     }
   }
 
+  Real new_time = m_time + m_dt;
 
   if (s_verbosity >= 1)
   {
@@ -586,7 +540,8 @@ Real AMRLevelMushyLayer::advance()
     Real maxAdvU = getMaxVelocityForCFL();
     m_computedCFL = m_dt*maxAdvU/m_dx;
 
-    pout() << " AMRLevelMushyLayer::advance (level = "<< m_level << ", time=" << m_time << ", dt = " << m_dt << ", CFL=" << m_computedCFL << ")" << endl;
+    pout() << " AMRLevelMushyLayer::advance (level = "<< m_level << ", old_time=" << m_time << ", new_time=" << new_time
+        <<", dt = " << m_dt << ", CFL=" << m_computedCFL << ")" << endl;
   }
 
   // Reset BCs in case they change with time
@@ -631,8 +586,19 @@ Real AMRLevelMushyLayer::advance()
 
 //  Real old_time = m_time;
 //  Real half_time = new_time - m_dt / 2;
-  Real new_time = m_time + m_dt;
+
   m_time = new_time;
+
+//  if (m_level > 0)
+//  {
+//    // AMR Sanity checks
+//    if (m_time  > getCoarserLevel()->m_time)
+//    {
+//      pout() << "Error!! level " << m_level << " time=" << m_time << ", level " <<
+//          getCoarserLevel()->m_level << " time=" << getCoarserLevel()->m_time << endl;
+//      CH_assert(m_time <= getCoarserLevel()->m_time);
+//    }
+//  }
 
 
   // Compute d(porosity)/dt from the old timestep in case we need it at some point
@@ -1023,18 +989,9 @@ void AMRLevelMushyLayer::updateEnthalpyVariables()
 
   CH_TIME("AMRLevelMushyLayer::updateEnthalpyVariables");
 
-  // Apply BCs?
-//  fillScalars(*m_scalarNew[ScalarVars::m_bulkConcentration], m_time, ScalarVars::m_bulkConcentration);
-//  fillScalars(*m_scalarNew[ScalarVars::m_enthalpy], m_time, m_enthalpy);
-
   LevelData<FArrayBox> HC(m_grids, 2, IntVect::Unit);
   fillHC(HC, m_time);
 
-//  ::updateEnthalpyVariables(*m_scalarNew[ScalarVars::m_enthalpy], *m_scalarNew[ScalarVars::m_bulkConcentration],
-//                            *m_scalarNew[ScalarVars::m_temperature], *m_scalarNew[ScalarVars::m_liquidConcentration], *m_scalarNew[ScalarVars::m_solidConcentration],
-//                            *m_scalarNew[ScalarVars::m_porosity],
-//                            *m_scalarNew[ScalarVars::m_enthalpySolidus],*m_scalarNew[ScalarVars::m_enthalpyLiquidus],*m_scalarNew[ScalarVars::m_enthalpyEutectic],
-//                            m_parameters);
   ::updateEnthalpyVariables(HC,
                             *m_scalarNew[ScalarVars::m_temperature], *m_scalarNew[ScalarVars::m_liquidConcentration], *m_scalarNew[ScalarVars::m_solidConcentration],
                             *m_scalarNew[ScalarVars::m_porosity],
@@ -2500,8 +2457,6 @@ void AMRLevelMushyLayer::getTotalFlux(LevelData<FluxBox>& totalFlux)
 
   }
 
-  LevelData<FArrayBox>& tempDebug = *m_scalarNew[ScalarVars::m_FsVertDiffusion];
-
   // Set F = F_{fluid} + F_{frame}
   computeTotalAdvectiveFluxes(totalFlux);
 
@@ -2948,14 +2903,9 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
 
 Real AMRLevelMushyLayer::getMaxVelocity()
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRlevelMushyLayer::getMaxVelocity" << endl;
-  }
-
   Real maxAdvU = getMaxAdvVel();
 
-  if (s_verbosity >= 3)
+  if (s_verbosity >= 5)
   {
     pout() << "AMRlevelMushyLayer::getMaxVelocity - max (face centered U) = " << maxAdvU << endl;
   }
@@ -3280,14 +3230,13 @@ void AMRLevelMushyLayer::fillVectorField(LevelData<FArrayBox>& a_vector,
 
   Real old_time = m_time - m_dt;
 
-  LevelData<FArrayBox> porosityOld(m_grids, 1, a_vector.ghostVect());
-  LevelData<FArrayBox> porosityNew(m_grids, 1, a_vector.ghostVect());
-
-  fillScalars(porosityOld, old_time, m_porosity, true);
-  fillScalars(porosityNew, m_time, m_porosity, true);
-
   if (a_var == m_U_porosity)
   {
+    LevelData<FArrayBox> porosityOld(m_grids, 1, a_vector.ghostVect());
+    LevelData<FArrayBox> porosityNew(m_grids, 1, a_vector.ghostVect());
+
+    fillScalars(porosityOld, old_time, m_porosity, true);
+    fillScalars(porosityNew, m_time, m_porosity, true);
 
     for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
     {

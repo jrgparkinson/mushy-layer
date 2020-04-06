@@ -505,6 +505,14 @@ Real AMRLevelMushyLayer::getCoarseTimeInterpCoeff(Real a_time)
     crse_time_interp_coeff = (a_time - crse_old_time) / crse_dt;
   }
 
+  if (crse_time_interp_coeff < 0. || crse_time_interp_coeff > 1.)
+  {
+    pout() << "ERROR crse_time_interp_coeff = " << crse_time_interp_coeff << endl;
+    pout() << "Computing time interp coeff on level " << m_level << endl;
+    pout() << "Level " << m_level << ":     a_time="   << a_time    << ",   m_time="   << m_time <<      ",m_dt=" << m_dt << endl;
+    pout() << "Level " << getCoarserLevel()->m_level << ": old_time=" << crse_old_time<<", new_time=" << crse_new_time << ",m_dt=" << crse_dt << endl;
+  }
+
   CH_assert (crse_time_interp_coeff >= 0.);
   CH_assert (crse_time_interp_coeff <= 1.);
   return crse_time_interp_coeff;
@@ -530,10 +538,6 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   if (doInterior)
   {
     CH_TIME("AMRLevelMushyLayer::fillScalars::interior");
-    if (s_verbosity >= 9)
-    {
-      pout() << "  AMRLevelMushyLayer::fillScalars - start interior filling, a_time:" << a_time << ", old_time: " << old_time << endl;
-    }
 
     if (abs(a_time - old_time) < TIME_EPS)
     {
@@ -549,10 +553,6 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
   }
 
-  if (s_verbosity >= 10)
-  {
-    pout() << "  AMRLevelMushyLayer::fillScalars - done interior filling" << endl;
-  }
 
   // Only do CF interp if we have ghost vectors
   if (m_level > 0  && a_scal.ghostVect() >= IntVect::Unit )
@@ -577,10 +577,6 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
     Real crse_time_interp_coeff = getCoarseTimeInterpCoeff(a_time);
 
-    if (s_verbosity >= 10)
-    {
-      pout() << "  AMRLevelMushyLayer::fillScalars - crse_time_inter_coeff = " << crse_time_interp_coeff << endl;
-    }
 
     const IntVect& scalGrowVect = a_scal.ghostVect();
     int scalGrow = scalGrowVect[0];
@@ -592,41 +588,33 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     {
       CH_TIME("AMRLevelMushyLayer::fillScalars::linearFillPatch");
 
-//       int srcComp = 0;
-//       int destComp = scalComps.end();
-//       int numComp = 1;
-
       // Now we're using an alias:
-             int srcComp = 0; // the data to interpolate from always has 1 comp
-             int destComp = 0;
-             int numComp = 1;
+     int srcComp = 0; // the data to interpolate from always has 1 comp
+     int destComp = 0;
+     int numComp = 1;
 
       if (scalGrow == 1)
       {
         m_piecewiseLinearFillPatchScalarOne.fillInterp(alias, oldCrseScal, newCrseScal,
                                                        crse_time_interp_coeff,
-//                                                       scalComps.begin(), scalComps.end(), scalComps.size());
                                                        srcComp, destComp, numComp);
       }
       else if (scalGrow == 2)
       {
         m_piecewiseLinearFillPatchScalarTwo.fillInterp(alias, oldCrseScal, newCrseScal,
                                                        crse_time_interp_coeff,
-//                                                       scalComps.begin(), scalComps.end(), scalComps.size());
                                                        srcComp, destComp, numComp);
       }
       else if (scalGrow == 3)
       {
         m_piecewiseLinearFillPatchScalarThree.fillInterp(alias, oldCrseScal, newCrseScal,
                                                          crse_time_interp_coeff,
-//                                                         scalComps.begin(), scalComps.end(), scalComps.size());
                                                          srcComp, destComp, numComp);
       }
       else if (scalGrow == 4)
       {
         m_piecewiseLinearFillPatchScalarFour.fillInterp(alias, oldCrseScal, newCrseScal,
                                                         crse_time_interp_coeff,
-//                                                        scalComps.begin(), scalComps.end(), scalComps.size());
                                                         srcComp, destComp, numComp);
       }
       else
@@ -640,10 +628,6 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     if (quadInterp && m_quadCFInterpScalar.isDefined())
     {
       CH_TIME("AMRLevelMushyLayer::fillScalars::quadCFinterp");
-      if (s_verbosity >= 9)
-      {
-        pout() << "  AMRLevelMushyLayer::fillScalars - do quad interp" << endl;
-      }
 
       LevelData<FArrayBox> avCrseScal(crseGrids, 1, oldCrseScal.ghostVect());
       Real crse_new_time = getCoarserLevel()->m_time;
@@ -651,17 +635,6 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
         Real crse_old_time = crse_new_time - crse_dt;
       ::timeInterp(avCrseScal, a_time, oldCrseScal, crse_old_time, newCrseScal, crse_new_time, Interval(0,0));
 
-      if (s_verbosity >= 6)
-      {
-        pout() << "  AMRLevelMushyLayer::fillScalars - made quadInterp CF BC" << endl;
-      }
-
-      // Fill BCs on coarse scalar - doesn't seem to make a difference
-      //      crseLevel.fillScalars(avCrseScal, a_time, a_var, false, true);
-
-
-
-//      m_quadCFInterpScalar.coarseFineInterp(a_scal, avCrseScal);
       m_quadCFInterpScalar.coarseFineInterp(alias, avCrseScal);
     }
 
@@ -670,20 +643,11 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
   const ProblemDomain& physDomain = problemDomain();
 
   int numGhost = a_scal.ghostVect()[0];
-  if (s_verbosity >= 10)
-  {
-    pout() << "  AMRLevelMushyLayer::fillScalars - num ghost: " << numGhost << endl;
-  }
 
   // Do domain BCs if we have ghost cells
   if (numGhost > 0 &&  apply_bcs)
   {
     CH_TIME("AMRLevelMushyLayer::fillScalars::domainBCs");
-
-    if (s_verbosity >= 10)
-    {
-      pout() << "  AMRLevelMushyLayer::fillScalars - do  BCs" << endl;
-    }
 
     BCHolder thisBC;
     getScalarBCs(thisBC, a_var, false); // inhomogeneous
@@ -694,14 +658,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     {
       thisBC(a_scal[dit], m_grids[dit], physDomain, m_dx, false); // inhomogeneous
     }
-
   }
-
-  if (s_verbosity >= 10)
-  {
-    pout() << "  AMRLevelMushyLayer::fillScalars - regularisation ops" << endl;
-  }
-
 
   doRegularisationOps(a_scal, a_var, a_comp);
 
@@ -710,26 +667,17 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 
     a_scal.exchange();
 
-
     if (a_scal.ghostVect()[0] > 0 && m_opt.scalarExchangeCorners)
     {
-      if (s_verbosity >= 9)
-      {
-        pout() << "  AMRLevelMushyLayer::fillScalars - corner copier" << endl;
-      }
-
       CornerCopier cornerCopy(m_grids, m_grids, m_problem_domain, a_scal.ghostVect(), true);
       a_scal.exchange(a_scal.interval(), cornerCopy);
     }
-
-
   }
 
   if (s_verbosity >= 9)
   {
     pout() << "  AMRLevelMushyLayer::fillScalars - finished" << endl;
   }
-
 }
 
 

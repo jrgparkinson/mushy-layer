@@ -25,6 +25,7 @@ enum DiagnosticNames{
   diag_time,
   diag_dt,
   diag_timestep,
+  diag_level,
 
   diag_averageVerticalSaltFlux,
   diag_L2FsVertDiffusion,
@@ -75,7 +76,9 @@ enum DiagnosticNames{
 
   diag_maxLambda,
   diag_sumLambda,
+  diag_postRegridLambda,
   diag_maxVel,
+  diag_maxFreestreamCorrection,
 
   // Make sure this comes last in this list!
   numDiagnostics
@@ -92,7 +95,7 @@ public:
   Diagnostics ();
 
   /// Define object
-  void define (Real a_movingAverageTimescale, int a_verbosity, Real a_convCrit);
+  void define (Real a_movingAverageTimescale, int a_verbosity, Real a_convCrit, int a_level, bool a_printAllLevels=false);
 
   /// Destructor
   virtual  ~Diagnostics ();
@@ -155,6 +158,11 @@ private:
   /// Criteria for determining convergence
   Real m_convergenceCriteria;
 
+  /// Level of refinement
+  int m_level;
+
+  bool m_printAllLevels;
+
   /// Verbosity
   int m_verbosity;
 
@@ -162,10 +170,13 @@ private:
   bool m_defined;
 
   /// File to which all diagnostics are written
-  std::ofstream m_diagnosticsFile,
+  std::ofstream m_diagnosticsFile;
 
   /// File to which the latest the diagnostics are written
-  m_diagnosticsFileLatest;
+  std::ofstream m_diagnosticsFileLatest;
+
+  /// Name of diagnostics file
+  std::string m_diagnosticsFileName;
 
   /// Get the index for a certain timestep
   int getIndex(Real a_time);
