@@ -42,7 +42,7 @@ parameters.heleShaw=true
 parameters.permeabilityFunction=2
 
 # Output
-main.verbosity=2
+main.verbosity=3
 projector.verbosity=0
 
 # Data output frequency
