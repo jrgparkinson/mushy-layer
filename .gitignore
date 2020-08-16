@@ -41,6 +41,7 @@ visitlog.py
 **/OldClasses/*
 **/venv*/*
 **/env/*
+**/.venv/*
 **/test/output/*
 **/matlab/MethodsPaper/*.png
 *.csv
