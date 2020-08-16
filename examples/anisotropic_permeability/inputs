@@ -1,0 +1,145 @@
+# Roughly Simulate sea ice growth from S_i = 30g/kg water, with a cold (T=-20 celcius atmosphere). Initial water temperature 0.2 celcius above freezing. Physical box size 10cm^3
+# Ice permeability ~ 10^(-10) m^2
+# Other parameters somewhat idealised (see below)
+
+
+
+
+# 2-D
+bc.bulkConcentrationHi=1 1  # no salt flux across any boundary
+bc.bulkConcentrationHiVal=0.0 0.0 0.0
+bc.bulkConcentrationLoVal=0.0 0.0 0.0
+bc.enthalpyHiVal=0.0 6.05
+bc.enthalpyLoVal=0.0 6.01 # sets the initial temperature = 0.05 above freezing (initial liquidus = 1+stefan number)
+bc.liquidConcentrationHiVal=0.0 0.0 0.0
+bc.liquidConcentrationLoVal=0.0 0.0 0.0
+bc.scalarHi=1 0
+bc.scalarLo=1 0
+bc.temperatureHi=1 0
+bc.temperatureHiVal=0 0.15 # set temperature at top boundary
+bc.velHi=0 6 0 
+bc.velLo=0 6 0 
+main.periodic_bc=1 0 
+
+
+
+#######################################################
+
+amrmultigrid.MGtype=1
+amrmultigrid.hang_eps=1e-10
+amrmultigrid.max_iter=15
+amrmultigrid.norm_thresh=1e-10
+amrmultigrid.num_mg=1
+amrmultigrid.num_smooth=16
+amrmultigrid.tolerance=1e-10
+amrmultigrid.verbosity=0
+
+
+init.initVel=0.0
+machineCodeIsRunOn=atmlxmaster
+main.addSubtractGradP=1
+main.bc_relax_coeff=0.1
+main.block_factor=8
+main.cfl=0.1
+main.checkpoint_interval=10000
+main.chk_prefix=chk
+main.computeDiagnostics=true
+main.debug=false
+main.doEuler=1
+main.doProjection=1
+main.doSyncOperations=1
+main.doVCreflux=0
+main.domain_height=1.0
+main.dt_tolerance_factor=1.01
+main.enforceAnalyticSoln=false
+main.fill_ratio=0.75
+main.grid_buffer_size=0
+main.ignoreBulkConcentrationSteadyState=true
+main.ignoreSolverFails=true
+main.initial_cfl=0.1
+main.initialize_pressure=true
+main.iteration_plot_interval=-1
+main.max_bc_iter=10
+main.max_bc_residual=1e-05
+main.max_dt=0.1
+main.max_dt_growth=1.05
+main.max_grid_size=64
+main.max_level=0
+main.max_step=400
+main.max_time=0.5
+main.min_time=0.5
+main.nondimensionalisation=0
+main.num_cells=64 64 8
+main.num_init_passes=0
+main.output_folder=.
+
+main.plot_interval=10
+main.plot_period=0.02
+main.plot_prefix=plt
+main.project_initial_vel=true
+main.ref_ratio=1 1 1
+main.refineMethod=0
+main.refine_thresh=0.04
+main.refluxType=1
+main.reflux_momentum=1
+main.reflux_normal_momentum=0
+main.reflux_scalar=1
+main.regrid_interval=16 16 16
+main.scalePwithChi=1
+main.solverFailRestartMethod=0
+main.stdev=0.002
+main.steady_state=1e-08
+main.symmetric_domain=false
+main.tag_buffer_size=0
+main.taggingVar=0
+main.taggingVectorVar=-1
+main.time_integration_order=1
+main.useAccelDt=1
+main.use_limiting=true
+main.use_subcycling=1
+main.vel_refine_thresh=0.001
+main.verbosity=2
+main.viscous_solver_tol=1e-15
+num_proc=1
+parameters.K=1
+parameters.compositionRatio=1.18
+parameters.darcy=0.0
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.heatConductivityRatio=1
+parameters.heleShaw=true
+parameters.initialComposition=35
+parameters.lewis=200
+parameters.liquidusSlope=-0.1
+#parameters.nonDimReluctance=0.5
+parameters.heleShawPermeability=2.0
+parameters.nonDimVel=0.0
+parameters.permeabilityFunction=2
+#parameters.porosityFunction=0
+parameters.prandtl=0.0
+parameters.problem_type=0
+parameters.rayleighComp=100.0
+parameters.rayleighTemp=0
+parameters.referenceSalinity=230
+parameters.referenceTemperature=-23
+parameters.specificHeatRatio=1
+parameters.stefan=5.0
+parameters.waterDistributionCoeff=0.001
+picardSolver.max_iter=8
+picardSolver.tol=1e-05
+projection.MACbcScale=-0.5
+projection.eta=0.0
+projection.numSmoothDown=8
+projection.numSmoothUp=8
+projection.phiScale=1.0
+projection.solverTol=1e-15
+projection.usePiAdvectionBCs=true
+projector.verbosity=0
+regrid.tagDomainBoundary=false
+run_name=Uniform
+
+
+main.plot_prefix=plt
+
+
+main.anisotropic_permeability=1.0 1.0

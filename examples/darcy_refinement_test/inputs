@@ -1,0 +1,100 @@
+#restart file
+#main.restart_file = chk-hi_med_64-2lev000700.3d.hdf5
+
+main.max_step=932
+
+# This is a roughly minimal set of inputs for simulating flow and solidification in mushy layers
+# These are the properties which *must* be defined. Lots of other options can also be set,
+# see the online documentation for more information
+
+# See /mushy-layer/params/computeNonDimValsBCs.py for a python script to compute 
+# dimensionless parameters for sea ice
+
+
+
+# Domain setup
+main.max_level=2  # max level = 0 -> no refinement
+main.num_cells=32 32 32
+main.domain_width=1.0
+main.max_grid_size=32
+
+# Timestepping
+main.max_dt=1 
+main.max_time = 1.0
+main.cfl=0.2
+
+## Dynamics:
+parameters.heleShaw=true
+parameters.permeabilityFunction=2
+
+# Output
+main.verbosity=2
+projector.verbosity=0
+
+# Data output frequency
+#main.plot_period = 0.01
+main.plot_interval=8
+main.plot_prefix=plt-hi_med_64-2lev
+main.chk_prefix=chk-hi_med_64-2lev
+main.checkpoint_interval=100
+main.output_folder=.
+
+# Velocity solve
+projection.eta=0.0 # no freestream correction for uniform mesh case
+projection.useIncrementalPressure=1
+
+parameters.eutecticComposition=230
+parameters.eutecticTemp=-23
+parameters.initialComposition=30
+parameters.liquidusSlope=-0.1
+
+parameters.rayleighComp=200 # 800
+parameters.rayleighTemp=8.28
+parameters.darcy=0
+parameters.prandtl=0
+parameters.heleShawPermeability=4.0
+parameters.stefan=3.98
+parameters.compositionRatio=1.15
+parameters.lewis=200
+parameters.heatConductivityRatio=4.24
+parameters.specificHeatRatio=0.529
+main.periodic_bc=1  0
+bc.bulkConcentrationHi=1 1 1 
+bc.bulkConcentrationHiVal=0 0 
+bc.bulkConcentrationLoVal=0 -1
+bc.enthalpyHiVal=0  0.4
+bc.enthalpyLoVal=0  4.99
+bc.temperatureHiVal=0  0.65 # T_{atmosphere} = -10 celcius
+bc.temperatureLoVal=0 1.01 # T_{ocean} = T_{freezing} + 0.2 celcius
+bc.scalarHi=1  0
+bc.scalarLo=1  2
+
+bc.velHi=0  0   # velocity BCs: no flow through any of the sides
+bc.velLo=0  3
+
+# Add initial perturbation
+main.perturbationWavenumber=0
+main.initialRandomPerturbation=0.2
+main.time_integration_order=2
+main.max_init_dt=1e-3 # 1e-6
+main.max_dt_growth=1.01
+
+# AMR
+main.ref_ratio = 2 2 2 2 2 
+main.regrid_interval = 16 32 # 1 1 
+projection.eta=0.8
+main.max_dt_growth=1.001
+main.refine_thresh = 0.01
+regrid.onlyTagPorousCells=true
+regrid.porousCellsShrink=3
+main.grid_buffer_size = 2
+main.tag_buffer_size=4 4 2
+main.fill_ratio=1.0
+main.block_factor=4
+
+
+# main.taggingVectorVar=0
+# main.refine_thresh=0.05
+main.vel_refine_thresh=5
+
+main.max_level=1
