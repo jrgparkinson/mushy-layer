@@ -46,3 +46,4 @@ visitlog.py
 **/matlab/MethodsPaper/*.png
 *.csv
 /zzindex.html
+*.ipynb_checkpoints*
