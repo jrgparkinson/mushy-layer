@@ -5,6 +5,12 @@
 # the base name(s) of the application(s) in this directory
 ebase = mushyLayer
 
+# a bunch of common defs for the various machines we might be running on
+MACHINE := $(shell uname)
+UNAMEM := $(shell uname -m)
+UNAMEN := $(shell uname -n)
+WHO := $(shell whoami)
+
 # the location of the Chombo "lib" directory
 ifeq ($(NERSC_HOST),cori) 
 CHOMBO_HOME = ../../Chombo/lib
@@ -12,9 +18,10 @@ else
 CHOMBO_HOME = ../../chombofork/lib
 endif
 
+ifeq ($(UNAMEN),martin)
 # Compile with chombo trunk to check everything will work for other users
 CHOMBO_HOME = ../../Chombo/lib
-
+endif
 
 
 include ../mk/Make.defs.MushyLayer
