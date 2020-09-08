@@ -480,7 +480,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.tag_channels = false;
   ppRegrid.query("tag_channels", opt.tag_channels);
 
-
   // Default refinement is for mushy layer simulations with channels
   opt.refinementMethod =  RefinementMethod::tagMushChannels;
 
@@ -560,6 +559,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   opt.regrid_eta_scale=1.0;
   ppMain.query("regrid_eta_scale", opt.regrid_eta_scale);
+
+  opt.regrid_reflux_lambda=true;
+  ppMain.query("regrid_reflux_lambda", opt.regrid_reflux_lambda);
 
   opt.regrid_smoothing_coeff = 0.05;
   ppMain.query("regrid_smoothing_coeff", opt.regrid_smoothing_coeff);

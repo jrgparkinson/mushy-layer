@@ -22,6 +22,8 @@ Diagnostics::Diagnostics ()
   }
 
   m_diagnosticNames[DiagnosticNames::diag_dt] = "dt";
+  m_diagnosticNames[DiagnosticNames::diag_timestep] = "timestep";
+  m_diagnosticNames[DiagnosticNames::diag_level] = "level";
   m_diagnosticNames[DiagnosticNames::diag_Nu] = "Nusselt";
   m_diagnosticNames[DiagnosticNames::diag_NuLeft] = "NusseltLeft";
   m_diagnosticNames[DiagnosticNames::diag_NuMiddle] = "NusseltMiddle";
@@ -74,7 +76,9 @@ Diagnostics::Diagnostics ()
 
   m_diagnosticNames[DiagnosticNames::diag_maxLambda] = "LambdaMax";
   m_diagnosticNames[DiagnosticNames::diag_sumLambda] = "LambdaSum";
+  m_diagnosticNames[DiagnosticNames::diag_postRegridLambda] = "LambdaPostRegrid";
   m_diagnosticNames[DiagnosticNames::diag_maxVel] = "maxVel";
+  m_diagnosticNames[DiagnosticNames::diag_maxFreestreamCorrection] = "maxFreestreamCorrection";
 
   m_diagnosticNames[DiagnosticNames::diag_mushyAverageBulkConc] = "mushAvBulkConc";
   m_diagnosticNames[DiagnosticNames::diag_mushyAveragePorosity] = "mushAvPorosity";
@@ -95,20 +99,29 @@ Diagnostics::Diagnostics ()
   movingAverageTimescale = 0;
   m_verbosity = 0;
   m_convergenceCriteria = 1e-4;
+  m_level=0;
 
 
   m_defined = false;
 
 }
 
-void Diagnostics::define(Real a_movingAverageTimescale, int a_verbosity, Real a_convCrit)
+void Diagnostics::define(Real a_movingAverageTimescale, int a_verbosity, Real a_convCrit, int a_level, bool a_printAllLevels)
 {
   movingAverageTimescale = a_movingAverageTimescale;
   m_verbosity = a_verbosity;
   m_convergenceCriteria = a_convCrit;
+  m_level = a_level;
+  m_printAllLevels = a_printAllLevels;
 
-  m_diagnosticsFile.open("diagnostics.csv", std::ios_base::app);
-
+  if (m_printAllLevels)
+  {
+    m_diagnosticsFileName = "diagnostics." + std::to_string(a_level) + ".csv";
+  }
+  else
+  {
+    m_diagnosticsFileName = "diagnostics.csv";
+  }
 
   if (m_verbosity > 2)
   {
@@ -138,6 +151,7 @@ void Diagnostics::addDiagnostic(DiagnosticNames a_diagnostic, Real a_time, Real 
     m_times.push_back(a_time);
     index = m_times.size() - 1;
     (*m_diagnostics[diag_time]).push_back(a_time);
+    (*m_diagnostics[diag_level]).push_back(m_level);
   }
 
   // Check if we've already added a value for this diagnostic at this time
@@ -281,7 +295,12 @@ bool Diagnostics::diagnosticIsIncluded(const DiagnosticNames a_diag)
 
 void Diagnostics::printHeader()
 {
-  printHeader(m_diagnosticsFile);
+  if (m_printAllLevels || m_level==0)
+  {
+    m_diagnosticsFile.open(m_diagnosticsFileName, std::ios_base::app); // open file in append mode
+    printHeader(m_diagnosticsFile);
+    m_diagnosticsFile.close();
+  }
 }
 
 void Diagnostics::printHeader(std::ofstream& a_file)
@@ -307,17 +326,31 @@ void Diagnostics::printDiagnostics(Real a_time)
 {
   CH_TIME("Diagnostics::printDiagnostics");
 
-  printDiagnostics(a_time, m_diagnosticsFile);
+  if (m_printAllLevels || m_level==0)
+  {
 
-  // Open latest diags file and delete contents, then rewrite
-  m_diagnosticsFileLatest.open("diagnosticsLatest.csv", std::ofstream::out | std::ofstream::trunc);
-  printHeader(m_diagnosticsFileLatest);
-  printDiagnostics(a_time, m_diagnosticsFileLatest);
-  m_diagnosticsFileLatest.close();
+    pout() << "Print diagnostics (level " << m_level << ", time " << a_time << ")" << endl;
 
+    m_diagnosticsFile.open(m_diagnosticsFileName, std::ios_base::app); // open file in append mode
+    printDiagnostics(a_time, m_diagnosticsFile);
+    m_diagnosticsFile.close();
+
+
+    // Open latest diags file and delete contents, then rewrite
+    std::string latestFilename = "diagnosticsLatest.csv";
+    if (m_printAllLevels)
+    {
+      latestFilename = "diagnosticsLatest." + std::to_string(m_level) + ".csv";
+    }
+    m_diagnosticsFileLatest.open(latestFilename, std::ofstream::out | std::ofstream::trunc);
+    printHeader(m_diagnosticsFileLatest);
+    printDiagnostics(a_time, m_diagnosticsFileLatest);
+    m_diagnosticsFileLatest.close();
+  }
 }
 void Diagnostics::printDiagnostics(Real a_time, std::ofstream& a_file)
 {
+//  pout() << "Printing diagnostics to " << a_file.c_str << endl;
 
   for (int i = 0; i < m_diagsToPrint.size(); i++)
   {
@@ -344,6 +377,7 @@ int Diagnostics::getIndex(Real a_time)
 
   for (int i = 0; i < m_times.size(); i++)
   {
+
     if (m_times[i] == a_time)
     {
       return i;

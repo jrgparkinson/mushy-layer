@@ -818,6 +818,10 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
 {
 
   CH_TIME("AMRLevelMushyLayer::computeVorticityStreamfunction");
+  if (s_verbosity >= 3)
+  {
+    pout() << "AMRLevelMushyLayer::computeVorticityStreamfunction on level " << m_level << endl;
+  }
 
   // First vorticity = curl (u)
   computeVorticity();

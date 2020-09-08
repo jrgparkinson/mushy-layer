@@ -337,11 +337,6 @@ void AMRLevelMushyLayer::postTimeStep()
         }
       }
 
-      // We now have the finest level
-//      Real alpha = 0.1; // Some empirically chosen multiplier (must be < 1)
-//      Real maxU =  mlPtr->getMaxVelocity();
-      //    m_opt.minDt = alpha*m_initial_dt_multiplier*mlPtr->m_dx/maxU;
-
       if (s_verbosity > 2)
       {
         pout() << "Timestep failed min dt = " << m_opt.minDt << endl;
@@ -383,13 +378,10 @@ void AMRLevelMushyLayer::postTimeStep()
         }
 
         mlPtr = mlPtr->getFinerLevel();
-        //        mlPtr->dt(-mlPtr->m_dt);
-
       }
 
       return;
     }
-
 
     // Grow m_adv_vel_centering
     m_adv_vel_centering = m_adv_vel_centering*m_opt.adv_vel_centering_growth;
@@ -402,7 +394,6 @@ void AMRLevelMushyLayer::postTimeStep()
     {
       pout() << "Set adv vel centering = " << m_adv_vel_centering << endl;
     }
-
 
   } // end if level = 0
 
@@ -484,37 +475,6 @@ void AMRLevelMushyLayer::postTimeStep()
           {
             pout() << "Max(lambda-1) = " << maxLambda << endl;
           }
-
-          //          m_diagnostics.addDiagnostic(m_diagnostics.m_lambda_err, m_time, maxLambda);
-
-//          if (m_opt.variable_eta_factor != 1.0)
-//          {
-//            Real newEta = m_projection.etaLambda();
-//
-//            Real maxEta = maxAllowedEta();
-//
-//
-//            if (maxLambda > m_maxLambda)
-//            {
-//              newEta = newEta*m_opt.variable_eta_factor;
-//            }
-//            else
-//            {
-//              newEta = newEta/m_opt.variable_eta_factor;
-//            }
-//
-//            m_maxLambda = maxLambda;
-//
-//            newEta = max(newEta, m_opt.minEta);
-//            newEta = min(newEta, maxEta);
-//
-//            if (s_verbosity >= 3)
-//            {
-//              pout() << "New eta = " << newEta << endl;
-//            }
-//
-//            setEta(newEta);
-//          }
         }
 
         if (m_opt.reflux_enthalpy || m_opt.reflux_concentration)
@@ -703,19 +663,6 @@ void AMRLevelMushyLayer::postTimeStep()
       Interval velComps = m_vectorNew[VectorVars::m_fluidVel]->interval();
       m_vectorNew[VectorVars::m_fluidVel]->exchange(velComps);
 
-//      if (m_opt.computeFreestreamCorrectionSingleLevel)
-//      {
-//        Vector<LevelData<FArrayBox>* > compVel(1, nullptr);
-//        Vector<LevelData<FArrayBox>* > compLambda(1, nullptr);
-//        Vector<RefCountedPtr<LevelData<FluxBox> > > compPorosityFace(1);
-//        Vector<RefCountedPtr<LevelData<FArrayBox> > > compPorosity(1);
-//
-//        fillAMRLambda(compLambda);
-//        fillAMRVelPorosity(compVel, compPorosityFace,compPorosity);
-//
-//        m_projection.doSyncOperations(compVel, compLambda, compPorosityFace, compPorosity, m_time, m_dt);
-//      }
-
     } // end if level = 0
 
   } // end if there is or isn't a finer level
@@ -766,6 +713,46 @@ void AMRLevelMushyLayer::postTimeStep()
 
       AMRmlptr = AMRmlptr->getFinerLevel();
     }
+  }
+
+  // Now that everything else is done, can write out diagnostics on level 0
+  bool printAllLevels = true;
+  ParmParse pp("diagnostics");
+  pp.query("print_all_levels", printAllLevels);
+
+  if (m_opt.computeDiagnostics
+      && (m_level == 0 || printAllLevels))
+  {
+
+    // If a diagnostic period has been declared, check this time has passed since we last produced diagnostics
+      if (m_opt.diagnostics_period > 0 &&
+          m_time - m_prev_diag_output < m_opt.diagnostics_period)
+      {
+        // do nothing
+
+      }
+      else
+      {
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_timestep, m_time, AMR::s_step);
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dt, m_time, m_dt);
+
+        Real Tnorm = convergedToSteadyState(ScalarVars::m_enthalpy);
+        Real Cnorm = convergedToSteadyState(ScalarVars::m_bulkConcentration);
+        Real Unorm =  convergedToSteadyState(m_fluidVel, true);
+
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dTdt, m_time, Tnorm);
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dSdt, m_time, Cnorm);
+        m_diagnostics.addDiagnostic(DiagnosticNames::diag_dUdt, m_time, Unorm);
+
+        // Can print diagnostics now if on processor 0
+        bool printDiagnostics = (procID() == 0 );
+        if (printDiagnostics)
+        {
+          m_diagnostics.printDiagnostics(m_time);
+        }
+
+        m_prev_diag_output = m_time;
+      }
   }
 }
 

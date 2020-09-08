@@ -12,10 +12,9 @@ UNAMEN := $(shell uname -n)
 WHO := $(shell whoami)
 
 # the location of the Chombo "lib" directory
+# Assume CHOMBO_HOME is already set on anything other than cori
 ifeq ($(NERSC_HOST),cori) 
 CHOMBO_HOME = ../../Chombo/lib
-else
-CHOMBO_HOME = ../../chombofork/lib
 endif
 
 ifeq ($(UNAMEN),martin)
@@ -23,9 +22,7 @@ ifeq ($(UNAMEN),martin)
 CHOMBO_HOME = ../../Chombo/lib
 endif
 
-
 include ../mk/Make.defs.MushyLayer
-
 
 include $(CHOMBO_HOME)/mk/Make.defs
 include $(CHOMBO_HOME)/mk/Make.defs.config

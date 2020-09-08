@@ -57,17 +57,20 @@ enum MGmethod {
 };
 
 /// Strategy for tagging cells
+/**
+ * Set by main.refineMethod
+ */
 enum TaggingMethod {
-  /// Tag where the undivided gradient of some field is bigger than some value
-  UndividedGradient,
+  /// 0 - Tag where the undivided gradient of some field is bigger than some value
+  UndividedGradient = 0,
 
-  /// Tag where the magnitude of some field is bigger than some values
+  /// 1 - Tag where the magnitude of some field is bigger than some values
   Magnitude,
 
-  /// Tag where the value of some field is larger than some criteria
+  /// 2 - Tag where the value of some field is larger than some criteria
   CompareLargerThan,
 
-  /// Tag where the value of some field multiplied by -1 is larger than some criteria.
+  /// 3 - Tag where the value of some field multiplied by -1 is larger than some criteria.
   /**
    * Alternatively, can think of this as when some field is smaller than some criteria.
    */
@@ -1018,6 +1021,9 @@ struct MushyLayerOptions {
    * Default value = 1.0.
    */
   Real regrid_eta_scale;
+
+  /// Whether to reflux lambda before recomputing freestream correction after regridding
+  bool regrid_reflux_lambda;
 
   /// Whether or not to do some smoothing after regridding
    bool do_postRegrid_smoothing;

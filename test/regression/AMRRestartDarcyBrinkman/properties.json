@@ -1,0 +1,6 @@
+{ 
+   "name":"AMR Darcy Brinkman Restart",
+   "description":"Restart simulation for Darcy-Brinkman flow in a Hele-Shaw cell with AMR",
+   "dim":2,
+   "proc":1
+}

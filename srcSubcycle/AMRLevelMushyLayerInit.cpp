@@ -1154,7 +1154,12 @@ void AMRLevelMushyLayer::define(MushyLayerOptions a_opt, MushyLayerParams a_para
     diag_timescale = 1.0;
   }
 
-  m_diagnostics.define(diag_timescale, s_verbosity, m_opt.steadyStateCondition/10);
+  bool printAllLevels = false;
+  ParmParse pp("diagnostics");
+  pp.query("print_all_levels", printAllLevels);
+
+  m_diagnostics.define(diag_timescale, s_verbosity, m_opt.steadyStateCondition/10, m_level, printAllLevels);
+
 
   if (s_verbosity > 5)
   {
@@ -2571,13 +2576,7 @@ void AMRLevelMushyLayer::fillAMRVelPorosity(Vector<LevelData<FArrayBox>*> & amrV
   {
     thisLevelData = thisLevelData->getFinerLevel();
   }
-  //          CH_assert(thisLevelData->finestLevel());
   int numLevels = thisLevelData->m_level + 1;
-
-  //    Vector<LevelData<FArrayBox>*> amrVel(numLevels);
-  //    Vector<RefCountedPtr< LevelData<FluxBox> > > amrPorosityFace(numLevels);
-  //    Vector<RefCountedPtr< LevelData<FArrayBox> > > amrPorosity(numLevels);
-
 
   thisLevelData = getCoarsestLevel();
 
@@ -2971,14 +2970,70 @@ void AMRLevelMushyLayer::computeInitAdvectionVel()
   }
 }
 
+void AMRLevelMushyLayer::initializeGlobalPressureNew()
+{
+  pout() << "initialiseGlobalPressureNew (level " << m_level << ")" << endl;
+
+  int finest_level = getFinestLevel();
+
+  // first compute dtInit
+    Real cur_time = m_time;
+  // also save dt for each level so it can be reset later
+  Vector<Real> dtSave(finest_level+1, 1.0e8);
+  Real dtLevel;
+  Real dtInit = 10000000.0;
+  AMRLevelMushyLayer* thisMLptr = this;
+  for (int lev=m_level; lev<=finest_level; lev++)
+  {
+    dtSave[lev] = thisMLptr->m_dt;
+    dtLevel = thisMLptr->computeDt();
+    if (dtLevel < dtInit) dtInit = dtLevel;
+    thisMLptr = thisMLptr->getFinerLevel();
+  }
+  dtInit *= 0.5;
+
+
+  // pressures should already be initialized to first
+  // guess (most likely 0)
+
+  // now loop through levels and compute estimate of pressure
+  for (int iter = 0; iter < m_opt.num_init_passes; iter++)
+  {
+    int lbase = m_level;
+
+    thisMLptr = this;
+
+    for (int lev = lbase; lev <= finest_level; lev++) {
+      thisMLptr->backupTimestep();
+      thisMLptr->defineSolvers(cur_time);  // Nonlinear solves  must be defined at the appropriate point in time
+      thisMLptr->initializeLevelPressure(cur_time, dtInit);
+      thisMLptr = thisMLptr->getFinerLevel ();
+    }
+
+    // now reset times and dt
+    thisMLptr = this;
+    for (int lev = lbase; lev <= finest_level; lev++) {
+      thisMLptr->restartTimestepFromBackup(true); // true - don't replace pressure
+      thisMLptr->time(cur_time);
+      thisMLptr->dt (dtSave[lev]);
+      thisMLptr = thisMLptr->getFinerLevel ();
+    }
+  } // end loop over init passes
+}
+
+
 // -------------------------------------------------------------
 // this function manages the pressure initialization after
 // initialization and regridding
 void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
 {
-  if (s_verbosity >= 3)
+
+  pout() << "  initializeGlobalPressure (level " << m_level << ") begin" << endl;
+  AMRLevelMushyLayer* mlTemp = getCoarsestLevel();
+  while(mlTemp)
   {
-    pout() << "AMRLevelMushyLayer::initializeGlobalPressure (level " << m_level << ")" << endl;
+    pout() << "      level " << mlTemp->m_level << ": m_time=" << mlTemp->m_time << ", m_dt=" << mlTemp->m_dt << endl;
+    mlTemp = mlTemp->getFinerLevel();
   }
 
   // This function is only for darcy-brinkman - throw an error if that's not the case
@@ -3004,9 +3059,8 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     cur_time = m_opt.restart_new_time;
   }
 
-  //  Real dtLevel;
-  //  Real dtInit = 10000000.0;
   Real max_dtInit = 0.5*computeDtInit(finest_level);
+
   if (dtInit < 0)
   {
     dtInit = computeDtInit(finest_level);
@@ -3024,7 +3078,6 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   for (int lev = m_level; lev <= finest_level; lev++)
   {
     dtSave[lev] = thisMLPtr->m_dt;
-
     thisMLPtr = thisMLPtr->getFinerLevel();
   }
 
@@ -3048,14 +3101,10 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
   // gradually increase dt during initialization steps
 
   thisMLPtr = this;
-  int lbase = thisMLPtr->m_level;
+  int lbase = m_level;
   for (int iter = 0; iter < m_opt.num_init_passes; iter++)
   {
-    // Set dt for this init step
-//    if (m_opt.increaseDt)
-//    {
-      dtInit = min(dtInit*2, max_dtInit);
-//    }
+    dtInit = min(dtInit, max_dtInit);
     thisMLPtr = this;
     for (int lev = m_level; lev <= finest_level; lev++)
     {
@@ -3071,18 +3120,19 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     thisMLPtr = this;
     for (int lev = lbase; lev <= finest_level; lev++)
     {
-
       thisMLPtr->backupTimestep(); // save current 'new' states
       thisMLPtr->initializeLevelPressure(cur_time, dtInit); // advance current new states by a small dt
 
       bool doLambdaReflux = true;
-
 
       // Also advect lambda to see how this behaves
       thisMLPtr->advectLambda(doLambdaReflux);
 
       // Get plot fields
       thisMLPtr->getExtraPlotFields();
+
+      // Make sure 'old' fields are filled so finer levels can use them for interpolation
+      thisMLPtr->copyNewToOldStates();
 
       thisMLPtr = thisMLPtr->getFinerLevel();
     }
@@ -3148,6 +3198,15 @@ void AMRLevelMushyLayer::initializeGlobalPressure(Real dtInit, bool init)
     thisMLPtr = thisMLPtr->getFinerLevel();
   }
 
+  pout() << "  initializeGlobalPressure (level " << m_level << ") finish" << endl;
+  mlTemp = getCoarsestLevel();
+  while(mlTemp)
+  {
+    // Reset time
+//    mlTemp->time(cur_time);
+    pout() << "      level " << mlTemp->m_level << ": m_time=" << mlTemp->m_time << ", m_dt=" << mlTemp->m_dt << endl;
+    mlTemp = mlTemp->getFinerLevel();
+  }
 }
 
 Real AMRLevelMushyLayer::computeDtInit(int finest_level)
@@ -3192,8 +3251,6 @@ void AMRLevelMushyLayer::initializeLevelPressure(Real a_currentTime,
   Real new_time = a_currentTime + a_dtInit;
   m_time = new_time;
   m_dt = a_dtInit;
-
-
 
   // Computes advection velocities, and CC velocities if applicable
   if (solvingFullDarcyBrinkman())
@@ -3614,8 +3671,13 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     {
       if (solvingFullDarcyBrinkman())
       {
-        initializeGlobalPressure(m_dt,
-                                 false); // not initialising, but restarting
+        // This is just wrong - need to do the init thing
+//        initializeGlobalPressure(m_dt/2, // halve the timestep to avoid overstepping finer levels
+//                                 false); // not initialising, but restarting
+        if (m_level == 0)
+        {
+          initializeGlobalPressure(m_dt, false);
+        }
       }
       else
       {
@@ -3623,6 +3685,10 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
         initTimeIndependentPressure(lev);
       }
     }
+
+    // since calculatePermeability is only called on level 0 above, 
+    // do it again here
+    calculatePermeability();
 
     // Only do this on level 0 to ensure all other levels are setup
     if (m_level == 0)
@@ -3659,6 +3725,8 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
   Vector<DiagnosticNames> diagsToPrint;
   diagsToPrint.push_back(DiagnosticNames::diag_time);
   diagsToPrint.push_back(DiagnosticNames::diag_dt);
+  diagsToPrint.push_back(DiagnosticNames::diag_timestep);
+  diagsToPrint.push_back(DiagnosticNames::diag_level);
 
   diagsToPrint.push_back(DiagnosticNames::diag_dSdt);
   diagsToPrint.push_back(DiagnosticNames::diag_dUdt);
@@ -3720,14 +3788,23 @@ void AMRLevelMushyLayer::postInitialGrid(const bool a_restart)
     default:
       // Don't do anything else by default
       break;
+  }
 
+  bool print_lambda = false;
+  ParmParse ppDiag("diagnostics");
+  ppDiag.query("include_lambda", print_lambda);
+  if (print_lambda)
+  {
+    diagsToPrint.push_back(DiagnosticNames::diag_maxLambda);
+    diagsToPrint.push_back(DiagnosticNames::diag_sumLambda);
+    diagsToPrint.push_back(DiagnosticNames::diag_postRegridLambda);
+    diagsToPrint.push_back(DiagnosticNames::diag_maxFreestreamCorrection);
   }
 
   m_diagnostics.setPrintDiags(diagsToPrint);
 
-  if (m_level == 0 && procID() == 0)
+  if (procID() == 0)
   {
-
     m_diagnostics.printHeader();
   }
 

@@ -239,6 +239,9 @@ public:
   /// Operations to execute after we've done regridding
   virtual void postRegrid(int a_base_level);
 
+  void postRegridNew(int a_base_level);
+  void postRegridOld(int a_base_level);
+
   /// Create structures to hold data
   void createDataStructures();
 
@@ -619,6 +622,14 @@ protected:
   /// Calculate advective + diffusive flux
   void getTotalFlux(LevelData<FluxBox>& totalFlux);
 
+  /// Compute the total solute flux
+  /**
+   * Computes the diffusive flux and then combine with the already computed advective fluxes
+   */
+  void computeTotalFlux();
+
+  void computeDiagnosticSoluteFluxes();
+
   /// Compute \f$ \nabla^2 \mathbf{U} \f$
   void computeLapVel(LevelData<FArrayBox>& a_lapVel,
                      LevelData<FArrayBox>& a_vel,
@@ -894,6 +905,9 @@ protected:
   /// Initialize pressure across all levels
   void initializeGlobalPressure(Real dtInit=-1, bool init=true);
 
+  /// Init global pressure on this level and all finer levels
+  void initializeGlobalPressureNew();
+
   /// Compute initial advection velocities
   void computeInitAdvectionVel();
 
@@ -941,6 +955,8 @@ protected:
   void fillVectorField(LevelData<FArrayBox>& a_vector, Real a_time, int a_var,
                        bool doInterior=false, bool quadInterp=false);
 
+  /// Get coarse time interpolation coefficient
+  Real getCoarseTimeInterpCoeff(Real a_time);
 
   /// Fill ghost cells of scalar field
   void fillScalars(LevelData<FArrayBox>& a_scal,
