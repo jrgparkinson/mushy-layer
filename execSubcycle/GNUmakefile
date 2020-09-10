@@ -17,6 +17,17 @@ ifeq ($(NERSC_HOST),cori)
 CHOMBO_HOME = ../../Chombo/lib
 endif
 
+
+ifeq ($(UNAMEN),loren)
+# Compile with chombo trunk to check everything will work for other users
+CHOMBO_HOME = ../../Chombo/lib
+endif
+
+ifeq ($(UNAMEN),greenstreet)
+# Compile with chombo trunk to check everything will work for other users
+CHOMBO_HOME = ../../Chombo/lib
+endif
+
 ifeq ($(UNAMEN),martin)
 # Compile with chombo trunk to check everything will work for other users
 CHOMBO_HOME = ../../Chombo/lib
