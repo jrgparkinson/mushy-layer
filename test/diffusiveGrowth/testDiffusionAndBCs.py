@@ -1,23 +1,28 @@
-from MushyPltFile import MushyPltFile, latexify2
+"""
+
+This script is for testing that the mushy-layer code correctly solves diffusion problems correctly
+with all sorts of boundary conditions
+Within this file there are a number of useful functions, and a 'DiffusiveSolution' class,
+then at the bottom of we run everything which will:
+  a) run an appropriate simulation using the mushy layer code to compute the temperature T(z, t)
+  b) solve the steady-state problem using the solve_bvp function in scipy.integrate, to find T_{python}(z)
+  c) plot the two solutions along with the error in the final mushy-layer simulation
+"""
+
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_bvp
 import os
 import matplotlib as mpl
 import cycler
-import test.mushyLayerRunUtils as mushyLayerRunUtils
+from pathlib import Path
+from chombopy.inputs import read_inputs, write_inputs
 import subprocess
-import sys
 import shutil
+from MushyPltFile import MushyPltFile, latexify2
+from mushyLayerRunUtils import get_mushy_layer_dir, get_executable_name
 
-
-# This script is for testing that the mushy-layer code correctly solves diffusion problems correctly
-# with all sorts of boundary conditions
-# Within this file there are a number of useful functions, and a 'DiffusiveSolution' class,
-# then at the bottom of we run everything which will:
-#  a) run an appropriate simulation using the mushy layer code to compute the temperature T(z, t)
-#  b) solve the steady-state problem using the solve_bvp function in scipy.integrate, to find T_{python}(z)
-#  c) plot the two solutions along with the error in the final mushy-layer simulation
 
 class DiffusiveSolution:
     a = 0
@@ -52,8 +57,6 @@ class DiffusiveSolution:
     # noinspection PyUnresolvedReferences
     def compute_solution(self, z_sol):
 
-        # z = np.linspace(self.min_z, self.max_z, 100)
-
         if self.method == 'Linear':
             if self.V == 0:
                 solution = self.max_temperature - z_sol
@@ -62,14 +65,8 @@ class DiffusiveSolution:
                 sys.exit(-1)
 
         elif self.method == 'Mixed':
-
-            # init_guess = self.max_temperature - z
-
-            # Ensure z solve goes to 0 and 1 so BCs are implemented properly
             z_solve = np.linspace(0, 1, 10)
-
             init_guess = np.zeros((2, z_solve.size))
-
             res_a = solve_bvp(self.diffusion_equation_function, self.diffusion_eq_bc, z_solve, init_guess)
             solution = res_a.sol(z_sol)[0]
 
@@ -78,6 +75,7 @@ class DiffusiveSolution:
             sys.exit(-1)
 
         return solution
+
 
     def diffusion_equation_function(self, x, temperature):
         # For solving d^T/dz^2 - V*(dT/dz + dchi/dz) = 0
@@ -126,8 +124,8 @@ class DiffusiveSolution:
 
 
 def base_inputs():
-    test_dir = os.path.join(mushyLayerRunUtils.get_mushy_layer_dir(), 'test/diffusiveGrowth')
-    default_inputs = mushyLayerRunUtils.read_inputs(os.path.join(test_dir, 'inputs'))
+    test_dir = os.path.join(get_mushy_layer_dir(), 'test/diffusiveGrowth')
+    default_inputs = read_inputs(os.path.join(test_dir, 'inputs'))
 
     default_inputs['main.min_time'] = 0.5
     default_inputs['main.max_time'] = 3.0
@@ -152,6 +150,12 @@ if __name__ == "__main__":
     # T_max = 5.0
     st = 1.0  # stefan number
     cr = 0.5
+
+    # plotting_field = "Temperature"
+    include_solution_diffusion = False
+
+    plotting_field = "Bulk concentration"
+    include_solution_diffusion = True
 
     # this is just a dirichlet BC, data matches well
     # opt = {'a': 0.0, 'b': 1.0, 'Tref': 4.0, 'F': 0.0, 'T_min': T_min, 'T_max': T_max, 'V': 1.0, 'CR': cr}
@@ -180,7 +184,7 @@ if __name__ == "__main__":
     #        'T_max': T_max, 'V': 1.0, 'CR': cr}  # dirichlet
 
     # All simulations will be put in their own sub directory within this directory:
-    base_dir = '/home/parkinsonjl/mushy-layer/execSubcycle/ImperfectCooling/'
+    base_dir = Path.cwd().parent.parent / 'execSubcycle' / 'ImperfectCooling'
 
     # a = 0.5
     # b = -1.0
@@ -221,15 +225,17 @@ if __name__ == "__main__":
     inputs['bc.enthalpyHiVal'] = [0.0, T_max + st]
     inputs['parameters.nonDimVel'] = opt['V']
     inputs['parameters.compositionRatio'] = cr
-
     inputs['bc.HC_noflux'] = True
+
+    if include_solution_diffusion:
+        inputs['parameters.lewis'] = 10.0
 
     inputs['main.output_folder'] = full_output_folder
 
     new_inputs_loc = os.path.join(full_output_folder, 'inputs')
-    mushyLayerRunUtils.write_inputs(new_inputs_loc, inputs)
+    write_inputs(new_inputs_loc, inputs)
 
-    exec_loc = mushyLayerRunUtils.get_executable_name(return_full_path=True)
+    exec_loc = get_executable_name(return_full_path=True)
 
     cmd = 'cd %s; %s inputs' % (full_output_folder, exec_loc)
 
@@ -252,7 +258,7 @@ if __name__ == "__main__":
     # get some initial data
     init_pf = MushyPltFile(os.path.join(full_output_folder, plt_files[0]))
     init_pf.load_data()
-    T_data = init_pf.get_level_data('Temperature').mean('x').squeeze()
+    T_data = init_pf.get_level_data(plotting_field).mean('x').squeeze()
     z = T_data.coords['y']
     T_python = analytic_solution.compute_solution(z)
 
@@ -270,24 +276,25 @@ if __name__ == "__main__":
     for plot_loc in plt_files:
         pf = MushyPltFile(os.path.join(full_output_folder, plot_loc))
         pf.load_data()
-        T_data = pf.get_level_data('Temperature').mean('x').squeeze()
+        T_data = pf.get_level_data(plotting_field).mean('x').squeeze()
         z = T_data.coords['y']
 
         plt.plot(z, T_data, label='')
 
         times.append(float('%.1g' % pf.time))
 
-    plt_python = plt.plot(z, T_python, label='Python', color='red', linestyle='--')
+    if plotting_field == "Temperature":
+        plt_python = plt.plot(z, T_python, label='Python', color='red', linestyle='--')
 
     ax = plt.gca()
 
     ax.set_xlabel('$z$')
-    ax.set_ylabel('$T$')
+    ax.set_ylabel(plotting_field)
 
     # Add colorbar for times
     cax_porosity = fig.add_axes([0.2, 0.86, 0.5, 0.03])
     cmap = plt.get_cmap('viridis')
-    # noinspection PyUnresolvedReferences
+
     norm = mpl.colors.Normalize(vmin=min(times), vmax=max(times))
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array(np.array([]))
@@ -299,26 +306,26 @@ if __name__ == "__main__":
     ax.set_xlim([0, 1])
 
     # Plot error
-    difference = T_data - T_python
-    ax_err = ax.twinx()
-    plt_err = ax_err.plot(z, difference, color='black', linestyle=':', label='Error (right axis)')
-    # ax_err.set_yscale('symlog', linthreshx=1e-10)
+    if plotting_field == "Temperature":
+        difference = T_data - T_python
+        ax_err = ax.twinx()
+        plt_err = ax_err.plot(z, difference, color='black', linestyle=':', label='Error (right axis)')
+        ax_err.set_ylabel('Error')
 
-    ax_err.set_ylabel('Error')
+        # Add legend
+        lns = plt_python + plt_err
+        labs = [line.get_label() for line in lns]
+        ax.legend(lns, labs, loc=0)
 
-    # Add legend
-    lns = plt_python + plt_err
-    labs = [line.get_label() for line in lns]
-    ax.legend(lns, labs, loc=0)
+        ax_err.set_frame_on(True)  # make sure there is any background
+        ax_err.set_position([0.13, 0.15, 0.65, 0.7])
 
     # Sort axis positioning
     ax.set_zorder(1)  # make it on top
     ax.set_frame_on(False)  # make it transparent
-    ax_err.set_frame_on(True)  # make sure there is any background
 
     # Sort figure positioning
     ax.set_position([0.13, 0.15, 0.65, 0.7])
-    ax_err.set_position([0.13, 0.15, 0.65, 0.7])
 
     # Save figure
     for figure_output_path in figure_output_paths:

@@ -101,7 +101,6 @@ void AMRNonLinearMultiCompOp::computeDiffusedVar(FArrayBox& a_diffusedVar,
     m_diffusedVarBC(a_diffusedVar, m_domain.domainBox(), m_domain, m_dx, a_homogeneous);
   }
 
-//  this->m_bc
 }
 
 void AMRNonLinearMultiCompOp::residualI(LevelData<FArrayBox>&       a_lhs,
@@ -122,7 +121,7 @@ void AMRNonLinearMultiCompOp::residualI(LevelData<FArrayBox>&       a_lhs,
 
     for (dit.begin(); dit.ok(); ++dit)
     {
-      m_bc(phi[dit], dbl[dit()],m_domain, dx, a_homogeneous);
+      m_bc(phi[dit], dbl[dit()], m_domain, dx, a_homogeneous);
     }
   }
 
@@ -139,8 +138,6 @@ void AMRNonLinearMultiCompOp::residualI(LevelData<FArrayBox>&       a_lhs,
     //FArrayBox derivedVar(phi[dit]);
     // Is this quicker than the level data version?
     computeDiffusedVar(derivedVar[dit], phi[dit], dit(), a_homogeneous);
-
-
 
 #if CH_SPACEDIM == 1
     FORT_NLVCCOMPUTERES1D

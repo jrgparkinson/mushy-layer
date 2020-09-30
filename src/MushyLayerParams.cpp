@@ -32,6 +32,26 @@ string MushyLayerParams::s_ADVECTIVE_VELOCITY_SCALE = "Advective";
 /// Darcy velocity scale
 string MushyLayerParams::s_DARCY_VELOCITY_SCALE = "Darcy";
 
+void MushyLayerParams::printBCs(string bcName, Vector<int> bcTypeLo, Vector<int> bcTypeHi, RealVect bcValLo, RealVect bcValHi)
+{
+  char buffer [100];
+  sprintf(buffer, "%-10s", bcName.c_str());
+  pout() << buffer;
+
+  Vector<string> bcTypeNames;
+  bcTypeNames.push_back("Fixed");
+  bcTypeNames.push_back("No flux");
+
+    for (int dir=0; dir < SpaceDim; dir ++)
+    {
+      sprintf(buffer, "|%-10s= %02.2f|%-10s= %02.2f", m_scalarBCTypes[bcTypeLo[dir]].c_str(), bcValLo[dir],
+                                              m_scalarBCTypes[bcTypeHi[dir]].c_str(), bcValHi[dir]);
+      pout() << buffer;
+//      pout() << "| " << bcTypeLo[dir] << "= " << bcValLo[dir] << " | " << bcTypeHi[dir] << "= " << bcValHi[dir];
+    }
+    pout() << endl;
+}
+
 // Initialise in initialization list
 MushyLayerParams::MushyLayerParams() : physicalProblem(PhysicalProblems::m_mushyLayer),
     viscosity(-999),
@@ -132,7 +152,23 @@ MushyLayerParams::MushyLayerParams() : physicalProblem(PhysicalProblems::m_mushy
     m_porosityFunction(ParamsPorosityFunctions::m_porosityConstant),
     m_viscosityFunction(ViscosityFunction::uniformViscosity),
     max_viscosity(1.0)
-{}
+{
+  m_scalarBCTypes.push_back("fixed");
+  m_scalarBCTypes.push_back("noflux");
+  m_scalarBCTypes.push_back("open");
+  m_scalarBCTypes.push_back("inflow");
+
+  m_vectorBCTypes.push_back("noflow");
+  m_vectorBCTypes.push_back("inflowVelocity");
+  m_vectorBCTypes.push_back("open");
+  m_vectorBCTypes.push_back("outflownormal");
+  m_vectorBCTypes.push_back("inflowoutflow");
+  m_vectorBCTypes.push_back("noshear");
+  m_vectorBCTypes.push_back("symmetry");
+  m_vectorBCTypes.push_back("inflowPlume");
+  m_vectorBCTypes.push_back("outflowPressureGrad");
+  m_vectorBCTypes.push_back("pressureHead");
+}
 
 MushyLayerParams::~MushyLayerParams() {
 }
@@ -140,15 +176,30 @@ MushyLayerParams::~MushyLayerParams() {
 void
 MushyLayerParams::computeDerivedBCs ()
 {
+  pout() << "MushyLayerParams::computeDerivedBCs ThetaInitial=" << ThetaInitial
+      << ", H top = " << bcValEnthalpyHi[SpaceDim-1] << endl;
   // Now do defaults for the other boundary values
   for (int dir = 0; dir < SpaceDim; dir++) {
+    Real bulkCHi = bcValBulkConcentrationHi[dir];
+    Real bulkCLo = bcValBulkConcentrationLo[dir];
+
+    if (bcTypeBulkConcentrationHi[dir] == PhysBCUtil::Neumann)
+    {
+      bulkCHi = ThetaInitial;
+    }
+
+    if (bcTypeBulkConcentrationLo[dir] == PhysBCUtil::Neumann)
+    {
+      bulkCLo = ThetaInitial;
+    }
+
     ::computeBoundingEnergy (bcValEnthalpyHi[dir],
-                             bcValBulkConcentrationHi[dir], bcValSolidusHi[dir],
+                             bulkCHi, bcValSolidusHi[dir],
                              bcValLiquidusHi[dir], bcValEutecticHi[dir],
                              specificHeatRatio, stefan, compositionRatio,
                              waterDistributionCoeff, thetaEutectic,
                              ThetaEutectic);
-    ::computeEnthalpyVars (bcValEnthalpyHi[dir], bcValBulkConcentrationHi[dir],
+    ::computeEnthalpyVars (bcValEnthalpyHi[dir], bulkCHi,
                            bcValPorosityHi[dir], bcValTemperatureHi[dir],
                            bcValLiquidConcentrationHi[dir],
                            bcValSolidConcentrationHi[dir], bcValSolidusHi[dir],
@@ -156,13 +207,14 @@ MushyLayerParams::computeDerivedBCs ()
                            specificHeatRatio, stefan, compositionRatio,
                            waterDistributionCoeff, thetaEutectic,
                            ThetaEutectic);
-    ::computeBoundingEnergy (bcValEnthalpyLo[dir],
-                             bcValBulkConcentrationLo[dir], bcValSolidusLo[dir],
+
+    ::computeBoundingEnergy (bcValEnthalpyLo[dir], bulkCLo,
+                             bcValSolidusLo[dir],
                              bcValLiquidusLo[dir], bcValEutecticLo[dir],
                              specificHeatRatio, stefan, compositionRatio,
                              waterDistributionCoeff, thetaEutectic,
                              ThetaEutectic);
-    ::computeEnthalpyVars (bcValEnthalpyLo[dir], bcValBulkConcentrationLo[dir],
+    ::computeEnthalpyVars (bcValEnthalpyLo[dir], bulkCLo,
                            bcValPorosityLo[dir], bcValTemperatureLo[dir],
                            bcValLiquidConcentrationLo[dir],
                            bcValSolidConcentrationLo[dir], bcValSolidusLo[dir],
@@ -183,10 +235,24 @@ MushyLayerParams::computeDerivedBCs ()
       else
       {
         Hinitial = bcValEnthalpyLo[dir];
-        ;
       }
     }
   }
+
+  pout() << "After computeDerivedBCs: " << endl << "          ";
+    Vector<string> direction; direction.push_back("x"); direction.push_back("y"); direction.push_back("z");
+    for (int dir=0; dir < SpaceDim; dir ++)
+    {
+      pout() << "| " << direction[dir] << "(lo)         | " << direction[dir] << "(hi)         ";
+    }
+    pout () << endl;
+
+//    printBCs("H", bcTypeEnthalpyLo, bcTypeEnthalpyHi, bcValEnthalpyLo, bcValEnthalpyHi);
+//    printBCs("C", bcTypeBulkConcentrationLo, bcTypeBulkConcentrationHi, bcValBulkConcentrationLo, bcValBulkConcentrationHi);
+    printBCs("T", bcTypeTemperatureLo, bcTypeTemperatureHi, bcValTemperatureLo, bcValTemperatureHi);
+    printBCs("Sl", bcTypeLiquidConcentrationLo, bcTypeLiquidConcentrationHi, bcValLiquidConcentrationLo, bcValLiquidConcentrationHi);
+    printBCs("porosity", bcTypePorosityLo, bcTypePorosityHi, bcValPorosityLo, bcValPorosityHi);
+
 }
 
 void MushyLayerParams::getParameters()
@@ -628,7 +694,6 @@ void MushyLayerParams::getParameters()
 
 
   // Now BC values
-
   parseBCVals("liquidConcentrationLoVal", bcValLiquidConcentrationLo);
   parseBCVals("liquidConcentrationHiVal", bcValLiquidConcentrationHi);
 
@@ -794,6 +859,21 @@ void MushyLayerParams::getParameters()
 
   // uncomment to print the parameters
   //  printParameters();
+
+  pout() << "BCs used: " << endl << "          ";
+    Vector<string> direction; direction.push_back("x"); direction.push_back("y"); direction.push_back("z");
+    for (int dir=0; dir < SpaceDim; dir ++)
+    {
+      pout() << "| " << direction[dir] << "(lo)         | " << direction[dir] << "(hi)         ";
+    }
+    pout () << endl;
+
+    printBCs("H", bcTypeEnthalpyLo, bcTypeEnthalpyHi, bcValEnthalpyLo, bcValEnthalpyHi);
+    printBCs("C", bcTypeBulkConcentrationLo, bcTypeBulkConcentrationHi, bcValBulkConcentrationLo, bcValBulkConcentrationHi);
+    printBCs("T", bcTypeTemperatureLo, bcTypeTemperatureHi, bcValTemperatureLo, bcValTemperatureHi);
+    printBCs("Sl", bcTypeLiquidConcentrationLo, bcTypeLiquidConcentrationHi, bcValLiquidConcentrationLo, bcValLiquidConcentrationHi);
+    printBCs("porosity", bcTypePorosityLo, bcTypePorosityHi, bcValPorosityLo, bcValPorosityHi);
+
 }
 
 void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool required)
