@@ -47,3 +47,4 @@ visitlog.py
 *.csv
 /zzindex.html
 *.ipynb_checkpoints*
+/requirements (copy).txt

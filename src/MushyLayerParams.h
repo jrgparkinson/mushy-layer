@@ -722,6 +722,9 @@ public:
 	 */
 	Real max_viscosity;
 
+	Vector<string> m_scalarBCTypes;
+	Vector<string> m_vectorBCTypes;
+
 	/// Get all parameters from the inputs file
 	void getParameters();
 
@@ -781,6 +784,9 @@ public:
 
 	/// Compute boundary conditions for fields which can be found from the enthalpy and salinity via the phase diagram
 	void computeDerivedBCs ();
+
+	void printBCs(string bcName, Vector<int> bcTypeLo, Vector<int> bcTypeHi, RealVect bcValLo, RealVect bcValHi);
+
 };
 
 #endif /* SRC_MUSHYLAYERPARAMS_H_ */
