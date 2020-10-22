@@ -4,7 +4,7 @@ This is code to simulate flow in a reactive porous media, a "mushy layer". This 
  
 In this readme we first present some instructions on downloading and installing the code, then describe how to recreate the test problems and figures found in [Parkinson et. al. (2020)](https://www.sciencedirect.com/science/article/pii/S2590055219300599). The paper is a good reference for more information on the physics of this model.
 
-If you have any issues, please contact [james.parkinson@physics.ox.ac.uk][james.parkinson@physics.ox.ac.uk].
+If you have any issues, please contact [jamie.parkinson@gmail.com][jamie.parkinson@gmail.com].
 
 ## Prerequisites
 ### Required
