@@ -932,6 +932,9 @@ struct MushyLayerOptions {
   /// Method for refinement
   RefinementMethod refinementMethod;
 
+  /// Min level from which we refine around channels
+  int channelRefinementMinLevel;
+
   /// Turn on to only tags cells where other refinement criteria are met and porosity \f$\chi < 1 \f$
   bool onlyTagPorousCells;
 

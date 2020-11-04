@@ -480,6 +480,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.tag_channels = false;
   ppRegrid.query("tag_channels", opt.tag_channels);
 
+  opt.channelRefinementMinLevel = 1;
+  ppRegrid.query("channelRefinementMinLevel", channelRefinementMinLevel);
+
   // Default refinement is for mushy layer simulations with channels
   opt.refinementMethod =  RefinementMethod::tagMushChannels;
 
@@ -510,7 +513,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   }
   else if (ppRegrid.contains("tag_mush_channels"))
   {
-    pout() << "Refinement method: tag_mush_channes" << endl;
+    pout() << "Refinement method: tag_mush_channels" << endl;
     opt.refinementMethod = RefinementMethod::tagMushChannels;
   }
   else if (ppRegrid.contains("tag_channels_composite"))

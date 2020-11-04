@@ -510,6 +510,8 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
   }
 
+  pout() << "number of shrunkMushyCells: " << shrunkMushyCells.numPts() << endl;
+
   if (m_opt.refinementMethod == RefinementMethod::tagSpeed) // m_opt.tag_velocity
   {
 
@@ -644,22 +646,20 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     {
       if (m_opt.refinementMethod == RefinementMethod::tagPlumeMush)
       {
-        pout() << "AMRLevelMushyLayer::tagCells - refine plume mush - " << m_level << endl;
+        pout() << "AMRLevelMushyLayer::tagCells - refine plume mush - " << m_level << " (finest level: " << finestLevel << ")" << endl;
       }
       else
       {
-        pout() << "AMRLevelMushyLayer::tagCells - refine mush channels - " << m_level << endl;
+        pout() << "AMRLevelMushyLayer::tagCells - refine mush channels - " << m_level << " (finest level: " << finestLevel << ")" << endl;
       }
     }
 
 
-    // Place finest resolution around channels
-    if (m_level == finestLevel - 1)
+    // Place finest resolution around channels if not on base level
+    if (m_level >= m_opt.channelRefinementMinLevel)
     {
-
       if (m_opt.refinementMethod == RefinementMethod::tagMushChannels)
       {
-
         // Create new field, bulk concentration * vertical velocity
         LevelData<FArrayBox> concentrationVelocity(m_grids, 1, IntVect::Zero);
         m_scalarNew[m_bulkConcentration]->copyTo(concentrationVelocity);
@@ -682,6 +682,8 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
             }
           }
         }
+
+        pout() << "Tagged " << localTags.numPts() << " cells on level " << m_level << endl;
 
       }
       else
@@ -801,7 +803,9 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
   if (m_opt.onlyTagPorousCells)
   {
+    pout() << "Tags before merging with mushy cells: " << localTags.numPts();
     localTags &= shrunkMushyCells;
+    pout() << ", after: " << localTags.numPts() << endl;
   }
 
 
@@ -893,6 +897,8 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   localTagsBox &= m_problem_domain;
   localTags &= localTagsBox;
 
+  pout() << "Restrict tags to domain box, num left: "  << localTags.numPts() << endl;
+
 
   // This is some code which will force any refined levels to coarsen again,
   // setting up a cycle of refine->coarsen->refine to artifically test how
@@ -931,6 +937,10 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     pout() << "Final local tags: " << localTags << endl;
     pout() << "  Num points: " << localTags.numPts() << endl;
     pout() << "  Min enclosing box: " << localTags.minBox() << endl;
+  }
+  else
+  {
+    pout() << "Final local cells tagged (level: " << m_level << "): " << localTags.numPts() << endl;
   }
 
   a_tags = localTags;
