@@ -29,7 +29,7 @@ jobs:
           echo "CHOMBO_ROOT=$(echo $HOME)/chombo" >> $GITHUB_ENV
           echo "HDF5_PATH=$(echo $HOME)/hdf5-dir" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH):$(echo $HDF5_PATH)/lib" >> $GITHUB_ENV
-          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')" >> $GITHUB_ENV""
+          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')" >> $GITHUB_ENV
 
       - name: Setup latex
         run: |
