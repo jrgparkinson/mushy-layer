@@ -31,6 +31,7 @@ C     -----------------------------------------------------------------
       
       
       CHF_MULTIDO[region; i; j; k]
+
         if (H(CHF_IX[i;j;k],comp) .le. H_s(CHF_IX[i;j;k],comp)) then
           porosity(CHF_IX[i;j;k],comp) = 0
         else if ((H(CHF_IX[i;j;k],comp) .gt. H_s(CHF_IX[i;j;k],comp)) .and. (H(CHF_IX[i;j;k],comp) .le. H_e(CHF_IX[i;j;k],comp))) then
@@ -108,17 +109,28 @@ C     -----------------------------------------------------------------
      &     CHF_CONST_REAL[waterDistributionCoeff],
      &     CHF_CONST_REAL[specificHeatRatio],
      &     CHF_CONST_REAL[stefan])
-      REAL_T a,b,c
+      REAL_T a,b,c,validC
+
+C     Following quadratic coarse-fine interpolation, it seems that can have
+C     C < - composition ratio, which is unphysical and can lead to 
+C     porosity = NaN. We want to avoid this. Might eventually make more
+C     sense to construct a coarse-fine interpolator which respects the 
+C     physical constraints on the bulk concentration (C).
+      if (a_C .ge. -compositionRatio) then
+        validC = a_C
+      else
+        validC = -compositionRatio
+C        print *, "WARNING, C=", a_C, "! Setting C=", validC
+      endif
 
       if (stefan .eq. 0) then
          porosity = 1
       else
          a = compositionRatio*(specificHeatRatio -1) + stefan * (waterDistributionCoeff-1)
          b = compositionRatio * (1-2*specificHeatRatio) + H*(1-waterDistributionCoeff)
-     &				- a_C * (specificHeatRatio-1) - waterDistributionCoeff * stefan
-         c =  (compositionRatio + a_C)*specificHeatRatio +
-     &				waterDistributionCoeff * H
-
+     &				- validC * (specificHeatRatio-1) - waterDistributionCoeff * stefan
+         c =  (compositionRatio + validC)*specificHeatRatio +
+     &				waterDistributionCoeff * H		 
          porosity = (-b -sqrt(b*b - 4*a*c))/(2*a);
          
       endif
