@@ -38,10 +38,10 @@ jobs:
 
       - name: Setup environmental variables
         run: |
-          echo ::set-env name=CHOMBO_HOME::$(echo $HOME)/chombo/lib
-          echo ::set-env name=CHOMBO_ROOT::$(echo $HOME)/chombo
-          echo ::set-env name=HDF5_PATH::$(echo $HOME)/hdf5-dir
-          echo ::set-env name=LD_LIBRARY_PATH::$(echo $LD_LIBRARY_PATH):$(echo $HDF5_PATH)/lib
+          echo "CHOMBO_HOME=$(echo $HOME)/chombo/lib" >> $GITHUB_ENV
+          echo "CHOMBO_ROOT=$(echo $HOME)/chombo" >> $GITHUB_ENV
+          echo "HDF5_PATH=$(echo $HOME)/hdf5-dir" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH):$(echo $HDF5_PATH)/lib" >> $GITHUB_ENV
 
       - name: Info
         run: |
