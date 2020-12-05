@@ -2,8 +2,6 @@
 
 #include "ChomboSpline.h"
 
-
-
 /*
  * Calculate the analytic solution for this problem (if possible)
  */
@@ -256,8 +254,6 @@ calculateSolnBm1()
 
 
 
-
-
 void amrMushyLayer::enforceAnalyticSolution()
 {
   if (s_verbosity > 3)
@@ -319,8 +315,6 @@ void amrMushyLayer::enforceAnalyticSolution()
 //    updateEnthalpyVariables();
 //  }
 //
-
-
 
   //This is done at the start of timestep() anyway
   //Copy new to old

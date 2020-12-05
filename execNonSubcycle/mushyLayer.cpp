@@ -49,7 +49,6 @@ int main(int argc, char* argv[]) {
     ParmParse pp2("main");
     int maxStep;
     Real maxTime;
-    //Real startTime;
     pp2.get("max_time", maxTime);
     pp2.get("max_step", maxStep);
     

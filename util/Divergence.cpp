@@ -96,8 +96,6 @@ Divergence::levelDivergenceMAC(LevelData<FArrayBox>& a_div,
     {
       const FArrayBox& uEdgeDir = thisFluxBox[dir];
 
-
-
       FORT_DIVERGENCE(CHF_CONST_FRA1(uEdgeDir,comp),
                       CHF_FRA1(a_div[dit()], comp),
                       CHF_BOX(cellBox),
@@ -112,8 +110,6 @@ Divergence::levelDivergenceMAC(LevelData<FArrayBox>& a_div,
 //                      CHF_BOX(cellBox),
 //                      CHF_CONST_REAL(a_dx),
 //                      CHF_INT(dir));
-
-
 
     }
   }
@@ -416,8 +412,6 @@ void Divergence::levelDivergenceCCNew(LevelData<FArrayBox>& a_div,
   }
 
 
-
-
   int order = 2;
 
   int num_ghost = a_div.ghostVect()[0];
@@ -500,11 +494,7 @@ void Divergence::levelDivergenceCCNew(LevelData<FArrayBox>& a_div,
           a_divDir(iv, 0) += grad;
         } // end box iterator
 
-
-
       } // end side iterator
-
-
 
     } //direction iterator
 

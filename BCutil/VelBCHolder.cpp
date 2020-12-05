@@ -70,38 +70,6 @@ EdgeVelBCHolder::EdgeVelBCHolder(const Tuple<BCHolder, SpaceDim>& a_componentBC)
     }
 }
 
-
-//void EdgeVelBCHolder::applyToSide(LevelData<FluxBox>& a_state,
-//                                  const DisjointBoxLayout& a_valid,
-//                                  const ProblemDomain& a_domain,
-//                                  const Real a_dx,
-//                                  const int a_dir,
-//                                  const Side a_side,
-//                                  bool a_homogeneous)
-//{
-//
-//  ProblemDomain new_domain;
-//
-//  // Shrink domain
-//
-//  DataIterator dit = a_state.dataIterator();
-//  for (dit.reset(); dit.ok(); ++dit)
-//  {
-//    FluxBox& stateFab = a_state[dit];
-//    // bx is CELL-centered
-//    const Box& bx = a_valid[dit];
-//    //        for (int idir=0; idir<SpaceDim; idir++)
-//    //          {
-//    // stateFab[idir] is FACE-centered on face idir
-//    m_componentBC[a_dir](stateFab[a_dir], bx,
-//        new_domain, a_dx,
-//        a_homogeneous);
-//    //          }
-//  }
-//}
-
-
-
 // --------------------------------------------------------------
 void
 EdgeVelBCHolder::applyBCs(LevelData<FluxBox>& a_state,

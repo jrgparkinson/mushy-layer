@@ -232,7 +232,7 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(
   } // end loop over levels
 
   VCAMRPoissonOp2Factory *vcop =
-      new VCAMRPoissonOp2Factory(); // new AMRScalarDiffusionOp();
+      new VCAMRPoissonOp2Factory();
   vcop->define(m_problem_domain, grids, ref_rat, dx, bc, alpha, aCoef, beta,
                bCoef);
 

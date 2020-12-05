@@ -615,8 +615,6 @@ void Gradient::levelGradientCCUpwind(LevelData<FArrayBox>& a_grad,
 				a_grad[dit](iv, idir) = grad;
 			} // end box iterator
 
-
-
 		} //direction iterator
 
 
@@ -701,8 +699,6 @@ void Gradient::levelGradientCCNewOneSided(LevelData<FArrayBox>& a_grad,
 
 					a_grad[dit](iv, idir) = grad;
 				} // end box iterator
-
-
 
 			} // end side iterator
 
