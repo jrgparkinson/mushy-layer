@@ -12,7 +12,6 @@
 #ifndef _AMRLEVELMUSHYLAYER_H_
 #define _AMRLEVELMUSHYLAYER_H_
 
-// #include <ctime>
 #include "FArrayBox.H"
 #include "LevelData.H"
 #include "AMRLevel.H"

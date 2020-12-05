@@ -10,18 +10,18 @@
 
 //#include <cmath>
 #include "FArrayBox.H"
-#include "Vector.H"
 #include "Misc.H"
-#include "parstream.H"
-#include <iomanip>
-#include <fstream>
+#include "Vector.H"
 #include "mushyLayerOpt.h"
+#include "parstream.H"
+#include <fstream>
+#include <iomanip>
 
 #include "NamespaceHeader.H"
 
-
 /// Different diagnostics we consider
-enum DiagnosticNames{
+enum DiagnosticNames
+{
   diag_time,
   diag_dt,
   diag_timestep,
@@ -86,65 +86,69 @@ enum DiagnosticNames{
 
 /// Class to contain diagnostics
 /**
- * This class manages various diagnostics that we want to track during simulations
+ * This class manages various diagnostics that we want to track during
+ * simulations
  */
 class Diagnostics
 {
 public:
   /// Default constructore
-  Diagnostics ();
+  Diagnostics();
 
   /// Define object
-  void define (Real a_movingAverageTimescale, int a_verbosity, Real a_convCrit, int a_level, bool a_printAllLevels=false);
+  void define(Real a_movingAverageTimescale, int a_verbosity, Real a_convCrit,
+              int a_level, bool a_printAllLevels = false);
 
   /// Destructor
-  virtual  ~Diagnostics ();
+  virtual ~Diagnostics();
 
   /// Add a diagnostic
   void addDiagnostic(DiagnosticNames a_diagnostic, Real a_time, Real value);
 
   /// Get the value of a diagnostic, \f$ \alpha \f$
-  Real getDiagnostic(DiagnosticNames a_diagnostic, Real a_time, int timestepOffset = 0);
+  Real getDiagnostic(DiagnosticNames a_diagnostic, Real a_time,
+                     int timestepOffset = 0);
 
   /// Get the moving average of a diagnostic
-  Real getMovingAverage(DiagnosticNames a_diagnostic, Real a_endTime, Real a_timeSpan);
+  Real getMovingAverage(DiagnosticNames a_diagnostic, Real a_endTime,
+                        Real a_timeSpan);
 
   /// Get \f$ \frac{d \alpha}{d t} \f$
   Real getRateOfChange(DiagnosticNames a_diagnostic, Real a_endTime, Real a_dt);
 
   /// Calculate \f$ \frac{d^2 \alpha}{dt^2} \f$
-  Real getSecondRateOfChange(DiagnosticNames a_diagnostic, Real a_endTime, Real a_dt);
+  Real getSecondRateOfChange(DiagnosticNames a_diagnostic, Real a_endTime,
+                             Real a_dt);
 
   /// Determine if the moving average has reached steady state
-  bool movingAverageHasConverged(DiagnosticNames a_diagnostic, Real m_time, Real a_dt);
+  bool movingAverageHasConverged(DiagnosticNames a_diagnostic, Real m_time,
+                                 Real a_dt);
 
   /// Print header of all diagnostic names
   void printHeader();
 
   /// Print header to specified file
-  void printHeader(std::ofstream& a_file);
+  void printHeader(std::ofstream &a_file);
 
   /// Print diagnostics at specified time
   void printDiagnostics(Real a_time);
 
   /// Print diagnostics at given time to a certain file
-  void printDiagnostics(Real a_time, std::ofstream& a_file);
+  void printDiagnostics(Real a_time, std::ofstream &a_file);
 
-  /// Returns whether or not the specified diagnostic is one that's in one list of diagnostics to print
+  /// Returns whether or not the specified diagnostic is one that's in one list
+  /// of diagnostics to print
   bool diagnosticIsIncluded(const DiagnosticNames a_diag);
-
-
 
   /// Specify which diagnostics we should print out
   void setPrintDiags(Vector<DiagnosticNames> a_diagsToPrint);
 
 private:
-
   /// Times at which diagnostics have been calculated
   Vector<Real> m_times;
 
   /// Diagnostics at each time
-  Vector<Vector<Real>* > m_diagnostics;
+  Vector<Vector<Real> *> m_diagnostics;
 
   /// Names of diagnostics
   Vector<string> m_diagnosticNames;
@@ -180,9 +184,6 @@ private:
 
   /// Get the index for a certain timestep
   int getIndex(Real a_time);
-
-
-
 };
 
 #include "NamespaceFooter.H"

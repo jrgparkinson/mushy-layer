@@ -10,30 +10,32 @@
 #endif
 
 #include "MushyLayerUtils.H"
-#include "ParmParse.H"
-#include "CoarseAverage.H"
-#include "computeNorm.H"
 #include "BCFunc.H"
-#include "MushyLayerParams.h"
-#include "Gradient.H"
-#include "SetValLevel.H"
 #include "CellToEdge.H"
 #include "CellToEdge2.H"
+#include "CoarseAverage.H"
+#include "Gradient.H"
 #include "Logging.H"
+#include "MushyLayerParams.h"
+#include "ParmParse.H"
+#include "SetValLevel.H"
+#include "computeNorm.H"
 
+#include <array>
 #include <cstdio>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <array>
-
 
 #include "NamespaceHeader.H"
 
-
-
-Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>& Sl, const LevelData<FArrayBox>& porosity, const LevelData<FluxBox>& vel, Real a_dx, MushyLayerParams m_parameters, int a_dir, Side::LoHiSide a_side)
+Real computeSoluteFlux(const LevelData<FArrayBox> &S,
+                       const LevelData<FArrayBox> &Sl,
+                       const LevelData<FArrayBox> &porosity,
+                       const LevelData<FluxBox> &vel, Real a_dx,
+                       MushyLayerParams m_parameters, int a_dir,
+                       Side::LoHiSide a_side)
 {
   //  Real Fs = 0;
 
@@ -56,7 +58,8 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
 
   for (dit.reset(); dit.ok(); ++dit)
   {
-    // Make sure S is positive, so flux has correct sign (-ve flux = flux out of domain)
+    // Make sure S is positive, so flux has correct sign (-ve flux = flux out of
+    // domain)
     shiftedS[dit].copy(S[dit]);
     //      shiftedS[dit].plus(m_parameters.compositionRatio);
     shiftedSl[dit].copy(Sl[dit]);
@@ -76,8 +79,7 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
     fluxFrameAdv[dit][0].mult(0.0);
     fluxFrameAdv[dit][1].mult(m_parameters.nonDimVel);
 
-
-    for (int dir=0; dir<SpaceDim; dir++)
+    for (int dir = 0; dir < SpaceDim; dir++)
     {
       fluxFluidAdv[dit][dir].mult(vel[dit][dir]);
       fluxDiffusion[dit][dir].mult(porosityEdge[dit][dir], 0, 0, 1);
@@ -87,7 +89,6 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
       flux[dit][dir].plus(fluxFluidAdv[dit][dir]);
       flux[dit][dir].plus(fluxFrameAdv[dit][dir]);
       flux[dit][dir].minus(fluxDiffusion[dit][dir]);
-
     }
   }
 
@@ -100,67 +101,7 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
     perpDir = 0;
   }
   Real length = domBox.hiVect()[a_dir] + 1 - domBox.loVect()[a_dir];
-  Real width = (domBox.hiVect()[perpDir] + 1 - domBox.loVect()[perpDir])*a_dx;
-
-
-
-  // Get the box containing cells at the required edge of the domain
-  /*
-
-  Box ghost;
-  if (a_side == Side::Lo)
-  {
-    ghost = ::adjCellLo(domBox, a_dir, 1);
-  }
-  else
-  {
-    ghost = ::adjCellHi(domBox, a_dir, 1);
-  }
-
-  Box bottomBox = ghost;
-
-  // shift towards domain
-  if (a_side == Side::Lo)
-  {
-    // Shift up
-    bottomBox.shift(a_dir, 1);
-  }
-  else
-  {
-    //Shift down
-    bottomBox.shift(a_dir, -1);
-  }
-
-  // Convert Side:Lo to -1, Side::Hi to 1
-  //      int shiftDir = int(a_side);
-  //      if (shiftDir == 0)
-  //      {
-  //        shiftDir = -1;
-  //      }
-  //      bottomBox.shift(a_dir, -shiftDir); // shift towards domain
-
-
-
-
-
-  for (dit.reset(); dit.ok(); ++dit)
-  {
-
-    // Find the portion of the edgeBox that is covered by this dataIterator
-    Box thisBottomBox = bottomBox;
-    Box thisBox = flux[dit].box();
-    thisBottomBox &= thisBox;
-
-    for (BoxIterator bit = BoxIterator(thisBottomBox); bit.ok(); ++bit)
-    {
-      IntVect iv = bit();
-      Fs += a_dx*(flux[dit][a_dir](iv));
-    }
-  }
-
-  Fs = Fs/width;
-
-   */
+  Real width = (domBox.hiVect()[perpDir] + 1 - domBox.loVect()[perpDir]) * a_dx;
 
   // New method - calculate flux at each point in the domain
   Box strip = ::adjCellLo(domBox, a_dir, 1);
@@ -171,10 +112,10 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
   // This is now the strip of cells at the bottom of the domain
   //  strip.shift(a_dir, 1);
 
-  Vector<Real> fluxes(length+1, 0.0);
-  int i=0;
+  Vector<Real> fluxes(length + 1, 0.0);
+  int i = 0;
 
-  while(i <= length)
+  while (i <= length)
   {
     Real Fs = 0;
 
@@ -185,7 +126,6 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
       Box thisStripBox = strip;
       Box thisBox = flux[dit].box();
       thisStripBox &= thisBox;
-
 
       for (BoxIterator bit = BoxIterator(thisStripBox); bit.ok(); ++bit)
       {
@@ -205,20 +145,20 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
 
         Real averageSl = (Sl[dit](ivUp) + Sl[dit](iv)) / 2;
         Real averageS = (S[dit](ivUp) + S[dit](iv)) / 2;
-        Real w =  vel[dit][a_dir](ivUp);
+        Real w = vel[dit][a_dir](ivUp);
         //          Real chi = (porosity[dit](iv) + porosity[dit](ivUp))/2;
         Real chi = sqrt(porosity[dit](iv) * porosity[dit](ivUp));
 
         Real Fframe = m_parameters.nonDimVel * averageS;
         Real Ffluid = w * averageSl;
-        Real Fdiffusive = (m_parameters.m_saltDiffusionCoeff) * (chi * (Sl[dit](ivUp) - Sl[dit](iv)) / a_dx);
-
+        Real Fdiffusive = (m_parameters.m_saltDiffusionCoeff) *
+                          (chi * (Sl[dit](ivUp) - Sl[dit](iv)) / a_dx);
 
         Fs += a_dx * (Fframe + Ffluid - Fdiffusive);
       }
     }
 
-    Fs = Fs/width;
+    Fs = Fs / width;
     fluxes[i] = Fs;
     i++;
     strip.shift(a_dir, 1);
@@ -226,19 +166,16 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
 
   Real thisFlux = 0;
 
-
-
   // Another attempt to get the flux - from the operator
-
 
   // Choose which flux to return
   if (a_side == Side::Lo)
   {
-    thisFlux =  fluxes[1];
+    thisFlux = fluxes[1];
   }
   else
   {
-    thisFlux = fluxes[length-1];
+    thisFlux = fluxes[length - 1];
   }
   int srcProc = 0;
   broadcast(thisFlux, srcProc);
@@ -248,9 +185,10 @@ Real computeSoluteFlux(const LevelData<FArrayBox>& S, const LevelData<FArrayBox>
   //  return Fs;
 }
 
-Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& vel,
-                    Real a_dx, MushyLayerParams a_params, Real a_domWidth, Real a_domHeight,
-                    int dir, int NusseltType)
+Real computeNusselt(const LevelData<FArrayBox> &T,
+                    const LevelData<FArrayBox> &vel, Real a_dx,
+                    MushyLayerParams a_params, Real a_domWidth,
+                    Real a_domHeight, int dir, int NusseltType)
 {
   Real Nu = 0;
   DisjointBoxLayout grids = T.disjointBoxLayout();
@@ -274,7 +212,7 @@ Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& v
   {
     Gradient::levelGradientMAC(gradTedge, T, a_dx);
 
-    Real scale = 0.5*a_dx/sideLength;
+    Real scale = 0.5 * a_dx / sideLength;
 
     for (SideIterator sit = SideIterator(); sit.ok(); ++sit)
     {
@@ -294,7 +232,6 @@ Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& v
         sideBox.shift(dir, -1);
       }
 
-
       for (DataIterator dit = grids.dataIterator(); dit.ok(); ++dit)
       {
 
@@ -306,17 +243,12 @@ Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& v
         {
           IntVect iv = bit();
 
-          Nu += gradTedge[dit][dir](iv)*scale;
+          Nu += gradTedge[dit][dir](iv) * scale;
         }
       }
-
-
-
     }
 
-//    int temp=0;
-
-
+    //    int temp=0;
   }
   else
   {
@@ -328,28 +260,27 @@ Real computeNusselt(const LevelData<FArrayBox>& T, const LevelData<FArrayBox>& v
       {
         IntVect iv = bit();
         // Add (V*T + dTdz) * dx to Nusselt
-        Nu += (-vel[dit](iv, 1)*T[dit](iv) + gradT[dit](iv, 1))*a_dx*a_dx/(a_domWidth*a_domHeight);
+        Nu += (-vel[dit](iv, 1) * T[dit](iv) + gradT[dit](iv, 1)) * a_dx *
+              a_dx / (a_domWidth * a_domHeight);
       }
     }
   }
 
-
   // Scale with conductive temperature profile
   //  Real height = (domBox.hiVect()[1] + 1 - domBox.loVect()[1])*a_dx;
-  Real deltaT = a_params.bcValTemperatureHi[0] - a_params.bcValTemperatureLo[0]; // Just fix this for now
-  Nu /= deltaT/a_domHeight;
+  Real deltaT = a_params.bcValTemperatureHi[0] -
+                a_params.bcValTemperatureLo[0]; // Just fix this for now
+  Nu /= deltaT / a_domHeight;
 
   // Nu is only calculated by proc 0, apparently
   // need to broadcast to all procs
   int srcProc = 0;
   broadcast(Nu, srcProc);
 
-
   return Nu;
 }
 
-void
-getProblemDomain(ProblemDomain& a_domain)
+void getProblemDomain(ProblemDomain &a_domain)
 {
   CH_TIME("getProblemDomain");
   ParmParse pp("main");
@@ -362,12 +293,13 @@ getProblemDomain(ProblemDomain& a_domain)
 
   if (symmetric)
   {
-    hiEnd = IntVect(D_DECL((ncell[0]/2)-1,(ncell[1]/2)-1,(ncell[2]/2)-1));
-    loEnd = IntVect(D_DECL(-(ncell[0]/2),-(ncell[1]/2),-(ncell[2]/2)));
+    hiEnd = IntVect(
+        D_DECL((ncell[0] / 2) - 1, (ncell[1] / 2) - 1, (ncell[2] / 2) - 1));
+    loEnd = IntVect(D_DECL(-(ncell[0] / 2), -(ncell[1] / 2), -(ncell[2] / 2)));
   }
   else
   {
-    hiEnd = IntVect(D_DECL(ncell[0]-1,ncell[1]-1,ncell[2]-1));
+    hiEnd = IntVect(D_DECL(ncell[0] - 1, ncell[1] - 1, ncell[2] - 1));
     loEnd = IntVect::Zero;
   }
   //	IntVect hiEnd
@@ -380,125 +312,127 @@ getProblemDomain(ProblemDomain& a_domain)
   pp.getarr("periodic_bc", v_is_periodic, 0, SpaceDim);
 
   bool is_periodic[SpaceDim];
-  for (int idir = 0; idir < SpaceDim; idir++) is_periodic[idir] = (v_is_periodic[idir]==1);
+  for (int idir = 0; idir < SpaceDim; idir++)
+    is_periodic[idir] = (v_is_periodic[idir] == 1);
 
-  ProblemDomain prob_domain(level0Domain.smallEnd(),
-                            level0Domain.bigEnd(),
+  ProblemDomain prob_domain(level0Domain.smallEnd(), level0Domain.bigEnd(),
                             &(is_periodic[0]));
 
   a_domain = prob_domain;
 }
 
 //(non-dimensional) Calculate the liquidus temperature for a given concentration
-//Real
-//liquidusTemp(Real C)
+// Real
+// liquidusTemp(Real C)
 //{
 //  return C;
 //}
 
-void getScalarVarNames(Vector<string>& varNames,
-                       const int numScalarVars,
+void getScalarVarNames(Vector<string> &varNames, const int numScalarVars,
                        const Vector<string> scalarVarNames)
 {
-  for (int a_var = 0; a_var<numScalarVars; a_var++)
+  for (int a_var = 0; a_var < numScalarVars; a_var++)
   {
     varNames[a_var] = scalarVarNames[a_var];
   }
 }
 
-void getVectorVarNames(Vector<string>& varNames,
-                       const int numVectorVars,
+void getVectorVarNames(Vector<string> &varNames, const int numVectorVars,
                        const Vector<string> vectorVarNames,
                        const int startPos)
 {
-  for (int a_var = 0; a_var<numVectorVars; a_var++)
+  for (int a_var = 0; a_var < numVectorVars; a_var++)
   {
-    int startComp = startPos + (a_var*2);
+    int startComp = startPos + (a_var * 2);
     Vector<string> dirString(SpaceDim);
     getDirString(dirString);
 
-    for (int dir = 0; dir<SpaceDim; dir++)
+    for (int dir = 0; dir < SpaceDim; dir++)
     {
-      varNames[startComp+dir] = dirString[dir] + vectorVarNames[a_var];
+      varNames[startComp + dir] = dirString[dir] + vectorVarNames[a_var];
     }
   }
 }
 
-void
-getDirString (Vector<string>& dirString)
+void getDirString(Vector<string> &dirString)
 {
-  dirString[0] = string ("x");
-  if (SpaceDim == 2) {
-    dirString[1] = string ("y");
+  dirString[0] = string("x");
+  if (SpaceDim == 2)
+  {
+    dirString[1] = string("y");
   }
-  else if (SpaceDim == 3) {
-    dirString[1] = string ("y");
-    dirString[2] = string ("z");
+  else if (SpaceDim == 3)
+  {
+    dirString[1] = string("y");
+    dirString[2] = string("z");
   }
 }
 
-void getChkVectorVarNames(Vector<string>& chkVectorVarNames,
+void getChkVectorVarNames(Vector<string> &chkVectorVarNames,
                           const Vector<int> chkVectorVars,
-                          const Vector<string> vectorVarNames
-)
+                          const Vector<string> vectorVarNames)
 {
-  for (int i = 0; i<chkVectorVars.size(); i++)
+  for (int i = 0; i < chkVectorVars.size(); i++)
   {
     int a_var = chkVectorVars[i];
 
-    int startComp = (i*SpaceDim);
+    int startComp = (i * SpaceDim);
     Vector<string> dirString(SpaceDim);
-    getDirString (dirString);
-    for (int dir = 0; dir<SpaceDim; dir++)
+    getDirString(dirString);
+    for (int dir = 0; dir < SpaceDim; dir++)
     {
-      //varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") + dirString[dir];
-      chkVectorVarNames[startComp+dir] = dirString[dir] + vectorVarNames[a_var];
+      // varNames[startComp+dir] = m_vectorVarNames[a_var] + string(" ") +
+      // dirString[dir];
+      chkVectorVarNames[startComp + dir] =
+          dirString[dir] + vectorVarNames[a_var];
     }
   }
 }
 
-void getVarNames(Vector<string>& varNames,
-                 const int numScalarVars, const int numVectorVars,
-                 const Vector<string> scalarVarNames, const Vector<string> vectorVarNames)
+void getVarNames(Vector<string> &varNames, const int numScalarVars,
+                 const int numVectorVars, const Vector<string> scalarVarNames,
+                 const Vector<string> vectorVarNames)
 {
-  //First do scalar vars
+  // First do scalar vars
   //  for (int a_var = 0; a_var<numScalarVars; a_var++)
   //  {
   //    varNames[a_var] = scalarVarNames[a_var];
   //  }
   getScalarVarNames(varNames, numScalarVars, scalarVarNames);
 
-  //Then vector vars
+  // Then vector vars
   getVectorVarNames(varNames, numVectorVars, vectorVarNames,
                     numScalarVars); // initial offset
 }
 
-void getVarNames(Vector<string>& varNames,
-                 const Vector<int> scalarVars, const Vector<int> vectorVars,
-                 const Vector<string> scalarVarNames, const Vector<string> vectorVarNames)
+void getVarNames(Vector<string> &varNames, const Vector<int> scalarVars,
+                 const Vector<int> vectorVars,
+                 const Vector<string> scalarVarNames,
+                 const Vector<string> vectorVarNames)
 {
-  //First do scalar vars
+  // First do scalar vars
   int numScalarVars = scalarVars.size();
   int numVectorVars = vectorVars.size();
 
-  varNames.resize(numScalarVars + SpaceDim*numVectorVars);
+  varNames.resize(numScalarVars + SpaceDim * numVectorVars);
 
-  for (int a_var = 0; a_var<numScalarVars; a_var++)
+  for (int a_var = 0; a_var < numScalarVars; a_var++)
   {
     varNames[a_var] = scalarVarNames[scalarVars[a_var]];
   }
 
-  //Then vector vars
-  Interval vecSrcComps(0, SpaceDim-1);
-  for (int a_var = 0; a_var<numVectorVars; a_var++)
+  // Then vector vars
+  Interval vecSrcComps(0, SpaceDim - 1);
+  for (int a_var = 0; a_var < numVectorVars; a_var++)
   {
-    int startComp = numScalarVars + (a_var*SpaceDim);
+    int startComp = numScalarVars + (a_var * SpaceDim);
     Vector<string> dirString(SpaceDim);
-    getDirString (dirString);
+    getDirString(dirString);
 
-    for (int dir = 0; dir<SpaceDim; dir++)
+    for (int dir = 0; dir < SpaceDim; dir++)
     {
-      varNames[startComp+dir] = dirString[dir] + vectorVarNames[vectorVars[a_var]];
+      varNames[startComp + dir] =
+          dirString[dir] + vectorVarNames[vectorVars[a_var]];
     }
   }
 }
@@ -509,12 +443,14 @@ void printRepoVersion()
   // know exactly what code created the output
   //      system(' hg identify --num');
 
-  const char* cmd = " hg identify --num";
+  const char *cmd = " hg identify --num";
   std::array<char, 128> buffer;
   std::string result;
   std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
-  if (!pipe) throw std::runtime_error("popen() failed!");
-  while (!feof(pipe.get())) {
+  if (!pipe)
+    throw std::runtime_error("popen() failed!");
+  while (!feof(pipe.get()))
+  {
     if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
       result += buffer.data();
   }
@@ -522,9 +458,9 @@ void printRepoVersion()
   LOG("Mercurial repository revision: " << result);
 }
 
-
-void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionFAB,
-                           MushyLayerParams& params, Real a_dx)
+void calculatePermeability(FArrayBox &permeabilityFAB,
+                           FArrayBox &solidFractionFAB,
+                           MushyLayerParams &params, Real a_dx)
 {
 
   BoxIterator bit(permeabilityFAB.box());
@@ -535,35 +471,40 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
     Real x, y, zz;
     getLocation(iv, a_dx, x, y, zz);
 
-    Real solidFraction = solidFractionFAB(iv,0);
+    Real solidFraction = solidFractionFAB(iv, 0);
 
-    Real liquidFraction = (1-solidFraction);
+    Real liquidFraction = (1 - solidFraction);
     Real permeability;
 
-    if(params.permeabilityFunction == PermeabilityFunctions::m_permeabilityXSquared)
+    if (params.permeabilityFunction ==
+        PermeabilityFunctions::m_permeabilityXSquared)
     {
       Real scale = 0.1;
 
       // Creates a channel of high permeability in the middle of the domain
-//      permeability = exp(-pow(x-0.5,2)/scale);
+      //      permeability = exp(-pow(x-0.5,2)/scale);
 
       // Create a hole of low permeabilty in the middle of the domain
-      //					permeability = 1-exp(-pow(x-0.5,2)/scale)*exp(-pow(z-0.5,2)/scale);
+      //					permeability =
+      //1-exp(-pow(x-0.5,2)/scale)*exp(-pow(z-0.5,2)/scale);
 
       // Two permeability holes in the left and right of the domain
       scale = 0.03;
       Real yScale = 0.12;
-      permeability = exp(-pow(x-0.2,2)/scale)*exp(-pow(y-0.5,2)/yScale);
-      permeability = permeability + exp(-pow(x-0.8,2)/scale)*exp(-pow(y-0.5,2)/yScale);
-      permeability = 1-permeability;
+      permeability =
+          exp(-pow(x - 0.2, 2) / scale) * exp(-pow(y - 0.5, 2) / yScale);
+      permeability = permeability + exp(-pow(x - 0.8, 2) / scale) *
+                                        exp(-pow(y - 0.5, 2) / yScale);
+      permeability = 1 - permeability;
 
-      //Block flow at the boundaries
+      // Block flow at the boundaries
       scale = 0.02;
-      permeability = exp(-pow(x-0.5,2)/scale);
+      permeability = exp(-pow(x - 0.5, 2) / scale);
 
       if (params.heleShaw)
       {
-        permeability = 1 / (1/params.heleShawPermeability + 1.0/permeability);
+        permeability =
+            1 / (1 / params.heleShawPermeability + 1.0 / permeability);
       }
     }
 
@@ -574,12 +515,13 @@ void calculatePermeability(FArrayBox& permeabilityFAB, FArrayBox& solidFractionF
 
     permeabilityFAB(iv, 0) = permeability;
 
-  } //box iterator
+  } // box iterator
 }
 
-void getLocation(const IntVect iv, const Real a_dx, Real& x, Real& y, Real& z, const RealVect ccOffset)
+void getLocation(const IntVect iv, const Real a_dx, Real &x, Real &y, Real &z,
+                 const RealVect ccOffset)
 {
-  RealVect scaledOffset = ccOffset*a_dx;
+  RealVect scaledOffset = ccOffset * a_dx;
   RealVect loc = iv;
   loc *= a_dx;
   loc += scaledOffset;
@@ -592,49 +534,54 @@ void getLocation(const IntVect iv, const Real a_dx, Real& x, Real& y, Real& z, c
   }
 }
 
-void getLocation(const IntVect iv, RealVect& loc, const Real a_dx, const RealVect ccOffset)
+void getLocation(const IntVect iv, RealVect &loc, const Real a_dx,
+                 const RealVect ccOffset)
 {
-  //Default value for ccOffsetScale is 0.5 i.e. cell centred.
+  // Default value for ccOffsetScale is 0.5 i.e. cell centred.
 
   // I think this was wrong before? As ccoffset was already scaled by m_dx
   //  RealVect scale = RealVect(ccOffsetX, ccOffsetY);
   //  RealVect ccOffset = scale*a_dx*RealVect::Unit;
 
-  RealVect scaledOffset = ccOffset*a_dx;
+  RealVect scaledOffset = ccOffset * a_dx;
 
   loc = iv;
   loc *= a_dx;
   loc += scaledOffset;
 }
 
-
 Real burgersPeriodicInit(Real x, Real y, int dir, MushyLayerParams params)
 {
-
 
   if (dir == 1)
   {
     return 0.0;
-  } else {
+  }
+  else
+  {
 
-
-
-    Real phi = exp(-x*x/(4*params.darcy)) + exp(-pow(x-2*M_PI, 2)/(4*params.darcy));
-    Real dPhidx = (-1/(2*params.darcy))* (x*exp(-x*x/(4*params.darcy)) + (x-2*M_PI)*exp(-pow(x-2*M_PI, 2)/(4*params.darcy)));
-    Real val = 4 - 2*params.darcy * dPhidx/phi;
+    Real phi = exp(-x * x / (4 * params.darcy)) +
+               exp(-pow(x - 2 * M_PI, 2) / (4 * params.darcy));
+    Real dPhidx =
+        (-1 / (2 * params.darcy)) *
+        (x * exp(-x * x / (4 * params.darcy)) +
+         (x - 2 * M_PI) * exp(-pow(x - 2 * M_PI, 2) / (4 * params.darcy)));
+    Real val = 4 - 2 * params.darcy * dPhidx / phi;
 
     return val;
   }
 }
 
-Real burgersSinInit(Real x, Real y, int dir, const MushyLayerParams& params)
+Real burgersSinInit(Real x, Real y, int dir, const MushyLayerParams &params)
 {
   if (dir == 1)
   {
     return 0.0;
-  } else {
+  }
+  else
+  {
 
-    Real val = - sin(M_PI*x);
+    Real val = -sin(M_PI * x);
 
     return val;
   }
@@ -649,22 +596,19 @@ Real burgersSinInit(Real x, Real y, int dir, const MushyLayerParams& params)
  * periodic in y
  * See latex file for more details
  */
-Real stokesDarcyInit(Real x, Real y, int dir, const MushyLayerParams& params)
+Real stokesDarcyInit(Real x, Real y, int dir, const MushyLayerParams &params)
 {
 
   if (dir == 1)
   {
 
-    Real val = 1 - cosh(sqrt(0.5)*(0.5-x))/cosh(0.5*sqrt(0.5));
+    Real val = 1 - cosh(sqrt(0.5) * (0.5 - x)) / cosh(0.5 * sqrt(0.5));
     return val;
-
-
-  } else {
+  }
+  else
+  {
     return 0.0;
   }
-
 }
 
-
 #include "NamespaceFooter.H"
-

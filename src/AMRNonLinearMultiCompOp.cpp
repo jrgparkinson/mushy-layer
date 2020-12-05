@@ -8,15 +8,15 @@
  */
 #endif
 
-#include "FORT_PROTO.H"
-#include "BoxIterator.H"
+#include "AMRMultiGrid.H"
 #include "AverageF_F.H"
-#include "InterpF_F.H"
-#include "LayoutIterator.H"
-#include "FineInterp.H"
+#include "BoxIterator.H"
 #include "CoarseAverage.H"
 #include "CoarseAverageFace.H"
-#include "AMRMultiGrid.H"
+#include "FORT_PROTO.H"
+#include "FineInterp.H"
+#include "InterpF_F.H"
+#include "LayoutIterator.H"
 #include "Misc.H"
 
 #include "AMRPoissonOpF_F.H"
@@ -24,16 +24,18 @@
 #include "AMRNonLinearMultiCompOp.H"
 #include "AMRNonLinearMultiCompOpF_F.H"
 #include "CellToEdge.H"
-#include "EdgeToCell.H"
 #include "DebugOut.H"
-#include "MushyLayerUtils.H"
+#include "EdgeToCell.H"
 #include "EnthalpyVariablesF_F.H"
+#include "MushyLayerUtils.H"
 
 #include "CoefficientInterpolatorLinear.H"
 
 #include "NamespaceHeader.H"
 
-void AMRNonLinearMultiCompOp::computeDiffusedVar(LevelData<FArrayBox>& a_diffusedVar, const LevelData<FArrayBox>& a_phi, bool a_homogeneous)
+void AMRNonLinearMultiCompOp::computeDiffusedVar(
+    LevelData<FArrayBox> &a_diffusedVar, const LevelData<FArrayBox> &a_phi,
+    bool a_homogeneous)
 {
   CH_TIME("AMRNonLinearMultiCompOp::computeDerivedVar");
 
@@ -47,72 +49,67 @@ void AMRNonLinearMultiCompOp::computeDiffusedVar(LevelData<FArrayBox>& a_diffuse
     a_diffusedVar.exchange(a_diffusedVar.interval(), m_exchangeCopier);
     // Stick a corner copier in here too?
     //	const DisjointBoxLayout dbl = a_diffusedVar.disjointBoxLayout();
-    //	CornerCopier cornerCopy(dbl, dbl, m_domain, a_diffusedVar.ghostVect(), true);
-    //	a_calculatedVar.exchange(a_diffusedVar.interval(), cornerCopy);
+    //	CornerCopier cornerCopy(dbl, dbl, m_domain, a_diffusedVar.ghostVect(),
+    //true); 	a_calculatedVar.exchange(a_diffusedVar.interval(), cornerCopy);
   }
-
 }
 //
-void AMRNonLinearMultiCompOp::computeDiffusedVar(FArrayBox& a_diffusedVar,
-                                                 const FArrayBox& a_phi, const DataIndex dit,
+void AMRNonLinearMultiCompOp::computeDiffusedVar(FArrayBox &a_diffusedVar,
+                                                 const FArrayBox &a_phi,
+                                                 const DataIndex dit,
                                                  bool a_homogeneous)
 {
-  // Another attempt to stop solver fails - recalculate solidus/eutectic/liquidus each time
+  // Another attempt to stop solver fails - recalculate
+  // solidus/eutectic/liquidus each time
 
-  FArrayBox& Hs = (*m_enthalpySolidus)[dit];
-  FArrayBox& He = (*m_enthalpyEutectic)[dit];
-  FArrayBox& Hl = (*m_enthalpyLiquidus)[dit];
+  FArrayBox &Hs = (*m_enthalpySolidus)[dit];
+  FArrayBox &He = (*m_enthalpyEutectic)[dit];
+  FArrayBox &Hl = (*m_enthalpyLiquidus)[dit];
 
   Box region = a_diffusedVar.box();
   region &= Hs.box();
 
-  FORT_CALCULATE_BOUNDING_ENERGY( CHF_CONST_FRA(a_phi),
-                       CHF_FRA(Hs),
-                       CHF_FRA(He),
-                       CHF_FRA(Hl),
-                       CHF_BOX(region),
-                       CHF_CONST_REAL(m_params->compositionRatio),
-                       CHF_CONST_REAL(m_params->waterDistributionCoeff),
-                       CHF_CONST_REAL(m_params->specificHeatRatio),
-                       CHF_CONST_REAL(m_params->stefan),
-                       CHF_CONST_REAL(m_params->thetaEutectic),
-                       CHF_CONST_REAL(m_params->ThetaEutectic));
+  FORT_CALCULATE_BOUNDING_ENERGY(
+      CHF_CONST_FRA(a_phi), CHF_FRA(Hs), CHF_FRA(He), CHF_FRA(Hl),
+      CHF_BOX(region), CHF_CONST_REAL(m_params->compositionRatio),
+      CHF_CONST_REAL(m_params->waterDistributionCoeff),
+      CHF_CONST_REAL(m_params->specificHeatRatio),
+      CHF_CONST_REAL(m_params->stefan), CHF_CONST_REAL(m_params->thetaEutectic),
+      CHF_CONST_REAL(m_params->ThetaEutectic));
 
   // Apply BCs to H-C, then compute T, S_l, porosity BC from these values
   // a_phi is const so can't apply BCs here - assume they're already set
-//  m_bc(a_phi, m_domain.domainBox(), m_domain, m_dx, a_homogeneous);
+  //  m_bc(a_phi, m_domain.domainBox(), m_domain, m_dx, a_homogeneous);
 
-  FORT_CALCULATE_T_CL(CHF_FRA(a_diffusedVar),
-                      CHF_CONST_FRA(a_phi),
-                      CHF_CONST_FRA(Hs),
-                      CHF_CONST_FRA(He),
-                      CHF_CONST_FRA(Hl),
-                      CHF_BOX(region),
-                      CHF_CONST_REAL(m_params->compositionRatio),
-                      CHF_CONST_REAL(m_params->waterDistributionCoeff),
-                      CHF_CONST_REAL(m_params->specificHeatRatio),
-                      CHF_CONST_REAL(m_params->stefan),
-                      CHF_CONST_REAL(m_params->thetaEutectic),
-                      CHF_CONST_REAL(m_params->ThetaEutectic));
+  FORT_CALCULATE_T_CL(
+      CHF_FRA(a_diffusedVar), CHF_CONST_FRA(a_phi), CHF_CONST_FRA(Hs),
+      CHF_CONST_FRA(He), CHF_CONST_FRA(Hl), CHF_BOX(region),
+      CHF_CONST_REAL(m_params->compositionRatio),
+      CHF_CONST_REAL(m_params->waterDistributionCoeff),
+      CHF_CONST_REAL(m_params->specificHeatRatio),
+      CHF_CONST_REAL(m_params->stefan), CHF_CONST_REAL(m_params->thetaEutectic),
+      CHF_CONST_REAL(m_params->ThetaEutectic));
 
   if (m_apply_bcs_to_diagnostic_var)
   {
-    m_diffusedVarBC(a_diffusedVar, m_domain.domainBox(), m_domain, m_dx, a_homogeneous);
+    m_diffusedVarBC(a_diffusedVar, m_domain.domainBox(), m_domain, m_dx,
+                    a_homogeneous);
   }
 }
 
-void AMRNonLinearMultiCompOp::residualI(LevelData<FArrayBox>&       a_lhs,
-                                        const LevelData<FArrayBox>& a_phi,
-                                        const LevelData<FArrayBox>& a_rhs,
-                                        bool                        a_homogeneous)
+void AMRNonLinearMultiCompOp::residualI(LevelData<FArrayBox> &a_lhs,
+                                        const LevelData<FArrayBox> &a_phi,
+                                        const LevelData<FArrayBox> &a_rhs,
+                                        bool a_homogeneous)
 {
   CH_TIME("AMRNonLinearMultiCompOp::residualI");
 
-  LevelData<FArrayBox>& phi = (LevelData<FArrayBox>&)a_phi;
-  LevelData<FArrayBox> derivedVar(phi.disjointBoxLayout(), phi.nComp(), phi.ghostVect());
+  LevelData<FArrayBox> &phi = (LevelData<FArrayBox> &)a_phi;
+  LevelData<FArrayBox> derivedVar(phi.disjointBoxLayout(), phi.nComp(),
+                                  phi.ghostVect());
 
   Real dx = m_dx;
-  const DisjointBoxLayout& dbl = a_lhs.disjointBoxLayout();
+  const DisjointBoxLayout &dbl = a_lhs.disjointBoxLayout();
   DataIterator dit = phi.dataIterator();
   {
     CH_TIME("AMRNonLinearMultiCompOp::residualIBC");
@@ -123,17 +120,16 @@ void AMRNonLinearMultiCompOp::residualI(LevelData<FArrayBox>&       a_lhs,
     }
   }
 
-
   phi.exchange(phi.interval(), m_exchangeCopier);
 
   //  computeDiffusedVar(derivedVar, phi, a_homogeneous);
 
   for (dit.begin(); dit.ok(); ++dit)
   {
-    const Box& region = dbl[dit()];
-    const FluxBox& thisBCoef = (*m_bCoef)[dit];
+    const Box &region = dbl[dit()];
+    const FluxBox &thisBCoef = (*m_bCoef)[dit];
 
-    //FArrayBox derivedVar(phi[dit]);
+    // FArrayBox derivedVar(phi[dit]);
     // Is this quicker than the level data version?
     computeDiffusedVar(derivedVar[dit], phi[dit], dit(), a_homogeneous);
 
@@ -147,39 +143,34 @@ void AMRNonLinearMultiCompOp::residualI(LevelData<FArrayBox>&       a_lhs,
 #else
     //		This_will_not_compile!
 #endif
-    (CHF_FRA(a_lhs[dit]),
-     CHF_CONST_FRA(phi[dit]),
-     CHF_CONST_FRA(derivedVar[dit]),
-     CHF_CONST_FRA(a_rhs[dit]),
-     CHF_CONST_REAL(m_alpha),
-     CHF_CONST_FRA((*m_aCoef)[dit]),
-     CHF_CONST_REAL(m_beta),
+        (CHF_FRA(a_lhs[dit]), CHF_CONST_FRA(phi[dit]),
+         CHF_CONST_FRA(derivedVar[dit]), CHF_CONST_FRA(a_rhs[dit]),
+         CHF_CONST_REAL(m_alpha), CHF_CONST_FRA((*m_aCoef)[dit]),
+         CHF_CONST_REAL(m_beta),
 #if CH_SPACEDIM >= 1
-     CHF_CONST_FRA(thisBCoef[0]),
+         CHF_CONST_FRA(thisBCoef[0]),
 #endif
 #if CH_SPACEDIM >= 2
-     CHF_CONST_FRA(thisBCoef[1]),
+         CHF_CONST_FRA(thisBCoef[1]),
 #endif
 #if CH_SPACEDIM >= 3
-     CHF_CONST_FRA(thisBCoef[2]),
+         CHF_CONST_FRA(thisBCoef[2]),
 #endif
 #if CH_SPACEDIM >= 4
-     This_will_not_compile!
+         This_will_not_compile !
 #endif
-     CHF_BOX(region),
-     CHF_CONST_REAL(m_dx));
+         CHF_BOX(region),
+         CHF_CONST_REAL(m_dx));
 
   } // end loop over boxes
-
-
 }
 
 /**************************/
 // this preconditioner first initializes phihat to (IA)phihat = rhshat
 // (diagonization of L -- A is the matrix version of L)
 // then smooths with a couple of passes of levelGSRB
-void AMRNonLinearMultiCompOp::preCond(LevelData<FArrayBox>&       a_phi,
-                                      const LevelData<FArrayBox>& a_rhs)
+void AMRNonLinearMultiCompOp::preCond(LevelData<FArrayBox> &a_phi,
+                                      const LevelData<FArrayBox> &a_rhs)
 {
   CH_TIME("AMRNonLinearMultiCompOp::preCond");
 
@@ -193,7 +184,7 @@ void AMRNonLinearMultiCompOp::preCond(LevelData<FArrayBox>&       a_phi,
   int ncomp = a_phi.nComp();
 
   CH_assert(m_lambda.isDefined());
-  CH_assert(a_rhs.nComp()    == ncomp);
+  CH_assert(a_rhs.nComp() == ncomp);
   CH_assert(m_bCoef->nComp() == ncomp);
 
   // Recompute the relaxation coefficient if needed.
@@ -214,14 +205,17 @@ void AMRNonLinearMultiCompOp::preCond(LevelData<FArrayBox>&       a_phi,
   relax(a_phi, a_rhs, 2);
 }
 
-void AMRNonLinearMultiCompOp::applyOpMg(LevelData<FArrayBox>& a_lhs, LevelData<FArrayBox>& a_phi,
-                                        LevelData<FArrayBox>* a_phiCoarse, bool a_homogeneous)
+void AMRNonLinearMultiCompOp::applyOpMg(LevelData<FArrayBox> &a_lhs,
+                                        LevelData<FArrayBox> &a_phi,
+                                        LevelData<FArrayBox> *a_phiCoarse,
+                                        bool a_homogeneous)
 {
   // Do CF stuff if we have a coarser level that's not just a single grid cell
   if (a_phiCoarse != nullptr)
   {
-    const ProblemDomain& probDomain = a_phiCoarse->disjointBoxLayout().physDomain();
-    const Box& domBox = probDomain.domainBox();
+    const ProblemDomain &probDomain =
+        a_phiCoarse->disjointBoxLayout().physDomain();
+    const Box &domBox = probDomain.domainBox();
     if (domBox.bigEnd() != domBox.smallEnd())
     {
       m_interpWithCoarser.coarseFineInterp(a_phi, *a_phiCoarse);
@@ -231,35 +225,36 @@ void AMRNonLinearMultiCompOp::applyOpMg(LevelData<FArrayBox>& a_lhs, LevelData<F
   applyOpI(a_lhs, a_phi, a_homogeneous);
 }
 
-void AMRNonLinearMultiCompOp::applyOpI(LevelData<FArrayBox>&      a_lhs,
-                                       const LevelData<FArrayBox>& a_phi,
-                                       bool                        a_homogeneous )
+void AMRNonLinearMultiCompOp::applyOpI(LevelData<FArrayBox> &a_lhs,
+                                       const LevelData<FArrayBox> &a_phi,
+                                       bool a_homogeneous)
 {
   CH_TIME("AMRNonLinearMultiCompOp::applyOpI");
-  LevelData<FArrayBox>& phi = (LevelData<FArrayBox>&)a_phi;
+  LevelData<FArrayBox> &phi = (LevelData<FArrayBox> &)a_phi;
   Real dx = m_dx;
-  const DisjointBoxLayout& dbl = a_lhs.disjointBoxLayout();
+  const DisjointBoxLayout &dbl = a_lhs.disjointBoxLayout();
   DataIterator dit = phi.dataIterator();
 
   for (dit.begin(); dit.ok(); ++dit)
   {
-    m_bc(phi[dit], dbl[dit()],m_domain, dx, a_homogeneous);
+    m_bc(phi[dit], dbl[dit()], m_domain, dx, a_homogeneous);
   }
 
   applyOpNoBoundary2(a_lhs, a_phi, a_homogeneous);
 }
 
-void AMRNonLinearMultiCompOp::applyOpNoBoundary2(LevelData<FArrayBox>&      a_lhs,
-                                                 const LevelData<FArrayBox>& a_phi,
-                                                 bool                        a_homogeneous )
+void AMRNonLinearMultiCompOp::applyOpNoBoundary2(
+    LevelData<FArrayBox> &a_lhs, const LevelData<FArrayBox> &a_phi,
+    bool a_homogeneous)
 {
   CH_TIME("AMRNonLinearMultiCompOp::applyOpNoBoundary");
 
-  LevelData<FArrayBox>& phi = (LevelData<FArrayBox>&)a_phi;
+  LevelData<FArrayBox> &phi = (LevelData<FArrayBox> &)a_phi;
 
-  LevelData<FArrayBox> derivedVar(phi.disjointBoxLayout(), phi.nComp(), phi.ghostVect());
+  LevelData<FArrayBox> derivedVar(phi.disjointBoxLayout(), phi.nComp(),
+                                  phi.ghostVect());
 
-  const DisjointBoxLayout& dbl = a_lhs.disjointBoxLayout();
+  const DisjointBoxLayout &dbl = a_lhs.disjointBoxLayout();
   DataIterator dit = phi.dataIterator();
 
   phi.exchange(phi.interval(), m_exchangeCopier);
@@ -268,8 +263,8 @@ void AMRNonLinearMultiCompOp::applyOpNoBoundary2(LevelData<FArrayBox>&      a_lh
 
   for (dit.begin(); dit.ok(); ++dit)
   {
-    const Box& region = dbl[dit()];
-    const FluxBox& thisBCoef = (*m_bCoef)[dit];
+    const Box &region = dbl[dit()];
+    const FluxBox &thisBCoef = (*m_bCoef)[dit];
 
 #if CH_SPACEDIM == 1
     FORT_NLVCCOMPUTEOP1D
@@ -281,42 +276,40 @@ void AMRNonLinearMultiCompOp::applyOpNoBoundary2(LevelData<FArrayBox>&      a_lh
 #else
     //		This_will_not_compile!
 #endif
-    (CHF_FRA(a_lhs[dit]),
-     CHF_CONST_FRA(phi[dit]),
-     CHF_CONST_FRA(derivedVar[dit]),
-     CHF_CONST_REAL(m_alpha),
-     CHF_CONST_FRA((*m_aCoef)[dit]),
-     CHF_CONST_REAL(m_beta),
+        (CHF_FRA(a_lhs[dit]), CHF_CONST_FRA(phi[dit]),
+         CHF_CONST_FRA(derivedVar[dit]), CHF_CONST_REAL(m_alpha),
+         CHF_CONST_FRA((*m_aCoef)[dit]), CHF_CONST_REAL(m_beta),
 #if CH_SPACEDIM >= 1
-     CHF_CONST_FRA(thisBCoef[0]),
+         CHF_CONST_FRA(thisBCoef[0]),
 #endif
 #if CH_SPACEDIM >= 2
-     CHF_CONST_FRA(thisBCoef[1]),
+         CHF_CONST_FRA(thisBCoef[1]),
 #endif
 #if CH_SPACEDIM >= 3
-     CHF_CONST_FRA(thisBCoef[2]),
+         CHF_CONST_FRA(thisBCoef[2]),
 #endif
 #if CH_SPACEDIM >= 4
-     This_will_not_compile!
+         This_will_not_compile !
 #endif
-     CHF_BOX(region),
-     CHF_CONST_REAL(m_dx));
+         CHF_BOX(region),
+         CHF_CONST_REAL(m_dx));
 
-     int temp=0;
+    int temp = 0;
 
   } // end loop over boxes
 }
 
-void AMRNonLinearMultiCompOp::applyOpNoBoundary(LevelData<FArrayBox>&      a_lhs,
-                                                const LevelData<FArrayBox>& a_phi)
+void AMRNonLinearMultiCompOp::applyOpNoBoundary(
+    LevelData<FArrayBox> &a_lhs, const LevelData<FArrayBox> &a_phi)
 {
   CH_TIME("AMRNonLinearMultiCompOp::applyOpNoBoundary");
 
-  LevelData<FArrayBox>& phi = (LevelData<FArrayBox>&)a_phi;
+  LevelData<FArrayBox> &phi = (LevelData<FArrayBox> &)a_phi;
 
-  LevelData<FArrayBox> derivedVar(phi.disjointBoxLayout(), phi.nComp(), phi.ghostVect());
+  LevelData<FArrayBox> derivedVar(phi.disjointBoxLayout(), phi.nComp(),
+                                  phi.ghostVect());
 
-  const DisjointBoxLayout& dbl = a_lhs.disjointBoxLayout();
+  const DisjointBoxLayout &dbl = a_lhs.disjointBoxLayout();
   DataIterator dit = phi.dataIterator();
 
   phi.exchange(phi.interval(), m_exchangeCopier);
@@ -325,8 +318,8 @@ void AMRNonLinearMultiCompOp::applyOpNoBoundary(LevelData<FArrayBox>&      a_lhs
 
   for (dit.begin(); dit.ok(); ++dit)
   {
-    const Box& region = dbl[dit()];
-    const FluxBox& thisBCoef = (*m_bCoef)[dit];
+    const Box &region = dbl[dit()];
+    const FluxBox &thisBCoef = (*m_bCoef)[dit];
 
 #if CH_SPACEDIM == 1
     FORT_NLVCCOMPUTEOP1D
@@ -338,53 +331,49 @@ void AMRNonLinearMultiCompOp::applyOpNoBoundary(LevelData<FArrayBox>&      a_lhs
 #else
     //		This_will_not_compile!
 #endif
-    (CHF_FRA(a_lhs[dit]),
-     CHF_CONST_FRA(phi[dit]),
-     CHF_CONST_FRA(derivedVar[dit]),
-     CHF_CONST_REAL(m_alpha),
-     CHF_CONST_FRA((*m_aCoef)[dit]),
-     CHF_CONST_REAL(m_beta),
+        (CHF_FRA(a_lhs[dit]), CHF_CONST_FRA(phi[dit]),
+         CHF_CONST_FRA(derivedVar[dit]), CHF_CONST_REAL(m_alpha),
+         CHF_CONST_FRA((*m_aCoef)[dit]), CHF_CONST_REAL(m_beta),
 #if CH_SPACEDIM >= 1
-     CHF_CONST_FRA(thisBCoef[0]),
+         CHF_CONST_FRA(thisBCoef[0]),
 #endif
 #if CH_SPACEDIM >= 2
-     CHF_CONST_FRA(thisBCoef[1]),
+         CHF_CONST_FRA(thisBCoef[1]),
 #endif
 #if CH_SPACEDIM >= 3
-     CHF_CONST_FRA(thisBCoef[2]),
+         CHF_CONST_FRA(thisBCoef[2]),
 #endif
 #if CH_SPACEDIM >= 4
-     This_will_not_compile!
+         This_will_not_compile !
 #endif
-     CHF_BOX(region),
-     CHF_CONST_REAL(m_dx));
+         CHF_BOX(region),
+         CHF_CONST_REAL(m_dx));
   } // end loop over boxes
 }
 
 // Re implement here in a slightly different way to AMRPoissonOp
-void AMRNonLinearMultiCompOp::createCoarser(LevelData<FArrayBox>&       a_coarse,
-                                            const LevelData<FArrayBox>& a_fine,
-                                            bool                        a_ghosted)
+void AMRNonLinearMultiCompOp::createCoarser(LevelData<FArrayBox> &a_coarse,
+                                            const LevelData<FArrayBox> &a_fine,
+                                            bool a_ghosted)
 {
   CH_TIME("AMRPoissonOp::createCoarser");
 
   // CH_assert(!a_ghosted);
   IntVect ghost = a_fine.ghostVect();
 
-  const DisjointBoxLayout& fineGrids =  a_fine.disjointBoxLayout();
+  const DisjointBoxLayout &fineGrids = a_fine.disjointBoxLayout();
   DisjointBoxLayout crseGrids;
 
   CH_assert(fineGrids.coarsenable(2));
-  coarsen(crseGrids,fineGrids, 2); //multigrid, so coarsen by 2
+  coarsen(crseGrids, fineGrids, 2); // multigrid, so coarsen by 2
 
   a_coarse.define(crseGrids, a_fine.nComp(), ghost);
 }
 
-void AMRNonLinearMultiCompOp::restrictResidual(LevelData<FArrayBox>& a_resCoarse,
-                                               LevelData<FArrayBox>& a_phiFine,
-                                               const LevelData<FArrayBox>* a_phiCoarse,
-                                               const LevelData<FArrayBox>& a_rhsFine,
-                                               bool homogeneous)
+void AMRNonLinearMultiCompOp::restrictResidual(
+    LevelData<FArrayBox> &a_resCoarse, LevelData<FArrayBox> &a_phiFine,
+    const LevelData<FArrayBox> *a_phiCoarse,
+    const LevelData<FArrayBox> &a_rhsFine, bool homogeneous)
 {
   CH_TIME("AMRNonLinearMultiCompOp::restrictResidual");
 
@@ -401,31 +390,31 @@ void AMRNonLinearMultiCompOp::restrictResidual(LevelData<FArrayBox>& a_resCoarse
     homogeneousCFInterp(a_phiFine);
   }
 
-
-  const DisjointBoxLayout& dblFine = a_phiFine.disjointBoxLayout();
+  const DisjointBoxLayout &dblFine = a_phiFine.disjointBoxLayout();
   for (DataIterator dit = a_phiFine.dataIterator(); dit.ok(); ++dit)
   {
-    FArrayBox& phi = a_phiFine[dit];
+    FArrayBox &phi = a_phiFine[dit];
     m_bc(phi, dblFine[dit()], m_domain, m_dx, homogeneous);
   }
 
   a_phiFine.exchange(a_phiFine.interval(), m_exchangeCopier);
 
-  LevelData<FArrayBox> derivedVar(a_phiFine.disjointBoxLayout(), a_phiFine.nComp(), a_phiFine.ghostVect());
+  LevelData<FArrayBox> derivedVar(a_phiFine.disjointBoxLayout(),
+                                  a_phiFine.nComp(), a_phiFine.ghostVect());
   computeDiffusedVar(derivedVar, a_phiFine, homogeneous);
 
   for (DataIterator dit = a_phiFine.dataIterator(); dit.ok(); ++dit)
   {
-    FArrayBox&       phi = a_phiFine[dit];
-    FArrayBox&       Cl = derivedVar[dit];
-    const FArrayBox& rhs = a_rhsFine[dit];
-    FArrayBox&       res = a_resCoarse[dit];
+    FArrayBox &phi = a_phiFine[dit];
+    FArrayBox &Cl = derivedVar[dit];
+    const FArrayBox &rhs = a_rhsFine[dit];
+    FArrayBox &res = a_resCoarse[dit];
 
-    const FArrayBox& thisACoef = (*m_aCoef)[dit];
-    const FluxBox&   thisBCoef = (*m_bCoef)[dit];
+    const FArrayBox &thisACoef = (*m_aCoef)[dit];
+    const FluxBox &thisBCoef = (*m_bCoef)[dit];
 
     Box region = dblFine.get(dit());
-    const IntVect& iv = region.smallEnd();
+    const IntVect &iv = region.smallEnd();
     IntVect civ = coarsen(iv, 2);
 
     res.setVal(0.0);
@@ -440,113 +429,106 @@ void AMRNonLinearMultiCompOp::restrictResidual(LevelData<FArrayBox>& a_resCoarse
 #else
     //		This_will_not_compile!
 #endif
-    (CHF_FRA_SHIFT(res, civ),
-     CHF_CONST_FRA_SHIFT(phi, iv),
-     CHF_CONST_FRA_SHIFT(Cl, iv),
-     CHF_CONST_FRA_SHIFT(rhs, iv),
-     CHF_CONST_REAL(m_alpha),
-     CHF_CONST_FRA_SHIFT(thisACoef, iv),
-     CHF_CONST_REAL(m_beta),
+        (CHF_FRA_SHIFT(res, civ), CHF_CONST_FRA_SHIFT(phi, iv),
+         CHF_CONST_FRA_SHIFT(Cl, iv), CHF_CONST_FRA_SHIFT(rhs, iv),
+         CHF_CONST_REAL(m_alpha), CHF_CONST_FRA_SHIFT(thisACoef, iv),
+         CHF_CONST_REAL(m_beta),
 #if CH_SPACEDIM >= 1
-     CHF_CONST_FRA_SHIFT(thisBCoef[0], iv),
+         CHF_CONST_FRA_SHIFT(thisBCoef[0], iv),
 #endif
 #if CH_SPACEDIM >= 2
-     CHF_CONST_FRA_SHIFT(thisBCoef[1], iv),
+         CHF_CONST_FRA_SHIFT(thisBCoef[1], iv),
 #endif
 #if CH_SPACEDIM >= 3
-     CHF_CONST_FRA_SHIFT(thisBCoef[2], iv),
+         CHF_CONST_FRA_SHIFT(thisBCoef[2], iv),
 #endif
 #if CH_SPACEDIM >= 4
-     This_will_not_compile!
+         This_will_not_compile !
 #endif
-     CHF_BOX_SHIFT(region, iv),
-     CHF_CONST_REAL(m_dx));
+         CHF_BOX_SHIFT(region, iv),
+         CHF_CONST_REAL(m_dx));
   }
-
 }
 
 // ---------------------------------------------------------
-void AMRNonLinearMultiCompOp::prolongIncrement(LevelData<FArrayBox>&       a_phiThisLevel,
-                                               const LevelData<FArrayBox>& a_correctCoarse)
+void AMRNonLinearMultiCompOp::prolongIncrement(
+    LevelData<FArrayBox> &a_phiThisLevel,
+    const LevelData<FArrayBox> &a_correctCoarse)
 {
   CH_TIME("AMRNonLinearMultiCompOp::prolongIncrement");
 
   DisjointBoxLayout dbl = a_phiThisLevel.disjointBoxLayout();
   DataIterator dit = a_phiThisLevel.dataIterator();
-  int nbox=dit.size();
+  int nbox = dit.size();
 
 #pragma omp parallel
   {
 #pragma omp for
-    for(int ibox = 0; ibox < nbox; ibox++)
+    for (int ibox = 0; ibox < nbox; ibox++)
     {
-      FArrayBox& phi =  a_phiThisLevel[dit[ibox]];
-      const FArrayBox& coarse = a_correctCoarse[dit[ibox]];
+      FArrayBox &phi = a_phiThisLevel[dit[ibox]];
+      const FArrayBox &coarse = a_correctCoarse[dit[ibox]];
       Box region = dbl[dit[ibox]];
-      const IntVect& iv = region.smallEnd();
-      IntVect civ=coarsen(iv, 2);
+      const IntVect &iv = region.smallEnd();
+      IntVect civ = coarsen(iv, 2);
 
       // refinement of two as this is multigrid
       int refinement = 2;
 
-      FORT_PROLONG_2(CHF_FRA_SHIFT(phi, iv),
-                     CHF_CONST_FRA_SHIFT(coarse, civ),
-                     CHF_BOX_SHIFT(region, iv),
-                     CHF_CONST_INT(refinement));
-
-          }
-  }//end pragma
+      FORT_PROLONG_2(CHF_FRA_SHIFT(phi, iv), CHF_CONST_FRA_SHIFT(coarse, civ),
+                     CHF_BOX_SHIFT(region, iv), CHF_CONST_INT(refinement));
+    }
+  } // end pragma
 }
 
-void AMRNonLinearMultiCompOp::restrictResidual(LevelData<FArrayBox>&       a_resCoarse,
-                                               LevelData<FArrayBox>&       a_phiFine,
-                                               const LevelData<FArrayBox>& a_rhsFine)
+void AMRNonLinearMultiCompOp::restrictResidual(
+    LevelData<FArrayBox> &a_resCoarse, LevelData<FArrayBox> &a_phiFine,
+    const LevelData<FArrayBox> &a_rhsFine)
 {
   // default implementation is homogeneous
   restrictResidual(a_resCoarse, a_phiFine, nullptr, a_rhsFine, true);
 }
 
-void AMRNonLinearMultiCompOp::restrictR(LevelData<FArrayBox>& a_phiCoarse,
-                                       const LevelData<FArrayBox>& a_phiFine)
+void AMRNonLinearMultiCompOp::restrictR(LevelData<FArrayBox> &a_phiCoarse,
+                                        const LevelData<FArrayBox> &a_phiFine)
 {
   //	a_phiFine.exchange(a_phiFine.interval(), m_exchangeCopier);
 
-  const DisjointBoxLayout& dblFine = a_phiFine.disjointBoxLayout();
+  const DisjointBoxLayout &dblFine = a_phiFine.disjointBoxLayout();
 
   for (DataIterator dit = a_phiFine.dataIterator(); dit.ok(); ++dit)
   {
-    const FArrayBox&       phiFine = a_phiFine[dit];
-    FArrayBox&       phiCoarse = a_phiCoarse[dit];
+    const FArrayBox &phiFine = a_phiFine[dit];
+    FArrayBox &phiCoarse = a_phiCoarse[dit];
 
     Box region = dblFine.get(dit());
-    const IntVect& iv = region.smallEnd();
+    const IntVect &iv = region.smallEnd();
     IntVect civ = coarsen(iv, 2);
 
     phiCoarse.setVal(0.0);
 
     FORT_RESTRICT(CHF_FRA_SHIFT(phiCoarse, civ),
-                  CHF_CONST_FRA_SHIFT(phiFine, iv),
-                  CHF_BOX_SHIFT(region, iv),
+                  CHF_CONST_FRA_SHIFT(phiFine, iv), CHF_BOX_SHIFT(region, iv),
                   CHF_CONST_REAL(m_dx));
   }
 }
-void AMRNonLinearMultiCompOp::setAlphaAndBeta(const Real& a_alpha,
-                                              const Real& a_beta)
+void AMRNonLinearMultiCompOp::setAlphaAndBeta(const Real &a_alpha,
+                                              const Real &a_beta)
 {
   m_alpha = a_alpha;
-  m_beta  = a_beta;
+  m_beta = a_beta;
 
   // Our relaxation parameter is officially out of date!
   m_lambdaNeedsResetting = true;
 }
 
-void AMRNonLinearMultiCompOp::setCoefs(const RefCountedPtr<LevelData<FArrayBox> >& a_aCoef,
-                                       const RefCountedPtr<LevelData<FluxBox  > >& a_bCoef,
-                                       const Real&                                 a_alpha,
-                                       const Real&                                 a_beta)
+void AMRNonLinearMultiCompOp::setCoefs(
+    const RefCountedPtr<LevelData<FArrayBox>> &a_aCoef,
+    const RefCountedPtr<LevelData<FluxBox>> &a_bCoef, const Real &a_alpha,
+    const Real &a_beta)
 {
   m_alpha = a_alpha;
-  m_beta  = a_beta;
+  m_beta = a_beta;
 
   m_aCoef = a_aCoef;
   m_bCoef = a_bCoef;
@@ -555,22 +537,20 @@ void AMRNonLinearMultiCompOp::setCoefs(const RefCountedPtr<LevelData<FArrayBox> 
   m_lambdaNeedsResetting = true;
 }
 
-
-
 void AMRNonLinearMultiCompOp::resetLambda()
 {
   CH_TIME("AMRNonLinearMultiCompOp::resetLambda");
   if (m_lambdaNeedsResetting)
   {
-    Real scale = 1.0 / (m_dx*m_dx);
+    Real scale = 1.0 / (m_dx * m_dx);
 
     // Compute it box by box, point by point
     for (DataIterator dit = m_lambda.dataIterator(); dit.ok(); ++dit)
     {
-      FArrayBox&       lambdaFab = m_lambda[dit];
-      const FArrayBox& aCoefFab  = (*m_aCoef)[dit];
-      const FluxBox&   bCoefFab  = (*m_bCoef)[dit];
-      const Box& curBox = lambdaFab.box();
+      FArrayBox &lambdaFab = m_lambda[dit];
+      const FArrayBox &aCoefFab = (*m_aCoef)[dit];
+      const FluxBox &bCoefFab = (*m_bCoef)[dit];
+      const Box &curBox = lambdaFab.box();
 
       // Compute the diagonal term
       lambdaFab.copy(aCoefFab);
@@ -578,17 +558,13 @@ void AMRNonLinearMultiCompOp::resetLambda()
 
       for (int dir = 0; dir < SpaceDim; dir++)
       {
-        FORT_SUMFACESNLVC(CHF_FRA(lambdaFab),
-                          CHF_CONST_REAL(m_beta),
-                          CHF_CONST_FRA(bCoefFab[dir]),
-                          CHF_BOX(curBox),
-                          CHF_CONST_INT(dir),
-                          CHF_CONST_REAL(scale));
+        FORT_SUMFACESNLVC(CHF_FRA(lambdaFab), CHF_CONST_REAL(m_beta),
+                          CHF_CONST_FRA(bCoefFab[dir]), CHF_BOX(curBox),
+                          CHF_CONST_INT(dir), CHF_CONST_REAL(scale));
       }
 
       // Take its reciprocal
       lambdaFab.invert(1.0);
-
     }
 
     // Lambda is reset.
@@ -603,15 +579,14 @@ void AMRNonLinearMultiCompOp::computeLambda()
   CH_TIME("AMRNonLinearMultiCompOp::computeLambda");
 
   //	CH_assert(!m_lambda.isDefined());
-  if(m_lambda.isDefined())
+  if (m_lambda.isDefined())
   {
     // Make sure we recalculate it
     m_lambdaNeedsResetting = true;
   }
 
   // Define lambda
-  m_lambda.define(m_aCoef->disjointBoxLayout(),m_aCoef->nComp());
-
+  m_lambda.define(m_aCoef->disjointBoxLayout(), m_aCoef->nComp());
 
   resetLambda();
 }
@@ -623,15 +598,15 @@ void AMRNonLinearMultiCompOp::computeLambda()
 //   in this file.  Brian asked to preserve the old version in this way for
 //   now. - TJL (12/10/2007)
 //
-void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFine,
-                                     const LevelData<FArrayBox>&        a_phi,
-                                     LevelData<FArrayBox>&              a_residual,
-                                     AMRLevelOp<LevelData<FArrayBox> >* a_finerOp)
+void AMRNonLinearMultiCompOp::reflux(
+    const LevelData<FArrayBox> &a_phiFine, const LevelData<FArrayBox> &a_phi,
+    LevelData<FArrayBox> &a_residual,
+    AMRLevelOp<LevelData<FArrayBox>> *a_finerOp)
 {
   CH_TIMERS("AMRNonLinearMultiCompOp::reflux");
 
   m_levfluxreg.setToZero();
-  Interval interv(0,a_phi.nComp()-1);
+  Interval interv(0, a_phi.nComp() - 1);
 
   CH_TIMER("AMRNonLinearMultiCompOp::reflux::incrementCoarse", t2);
   CH_START(t2);
@@ -639,9 +614,9 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
   DataIterator dit = a_phi.dataIterator();
   for (dit.reset(); dit.ok(); ++dit)
   {
-    const FArrayBox& coarfab   = a_phi[dit];
-    const FluxBox&   coarBCoef = (*m_bCoef)[dit];
-    const Box&       gridBox   = a_phi.getBoxes()[dit];
+    const FArrayBox &coarfab = a_phi[dit];
+    const FluxBox &coarBCoef = (*m_bCoef)[dit];
+    const Box &gridBox = a_phi.getBoxes()[dit];
 
     if (m_levfluxreg.hasCF(dit()))
     {
@@ -650,11 +625,11 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
         FArrayBox coarflux;
         Box faceBox = surroundingNodes(gridBox, idir);
 
-        getFlux(coarflux, coarfab, coarBCoef, faceBox,idir, dit());
+        getFlux(coarflux, coarfab, coarBCoef, faceBox, idir, dit());
 
         Real scale = 1.0;
-        m_levfluxreg.incrementCoarse(coarflux, scale,dit(),
-                                     interv, interv, idir);
+        m_levfluxreg.incrementCoarse(coarflux, scale, dit(), interv, interv,
+                                     idir);
       }
     }
   }
@@ -662,10 +637,11 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
   CH_STOP(t2);
 
   // const cast:  OK because we're changing ghost cells only
-  LevelData<FArrayBox>& phiFineRef = ( LevelData<FArrayBox>&)a_phiFine;
+  LevelData<FArrayBox> &phiFineRef = (LevelData<FArrayBox> &)a_phiFine;
 
-  AMRNonLinearMultiCompOp* finerAMRPOp = static_cast<AMRNonLinearMultiCompOp*>(a_finerOp);
-  QuadCFInterp& quadCFI = finerAMRPOp->m_interpWithCoarser;
+  AMRNonLinearMultiCompOp *finerAMRPOp =
+      static_cast<AMRNonLinearMultiCompOp *>(a_finerOp);
+  QuadCFInterp &quadCFI = finerAMRPOp->m_interpWithCoarser;
 
   quadCFI.coarseFineInterp(phiFineRef, a_phi);
   // I'm pretty sure this is not necessary. bvs -- flux calculations use
@@ -677,33 +653,34 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
   CH_START(t3);
 
   DataIterator ditf = a_phiFine.dataIterator();
-  const DisjointBoxLayout& dblFine = a_phiFine.disjointBoxLayout();
+  const DisjointBoxLayout &dblFine = a_phiFine.disjointBoxLayout();
   for (ditf.reset(); ditf.ok(); ++ditf)
   {
-    const FArrayBox& phifFab   = a_phiFine[ditf];
-    const FluxBox&   fineBCoef = (*(finerAMRPOp->m_bCoef))[ditf];
-    const Box&       gridbox   = dblFine.get(ditf());
+    const FArrayBox &phifFab = a_phiFine[ditf];
+    const FluxBox &fineBCoef = (*(finerAMRPOp->m_bCoef))[ditf];
+    const Box &gridbox = dblFine.get(ditf());
 
     for (int idir = 0; idir < SpaceDim; idir++)
     {
-      //int normalGhost = phiGhost[idir];
+      // int normalGhost = phiGhost[idir];
       SideIterator sit;
       for (sit.begin(); sit.ok(); sit.next())
       {
         if (m_levfluxreg.hasCF(ditf(), sit()))
         {
           Side::LoHiSide hiorlo = sit();
-          Box fluxBox = bdryBox(gridbox,idir,hiorlo,1);
+          Box fluxBox = bdryBox(gridbox, idir, hiorlo, 1);
 
-          FArrayBox fineflux(fluxBox,ncomps);
-          //          getFlux(fineflux, phifFab, fineBCoef, fluxBox, idir, ditf(),
+          FArrayBox fineflux(fluxBox, ncomps);
+          //          getFlux(fineflux, phifFab, fineBCoef, fluxBox, idir,
+          //          ditf(),
           //                  m_refToFiner);
-          finerAMRPOp->getFlux(fineflux, phifFab, fineBCoef, fluxBox, idir, ditf(),
-                               m_refToFiner);
+          finerAMRPOp->getFlux(fineflux, phifFab, fineBCoef, fluxBox, idir,
+                               ditf(), m_refToFiner);
 
           Real scale = 1.0;
-          m_levfluxreg.incrementFine(fineflux, scale, ditf(),
-                                     interv, interv, idir, hiorlo);
+          m_levfluxreg.incrementFine(fineflux, scale, ditf(), interv, interv,
+                                     idir, hiorlo);
         }
       }
     }
@@ -711,66 +688,65 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
 
   CH_STOP(t3);
 
-  Real scale = 1.0/m_dx;
+  Real scale = 1.0 / m_dx;
   m_levfluxreg.reflux(a_residual, scale);
 }
 
 #else
 
-void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFine,
-                                     const LevelData<FArrayBox>&        a_phi,
-                                     LevelData<FArrayBox>&              a_residual,
-                                     AMRLevelOp<LevelData<FArrayBox> >* a_finerOp)
+void AMRNonLinearMultiCompOp::reflux(
+    const LevelData<FArrayBox> &a_phiFine, const LevelData<FArrayBox> &a_phi,
+    LevelData<FArrayBox> &a_residual,
+    AMRLevelOp<LevelData<FArrayBox>> *a_finerOp)
 {
   CH_TIME("AMRNonLinearMultiCompOp::reflux");
 
   int ncomp = 1;
   ProblemDomain fineDomain = refine(m_domain, m_refToFiner);
   LevelFluxRegister levfluxreg(a_phiFine.disjointBoxLayout(),
-                               a_phi.disjointBoxLayout(),
-                               fineDomain,
-                               m_refToFiner,
-                               ncomp);
+                               a_phi.disjointBoxLayout(), fineDomain,
+                               m_refToFiner, ncomp);
 
   levfluxreg.setToZero();
-  Interval interv(0,a_phi.nComp()-1);
+  Interval interv(0, a_phi.nComp() - 1);
 
   DataIterator dit = a_phi.dataIterator();
   for (dit.reset(); dit.ok(); ++dit)
   {
-    const FArrayBox& coarfab = a_phi[dit];
-    const FluxBox& coarBCoef  = (*m_bCoef)[dit];
-    const Box& gridBox = a_phi.getBoxes()[dit];
+    const FArrayBox &coarfab = a_phi[dit];
+    const FluxBox &coarBCoef = (*m_bCoef)[dit];
+    const Box &gridBox = a_phi.getBoxes()[dit];
 
     for (int idir = 0; idir < SpaceDim; idir++)
     {
       FArrayBox coarflux;
       Box faceBox = surroundingNodes(gridBox, idir);
-      getFlux(coarflux, coarfab, coarBCoef , faceBox,  idir, dit());
+      getFlux(coarflux, coarfab, coarBCoef, faceBox, idir, dit());
 
       Real scale = 1.0;
-      levfluxreg.incrementCoarse(coarflux, scale,dit(),
-                                 interv,interv,idir);
+      levfluxreg.incrementCoarse(coarflux, scale, dit(), interv, interv, idir);
     }
   }
-  LevelData<FArrayBox>& p = ( LevelData<FArrayBox>&)a_phiFine;
+  LevelData<FArrayBox> &p = (LevelData<FArrayBox> &)a_phiFine;
 
   // has to be its own object because the finer operator
   // owns an interpolator and we have no way of getting to it
-  AMRNonLinearMultiCompOp* finerAMRPOp = static_cast<AMRNonLinearMultiCompOp*> (a_finerOp);
-  QuadCFInterp& quadCFI = finerAMRPOp->m_interpWithCoarser;
+  AMRNonLinearMultiCompOp *finerAMRPOp =
+      static_cast<AMRNonLinearMultiCompOp *>(a_finerOp);
+  QuadCFInterp &quadCFI = finerAMRPOp->m_interpWithCoarser;
 
   quadCFI.coarseFineInterp(p, a_phi);
-  // p.exchange(a_phiFine.interval()); // BVS is pretty sure this is not necesary.
+  // p.exchange(a_phiFine.interval()); // BVS is pretty sure this is not
+  // necesary.
   IntVect phiGhost = p.ghostVect();
 
   DataIterator ditf = a_phiFine.dataIterator();
-  const  DisjointBoxLayout& dblFine = a_phiFine.disjointBoxLayout();
+  const DisjointBoxLayout &dblFine = a_phiFine.disjointBoxLayout();
   for (ditf.reset(); ditf.ok(); ++ditf)
   {
-    const FArrayBox& phifFab = a_phiFine[ditf];
-    const FluxBox& fineBCoef  = (*(finerAMRPOp->m_bCoef))[ditf];
-    const Box& gridbox = dblFine.get(ditf());
+    const FArrayBox &phifFab = a_phiFine[ditf];
+    const FluxBox &fineBCoef = (*(finerAMRPOp->m_bCoef))[ditf];
+    const Box &gridbox = dblFine.get(ditf());
     for (int idir = 0; idir < SpaceDim; idir++)
     {
       int normalGhost = phiGhost[idir];
@@ -790,20 +766,20 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
         // (dfm 8-4-06)
         if (sit() == Side::Lo)
         {
-          fabbox = adjCellLo(gridbox,idir, 2*normalGhost);
+          fabbox = adjCellLo(gridbox, idir, 2 * normalGhost);
           fabbox.shift(idir, 1);
-          facebox = bdryLo(gridbox, idir,1);
+          facebox = bdryLo(gridbox, idir, 1);
         }
         else
         {
-          fabbox = adjCellHi(gridbox,idir, 2*normalGhost);
+          fabbox = adjCellHi(gridbox, idir, 2 * normalGhost);
           fabbox.shift(idir, -1);
           facebox = bdryHi(gridbox, idir, 1);
         }
 
         // just in case we need ghost cells in the transverse direction
         // (dfm 8-4-06)
-        for (int otherDir=0; otherDir<SpaceDim; ++otherDir)
+        for (int otherDir = 0; otherDir < SpaceDim; ++otherDir)
         {
           if (otherDir != idir)
           {
@@ -816,29 +792,28 @@ void AMRNonLinearMultiCompOp::reflux(const LevelData<FArrayBox>&        a_phiFin
         phifab.copy(phifFab);
 
         FArrayBox fineflux;
-        getFlux(fineflux, phifab, fineBCoef, facebox,  idir, ditf(),
+        getFlux(fineflux, phifab, fineBCoef, facebox, idir, ditf(),
                 m_refToFiner);
 
         Real scale = 1.0;
-        levfluxreg.incrementFine(fineflux, scale, ditf(),
-                                 interv, interv, idir, hiorlo);
+        levfluxreg.incrementFine(fineflux, scale, ditf(), interv, interv, idir,
+                                 hiorlo);
       }
     }
   }
 
-  Real scale =  1.0/m_dx;
+  Real scale = 1.0 / m_dx;
   levfluxreg.reflux(a_residual, scale);
 }
 
 #endif
 
-
 /*
  * Computes a_phi = a_phi - lambda*(op(a_phi) - rhs)
  * where op(phi) = alpha*a*phi - beta*div(b*grad(phi))
  */
-void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
-                                        const LevelData<FArrayBox>& a_rhs)
+void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox> &a_phi,
+                                        const LevelData<FArrayBox> &a_rhs)
 {
   CH_TIME("AMRNonLinearMultiCompOp::levelGSRB");
 
@@ -851,7 +826,7 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
   CH_assert(phiGhostVect >= IntVect::Unit);
   CH_assert(nComp == a_rhs.nComp());
 
-  const DisjointBoxLayout& dbl = a_phi.disjointBoxLayout();
+  const DisjointBoxLayout &dbl = a_phi.disjointBoxLayout();
 
   // This define is possibly taking an awfully long time
   // However I don't think there's a quicker way.
@@ -859,7 +834,7 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
   LevelData<FArrayBox> derivedVar;
   {
     CH_TIME("AMRNonLinearMultiCompOp::derivedVarDefine");
-    derivedVar.define(dbl, nComp,phiGhostVect);
+    derivedVar.define(dbl, nComp, phiGhostVect);
   }
 
   DataIterator dit = a_phi.dataIterator();
@@ -882,7 +857,8 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
 
       // fill in intersection of ghostcells and a_phi's boxes
       // if we're not super optimised always fill ghost cells.
-      // if we are super optimised, only do this on first pass (this is dodgy but saves some time)
+      // if we are super optimised, only do this on first pass (this is dodgy
+      // but saves some time)
       if (!m_superOptimised || whichPass == 0)
       {
         {
@@ -896,12 +872,11 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
         {
           CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::exchange");
           if (s_exchangeMode == 0)
-            a_phi.exchange( a_phi.interval(), m_exchangeCopier );
+            a_phi.exchange(a_phi.interval(), m_exchangeCopier);
           else if (s_exchangeMode == 1)
             a_phi.exchangeNoOverlap(m_exchangeCopier);
           else
             MayDay::Abort("exchangeMode");
-
         }
       }
 
@@ -911,35 +886,32 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
       {
         for (dit.begin(); dit.ok(); ++dit)
         {
-          const Box& region = dbl.get(dit());
-          const FluxBox& thisBCoef  = (*m_bCoef)[dit];
-          FArrayBox& thisPhi = a_phi[dit];
-          FArrayBox& thisDerivedVar = derivedVar[dit];
-
+          const Box &region = dbl.get(dit());
+          const FluxBox &thisBCoef = (*m_bCoef)[dit];
+          FArrayBox &thisPhi = a_phi[dit];
+          FArrayBox &thisDerivedVar = derivedVar[dit];
 
           {
             CH_TIME("AMRNonLinearMultiCompOp::levelGSRB::BCs");
             m_bc(thisPhi, region, m_domain, m_dx, homogeneous);
-//            m_bc(thisPhi, region., m_domain, m_dx, homogeneous);
+            //            m_bc(thisPhi, region., m_domain, m_dx, homogeneous);
           }
-//        }
-//
-//        a_phi.exchange(a_phi.interval(), m_exchangeCopier);
-//
-//        for (dit.begin(); dit.ok(); ++dit)
-//                {
-//                  const Box& region = dbl.get(dit());
-//                  const FluxBox& thisBCoef  = (*m_bCoef)[dit];
-//                  FArrayBox& thisPhi = a_phi[dit];
-//                  FArrayBox& thisDerivedVar = derivedVar[dit];
-
-
+          //        }
+          //
+          //        a_phi.exchange(a_phi.interval(), m_exchangeCopier);
+          //
+          //        for (dit.begin(); dit.ok(); ++dit)
+          //                {
+          //                  const Box& region = dbl.get(dit());
+          //                  const FluxBox& thisBCoef  = (*m_bCoef)[dit];
+          //                  FArrayBox& thisPhi = a_phi[dit];
+          //                  FArrayBox& thisDerivedVar = derivedVar[dit];
 
           // Need to do this every pass or convergence is very slow
-//          if (!m_superOptimised || whichPass == 0)
-//          {
-            computeDiffusedVar(thisDerivedVar, thisPhi, dit(), homogeneous);
-//          }
+          //          if (!m_superOptimised || whichPass == 0)
+          //          {
+          computeDiffusedVar(thisDerivedVar, thisPhi, dit(), homogeneous);
+          //          }
 
 #if CH_SPACEDIM == 1
           FORT_NONLINEARSMOOTHING1D
@@ -950,49 +922,41 @@ void AMRNonLinearMultiCompOp::levelGSRB(LevelData<FArrayBox>&       a_phi,
 #else
           //				This_will_not_compile!
 #endif
-          (CHF_FRA(thisPhi),
-           CHF_FRA(thisDerivedVar),
-           CHF_CONST_FRA(a_rhs[dit]),
-           CHF_BOX(region),
-           CHF_CONST_REAL(m_dx),
-           CHF_CONST_REAL(m_alpha),
-           CHF_CONST_FRA((*m_aCoef)[dit]),
-           CHF_CONST_REAL(m_beta),
+              (CHF_FRA(thisPhi), CHF_FRA(thisDerivedVar),
+               CHF_CONST_FRA(a_rhs[dit]), CHF_BOX(region), CHF_CONST_REAL(m_dx),
+               CHF_CONST_REAL(m_alpha), CHF_CONST_FRA((*m_aCoef)[dit]),
+               CHF_CONST_REAL(m_beta),
 #if CH_SPACEDIM >= 1
-           CHF_CONST_FRA(thisBCoef[0]),
+               CHF_CONST_FRA(thisBCoef[0]),
 #endif
 #if CH_SPACEDIM >= 2
-           CHF_CONST_FRA(thisBCoef[1]),
+               CHF_CONST_FRA(thisBCoef[1]),
 #endif
 #if CH_SPACEDIM >= 3
-           CHF_CONST_FRA(thisBCoef[2]),
+               CHF_CONST_FRA(thisBCoef[2]),
 #endif
 #if CH_SPACEDIM >= 4
-           This_will_not_compile!
+               This_will_not_compile !
 #endif
-           CHF_CONST_FRA(m_lambda[dit]),
-           CHF_CONST_INT(whichPass),
-           CHF_CONST_INT(whichComponent));
-
+               CHF_CONST_FRA(m_lambda[dit]),
+               CHF_CONST_INT(whichPass), CHF_CONST_INT(whichComponent));
 
         } // end loop through grids
-
       }
     } // end loop through red-black
 
   } // end loop over components
-
 }
 
-void AMRNonLinearMultiCompOp::levelMultiColor(LevelData<FArrayBox>&       a_phi,
-                                              const LevelData<FArrayBox>& a_rhs)
+void AMRNonLinearMultiCompOp::levelMultiColor(
+    LevelData<FArrayBox> &a_phi, const LevelData<FArrayBox> &a_rhs)
 {
   CH_TIME("AMRNonLinearMultiCompOp::levelMultiColor");
   MayDay::Abort("AMRNonLinearMultiCompOp::levelMultiColor - Not implemented");
 }
 
-void AMRNonLinearMultiCompOp::looseGSRB(LevelData<FArrayBox>&       a_phi,
-                                        const LevelData<FArrayBox>& a_rhs)
+void AMRNonLinearMultiCompOp::looseGSRB(LevelData<FArrayBox> &a_phi,
+                                        const LevelData<FArrayBox> &a_rhs)
 {
   CH_TIME("AMRNonLinearMultiCompOp::looseGSRB");
 #if 1
@@ -1008,7 +972,7 @@ void AMRNonLinearMultiCompOp::looseGSRB(LevelData<FArrayBox>&       a_phi,
   // Recompute the relaxation coefficient if needed.
   resetLambda();
 
-  const DisjointBoxLayout& dbl = a_phi.disjointBoxLayout();
+  const DisjointBoxLayout &dbl = a_phi.disjointBoxLayout();
 
   DataIterator dit = a_phi.dataIterator();
 
@@ -1032,8 +996,8 @@ void AMRNonLinearMultiCompOp::looseGSRB(LevelData<FArrayBox>&       a_phi,
       m_bc(a_phi[dit], dbl[dit()], m_domain, m_dx, true);
     }
 
-    const Box& region = dbl.get(dit());
-    const FluxBox& thisBCoef  = (*m_bCoef)[dit];
+    const Box &region = dbl.get(dit());
+    const FluxBox &thisBCoef = (*m_bCoef)[dit];
 
     int whichPass = 0;
 
@@ -1044,29 +1008,25 @@ void AMRNonLinearMultiCompOp::looseGSRB(LevelData<FArrayBox>&       a_phi,
 #elif CH_SPACEDIM == 3
     FORT_GSRBHELMHOLTZVC3D
 #else
-    This_will_not_compile!
+    This_will_not_compile !
 #endif
-    (CHF_FRA(a_phi[dit]),
-        CHF_CONST_FRA(a_rhs[dit]),
-        CHF_BOX(region),
-        CHF_CONST_REAL(m_dx),
-        CHF_CONST_REAL(m_alpha),
-        CHF_CONST_FRA((*m_aCoef)[dit]),
-        CHF_CONST_REAL(m_beta),
+        (CHF_FRA(a_phi[dit]), CHF_CONST_FRA(a_rhs[dit]), CHF_BOX(region),
+         CHF_CONST_REAL(m_dx), CHF_CONST_REAL(m_alpha),
+         CHF_CONST_FRA((*m_aCoef)[dit]), CHF_CONST_REAL(m_beta),
 #if CH_SPACEDIM >= 1
-        CHF_CONST_FRA(thisBCoef[0]),
+         CHF_CONST_FRA(thisBCoef[0]),
 #endif
 #if CH_SPACEDIM >= 2
-        CHF_CONST_FRA(thisBCoef[1]),
+         CHF_CONST_FRA(thisBCoef[1]),
 #endif
 #if CH_SPACEDIM >= 3
-        CHF_CONST_FRA(thisBCoef[2]),
+         CHF_CONST_FRA(thisBCoef[2]),
 #endif
 #if CH_SPACEDIM >= 4
-        This_will_not_compile!
+         This_will_not_compile !
 #endif
-        CHF_CONST_FRA(m_lambda[dit]),
-        CHF_CONST_INT(whichPass));
+         CHF_CONST_FRA(m_lambda[dit]),
+         CHF_CONST_INT(whichPass));
 
     whichPass = 1;
 
@@ -1077,49 +1037,45 @@ void AMRNonLinearMultiCompOp::looseGSRB(LevelData<FArrayBox>&       a_phi,
 #elif CH_SPACEDIM == 3
     FORT_GSRBHELMHOLTZVC3D
 #else
-    This_will_not_compile!
+    This_will_not_compile !
 #endif
-    (CHF_FRA(a_phi[dit]),
-        CHF_CONST_FRA(a_rhs[dit]),
-        CHF_BOX(region),
-        CHF_CONST_REAL(m_dx),
-        CHF_CONST_REAL(m_alpha),
-        CHF_CONST_FRA((*m_aCoef)[dit]),
-        CHF_CONST_REAL(m_beta),
+        (CHF_FRA(a_phi[dit]), CHF_CONST_FRA(a_rhs[dit]), CHF_BOX(region),
+         CHF_CONST_REAL(m_dx), CHF_CONST_REAL(m_alpha),
+         CHF_CONST_FRA((*m_aCoef)[dit]), CHF_CONST_REAL(m_beta),
 #if CH_SPACEDIM >= 1
-        CHF_CONST_FRA(thisBCoef[0]),
+         CHF_CONST_FRA(thisBCoef[0]),
 #endif
 #if CH_SPACEDIM >= 2
-        CHF_CONST_FRA(thisBCoef[1]),
+         CHF_CONST_FRA(thisBCoef[1]),
 #endif
 #if CH_SPACEDIM >= 3
-        CHF_CONST_FRA(thisBCoef[2]),
+         CHF_CONST_FRA(thisBCoef[2]),
 #endif
 #if CH_SPACEDIM >= 4
-        This_will_not_compile!
+         This_will_not_compile !
 #endif
-        CHF_CONST_FRA(m_lambda[dit]),
-        CHF_CONST_INT(whichPass));
+         CHF_CONST_FRA(m_lambda[dit]),
+         CHF_CONST_INT(whichPass));
   } // end loop through grids
 #endif
 }
 
-void AMRNonLinearMultiCompOp::overlapGSRB(LevelData<FArrayBox>&       a_phi,
-                                          const LevelData<FArrayBox>& a_rhs)
+void AMRNonLinearMultiCompOp::overlapGSRB(LevelData<FArrayBox> &a_phi,
+                                          const LevelData<FArrayBox> &a_rhs)
 {
   CH_TIME("AMRNonLinearMultiCompOp::overlapGSRB");
   MayDay::Abort("AMRNonLinearMultiCompOp::overlapGSRB - Not implemented");
 }
 
-void AMRNonLinearMultiCompOp::levelGSRBLazy(LevelData<FArrayBox>&       a_phi,
-                                            const LevelData<FArrayBox>& a_rhs)
+void AMRNonLinearMultiCompOp::levelGSRBLazy(LevelData<FArrayBox> &a_phi,
+                                            const LevelData<FArrayBox> &a_rhs)
 {
   CH_TIME("AMRNonLinearMultiCompOp::levelGSRBLazy");
   MayDay::Abort("AMRNonLinearMultiCompOp::levelGSRBLazy - Not implemented");
 }
 
-void AMRNonLinearMultiCompOp::levelJacobi(LevelData<FArrayBox>&       a_phi,
-                                          const LevelData<FArrayBox>& a_rhs)
+void AMRNonLinearMultiCompOp::levelJacobi(LevelData<FArrayBox> &a_phi,
+                                          const LevelData<FArrayBox> &a_rhs)
 {
   CH_TIME("AMRNonLinearMultiCompOp::levelJacobi");
 
@@ -1129,7 +1085,7 @@ void AMRNonLinearMultiCompOp::levelJacobi(LevelData<FArrayBox>&       a_phi,
   create(resid, a_rhs);
 
   // Get the residual
-  residual(resid,a_phi,a_rhs,false);
+  residual(resid, a_phi, a_rhs, false);
 
   // Multiply by the weights
   DataIterator dit = m_lambda.dataIterator();
@@ -1144,18 +1100,16 @@ void AMRNonLinearMultiCompOp::levelJacobi(LevelData<FArrayBox>&       a_phi,
   incr(a_phi, resid, weight);
 }
 
-void AMRNonLinearMultiCompOp::getFlux(FArrayBox&       a_flux,
-                                      const FArrayBox& a_data,
-                                      const FluxBox&   a_bCoef,
-                                      const Box&       a_facebox,
-                                      int              a_dir,
-                                      const DataIndex&  a_dit,
-                                      int              a_ref) const
+void AMRNonLinearMultiCompOp::getFlux(FArrayBox &a_flux,
+                                      const FArrayBox &a_data,
+                                      const FluxBox &a_bCoef,
+                                      const Box &a_facebox, int a_dir,
+                                      const DataIndex &a_dit, int a_ref) const
 {
   CH_TIME("AMRNonLinearMultiCompOp::getFlux");
 
   CH_assert(a_dir >= 0);
-  CH_assert(a_dir <  SpaceDim);
+  CH_assert(a_dir < SpaceDim);
   CH_assert(!a_data.box().isEmpty());
   CH_assert(!a_facebox.isEmpty());
 
@@ -1165,7 +1119,7 @@ void AMRNonLinearMultiCompOp::getFlux(FArrayBox&       a_flux,
   faceTestBox.surroundingNodes(a_dir);
   CH_assert(a_facebox.type() == faceTestBox.type());
 
-  const FArrayBox& bCoefDir = a_bCoef[a_dir];
+  const FArrayBox &bCoefDir = a_bCoef[a_dir];
 
   // reality check for bCoef
   CH_assert(bCoefDir.box().contains(a_facebox));
@@ -1176,16 +1130,17 @@ void AMRNonLinearMultiCompOp::getFlux(FArrayBox&       a_flux,
   Real scale = m_beta * a_ref / m_dx;
 
   // a_data is Enthalpy, Bulk Concentration etc.
-  // need to convert this to temperature, liquid concentration to calculate diffusive flux
+  // need to convert this to temperature, liquid concentration to calculate
+  // diffusive flux
   FArrayBox derivedVar(a_data.box(), a_data.nComp());
 
-  AMRNonLinearMultiCompOp* op = const_cast<AMRNonLinearMultiCompOp*> (this);
+  AMRNonLinearMultiCompOp *op = const_cast<AMRNonLinearMultiCompOp *>(this);
   op->computeDiffusedVar(derivedVar, a_data, a_dit);
 
   // const FArrayBox& diffusedVar = a_data;
-  FArrayBox& diffusedVar = derivedVar;// should be this, but it isn't working?
+  FArrayBox &diffusedVar = derivedVar; // should be this, but it isn't working?
 
-  for ( bit.begin(); bit.ok(); bit.next())
+  for (bit.begin(); bit.ok(); bit.next())
   {
     IntVect iv = bit();
     IntVect shiftiv = BASISV(a_dir);
@@ -1197,19 +1152,17 @@ void AMRNonLinearMultiCompOp::getFlux(FArrayBox&       a_flux,
 
     for (int ivar = 0; ivar < a_data.nComp(); ivar++)
     {
-      Real phihi = diffusedVar(ivhi,ivar);
-      Real philo = diffusedVar(ivlo,ivar);
-      Real gradphi = (phihi - philo ) * scale;
+      Real phihi = diffusedVar(ivhi, ivar);
+      Real philo = diffusedVar(ivlo, ivar);
+      Real gradphi = (phihi - philo) * scale;
 
-      a_flux(iv,ivar) = -bCoefDir(iv, ivar) * gradphi;
+      a_flux(iv, ivar) = -bCoefDir(iv, ivar) * gradphi;
     }
   }
 }
 
 //-----------------------------------------------------------------------
-void
-AMRNonLinearMultiCompOp::
-setTime(Real a_time)
+void AMRNonLinearMultiCompOp::setTime(Real a_time)
 {
   // Jot down the time.
   m_time = a_time;
@@ -1237,31 +1190,25 @@ setTime(Real a_time)
 //-----------------------------------------------------------------------
 
 // Factory
-AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory() : m_coefficient_average_type(0),
-    m_apply_bcs_to_diagnostic_var(true), m_alpha(-1), m_beta(-1),
-    m_params(nullptr), m_relaxMode(1), m_FAS(true), m_numComp(2), m_superOptimised(false)
+AMRNonLinearMultiCompOpFactory::AMRNonLinearMultiCompOpFactory()
+    : m_coefficient_average_type(0), m_apply_bcs_to_diagnostic_var(true),
+      m_alpha(-1), m_beta(-1), m_params(nullptr), m_relaxMode(1), m_FAS(true),
+      m_numComp(2), m_superOptimised(false)
 {
   setDefaultValues();
 }
 
-
-void AMRNonLinearMultiCompOpFactory::define(const ProblemDomain& a_coarseDomain,
-                                            const Vector<DisjointBoxLayout>&               a_grids,
-                                            const Vector<int>&                             a_refRatios,
-                                            const Real&                                    a_coarsedx,
-                                            BCHolder                                       a_bc,
-                                            const Real&                                    a_alpha,
-                                            Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_aCoef,
-                                            const Real&                                    a_beta,
-                                            Vector<RefCountedPtr<LevelData<FluxBox> > >&   a_bCoef,
-                                            Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_enthalpySolidus,
-                                            Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_enthalpyLiquidus,
-                                            Vector<RefCountedPtr<LevelData<FArrayBox> > >& a_enthalpyEutectic,
-                                            MushyLayerParams*			   a_params,
-                                            BCHolder  a_derivedVarBC,
-                                            int a_relaxMode,
-                                            EdgeVelBCHolder a_porosityEdgeBC,
-                                            bool a_apply_bcs_to_diagnostic_var)
+void AMRNonLinearMultiCompOpFactory::define(
+    const ProblemDomain &a_coarseDomain,
+    const Vector<DisjointBoxLayout> &a_grids, const Vector<int> &a_refRatios,
+    const Real &a_coarsedx, BCHolder a_bc, const Real &a_alpha,
+    Vector<RefCountedPtr<LevelData<FArrayBox>>> &a_aCoef, const Real &a_beta,
+    Vector<RefCountedPtr<LevelData<FluxBox>>> &a_bCoef,
+    Vector<RefCountedPtr<LevelData<FArrayBox>>> &a_enthalpySolidus,
+    Vector<RefCountedPtr<LevelData<FArrayBox>>> &a_enthalpyLiquidus,
+    Vector<RefCountedPtr<LevelData<FArrayBox>>> &a_enthalpyEutectic,
+    MushyLayerParams *a_params, BCHolder a_derivedVarBC, int a_relaxMode,
+    EdgeVelBCHolder a_porosityEdgeBC, bool a_apply_bcs_to_diagnostic_var)
 {
   CH_TIME("AMRNonLinearMultiCompOpFactory::define");
 
@@ -1293,10 +1240,10 @@ void AMRNonLinearMultiCompOpFactory::define(const ProblemDomain& a_coarseDomain,
 
   for (int i = 1; i < a_grids.size(); i++)
   {
-    m_dx[i] = m_dx[i-1] / m_refRatios[i-1];
+    m_dx[i] = m_dx[i - 1] / m_refRatios[i - 1];
 
-    m_domains[i] = m_domains[i-1];
-    m_domains[i].refine(m_refRatios[i-1]);
+    m_domains[i] = m_domains[i - 1];
+    m_domains[i].refine(m_refRatios[i - 1]);
 
     m_exchangeCopiers[i].exchangeDefine(a_grids[i], IntVect::Unit);
     m_exchangeCopiers[i].trimEdges(a_grids[i], IntVect::Unit);
@@ -1307,7 +1254,7 @@ void AMRNonLinearMultiCompOpFactory::define(const ProblemDomain& a_coarseDomain,
   m_alpha = a_alpha;
   m_aCoef = a_aCoef;
 
-  m_beta  = a_beta;
+  m_beta = a_beta;
   m_bCoef = a_bCoef;
 
   m_enthalpySolidus = a_enthalpySolidus;
@@ -1324,7 +1271,6 @@ void AMRNonLinearMultiCompOpFactory::define(const ProblemDomain& a_coarseDomain,
   m_numComp = m_bCoef[0]->nComp();
 
   m_superOptimised = false;
-
 }
 
 void AMRNonLinearMultiCompOpFactory::setSuperOptimised(bool a_val)
@@ -1332,17 +1278,13 @@ void AMRNonLinearMultiCompOpFactory::setSuperOptimised(bool a_val)
   m_superOptimised = a_val;
 }
 
-void AMRNonLinearMultiCompOpFactory::setBC(BCHolder& a_bc)
-{
-  m_bc = a_bc;
-}
-
+void AMRNonLinearMultiCompOpFactory::setBC(BCHolder &a_bc) { m_bc = a_bc; }
 
 //-----------------------------------------------------------------------
 
-MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const ProblemDomain& a_indexSpace,
-                                                                          int                  a_depth,
-                                                                          bool                 a_homoOnly)
+MGLevelOp<LevelData<FArrayBox>> *
+AMRNonLinearMultiCompOpFactory::MGnewOp(const ProblemDomain &a_indexSpace,
+                                        int a_depth, bool a_homoOnly)
 {
   CH_TIME("AMRNonLinearMultiCompOpFactory::MGnewOp");
 
@@ -1358,11 +1300,11 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
     }
   }
 
-  CH_assert(ref !=  m_domains.size()); // didn't find domain
+  CH_assert(ref != m_domains.size()); // didn't find domain
 
   if (ref > 0)
   {
-    dxCrse = m_dx[ref-1];
+    dxCrse = m_dx[ref - 1];
   }
 
   ProblemDomain domain(m_domains[ref]);
@@ -1375,7 +1317,9 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
     domain.coarsen(2);
   }
 
-  if (coarsening > 1 && !m_boxes[ref].coarsenable(coarsening*AMRNonLinearMultiCompOp::s_maxCoarse))
+  if (coarsening > 1 &&
+      !m_boxes[ref].coarsenable(coarsening *
+                                AMRNonLinearMultiCompOp::s_maxCoarse))
   {
     return nullptr;
   }
@@ -1389,11 +1333,11 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
   // ref = 0 means no amr refinement (starting from amr level 0)
   if (ref > 0)
   {
-    // This assumes that the ref ratio from this level n to the coarser level n-1 is the same
-    // as that from level n-1 to n-2
-    if (m_boxes[ref-1].coarsenable(coarsening))
+    // This assumes that the ref ratio from this level n to the coarser level
+    // n-1 is the same as that from level n-1 to n-2
+    if (m_boxes[ref - 1].coarsenable(coarsening))
     {
-      coarsen_dbl(layoutCrse, m_boxes[ref-1], coarsening);
+      coarsen_dbl(layoutCrse, m_boxes[ref - 1], coarsening);
     }
     else
     {
@@ -1410,38 +1354,33 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
     cfregion.coarsen(coarsening);
   }
 
-
-  AMRNonLinearMultiCompOp* newOp = new AMRNonLinearMultiCompOp;
+  AMRNonLinearMultiCompOp *newOp = new AMRNonLinearMultiCompOp;
 
   // Can we just do AMR define with a coarse level?
   int refRatio = 2; // default MG refinement
-  if (ref-1 < m_refRatios.size())
+  if (ref - 1 < m_refRatios.size())
   {
-    refRatio = m_refRatios[ref-1]; // AMR refinement if defined, else default back to MG
+    refRatio =
+        m_refRatios[ref -
+                    1]; // AMR refinement if defined, else default back to MG
   }
-
 
   // ref > 0 means we've done AMR coarsening i.e. there are coarser amr levels
   if (ref > 0)
   {
-    newOp->define(layout, layoutCrse, dx,
-                  refRatio,
-                  domain, m_bc,
-                  ex, cfregion, m_numComp);
+    newOp->define(layout, layoutCrse, dx, refRatio, domain, m_bc, ex, cfregion,
+                  m_numComp);
   }
   else
   {
     // no coarse level define
     newOp->define(layout, dx, domain, m_bc, ex, cfregion);
-
   }
-
 
   // Now need to generate correctly coarsened data on this level
 
-
   newOp->m_alpha = m_alpha;
-  newOp->m_beta  = m_beta;
+  newOp->m_beta = m_beta;
 
   newOp->m_params = m_params;
 
@@ -1458,11 +1397,11 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
   RefCountedPtr<CoefficientInterpolatorLinear> aCoefInterpolator;
   RefCountedPtr<CoefficientInterpolatorLinearFace> bCoefInterpolator;
 
-  aCoefInterpolator = RefCountedPtr<CoefficientInterpolatorLinear>
-  (new CoefficientInterpolatorLinear);
+  aCoefInterpolator = RefCountedPtr<CoefficientInterpolatorLinear>(
+      new CoefficientInterpolatorLinear);
 
-  bCoefInterpolator = RefCountedPtr<CoefficientInterpolatorLinearFace>
-  (new CoefficientInterpolatorLinearFace);
+  bCoefInterpolator = RefCountedPtr<CoefficientInterpolatorLinearFace>(
+      new CoefficientInterpolatorLinearFace);
 
   newOp->setACoefInterpolator(aCoefInterpolator);
   newOp->setBCoefInterpolator(bCoefInterpolator);
@@ -1477,69 +1416,73 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
     newOp->m_enthalpyLiquidus = m_enthalpyLiquidus[ref];
     newOp->m_enthalpyEutectic = m_enthalpyEutectic[ref];
 
-
-
     //    if ()
-
   }
   else
   {
     // need to coarsen coefficients
-    RefCountedPtr<LevelData<FArrayBox> > aCoef( new LevelData<FArrayBox> );
-    RefCountedPtr<LevelData<FluxBox> > bCoef( new LevelData<FluxBox> );
-    RefCountedPtr<LevelData<FArrayBox> > enthalpy( new LevelData<FArrayBox> );
-    RefCountedPtr<LevelData<FArrayBox> > enthalpySolidus( new LevelData<FArrayBox> );
-    RefCountedPtr<LevelData<FArrayBox> > enthalpyLiquidus( new LevelData<FArrayBox> );
-    RefCountedPtr<LevelData<FArrayBox> > enthalpyEutectic( new LevelData<FArrayBox> );
-
+    RefCountedPtr<LevelData<FArrayBox>> aCoef(new LevelData<FArrayBox>);
+    RefCountedPtr<LevelData<FluxBox>> bCoef(new LevelData<FluxBox>);
+    RefCountedPtr<LevelData<FArrayBox>> enthalpy(new LevelData<FArrayBox>);
+    RefCountedPtr<LevelData<FArrayBox>> enthalpySolidus(
+        new LevelData<FArrayBox>);
+    RefCountedPtr<LevelData<FArrayBox>> enthalpyLiquidus(
+        new LevelData<FArrayBox>);
+    RefCountedPtr<LevelData<FArrayBox>> enthalpyEutectic(
+        new LevelData<FArrayBox>);
 
     aCoef->define(layout, m_aCoef[ref]->nComp(), m_aCoef[ref]->ghostVect());
 
-    enthalpySolidus->define(layout, m_enthalpySolidus[ref]->nComp(), m_enthalpySolidus[ref]->ghostVect());
-    enthalpyLiquidus->define(layout, m_enthalpyLiquidus[ref]->nComp(), m_enthalpyLiquidus[ref]->ghostVect());
-    enthalpyEutectic->define(layout, m_enthalpyEutectic[ref]->nComp(), m_enthalpyEutectic[ref]->ghostVect());
+    enthalpySolidus->define(layout, m_enthalpySolidus[ref]->nComp(),
+                            m_enthalpySolidus[ref]->ghostVect());
+    enthalpyLiquidus->define(layout, m_enthalpyLiquidus[ref]->nComp(),
+                             m_enthalpyLiquidus[ref]->ghostVect());
+    enthalpyEutectic->define(layout, m_enthalpyEutectic[ref]->nComp(),
+                             m_enthalpyEutectic[ref]->ghostVect());
 
     bCoef->define(layout, m_bCoef[ref]->nComp(), m_bCoef[ref]->ghostVect());
-
 
     // average coefficients to coarser level
     // for now, do this with a CoarseAverage --
     // may want to switch to harmonic averaging at some point
-    CoarseAverage averager(m_aCoef[ref]->getBoxes(),
-                           layout, aCoef->nComp(), coarsening);
+    CoarseAverage averager(m_aCoef[ref]->getBoxes(), layout, aCoef->nComp(),
+                           coarsening);
 
     /// Different number of components for these
-    CoarseAverage averagerBoundingEnergies(m_aCoef[ref]->getBoxes(),
-                               layout, enthalpySolidus->nComp(), coarsening);
+    CoarseAverage averagerBoundingEnergies(
+        m_aCoef[ref]->getBoxes(), layout, enthalpySolidus->nComp(), coarsening);
 
-    CoarseAverageFace faceAverager(m_bCoef[ref]->getBoxes(),
-                                   bCoef->nComp(), coarsening);
+    CoarseAverageFace faceAverager(m_bCoef[ref]->getBoxes(), bCoef->nComp(),
+                                   coarsening);
 
     if (m_coefficient_average_type == CoarseAverage::arithmetic)
     {
       averager.averageToCoarse(*aCoef, *(m_aCoef[ref]));
       faceAverager.averageToCoarse(*bCoef, *(m_bCoef[ref]));
 
-      averagerBoundingEnergies.averageToCoarse(*enthalpySolidus, *(m_enthalpySolidus[ref]));
-      averagerBoundingEnergies.averageToCoarse(*enthalpyLiquidus, *(m_enthalpyLiquidus[ref]));
-      averagerBoundingEnergies.averageToCoarse(*enthalpyEutectic, *(m_enthalpyEutectic[ref]));
-
-
-
+      averagerBoundingEnergies.averageToCoarse(*enthalpySolidus,
+                                               *(m_enthalpySolidus[ref]));
+      averagerBoundingEnergies.averageToCoarse(*enthalpyLiquidus,
+                                               *(m_enthalpyLiquidus[ref]));
+      averagerBoundingEnergies.averageToCoarse(*enthalpyEutectic,
+                                               *(m_enthalpyEutectic[ref]));
     }
     else if (m_coefficient_average_type == CoarseAverage::harmonic)
     {
       averager.averageToCoarseHarmonic(*aCoef, *(m_aCoef[ref]));
       faceAverager.averageToCoarseHarmonic(*bCoef, *(m_bCoef[ref]));
 
-      averagerBoundingEnergies.averageToCoarseHarmonic(*enthalpySolidus, *(m_enthalpySolidus[ref]));
-      averagerBoundingEnergies.averageToCoarseHarmonic(*enthalpyLiquidus, *(m_enthalpyLiquidus[ref]));
-      averagerBoundingEnergies.averageToCoarseHarmonic(*enthalpyEutectic, *(m_enthalpyEutectic[ref]));
-
+      averagerBoundingEnergies.averageToCoarseHarmonic(
+          *enthalpySolidus, *(m_enthalpySolidus[ref]));
+      averagerBoundingEnergies.averageToCoarseHarmonic(
+          *enthalpyLiquidus, *(m_enthalpyLiquidus[ref]));
+      averagerBoundingEnergies.averageToCoarseHarmonic(
+          *enthalpyEutectic, *(m_enthalpyEutectic[ref]));
     }
     else
     {
-      MayDay::Abort("AMRNonLinearMultiCompOpFactory::MGNewOp -- bad averagetype");
+      MayDay::Abort(
+          "AMRNonLinearMultiCompOpFactory::MGNewOp -- bad averagetype");
     }
 
     newOp->m_aCoef = aCoef;
@@ -1548,35 +1491,29 @@ MGLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::MGnewOp(const 
     newOp->m_enthalpySolidus = enthalpySolidus;
     newOp->m_enthalpyLiquidus = enthalpyLiquidus;
     newOp->m_enthalpyEutectic = enthalpyEutectic;
-
-
   }
 
   newOp->computeLambda();
 
-
   newOp->m_dxCrse = dxCrse;
 
-
-
-  return (MGLevelOp<LevelData<FArrayBox> >*)newOp;
-
-
-
+  return (MGLevelOp<LevelData<FArrayBox>> *)newOp;
 }
 
-AMRLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::AMRnewOp(const ProblemDomain& a_indexSpace)
+AMRLevelOp<LevelData<FArrayBox>> *
+AMRNonLinearMultiCompOpFactory::AMRnewOp(const ProblemDomain &a_indexSpace)
 {
   CH_TIME("AMRNonLinearMultiCompOpFactory::AMRnewOp");
 
-  //	MayDay::Error("Haven't properly edited AMRNonLinearMultiCompOpFactory::AMRnewOp yet");
+  //	MayDay::Error("Haven't properly edited
+  //AMRNonLinearMultiCompOpFactory::AMRnewOp yet");
 
-  AMRNonLinearMultiCompOp* newOp = new AMRNonLinearMultiCompOp;
+  AMRNonLinearMultiCompOp *newOp = new AMRNonLinearMultiCompOp;
   Real dxCrse = -1.0;
 
   int ref;
 
-  for (ref = 0; ref< m_domains.size(); ref++)
+  for (ref = 0; ref < m_domains.size(); ref++)
   {
     if (a_indexSpace.domainBox() == m_domains[ref].domainBox())
     {
@@ -1590,49 +1527,44 @@ AMRLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::AMRnewOp(cons
     if (m_domains.size() == 1)
     {
       // no finer level
-      newOp->define(m_boxes[0], m_dx[0],
-                    a_indexSpace, m_bc,
+      newOp->define(m_boxes[0], m_dx[0], a_indexSpace, m_bc,
                     m_exchangeCopiers[0], m_cfregion[0]);
     }
     else
     {
       // finer level exists but no coarser
-      int dummyRat = 1;  // argument so compiler can find right function
+      int dummyRat = 1;                // argument so compiler can find right function
       int refToFiner = m_refRatios[0]; // actual refinement ratio
-      newOp->define(m_boxes[0],  m_boxes[1], m_dx[0],
-                    dummyRat, refToFiner,
-                    a_indexSpace, m_bc,
-                    m_exchangeCopiers[0], m_cfregion[0]);
+      newOp->define(m_boxes[0], m_boxes[1], m_dx[0], dummyRat, refToFiner,
+                    a_indexSpace, m_bc, m_exchangeCopiers[0], m_cfregion[0]);
     }
   }
-  else if (ref ==  m_domains.size()-1)
+  else if (ref == m_domains.size() - 1)
   {
-    dxCrse = m_dx[ref-1];
+    dxCrse = m_dx[ref - 1];
 
     // finest AMR level
-    newOp->define(m_boxes[ref], m_boxes[ref-1], m_dx[ref],
-                  m_refRatios[ref-1],
-                  a_indexSpace, m_bc,
+    newOp->define(m_boxes[ref], m_boxes[ref - 1], m_dx[ref],
+                  m_refRatios[ref - 1], a_indexSpace, m_bc,
                   m_exchangeCopiers[ref], m_cfregion[ref], m_numComp);
   }
-  else if ( ref == m_domains.size())
+  else if (ref == m_domains.size())
   {
-    MayDay::Abort("Did not find a domain to match AMRnewOp(const ProblemDomain& a_indexSpace)");
-
+    MayDay::Abort("Did not find a domain to match AMRnewOp(const "
+                  "ProblemDomain& a_indexSpace)");
   }
   else
   {
-    dxCrse = m_dx[ref-1];
+    dxCrse = m_dx[ref - 1];
 
     // intermediate AMR level, full define
-    newOp->define(m_boxes[ref], m_boxes[ref+1], m_boxes[ref-1], m_dx[ref],
-                  m_refRatios[ref-1], m_refRatios[ref],
-                  a_indexSpace, m_bc,
+    newOp->define(m_boxes[ref], m_boxes[ref + 1], m_boxes[ref - 1], m_dx[ref],
+                  m_refRatios[ref - 1], m_refRatios[ref], a_indexSpace, m_bc,
                   m_exchangeCopiers[ref], m_cfregion[ref], m_numComp);
   }
 
   newOp->m_alpha = m_alpha;
-  newOp->m_beta  = m_beta;
+  newOp->m_beta = m_beta;
 
   newOp->m_aCoef = m_aCoef[ref];
   newOp->m_bCoef = m_bCoef[ref];
@@ -1646,7 +1578,8 @@ AMRLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::AMRnewOp(cons
   newOp->m_diffusedVarBC = m_diffusedVarBC;
   newOp->m_apply_bcs_to_diagnostic_var = m_apply_bcs_to_diagnostic_var;
   //  newOp->m_computeEnthalpyVars =m_computeEnthalpyVars;
-  //  (newOp->m_computeEnthalpyVars).define(m_computeEnthalpyVars.m_derivedVar, a_indexSpace, m_dx[ref], m_computeEnthalpyVars.m_derivedVarBC);
+  //  (newOp->m_computeEnthalpyVars).define(m_computeEnthalpyVars.m_derivedVar,
+  //  a_indexSpace, m_dx[ref], m_computeEnthalpyVars.m_derivedVarBC);
   //  newOp->m_porosityEdgeBC = m_porosityEdgeBC;
 
   newOp->m_superOptimised = m_superOptimised;
@@ -1659,10 +1592,11 @@ AMRLevelOp<LevelData<FArrayBox> >* AMRNonLinearMultiCompOpFactory::AMRnewOp(cons
 
   newOp->s_relaxMode = m_relaxMode; // 4 is for jacobi, 1 is for GSRB
 
-  return (AMRLevelOp<LevelData<FArrayBox> >*)newOp;
+  return (AMRLevelOp<LevelData<FArrayBox>> *)newOp;
 }
 
-int AMRNonLinearMultiCompOpFactory::refToFiner(const ProblemDomain& a_domain) const
+int AMRNonLinearMultiCompOpFactory::refToFiner(
+    const ProblemDomain &a_domain) const
 {
   int retval = -1;
   bool found = false;
@@ -1700,33 +1634,34 @@ void AMRNonLinearMultiCompOpFactory::setDefaultValues()
 //-----------------------------------------------------------------------
 
 //-----------------------------------------------------------------------
-void
-AMRNonLinearMultiCompOp::
-finerOperatorChanged(const MGLevelOp<LevelData<FArrayBox> >& a_operator,
-                     int a_coarseningFactor)
+void AMRNonLinearMultiCompOp::finerOperatorChanged(
+    const MGLevelOp<LevelData<FArrayBox>> &a_operator, int a_coarseningFactor)
 {
-  const AMRNonLinearMultiCompOp& op =
-      dynamic_cast<const AMRNonLinearMultiCompOp&>(a_operator);
+  const AMRNonLinearMultiCompOp &op =
+      dynamic_cast<const AMRNonLinearMultiCompOp &>(a_operator);
 
-  MayDay::Error("Haven't properly edited AMRNonLinearMultiCompOp::finerOperatorChanged yet");
+  MayDay::Error("Haven't properly edited "
+                "AMRNonLinearMultiCompOp::finerOperatorChanged yet");
 
   // Perform multigrid coarsening on the operator data.
-  LevelData<FArrayBox>& acoefCoar = *m_aCoef;
-  const LevelData<FArrayBox>& acoefFine = *(op.m_aCoef);
-  LevelData<FluxBox>& bcoefCoar = *m_bCoef;
-  const LevelData<FluxBox>& bcoefFine = *(op.m_bCoef);
+  LevelData<FArrayBox> &acoefCoar = *m_aCoef;
+  const LevelData<FArrayBox> &acoefFine = *(op.m_aCoef);
+  LevelData<FluxBox> &bcoefCoar = *m_bCoef;
+  const LevelData<FluxBox> &bcoefFine = *(op.m_bCoef);
   if (a_coarseningFactor != 1)
   {
     CoarseAverage cellAverage(acoefFine.disjointBoxLayout(),
-                              acoefCoar.disjointBoxLayout(),
-                              1, a_coarseningFactor);
-    for (DataIterator dit = acoefCoar.disjointBoxLayout().dataIterator(); dit.ok(); ++dit)
+                              acoefCoar.disjointBoxLayout(), 1,
+                              a_coarseningFactor);
+    for (DataIterator dit = acoefCoar.disjointBoxLayout().dataIterator();
+         dit.ok(); ++dit)
       acoefCoar[dit()].setVal(0.);
     cellAverage.averageToCoarse(acoefCoar, acoefFine);
 
-    CoarseAverageFace faceAverage(bcoefFine.disjointBoxLayout(),
-                                  1, a_coarseningFactor);
-    for (DataIterator dit = bcoefCoar.disjointBoxLayout().dataIterator(); dit.ok(); ++dit)
+    CoarseAverageFace faceAverage(bcoefFine.disjointBoxLayout(), 1,
+                                  a_coarseningFactor);
+    for (DataIterator dit = bcoefCoar.disjointBoxLayout().dataIterator();
+         dit.ok(); ++dit)
       bcoefCoar[dit()].setVal(0.);
     faceAverage.averageToCoarse(bcoefCoar, bcoefFine);
   }
@@ -1744,4 +1679,3 @@ finerOperatorChanged(const MGLevelOp<LevelData<FArrayBox> >& a_operator,
 //-----------------------------------------------------------------------
 
 #include "NamespaceFooter.H"
-

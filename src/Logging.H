@@ -7,6 +7,9 @@
  * FUNCTION: s_verbosity >= 3 (logs when we enter various functions)
  * DEBUG EXTRA: s_verbosity >= 4 even more debug logging, lots and lots of output
 **/
+
+#include "parstream.H"
+
 #ifndef LOG
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

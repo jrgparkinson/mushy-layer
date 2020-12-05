@@ -616,25 +616,20 @@ public:
 
               if (bcType == PhysBCUtil::FixedTemperature || bcType == PhysBCUtil::TemperatureFlux || bcType == PhysBCUtil::TemperatureFluxRadiation)
               {
-//                CH_assert(a_state.nComp() == 2);
-
                 if (a_state.nComp() == 1)
                 {
                   int a_comp = 0;
-                  // if for some reason we only have one component, just apply extrapolation bcs to a_state
 
+                  // if for some reason we only have one component, just apply extrapolation bcs to a_state
                   ExtraBC(a_state, a_valid,
                                       idir, side, order, a_comp);
 
                 }
                 else
                 {
-
                   // This is a special case
-
                   int Hcomp = 0;
                   int Ccomp = 1;
-
 
                   CH_TIME("BCFunctions::TemperatureBC");
                   int isign = sign(side);
@@ -668,11 +663,7 @@ public:
                       T_ref = m_params.m_bc_bTref.getBC(idir, side);
 
                       break;
-
                     default:
-
-                      //MayDay::Error("Unknown bcType specified");
-
                       break;
                   }
 
@@ -745,10 +736,7 @@ public:
                       // Set boundary value as required
                       // This could be more accurate for flux BCs, maybe fix later
                       a_state(ivto, comp) = 2*bcVal - a_state(iv_interior, comp);
-
-
                     }
-                    // if (bcType == PhysBCUtil::TemperatureFlux || bcType == PhysBCUtil::TemperatureFluxRadiation)
                     else
                     {
                       CH_TIME("BCFunctions::TemperatureFluxBC");
@@ -765,13 +753,11 @@ public:
                         {
                           // no flux below z = some value (0.75) for now
   //                        bcVal = 0.0;
-
                           // No flux boundaries are easy:
                           a_state(ivto, comp) = a_state(iv_interior, comp);
                         }
                         else
                         {
-
                           CH_TIME("BCFunctions::FixedTempBC::nonlinearsolve");
 
                           // Compute BC valute to satisfy some boundary condition whose residual is computed by the residual object.
@@ -793,39 +779,23 @@ public:
                       }
                       else
                       {
-
                         MayDay::Error("Can't apply temperature bcs to bulk concentration yet");
-
                       }
-
-
                     } // end if temperature flux condition
-
-
-
                   } // end loop over box
-
                   // Clean up memory
                   delete residual;
-
-
                 }
-
-
               }
               else if (bcType == PhysBCUtil::MixedBCTemperatureSalinity)
               {
 
                   // This is a special case
-
                   int Tcomp = 0;
                   int Slcomp = 1;
 
-
                   CH_TIME("BCFunctions::MixedTemperatureSalinityBC");
                   int isign = sign(side);
-
-                  //                                  NonlinearTemperatureBC* residual;
 
                   // default values
                   Real a = 0.0, b=0.0, T_ref=0.0, no_flux_position_limit=0.0, flux=0.0;
@@ -856,16 +826,12 @@ public:
                     {
                       a_state(ivto, Slcomp) = a_state(iv_interior, Slcomp);
                     }
-
                   }
-
-
               }
 
               else
               {
-              // All other BCs (e.g. dirichlet, neumann) are applied here.
-
+                // All other BCs (e.g. dirichlet, neumann) are applied here.
                 applyCorrectScalarBC(a_state,
                                      m_advVel,
                                      a_valid,
@@ -1446,8 +1412,7 @@ public:
     if (m_comp >= 0)
     {
       const Box& domainBox = a_domain.domainBox();
-      //			PhysBCUtil bcInfo(m_params); // sets BCs from ParmParse table
-
+      
       FArrayBox aliasStateFab(m_interval, a_state);
 
       // aliasStateFab only has 1 component, in index 0
@@ -2414,7 +2379,6 @@ public:
     if (m_isDefined)
     {
       const Box& domainBox = a_domain.domainBox();
-      //			PhysBCUtil bcInfo(m_params); // sets BCs from ParmParse table
       RefCountedPtr<ConstValueFunction>
       zeroFunc(new ConstValueFunction(0.0, a_state.nComp()));
 
@@ -2429,17 +2393,12 @@ public:
             if (a_valid.sideEnd(side)[idir] ==
                 domainBox.sideEnd(side)[idir])
             {
-              //							int bctype = bcInfo.getBC(idir, side);
+
               int bctype = m_params.getVelBCType(idir, side);
               switch(bctype)
               {
-                //                case PhysBCUtil::Inflow :
-                //                case PhysBCUtil::Outflow :
-                //                case PhysBCUtil::VelInflowOutflow :
-                //                case PhysBCUtil::OutflowNormal :
                 case PhysBCUtil::SolidWall :
                 case PhysBCUtil::noShear :
-                  //                case PhysBCUtil::VelInflowPlume :
                 case PhysBCUtil::Symmetry :
                 {
                   NeumBC(a_state, a_valid, a_dx,
@@ -2716,7 +2675,6 @@ public:
     if (m_isDefined)
     {
       const Box& domainBox = a_domain.domainBox();
-      // PhysBCUtil bcInfo(m_params); // sets BCs from ParmParse table
 
       for (int idir = 0; idir < SpaceDim; idir++)
       {
@@ -2824,7 +2782,6 @@ public:
       int comp = 0;
 
       const Box& domainBox = a_domain.domainBox();
-      //      PhysBCUtil bcInfo(m_params); // sets BCs from ParmParse table
 
       for (int idir = 0; idir < SpaceDim; idir++)
       {

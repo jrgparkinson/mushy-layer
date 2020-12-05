@@ -9,24 +9,21 @@
  */
 #endif
 
-
-
 #include "MushyLayerSubcycleUtils.H"
-#include "ParmParse.H"
 #include "CoarseAverage.H"
+#include "ParmParse.H"
 #include "computeNorm.H"
 #include "mushyLayerOpt.h"
 
 #include "NamespaceHeader.H"
 
-void
-getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
+void getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory> &a_fact)
 {
   CH_TIME("getAMRFactory");
 
   // First, check for deprecated options
-  // These are no longer read in, but used to be, so the user might be expecting some behaviour
-  // which they won't get - we better warn them about this.
+  // These are no longer read in, but used to be, so the user might be expecting
+  // some behaviour which they won't get - we better warn them about this.
 
   ParmParse pp;
   Vector<string> old_options;
@@ -56,8 +53,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   old_options.push_back(string("main.skipTrickySourceTime"));
   old_options.push_back(string("main.iter_plot_interval"));
 
-
-  for (int i=0; i< old_options.size(); i++)
+  for (int i = 0; i < old_options.size(); i++)
   {
     string option = old_options[i];
     if (pp.contains(option))
@@ -87,7 +83,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   params.getParameters();
 
   opt.cfl = 0.5;
-  ppMain.query("cfl",opt.cfl);
+  ppMain.query("cfl", opt.cfl);
 
   opt.min_time = 0;
   ppMain.query("min_time", opt.min_time);
@@ -112,36 +108,36 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.ignoreVelocitySteadyState = !params.isDarcyBrinkman();
   ppMain.query("ignoreVelocitySteadyState", opt.ignoreVelocitySteadyState);
 
-  opt.ignoreBulkConcSteadyState=false;
-  ppMain.query("ignoreBulkConcentrationSteadyState", opt.ignoreBulkConcSteadyState);
+  opt.ignoreBulkConcSteadyState = false;
+  ppMain.query("ignoreBulkConcentrationSteadyState",
+               opt.ignoreBulkConcSteadyState);
 
   // This is really the domain width, not length,
   // but changing it in the inputs files would be a right pain
   // at this point
   opt.domainWidth = -1;
-  ppMain.query("domain_length", opt.domainWidth); // retained for backward compatability
+  ppMain.query("domain_length",
+               opt.domainWidth); // retained for backward compatability
   ppMain.query("domain_width", opt.domainWidth);
 
   std::vector<int> num_cells; // (num_read_levels,1);
-  ppMain.getarr("num_cells",num_cells,0,SpaceDim);
+  ppMain.getarr("num_cells", num_cells, 0, SpaceDim);
 
   if (ppMain.contains("domain_height"))
   {
     ppMain.query("domain_height", opt.domainHeight);
-    opt.domainWidth = opt.domainHeight*num_cells[0]/num_cells[SpaceDim-1];
-
+    opt.domainWidth = opt.domainHeight * num_cells[0] / num_cells[SpaceDim - 1];
   }
   else
   {
     // compute domainHeight from domainWidth
-    opt.domainHeight = opt.domainWidth*num_cells[SpaceDim-1]/num_cells[0];
+    opt.domainHeight = opt.domainWidth * num_cells[SpaceDim - 1] / num_cells[0];
   }
 
   if (opt.domainWidth <= 0)
   {
     MayDay::Error("No domain width specified, or domain width is invalid");
   }
-
 
   opt.verbosity = 1;
   ppMain.query("verbosity", opt.verbosity);
@@ -188,21 +184,21 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   // Decides whether or not we solve for inertial terms in the momentum equation
   opt.doEulerPart = true;
   ppMain.query("doEuler", opt.doEulerPart);
-  ppMain.query("includeInertialTerms", opt.doEulerPart); // extra option with clearer name
+  ppMain.query("includeInertialTerms",
+               opt.doEulerPart); // extra option with clearer name
 
   opt.doScalarAdvectionDiffusion = true;
   ppMain.query("doScalarAdvectionDiffusion", opt.doScalarAdvectionDiffusion);
 
-  int advectionMethod =  velocityAdvectionTypes::m_porosityOutsideAdvection;
+  int advectionMethod = velocityAdvectionTypes::m_porosityOutsideAdvection;
   ppMain.query("advectionMethod", advectionMethod);
   opt.advectionMethod = velocityAdvectionTypes(advectionMethod);
 
-//  opt.skipTrickySourceTerm = -1;
-//  ppMain.query("skipTrickySourceTime", opt.skipTrickySourceTerm);
+  //  opt.skipTrickySourceTerm = -1;
+  //  ppMain.query("skipTrickySourceTime", opt.skipTrickySourceTerm);
 
   opt.allowMulticompAdvection = true;
   ppMain.query("allowMulticompAdvection", opt.allowMulticompAdvection);
-
 
   opt.scaleP_MAC = true;
   ppMain.query("scalePwithChi", opt.scaleP_MAC);
@@ -221,8 +217,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.usePiAdvectionBCs = true;
   ppProjection.query("usePiAdvectionBCs", opt.usePiAdvectionBCs);
 
-//  opt.explicitDarcyTerm = false;
-//  ppMain.query("explicitDarcyTerm", opt.explicitDarcyTerm);
+  //  opt.explicitDarcyTerm = false;
+  //  ppMain.query("explicitDarcyTerm", opt.explicitDarcyTerm);
 
   opt.solidPorosity = 0.05;
   ppMain.query("solidPorosity", opt.solidPorosity);
@@ -236,14 +232,15 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.ccVelPorosityLimit = opt.solidPorosity;
   ppMain.query("ccvel_porosity_cap", opt.ccVelPorosityLimit);
 
-  opt.advVelsrcChiLimit = opt.solidPorosity; //1e-10
+  opt.advVelsrcChiLimit = opt.solidPorosity; // 1e-10
   ppMain.query("advVelSrcChiLimit", opt.advVelsrcChiLimit);
 
-  opt.advVelChiLimit = min(pow(10,5)*opt.lowerPorosityLimit, pow(10,-10)) ; //was 1e-10
+  opt.advVelChiLimit =
+      min(pow(10, 5) * opt.lowerPorosityLimit, pow(10, -10)); // was 1e-10
   ppMain.query("advPorosityLimit", opt.advVelChiLimit);
 
   // by default make this tiny (so essentially turned off)
-  opt.uDelU_porosityLimit = 10*opt.lowerPorosityLimit; //1e-15;
+  opt.uDelU_porosityLimit = 10 * opt.lowerPorosityLimit; // 1e-15;
   ppMain.query("uDelu_porosity", opt.uDelU_porosityLimit);
 
   opt.lapVelBCOrder = 0;
@@ -263,9 +260,9 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("correctAnalyticVel", opt.projectAnalyticVel);
 
   opt.analyticVelType = params.physicalProblem;
-  ppMain.query ("analyticVelType", opt.analyticVelType);
+  ppMain.query("analyticVelType", opt.analyticVelType);
 
-  opt.initAnalyticVel=false;
+  opt.initAnalyticVel = false;
   ppMain.query("initAnalyticVel", opt.initAnalyticVel);
 
   opt.useOldAdvVel = false;
@@ -284,7 +281,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppAdvsrc.query("viscous", opt.advVelViscousSrc);
   ppAdvsrc.query("buoyancy", opt.advVelBuoyancySrc);
 
-
   opt.uDeluMethod = 0;
   ppMain.query("uDeluMethod", opt.uDeluMethod);
 
@@ -300,8 +296,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppCCSrc.query("advection", opt.CCAdvSrc);
 
   // This line must come after quering explicit Darcy Term
-//  opt.CCDarcySrc = opt.explicitDarcyTerm;
-//  ppCCSrc.query("darcy", opt.CCDarcySrc);
+  //  opt.CCDarcySrc = opt.explicitDarcyTerm;
+  //  ppCCSrc.query("darcy", opt.CCDarcySrc);
 
   opt.CCPressureSrcOverride = false;
   opt.CCPressureSrc = true;
@@ -311,15 +307,14 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
     ppCCSrc.get("pressure", opt.CCPressureSrc);
   }
 
-
   opt.CCBuoyancySrc = true;
   ppCCSrc.query("buoyancy", opt.CCBuoyancySrc);
 
   opt.spongeHeight = 0.0;
   ppMain.query("spongeHeight", opt.spongeHeight);
 
-//  opt.postTraceSmoothing = 0.0; // default is no smoothing
-//  ppMain.query("postTraceSmoothing", opt.postTraceSmoothing);
+  //  opt.postTraceSmoothing = 0.0; // default is no smoothing
+  //  ppMain.query("postTraceSmoothing", opt.postTraceSmoothing);
 
   opt.rampBuoyancy = 0.0;
   ppParams.query("rampBuoyancy", opt.rampBuoyancy);
@@ -327,39 +322,39 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.maxRaC = 0.0;
   opt.maxRaT = 0.0;
 
-   ppParams.query("maxRaT", opt.maxRaT);
-   ppParams.query("maxRaC", opt.maxRaC);
+  ppParams.query("maxRaT", opt.maxRaT);
+  ppParams.query("maxRaC", opt.maxRaC);
 
-   opt.initRaC = 0;
-   opt.initRaT = 0;
-   ppParams.query("initRaT", opt.initRaT);
-   ppParams.query("initRaC", opt.initRaC);
+  opt.initRaC = 0;
+  opt.initRaT = 0;
+  ppParams.query("initRaT", opt.initRaT);
+  ppParams.query("initRaC", opt.initRaC);
 
-//   opt.skipNewLevelScalars = false;
-//   ppMain.query("skipNewLevelScalars", opt.skipNewLevelScalars);
+  //   opt.skipNewLevelScalars = false;
+  //   ppMain.query("skipNewLevelScalars", opt.skipNewLevelScalars);
 
-   opt.skipSaltUpdate = false;
-   ppMain.query("skipSaltUpdate", opt.skipSaltUpdate);
+  opt.skipSaltUpdate = false;
+  ppMain.query("skipSaltUpdate", opt.skipSaltUpdate);
 
-   // Option here to not update enthalpy and salinity
-   // (useful for debugging)
-   opt.skipHCUpdate = false;
-   ppMain.query("skipHCUpdate", opt.skipHCUpdate);
+  // Option here to not update enthalpy and salinity
+  // (useful for debugging)
+  opt.skipHCUpdate = false;
+  ppMain.query("skipHCUpdate", opt.skipHCUpdate);
 
-   opt.doDiffusionSrc = true;
-   ppMain.query("diffusiveSrcForAdvection", opt.doDiffusionSrc);
+  opt.doDiffusionSrc = true;
+  ppMain.query("diffusiveSrcForAdvection", opt.doDiffusionSrc);
 
-   ppMain.query("consider_u_chi_dt", opt.forceUseUChiForCFL);
+  ppMain.query("consider_u_chi_dt", opt.forceUseUChiForCFL);
 
-   opt.skipUnsafeCFL=false;
-   ppMain.query("skip_unsafe_cfl", opt.skipUnsafeCFL);
+  opt.skipUnsafeCFL = false;
+  ppMain.query("skip_unsafe_cfl", opt.skipUnsafeCFL);
 
-   /**
-    * Physics related options
+  /**
+   * Physics related options
    */
 
-//  opt.iter_plot_interval = -1;
-//  ppMain.query("iter_plot_interval", opt.iter_plot_interval);
+  //  opt.iter_plot_interval = -1;
+  //  ppMain.query("iter_plot_interval", opt.iter_plot_interval);
 
   opt.lowerPorosityLimit = 1e-15;
   ppMain.query("lowPorosityLimit", opt.lowerPorosityLimit);
@@ -374,21 +369,21 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.CFinterpOrder_advection = 1;
   ppMain.query("advectionInterpOrder", opt.CFinterpOrder_advection);
 
-
   opt.refineThresh = 0.3;
   ppMain.query("refine_thresh", opt.refineThresh);
 
   opt.tagBufferSize = 4;
   ppMain.query("tag_buffer_size", opt.tagBufferSize);
 
-  opt.doProjection=true;
+  opt.doProjection = true;
   ppMain.query("doProjection", opt.doProjection);
 
   opt.useIncrementalPressure = false;
   ppProjection.query("useIncrementalPressure", opt.useIncrementalPressure);
 
   opt.useIncrementalPressureRefinedLevels = false;
-  ppProjection.query("useIncrementalPressureRefinedLevels", opt.useIncrementalPressureRefinedLevels);
+  ppProjection.query("useIncrementalPressureRefinedLevels",
+                     opt.useIncrementalPressureRefinedLevels);
 
   opt.doSyncOperations = true;
   ppMain.query("doSyncOperations", opt.doSyncOperations);
@@ -421,15 +416,17 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppMain.query("refluxBetaSign", opt.refluxBetaSign);
   ppMain.query("refluxCorrSign", opt.refluxCorrSign);
 
-//  opt.variable_eta_factor = 1.0;
-//  ppMain.query("variable_eta_factor", opt.variable_eta_factor);
-//  CH_assert(opt.variable_eta_factor >= 1); // This must be >= 1, else eta will increase when it should be decreasing (and vice-versa)
+  //  opt.variable_eta_factor = 1.0;
+  //  ppMain.query("variable_eta_factor", opt.variable_eta_factor);
+  //  CH_assert(opt.variable_eta_factor >= 1); // This must be >= 1, else eta
+  //  will increase when it should be decreasing (and vice-versa)
 
-//  opt.minEta = 0.99;
-//  ppProjection.query("eta", opt.minEta);
+  //  opt.minEta = 0.99;
+  //  ppProjection.query("eta", opt.minEta);
 
-//  opt.computeFreestreamCorrectionSingleLevel = false;
-//  ppMain.query("single_level_lambda_corr", opt.computeFreestreamCorrectionSingleLevel);
+  //  opt.computeFreestreamCorrectionSingleLevel = false;
+  //  ppMain.query("single_level_lambda_corr",
+  //  opt.computeFreestreamCorrectionSingleLevel);
 
   opt.compute_initial_VD_corr = true;
   ppMain.query("initialize_VD_corr", opt.compute_initial_VD_corr);
@@ -456,10 +453,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.min_regrid_time = -1;
   ppRegrid.query("min_regrid_time", opt.min_regrid_time);
 
-  opt.tag_velocity=false;
+  opt.tag_velocity = false;
   if (ppMain.contains("vel_refine_thresh"))
   {
-    opt.tag_velocity=true;
+    opt.tag_velocity = true;
     ppMain.get("vel_refine_thresh", opt.vel_thresh);
   }
 
@@ -467,14 +464,18 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   if ((ppRegrid.contains("plume_vel") || ppRegrid.contains("plume_salinity")))
   {
     opt.tag_plume_mush = true;
-    opt.plumeSalinityThreshold = -1.0 + log10(params.compositionRatio); // rough guess of salinity in channels
-    opt.plumeVelThreshold = params.m_buoyancySCoeff/params.m_darcyCoeff; // rough guess of the velocity in the channels
-    ppRegrid.query("plume_vel", opt.plumeVelThreshold); // think  this scales like da^3*ra
+    opt.plumeSalinityThreshold =
+        -1.0 +
+        log10(params.compositionRatio); // rough guess of salinity in channels
+    opt.plumeVelThreshold =
+        params.m_buoyancySCoeff /
+        params.m_darcyCoeff; // rough guess of the velocity in the channels
+    ppRegrid.query("plume_vel",
+                   opt.plumeVelThreshold); // think  this scales like da^3*ra
     ppRegrid.query("plume_salinity", opt.plumeSalinityThreshold);
-
   }
-  
-  opt.compositeChannelTagging=false;
+
+  opt.compositeChannelTagging = false;
   ppRegrid.query("compositeChannelTagging", opt.compositeChannelTagging);
 
   opt.tag_channels = false;
@@ -484,7 +485,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppRegrid.query("channelRefinementMinLevel", opt.channelRefinementMinLevel);
 
   // Default refinement is for mushy layer simulations with channels
-  opt.refinementMethod =  RefinementMethod::tagMushChannels;
+  opt.refinementMethod = RefinementMethod::tagMushChannels;
 
   if (opt.tag_velocity)
   {
@@ -557,19 +558,20 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.regrid_freestream_subcycle = true;
   ppMain.query("regrid_freestream_subcycle", opt.regrid_freestream_subcycle);
 
-  opt.regrid_advect_before_freestream=false;
-  ppMain.query("regrid_advect_before_freestream", opt.regrid_advect_before_freestream);
+  opt.regrid_advect_before_freestream = false;
+  ppMain.query("regrid_advect_before_freestream",
+               opt.regrid_advect_before_freestream);
 
-  opt.regrid_eta_scale=1.0;
+  opt.regrid_eta_scale = 1.0;
   ppMain.query("regrid_eta_scale", opt.regrid_eta_scale);
 
-  opt.regrid_reflux_lambda=true;
+  opt.regrid_reflux_lambda = true;
   ppMain.query("regrid_reflux_lambda", opt.regrid_reflux_lambda);
 
   opt.regrid_smoothing_coeff = 0.05;
   ppMain.query("regrid_smoothing_coeff", opt.regrid_smoothing_coeff);
 
-  //Initialization
+  // Initialization
   if (params.isDarcyBrinkman())
   {
     opt.initialize_pressures = true;
@@ -625,11 +627,10 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   int mgtype = MGmethod::MGTypeFAS;
 
-
-  opt.AMRMultigridVerb=0;
-  opt.AMRMultigridTolerance=1e-10;
-  opt.AMRMultigridHang=1e-10;
-  opt.AMRMultigridNormThresh=1e-10;
+  opt.AMRMultigridVerb = 0;
+  opt.AMRMultigridTolerance = 1e-10;
+  opt.AMRMultigridHang = 1e-10;
+  opt.AMRMultigridNormThresh = 1e-10;
 
   ppAMRMultigrid.query("hang_eps", opt.AMRMultigridHang);
   ppAMRMultigrid.query("tolerance", opt.AMRMultigridTolerance);
@@ -650,29 +651,29 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.apply_diagnostic_bcs = true;
   ppMain.query("apply_diagnostic_bcs", opt.apply_diagnostic_bcs);
 
-  opt.velMGNumSmooth=2;
-  opt.velMGTolerance=1e-10;
-  opt.velMGHang=1e-10;
-  opt.velMGNormThresh=1e-10;
-  opt.velMGNumMG=1;
-  opt.VelMGMaxIter=10;
+  opt.velMGNumSmooth = 2;
+  opt.velMGTolerance = 1e-10;
+  opt.velMGHang = 1e-10;
+  opt.velMGNormThresh = 1e-10;
+  opt.velMGNumMG = 1;
+  opt.VelMGMaxIter = 10;
 
   ppVelMultigrid.query("num_smooth", opt.velMGNumSmooth);
-  ppVelMultigrid.query("tolerance",  opt.velMGTolerance);
-  ppVelMultigrid.query("hang_eps",   opt.velMGHang);
-  ppVelMultigrid.query("num_mg",     opt.velMGNumMG);
+  ppVelMultigrid.query("tolerance", opt.velMGTolerance);
+  ppVelMultigrid.query("hang_eps", opt.velMGHang);
+  ppVelMultigrid.query("num_mg", opt.velMGNumMG);
   ppVelMultigrid.query("norm_thresh", opt.velMGNormThresh);
-  ppVelMultigrid.query("max_iter",  opt.VelMGMaxIter);
+  ppVelMultigrid.query("max_iter", opt.VelMGMaxIter);
 
-  opt.HCMultigridNumSmoothUp=4;
-  opt.HCMultigridNumSmoothDown=1;
-  opt.HCMultigridNumMG=1;
-  opt.HCMultigridMaxIter=10;
-  opt.HCMultigridVerbosity=0;
-  opt.HCMultigridBottomSolveIterations=40;
-  opt.HCMultigridTolerance=1e-10;
-  opt.HCMultigridHang=1e-10;
-  opt.HCMultigridNormThresh=1e-10;
+  opt.HCMultigridNumSmoothUp = 4;
+  opt.HCMultigridNumSmoothDown = 1;
+  opt.HCMultigridNumMG = 1;
+  opt.HCMultigridMaxIter = 10;
+  opt.HCMultigridVerbosity = 0;
+  opt.HCMultigridBottomSolveIterations = 40;
+  opt.HCMultigridTolerance = 1e-10;
+  opt.HCMultigridHang = 1e-10;
+  opt.HCMultigridNormThresh = 1e-10;
   opt.HCMultigridRelaxMode = 1; // 1=GSRB, 4=jacobi
   opt.HCMultigridUseRelaxBottomSolverForHC = true;
 
@@ -685,20 +686,21 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   HCMultigrid.query("verbosity", opt.HCMultigridVerbosity);
   HCMultigrid.query("numSmoothDown", opt.HCMultigridNumSmoothDown);
   HCMultigrid.query("relaxMode", opt.HCMultigridRelaxMode);
-  HCMultigrid.query("bottomSolveIterations", opt.HCMultigridBottomSolveIterations);
-  HCMultigrid.query("useRelaxBottomSolver", opt.HCMultigridUseRelaxBottomSolverForHC);
+  HCMultigrid.query("bottomSolveIterations",
+                    opt.HCMultigridBottomSolveIterations);
+  HCMultigrid.query("useRelaxBottomSolver",
+                    opt.HCMultigridUseRelaxBottomSolverForHC);
 
-//  opt.noMultigrid = false;
-//  opt.noMultigridIter = 100;
-//  ppMain.query("noMultigrid", opt.noMultigrid);
-//  ppMain.query("noMultigridIter", opt.noMultigridIter);
+  //  opt.noMultigrid = false;
+  //  opt.noMultigridIter = 100;
+  //  ppMain.query("noMultigrid", opt.noMultigrid);
+  //  ppMain.query("noMultigridIter", opt.noMultigridIter);
 
   // 1 -> PLM, 2 -> PPM
   opt.velAdvNormalPredOrder = 1;
 
   // Use 4th order slope computations
   opt.velAdvUseFourthOrderSlopes = true;
-
 
   // No artificial viscosity
   opt.velAdvUseArtVisc = false;
@@ -709,8 +711,8 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   ppPatchGodunov.query("velUseArtVisc", opt.velAdvUseArtVisc);
   ppPatchGodunov.query("velArtVisc", opt.velAdvArtVisc);
 
-  // There is a bug in Chombo at the moment which means we have to use the limiter if we're
-  // doing 2nd order slopes
+  // There is a bug in Chombo at the moment which means we have to use the
+  // limiter if we're doing 2nd order slopes
   if (opt.velAdvNormalPredOrder == 2)
   {
     opt.velAdvHigherOrderLimiter = true;
@@ -746,12 +748,14 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.restart_new_time = -1.0;
   ppMain.query("restart_newTime", opt.restart_new_time);
 
-//  opt.increaseDt = true;
-//  ppMain.query("init_increase_dt", opt.increaseDt);
+  //  opt.increaseDt = true;
+  //  ppMain.query("init_increase_dt", opt.increaseDt);
 
   opt.init_use_prev_pressure_for_Ustar = false;
-  ppMain.query("init_add_subtract_grad_p", opt.init_use_prev_pressure_for_Ustar); // legacy option
-  ppMain.query("init_use_prev_pressure_for_Ustar", opt.init_use_prev_pressure_for_Ustar);
+  ppMain.query("init_add_subtract_grad_p",
+               opt.init_use_prev_pressure_for_Ustar); // legacy option
+  ppMain.query("init_use_prev_pressure_for_Ustar",
+               opt.init_use_prev_pressure_for_Ustar);
 
   opt.init_compute_uDelu = true;
   ppMain.query("init_compute_uDelu", opt.init_compute_uDelu);
@@ -790,12 +794,13 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
     opt.enforceAnalyticSoln = true;
   }
 
-  // Actual value of the analytic soln is by default the same as this physical problem
+  // Actual value of the analytic soln is by default the same as this physical
+  // problem
   opt.analyticSolution = params.physicalProblem;
   ppMain.query("analyticSoln", opt.analyticSolution);
 
-//  opt.useAnalyticSource = false;
-//  ppMain.query("analyticSourceTerm", opt.useAnalyticSource);
+  //  opt.useAnalyticSource = false;
+  //  ppMain.query("analyticSourceTerm", opt.useAnalyticSource);
 
   opt.initialPerturbation = 0.0;
   ppMain.query("initialPerturbation", opt.initialPerturbation);
@@ -815,7 +820,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.perturbationSin = false;
   ppMain.query("perturbationSin", opt.perturbationSin);
 
-  opt.initialRandomPerturbation=false;
+  opt.initialRandomPerturbation = false;
   ppMain.query("initialRandomPerturbation", opt.initialRandomPerturbation);
 
   opt.seedRandomPert = true;
@@ -827,7 +832,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.fixedPorosity = -1.0;
   ppMain.query("fixed_porosity", opt.fixedPorosity);
 
-  opt.porosityTimescale = 1/params.darcy;
+  opt.porosityTimescale = 1 / params.darcy;
   ppMain.query("porosityTimescale", opt.porosityTimescale);
 
   opt.initVel = 0.0;
@@ -840,7 +845,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.restartPerturbation = 0.0;
   ppMain.query("restart_perturbation", opt.restartPerturbation);
 
-  opt.porousHoleRadius = 0.1*opt.domainWidth;
+  opt.porousHoleRadius = 0.1 * opt.domainWidth;
   ppMain.query("radius", opt.porousHoleRadius);
 
   opt.initVelScale = 1e-3;
@@ -849,7 +854,7 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.summerProfile = -1;
   ppInit.query("summerProfile", opt.summerProfile);
 
-  opt.mushHeight = opt.domainHeight/2;
+  opt.mushHeight = opt.domainHeight / 2;
   ppInit.query("summerProfileMushHeight", opt.mushHeight);
 
   opt.linearGradient = false;
@@ -865,15 +870,15 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.horizAverageRestart = false;
   ppMain.query("horizontallyAverageRestart", opt.horizAverageRestart);
 
-//  ppMain.query("doAutomaticRestart",opt.initiallyDoAutomaticRestart);
-
+  //  ppMain.query("doAutomaticRestart",opt.initiallyDoAutomaticRestart);
 
   /**
    * Other options
    */
 
   opt.FixedPorositySTD = 0.005;
-  opt.fixedPorosityMaxChi = 1.05; // want to make this a bit more than 1, so we get porosity=1 region of finite size
+  opt.fixedPorosityMaxChi = 1.05; // want to make this a bit more than 1, so we
+                                  // get porosity=1 region of finite size
   ppMain.query("maxChi", opt.fixedPorosityMaxChi);
   ppMain.query("stdev", opt.FixedPorositySTD);
 
@@ -890,7 +895,6 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.buoyancy_zero_time = -1;
   ppMain.query("turn_off_buoyancy_time", opt.buoyancy_zero_time);
 
-
   // Biogeochemistry
   opt.includeTracers = false;
   ppBio.query("includeTracers", opt.includeTracers);
@@ -898,11 +902,12 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.surfaceIrradiance = 0.0;
   ppBio.query("surfaceIrradiance", opt.surfaceIrradiance);
 
-//  opt.activeTracerInitVal=0.0;
-//     ppBio.query("activeTracerInitVal", opt.activeTracerInitVal);
+  //  opt.activeTracerInitVal=0.0;
+  //     ppBio.query("activeTracerInitVal", opt.activeTracerInitVal);
 
-//  opt.maxEta = -1;
-//  ppMain.query("max_eta", opt.maxEta); // let user specify different max eta if they want
+  //  opt.maxEta = -1;
+  //  ppMain.query("max_eta", opt.maxEta); // let user specify different max eta
+  //  if they want
 
   opt.minDt = 1e-7;
   ppMain.query("min_dt", opt.minDt);
@@ -932,41 +937,35 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
   opt.computeVorticityStreamFunction = true;
   ppMain.query("computeVorticity", opt.computeVorticityStreamFunction);
 
-
   opt.useFortranRegularisationFace = false;
   ppMain.query("fortranRegularisationFace", opt.useFortranRegularisationFace);
   opt.useFortranRegularisation = true;
   ppMain.query("fortranRegularisation", opt.useFortranRegularisation);
 
-
-//  opt.stokesDarcyForcingTimescale = 0.5;
-//  ppParams.query("forcing_timescale", opt.stokesDarcyForcingTimescale);
+  //  opt.stokesDarcyForcingTimescale = 0.5;
+  //  ppParams.query("forcing_timescale", opt.stokesDarcyForcingTimescale);
 
   opt.viscousBCs = params.isViscous();
-    ppMain.query("viscousBCs", opt.viscousBCs);
+  ppMain.query("viscousBCs", opt.viscousBCs);
 
-
-
-  a_fact = RefCountedPtr<AMRLevelMushyLayerFactory> (new AMRLevelMushyLayerFactory(opt, params));
-
+  a_fact = RefCountedPtr<AMRLevelMushyLayerFactory>(
+      new AMRLevelMushyLayerFactory(opt, params));
 }
-void
-defineAMR(AMR&                                          a_amr,
-          RefCountedPtr<AMRLevelMushyLayerFactory>&     a_fact,
-          const ProblemDomain&                          a_prob_domain,
-          const Vector<int>&                            a_refRat)
+void defineAMR(AMR &a_amr, RefCountedPtr<AMRLevelMushyLayerFactory> &a_fact,
+               const ProblemDomain &a_prob_domain,
+               const Vector<int> &a_refRat)
 {
-//  LOG("MushyLayerSubcycleUtils - defineAMR(..) - creating AMR object");
+  //  LOG("MushyLayerSubcycleUtils - defineAMR(..) - creating AMR object");
 
   ParmParse ppMain("main");
   int max_level = 0;
-  ppMain.get("max_level",max_level);
+  ppMain.get("max_level", max_level);
 
-  int num_read_levels = Max(max_level,1);
+  int num_read_levels = Max(max_level, 1);
   std::vector<int> regrid_intervals;
   if (max_level > 0)
   {
-    ppMain.getarr("regrid_interval",regrid_intervals,0,num_read_levels);
+    ppMain.getarr("regrid_interval", regrid_intervals, 0, num_read_levels);
   }
   else
   {
@@ -977,7 +976,7 @@ defineAMR(AMR&                                          a_amr,
   {
     std::vector<int> ref_ratios = std::vector<int>(); // (num_read_levels,1);
     ppMain.getarr("ref_ratio", ref_ratios, 0, num_read_levels);
-    for (int i=0; i<=max_level; i++)
+    for (int i = 0; i <= max_level; i++)
     {
       if (ref_ratios[i] == 1)
       {
@@ -986,54 +985,52 @@ defineAMR(AMR&                                          a_amr,
     }
   }
 
-  Vector<Vector<Box> > fixedGrids;
+  Vector<Vector<Box>> fixedGrids;
   bool predefinedGrids = false;
   predefinedGrids = getFixedGrids(fixedGrids, a_prob_domain);
 
-  if (predefinedGrids &&
-      fixedGrids.size() != max_level + 1)
+  if (predefinedGrids && fixedGrids.size() != max_level + 1)
   {
-    MayDay::Error("Specified grids do not contain the correct number of levels");
+    MayDay::Error(
+        "Specified grids do not contain the correct number of levels");
   }
 
   if (predefinedGrids)
   {
-    for (int i = 0; i <=max_level; i++)
+    for (int i = 0; i <= max_level; i++)
     {
       regrid_intervals[i] = -1;
     }
   }
 
   int block_factor = 1;
-  ppMain.query("block_factor",block_factor);
+  ppMain.query("block_factor", block_factor);
 
   int max_grid_size = 128;
-  ppMain.query("max_grid_size",max_grid_size);
+  ppMain.query("max_grid_size", max_grid_size);
 
   Real fill_ratio = 0.75;
-  ppMain.query("fill_ratio",fill_ratio);
+  ppMain.query("fill_ratio", fill_ratio);
 
   int checkpoint_interval = 0;
-  ppMain.query("checkpoint_interval",checkpoint_interval);
+  ppMain.query("checkpoint_interval", checkpoint_interval);
 
   int plot_interval = 0;
-  ppMain.query("plot_interval",plot_interval);
+  ppMain.query("plot_interval", plot_interval);
 
   Real plot_period = 0;
   ppMain.query("plot_period", plot_period);
 
   Real max_dt_growth = 1.1;
-  ppMain.query("max_dt_growth",max_dt_growth);
+  ppMain.query("max_dt_growth", max_dt_growth);
 
   Real fixed_dt = -1.0;
   ppMain.query("fixed_dt", fixed_dt);
 
   Real dt_tolerance_factor = 1.1;
-  ppMain.query("dt_tolerance_factor",dt_tolerance_factor);
+  ppMain.query("dt_tolerance_factor", dt_tolerance_factor);
   AMR amr;
-  a_amr.define(max_level, a_refRat,
-               a_prob_domain,&(*a_fact));
-
+  a_amr.define(max_level, a_refRat, a_prob_domain, &(*a_fact));
 
   // set grid generation parameters
   a_amr.maxGridSize(max_grid_size);
@@ -1042,7 +1039,7 @@ defineAMR(AMR&                                          a_amr,
 
   // the hyperbolic codes use a grid buffer of 1
   int gridBufferSize = 1;
-  ppMain.query("grid_buffer_size",gridBufferSize);
+  ppMain.query("grid_buffer_size", gridBufferSize);
   a_amr.gridBufferSize(gridBufferSize);
 
   // set output parameters
@@ -1059,7 +1056,6 @@ defineAMR(AMR&                                          a_amr,
   std::string output_folder = "";
   ppMain.query("output_folder", output_folder);
 
-
   if (fixed_dt > 0)
   {
     a_amr.fixedDt(fixed_dt);
@@ -1070,18 +1066,18 @@ defineAMR(AMR&                                          a_amr,
     ppMain.get("use_subcycling", useSubcycling);
     if (!useSubcycling)
     {
-      LOG("SUBCYCLING IN TIME TURNED OFF!!!" );
+      LOG("SUBCYCLING IN TIME TURNED OFF!!!");
     }
     a_amr.useSubcyclingInTime(useSubcycling);
   }
   if (ppMain.contains("plot_prefix"))
   {
     std::string prefix;
-    ppMain.get("plot_prefix",prefix);
+    ppMain.get("plot_prefix", prefix);
 
     // I think this length being too small is the cause of stack smashing
     char(fullPrefix[2000]);
-    sprintf(fullPrefix, "%s/%s", output_folder.c_str(),prefix.c_str());
+    sprintf(fullPrefix, "%s/%s", output_folder.c_str(), prefix.c_str());
 
     a_amr.plotPrefix(fullPrefix);
   }
@@ -1089,10 +1085,10 @@ defineAMR(AMR&                                          a_amr,
   if (ppMain.contains("chk_prefix"))
   {
     std::string prefix;
-    ppMain.get("chk_prefix",prefix);
+    ppMain.get("chk_prefix", prefix);
 
     char(fullPrefix[2000]);
-    sprintf(fullPrefix, "%s/%s", output_folder.c_str(),prefix.c_str());
+    sprintf(fullPrefix, "%s/%s", output_folder.c_str(), prefix.c_str());
 
     a_amr.checkpointPrefix(fullPrefix);
   }
@@ -1114,17 +1110,14 @@ defineAMR(AMR&                                          a_amr,
 #endif
 
   int verbosity = 1;
-  ppMain.query("verbosity",verbosity);
+  ppMain.query("verbosity", verbosity);
   CH_assert(verbosity >= 0);
 
   a_amr.verbosity(verbosity);
-
-
 }
 
-bool
-getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
-              string gridfileParam, int verbosity)
+bool getFixedGrids(Vector<Vector<Box>> &amrGrids, ProblemDomain prob_domain,
+                   string gridfileParam, int verbosity)
 {
 
   //  LOG("getFixedGrids");
@@ -1154,7 +1147,6 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
     LOG("No max_grid_size given, using max_grid_size = " << max_grid_size);
   }
 
-
   bool predefinedGrids = ppMain.contains(gridfileParam);
   string gridfile;
 
@@ -1171,7 +1163,7 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
 #ifdef CH_MPI
   // if (procID() ==  uniqueProc(SerialTask::compute))
   MPI_Barrier(Chombo_MPI::comm);
-  if (procID() ==  0)
+  if (procID() == 0)
   {
 #endif
     // read in predefined grids
@@ -1193,27 +1185,28 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
     // grids on level, list of boxes
     int in_numLevels;
     is >> in_numLevels;
-    CH_assert (in_numLevels <= max_level+1);
+    CH_assert(in_numLevels <= max_level + 1);
     if (verbosity >= 3)
     {
       LOG("numLevels = " << in_numLevels);
     }
-    while (is.get() != '\n');
+    while (is.get() != '\n')
+      ;
     amrGrids.resize(in_numLevels);
     // check to see if coarsest level needs to be broken up
-    domainSplit(prob_domain,amrGrids[0], max_grid_size,4);
+    domainSplit(prob_domain, amrGrids[0], max_grid_size, 4);
 
     if (verbosity >= 3)
     {
       LOG_NOEND("level 0: ");
-      for (int n=0; n<amrGrids[0].size(); n++)
+      for (int n = 0; n < amrGrids[0].size(); n++)
       {
         LOG(amrGrids[0][n]);
       }
     }
     // now loop over levels, starting with level 1
     int ngrid;
-    for (int lev=1; lev<in_numLevels; lev++)
+    for (int lev = 1; lev < in_numLevels; lev++)
     {
       is >> ngrid;
       if (verbosity >= 3)
@@ -1221,9 +1214,10 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
         LOG("level " << lev << " numGrids = " << ngrid);
         pout() << "Grids: ";
       }
-      while (is.get() != '\n');
+      while (is.get() != '\n')
+        ;
       amrGrids[lev].resize(ngrid);
-      for (int i=0; i<ngrid; i++)
+      for (int i = 0; i < ngrid; i++)
       {
         Box bx;
         is >> bx;
@@ -1231,15 +1225,17 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
         // advance to next box
         while (char ch = is.get())
         {
-          if (ch == '#') break;
-          if (ch == '\n') break;
+          if (ch == '#')
+            break;
+          if (ch == '\n')
+            break;
         }
 
         // quick check on box size
         Box bxRef(bx);
         // not really sure why i was doing this (holdover from
         // legacy code)
-        //bxRef.refine(ref_ratios[lev-1]);
+        // bxRef.refine(ref_ratios[lev-1]);
         if (bxRef.longside() > max_grid_size)
         {
           LOG("Grid " << bx << " too large");
@@ -1251,21 +1247,18 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
         }
         amrGrids[lev][i] = bx;
       } // end loop over boxes on this level
-    } // end loop over levels
+    }   // end loop over levels
 
 #ifdef CH_MPI
   } // end if procID = 0
-  //broadcast (amrGrids, uniqueProc(SerialTask::compute));
-  broadcast (amrGrids, 0);
+  // broadcast (amrGrids, uniqueProc(SerialTask::compute));
+  broadcast(amrGrids, 0);
 #endif
-
-
 
   return true;
 }
 
-void
-setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
+void setupAMRForAMRRun(AMR &a_amr, ProblemDomain prob_domain)
 {
 
   ParmParse ppMain("main");
@@ -1273,22 +1266,22 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
   // make new blank diagnostics file
   // overwrites existing file if one exists
   // Stop doing this - in danger of deleting data
-//  std::ofstream diagnosticsFile ("diagnostics.csv");
-//  diagnosticsFile.close();
+  //  std::ofstream diagnosticsFile ("diagnostics.csv");
+  //  diagnosticsFile.close();
 
   // Check
-  Vector<Vector<Box> > fixedGrids;
+  Vector<Vector<Box>> fixedGrids;
   bool predefinedGrids = false;
   predefinedGrids = getFixedGrids(fixedGrids, prob_domain);
 
   if (ppMain.contains("restart_file"))
   {
     std::string restart_file;
-    ppMain.get("restart_file",restart_file);
+    ppMain.get("restart_file", restart_file);
     LOG(" restarting from file " << restart_file);
 
 #ifdef CH_USE_HDF5
-    HDF5Handle handle(restart_file,HDF5Handle::OPEN_RDONLY);
+    HDF5Handle handle(restart_file, HDF5Handle::OPEN_RDONLY);
     // read from checkpoint file
     LOG("Opened checkpoint file");
     a_amr.setupForRestart(handle);
@@ -1300,21 +1293,22 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
 
     Real resetTime = -1;
     ppMain.query("restart_newTime", resetTime);
-    if (resetTime >= 0 )
+    if (resetTime >= 0)
     {
 #ifdef CH_FORK
       a_amr.cur_time(resetTime);
-      Vector<AMRLevel*> amrLev = a_amr.getAMRLevels();
-      for (int i=0; i < amrLev.size(); i++)
+      Vector<AMRLevel *> amrLev = a_amr.getAMRLevels();
+      for (int i = 0; i < amrLev.size(); i++)
       {
         amrLev[i]->time(resetTime);
       }
       LOG("Set time = " << resetTime);
 #else
-      MayDay::Warning("Unable to reset time as you're not using the forked version of Chombo, and therefore your AMR class doesn't have a cur_time() method");
+      MayDay::Warning("Unable to reset time as you're not using the forked "
+                      "version of Chombo, and therefore your AMR class doesn't "
+                      "have a cur_time() method");
 #endif
     }
-
   }
   else if (predefinedGrids)
   {
@@ -1326,27 +1320,29 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
     // initialize hierarchy of levels
     a_amr.setupForNewAMRRun();
   }
-
 }
 
-bool is_integer(const std::string& s)
+bool is_integer(const std::string &s)
 {
-    std::string::const_iterator it = s.begin();
-    while (it != s.end() && std::isdigit(*it)) ++it;
-    return !s.empty() && it == s.end();
+  std::string::const_iterator it = s.begin();
+  while (it != s.end() && std::isdigit(*it))
+    ++it;
+  return !s.empty() && it == s.end();
 }
 
-
-
-void createPhaseBoundaryStructures(const int lev, const Vector<DisjointBoxLayout>& grids, const IntVect ivGhost,
-                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpySolidus,
-                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyEutectic,
-                                   Vector<RefCountedPtr<LevelData<FArrayBox> > >& enthalpyLiquidus)
+void createPhaseBoundaryStructures(
+    const int lev, const Vector<DisjointBoxLayout> &grids,
+    const IntVect ivGhost,
+    Vector<RefCountedPtr<LevelData<FArrayBox>>> &enthalpySolidus,
+    Vector<RefCountedPtr<LevelData<FArrayBox>>> &enthalpyEutectic,
+    Vector<RefCountedPtr<LevelData<FArrayBox>>> &enthalpyLiquidus)
 {
-  enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-  enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
-  enthalpyEutectic[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+  enthalpySolidus[lev] = RefCountedPtr<LevelData<FArrayBox>>(
+      new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+  enthalpyLiquidus[lev] = RefCountedPtr<LevelData<FArrayBox>>(
+      new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
+  enthalpyEutectic[lev] = RefCountedPtr<LevelData<FArrayBox>>(
+      new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
 }
-
 
 #include "NamespaceFooter.H"

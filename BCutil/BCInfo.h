@@ -8,9 +8,12 @@
 #ifndef BCUTIL_BCINFO_H_
 #define BCUTIL_BCINFO_H_
 
+#include "LoHiSide.H"
 #include "Logging.H"
+#include "ParmParse.H"
+#include "UsingNamespace.H"
 
-/// General class to contian some boundary condition information
+/// General class to contain some boundary condition information
 /**
  * Hold information for some particular variable for each direction/side/component
  * Provides methods for easy access to each component
@@ -122,9 +125,5 @@ protected:
   Vector<Vector<Real>> m_val;
   bool m_required;
 };
-
-
-
-
 
 #endif /* BCUTIL_BCINFO_H_ */
