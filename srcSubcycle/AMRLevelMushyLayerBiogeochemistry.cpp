@@ -236,13 +236,15 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(
   vcop->define(m_problem_domain, grids, ref_rat, dx, bc, alpha, aCoef, beta,
                bCoef);
 
-  LevelData<FArrayBox> *crseVar = nullptr;
-
-  AMRLevelMushyLayer *crseML = getCoarserLevel();
-  if (crseML)
-  {
-    crseML->computeScalarConcInLiquid(*crseVar, a_scalarBulkConc);
-  }
+  // Don't currently use CF BCs in the solver below (but probably should)
+  // so commenting this out for now
+  // LevelData<FArrayBox> *crseVar = nullptr;
+  // AMRLevelMushyLayer *crseML = getCoarserLevel();
+  // if (crseML)
+  // {
+  //   crseVar = new LevelData<FArrayBox>(crseML->m_grids, 1, IntVect::Unit);
+  //   crseML->computeScalarConcInLiquid(*crseVar, a_scalarBulkConc);
+  // }
 
   amrpop->setAlphaAndBeta(0, -m_scalarDiffusionCoeffs[a_scalarBulkConc]);
 

@@ -117,6 +117,7 @@ Diagnostics::Diagnostics()
   m_verbosity = 0;
   m_convergenceCriteria = 1e-4;
   m_level = 0;
+  m_printAllLevels = true;
 
   m_defined = false;
 }
