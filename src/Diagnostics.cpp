@@ -8,7 +8,7 @@
 #include "Diagnostics.h"
 #include <iostream>
 #include "NamespaceHeader.H"
-
+#include "Logging.H"
 
 Diagnostics::Diagnostics ()
 {
@@ -125,7 +125,7 @@ void Diagnostics::define(Real a_movingAverageTimescale, int a_verbosity, Real a_
 
   if (m_verbosity > 2)
   {
-    pout() << "Diagnostics::define with timescale = " << a_movingAverageTimescale << std::endl;
+    LOG("Diagnostics::define with timescale = " << a_movingAverageTimescale);
   }
 
   m_defined = true;
@@ -259,10 +259,7 @@ bool Diagnostics::movingAverageHasConverged(DiagnosticNames a_diagnostic, Real a
   {
     Real movingAverageDiff = std::abs(getMovingAverage(a_diagnostic, a_time, movingAverageTimescale) - getMovingAverage(a_diagnostic, a_time, 2*movingAverageTimescale));
 
-    if (m_verbosity > 0)
-    {
-      pout() << "Difference in moving average (" << m_diagnosticNames[a_diagnostic] << ") = " << movingAverageDiff << std::endl;
-    }
+    LOG("Difference in moving average (" << m_diagnosticNames[a_diagnostic] << ") = " << movingAverageDiff);
 
     if ( movingAverageDiff < m_convergenceCriteria )
     {
@@ -329,7 +326,7 @@ void Diagnostics::printDiagnostics(Real a_time)
   if (m_printAllLevels || m_level==0)
   {
 
-    pout() << "Print diagnostics (level " << m_level << ", time " << a_time << ")" << endl;
+    LOG("Print diagnostics (level " << m_level << ", time " << a_time << ")");
 
     m_diagnosticsFile.open(m_diagnosticsFileName, std::ios_base::app); // open file in append mode
     printDiagnostics(a_time, m_diagnosticsFile);
@@ -350,8 +347,6 @@ void Diagnostics::printDiagnostics(Real a_time)
 }
 void Diagnostics::printDiagnostics(Real a_time, std::ofstream& a_file)
 {
-//  pout() << "Printing diagnostics to " << a_file.c_str << endl;
-
   for (int i = 0; i < m_diagsToPrint.size(); i++)
   {
     DiagnosticNames diag_i = m_diagsToPrint[i];

@@ -1,6 +1,5 @@
 #include "AMRLevelMushyLayer.H"
 
-
 void AMRLevelMushyLayer::computeViscosity()
 {
   LevelData<FArrayBox>& a_viscosity = *m_scalarNew[m_viscosity];
@@ -405,6 +404,8 @@ void AMRLevelMushyLayer::fillHC(LevelData<FArrayBox>& a_phi, Real a_time,
   {
     bc(a_phi[dit], m_grids[dit], m_problem_domain, m_dx, false);
   }
+
+  doSanityChecks(a_phi, "HC");
 }
 
 
@@ -412,10 +413,7 @@ void AMRLevelMushyLayer::fillScalarFace(LevelData<FluxBox>& a_scal,
                                         Real a_time, const int a_var, bool doInterior , bool quadInterp)
 {
   CH_TIME("AMRLevelMushyLayer::fillScalarFace");
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::fillScalarFace - field: " << m_scalarVarNames[a_var] << ", level: " << m_level << endl;
-  }
+  LOG_DEBUG("FillScalarFace - field: " << m_scalarVarNames[a_var] << ", level: " << m_level);
 
   CellToEdgeAveragingMethod method = arithmeticAveraging; //Arithmetic mean
   // Geometric mean for permeability was making pressure projection impossible
@@ -507,10 +505,10 @@ Real AMRLevelMushyLayer::getCoarseTimeInterpCoeff(Real a_time)
 
   if (crse_time_interp_coeff < 0. || crse_time_interp_coeff > 1.)
   {
-    pout() << "ERROR crse_time_interp_coeff = " << crse_time_interp_coeff << endl;
-    pout() << "Computing time interp coeff on level " << m_level << endl;
-    pout() << "Level " << m_level << ":     a_time="   << a_time    << ",   m_time="   << m_time <<      ",m_dt=" << m_dt << endl;
-    pout() << "Level " << getCoarserLevel()->m_level << ": old_time=" << crse_old_time<<", new_time=" << crse_new_time << ",m_dt=" << crse_dt << endl;
+    LOG_INFO("ERROR crse_time_interp_coeff = " << crse_time_interp_coeff);
+    LOG_INFO("Computing time interp coeff on level " << m_level);
+    LOG_INFO("Level " << m_level << ":     a_time="   << a_time    << ",   m_time="   << m_time <<      ",m_dt=" << m_dt);
+    LOG_INFO("Level " << getCoarserLevel()->m_level << ": old_time=" << crse_old_time<<", new_time=" << crse_new_time << ",m_dt=" << crse_dt);
   }
 
   CH_assert (crse_time_interp_coeff >= 0.);
@@ -523,15 +521,10 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
 {
 
   CH_TIME("AMRLevelMushyLayer::fillScalars");
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::fillScalars - field: " << m_scalarVarNames[a_var] << ", level: " << m_level << endl;
-  }
+  LOG_DEBUG_EXTRA("Fill scalar field: " << m_scalarVarNames[a_var] << ", level: " << m_level);
 
-  //  const DisjointBoxLayout& levelGrids = m_grids;
   Interval scalComps = Interval(a_comp,a_comp);
   Interval srcComps = Interval(0,0);
-//  CH_assert(a_scal.nComp() == 1);
 
   Real old_time = m_time - m_dt;
 
@@ -619,7 +612,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
       }
       else
       {
-        pout() << "ERROR: No fill patch object for " << scalGrow << "ghost cells" << endl;
+        LOG_INFO("ERROR: No fill patch object for " << scalGrow << "ghost cells");
         MayDay::Error("No fill patch object for this number of ghost cells");
       }
 
@@ -674,10 +667,7 @@ void AMRLevelMushyLayer::fillScalars(LevelData<FArrayBox>& a_scal, Real a_time,
     }
   }
 
-  if (s_verbosity >= 9)
-  {
-    pout() << "  AMRLevelMushyLayer::fillScalars - finished" << endl;
-  }
+  LOG_FUNCTION_EXIT();
 }
 
 
@@ -686,8 +676,6 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
 {
   IntVect ghost = a_advVel.ghostVect();
   DataIterator dit = a_advVel.dataIterator();
-
-
   LevelData<FluxBox> permeability_face(m_grids, 1, ghost);
   LevelData<FluxBox> T_face(m_grids, 1, ghost);
   LevelData<FluxBox> C_face(m_grids, 1, ghost);
@@ -735,11 +723,19 @@ void AMRLevelMushyLayer::fillUnprojectedDarcyVelocity(LevelData<FluxBox>& a_advV
       }
 
     }
+  }
 
+  EdgeToCell(a_advVel, *m_vectorNew[VectorVars::m_advUstar]);
+  Real maxVel = ::computeNorm(*m_vectorNew[VectorVars::m_advUstar], nullptr, 1, m_dx, Interval(0,SpaceDim-1), 0);
+  if (maxVel > 1e290)
+  {
+    LOG_INFO("WARNING: max(unprojected advection velocity) = " << maxVel);
+  }
+  else
+  {
+    LOG_INFO("Max unprojected vel=" << maxVel);
   }
 }
-
-
 
 void AMRLevelMushyLayer::fillPressureSrcTerm(LevelData<FArrayBox>& gradP,
                                              LevelData<FArrayBox>& pressureScale,
@@ -835,11 +831,30 @@ void AMRLevelMushyLayer::fillBuoyancy(FArrayBox& buoyancy,FArrayBox& temperature
 
   // buoyancy = porosity * (Ra_T * theta - Ra_c*Theta_l) e_z
   buoyancy.setVal(0.0);
-
-
   buoyancy.plus(temperature, m_parameters.m_buoyancyTCoeff, 0, gravityDir, 1);
   buoyancy.plus(liquidConc, -m_parameters.m_buoyancySCoeff, 0, gravityDir, 1);
   buoyancy.plus(bodyForce, 1, gravityDir, gravityDir, 1);
 
   buoyancy.mult(porosity, buoyancy.box(), 0, gravityDir, 1);
+}
+
+void AMRLevelMushyLayer::ensureGreaterThan(LevelData<FArrayBox>& a_phi, Real min_val, string field_name, int comp)
+{
+  LOG_INFO("Check " << field_name << " > " << min_val);
+  DataIterator dit = a_phi.dataIterator();
+  for (dit.reset(); dit.ok(); ++dit)
+  {
+    // Would probably be quicker to write this in Fortran,
+    // but as we only do this after regridding it's probably not worth it
+    FArrayBox& phiFAB = a_phi[dit];
+    for (BoxIterator bit = BoxIterator (phiFAB.box()); bit.ok (); ++bit) {
+      IntVect iv = bit ();
+      Real val =phiFAB.get(iv, comp);
+      if (val < min_val)
+      {
+        LOG_WARNING(field_name << " (" << iv <<")=" << val << " which is < " << min_val);
+        phiFAB.set(iv, 0, min_val);
+      }
+    }
+  }
 }

@@ -24,6 +24,7 @@ using namespace std;
 #include "AMRLevelMushyLayer.H"
 #include "Diagnostics.h"
 #include "MushyLayerLoadUtils.H"
+#include "Logging.H"
 
 // One more function for MPI
 void dumpmemoryatexit();
@@ -72,14 +73,14 @@ void getBoxes(Vector<Box>& outBoxes, Box newDomain,
     IntVect hi = min(lo + base_size - IntVect::Unit, domain_hi);
     Box grid(lo,hi);
 
-    pout() << "New box (" << lo[0] << "," << lo[1] << ") - (" << hi[0] << "," << hi[1] << ")" << endl;
+    LOG("New box (" << lo[0] << "," << lo[1] << ") - (" << hi[0] << "," << hi[1] << ")");
 
 
     // I have no idea why we were previously refining these boxes
 //    Box refinedBox = refine(grid, block_factor);
 //    lo = refinedBox.smallEnd();
 //    hi = refinedBox.bigEnd();
-//    pout() << "Refined box (" << lo[0] << "," << lo[1] << ") - (" << hi[0] << "," << hi[1] << ")" << endl;
+//    LOG("Refined box (" << lo[0] << "," << lo[1] << ") - (" << hi[0] << "," << hi[1] << ")");
 
 //    outBoxes.push_back(refinedBox );
 
@@ -116,7 +117,7 @@ int main(int argc, char* argv[])
 #endif
 
   pout() << endl;
-  pout() << "Initializing..." << endl;
+  LOG("Initializing...");
 
   // declare variable to store hierarchy
   string    previousRestartFile;
@@ -195,7 +196,7 @@ int main(int argc, char* argv[])
     if ((changeLeft != 0 || changeRight != 0 || changeTop != 0 || changeBottom != 0) != 0
         && refinement != 1)
     {
-      pout() << "Warning - not doing refinement" << endl;
+      LOG("Warning - not doing refinement");
     }
 
     // Initially level 0 domain, then get's refined
@@ -217,12 +218,12 @@ int main(int argc, char* argv[])
     {
       AMRLevelMushyLayer* ml = amrlevels[level];
 
-      pout() << "Processing level " << level << "..." << endl;
+      LOG("Processing level " << level << "...");
 
       Vector<Box> outBoxes;
       Vector<int> outProcs;
 
-      pout() << "  Creating data holders..." << endl;
+      LOG("  Creating data holders...");
 
       // Define new grids with specified box_size
       if (box_size > 0)
@@ -240,9 +241,9 @@ int main(int argc, char* argv[])
 
 
       // Copy data to new grids and fill extra cells
-      pout() << "Reshaping data for new grids" << endl;
+      LOG("Reshaping data for new grids");
       ml->reshapeData(outGrids, newDomain);
-      pout() << "Finished reshaping data for new grids" << endl;
+      LOG("Finished reshaping data for new grids");
 
       // Turn the new problem domain for this level into the new problem domain for the next level
       // by refining it
@@ -252,7 +253,7 @@ int main(int argc, char* argv[])
   } // end if changing domain
   else if (refinement != 1)
   {
-    pout() << "Refining data with refinement factor: " << refinement << endl;
+    LOG("Refining data with refinement factor: " << refinement);
 
 
 
@@ -269,7 +270,7 @@ int main(int argc, char* argv[])
 
       domain.refine(refinement);
 
-      pout() << "Generating boxes on level: " << level << endl;
+      LOG("Generating boxes on level: " << level);
 
       DisjointBoxLayout outGrids;
 
@@ -306,7 +307,7 @@ int main(int argc, char* argv[])
 
     for (int level = 0; level <= finest_level; level++)
     {
-      pout() << "Shifting data on level: " << level << endl;
+      LOG("Shifting data on level: " << level);
       AMRLevelMushyLayer* ml = amrlevels[level];
 
       ml->shiftData(dir, xShift);
@@ -356,7 +357,7 @@ int main(int argc, char* argv[])
     pp.query("smoothVel", smoothVel);
     pp.query("smoothScalar", smoothScalar);
 
-    pout() << "Doing smoothing with coefficient " << smoothing << endl;
+    LOG("Doing smoothing with coefficient " << smoothing);
     // Only have to call this from the coarsest level
       AMRLevelMushyLayer* mlCoarsest = amrlevels[0];
       mlCoarsest->setSmoothingCoeff(smoothing);
@@ -455,13 +456,13 @@ int main(int argc, char* argv[])
 
 
   // Write header containing details about the fields in this data file
-  pout() << " Write checkpoint header" << endl;
+  LOG(" Write checkpoint header");
   amrlevels[0]->writeCheckpointHeader(handleOut);
 
   // Write out the data on each level
   for (int level = 0; level <= finest_level; ++level)
   {
-    pout() << " Write checkpoint data for level: " << level << endl;
+    LOG(" Write checkpoint data for level: " << level);
     amrlevels[level]->writeCheckpointLevel(handleOut);
   }
 

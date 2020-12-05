@@ -1,5 +1,5 @@
 #include "analyticSolns.H"
-
+#include "Logging.H"
 
 
 void channelFieldMushyLayer(LevelData<FArrayBox>& enthalpyAnalytic,
@@ -72,7 +72,7 @@ void analyticSolnSolidificationNoFlow(LevelData<FArrayBox>& enthalpyAnalytic,
     zEutectic = (HBottom-a_parameters.thetaEutectic)/(HBottom-HTop) * a_domainLength;
   }
 
-  pout() << "zEutectic =  " << zEutectic << endl;
+  LOG("zEutectic =  " << zEutectic);
 
   if (abs(vel) > 0)
   {
@@ -84,7 +84,7 @@ void analyticSolnSolidificationNoFlow(LevelData<FArrayBox>& enthalpyAnalytic,
     Real upper = hotBoundary*100.0; // make this sufficiently large that we should definitely capture hot boundary
 
     pout() << setiosflags(ios::scientific) << setprecision(10);
-    pout() << "Initial thetaInf guess:  " << lower << " < thetaInf < " << upper << endl;
+    LOG("Initial thetaInf guess:  " << lower << " < thetaInf < " << upper);
 
     // Initial guess
     a_parameters.thetaInterface = a_parameters.thetaEutectic + 1; // Strictly: ( a_parameters.lewis * a_parameters.ThetaInf - a_parameters.thetaInf) / (a_parameters.lewis -1 );
@@ -119,13 +119,13 @@ void analyticSolnSolidificationNoFlow(LevelData<FArrayBox>& enthalpyAnalytic,
       }
 
       pout() << setiosflags(ios::scientific) << setprecision(10);
-      pout() << lower << " < thetaInf < " << upper << endl;
+      LOG(lower << " < thetaInf < " << upper);
 
       counter++;
       if (counter % 10 == 0)
       {
         pout() << setiosflags(ios::scientific) << setprecision(10);
-        pout() << counter << " iterations, thetaInf = " << a_parameters.thetaInf << endl;
+        LOG(counter << " iterations, thetaInf = " << a_parameters.thetaInf);
       }
     }
 
@@ -137,9 +137,9 @@ void analyticSolnSolidificationNoFlow(LevelData<FArrayBox>& enthalpyAnalytic,
 
     h = a_parameters.directionalSolidificationMushyZ(a_parameters.thetaInterface, zEutectic); // position of the mush-liquid interface
 
-    pout() << "Calculating analytic solution for solidification without flow: " << endl;
-    pout() << "zEutectic was set to " << zEutectic << endl;
-    pout() << "h = " << h << ", thetaInf = " << a_parameters.thetaInf << ", thetaInterface = " << a_parameters.thetaInterface << endl;
+    LOG("Calculating analytic solution for solidification without flow: ");
+    LOG("zEutectic was set to " << zEutectic);
+    LOG("h = " << h << ", thetaInf = " << a_parameters.thetaInf << ", thetaInterface = " << a_parameters.thetaInterface);
 
     // Need to start with low temperatures i.e. cold boundary
     for (int i = numPoints; i >= 0; i--)

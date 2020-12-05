@@ -184,52 +184,22 @@ void VariableFluxBC(FArrayBox&      a_state,
     a_value = 0;
   }
 
-//  FORT_NEUMBC(CHF_FRA(a_state),
-//              CHF_REAL(a_value),
-//              CHF_BOX(toRegion),
-//              CHF_INT(isign),
-//              CHF_INT(a_dir),
-//              CHF_REAL(a_dx),
-//              CHF_INT(a_comp));
-
   RealVect loc;
-//  pout() << endl;
 
   for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
   {
     IntVect iv = bit();
-//    ::getLocation(iv, loc, a_dx);
 
     loc = iv;
     loc *= a_dx;
-//    RealVect ccOffset = (0.5, 0.5);
     RealVect ccOffset = 0.5*RealVect::Unit;
     ccOffset *= a_dx;
     loc += ccOffset; // cell centred offset
 
     Real flux = a_value*0.5*(1+tanh(50*(loc[SpaceDim-1]-0.75)));
-
-//    pout() << iv[1] << ",";
-
-//    if (loc[1] > 0.5)
-//    {
-//      flux = a_value;
-//    }
-//    else
-//    {
-//      flux = 0.0;
-//    }
-
-//    flux = 200;
-
     IntVect ivFrom = iv - isign*BASISV(a_dir);
-
     a_state(iv, a_comp) = a_state(ivFrom, a_comp) + a_dx*flux;
-
-
   }
-
-//  pout() << endl;
 
 }
 
@@ -247,8 +217,6 @@ void ExtrapBC(FArrayBox&      a_state,
   Box toRegion = adjCellBox(a_valid, a_dir, a_side, 1);
   Box thisBox = a_state.box();
   IndexType::CellIndex ix = thisBox.type(a_dir);
-
-//  int perpDir = (a_dir == 0) ? 1 : 0;
 
   if (ix == IndexType::NODE)
   {
@@ -311,11 +279,8 @@ void InflowOutflowBC(FArrayBox&      a_state,
   // however just apply diri BC
   if (a_advVel == nullptr)
   {
-    pout() << "InflowOutflowBC error - haven't specified the velocity field";
-    //    ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order);
-    //    return;
+    LOG("ERROR: InflowOutflowBC: haven't specified the velocity field");
   }
-
 
   if (a_homogeneous)
   {
@@ -330,83 +295,33 @@ void InflowOutflowBC(FArrayBox&      a_state,
   }
 
   FArrayBox advVelDir;
+  DataIterator dit = a_advVel->dataIterator();
+  const Box& stateBox = a_state.box();
 
-  // Don't currently do this
-//  bool tryCoarsening = false;
-//  if (tryCoarsening)
-//  {
-//    int refRat = a_dx/fine_dx;
-//
-//    DataIterator dit = a_advVel->dataIterator();
-//    //    pout() << "valid box: " << a_valid << endl;
-//
-//    for (dit.reset(); dit.ok(); ++dit)
-//    {
-//      const Box& advVelBox = (*a_advVel)[dit].box();
-//      Box coarsenableBox(advVelBox);
-//      coarsenableBox.coarsen(refRat);
-//      //      pout() << "advVeBox: " << advVelBox << endl;
-//
-//      if (coarsenableBox.contains(a_valid))
-//      {
-//        //        pout() << "advVel contains valid" << endl;
-//        break;
-//      }
-//    }
+  for (dit.reset(); dit.ok(); ++dit)
+  {
+    const FluxBox& flux = (*a_advVel)[dit];
+    Box advVelBox = flux.box();
 
-//    advVelDir.define(a_valid, 1);
-//    advVelDir.setVal(0.0);
-//
-//    CoarseAverage average;
-//    for (BoxIterator bit((*a_advVel)[dit].box()); bit.ok(); ++bit)
-//    {
-//      IntVect ivFine = bit();
-//      IntVect ivCoarse = ivFine;
-//      ivCoarse.coarsen(refRat);
-//      if (a_valid.contains(ivCoarse))
-//      {
-//        advVelDir(ivCoarse) += 0.5*(*a_advVel)[dit][a_dir](ivFine);
-//      }
-//    }
-//
-//  }
+    // Adv vel box might have more ghost cells than a_state.box - so remove them for comparison
+    advVelBox &= a_state.box();
 
-//  else
-//  {
-//    CH_TIME("InflowOutflowBC::findAdvVel");
-
-    DataIterator dit = a_advVel->dataIterator();
-
-    const Box& stateBox = a_state.box();
-
-    for (dit.reset(); dit.ok(); ++dit)
+    // If this advection velocity box contains information relating to this state, apply BCs
+    if (advVelBox.contains(stateBox))
     {
-      const FluxBox& flux = (*a_advVel)[dit];
-      Box advVelBox = flux.box();
+      // Extrapolation for outflow, dirichlet for inflow
 
-      // Adv vel box might have more ghost cells than a_state.box - so remove them for comparison
-      advVelBox &= a_state.box();
-
-      // If this advection velocity box contains information relating to this state, apply BCs
-      if (advVelBox.contains(stateBox))
-      {
-        //        matched = true;
-
-        // Extrapolation for outflow, dirichlet for inflow
-
-        FORT_INFLOWOUTFLOWBC(CHF_FRA(a_state),
-                             CHF_CONST_FRA(flux[a_dir]),
-                             CHF_REAL(a_DiriValue),
-                             CHF_BOX(toRegion),
-                             CHF_INT(a_order),
-                             CHF_INT(isign),
-                             CHF_INT(a_dir),
-                             CHF_INT(a_comp));
-        return;
-      }
+      FORT_INFLOWOUTFLOWBC(CHF_FRA(a_state),
+                            CHF_CONST_FRA(flux[a_dir]),
+                            CHF_REAL(a_DiriValue),
+                            CHF_BOX(toRegion),
+                            CHF_INT(a_order),
+                            CHF_INT(isign),
+                            CHF_INT(a_dir),
+                            CHF_INT(a_comp));
+      return;
     }
-//  } // end if not trying coarsening
-
+  }
   // If we made it this far, we didn't find a data index
   // Can't enforce inflow/outflow, just do dirichlet BCs
   /* There is an issue with the current inflow/outflow BCs - they don't work with multigrid as
@@ -420,7 +335,6 @@ void InflowOutflowBC(FArrayBox&      a_state,
    */
 
   ConstantDiriBC(a_state, a_valid, a_homogeneous, a_DiriValue, a_dir, a_side, a_order, a_comp);
-  //    ConstantNeumBC(a_state, a_valid, a_homogeneous, 0.0, a_dir, a_side, a_dx);
   return;
 
 }
@@ -479,9 +393,6 @@ void PressureInflowOutflow(FArrayBox&      a_state,
                            Real a_fineDx,
                            int a_comp)
 {
-  //  Interval stateInterval = a_state.interval();
-  //    DiriBC(a_state,a_valid, a_dx, a_homogeneous,
-  //           a_diriValue,a_dir, a_side, stateInterval, a_order);
   if (a_neumValue == 0)
   {
     InflowOutflowBC(a_state, a_advVel, a_valid, a_homogeneous, a_diriValue,

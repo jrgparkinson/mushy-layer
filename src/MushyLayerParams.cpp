@@ -9,10 +9,10 @@
 #include "MushyLayerUtils.H"
 #include "PhysBCUtil.H"
 #include "phaseDiagram.H"
-
+#include "Logging.H"
 
 //This is for printing out variable names, because c++ doesn't do reflection
-#define SHOW(a) pout() << #a << ": " << (a) << std::endl
+#define SHOW(a) LOG(#a << ": " << (a));
 
 /// Darcy timescale
 string MushyLayerParams::s_DARCY_TIMESCALE = "Darcy";
@@ -36,7 +36,7 @@ void MushyLayerParams::printBCs(string bcName, Vector<int> bcTypeLo, Vector<int>
 {
   char buffer [100];
   sprintf(buffer, "%-10s", bcName.c_str());
-  pout() << buffer;
+  LOG_NOEND(buffer);
 
   Vector<string> bcTypeNames;
   bcTypeNames.push_back("Fixed");
@@ -47,7 +47,6 @@ void MushyLayerParams::printBCs(string bcName, Vector<int> bcTypeLo, Vector<int>
       sprintf(buffer, "|%-10s= %02.2f|%-10s= %02.2f", m_scalarBCTypes[bcTypeLo[dir]].c_str(), bcValLo[dir],
                                               m_scalarBCTypes[bcTypeHi[dir]].c_str(), bcValHi[dir]);
       pout() << buffer;
-//      pout() << "| " << bcTypeLo[dir] << "= " << bcValLo[dir] << " | " << bcTypeHi[dir] << "= " << bcValHi[dir];
     }
     pout() << endl;
 }
@@ -239,7 +238,8 @@ MushyLayerParams::computeDerivedBCs ()
     }
   }
 
-  pout() << "After computeDerivedBCs: " << endl << "          ";
+  LOG("After computeDerivedBCs: ");
+  LOG_NOEND("         ");
     Vector<string> direction; direction.push_back("x"); direction.push_back("y"); direction.push_back("z");
     for (int dir=0; dir < SpaceDim; dir ++)
     {
@@ -737,7 +737,7 @@ void MushyLayerParams::getParameters()
 
   if (m_nondimensionalisation == m_darcyTime_advectiveVel)
   {
-    pout() << "Darcy timescale, advective velocity scale" << endl;
+    LOG("Darcy timescale, advective velocity scale");
 
     // To avoid dividing by 0 when Da = Pr = 0
     if (darcy == prandtl)
@@ -760,7 +760,7 @@ void MushyLayerParams::getParameters()
   }
   else if (m_nondimensionalisation == m_diffusiveTime_advectiveVel)
   {
-    pout() << "Diffusive timescale, advective velocity scale" << endl;
+    LOG("Diffusive timescale, advective velocity scale");
 
     m_heatDiffusionCoeff = 1.0;
     m_saltDiffusionCoeff = 1/lewis;
@@ -779,7 +779,7 @@ void MushyLayerParams::getParameters()
   else if (m_nondimensionalisation == m_darcyTime_darcyVel)
   {
 
-    pout() << "Darcy timescale, darcy velocity scale" << endl;
+    LOG("Darcy timescale, darcy velocity scale");
 
 
     m_heatDiffusionCoeff = darcy/prandtl;
@@ -792,7 +792,7 @@ void MushyLayerParams::getParameters()
   }
   else if (m_nondimensionalisation == m_advectiveTime_darcyVel)
   {
-    pout() << "Advective timescale, darcy velocity scale" << endl;
+    LOG("Advective timescale, darcy velocity scale");
 
     m_heatDiffusionCoeff = 1/(darcy*rayleighTemp);
     m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
@@ -804,7 +804,7 @@ void MushyLayerParams::getParameters()
   }
   else if (m_nondimensionalisation == m_buoyancyTime_advectiveVel)
   {
-    pout() << "Buoyancy timescale, advective velocity scale" << endl;
+    LOG("Buoyancy timescale, advective velocity scale");
 
     Real R = rayleighComposition;
     if (R == 0)
@@ -860,7 +860,8 @@ void MushyLayerParams::getParameters()
   // uncomment to print the parameters
   //  printParameters();
 
-  pout() << "BCs used: " << endl << "          ";
+  LOG("BCs used: ");
+  LOG_NOEND("         ");
     Vector<string> direction; direction.push_back("x"); direction.push_back("y"); direction.push_back("z");
     for (int dir=0; dir < SpaceDim; dir ++)
     {
@@ -976,7 +977,7 @@ void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool req
 
         else
         {
-          pout() << "Unknown BC " << temp_str[idir] << endl;
+          LOG("Unknown BC " << temp_str[idir]);
           temp[idir] = 0;
         }
       }
@@ -996,7 +997,7 @@ void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool req
   {
     if (required)
     {
-      pout() << "Can't find BC " << a_name << endl;
+      LOG("Can't find BC " << a_name);
       MayDay::Error("Couldn't find BC");
     }
   }
@@ -1020,7 +1021,7 @@ void MushyLayerParams::parseBCVals(string a_name, RealVect& a_bcHolder, bool req
   {
     if (required)
     {
-      pout() << "Can't find BC " << a_name << endl;
+      LOG("Can't find BC " << a_name);
       MayDay::Error("Couldn't find BC");
     }
   }
@@ -1135,7 +1136,7 @@ void MushyLayerParams::
 printParameters()
 {
 
-  pout() << "Parameters: " << endl;
+  LOG("Parameters: ");
 
   SHOW(physicalProblem);
   SHOW(viscosity);

@@ -56,10 +56,6 @@ void AMRLevelMushyLayer::computeRadianceIntensity()
     for (DataIterator dit = attenuation.dataIterator(); dit.ok(); ++dit)
        {
          Box b = m_grids[dit];
-
-
-//         b.growLo(SpaceDim-1, -1);
-
          IntVect iv_lo = IntVect(lo_i, z_i);
 
          if (b.contains(iv_lo))
@@ -116,12 +112,6 @@ void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_s
                               &coarserFRPtr, &finerFRPtr, // get the flux registers for the thing we're updating, a_scalarVar
                               tCoarserOld, tCoarserNew); // don't need these either, they're just dummy arguments
 
-//  if (!doFRupdates)
-//  {
-//    coarserFRPtr = nullptr;
-//    finerFRPtr = nullptr;
-//  }
-
   DataIterator dit(m_grids);
 
   LevelData<FArrayBox> liquid_tracer_conc;
@@ -132,7 +122,6 @@ void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_s
   LevelData<FluxBox> flux(m_grids, 1, a_src.ghostVect()-IntVect::Unit);
 
   // Get the flux of a_advectionVar, i.e. u*a_advectionVar
-  //    computeScalarAdvectiveFlux(flux, a_advectionVar, -1, a_advVel, m_time-m_dt, m_dt); // -1 means no diffusive src
   computeScalarAdvectiveFlux(flux, liquid_tracer_conc, a_src, m_advVel, a_tracerVar, m_time-m_dt, m_dt); // -1 means no diffusive src
 
   // Need to get tracer var/chi to advect
@@ -146,8 +135,6 @@ void AMRLevelMushyLayer::advectTracer(int a_tracerVar, LevelData<FArrayBox>& a_s
   {
     update[dit].mult(m_dt);
     (*m_scalarNew[a_tracerVar])[dit] -= update[dit];
-//    (*m_scalarNew[a_tracerVar])[dit] += update[dit];
-
   }
 
   // Flux register updates
@@ -178,8 +165,6 @@ void AMRLevelMushyLayer::advectPassiveTracer()
   LevelData<FArrayBox> a_src(m_grids, 1, 1*IntVect::Unit);
 
   computeScalarDiffusiveSrc(ScalarVars::m_passiveScalar, a_src);
-
-//  setValLevel(a_src, 0);
   advectTracer(ScalarVars::m_passiveScalar, a_src);
 
 }
@@ -234,7 +219,6 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelDa
   for (int lev=0; lev < num_levels; lev++)
     {
       bCoef[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, ivGhost));
-//      porosityFace[lev] = RefCountedPtr<LevelData<FluxBox> >(new LevelData<FluxBox>(grids[lev], 1, ivGhost));
       aCoef[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
       porosity[lev] = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>(grids[lev], 1, ivGhost));
 
@@ -247,9 +231,6 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelDa
       ml = ml->getFinerLevel();
     } // end loop over levels
 
-//  AMRScalarDiffusionOpFactory* vcop = new AMRScalarDiffusionOpFactory(); //new AMRScalarDiffusionOp();
-//  vcop->define(m_problem_domain, grids, ref_rat, dx, bc, alpha, aCoef, beta, bCoef, porosity);
-
   VCAMRPoissonOp2Factory* vcop = new VCAMRPoissonOp2Factory(); //new AMRScalarDiffusionOp();
   vcop->define(m_problem_domain, grids, ref_rat, dx, bc, alpha, aCoef, beta, bCoef);
 
@@ -258,7 +239,6 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelDa
   AMRLevelMushyLayer* crseML = getCoarserLevel();
   if (crseML)
   {
-//    crseVar = &(*crseML->m_scalarNew[a_var]);
     crseML->computeScalarConcInLiquid(*crseVar, a_scalarBulkConc);
   }
 
@@ -268,14 +248,8 @@ void AMRLevelMushyLayer::computeScalarDiffusiveSrc(int a_scalarBulkConc, LevelDa
   computeScalarConcInLiquid(liquidConc, a_scalarBulkConc);
 
   // This just calls applyOpI if crseHC = nullptr, else does CF interpolation
-//  amrpop->applyOpMg(a_src, liquidConc, crseVar, false);
   amrpop->applyOp(a_src, liquidConc, false);
-
-//  Real maxSrc = ::computeNorm(a_src, nullptr, -1, m_dx);
-//  pout() << "Max diffusive tracer src = " << maxSrc << endl;
-
   a_src.exchange();
-
 }
 
 

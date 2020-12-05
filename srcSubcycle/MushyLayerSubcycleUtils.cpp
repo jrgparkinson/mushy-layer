@@ -488,37 +488,37 @@ getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact)
 
   if (opt.tag_velocity)
   {
-    pout() << "Refinement method: tag fluid speed" << endl;
+    LOG("Refinement method: tag fluid speed");
     opt.refinementMethod = RefinementMethod::tagSpeed;
   }
   else if (opt.tag_channels)
   {
-    pout() << "Refinement method: tag channels" << endl;
+    LOG("Refinement method: tag channels");
     opt.refinementMethod = RefinementMethod::tagChannels;
   }
   else if (opt.tag_plume_mush)
   {
-    pout() << "Refinement method: tag plume mush" << endl;
+    LOG("Refinement method: tag plume mush");
     opt.refinementMethod = RefinementMethod::tagPlumeMush;
   }
   else if (opt.taggingVar > -1)
   {
-    pout() << "Refinement method: tag scalar field" << endl;
+    LOG("Refinement method: tag scalar field");
     opt.refinementMethod = RefinementMethod::tagScalar;
   }
   else if (opt.taggingVectorVar > -1)
   {
-    pout() << "Refinement method: tag vector" << endl;
+    LOG("Refinement method: tag vector");
     opt.refinementMethod = RefinementMethod::tagVector;
   }
   else if (ppRegrid.contains("tag_mush_channels"))
   {
-    pout() << "Refinement method: tag_mush_channels" << endl;
+    LOG("Refinement method: tag_mush_channels");
     opt.refinementMethod = RefinementMethod::tagMushChannels;
   }
   else if (ppRegrid.contains("tag_channels_composite"))
   {
-    pout() << "Refinement method: tag_channels_composite" << endl;
+    LOG("Refinement method: tag_channels_composite");
     opt.refinementMethod = RefinementMethod::tagMushChannelsCompositeCriteria;
   }
 
@@ -956,7 +956,7 @@ defineAMR(AMR&                                          a_amr,
           const ProblemDomain&                          a_prob_domain,
           const Vector<int>&                            a_refRat)
 {
-//  pout() << "MushyLayerSubcycleUtils - defineAMR(..) - creating AMR object" << endl;
+//  LOG("MushyLayerSubcycleUtils - defineAMR(..) - creating AMR object");
 
   ParmParse ppMain("main");
   int max_level = 0;
@@ -1070,7 +1070,7 @@ defineAMR(AMR&                                          a_amr,
     ppMain.get("use_subcycling", useSubcycling);
     if (!useSubcycling)
     {
-      pout() << "SUBCYCLING IN TIME TURNED OFF!!!"  << endl;
+      LOG("SUBCYCLING IN TIME TURNED OFF!!!" );
     }
     a_amr.useSubcyclingInTime(useSubcycling);
   }
@@ -1127,7 +1127,7 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
               string gridfileParam, int verbosity)
 {
 
-  //  pout() << "getFixedGrids" << endl;
+  //  LOG("getFixedGrids");
 
   ParmParse ppMain("main");
 
@@ -1141,7 +1141,7 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
   else
   {
     max_level = 0;
-    pout() << "No max_level given, using max_level = 0" << endl;
+    LOG("No max_level given, using max_level = 0");
   }
 
   if (ppMain.contains("max_grid_size"))
@@ -1151,7 +1151,7 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
   else
   {
     max_grid_size = prob_domain.domainBox().longside();
-    pout() << "No max_grid_size given, using max_grid_size = " << max_grid_size << endl;
+    LOG("No max_grid_size given, using max_grid_size = " << max_grid_size);
   }
 
 
@@ -1178,13 +1178,13 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
     ifstream is(gridfile.c_str(), ios::in);
     if (is.fail())
     {
-      pout() << "cannot open grids file " << gridfile << endl;
+      LOG("cannot open grids file " << gridfile);
       MayDay::Error("Cannot open grids file");
     }
 
 #ifdef CH_MPI
 
-    pout() << "procID: " << procID() << "  opening gridfile \n" << endl;
+    LOG("procID: " << procID() << "  opening gridfile \n");
 
 #endif
 
@@ -1196,7 +1196,7 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
     CH_assert (in_numLevels <= max_level+1);
     if (verbosity >= 3)
     {
-      pout() << "numLevels = " << in_numLevels << endl;
+      LOG("numLevels = " << in_numLevels);
     }
     while (is.get() != '\n');
     amrGrids.resize(in_numLevels);
@@ -1205,10 +1205,10 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
 
     if (verbosity >= 3)
     {
-      pout() << "level 0: ";
+      LOG_NOEND("level 0: ");
       for (int n=0; n<amrGrids[0].size(); n++)
       {
-        pout () << amrGrids[0][n] << endl;
+        LOG(amrGrids[0][n]);
       }
     }
     // now loop over levels, starting with level 1
@@ -1218,7 +1218,7 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
       is >> ngrid;
       if (verbosity >= 3)
       {
-        pout() << "level " << lev << " numGrids = " << ngrid << endl;
+        LOG("level " << lev << " numGrids = " << ngrid);
         pout() << "Grids: ";
       }
       while (is.get() != '\n');
@@ -1242,12 +1242,12 @@ getFixedGrids(Vector<Vector<Box> >& amrGrids,  ProblemDomain prob_domain,
         //bxRef.refine(ref_ratios[lev-1]);
         if (bxRef.longside() > max_grid_size)
         {
-          pout() << "Grid " << bx << " too large" << endl;
+          LOG("Grid " << bx << " too large");
           MayDay::Error();
         }
         if (verbosity >= 3)
         {
-          pout() << bx << endl;
+          LOG(bx);
         }
         amrGrids[lev][i] = bx;
       } // end loop over boxes on this level
@@ -1285,12 +1285,12 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
   {
     std::string restart_file;
     ppMain.get("restart_file",restart_file);
-    pout() << " restarting from file " << restart_file << endl;
+    LOG(" restarting from file " << restart_file);
 
 #ifdef CH_USE_HDF5
     HDF5Handle handle(restart_file,HDF5Handle::OPEN_RDONLY);
     // read from checkpoint file
-    pout() << "Opened checkpoint file" << endl;
+    LOG("Opened checkpoint file");
     a_amr.setupForRestart(handle);
     handle.close();
 #else
@@ -1309,7 +1309,7 @@ setupAMRForAMRRun(AMR& a_amr, ProblemDomain prob_domain)
       {
         amrLev[i]->time(resetTime);
       }
-      pout() << "Set time = " << resetTime << endl;
+      LOG("Set time = " << resetTime);
 #else
       MayDay::Warning("Unable to reset time as you're not using the forked version of Chombo, and therefore your AMR class doesn't have a cur_time() method");
 #endif

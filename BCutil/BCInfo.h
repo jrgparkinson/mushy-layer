@@ -8,6 +8,8 @@
 #ifndef BCUTIL_BCINFO_H_
 #define BCUTIL_BCINFO_H_
 
+#include "Logging.H"
+
 /// General class to contian some boundary condition information
 /**
  * Hold information for some particular variable for each direction/side/component
@@ -79,7 +81,7 @@ public:
       {
         if (m_required)
         {
-          pout() << "Can't find BC " << a_name << endl;
+          LOG("Can't find BC: " << a_name);
           MayDay::Error("Couldn't find BC");
         }
         else

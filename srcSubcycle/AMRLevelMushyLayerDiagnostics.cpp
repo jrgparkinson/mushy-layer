@@ -537,7 +537,6 @@ void AMRLevelMushyLayer::computeDiagnostics()
   if (calcDiagnostics
       && m_diagnostics.diagnosticIsIncluded(DiagnosticNames::diag_avSalinity))
   {
-    //    pout() << "AMRLevelMushyLayer::computeDiagnostics - compute average salinity" << endl;
     Vector<Real> averagedSalinity;
     horizontallyAverage(averagedSalinity, *m_scalarNew[ScalarVars::m_liquidConcentration]);
 

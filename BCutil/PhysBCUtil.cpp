@@ -10,7 +10,6 @@
 #include "NonlinearBC.H"
 #include "viscousBCF_F.H"
 
-//#include "NamespaceHeader.H"
 
 static void getDomainFacePosition(RealVect&             a_retval,
                                   const IntVect&        a_validIV,
@@ -1204,8 +1203,6 @@ public:
 
                     IntVect se = velBox.smallEnd();
                     IntVect be = velBox.bigEnd();
-                    //                    pout() << velBox.smallEnd() << " - " << velBox.bigEnd() << endl;
-                    //                    pout() << stateBox.smallEnd() << " - " << stateBox.bigEnd() << endl;
 
                     if (velBox == stateBox || stateBox.contains(velBox))
                     {
@@ -4064,7 +4061,6 @@ PhysBCUtil::PhysBCUtil() : m_dx(-1),
 // ---------------------------------------------------------------
 PhysBCUtil::PhysBCUtil(MushyLayerParams a_params, Real a_dx)
 {
-  //  pout() << "PhysBCUtil::PhysBCUtil" << endl;
   m_advVel = nullptr;
 
   // initialize to bogus values
@@ -4242,14 +4238,7 @@ void PhysBCUtil::updateTimeDependentBCs()
 
     m_params.bcValTemperatureHi[dir] = m_params.sinusoidal_temperature_bc_av + m_params.sinusoidal_temperature_bc_amplitude
         *sin(2*M_PI*(m_params.sinusoidal_temperature_bc_phase_diff + m_time/m_params.sinusoidal_temperature_bc_timescale) );
-//    bcValEnthalpyLo[dir] = stefan + T;
 
-    //    pout() << "Set bottom temperature BC = " << T << endl;
-
-
-    // m_BCtimescale = 1;
-    //   m_time = -999;
-    //   m_timeDependentBC = m_constant;)
   }
 
 }

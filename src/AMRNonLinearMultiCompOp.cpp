@@ -42,7 +42,6 @@ void AMRNonLinearMultiCompOp::computeDiffusedVar(LevelData<FArrayBox>& a_diffuse
     computeDiffusedVar(a_diffusedVar[dit], a_phi[dit], dit(), a_homogeneous);
   }
 
-
   {
     CH_TIME("AMRNonLinearMultiCompOp::computeDiffusedVar::exchange");
     a_diffusedVar.exchange(a_diffusedVar.interval(), m_exchangeCopier);
@@ -100,7 +99,6 @@ void AMRNonLinearMultiCompOp::computeDiffusedVar(FArrayBox& a_diffusedVar,
   {
     m_diffusedVarBC(a_diffusedVar, m_domain.domainBox(), m_domain, m_dx, a_homogeneous);
   }
-
 }
 
 void AMRNonLinearMultiCompOp::residualI(LevelData<FArrayBox>&       a_lhs,
@@ -224,7 +222,6 @@ void AMRNonLinearMultiCompOp::applyOpMg(LevelData<FArrayBox>& a_lhs, LevelData<F
   {
     const ProblemDomain& probDomain = a_phiCoarse->disjointBoxLayout().physDomain();
     const Box& domBox = probDomain.domainBox();
-    //    IntVect hi = domBox.b
     if (domBox.bigEnd() != domBox.smallEnd())
     {
       m_interpWithCoarser.coarseFineInterp(a_phi, *a_phiCoarse);
@@ -249,7 +246,7 @@ void AMRNonLinearMultiCompOp::applyOpI(LevelData<FArrayBox>&      a_lhs,
     m_bc(phi[dit], dbl[dit()],m_domain, dx, a_homogeneous);
   }
 
-  applyOpNoBoundary2(a_lhs, a_phi,a_homogeneous );
+  applyOpNoBoundary2(a_lhs, a_phi, a_homogeneous);
 }
 
 void AMRNonLinearMultiCompOp::applyOpNoBoundary2(LevelData<FArrayBox>&      a_lhs,
@@ -304,7 +301,8 @@ void AMRNonLinearMultiCompOp::applyOpNoBoundary2(LevelData<FArrayBox>&      a_lh
 #endif
      CHF_BOX(region),
      CHF_CONST_REAL(m_dx));
-    //		int temp=0;
+
+     int temp=0;
 
   } // end loop over boxes
 }

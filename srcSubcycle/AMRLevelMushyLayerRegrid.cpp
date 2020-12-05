@@ -444,10 +444,7 @@ AMRLevelMushyLayer::defineRegridAMROp(AMRPoissonOpFactory& a_factory,
 
 void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::tagCells " << m_level << endl;
-  }
+  LOG_DEBUG("Tag cells level:" << m_level);
 
   // Since tags are calculated using only current time step data, use
   // the same tagging function for initialization and for regridding.
@@ -458,7 +455,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   if (m_opt.min_regrid_time >= 0 && m_time < m_opt.min_regrid_time)
   {
     a_tags = localTags;
-    pout() << "Not tagging any cells as current time (" << m_time << ") is less than " << m_opt.min_regrid_time << endl;
+    LOG_INFO("Not tagging any cells as current time (" << m_time << ") is less than " << m_opt.min_regrid_time);
     return;
   }
 
@@ -510,24 +507,18 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     }
   }
 
-  pout() << "number of shrunkMushyCells: " << shrunkMushyCells.numPts() << endl;
+  LOG_INFO("number of shrunkMushyCells: " << shrunkMushyCells.numPts());
 
   if (m_opt.refinementMethod == RefinementMethod::tagSpeed) // m_opt.tag_velocity
   {
 
-    if (s_verbosity >= 2)
-    {
-      pout() << "AMRLevelMushyLayer::tagCells - tag fluid speed >  " << m_opt.vel_thresh << endl;
-    }
+    LOG_DEBUG("Tag fluid speed >  " << m_opt.vel_thresh);
 
     tagCellsVar(localTags, m_opt.vel_thresh, -1, m_fluidVel, TaggingMethod::Magnitude);
   }
   else if (m_opt.refinementMethod == RefinementMethod::tagMushChannelsCompositeCriteria)
   {
-    if (s_verbosity >= 2)
-       {
-         pout() << "AMRLevelMushyLayer::tagCells - using composite criteria to find mush and channels >  " << endl;
-       }
+    LOG_DEBUG("Using composite tagging criteria to find mush and channels >  ");
 
     DataIterator dit = m_grids.dataIterator();
         for (dit.begin(); dit.ok(); ++dit)
@@ -646,11 +637,11 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     {
       if (m_opt.refinementMethod == RefinementMethod::tagPlumeMush)
       {
-        pout() << "AMRLevelMushyLayer::tagCells - refine plume mush - " << m_level << " (finest level: " << finestLevel << ")" << endl;
+        LOG_INFO("tagCells - refine plume mush - " << m_level << " (finest level: " << finestLevel << ")");
       }
       else
       {
-        pout() << "AMRLevelMushyLayer::tagCells - refine mush channels - " << m_level << " (finest level: " << finestLevel << ")" << endl;
+        LOG_INFO("tagCells - refine mush channels - " << m_level << " (finest level: " << finestLevel << ")");
       }
     }
 
@@ -683,7 +674,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
           }
         }
 
-        pout() << "Tagged " << localTags.numPts() << " cells on level " << m_level << endl;
+        LOG_INFO("Tagged " << localTags.numPts() << " cells on level " << m_level);
 
       }
       else
@@ -722,10 +713,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
         // Only take downflow cells which are also in the set of cells satisfying the porosity gradient condition
         downflowCells &= porosityGradientCells;
 
-        if (s_verbosity >= 5)
-        {
-          pout() << "Downflow & porous gradient cells: " << downflowCells << endl;
-        }
+        LOG_DEBUG("Downflow & porous gradient cells: " << downflowCells);
 
         // Add to the local tag set
         localTags |= downflowCells;
@@ -738,21 +726,12 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       // Make sure we tag mushy regions on level 0
       if (m_level == 0)
       {
-        if (s_verbosity >= 5)
-        {
-          pout() << "Refining on level " << m_level << " where porosity < 1 (all mushy cells)" << endl;
-        }
-
+        LOG_DEBUG("Refining on level " << m_level << " where porosity < 1 (all mushy cells)");
         localTags |= mushyCells;
       }
       else
       {
-
-
-        if (s_verbosity >= 5)
-        {
-          pout() << "Refining on level " << m_level << " where porosity gradients > refine thresh (" << m_opt.refineThresh << ")" << endl;
-        }
+        LOG_DEBUG("Refining on level " << m_level << " where porosity gradients > refine thresh (" << m_opt.refineThresh << ")");
 
         // Refine mushy regions which may be about generate channels
         IntVectSet mushyCells;
@@ -775,7 +754,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     if (s_verbosity >= 2)
     {
 
-      pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_scalarVarNames[m_opt.taggingVar] << endl;
+      LOG_INFO("tagCells - refining on variable - " << m_scalarVarNames[m_opt.taggingVar]);
 
     }
 
@@ -786,7 +765,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     if (s_verbosity >= 2)
     {
 
-      pout() << "AMRLevelMushyLayer::tagCells - refining on variable - " << m_vectorVarNames[m_opt.taggingVectorVar] << endl;
+      LOG_INFO("Refining on variable - " << m_vectorVarNames[m_opt.taggingVectorVar]);
 
     }
 
@@ -794,54 +773,35 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   }
   else
   {
-    if (s_verbosity >= 2)
-    {
-      pout() << "AMRLevelMushyLayer::tagCells - custom tagging criteria, tagging mushy cells " << endl;
-    }
+    LOG_DEBUG("Custom tagging criteria, tagging mushy cells ");
     localTags |= mushyCells;
   }
 
   if (m_opt.onlyTagPorousCells)
   {
-    pout() << "Tags before merging with mushy cells: " << localTags.numPts();
+    LOG_INFO("Tags before merging with mushy cells: " << localTags.numPts());
     localTags &= shrunkMushyCells;
-    pout() << ", after: " << localTags.numPts() << endl;
+    LOG_INFO("After: " << localTags.numPts());
   }
 
 
   if (m_opt.tagMLboundary)
   {
-    if (s_verbosity >= 2)
-    {
-      pout() << "AMRLevelMushyLayer::tagCells - also tag Mush-Liquid boundary " << endl;
-    }
-
-
+    LOG_DEBUG("Tag Mush-Liquid boundary ");
 
     // Tag liquid-mush boundary and add to existing tags
     tagMushLiquidBoundary(localTags);
-
-    // Tags cells with porosity < 1
-    //    tagMushyCells(localTags);
   }
 
   if (m_opt.tagDomainBoundary)
   {
-    if (s_verbosity >= 2)
-    {
-      pout() << "AMRLevelMushyLayer::tagCells - also tag domain boundary " << endl;
-    }
-
+    LOG_DEBUG("Tag domain boundary ");
     tagBoundaryLayerCells(localTags);
   }
 
   if (m_opt.tagCenterBoxSize > 0)
   {
-    if (s_verbosity >= 2)
-    {
-      pout() << "AMRLevelMushyLayer::tagCells - only tag the middle of the domain " << endl;
-    }
-
+    LOG_DEBUG("Only tag the middle of the domain ");
     localTags = IntVectSet();
 
     if (m_time >= m_opt.tagCenterBoxRegridTime)
@@ -860,10 +820,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
     localTags = IntVectSet();
     if (m_time > m_opt.fixed_grid_time)
     {
-      if (s_verbosity >= 2)
-      {
-        pout() << "AMRLevelMushyLayer::tagCells - tag all cells covered by specified grid file " <<  endl;
-      }
+      LOG_DEBUG("Tag all cells covered by specified grid file");
 
       // Get whole hierarchy of grids
       Vector<Vector<Box> > amrGrids;
@@ -875,8 +832,6 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
       int levelForGrids = m_level+1;
       if (levelForGrids < numLevels)
       {
-
-
         Vector<Box> levelGrids = amrGrids[levelForGrids];
 
         for (int i=0; i < levelGrids.size(); i++)
@@ -897,7 +852,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   localTagsBox &= m_problem_domain;
   localTags &= localTagsBox;
 
-  pout() << "Restrict tags to domain box, num left: "  << localTags.numPts() << endl;
+  LOG_INFO("Restrict tags to domain box, num left: "  << localTags.numPts());
 
 
   // This is some code which will force any refined levels to coarsen again,
@@ -905,10 +860,7 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
   // the code handles such procedures (e.g. testing for memory leaks)
   if (m_opt.testRegridCoarsening)
   {
-    if (s_verbosity >= 2)
-    {
-      pout() << "AMRLevelMushyLayer::tagCells - testing regrid coarsening" << endl;
-    }
+    LOG_DEBUG("Testing regrid coarsening");
 
     bool hasValidFinerLevel = false;
     if (m_hasFiner)
@@ -934,13 +886,13 @@ void AMRLevelMushyLayer::tagCells(IntVectSet& a_tags)
 
   if (s_verbosity >= 3)
   {
-    pout() << "Final local tags: " << localTags << endl;
-    pout() << "  Num points: " << localTags.numPts() << endl;
-    pout() << "  Min enclosing box: " << localTags.minBox() << endl;
+    LOG_INFO("Final local tags: " << localTags);
+    LOG_INFO("  Num points: " << localTags.numPts());
+    LOG_INFO("  Min enclosing box: " << localTags.minBox());
   }
   else
   {
-    pout() << "Final local cells tagged (level: " << m_level << "): " << localTags.numPts() << endl;
+    LOG_INFO("Final local cells tagged (level: " << m_level << "): " << localTags.numPts());
   }
 
   a_tags = localTags;
@@ -1206,17 +1158,14 @@ void AMRLevelMushyLayer::tagCellsInit(IntVectSet& a_tags)
 void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
 {
   // Always print when we regrid
-  if (s_verbosity >= 0)
-  {
-    pout() << "AMRLevelMushyLayer::regrid (level " << m_level << ")" << endl;
-  }
+  LOG_DEBUG("regrid (level " << m_level << ")");
 
   if (s_verbosity >= 4)
   {
     for (int i=0; i < a_newGrids.size(); i++)
     {
       const Box& b = a_newGrids[i];
-      pout() << "  Box spanning (" << b.smallEnd() << ") -  (" << b.bigEnd() << ")" << endl;
+      LOG_INFO("  Box spanning (" << b.smallEnd() << ") -  (" << b.bigEnd() << ")");
     }
 
   }
@@ -1232,7 +1181,7 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
     m_newGrids_different = false;
   }
 
-  pout() << "  New grids are different (time = " << m_time << ")? " << m_newGrids_different << endl;
+  LOG_INFO("  New grids are different (time = " << m_time << ")? " << m_newGrids_different);
 
   if (m_newGrids_different)
   {
@@ -1333,7 +1282,6 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
     scalarInterp.define(m_grids, 1, crseRefRat, m_problem_domain);
     vectorInterp.define(m_grids, SpaceDim, crseRefRat, m_problem_domain);
 
-
     for (int scalarVar = 0; scalarVar < m_numScalarVars;
         scalarVar++)
     {
@@ -1359,13 +1307,11 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
       {
         setValLevel(*m_scalarNew[scalarVar], 1.0);
       }
-
     }
 
     for (int vectorVar = 0; vectorVar < m_numVectorVars;
         vectorVar++)
     {
-
       if (m_opt.vectorHOinterp)
       {
         vectorInterp4.interpToFine(*m_vectorNew[vectorVar],
@@ -1380,16 +1326,12 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
         vectorInterp.interpToFine(*m_vectorOld[vectorVar],
                                   *(amrMushyLayerCoarserPtr->m_vectorOld[vectorVar]));
       }
-
     }
-
   }
 
   // Copy from old grids into new grids
-
   for (int scalarVar = 0; scalarVar < m_numScalarVars; scalarVar++)
   {
-
     scalarNew_OldGrids[scalarVar]->copyTo(
         scalarNew_OldGrids[scalarVar]->interval(),
         *m_scalarNew[scalarVar],
@@ -1419,12 +1361,6 @@ void AMRLevelMushyLayer::regrid(const Vector<Box>& a_newGrids)
   calculateAnalyticSolns(false);
 
   fillFrameVelocity();
-
-  // Ensure the new theta, porosity etc. are consistent with the regridded H and S
-  // This was introducing errors during regridding for some reason - turn it off
-  //  updateEnthalpyVariables();
-
-  //    int temp=0;
 }
 
 
@@ -1517,9 +1453,9 @@ void AMRLevelMushyLayer::postRegridNew(int a_base_level)
     return;
   }
 
-  pout() << "postRegridNew between base level " << a_base_level << " and current level " << m_level << endl;
-  pout() << "     level " << m_level << ": time=" << m_time << ", dt=" << m_dt << endl;
-  pout() << "     level " << getCoarserLevel()->m_level << ": time=" << getCoarserLevel()->m_time << ", dt=" << getCoarserLevel()->m_dt << endl;
+  LOG_INFO("postRegridNew between base level " << a_base_level << " and current level " << m_level);
+  LOG_INFO("     level " << m_level << ": time=" << m_time << ", dt=" << m_dt);
+  LOG_INFO("     level " << getCoarserLevel()->m_level << ": time=" << getCoarserLevel()->m_time << ", dt=" << getCoarserLevel()->m_dt);
 
   // Get the mushy layer object for the base level
   AMRLevelMushyLayer* ml_base = this;
@@ -1583,7 +1519,7 @@ void AMRLevelMushyLayer::postRegridNew(int a_base_level)
   m_diagnostics.addDiagnostic(DiagnosticNames::diag_postRegridLambda, m_time+m_dt, maxLambda);
   Real crseNewTime =getCoarsestLevel()->m_time + getCoarsestLevel()->m_dt;
   getCoarsestLevel()->m_diagnostics.addDiagnostic(DiagnosticNames::diag_postRegridLambda, crseNewTime, maxLambda);
-  pout() << "PostRegrid(level " << m_level <<", time " << m_time <<") - max|Lambda| = " << maxLambda << endl;
+  LOG_INFO("PostRegrid(level " << m_level <<", time " << m_time <<") - max|Lambda| = " << maxLambda);
 
   base_projection.doPostRegridOps(amrLambda,amrPorosityFace,
                                   base_dt,m_time, 1.0);
@@ -1615,17 +1551,14 @@ void AMRLevelMushyLayer::postRegridNew(int a_base_level)
   }
 
   // Sanity checking
-  pout() << "postRegridNew (level " << m_level << ") finished. time=" << m_time << ", dt=" << m_dt << endl;
+  LOG_INFO("postRegridNew (level " << m_level << ") finished. time=" << m_time << ", dt=" << m_dt);
 
 
 }
 
 void AMRLevelMushyLayer::postRegridOld(int a_base_level)
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::postRegrid (level " << m_level << ")" << endl;
-  }
+  LOG_DEBUG("postRegrid (level " << m_level << ")");
 
   // If the new grids are no different to old grids, don't do anything
   // Need to check across all levels
@@ -1795,7 +1728,7 @@ void AMRLevelMushyLayer::postRegridOld(int a_base_level)
       {
         if (s_verbosity > 2)
         {
-          pout() << "AMRLevelMushyLayer::postRegrid - advecting lambda on all levels to compute correction" << endl;
+          LOG_INFO("postRegrid - advecting lambda on all levels to compute correction");
         }
 
         // This is a fake subcycled advance

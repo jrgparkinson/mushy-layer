@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
     number_procs=1;
 #endif
     
-    pout() << "mushyLayer starting" << endl;
+    LOG("mushyLayer starting");
 
     if(argc < 2) 
       { std::cerr << " usage: " << argv[0] << " <input_file>\n"; exit(0); }

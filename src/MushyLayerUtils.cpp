@@ -19,6 +19,7 @@
 #include "SetValLevel.H"
 #include "CellToEdge.H"
 #include "CellToEdge2.H"
+#include "Logging.H"
 
 #include <cstdio>
 #include <iostream>
@@ -518,7 +519,7 @@ void printRepoVersion()
       result += buffer.data();
   }
 
-  pout() << "Mercurial repository revision: " << result << endl;
+  LOG("Mercurial repository revision: " << result);
 }
 
 

@@ -126,10 +126,7 @@ void
 AMRLevelMushyLayer::
 writeCheckpointHeader(HDF5Handle& a_handle) const
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::writeCheckpointHeader" << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   // Setup the number of components
   HDF5HeaderData header;
@@ -151,12 +148,6 @@ writeCheckpointHeader(HDF5Handle& a_handle) const
   Vector<string> chkVectorVarNames(m_numVectorVars);
   getChkVectorVarNames(chkVectorVarNames, m_chkVectorVars, m_vectorVarNames);
 
-  if (s_verbosity >= 3)
-    {
-      pout() << "AMRLevelMushyLayer::writeCheckpointHeader - get scalar var names" << endl;
-    }
-
-
   // Now write out the ones we want
   // First do scalar comps
   for (int comp = 0; comp < numChkScalarComps; ++comp)
@@ -168,11 +159,6 @@ writeCheckpointHeader(HDF5Handle& a_handle) const
 
     header.m_string[compStr] = scalarVarNames[scalarVarComp];
   }
-
-  if (s_verbosity >= 3)
-     {
-       pout() << "AMRLevelMushyLayer::writeCheckpointHeader - get vector var names" << endl;
-     }
 
   // Now do vector comps. Slightly more complicated because
   // each variable has x, y, (maybe z) components
@@ -187,11 +173,7 @@ writeCheckpointHeader(HDF5Handle& a_handle) const
   // Write the header
   header.writeToFile(a_handle);
 
-  if (s_verbosity >= 3)
-     {
-       pout() << "AMRLevelMushyLayer::writeCheckpointHeader - finished" << endl;
-     }
-
+  LOG_FUNCTION_EXIT();
 }
 
 /*******/
@@ -199,10 +181,7 @@ void
 AMRLevelMushyLayer::
 writeCheckpointLevel(HDF5Handle& a_handle) const
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::writeCheckpointLevel" << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   // Setup the level string
   char levelStr[20];
@@ -238,11 +217,6 @@ writeCheckpointLevel(HDF5Handle& a_handle) const
           else
             header.m_int ["is_periodic_2"] = 0; );
 
-  if (s_verbosity >= 3)
-    {
-      pout() << "AMRLevelMushyLayer::writeCheckpointLevel - write header" << endl;
-    }
-
   // Write the header for this level
   header.writeToFile(a_handle);
 
@@ -254,11 +228,6 @@ writeCheckpointLevel(HDF5Handle& a_handle) const
   int numChkScalarComps = m_chkScalarVars.size();
   int numChkVectorComps = m_chkVectorVars.size();
 
-  if (s_verbosity >= 3)
-    {
-      pout() << "AMRLevelMushyLayer::writeCheckpointLevel - write scalar fields" << endl;
-    }
-
   for (int i=0; i<numChkScalarComps; i++)
   {
     int var = m_chkScalarVars[i];
@@ -266,29 +235,13 @@ writeCheckpointLevel(HDF5Handle& a_handle) const
     write(a_handle,*m_scalarNew[var],m_scalarVarNames[var]);
   }
 
-
-  if (s_verbosity >= 3)
-    {
-      pout() << "AMRLevelMushyLayer::writeCheckpointLevel - write vector fields" << endl;
-    }
-
   for (int i=0; i<numChkVectorComps; i++)
   {
     int var = m_chkVectorVars[i];
     write(a_handle,*m_vectorNew[var],m_vectorVarNames[var]);
   }
 
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::writeCheckpointLevel - write adv vel" << endl;
-  }
-
   write(a_handle, m_advVel, "advVel");
-
-  if (s_verbosity >= 3)
-    {
-      pout() << "AMRLevelMushyLayer::writeCheckpointLevel - finished" << endl;
-    }
 }
 
 /*******/
@@ -296,10 +249,7 @@ void
 AMRLevelMushyLayer::
 readCheckpointHeader(HDF5Handle& a_handle)
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::readCheckpointHeader" << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   // Reader the header
   HDF5HeaderData header;
@@ -312,11 +262,7 @@ void
 AMRLevelMushyLayer::
 readCheckpointLevel(HDF5Handle& a_handle)
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::readCheckpointLevel (level " << m_level << ")" << endl;
-  }
-
+  LOG_FUNCTION_ENTRY();
   // Setup the level string
   char levelStr[20];
   sprintf(levelStr,"%d",m_level);
@@ -335,10 +281,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
   }
   m_ref_ratio = header.m_int["ref_ratio"];
 
-  if (s_verbosity >= 2)
-  {
-    pout() << "read ref_ratio = " << m_ref_ratio << endl;
-  }
+  LOG_DEBUG("read ref_ratio = " << m_ref_ratio);
 
   // Get the tag buffer size
   if (header.m_int.find("tag_buffer_size") == header.m_int.end())
@@ -347,10 +290,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
   }
   m_opt.tagBufferSize= header.m_int["tag_buffer_size"];
 
-  if (s_verbosity >= 2)
-  {
-    pout() << "read tag_buffer_size = " << m_opt.tagBufferSize << endl;
-  }
+  LOG_DEBUG("read tag_buffer_size = " << m_opt.tagBufferSize);
 
   // Get dx
   if (header.m_real.find("dx") == header.m_real.end())
@@ -359,10 +299,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
   }
   m_dx = header.m_real["dx"];
 
-  if (s_verbosity >= 2)
-  {
-    pout() << "read dx = " << m_dx << endl;
-  }
+  LOG_DEBUG("read dx = " << m_dx);
 
   // Get dt
   if (header.m_real.find("dt") == header.m_real.end())
@@ -372,10 +309,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
 
   m_dt = header.m_real["dt"];
 
-  if (s_verbosity >= 2)
-  {
-    pout() << "read dt = " << m_dt << endl;
-  }
+  LOG_DEBUG("read dt = " << m_dt);
 
   // Get time
   if (header.m_real.find("time") == header.m_real.end())
@@ -384,10 +318,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
   }
   m_time = header.m_real["time"];
 
-  if (s_verbosity >= 2)
-  {
-    pout() << "read time = " << m_time << endl;
-  }
+  LOG_DEBUG("read time = " << m_time);
 
   // Get the problem domain
   if (header.m_box.find("prob_domain") == header.m_box.end())
@@ -444,12 +375,12 @@ readCheckpointLevel(HDF5Handle& a_handle)
 
   if (s_verbosity >= 4)
   {
-    pout() << "read level domain: " << endl;
+    LOG_INFO("read level domain: ");
     LayoutIterator lit = m_grids.layoutIterator();
     for (lit.begin(); lit.ok(); ++lit)
     {
       const Box& b = m_grids[lit()];
-      pout() << lit().intCode() << ": " << b << endl;
+      LOG_INFO(lit().intCode() << ": " << b);
     }
     pout() << endl;
   }
@@ -465,14 +396,14 @@ readCheckpointLevel(HDF5Handle& a_handle)
 
   if (s_verbosity >= 10)
   {
-    pout() << "AMRLevelMushyLayer::readCheckpointLevel() - read in data" << endl;
+    LOG_INFO("readCheckpointLevel() - read in data");
   }
 
   for (int var=0; var<m_numScalarVars; var++)
   {
     if (s_verbosity >= 10)
     {
-      pout() << "     reading in variable: " << m_scalarVarNames[var] << endl;
+      LOG_INFO("     reading in variable: " << m_scalarVarNames[var]);
     }
 
     // Check that this is a variable we have been writing out
@@ -490,14 +421,14 @@ readCheckpointLevel(HDF5Handle& a_handle)
       {
         if (s_verbosity >= 10)
         {
-          pout() << "       ... variable not found in checkpoint file, continuing anyway " << endl;
+          LOG_INFO("       ... variable not found in checkpoint file, continuing anyway ");
         }
         // This is no longer an error - just read in what we can and deal with it
         //      MayDay::Error("AMRLevelMushyLayer::readCheckpointLevel: file does not contain state data");
       }
       else if (s_verbosity >= 10)
       {
-        pout() << "       ... done " << endl;
+        LOG_INFO("       ... done ");
       }
 
     }
@@ -505,7 +436,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
     {
       if (s_verbosity >= 10)
       {
-        pout() << "       ... skipping " << endl;
+        LOG_INFO("       ... skipping ");
       }
     }
   }
@@ -515,7 +446,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
   {
     if (s_verbosity >= 10)
     {
-      pout() << "     reading in variable: " << m_vectorVarNames[var] << endl;
+      LOG_INFO("     reading in variable: " << m_vectorVarNames[var]);
     }
 
     std::vector<int> v = m_chkVectorVars.stdVector();
@@ -526,7 +457,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
       tempVector.copyTo(Interval(0, SpaceDim-1), *m_vectorNew[var], Interval(0, SpaceDim-1) );
 //      if (dataStatus != 0)
 //      {
-        //pout() << "       ... variable not found in checkpoint file, continuing anyway " << endl;
+        //LOG_INFO("       ... variable not found in checkpoint file, continuing anyway ");
 //     }
 
 
@@ -555,7 +486,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
     {
       // H = H - 1
       // S = S + 1
-      pout() << "Converting Katz to Wells units (H=H-1; S=S+1)" << endl;
+      LOG_INFO("Converting Katz to Wells units (H=H-1; S=S+1)");
 
       for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
       {
@@ -567,7 +498,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
     }
     else
     {
-      pout() << "Don't know how to transform these units" << endl;
+      LOG_INFO("Don't know how to transform these units");
     }
   }
 
@@ -575,7 +506,7 @@ readCheckpointLevel(HDF5Handle& a_handle)
 
 
   m_dt = m_dt/m_opt.dtReductionFactor;
-  pout() << "dt reduced by factor " << m_opt.dtReductionFactor << " to " << m_dt << endl;
+  LOG_INFO("dt reduced by factor " << m_opt.dtReductionFactor << " to " << m_dt);
 
   // Calculate diagnostic variables from (H, S)
   updateEnthalpyVariables();
@@ -595,10 +526,7 @@ void
 AMRLevelMushyLayer::
 writePlotHeader(HDF5Handle& a_handle) const
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::writePlotHeader" << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   // Setup the number of components -- include space for error
   HDF5HeaderData header;
@@ -637,10 +565,7 @@ void
 AMRLevelMushyLayer::
 writePlotLevel(HDF5Handle& a_handle) const
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::writePlotLevel (level " << m_level << ")" << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
 
   // Setup the level string
@@ -660,21 +585,11 @@ writePlotLevel(HDF5Handle& a_handle) const
   header.m_box ["prob_domain"] = m_problem_domain.domainBox();
   header.m_int ["timestepFailed"] = m_timestepFailed;
 
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::writePlotLevel - done setup level header information" << endl;
-  }
-
   // Write the header for this level
   header.writeToFile(a_handle);
 
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::writePlotLevel - done write to handle" << endl;
-  }
-
   const DisjointBoxLayout& levelGrids = m_scalarNew[0]->getBoxes();
-    if (s_verbosity >= 5) { pout() << "AMRLevelMushyLayer::writePlotLevel - got levelGrids" << endl; }
+    if (s_verbosity >= 5) { LOG_INFO("writePlotLevel - got levelGrids"); }
 
 
     write(a_handle,levelGrids);
@@ -716,26 +631,15 @@ writePlotLevel(HDF5Handle& a_handle) const
 
   write(a_handle,plotData,"data");
 
-
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::writePlotLevel - finished all" << endl;
-  }
-
+  LOG_FUNCTION_EXIT();
 }
 
 void AMRLevelMushyLayer::writePlotFile(int iter)
 {
-
-  if (s_verbosity > 5)
-  {
-    pout() << "AMRLevelMushyLayer::writePlotFile() " << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   int m_cur_step = m_time/m_dt;
-
   string iter_str = m_opt.plotfile_prefix;
-
   char suffix[100];
   sprintf(suffix,"%06dlev%diter%d.%dd.hdf5",m_cur_step,m_level,iter,SpaceDim);
 
@@ -818,10 +722,7 @@ void AMRLevelMushyLayer::computeVorticityStreamfunction()
 {
 
   CH_TIME("AMRLevelMushyLayer::computeVorticityStreamfunction");
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::computeVorticityStreamfunction on level " << m_level << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   // First vorticity = curl (u)
   computeVorticity();
@@ -969,7 +870,7 @@ void AMRLevelMushyLayer::setDimensionlessReferenceEutectic()
   // Assume that, in this case, the current reference point is the initial
   // H = H + 1
   // S = S - 1
-  pout() << "Converting Wells to Katz units (H=H+1; S=S-1)" << endl;
+  LOG_INFO("Converting Wells to Katz units (H=H+1; S=S-1)");
 
   for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
   {
@@ -1015,7 +916,7 @@ void AMRLevelMushyLayer::setDimensionlessReferenceInitial()
   // Assume that, in this case, we are ready to transform
   // H = H - 1
   // S = S + 1
-  pout() << "Converting Katz to Wells units (H=H-1; S=S+1)" << endl;
+  LOG_INFO("Converting Katz to Wells units (H=H-1; S=S+1)");
 
   for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
   {

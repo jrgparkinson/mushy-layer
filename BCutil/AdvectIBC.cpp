@@ -13,7 +13,7 @@
 
 #include "SolidF_F.H"
 #include "AdvectIBC.H"
-
+#include "Logging.H"
 
 // Null constructor
 AdvectIBC::AdvectIBC()
@@ -183,7 +183,7 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
         {
           if (m_advVel == nullptr)
           {
-            pout() << "AdvectIBC error - haven't specified the velocity field";
+            LOG("AdvectIBC error - haven't specified the velocity field");
           }
 
           DataIterator dit = m_advVel->dataIterator();
@@ -200,7 +200,7 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
           // What if we don't find a data index?
           if (!dit.ok())
           {
-            pout() << "AdvectIBC error - velocity field doesn't include boundary" << endl;
+            LOG("AdvectIBC error - velocity field doesn't include boundary");
             //			                            return;
           }
 

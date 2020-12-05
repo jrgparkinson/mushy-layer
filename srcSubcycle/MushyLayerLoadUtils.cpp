@@ -122,7 +122,7 @@ void getAMRHierarchy(string inFile, Vector<AMRLevelMushyLayer*>& amrlevels, int&
 
 void addExtraParams(string runInputs, ParmParse& pp)
 {
-  pout() << "addExtraParams() from " << runInputs << endl;
+  LOG("addExtraParams() from " << runInputs);
   const char* pFile = runInputs.c_str();
     std::ifstream t(pFile);
     std::string str((std::istreambuf_iterator<char>(t)),

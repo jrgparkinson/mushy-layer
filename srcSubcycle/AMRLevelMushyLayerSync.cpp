@@ -293,10 +293,7 @@ void AMRLevelMushyLayer::postTimeStep()
 {
   CH_TIME("AMRLevelMushyLayer::postTimeStep");
 
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRLevelMushyLayer::postTimeStep - do sync operations on level " << m_level << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   // Get the advection velocity as a CC variable so we can write it out
   EdgeToCell(m_advVel, *m_vectorNew[VectorVars::m_advectionVel]);
@@ -339,7 +336,7 @@ void AMRLevelMushyLayer::postTimeStep()
 
       if (s_verbosity > 2)
       {
-        pout() << "Timestep failed min dt = " << m_opt.minDt << endl;
+        LOG_INFO("Timestep failed min dt = " << m_opt.minDt);
       }
 
       // Check if we're going to make dt too small on the finest level, in
@@ -351,7 +348,7 @@ void AMRLevelMushyLayer::postTimeStep()
         timestepFailed = false; // don't halve the timestep
         if (s_verbosity > 1)
         {
-          pout() << "AMRLevelMushyLayer::postTimestep() - Not reducing dt as it would break the minimum dt cap" << endl;
+          LOG_INFO("postTimestep() - Not reducing dt as it would break the minimum dt cap");
         }
 
       }
@@ -390,10 +387,7 @@ void AMRLevelMushyLayer::postTimeStep()
     // Set the same value on all levels of refinement
     setAdvVelCentering(m_adv_vel_centering);
 
-    if (s_verbosity >= 3)
-    {
-      pout() << "Set adv vel centering = " << m_adv_vel_centering << endl;
-    }
+    LOG_DEBUG("Set adv vel centering = " << m_adv_vel_centering);
 
   } // end if level = 0
 
@@ -471,26 +465,20 @@ void AMRLevelMushyLayer::postTimeStep()
           fillAMRLambda(amrLambda);
 
           Real maxLambda = ::computeNorm(amrLambda,nRef,m_dx, Interval(0,0), 0, m_level) - 1;
-          if (s_verbosity >= 3)
-          {
-            pout() << "Max(lambda-1) = " << maxLambda << endl;
-          }
+          LOG_DEBUG("Max(lambda-1) = " << maxLambda);
         }
 
         if (m_opt.reflux_enthalpy || m_opt.reflux_concentration)
         {
           Real refluxRHS = 100.0;
           refluxRHS = doHCreflux();
-          if (s_verbosity >= 3)
-          {
-            pout() << "  Sum (reflux RHS) = " << refluxRHS << endl;
-          }
+          LOG_DEBUG("  Sum (reflux RHS) = " << refluxRHS);
         }
         else
         {
           if (s_verbosity >=3 )
           {
-            pout() << "  Not doing HC reflux" << endl;
+            LOG_INFO("  Not doing HC reflux");
           }
         }
 
@@ -707,7 +695,7 @@ void AMRLevelMushyLayer::postTimeStep()
       Real maxU = ::computeNorm(*(AMRmlptr->m_vectorNew[VectorVars::m_fluidVel]), nullptr, 1 , m_dx, Interval(0, SpaceDim-1), 0);
       if (maxU > 1e10)
       {
-        pout() << "WARNING - During PostTimestep,  Max U = " << maxU << endl;
+        LOG_INFO("WARNING - During PostTimestep,  Max U = " << maxU);
       }
 
 
@@ -932,10 +920,7 @@ Real AMRLevelMushyLayer::doHCreflux()
 {
   CH_TIME("AMRLevelMushyLayer::doHCreflux");
 
-  if (s_verbosity > 5)
-  {
-    pout() << "AMRLevelMushyLayer::doHCreflux on level " << m_level << endl;
-  }
+  LOG_FUNCTION_ENTRY();
   // Two components: enthalpy and salinity
   Interval solverComps(0, 1);
   int numComps = solverComps.size();

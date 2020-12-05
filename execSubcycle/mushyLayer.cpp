@@ -12,7 +12,7 @@
 #include "ParmParse.H"
 #include "CH_HDF5.H"
 #include "parstream.H"
-
+#include "Logging.H"
 
 #include "AMR.H"
 #include "AMRLevelMushyLayerFactory.H"
@@ -81,8 +81,8 @@ main(int a_argc, char* a_argv[])
       }
     else
       {
-        pout() << "Usage: <executable name> <inputfile>" << endl;
-        pout() << "No input file specified" << endl;
+        LOG("Usage: <executable name> <inputfile>");
+        LOG("No input file specified");
         return -1;
       }
     // Parse the command line and the input file (if any)
@@ -102,8 +102,7 @@ main(int a_argc, char* a_argv[])
     else
     {
       stopTime = 100000.0;
-      pout() << "No max_time given, using max_time = " << stopTime << endl;
-
+      LOG("No max_time given, using max_time = " << stopTime);
     }
 
     Real nstop = 0;
@@ -115,13 +114,13 @@ main(int a_argc, char* a_argv[])
     else
     {
       nstop = 9999999;
-      pout() << "No max_step given, using max_step = " << nstop << endl;
+      LOG("No max_step given, using max_step = " << nstop);
     }
     int nstop_int = round(nstop);
 
     if (!stopTimeOrStep)
     {
-      pout() << "Neither max_step or max_time given, please define one of these to decide when to stop the simulation." << endl;
+      LOG("Neither max_step or max_time given, please define one of these to decide when to stop the simulation.");
       MayDay::Error("Quitting as no max_step or max_time");
     }
 
@@ -132,7 +131,7 @@ main(int a_argc, char* a_argv[])
     }
     else
     {
-      pout() << "No max_level give, using max_level = " << max_level << endl;
+      LOG("No max_level give, using max_level = " << max_level);
     }
 
     int num_read_levels = Max(max_level,1);

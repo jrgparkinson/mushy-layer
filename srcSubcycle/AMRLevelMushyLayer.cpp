@@ -127,9 +127,9 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   // Check to see if we've crashed
   if(crashed())
   {
-    pout() << "==============================" << endl;
-    pout() << "Simulation crashed, stopping gracefully." << endl;
-    pout() << "==============================" << endl;
+    LOG_INFO("==============================");
+    LOG_INFO("Simulation crashed, stopping gracefully.");
+    LOG_INFO("==============================");
 
     return true;
   }
@@ -187,23 +187,22 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
       && Cconverged
       && velConverged)
   {
-    pout() << "Steady state reached (all fields converged)" << endl;
+    LOG_INFO("Steady state reached (all fields converged)");
     hasConverged = true; // converged
   }
   else if (velStalled
       && metricConverged)
   {
-    pout() << "Steady state reached (all fields nearly converged and metric converged)" << endl;
+    LOG_INFO("Steady state reached (all fields nearly converged and metric converged)");
     hasConverged = true; // converged
   }
   else if (metricConverged)
   {
-    pout() << "Steady state reached (metric converged)" << endl;
+    LOG_INFO("Steady state reached (metric converged)");
     hasConverged = true; // converged
   }
   else
   {
-    //pout() << "Steady state not reached" << endl;
     hasConverged = false; // not converged
   }
 
@@ -215,7 +214,7 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
 //  Real maxVel = ::computeNorm(*m_vectorNew[VectorVars::m_advectionVel], nullptr, -1, m_dx, Interval(0, SpaceDim-1), 0);
 //  if (hasConverged && m_doAutomaticRestart && abs(maxVel) < 1e-3)
 //  {
-//    pout() << "Max Vel = " << maxVel << ". Trying to restart with a small perturbation to kick off instability" << endl;
+//    LOG_INFO("Max Vel = " << maxVel << ". Trying to restart with a small perturbation to kick off instability");
 //    addPerturbation(ScalarVars::m_enthalpy, 1e-3);
 //    hasConverged = false;
 //    m_doAutomaticRestart = false;
@@ -223,14 +222,14 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
 
   if (hasConverged && m_dt < 1e-10)
   {
-    pout() << "AMRLevelMushyLayer::convergedToSteadyState - all fields converged but dt < 1e-10 so keep solving" << endl;
+    LOG_INFO("All fields converged but dt < 1e-10 so keep solving");
     return false;
   }
 
 
   if (hasConverged && m_time < m_opt.min_time)
   {
-    pout() << "AMRLevelMushyLayer::convergedToSteadyState - converged but time < min_time (" << m_time << " < " << m_opt.min_time << ")" << endl;
+    LOG_INFO("Converged but time < min_time (" << m_time << " < " << m_opt.min_time << ")");
     return false;
   }
 
@@ -363,11 +362,7 @@ Real AMRLevelMushyLayer::convergedToSteadyState(const int a_var, bool vector)
   string varName = vector ? m_vectorVarNames[a_var] : m_scalarVarNames[a_var] ;
   sprintf(outString, "d/dt (%-20s) = %e ", varName.c_str(), norm);
 
-  if (s_verbosity > 3)
-  {
-    pout() << outString << endl;
-  }
-
+  LOG_DEBUG(outString);
 
   return norm;
 }
@@ -437,10 +432,7 @@ bool AMRLevelMushyLayer::doVelocityAdvection()
 
 void AMRLevelMushyLayer::copyNewToOldStates()
 {
-  if (s_verbosity > 4)
-  {
-    pout() << "AMRLevelMushyLayer::copyNewToOldStates(" << m_time << " to " << m_time-m_dt << ") " << endl;
-  }
+  LOG_DEBUG("copyNewToOldStates(" << m_time << " to " << m_time-m_dt << ") ");
 
   // Copy the new to the old
   // Old now contains values at n, new will contain values at n+1 eventually
@@ -499,7 +491,6 @@ Real AMRLevelMushyLayer::advance()
     Real oldLev0Dt = m_dt;
     Real oldTime = m_time;
 
-
     while(amrMLptr)
     {
 
@@ -511,14 +502,14 @@ Real AMRLevelMushyLayer::advance()
       // 2) Set timestep failed flags to false, after halving dts
       if (amrMLptr->m_timestepFailed)
       {
-        //        pout() << "PREVIOUS TIMESTEP FAILED - HALVING DT" << endl;
+        //        LOG_INFO("PREVIOUS TIMESTEP FAILED - HALVING DT");
         Real prevDt = amrMLptr->dt();
         Real prevTime = amrMLptr->time();
         amrMLptr->dt(prevDt/2); // halve the timestep
         amrMLptr->time(oldTime - oldLev0Dt);
 
         pout() << "Reset on level " << amrMLptr->level() << " from (time=" << prevTime << ", dt = " << prevDt << ")";
-        pout() << " to (time=" << amrMLptr->time() << ", dt = " << amrMLptr->dt() << ")" << endl;
+        LOG_INFO(" to (time=" << amrMLptr->time() << ", dt = " << amrMLptr->dt() << ")");
       }
       amrMLptr->m_timestepFailed = false;
 
@@ -534,15 +525,12 @@ Real AMRLevelMushyLayer::advance()
 
   Real new_time = m_time + m_dt;
 
-  if (s_verbosity >= 1)
-  {
-    // Let's determine the CFL number we're running at
-    Real maxAdvU = getMaxVelocityForCFL();
-    m_computedCFL = m_dt*maxAdvU/m_dx;
+  // Let's determine the CFL number we're running at
+  Real maxAdvU = getMaxVelocityForCFL();
+  m_computedCFL = m_dt*maxAdvU/m_dx;
 
-    pout() << " AMRLevelMushyLayer::advance (level = "<< m_level << ", old_time=" << m_time << ", new_time=" << new_time
-        <<", dt = " << m_dt << ", CFL=" << m_computedCFL << ")" << endl;
-  }
+  LOG_INFO(" AMRLevelMushyLayer::advance (level = "<< m_level << ", old_time=" << m_time << ", new_time=" << new_time
+      <<", dt = " << m_dt << ", CFL=" << m_computedCFL << ")");
 
   // Reset BCs in case they change with time
   m_parameters.setTime(m_time); // BCs are stored in m_parameters
@@ -567,7 +555,7 @@ Real AMRLevelMushyLayer::advance()
     m_parameters.rayleighComposition = min(m_opt.maxRaC, m_parameters.rayleighComposition);
     m_parameters.rayleighTemp = min(m_opt.maxRaT, m_parameters.rayleighTemp);
 
-    pout() << "RaC = " << m_parameters.rayleighComposition  << ", RaT = " <<  m_parameters.rayleighTemp  << endl;
+    LOG_INFO("RaC = " << m_parameters.rayleighComposition  << ", RaT = " <<  m_parameters.rayleighTemp );
   }
 
   // Compute temperature, porosity, liquid concentration and sold concentration
@@ -588,18 +576,6 @@ Real AMRLevelMushyLayer::advance()
 //  Real half_time = new_time - m_dt / 2;
 
   m_time = new_time;
-
-//  if (m_level > 0)
-//  {
-//    // AMR Sanity checks
-//    if (m_time  > getCoarserLevel()->m_time)
-//    {
-//      pout() << "Error!! level " << m_level << " time=" << m_time << ", level " <<
-//          getCoarserLevel()->m_level << " time=" << getCoarserLevel()->m_time << endl;
-//      CH_assert(m_time <= getCoarserLevel()->m_time);
-//    }
-//  }
-
 
   // Compute d(porosity)/dt from the old timestep in case we need it at some point
   // First create data structures
@@ -657,6 +633,12 @@ Real AMRLevelMushyLayer::advance()
   }
   else
   {
+    // Sanity checks
+    Real maxEnthalpy = ::computeNorm(*m_scalarNew[ScalarVars::m_enthalpy], nullptr, 1, m_dx, Interval(0,0), 0);
+    if (maxEnthalpy > 1e200)
+    {
+      LOG_WARNING("Max enthalpy = " << maxEnthalpy);
+    }
     //    this->finestLevel()
     //Calculate time centred advection velocity
     calculateTimeIndAdvectionVel(m_time-m_dt, m_advVel);
@@ -674,7 +656,7 @@ Real AMRLevelMushyLayer::advance()
   // Another sanity check
   //  Divergence::levelDivergenceMAC(*m_scalarNew[ScalarVars::m_divUadv], m_advVel, m_dx);
   //  Real  maxDivU = ::computeNorm(*m_scalarNew[ScalarVars::m_divUadv], nullptr, 1, m_dx, Interval(0,0));
-  //  pout() << "  Sanity check: max(div u) = " << maxDivU << endl;
+  //  LOG_INFO("  Sanity check: max(div u) = " << maxDivU);
 
   // always* advect lambda (and update flux registers)
   // do this as soon as we have advection velocities, in case we want to
@@ -692,16 +674,6 @@ Real AMRLevelMushyLayer::advance()
     this->advectActiveTracer();
   }
 
-//  if (m_newLevel && m_level > 0)
-//  {
-//    if (m_opt.skipNewLevelScalars)
-//    {
-//      pout() << "First time step on a new level - skipping advection and diffusion" << endl;
-//      m_opt.doScalarAdvectionDiffusion = false;
-//    }
-//    m_newLevel = false;
-//  }
-
   if (!(m_parameters.physicalProblem == PhysicalProblems::m_poiseuilleFlow ||
       m_parameters.physicalProblem == PhysicalProblems::m_soluteFluxTest ||
       m_parameters.physicalProblem == PhysicalProblems::m_zeroPorosityTest) && m_opt.doScalarAdvectionDiffusion)
@@ -709,15 +681,9 @@ Real AMRLevelMushyLayer::advance()
     // Computation of advection velocity is done
     // Now do advection and diffusion of scalar fields
     CH_TIME("AMRLevelMushyLayer::advection-diffusion");
-    if (s_verbosity >= 5)
-    {
-      pout() << "AMRLevelMushyLayer::advance - advect and diffuse scalars" << endl;
-    }
+    LOG_DEBUG("Advect and diffuse scalars");
 
     int exitStatus = 0;
-
-    //bool doFRupdates = true;
-
 
     // Need to construct multi component object
     LevelData<FArrayBox> HC_new(m_grids, 2, IntVect::Unit);
@@ -737,6 +703,12 @@ Real AMRLevelMushyLayer::advance()
 
     bool solverFailed = (exitStatus == 2 || exitStatus == 4 || exitStatus == 6);
 
+    Real maxHCNew = ::computeNorm(HC_new, nullptr, 1, m_dx, Interval(0,1), 0);
+    if (maxHCNew > 1e200)
+    {
+      LOG_WARNING("Max (enthalpy, bulk concentration) = " << maxHCNew);
+    }
+
     // Get back the answer if solver was a success
     HC_new.copyTo(Interval(0,0), *m_scalarNew[ScalarVars::m_enthalpy], Interval(0,0));
     HC_new.copyTo(Interval(1,1), *m_scalarNew[ScalarVars::m_bulkConcentration], Interval(0,0));
@@ -747,7 +719,7 @@ Real AMRLevelMushyLayer::advance()
     {
       if (m_opt.ignoreSolveFails)
       {
-        pout() << "Ignoring all solver fails." << endl;
+        LOG_INFO("Ignoring all solver fails.");
       }
       else
       {
@@ -762,7 +734,7 @@ Real AMRLevelMushyLayer::advance()
         failedReasons[2] = "Reached iter max";
         failedReasons[1] = "Initial norm not reduced enough";
 
-        pout() << "Solver failed. Exit status: " << exitStatus << "(" << failedReasons[exitStatus] << ")" << endl;
+        LOG_INFO("Solver failed. Exit status: " << exitStatus << "(" << failedReasons[exitStatus] << ")");
 
       }
 
@@ -962,12 +934,7 @@ void AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& a_src, int a
 void AMRLevelMushyLayer::advectLambda(bool doFRupdates)
 {
   CH_TIME("AMRLevelMushyLayer::advectLambda");
-
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::advectLambda" << endl;
-  }
-
+  LOG_FUNCTION_ENTRY();
 
   m_advVel.exchange();
 
@@ -985,8 +952,6 @@ void AMRLevelMushyLayer::advectLambda(bool doFRupdates)
 
 void AMRLevelMushyLayer::updateEnthalpyVariables()
 {
-
-
   CH_TIME("AMRLevelMushyLayer::updateEnthalpyVariables");
 
   LevelData<FArrayBox> HC(m_grids, 2, IntVect::Unit);
@@ -1014,9 +979,12 @@ void AMRLevelMushyLayer::updateEnthalpyVariables()
     m_scalarNew[ScalarVars::m_porosity]->copyTo(*m_scalarOld[ScalarVars::m_porosity]);
   }
 
-
-  // stop doing this
-//  computeLambdaPorosity();
+  Real maxEnthalpy = ::computeNorm(*m_scalarNew[ScalarVars::m_enthalpy], nullptr, 1, m_dx, Interval(0,0), 0);
+  Real maxBulkC = ::computeNorm(*m_scalarNew[ScalarVars::m_bulkConcentration], nullptr, 1, m_dx, Interval(0,0), 0);
+  if (maxEnthalpy > 1e200 || maxBulkC > 1e200)
+  {
+    LOG_WARNING("Max enthalpy = " << maxEnthalpy << ", bulk concentration = "<< maxBulkC);
+  }
 
 }
 
@@ -1190,11 +1158,7 @@ computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeScal,
                            Real a_old_time, Real a_dt)
 {
   CH_TIME("AMRLevelMushyLayer::computeScalarAdvectiveFlux");
-
-  if (s_verbosity > 5)
-  {
-    pout() << "AMRLevelMushyLayer::computeScalarAdvectiveFlux, level " << m_level  << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   int numScal = a_edgeScal.nComp();
 
@@ -1226,10 +1190,7 @@ computeScalarAdvectiveFlux(LevelData<FluxBox>& a_edgeScal,
 
 void AMRLevelMushyLayer::calculatePermeability()
 {
-  if (s_verbosity >= 5)
-  {
-    pout() << "  AMRLevelMushyLayer::calculatePermeability" << endl;
-  }
+  LOG_FUNCTION_ENTRY();
   LevelData<FArrayBox> porosityNew(m_grids, 1, m_numGhost*IntVect::Unit);
   LevelData<FArrayBox> porosityOld(m_grids, 1, m_numGhost*IntVect::Unit);
 
@@ -1287,10 +1248,7 @@ AMRLevelMushyLayer::computeScalDiffusion(const int a_var,
                                          Real a_time)
 {
   CH_TIME("AMRLevelMushyLayer::computeScalDiffusion");
-  if (s_verbosity > 5)
-  {
-    pout() << "AMRLevelMushyLayer::computeScalDiffusion for var " << a_var  << endl;
-  }
+  LOG_DEBUG("computeScalDiffusion for var " << a_var << " on level " << m_level);
 
   // Compute diffusion for both fields
   LevelData<FArrayBox> diffusiveSrc(m_grids, 2, IntVect::Zero);
@@ -1333,12 +1291,17 @@ AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
   {
     crseHC = new LevelData<FArrayBox>(mlCrse->m_grids, numComp, IntVect::Unit);
     mlCrse->fillHC(*crseHC, a_time, true, true);
+    doSanityChecks(*crseHC, "(H, C)^{n, l-1}");
   }
 
   amrpop->setAlphaAndBeta(0, 1);
 
+  doSanityChecks(HC, "(H, C)^{n, l}");
+
   // This just calls applyOpI if crseHC = nullptr, else does CF interpolation
   amrpop->applyOpMg(diffusiveSrc, HC, crseHC, isHomogeneous);
+
+  doSanityChecks(diffusiveSrc, "Diffusive src");
 
   int order = 1;
   BCHolder bc = m_physBCPtr->extrapolationFuncBC(order);
@@ -1351,10 +1314,7 @@ AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
        grids[dit],
        m_problem_domain, m_dx,
        false); // not homogeneous
-
-    //    int temp=0;
   }
-
 
   // finally, do exchange
   diffusiveSrc.exchange(diffusiveSrc.interval());
@@ -1365,6 +1325,8 @@ AMRLevelMushyLayer::computeScalDiffusion(LevelData<FArrayBox>& diffusiveSrc,
     CornerCopier cornerCopy(grids, grids, m_problem_domain, diffusiveSrc.ghostVect(), true);
     diffusiveSrc.exchange(diffusiveSrc.interval(), cornerCopy);
   }
+
+  doSanityChecks(diffusiveSrc, "Diffusive src");
 
   // Clean up
   if (crseHC != nullptr)
@@ -1599,11 +1561,7 @@ void AMRLevelMushyLayer::horizontallyAverage(LevelData<FArrayBox>& a_averaged, L
 void AMRLevelMushyLayer::backupTimestep()
 {
   // Make sure we copy ghost cells as well
-
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::backupTimestep " << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   for (DataIterator dit = m_scalarNew[0]->dataIterator(); dit.ok(); ++dit)
   {
@@ -1629,10 +1587,8 @@ void AMRLevelMushyLayer::backupTimestep()
 
 void AMRLevelMushyLayer::restartTimestepFromBackup(bool ignorePressure)
 {
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::restartTimestepFromBackup"        << endl;
-  }
+  LOG_FUNCTION_ENTRY();
+
   Vector<int> restartVars;
 
   // Make sure we copy ghost cells
@@ -1675,10 +1631,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
                                                LevelData<FArrayBox>& a_src, bool doFRupdates, bool computeAdvectiveSrc)
 {
   CH_TIME("AMRLevelMushyLayer::advectDiffuseScalar");
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRLevelMushyLayer::advectDiffuseScalar: " << m_level << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   int exitStatus = 0;
   int numComp = a_src.nComp();
@@ -1713,7 +1666,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
   if (m_opt.skipHCUpdate)
   {
-    pout() << "Skipping HC update" << endl;
+    LOG_INFO("Skipping HC update");
     return 0;
   }
 
@@ -1746,6 +1699,9 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
 
     coarserPtr->fillHC(*coarserDataOldPtr,tCoarserOld );
     coarserPtr->fillHC(*coarserDataNewPtr,tCoarserNew );
+
+    doSanityChecks(*coarserDataNewPtr, "HC^{n+1, l-1}");
+    doSanityChecks(*coarserDataNewPtr, "HC^{n, l-1}");
   }
 
   // If a finer level exists
@@ -1774,11 +1730,11 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     coarserFRPtr = nullptr;
   }// end if do advective flux reg updates
 
-  if (s_verbosity > 5)
-  {
-    pout() << "multiCompAdvectDiffuse - call backward euler on level " << m_level << endl;
-    pout() << "multiCompAdvectDiffuse - has coarser? " << m_hasCoarser << ", has finer? " << m_hasFiner << endl;
-  }
+  LOG_DEBUG("Solve for (H, C) on level " << m_level 
+              << ", has coarser? " << m_hasCoarser << ", has finer? " << m_hasFiner);
+  
+  doSanityChecks(a_phi_old, "HC^n");
+  doSanityChecks(full_src, "HC src");
 
   Real old_time = m_time-m_dt;
 
@@ -1797,10 +1753,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
                                      tCoarserNew, m_dt, m_level, false); //false - don't zero phi
   }
 
-  if (s_verbosity > 5)
-  {
-    pout() << "multiCompAdvectDiffuse -  updated solution" << endl;
-  }
+  doSanityChecks(a_phi_new, "HC^{n+1}");
 
   a_phi_new.exchange();
 
@@ -1820,7 +1773,7 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     Real residual = baseLevBE->finalResidual();
     int num_iter =  baseLevBE->numMGiterations();
 
-    pout() << "  HC solve       (level " << m_level << "): exit status " << exitStatus << ", solver residual = " << residual << ", num MG iterations = " << num_iter << endl;
+    LOG_INFO("  HC solve       (level " << m_level << "): exit status " << exitStatus << ", solver residual = " << residual << ", num MG iterations = " << num_iter);
 
   }
 #endif
@@ -1838,15 +1791,16 @@ int AMRLevelMushyLayer::multiCompAdvectDiffuse(LevelData<FArrayBox>& a_phi_old, 
     coarserDataOldPtr = nullptr;
   }
 
+  doSanityChecks(a_phi_new, "HC^{n+1}");
+
+  LOG_FUNCTION_EXIT();
+
   return exitStatus;
 }
 
 void AMRLevelMushyLayer::incrementHCFluxRegisters(LevelData<FluxBox>& flux, Real fluxMult)
 {
-  if (s_verbosity > 5)
-  {
-    pout() << "AMRLevelMushyLayer::incrementFluxRegisters on level " << m_level << endl;
-  }
+  LOG_FUNCTION_ENTRY();
   // Do flux register updates here!
 
   Interval refluxComps = flux.interval();
@@ -1915,18 +1869,33 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
           true,  // fill interior?
           (m_opt.CFinterpOrder_advection==2)); //  do quadratic interpolation at CF boundaries? - need this for corner cells that border CF and domain boundaries
 
+  doSanityChecks(HC_old, "(H, C)^n");
+  doSanityChecks(TCl_old, "(T, C_l)^n");
+  doSanityChecks(m_frameAdvVel, "Frame advection velocity");
 
-  // Compute frame advection src term
-  computeScalarAdvectiveFluxMultiComp(edgeScalFrameAdvection, m_frameAdvVel,
-                                      m_patchGodHC, HC_old,
-                                      old_time, m_dt);
+  // Compute frame advection src term if required
+  if (m_parameters.nonDimVel != 0)
+  {
+    computeScalarAdvectiveFluxMultiComp(edgeScalFrameAdvection, m_frameAdvVel,
+                                        m_patchGodHC, HC_old,
+                                        old_time, m_dt);
+  }
+  else
+  {
+    setValLevel(edgeScalFrameAdvection, 0.0);
+  }
 
+  doSanityChecks(edgeScalFrameAdvection, "Frame advection fluxes");
 
   if (m_opt.reflux_enthalpy == m_opt.reflux_concentration && m_opt.allowMulticompAdvection)
   {
+    doSanityChecks(m_advVel, "Advection velocity");
+
     computeScalarAdvectiveFluxMultiComp(edgeScalFluidAdv, m_advVel,
                                         m_patchGodTSl, TCl_old,
                                         old_time, m_dt);
+
+    doSanityChecks(edgeScalFluidAdv, "Advective fluxes");
 
   }
   else
@@ -1953,8 +1922,6 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
     {
       advVel_noReflux[dit].copy(m_advVel[dit]);
       advVel_reflux[dit].copy(m_advVel[dit]);
-
-
     }
 
     m_projection.removeFreestreamCorrection(advVel_noReflux);
@@ -2021,8 +1988,10 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
       edgeScalFluidAdv[dit].plus(a_HeatFlux[dit], a_HeatFlux[dit].box(), 0, 0, 1);
       edgeScalFluidAdv[dit].plus(a_ConcFlux[dit], a_ConcFlux[dit].box(), 0, 1, 1);
     }
-
   }
+
+  doSanityChecks(edgeScalFluidAdv, "Fluid advection fluxes");
+
   // Combine the two fluxes
   for (DataIterator dit = edgeScalFluidAdv.dataIterator(); dit.ok(); ++dit)
   {
@@ -2059,33 +2028,6 @@ void AMRLevelMushyLayer::computeTotalAdvectiveFluxes(LevelData<FluxBox>& edgeSca
     edgeScalTotal.exchange(edgeScalTotal.interval());
   }
 
-  // Set some analytic source term if needed
-//  if (m_opt.useAnalyticSource)
-//  {
-//    for (DataIterator dit = edgeScalTotal.dataIterator(); dit.ok(); ++dit)
-//    {
-//      FluxBox& thisFlux = edgeScalTotal[dit];
-//
-//      for (BoxIterator bit = BoxIterator(thisFlux.box()); bit.ok(); ++bit)
-//      {
-//        IntVect iv = bit();
-//        RealVect loc;
-//        getLocation(iv, loc, m_dx);
-//
-//        // Horizontal
-//        thisFlux[0](iv, 0) =  0; // H comp
-//        thisFlux[0](iv, 1) = 0.0; // C comp
-//
-//        // Vertical
-//        //          thisFlux[1](iv, 0) =  -m_parameters.nonDimVel*loc[1]*loc[1]; // H comp
-//        thisFlux[1](iv, 0) =  -m_parameters.nonDimVel*loc[1]; // H comp
-//        thisFlux[1](iv, 1) = 0.0; // C comp
-//      }
-//
-//    }
-//  }
-
-
 }
 
 void AMRLevelMushyLayer::computeScalarAdvectiveSrcHC(LevelData<FArrayBox>& a_src,
@@ -2099,11 +2041,14 @@ void AMRLevelMushyLayer::computeScalarAdvectiveSrcHC(LevelData<FArrayBox>& a_src
 
   // Compute fluxes due to fluid advection and frame advection
   computeTotalAdvectiveFluxes(edgeScalTotal);
+  doSanityChecks(edgeScalTotal, "Advective fluxes");
   //  edgeScalTotal.exchange();
 
   // The source term is the divergence of the fluxes
   LevelData<FArrayBox> advectiveSrc(m_grids, numComp, IntVect::Zero);
   Divergence::levelDivergenceMACMultiComp(advectiveSrc, edgeScalTotal, m_dx);
+
+  doSanityChecks(advectiveSrc, "HC advection src");
 
   for (dit.reset(); dit.ok(); ++dit)
   {
@@ -2112,10 +2057,9 @@ void AMRLevelMushyLayer::computeScalarAdvectiveSrcHC(LevelData<FArrayBox>& a_src
                     0, // src comp
                     0, // dest comp
                     numComp); // num comps
-
-    //    a_src[dit].mult(m_parameters.m_advectionCoeff);
-
   }
+
+  doSanityChecks(a_src, "HC src");
 
 }
 
@@ -2239,7 +2183,6 @@ void AMRLevelMushyLayer::computeScalarAdvectiveFluxMultiComp(LevelData<FluxBox>&
   int numComp = a_scalOld.nComp(); // 2 components - temperature and liquid salinity (or enthalpy and bulk concentration)
 
   CH_assert(a_edgeScal.nComp() == numComp);
-  //  CH_assert(a_scalOld.nComp() == numComp);
 
   IntVect advect_grow = m_numGhostAdvection*IntVect::Unit;
   LevelData<FArrayBox> vel(m_grids, SpaceDim, advect_grow);
@@ -2263,13 +2206,18 @@ void AMRLevelMushyLayer::computeScalarAdvectiveFluxMultiComp(LevelData<FluxBox>&
   computeInflowOutflowAdvVel();
 
   // Compute advective flux
+  doSanityChecks(a_scalOld, "(T, C_l)^n");
+  doSanityChecks(a_advVel, "Advection velocity");
+  doSanityChecks(m_totalAdvVel, "Total velocity");
+  doSanityChecks(vel, "Advection velocity (CC)");
+
   computeScalarAdvectiveFlux(a_edgeScal, a_scalOld, a_advVel,
                              m_totalAdvVel,
                              vel,
                              diffusiveSrc, a_patchGod,
                              a_old_time, m_dt);
 
-
+  doSanityChecks(a_edgeScal, "(T, C_l)^{n+1/2}");
 }
 
 
@@ -2511,8 +2459,6 @@ Real AMRLevelMushyLayer::averageOverFilterRegion(int a_var, PorosityFilterFuncti
     }
   }
 
-//  pout() << "averageOverFilterRegion sum=" << average << ", vol=" << vol;
-
   // avoid NaN values in case of no cells matching criteria
   if (numCells == 0)
   {
@@ -2523,9 +2469,9 @@ Real AMRLevelMushyLayer::averageOverFilterRegion(int a_var, PorosityFilterFuncti
     average /= numCells;
   }
 
-  pout() << ", average=" << average << endl;
+  LOG_INFO(", average=" << average);
 
-  //  pout() << "HorizontallyAverage - got local averages, now broadcast/gather" << endl;
+  //  LOG_INFO("HorizontallyAverage - got local averages, now broadcast/gather");
 
   // Broadcast/gather to compute averages over whole domain
   int srcProc = 0;
@@ -2597,7 +2543,7 @@ Real AMRLevelMushyLayer::averageOverMushyRegion(int a_var, Real& vol)
 //
 //  average /= vol;
 //
-//  //  pout() << "HorizontallyAverage - got local averages, now broadcast/gather" << endl;
+//  //  LOG_INFO("HorizontallyAverage - got local averages, now broadcast/gather");
 //
 //  // Broadcast/gather to compute averages over whole domain
 //  int srcProc = 0;
@@ -2701,7 +2647,7 @@ void AMRLevelMushyLayer::computeChimneyDiagnostics()
             if (!thisChannel.isFinished())
             {
               thisChannel |= iv;
-              //                pout() << iv << endl;
+              //                LOG_INFO(iv);
             }
             existingChannel = true;
             continue;
@@ -2713,7 +2659,7 @@ void AMRLevelMushyLayer::computeChimneyDiagnostics()
         bool bordersMush = mushyIVs.contains(iv);
         if (!existingChannel && bordersMush)
         {
-          //            pout() << "new channel - " << iv << endl;
+          //            LOG_INFO("new channel - " << iv);
           Channel *newChannel = new Channel(iv);
           channels.push_back(newChannel);
         }
@@ -2768,7 +2714,7 @@ void AMRLevelMushyLayer::computeChimneyDiagnostics()
 
   Vector<Real> channelSpacing;
   Channel::channelSpacing(channelSpacing, actualChannels, m_dx, m_problem_domain);
-  pout() << "Channel spacing: " << channelSpacing << endl;
+  LOG_INFO("Channel spacing: " << channelSpacing);
   for (int i = 0; i < channelSpacing.size(); i++)
   {
     averageChannelSpacing += channelSpacing[i];
@@ -2781,7 +2727,7 @@ void AMRLevelMushyLayer::computeChimneyDiagnostics()
     Channel& thisChannel = *actualChannels[i];
 
     Real averageWidth = thisChannel.averageWidth(m_dx);
-    pout() << "Channel average width = " << averageWidth << endl;
+    LOG_INFO("Channel average width = " << averageWidth);
 
     averageChannelWidth += averageWidth;
 
@@ -2895,7 +2841,7 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
 
   if (maxAdvULocal > 1e100)
   {
-    pout() << "  WARNING: max advection velocity (level " << m_level << ") = " << maxAdvULocal << endl;
+    LOG_INFO("  WARNING: max advection velocity (level " << m_level << ") = " << maxAdvULocal);
   }
 
   return maxAdvULocal;
@@ -2904,32 +2850,20 @@ Real AMRLevelMushyLayer::getMaxAdvVel()
 Real AMRLevelMushyLayer::getMaxVelocity()
 {
   Real maxAdvU = getMaxAdvVel();
-
-  if (s_verbosity >= 5)
-  {
-    pout() << "AMRlevelMushyLayer::getMaxVelocity - max (face centered U) = " << maxAdvU << endl;
-  }
-
+  LOG_DEBUG("Max (face centered U) = " << maxAdvU);
+  
   if (maxAdvU > 1e100)
   {
     maxAdvU = ::computeNorm(*m_vectorNew[VectorVars::m_fluidVel], nullptr, 1, m_dx, Interval(0,SpaceDim-1), 0);
-    if (s_verbosity >= 3)
-    {
-      pout() << "AMRlevelMushyLayer::getMaxVelocity - max (cell centered U) = " << maxAdvU << endl;
-    }
-
+    LOG_DEBUG("Max (cell centered U) = " << maxAdvU);
+    
     if (maxAdvU > 1e100)
     {
       maxAdvU = 0;
     }
   }
 
-  if (s_verbosity > 3)
-  {
-    pout() << "AMRLevelMushyLayer::getMaxVelocity() - Max velocity = " << maxAdvU << endl;
-  }
   maxAdvU = abs(maxAdvU);
-
   maxAdvU = max(maxAdvU, abs(m_parameters.nonDimVel));
 
   return maxAdvU;
@@ -2969,11 +2903,8 @@ Real AMRLevelMushyLayer::getMaxVelocityForCFL()
     }
   }
 
-  if (s_verbosity >= 4)
-  {
-    pout() << "  Max(U) = " << maxAdvU << ", max(U/chi) = " << maxUChi << endl;
-  }
-
+  LOG_DEBUG("  Max(U) = " << maxAdvU << ", max(U/chi) = " << maxUChi);
+  
   if (maxUChi < 1000*maxAdvU)
   {
     maxAdvU = max(maxAdvU, maxUChi);
@@ -2985,10 +2916,7 @@ Real AMRLevelMushyLayer::getMaxVelocityForCFL()
 
 Real AMRLevelMushyLayer::computeDt(Real cfl)
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRlevelMushyLayer::computeDt, cfl = " << cfl << endl;
-  }
+  LOG_DEBUG("CFL = " << cfl);
 
   if (m_grids.size() == 0)
   {
@@ -2996,13 +2924,8 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   }
 
   Real maxAdvU = getMaxVelocityForCFL();
-
   Real newDT = cfl * m_dx  / maxAdvU;
-
-  if (s_verbosity >= 4)
-  {
-    pout() << "computeDt() new dt = cfl*dx/maxAdvU = " << cfl << " * " << m_dx << "/" << maxAdvU << endl;
-  }
+  LOG_DEBUG("dt = cfl*dx/maxAdvU = " << cfl << " * " << m_dx << "/" << maxAdvU << " = " << newDT);
 
   AMRLevelMushyLayer* ml = this;
   while (ml->getFinerLevel())
@@ -3011,11 +2934,8 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   }
 
   Real finest_dx = ml->m_dx;
-
   Real maxPorosity = ::computeMax(*m_scalarNew[ScalarVars::m_porosity], nullptr, -1, Interval(0,0));
-
   Real maxUChi = computeMaxUChi();
-
   Real buoyancy_acceleration = abs(max(m_parameters.m_buoyancyTCoeff, m_parameters.m_buoyancySCoeff) * maxPorosity);
   Real darcy_acceleration = abs(m_parameters.m_darcyCoeff*maxUChi); //*maxPorosity/minPerm
   Real viscous_acceleration = abs(m_parameters.m_viscosityCoeff*maxAdvU/(m_domainHeight));
@@ -3042,11 +2962,10 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
   }
   Real accelDt = sqrt(accelCFL*finest_dx/acceleration);
 
-  if (m_opt.printAccelDt && s_verbosity >= 2)
+  if (m_opt.printAccelDt)
   {
-    pout() << "  Max dt computed from acceleration = " << accelDt << endl;
-    pout() << "  Accleration terms: buoyancy = " << buoyancy_acceleration << ", viscous = " << viscous_acceleration << ", darcy = " << darcy_acceleration << endl;
-
+    LOG_INFO("  Max dt computed from acceleration = " << accelDt);
+    LOG_INFO("  Accleration terms: buoyancy = " << buoyancy_acceleration << ", viscous = " << viscous_acceleration << ", darcy = " << darcy_acceleration);
   }
 
   // make sure we consider acceleration for determining dt at time 0.
@@ -3055,10 +2974,7 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 
   if (maxAdvU == 0 || (m_time == 0 && m_opt.useInitAccelDt) || m_opt.useAccelDt)
   {
-    if (s_verbosity >= 4)
-    {
-      pout() << "computeDt() new dt = min(new dt, accel dt) = min(" << newDT << ", " << accelDt << ")" << endl;
-    }
+    LOG_DEBUG("new dt = min(new dt, accel dt) = min(" << newDT << ", " << accelDt << ")");
     newDT = min(newDT, accelDt);
   }
 
@@ -3073,24 +2989,9 @@ Real AMRLevelMushyLayer::computeDt(Real cfl)
 /*******/
 Real AMRLevelMushyLayer::computeInitialDt()
 {
-  if (s_verbosity >= 3)
-  {
-    pout() << "AMRlevelMushyLayer::computeInitialDt" << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
-  Real localdt;
-
-
-
-  localdt = computeDt(m_initial_dt_multiplier*m_opt.cfl);
-
-
-  // Enforce absolute maximum dt
-  if (s_verbosity >= 4)
-  {
-    pout() << "AMRlevelMushyLayer::computeInitialDt - enforce max dt" << endl;
-  }
-
+  Real localdt = computeDt(m_initial_dt_multiplier*m_opt.cfl);
   Real max_init_dt = m_opt.max_dt*m_initial_dt_multiplier;
 
   if (m_opt.max_init_dt > 0)
@@ -3118,10 +3019,7 @@ Real AMRLevelMushyLayer::computeInitialDt()
 
 void AMRLevelMushyLayer::setFluxRegistersZero()
 {
-  if (s_verbosity > 5)
-  {
-    pout() << "AMRLevelMushyLayer::setFluxRegistersZero on level " << m_level << endl;
-  }
+  LOG_FUNCTION_ENTRY();
 
   if (m_grids.size() == 0)
   {
@@ -3743,7 +3641,7 @@ PhysIBC* AMRLevelMushyLayer::getScalarIBCs(int a_var)
   }
   else
   {
-    pout() << "WARNING, NO IBCs for scalar var " << a_var << endl;
+    LOG_INFO("WARNING, NO IBCs for scalar var " << a_var);
 
     MayDay::Warning("WARNING, NO IBCs for scalar var");
     return  m_physBCPtr->scalarTraceIBC(bcValLo, bcValHi,
@@ -3829,7 +3727,7 @@ void AMRLevelMushyLayer::getScalarBCs(BCHolder& thisBC, int a_var, bool a_homoge
   }
   else
   {
-    pout() << "WARNING No BCs for " << m_scalarVarNames[a_var] << endl;
+    LOG_INFO("WARNING No BCs for " << m_scalarVarNames[a_var]);
     MayDay::Warning("AMRLevelMushyLayer::getScalarBCs - No BCs for scalar variable, using extrapolation ");
 
     thisBC = m_physBCPtr->extrapFuncBC();
@@ -3890,7 +3788,7 @@ bool AMRLevelMushyLayer::crashed()
     Real limit = 1e50;
     if (max > limit || min < -limit)
     {
-      pout() << "WARNING: abs|" << m_scalarVarNames[vars[i]] << "| > " << limit << endl;
+      LOG_INFO("WARNING: abs|" << m_scalarVarNames[vars[i]] << "| > " << limit);
       return true;
     }
   }
@@ -3910,13 +3808,13 @@ bool AMRLevelMushyLayer::isCurrentCFLSafe(bool printWarning)
   {
     if (printWarning)
     {
-      pout() << "WARNING: new max(U) = " << maxAdvU << " means that CFL = " << newCFL << " which may be unstable" << endl;
+      LOG_INFO("WARNING: new max(U) = " << maxAdvU << " means that CFL = " << newCFL << " which may be unstable");
 
     }
 
     if (m_opt.skipUnsafeCFL)
     {
-      pout() << "Therefore, we will be skipping fluid advection during this timestep" << endl;
+      LOG_INFO("Therefore, we will be skipping fluid advection during this timestep");
       return false;
     }
     else

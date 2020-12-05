@@ -12,7 +12,7 @@
 #include "computeSum.H"
 
 LevelDomainFluxRegister::LevelDomainFluxRegister ()
-: m_fineFR(nullptr), m_coarseFR(nullptr), m_refRat(-1), m_dx(-1), m_defined(false), m_numComp(-1)
+: m_fineFR(nullptr), m_coarseFR(nullptr), m_defined(false),  m_refRat(-1), m_dx(-1), m_numComp(-1)
 { }
 
 LevelDomainFluxRegister::~LevelDomainFluxRegister ()

@@ -29,6 +29,7 @@
 #include "RelaxSolver.H"
 #include "computeNorm.H"
 #include "BoxIterator.H"
+#include "Logging.H"
 
 #ifdef CH_USE_HDF5
 #include "CH_HDF5.H"
@@ -490,7 +491,7 @@ void Projector::define(const DisjointBoxLayout& a_grids,
 
   if (s_verbosity > 4)
   {
-    pout() << "CCProjector::define finished" << endl;
+    LOG("CCProjector::define finished");
   }
 }
 
@@ -571,21 +572,13 @@ void Projector::variableSetUp()
   // now dump this all back out
   if (s_verbosity > 2)
   {
-    pout () << "Projection inputs: " << endl;
-
-    pout() << "  doSyncProjection = "  << m_doSyncProjection << endl;
-
-    pout() << "  applySyncCorrection = "  << m_applySyncCorrection << endl;
-
-    pout() << "  applyFreestreamCorrection = "  << s_applyVDCorrection
-        << endl;
-
-    pout() << "  doQuadInterp = "  << m_doQuadInterp << endl;
-
-    pout() << "  eta = "  <<  m_etaLambda << endl;
-
-    pout() << "  constantLambdaScaling = "  << s_constantLambdaScaling
-        << endl;
+    LOG("Projection inputs: ");
+    LOG("  doSyncProjection = "  << m_doSyncProjection);
+    LOG("  applySyncCorrection = "  << m_applySyncCorrection);
+    LOG("  applyFreestreamCorrection = "  << s_applyVDCorrection);
+    LOG("  doQuadInterp = "  << m_doQuadInterp);
+    LOG("  eta = "  <<  m_etaLambda);
+    LOG("  constantLambdaScaling = "  << s_constantLambdaScaling);
   }
 
   // set flag so we don't have to call this function again.
@@ -990,7 +983,7 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 {
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::levelMacProject (level " << m_level << ")"    << endl;
+    LOG("CCProjector::levelMacProject (level " << m_level << ")"   );
   }
 
 
@@ -1003,7 +996,7 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     int nRefFine = -1;
     Real sumRHS = computeSum(MACrhs(), finerGridsPtr,
                              nRefFine, m_dx, MACrhs().interval());
-    pout() << "  MAC projection (level " << m_level << ") -- sum(RHS) = " << sumRHS << endl;
+    LOG("  MAC projection (level " << m_level << ") -- sum(RHS) = " << sumRHS);
 
 
     // Compute sum over just the interior
@@ -1014,7 +1007,7 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 
     Real sumRHSInterior = ::computeSum(rhsInterior, finerGridsPtr,
                                        nRefFine, m_dx, MACrhs().interval());
-    pout() << "  MAC projection (level " << m_level << ") -- sum(interior RHS) = " << sumRHSInterior << endl;
+    LOG("  MAC projection (level " << m_level << ") -- sum(interior RHS) = " << sumRHSInterior);
 
   }
 
@@ -1141,7 +1134,7 @@ void Projector::checkDivergence(LevelData<FluxBox>& a_uEdge)
 
   if (s_verbosity >= 2)
   {
-    pout() << "  Projector::checkDivergence - Setting solver tolerance = " << s_solver_tolerance << endl;
+    LOG("  Projector::checkDivergence - Setting solver tolerance = " << s_solver_tolerance);
   }
 
 }
@@ -1176,7 +1169,7 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
 
   if (s_verbosity > 3)
   {
-    pout() << "CCProjector::levelMacProject" << endl;
+    LOG("CCProjector::levelMacProject");
   }
 
   Divergence::levelDivergenceMAC(MACrhs(), a_uEdge, m_dx);
@@ -1224,7 +1217,7 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     int nRefFine = -1;
     Real sumRHS = computeSum(MACrhs(), finerGridsPtr,
                              nRefFine, m_dx, MACrhs().interval());
-    pout() << "    MAC projection (level " << m_level << ") -- sum(RHS) = " << sumRHS << endl;
+    LOG("    MAC projection (level " << m_level << ") -- sum(RHS) = " << sumRHS);
   }
 
   for (DataIterator dit = MACrhs().dataIterator(); dit.ok(); ++dit)
@@ -1304,7 +1297,7 @@ int Projector::levelMacProject(LevelData<FluxBox>& a_uEdge,
     // Don't correct if div(u) is very small, or of order U
     if (maxDivU > 1e-10 && maxVel/maxDivU > 100)
     {
-      pout() << "  CCProjector - smoothing div(u) " << endl;
+      LOG("  CCProjector - smoothing div(u) ");
 
       Gradient::levelGradientMAC(correction, divU, m_dx);
 
@@ -1489,7 +1482,7 @@ void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
 {
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::LevelProject "            << endl;
+    LOG("CCProjector::LevelProject "           );
   }
 
   CH_TIME("CCProjector::levelProject");
@@ -1522,7 +1515,7 @@ void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
 
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::LevelProject - calculateDivergence "            << endl;
+    LOG("CCProjector::LevelProject - calculateDivergence "           );
   }
 
   // now compute RHS for projection
@@ -1552,12 +1545,12 @@ void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
     int nRefFine = -1;
     Real sumRHS = computeSum(CCrhs(), finerGridsPtr,
                              nRefFine, m_dx, CCrhs().interval());
-    pout() << "    Level projection -- sum(RHS) = " << sumRHS << endl;
+    LOG("    Level projection -- sum(RHS) = " << sumRHS);
   }
 
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::LevelProject - solve for pressure correction "            << endl;
+    LOG("CCProjector::LevelProject - solve for pressure correction "           );
   }
 
 
@@ -1575,7 +1568,7 @@ void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
 
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::LevelProject - apply BCs "            << endl;
+    LOG("CCProjector::LevelProject - apply BCs "           );
   }
 
   // loop over grids...
@@ -1628,7 +1621,7 @@ void Projector::LevelProject(LevelData<FArrayBox>& a_velocity,
 
     divU.exchange();
 
-    pout() << "  CCProjector - smoothing div(u) " << endl;
+    LOG("  CCProjector - smoothing div(u) ");
 
     Gradient::levelGradientCC(correction, divU, m_dx);
 
@@ -1657,7 +1650,7 @@ void Projector::AdditionalLevelProject(LevelData<FArrayBox>& a_velocity,
 {
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::LevelProject "            << endl;
+    LOG("CCProjector::LevelProject "           );
   }
 
   CH_TIME("CCProjector::levelProject");
@@ -1693,7 +1686,7 @@ void Projector::AdditionalLevelProject(LevelData<FArrayBox>& a_velocity,
 
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::LevelProject - calculateDivergence "            << endl;
+    LOG("CCProjector::LevelProject - calculateDivergence "           );
   }
 
   // now compute RHS for projection
@@ -1726,12 +1719,12 @@ void Projector::AdditionalLevelProject(LevelData<FArrayBox>& a_velocity,
     int nRefFine = -1;
     Real sumRHS = computeSum(CCrhs(), finerGridsPtr,
                              nRefFine, m_dx, CCrhs().interval());
-    pout() << "    Level projection -- sum(RHS) = " << sumRHS << endl;
+    LOG("    Level projection -- sum(RHS) = " << sumRHS);
   }
 
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::LevelProject - solve for pressure correction "            << endl;
+    LOG("CCProjector::LevelProject - solve for pressure correction "           );
   }
 
 
@@ -1746,7 +1739,7 @@ void Projector::AdditionalLevelProject(LevelData<FArrayBox>& a_velocity,
 
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::LevelProject - apply BCs "            << endl;
+    LOG("CCProjector::LevelProject - apply BCs "           );
   }
 
   // loop over grids...
@@ -1789,7 +1782,7 @@ void Projector::applyCCcorrection(LevelData<FArrayBox>& a_velocity,
 {
   if (s_verbosity >= 3)
   {
-    pout() << "CCProjector::applyCCcorrection with scale " << scale             << endl;
+    LOG("CCProjector::applyCCcorrection with scale " << scale            );
   }
 
   const DisjointBoxLayout& grids = getBoxes();
@@ -1847,7 +1840,7 @@ void Projector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
 
   if (s_verbosity > 3)
   {
-    pout() << "CCProjector::doSyncOperations" << endl;
+    LOG("CCProjector::doSyncOperations");
   }
 
   AMRMultiGrid<LevelData<FArrayBox> >* dspSolver = new
@@ -1878,7 +1871,6 @@ void Projector::doSyncOperations(Vector<LevelData<FArrayBox>* >& a_velocity,
   while(proj)
   {
     proj = proj->fineProjPtr();
-
   }
 
 
@@ -2013,12 +2005,7 @@ void Projector::doSyncProjection(Vector<LevelData<FArrayBox>* >& a_velocity,
     Interval sumComps(0,0);
     Real sumRHS;
     sumRHS =  computeSum(syncRHS, nRefFineVect, m_dx, sumComps, m_level);
-    if (s_verbosity >= 3)
-    {
-      pout() << "  Sum(RHS) for sync solve = "
-          << setiosflags(ios::scientific) << sumRHS << endl;
-
-    }
+    LOG_INFO("  Sum(RHS) for sync solve = " << setiosflags(ios::scientific) << sumRHS);
 
     // now solve
     a_solver.solve(syncCorr, syncRHS, vectorSize-1, m_level,
@@ -2095,7 +2082,7 @@ void Projector::applySyncCorrection(Vector<LevelData<FArrayBox>* >& a_velocities
 {
   if (s_verbosity >= 3)
   {
-    pout() << "CCProjector::applySyncCorrection " << endl;
+    LOG("CCProjector::applySyncCorrection ");
   }
 
   if (m_applySyncCorrection)
@@ -2185,7 +2172,7 @@ void Projector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
 {
   if (s_verbosity > 3)
   {
-    pout() << "CCProjector::computeVDCorrection, eta = " << m_etaLambda << endl;
+    LOG("CCProjector::computeVDCorrection, eta = " << m_etaLambda);
   }
 
   // only do this if eta != 0
@@ -2342,10 +2329,11 @@ void Projector::computeVDCorrection(Vector<LevelData<FArrayBox>* >& a_lambda,
     m_sumVDrhs =  computeSum(a_lambda, nRefFineVect, m_dx, sumComps, m_level);
     Real maxLambda = ::computeNorm(a_lambda, nRefFineVect, m_dx, sumComps, m_level);
     m_sumVDrhs = m_sumVDrhs/m_etaLambda;
-    pout() << "  Sum(RHS) for VD solve on level " << m_level << " (divided by eta) = "
-        << setiosflags(ios::scientific) << m_sumVDrhs << " (current time " <<a_newTime << "), max|lambda| = " << maxLambda <<  endl;
+    LOG_INFO("  Sum(RHS) for VD solve on level " << m_level << " (divided by eta) = "
+            << setiosflags(ios::scientific) << m_sumVDrhs 
+            << " (current time " << a_newTime << "), max|lambda| = " << maxLambda);
+  
     // now solve
-
     a_solver.solve(VDCorr, newLambda,
                    vectorSize-1,  // max
                    m_level, // base
@@ -2540,7 +2528,7 @@ void Projector::initialLevelProject(LevelData<FArrayBox>& a_velocity,
 {
   if (s_verbosity >= 2)
   {
-    pout() << "  CCProjector::initialLevelProject with dt = " << a_dt << endl;
+    LOG("  CCProjector::initialLevelProject with dt = " << a_dt);
   }
   LevelData<FArrayBox>* crseDataPtr=nullptr;
   LevelData<FArrayBox> levelProjRHS(getBoxes(),1);
@@ -2811,8 +2799,8 @@ void Projector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
   Interval sumComps(0,0);
   Real sumRHS;
   sumRHS =  computeSum(projRHS, nRefFineVect, m_dx, sumComps, m_level);
-  pout() << "Sum(RHS) for IVP solve = "
-      << setiosflags(ios::scientific) << sumRHS << endl;
+  LOG_INFO("Sum(RHS) for IVP solve = "
+            << setiosflags(ios::scientific) << sumRHS);
 
   // now solve!
   a_bigSolver.solve(projCorr, projRHS, finestLevel, m_level,
@@ -2820,7 +2808,7 @@ void Projector::initialVelocityProject(Vector<LevelData<FArrayBox>* >& a_vel,
 
   if (s_verbosity >= 2)
   {
-    pout() << "CCProjector::initialVelocityProject - finished solve " << endl;
+    LOG("CCProjector::initialVelocityProject - finished solve ");
   }
 
   // apply physical boundary conditions before
@@ -3043,7 +3031,7 @@ void Projector::defineSolverMGLevelVCOp(
 {
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::defineSolverMGLevelVCOp "            << endl;
+    LOG("CCProjector::defineSolverMGLevelVCOp "           );
   }
 
   m_porosityPtr = a_porosityPtr;
@@ -3139,7 +3127,7 @@ void Projector::defineSolverMGLevelVCOp(
 
   if (s_verbosity > 3)
   {
-    pout() << "CCProjector::defineSolverMGlevel - define multigrids" << endl;
+    LOG("CCProjector::defineSolverMGlevel - define multigrids");
   }
 
 //  VCAMRPoissonOp2Factory faceOpFact;
@@ -3181,7 +3169,7 @@ void Projector::makeBottomSolvers()
 {
   if (s_verbosity > 3)
   {
-    pout() << "CCProjector::makeBottomSolvers()" << endl;
+    LOG("CCProjector::makeBottomSolvers()");
   }
 
 
@@ -3232,7 +3220,7 @@ void Projector::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
 {
   if (s_verbosity > 3)
   {
-    pout() << "CCProjector::defineSolverMGlevel" << endl;
+    LOG("CCProjector::defineSolverMGlevel");
   }
 
   int numSolverLevels = 1;
@@ -3282,7 +3270,7 @@ void Projector::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
 
     if (s_verbosity > 3)
     {
-      pout() << "CCProjector::defineSolverMGlevel - define Poisson Op Factory" << endl;
+      LOG("CCProjector::defineSolverMGlevel - define Poisson Op Factory");
     }
     localPoissonOpFactory.define(baseDomain,
                                  m_allGrids,
@@ -3309,7 +3297,7 @@ void Projector::defineSolverMGlevel(const DisjointBoxLayout& a_grids,
 
   if (s_verbosity > 3)
   {
-    pout() << "CCProjector::defineSolverMGlevel - define multigrids" << endl;
+    LOG("CCProjector::defineSolverMGlevel - define multigrids");
   }
 
   if (s_relax_bottom_solver)
@@ -3357,7 +3345,7 @@ int Projector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
 {
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::solveMGlevel "            << endl;
+    LOG("CCProjector::solveMGlevel "           );
   }
 
   // Turn off initialising phi by default - it's dodgy with regridding
@@ -3412,30 +3400,13 @@ int Projector::solveMGlevel(LevelData<FArrayBox>&   a_phi,
 
   if (s_verbosity >= 5)
   {
-    pout() << "CCProjector::solveMGlevel - do actual solve "            << endl;
+    LOG("CCProjector::solveMGlevel - do actual solve "           );
   }
 
 
   // l_max = maxLevel, l_base = maxLevel
   m_solverMGlevel.solve(phiVect, rhsVect, maxLevel, maxLevel,
                         false); // don't initialize to zero
-
-
-
-//  if (s_verbosity >= 2
-//      || m_solverMGlevel.m_exitStatus != 0)
-//  {
-//    if (cellCentred)
-//    {
-//      pout() << "  CC Projection - solveMGlevel - solved, exitStatus =  " <<  m_solverMGlevel.m_exitStatus           << endl;
-//    }
-//    else
-//    {
-//      pout() << "  MAC Projection - solveMGlevel - solved, exitStatus =  " <<  m_solverMGlevel.m_exitStatus           << endl;
-//    }
-//  }
-
-  //	int exitStatus = m_solverMGlevel.m_exitStatus;
 
   return m_solverMGlevel.m_exitStatus;
 }
