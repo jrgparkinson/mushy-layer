@@ -1,7 +1,7 @@
 # import matplotlib
 # matplotlib.use('Agg')
 
-from MushyPltFile import MushyPltFile
+from plotting.MushyPltFile import MushyPltFile
 import matplotlib.pyplot as plt
 
 # file_loc = '/home/parkinsonjl/mnt/sharedStorage/optimalStates-restructured/Le200/CR2.000/RaC100/' \

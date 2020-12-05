@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-from MushyPltFile import MushyPltFile
+from plotting.MushyPltFile import MushyPltFile
 import sys
 
 plt.close('all')
