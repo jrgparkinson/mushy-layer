@@ -22,7 +22,7 @@ env:
   CHOMBO_HOME: /home/runner/chombo/lib
   HDF5_PATH: /home/runner/hdf5-dir
   LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
-  PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test
+  PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
   REGRESSIONS_PATH: /home/runner/work/mushy-layer/mushy-layer/test/regression
   TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test
   MUSHY_LAYER_TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test/output
