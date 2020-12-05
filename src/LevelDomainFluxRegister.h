@@ -11,15 +11,15 @@
 #ifndef AMRTOOLS_LEVELDOMAINFLUXREGISTER_H_
 #define AMRTOOLS_LEVELDOMAINFLUXREGISTER_H_
 
-#include "REAL.H"
-#include "Vector.H"
 #include "FArrayBox.H"
 #include "FluxBox.H"
 #include "IntVectSet.H"
-#include "LoHiSide.H"
-#include "LevelData.H"
 #include "LayoutData.H"
+#include "LevelData.H"
+#include "LoHiSide.H"
 #include "ProblemDomain.H"
+#include "REAL.H"
+#include "Vector.H"
 
 #include "NamespaceHeader.H"
 
@@ -30,24 +30,18 @@
 class LevelDomainFluxRegister
 {
 public:
-  LevelDomainFluxRegister ();
-  virtual
-  ~LevelDomainFluxRegister ();
+  LevelDomainFluxRegister();
+  virtual ~LevelDomainFluxRegister();
 
   /// Full define function
-  void define(const ProblemDomain a_domain,
-              const DisjointBoxLayout a_grids,
-              const int a_refRat,
-              const Real a_dx,
-              LevelDomainFluxRegister* a_fineFR,
-              LevelDomainFluxRegister* a_coarseFR,
-              int a_numComp = 1);
+  void define(const ProblemDomain a_domain, const DisjointBoxLayout a_grids,
+              const int a_refRat, const Real a_dx,
+              LevelDomainFluxRegister *a_fineFR,
+              LevelDomainFluxRegister *a_coarseFR, int a_numComp = 1);
 
   /// Increment flux registers with flux
-  void incrFlux(const LevelData<FluxBox>& a_flux,
-                const Real a_scale,
-                const int a_comp = 0,
-                const int a_localComp = 0,
+  void incrFlux(const LevelData<FluxBox> &a_flux, const Real a_scale,
+                const int a_comp = 0, const int a_localComp = 0,
                 const int a_numComps = 1);
 
   /// Get the flux on this level
@@ -56,9 +50,9 @@ public:
    * are not guaranteed to cover the entire domain edge.
    * Just included for completeness.
    */
-//  Real getFluxLevel(const int a_dir,
-//                 const Side::LoHiSide a_side,
-//                 const Real a_scale);
+  //  Real getFluxLevel(const int a_dir,
+  //                 const Side::LoHiSide a_side,
+  //                 const Real a_scale);
 
   /// Set the flux registers to zero
   void setToZero();
@@ -71,20 +65,18 @@ public:
    * In particular, useful for verifying that the numerical scheme is
    * globally flux conservative.
    */
-  Real getFluxHierarchy(const int a_dir,
-               const Side::LoHiSide a_side,
-               const Real a_scale,
-               const int a_localComp = 0);
-protected:
+  Real getFluxHierarchy(const int a_dir, const Side::LoHiSide a_side,
+                        const Real a_scale, const int a_localComp = 0);
 
+protected:
   /// Problem domain on this level
   ProblemDomain m_probDomain;
 
   /// Fluxes at the bottom of the domain in each direction
-  Vector<RefCountedPtr<LevelData<FArrayBox> > > m_fluxHi,
+  Vector<RefCountedPtr<LevelData<FArrayBox>>> m_fluxHi,
 
-  /// Fluxes at the top of the domain in each direction
-  m_fluxLo;
+      /// Fluxes at the top of the domain in each direction
+      m_fluxLo;
 
   /// Grids on this level
   DisjointBoxLayout m_grids;
@@ -92,8 +84,8 @@ protected:
   /// Coarser  domain flux registers (if they exist)
   LevelDomainFluxRegister *m_fineFR,
 
-  /// Finer  domain flux registers (if they exist)
-  *m_coarseFR;
+      /// Finer  domain flux registers (if they exist)
+      *m_coarseFR;
 
   /// Whether object is defined
   bool m_defined;
@@ -106,10 +98,7 @@ protected:
 
   /// Number of components to keep track of
   int m_numComp;
-
-
 };
-
 
 #include "NamespaceFooter.H"
 

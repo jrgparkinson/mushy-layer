@@ -1,7 +1,6 @@
 import re
 import os
 import time
-import math
 import sys
 import subprocess
 import socket

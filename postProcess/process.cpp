@@ -24,7 +24,7 @@ using namespace std;
 #include "AMRLevelMushyLayer.H"
 #include "Diagnostics.h"
 #include "MushyLayerLoadUtils.H"
-
+#include "Logging.H"
 
 // One more function for MPI
 void dumpmemoryatexit();
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 #endif
 
   pout() << endl;
-  pout() << "Initializing..." << endl;
+  LOG("Initializing...");
 
   // declare variable to store hierarchy
 
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
   // Else, search for files in the directory
   Vector<string> fileNames;
 
-  pout() << "Finding files..." << endl;
+  LOG("Finding files...");
 
   // Get all the files in the directory with the correct prefix
   DIR           *dirp;
@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
   myfile.close();
 
 
-  pout() << "Done..." << endl;
+  LOG("Done...");
   pout() << endl;
 
 #ifdef CH_MPI

@@ -21,16 +21,13 @@ public:
   //  Channel ();
 
   /// Standard creator
-  Channel ();
+  Channel();
 
   /// Create with intvectset
-  Channel(const IntVect& iv) : IntVectSet(iv)
-  {
-    m_finished = false;
-  }
+  Channel(const IntVect &iv) : IntVectSet(iv) { m_finished = false; }
 
   /// Does this channel border the intvect?
-  bool borders(const IntVect& iv);
+  bool borders(const IntVect &iv);
 
   /// Get the width at the vertical position specified
   Real width(Side::LoHiSide a_side, int a_offset, Real a_dx);
@@ -47,7 +44,6 @@ public:
    */
   Real location();
 
-
   /// Remove bottom row of cells
   void removeBottomCells();
 
@@ -58,15 +54,16 @@ public:
   void setFinished();
 
   /// Destructor
-  virtual
-  ~Channel ();
+  virtual ~Channel();
 
   /// Compute channel spacing
-  static void channelSpacing(Vector<Real>& a_spacing, Vector<Channel*>& a_channels, Real a_dx, ProblemDomain a_probDomain)
+  static void channelSpacing(Vector<Real> &a_spacing,
+                             Vector<Channel *> &a_channels, Real a_dx,
+                             ProblemDomain a_probDomain)
   {
     int numChannels = a_channels.size();
-    int numSpacings = a_probDomain.isPeriodic(0) ? numChannels : numChannels - 1;
-
+    int numSpacings =
+        a_probDomain.isPeriodic(0) ? numChannels : numChannels - 1;
 
     if (numSpacings <= 0)
     {
@@ -88,9 +85,9 @@ public:
     channelLocations.sort();
 
     // Get all spacings that don't involve wrapping around a periodic domain
-    for (int i = 0; i<(numChannels - 1); i++)
+    for (int i = 0; i < (numChannels - 1); i++)
     {
-      a_spacing[i] = (channelLocations[i+1] - channelLocations[i])*a_dx;
+      a_spacing[i] = (channelLocations[i + 1] - channelLocations[i]) * a_dx;
     }
 
     // If periodic, get the one extra channel spacing
@@ -99,14 +96,14 @@ public:
       int domMin_i = a_probDomain.domainBox().smallEnd(0);
       int domMax_i = a_probDomain.domainBox().bigEnd(0);
 
-      a_spacing[numSpacings - 1] = ( (domMax_i - channelLocations[numChannels-1])
-          + (channelLocations[0] - domMin_i) ) * a_dx;
+      a_spacing[numSpacings - 1] =
+          ((domMax_i - channelLocations[numChannels - 1]) +
+           (channelLocations[0] - domMin_i)) *
+          a_dx;
     }
-
   }
 
 private:
-
   /// Set if we've finished defining a channel
   bool m_finished;
 };

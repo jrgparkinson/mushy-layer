@@ -1,4 +1,4 @@
-from MushyPltFile import latexify
+from plotting.MushyPltFile import latexify
 from mushyLayerRunUtils import write_inputs, get_executable_name, get_final_plot_file
 import getopt
 import os

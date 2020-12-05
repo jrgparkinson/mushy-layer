@@ -11,11 +11,10 @@
 #include "AdvectionPhysics.H"
 #include "AdvectPhysicsF_F.H"
 #include "AdvectIBC.H"
-//#include "AdvectionPhysicsF_F.H"
 
 #include "LoHiSide.H"
 
-AdvectionPhysics::AdvectionPhysics():GodunovPhysics()
+AdvectionPhysics::AdvectionPhysics() : GodunovPhysics()
 {
   // Bogus values
   m_numCons = -1;
@@ -46,8 +45,8 @@ void AdvectionPhysics::setNComp(int nComp)
 }
 
 // Compute the maximum wave speed
-Real AdvectionPhysics::getMaxWaveSpeed(const FArrayBox& a_U,
-                                       const Box&       a_box)
+Real AdvectionPhysics::getMaxWaveSpeed(const FArrayBox &a_U,
+                                       const Box &a_box)
 {
   CH_assert(isDefined());
 
@@ -55,24 +54,25 @@ Real AdvectionPhysics::getMaxWaveSpeed(const FArrayBox& a_U,
   // is based entirely on the cell-centered velocity
   Real maxSpeed = 0.0, speed;
   for (int dir = 0; dir < SpaceDim; dir++)
-    {
-      FArrayBox& vel = *m_cellVelPtr;
-      speed = vel.norm(0,dir,1);
-      if (maxSpeed < speed) maxSpeed = speed;
-    }
+  {
+    FArrayBox &vel = *m_cellVelPtr;
+    speed = vel.norm(0, dir, 1);
+    if (maxSpeed < speed)
+      maxSpeed = speed;
+  }
 
   return maxSpeed;
 }
 
 // Factory method - this object is its own factory.  It returns a pointer
 // to new AdvectionPhysics object with the same definition as this object.
-GodunovPhysics* AdvectionPhysics::new_godunovPhysics() const
+GodunovPhysics *AdvectionPhysics::new_godunovPhysics() const
 {
   // Make the new object
-  AdvectionPhysics* newPtr = new AdvectionPhysics();
+  AdvectionPhysics *newPtr = new AdvectionPhysics();
 
   // Define the same domain and dx
-  newPtr->define(m_domain,m_dx);
+  newPtr->define(m_domain, m_dx);
 
   // Pass the current initial and boundary condition (IBC) object to this new
   // patch integrator so it can create its own IBC object and define it as it
@@ -85,7 +85,7 @@ GodunovPhysics* AdvectionPhysics::new_godunovPhysics() const
 
   newPtr->m_nCompDefined = m_nCompDefined;
 
-  GodunovPhysics* retval = static_cast<GodunovPhysics*>(newPtr);
+  GodunovPhysics *retval = static_cast<GodunovPhysics *>(newPtr);
 
   // Return the new object
   return retval;
@@ -112,25 +112,24 @@ int AdvectionPhysics::numFluxes()
   return m_numFlux;
 }
 
-void AdvectionPhysics::getFlux(FArrayBox&       a_flux,
-                               const FArrayBox& a_WHalf,
-                               const int&       a_dir,
-                               const Box&       a_box)
+void AdvectionPhysics::getFlux(FArrayBox &a_flux,
+                               const FArrayBox &a_WHalf,
+                               const int &a_dir,
+                               const Box &a_box)
 {
   CH_assert(isDefined());
   CH_assert(a_flux.nComp() == a_WHalf.nComp());
 
-  FArrayBox& advVelDir = (*m_advVelPtr)[a_dir];
+  FArrayBox &advVelDir = (*m_advVelPtr)[a_dir];
   // flux is WHalf*advVel
   a_flux.copy(a_WHalf, a_box);
   // componentwise multiplication, since all components of flux
   // get multiplied by 0th componenent of advVel
-  for (int comp=0; comp<a_flux.nComp(); comp++)
-    {
-      a_flux.mult(advVelDir, a_box, 0, comp, 1);
-    }
+  for (int comp = 0; comp < a_flux.nComp(); comp++)
+  {
+    a_flux.mult(advVelDir, a_box, 0, comp, 1);
+  }
 }
-
 
 // Is everthing defined
 bool AdvectionPhysics::isDefined() const
@@ -146,10 +145,10 @@ int AdvectionPhysics::numPrimitives()
   return m_numPrim;
 }
 
-void AdvectionPhysics::charAnalysis(FArrayBox&       a_dW,
-                                    const FArrayBox& a_W,
-                                    const int&       a_dir,
-                                    const Box&       a_box)
+void AdvectionPhysics::charAnalysis(FArrayBox &a_dW,
+                                    const FArrayBox &a_W,
+                                    const int &a_dir,
+                                    const Box &a_box)
 {
   CH_assert(isDefined());
 
@@ -160,10 +159,10 @@ void AdvectionPhysics::charAnalysis(FArrayBox&       a_dW,
   // This is the identity mapping for advection - do nothing
 }
 
-void AdvectionPhysics::charSynthesis(FArrayBox&       a_dW,
-                                     const FArrayBox& a_W,
-                                     const int&       a_dir,
-                                     const Box&       a_box)
+void AdvectionPhysics::charSynthesis(FArrayBox &a_dW,
+                                     const FArrayBox &a_W,
+                                     const int &a_dir,
+                                     const Box &a_box)
 {
   CH_assert(isDefined());
 
@@ -174,10 +173,10 @@ void AdvectionPhysics::charSynthesis(FArrayBox&       a_dW,
   // This is the identity mapping for advection - do nothing
 }
 
-void AdvectionPhysics::charValues(FArrayBox&       a_lambda,
-                                  const FArrayBox& a_W,
-                                  const int&       a_dir,
-                                  const Box&       a_box)
+void AdvectionPhysics::charValues(FArrayBox &a_lambda,
+                                  const FArrayBox &a_W,
+                                  const int &a_dir,
+                                  const Box &a_box)
 {
   CH_assert(isDefined());
 
@@ -185,72 +184,72 @@ void AdvectionPhysics::charValues(FArrayBox&       a_lambda,
   CH_assert(a_W.box().contains(a_box));
 
   CH_assert(m_cellVelPtr != nullptr);
-  FArrayBox& cellVel = *m_cellVelPtr;
+  FArrayBox &cellVel = *m_cellVelPtr;
 
   int nComp = a_lambda.nComp();
   int copyComp = 1;
 
   for (int comp = 0; comp < nComp; comp++)
   {
-    a_lambda.copy(cellVel,a_box,a_dir,a_box,comp,copyComp);
+    a_lambda.copy(cellVel, a_box, a_dir, a_box, comp, copyComp);
   }
 }
 
 // Increment the source term using the primitive state (not needed)
-void AdvectionPhysics::incrementSource(FArrayBox&       a_S,
-                                       const FArrayBox& a_W,
-                                       const Box&       a_box)
+void AdvectionPhysics::incrementSource(FArrayBox &a_S,
+                                       const FArrayBox &a_W,
+                                       const Box &a_box)
 {
-  CH_assert (isDefined());
+  CH_assert(isDefined());
 
-  CH_assert (a_S.box().contains(a_box));
-  CH_assert (a_W.box().contains(a_box));
+  CH_assert(a_S.box().contains(a_box));
+  CH_assert(a_W.box().contains(a_box));
 
-  CH_assert (a_S.nComp() == a_W.nComp());
+  CH_assert(a_S.nComp() == a_W.nComp());
 
   // The source term does not explicitly depend on the current primitive state
 }
 
 // Compute a Riemann problem and generate fluxes at the faces
-void AdvectionPhysics::riemann(FArrayBox&       a_WGdnv,
-                               const FArrayBox& a_WLeft,
-                               const FArrayBox& a_WRight,
-                               const FArrayBox& a_W,
-                               const Real&      a_time,
-                               const int&       a_dir,
-                               const Box&       a_box)
+void AdvectionPhysics::riemann(FArrayBox &a_WGdnv,
+                               const FArrayBox &a_WLeft,
+                               const FArrayBox &a_WRight,
+                               const FArrayBox &a_W,
+                               const Real &a_time,
+                               const int &a_dir,
+                               const Box &a_box)
 {
   CH_assert(isDefined());
 
   CH_assert(a_WGdnv.box().contains(a_box));
 
   CH_assert(m_advVelPtr != nullptr);
-  FluxBox& advVel = *m_advVelPtr;
+  FluxBox &advVel = *m_advVelPtr;
   // CH_assert(advVel.box().contains(a_box));
 
   // Get the numbers of relevant variables
   int numPrim = numPrimitives();
 
-  CH_assert(a_WGdnv .nComp() == numPrim);
-  CH_assert(a_WLeft .nComp() == numPrim);
+  CH_assert(a_WGdnv.nComp() == numPrim);
+  CH_assert(a_WLeft.nComp() == numPrim);
   CH_assert(a_WRight.nComp() == numPrim);
 
   // Cast away "const" inputs so their boxes can be shifted left or right
   // 1/2 cell and then back again (no net change is made!)
-  FArrayBox& shiftWLeft  = (FArrayBox&)a_WLeft;
-  FArrayBox& shiftWRight = (FArrayBox&)a_WRight;
+  FArrayBox &shiftWLeft = (FArrayBox &)a_WLeft;
+  FArrayBox &shiftWRight = (FArrayBox &)a_WRight;
 
   // Solution to the Riemann problem
 
   // Shift the left and right primitive variable boxes 1/2 cell so they are
   // face centered
-  shiftWLeft .shiftHalf(a_dir, 1);
-  shiftWRight.shiftHalf(a_dir,-1);
+  shiftWLeft.shiftHalf(a_dir, 1);
+  shiftWRight.shiftHalf(a_dir, -1);
 
-  CH_assert(shiftWLeft .box().contains(a_box));
+  CH_assert(shiftWLeft.box().contains(a_box));
   CH_assert(shiftWRight.box().contains(a_box));
 
-  FArrayBox& advVelDir = advVel[a_dir];
+  FArrayBox &advVelDir = advVel[a_dir];
   CH_assert(advVelDir.box().contains(a_box));
 
   // Riemann solver computes WGdnv all edges that are not on the physical
@@ -258,66 +257,66 @@ void AdvectionPhysics::riemann(FArrayBox&       a_WGdnv,
   FORT_RIEMANNF(CHF_FRA(a_WGdnv),
                 CHF_CONST_FRA(shiftWLeft),
                 CHF_CONST_FRA(shiftWRight),
-                CHF_CONST_FRA1(advVelDir,0),
+                CHF_CONST_FRA1(advVelDir, 0),
                 CHF_CONST_INT(a_dir),
                 CHF_BOX(a_box));
 
   // Call boundary Riemann solver (note: periodic BC's are handled there).
-  m_bc->primBC(a_WGdnv,shiftWLeft ,a_W,a_dir,Side::Hi,a_time);
-  m_bc->primBC(a_WGdnv,shiftWRight,a_W,a_dir,Side::Lo,a_time);
+  m_bc->primBC(a_WGdnv, shiftWLeft, a_W, a_dir, Side::Hi, a_time);
+  m_bc->primBC(a_WGdnv, shiftWRight, a_W, a_dir, Side::Lo, a_time);
 
   // Shift the left and right primitive variable boxes back to their original
   // position
-  shiftWLeft .shiftHalf(a_dir,-1);
+  shiftWLeft.shiftHalf(a_dir, -1);
   shiftWRight.shiftHalf(a_dir, 1);
 }
 
-void AdvectionPhysics::postNormalPred(FArrayBox&       a_WMinus,
-                                      FArrayBox&       a_WPlus,
-                                      const FArrayBox& a_W,
-                                      const Real&      a_dt,
-                                      const Real&      a_dx,
-                                      const int&       a_dir,
-                                      const Box&       a_box)
+void AdvectionPhysics::postNormalPred(FArrayBox &a_WMinus,
+                                      FArrayBox &a_WPlus,
+                                      const FArrayBox &a_W,
+                                      const Real &a_dt,
+                                      const Real &a_dx,
+                                      const int &a_dir,
+                                      const Box &a_box)
 {
   CH_assert(isDefined());
 
   // Nothing needs to be done here
 }
 
-void AdvectionPhysics::quasilinearUpdate(FArrayBox&       a_AdWdx,
-                                         const FArrayBox& a_WHalf,
-                                         const FArrayBox& a_W,
-                                         const Real&      a_scale,
-                                         const int&       a_dir,
-                                         const Box&       a_box)
+void AdvectionPhysics::quasilinearUpdate(FArrayBox &a_AdWdx,
+                                         const FArrayBox &a_WHalf,
+                                         const FArrayBox &a_W,
+                                         const Real &a_scale,
+                                         const int &a_dir,
+                                         const Box &a_box)
 {
   CH_assert(isDefined());
 
   CH_assert(a_AdWdx.box().contains(a_box));
-  CH_assert(a_W    .box().contains(a_box));
+  CH_assert(a_W.box().contains(a_box));
 
   // Get the numbers of relevant variables
   int numPrim = numPrimitives();
 
   CH_assert(a_AdWdx.nComp() == numPrim);
   CH_assert(a_WHalf.nComp() == numPrim);
-  CH_assert(a_W    .nComp() == numPrim);
+  CH_assert(a_W.nComp() == numPrim);
 
-  const FArrayBox& cellVel = *m_cellVelPtr;
+  const FArrayBox &cellVel = *m_cellVelPtr;
 
   FORT_QUASILINEARUPDATE(CHF_FRA(a_AdWdx),
                          CHF_CONST_FRA(a_WHalf),
-                         CHF_CONST_FRA1(cellVel,a_dir),
+                         CHF_CONST_FRA1(cellVel, a_dir),
                          CHF_CONST_REAL(a_scale),
                          CHF_CONST_INT(a_dir),
                          CHF_BOX(a_box));
 }
 
 // Compute the primitive variables from the conserved variables
-void AdvectionPhysics::consToPrim(FArrayBox&       a_W,
-                                  const FArrayBox& a_U,
-                                  const Box&       a_box)
+void AdvectionPhysics::consToPrim(FArrayBox &a_W,
+                                  const FArrayBox &a_U,
+                                  const Box &a_box)
 {
   CH_assert(isDefined());
   CH_assert(a_U.box().contains(a_box));
@@ -334,7 +333,7 @@ Interval AdvectionPhysics::velocityInterval()
 {
   MayDay::Error("AdvectionPhysics::velocityInterval - not defined");
 
-  Interval retval(-1,-1);
+  Interval retval(-1, -1);
   return retval;
 }
 
@@ -366,18 +365,14 @@ int AdvectionPhysics::bulkModulusIndex()
 }
 
 // Set face-centered advection velocity pointer
-void
-AdvectionPhysics::setAdvVelPtr(FluxBox* a_advVelPtr)
+void AdvectionPhysics::setAdvVelPtr(FluxBox *a_advVelPtr)
 {
   m_advVelPtr = a_advVelPtr;
-
-
 }
 
-void
-AdvectionPhysics::setInflowOutflowVelPtr(FluxBox* a_velPtr)
+void AdvectionPhysics::setInflowOutflowVelPtr(FluxBox *a_velPtr)
 {
-  AdvectIBC* ibc = dynamic_cast<AdvectIBC*>(m_bc);
+  AdvectIBC *ibc = dynamic_cast<AdvectIBC *>(m_bc);
 
   // If we've been succesful in casting it
   if (ibc != nullptr)
@@ -387,21 +382,20 @@ AdvectionPhysics::setInflowOutflowVelPtr(FluxBox* a_velPtr)
 }
 
 // Get face-centered advection velocity pointer
-const FluxBox*
+const FluxBox *
 AdvectionPhysics::advectionVelPtr() const
 {
   return m_advVelPtr;
 }
 
 // Set cell-centered advection velocity pointer
-void
-AdvectionPhysics::setCellVelPtr(FArrayBox* a_cellVelPtr)
+void AdvectionPhysics::setCellVelPtr(FArrayBox *a_cellVelPtr)
 {
   m_cellVelPtr = a_cellVelPtr;
 }
 
 // Get cell-centered advection velocity pointer
-const FArrayBox*
+const FArrayBox *
 AdvectionPhysics::cellVelPtr() const
 {
   return m_cellVelPtr;

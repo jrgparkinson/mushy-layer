@@ -53,7 +53,7 @@
 #include "PiecewiseLinearFillPatchFace.H"
 #include "timeInterp.H"
 
-// Files I made myself
+// Mushy Layer specific 
 #include "DarcyBrinkmanOp.H"
 #include "MushyLayerParams.h"
 #include "MushyLayerUtils.H"
@@ -65,6 +65,7 @@
 #include "AMRNonLinearMultiCompOp.H"
 #include "mushyLayerOpt.h"
 #include "PorosityFilterFunction.H"
+#include "Logging.H"
 
 // Fortran files
 #include "AdvectUtilF_F.H"
@@ -113,8 +114,6 @@ public:
 
     m_physBCPtr = nullptr;
 
-//    m_newLevel=false;
-
     m_enforceGradP = false;
     m_dtReduction = 0.0;
 
@@ -131,12 +130,10 @@ public:
     AMREnthalpySum_old = 0;
     AMRSaltSum_new = 0;
     AMRSaltSum_old = 0;
+
     m_pressureScaleVar = -1;
-
-//    m_doAutomaticRestart = false;
-
     m_maxLambda=0.0;
-
+    m_doSanityChecks=false;
 }
 
   /// Full constructor. Arguments are same as in define()
@@ -1433,7 +1430,53 @@ protected:
   /// Do reflux implicitly?
   bool s_implicit_reflux;
 
+  /// Whether to do sanity checks
+  bool m_doSanityChecks;
+
 private:
+
+  // Ensure field is great than min val
+  void ensureGreaterThan(LevelData<FArrayBox>& a_phi, Real min_val, string field_name, int comp=0);
+
+  // Check if field norm exceeds threshold, and warn if so
+  void doSanityChecks(LevelData<FluxBox>& a_flux, string fieldName, Real threshold=1e200)
+  {
+    LevelData<FArrayBox> a_phi(a_flux.disjointBoxLayout(), SpaceDim*a_flux.nComp(), a_flux.ghostVect());
+    EdgeToCell(a_flux,  a_phi);
+    doSanityChecks(a_phi, fieldName, threshold);
+  }
+
+  // Check if field norm exceeds threshold, and warn if so
+  void doSanityChecks(LevelData<FArrayBox>& a_phi, string fieldName, Real threshold=1e200)
+  {
+    if (m_doSanityChecks)
+    {
+      DisjointBoxLayout* fineGridsPtr = nullptr;
+      if (hasFinerLevel())
+      {
+        fineGridsPtr = &(getFinerLevel()->m_grids);
+      }
+      Real max = ::computeNorm(a_phi, fineGridsPtr, 1, m_dx, a_phi.interval(), 0);
+      Real av = ::computeNorm(a_phi, fineGridsPtr, 1, m_dx, a_phi.interval(), 1);
+      if (max > threshold or isnan(max) or isnan(av))
+      {
+        LOG_WARNING(fieldName << " abs(max)=" << max << ", av=" << av);
+      }
+    }
+  }
+//
+//      DataIterator dit = a_phi.dataIterator();
+//      for (dit.reset(); dit.ok(); ++dit)
+//      {
+//        FArrayBox& phiFAB = a_phi[dit]; // top right corner has 1e300 (80, 64), (100, 64)
+//        Real norm = phiFAB.norm(0);
+//        if (norm > threshold || isnan(norm))
+//        {
+//          LOG_WARNING("Norm (" << fieldName << ") in box " << phiFAB.box() << " = " << norm);
+//        }
+//      }
+//  }
+
 
   // Disallowed for all the usual reasons
   void operator=(const AMRLevelMushyLayer&);

@@ -1,4 +1,4 @@
-from MushyPltFile import MushyPltFile, latexify2
+from plotting.MushyPltFile import MushyPltFile, latexify2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_bvp

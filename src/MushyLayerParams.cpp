@@ -6,13 +6,15 @@
  */
 
 #include "MushyLayerParams.h"
+#include "Logging.H"
 #include "MushyLayerUtils.H"
 #include "PhysBCUtil.H"
+#include "ParmParse.H"
 #include "phaseDiagram.H"
+#include "CH_Timer.H"
 
-
-//This is for printing out variable names, because c++ doesn't do reflection
-#define SHOW(a) pout() << #a << ": " << (a) << std::endl
+// This is for printing out variable names, because c++ doesn't do reflection
+#define SHOW(a) LOG(#a << ": " << (a));
 
 /// Darcy timescale
 string MushyLayerParams::s_DARCY_TIMESCALE = "Darcy";
@@ -32,126 +34,71 @@ string MushyLayerParams::s_ADVECTIVE_VELOCITY_SCALE = "Advective";
 /// Darcy velocity scale
 string MushyLayerParams::s_DARCY_VELOCITY_SCALE = "Darcy";
 
-void MushyLayerParams::printBCs(string bcName, Vector<int> bcTypeLo, Vector<int> bcTypeHi, RealVect bcValLo, RealVect bcValHi)
+void MushyLayerParams::printBCs(string bcName, Vector<int> bcTypeLo,
+                                Vector<int> bcTypeHi, RealVect bcValLo,
+                                RealVect bcValHi)
 {
-  char buffer [100];
+  char buffer[100];
   sprintf(buffer, "%-10s", bcName.c_str());
-  pout() << buffer;
+  LOG_NOEND(buffer);
 
   Vector<string> bcTypeNames;
   bcTypeNames.push_back("Fixed");
   bcTypeNames.push_back("No flux");
 
-    for (int dir=0; dir < SpaceDim; dir ++)
-    {
-      sprintf(buffer, "|%-10s= %02.2f|%-10s= %02.2f", m_scalarBCTypes[bcTypeLo[dir]].c_str(), bcValLo[dir],
-                                              m_scalarBCTypes[bcTypeHi[dir]].c_str(), bcValHi[dir]);
-      pout() << buffer;
-//      pout() << "| " << bcTypeLo[dir] << "= " << bcValLo[dir] << " | " << bcTypeHi[dir] << "= " << bcValHi[dir];
-    }
-    pout() << endl;
+  for (int dir = 0; dir < SpaceDim; dir++)
+  {
+    sprintf(buffer, "|%-10s= %02.2f|%-10s= %02.2f",
+            m_scalarBCTypes[bcTypeLo[dir]].c_str(), bcValLo[dir],
+            m_scalarBCTypes[bcTypeHi[dir]].c_str(), bcValHi[dir]);
+    pout() << buffer;
+  }
+  pout() << endl;
 }
 
 // Initialise in initialization list
-MushyLayerParams::MushyLayerParams() : physicalProblem(PhysicalProblems::m_mushyLayer),
-    viscosity(-999),
-    heatConductivityLiquid(-999),
-    heatConductivitySolid(-999 ),
-    specificHeatLiquid(-999 ),
-    specificHeatSolid(-999 ),
-    liquidDensity(-999 ),
-    latentHeatDissolution(-999 ),
-    thermalExpansivity(-999 ),
-    solutalExpansivity(-999 ),
-    eutecticTemp(-999 ),
-    eutecticComposition(-999 ),
-    initialComposition(-999 ),
-    liquidusSlope(-999 ),
-    waterDistributionCoeff(-999 ),
-    heleShawCoolingCoeff(-999 ),
-    liquidSoluteDiffusivity(-999 ),
-    d(-999 ),
-    height(-999 ),
-    width(-999),
-    referencePermeability(-999 ),
-    gravitationalAcceleration(-999 ),
-    V(-999 ),
-    deltaTemp(-999 ),
-    deltaSalt(-999),
-    stefan(-999 ),
-    compositionRatio(-999 ),
-    liquidHeatDiffusivity(-999 ),
-    heatConductivityRatio(-999 ),
-    specificHeatRatio(-999 ),
-    lewis(-999 ),
-    darcy(-999),
-    nonDimReluctance(-999.0),
-    heleShawPermeability(-999.0),
-    reynolds(-999),
-    prandtl(0.0),
-    rayleighTemp(-999 ),
-    rayleighComposition(-999 ),
-    timescale(-999 ),
-    m_nondimensionalisation(0),
-    m_heatDiffusionCoeff(1),
-    m_saltDiffusionCoeff(1),
-    activeTracerDiffusionCoeff(0),
-    passiveTracerDiffusionCoeff(0),
-    activeTracerInitVal(0),
-    passiveTracerInitVal(0),
-    m_viscosityCoeff(1),
-    m_buoyancyTCoeff(1.0),
-    m_buoyancySCoeff(1),
-    m_darcyCoeff(1),
-    m_advectionCoeff(1.0),
-    body_force(0.0),
-    nonDimVel(-999 ),
-    nonDimHeleShawCooling(-999 ),
-    thetaEutectic(-999 ),
-    thetaInf(-999 ),
-    thetaInitialLiquidus(-999 ),
-    thetaInitial(-999 ),
-    thetaInterface(-999 ),
-    ThetaEutectic(-999 ),
-    ThetaInitial(-999 ),
-    ThetaInf(-999 ),
-    ThetaLInitial(-999 ),
-    ThetaSInitial(-999),
-    Hinitial(-999 ),
-    thetaPlumeInflow(-999),
-    HPlumeInflow(-999),
-    ThetaPlumeInflow(-999),
-    ThetaLPlumeInflow(-999),
-    ThetaSPlumeInflow(-999),
-    porosityPlume(-999),
-    permeabilityPlume(-999),
-    HLiquidusPlume(-999),
-    HEutecticPlume(-999),
-    HSolidusPlume(-999),
-    referenceTemperature(-999),
-    referenceSalinity(-999),
-    inflowVelocity(-999),
-    pressureHead(0),
-    sinusoidal_temperature_bc_timescale(1),
-    sinusoidal_temperature_bc_amplitude(0.5),
-    sinusoidal_temperature_bc_av(0.5),
-    sinusoidal_temperature_bc_phase_diff(0.0),
-    max_bc_iter(1),
-    bc_nonlinear_solve_method(NonlinearBCSolveMethods::picard) ,
-    max_bc_residual(3),
-    bc_relax_coeff(0.5),
-    m_BCAccuracy(1),
-    m_pressureBCAccuracy(1),
-    m_time(-999),
-    m_timeDependentBC(m_constant),
-    m_BCamplitude(0),
-    m_BCtimescale(1),
-    fixedTempDirection(-999),
-    permeabilityFunction(PermeabilityFunctions::m_kozenyCarman),
-    heleShaw(false),
-    m_porosityFunction(ParamsPorosityFunctions::m_porosityConstant),
-    m_viscosityFunction(ViscosityFunction::uniformViscosity),
-    max_viscosity(1.0)
+MushyLayerParams::MushyLayerParams()
+    : physicalProblem(PhysicalProblems::m_mushyLayer), viscosity(-999),
+      heatConductivityLiquid(-999), heatConductivitySolid(-999),
+      specificHeatLiquid(-999), specificHeatSolid(-999), liquidDensity(-999),
+      latentHeatDissolution(-999), thermalExpansivity(-999),
+      solutalExpansivity(-999), eutecticTemp(-999), eutecticComposition(-999),
+      initialComposition(-999), liquidusSlope(-999),
+      waterDistributionCoeff(-999), heleShawCoolingCoeff(-999),
+      liquidSoluteDiffusivity(-999), d(-999), height(-999), width(-999),
+      referencePermeability(-999), gravitationalAcceleration(-999), V(-999),
+      deltaTemp(-999), deltaSalt(-999), stefan(-999), compositionRatio(-999),
+      liquidHeatDiffusivity(-999), heatConductivityRatio(-999),
+      specificHeatRatio(-999), lewis(-999), darcy(-999),
+      nonDimReluctance(-999.0), heleShawPermeability(-999.0), reynolds(-999),
+      prandtl(0.0), rayleighTemp(-999), rayleighComposition(-999),
+      timescale(-999), m_nondimensionalisation(0), m_heatDiffusionCoeff(1),
+      m_saltDiffusionCoeff(1), activeTracerDiffusionCoeff(0),
+      passiveTracerDiffusionCoeff(0), activeTracerInitVal(0),
+      passiveTracerInitVal(0), m_viscosityCoeff(1), m_buoyancyTCoeff(1.0),
+      m_buoyancySCoeff(1), m_darcyCoeff(1), m_advectionCoeff(1.0),
+      body_force(0.0), nonDimVel(-999), nonDimHeleShawCooling(-999),
+      thetaEutectic(-999), thetaInf(-999), thetaInitialLiquidus(-999),
+      thetaInitial(-999), thetaInterface(-999), ThetaEutectic(-999),
+      ThetaInitial(-999), ThetaInf(-999), ThetaLInitial(-999),
+      ThetaSInitial(-999), Hinitial(-999), thetaPlumeInflow(-999),
+      HPlumeInflow(-999), ThetaPlumeInflow(-999), ThetaLPlumeInflow(-999),
+      ThetaSPlumeInflow(-999), porosityPlume(-999), permeabilityPlume(-999),
+      HLiquidusPlume(-999), HEutecticPlume(-999), HSolidusPlume(-999),
+      referenceTemperature(-999), referenceSalinity(-999), inflowVelocity(-999),
+      pressureHead(0), sinusoidal_temperature_bc_timescale(1),
+      sinusoidal_temperature_bc_amplitude(0.5),
+      sinusoidal_temperature_bc_av(0.5),
+      sinusoidal_temperature_bc_phase_diff(0.0), max_bc_iter(1),
+      bc_nonlinear_solve_method(NonlinearBCSolveMethods::picard),
+      max_bc_residual(3), bc_relax_coeff(0.5), m_BCAccuracy(1),
+      m_pressureBCAccuracy(1), m_time(-999), m_timeDependentBC(m_constant),
+      m_BCamplitude(0), m_BCtimescale(1), fixedTempDirection(-999),
+      permeabilityFunction(PermeabilityFunctions::m_kozenyCarman),
+      heleShaw(false),
+      m_porosityFunction(ParamsPorosityFunctions::m_porosityConstant),
+      m_viscosityFunction(ViscosityFunction::uniformViscosity),
+      max_viscosity(1.0)
 {
   m_scalarBCTypes.push_back("fixed");
   m_scalarBCTypes.push_back("noflux");
@@ -170,16 +117,15 @@ MushyLayerParams::MushyLayerParams() : physicalProblem(PhysicalProblems::m_mushy
   m_vectorBCTypes.push_back("pressureHead");
 }
 
-MushyLayerParams::~MushyLayerParams() {
-}
+MushyLayerParams::~MushyLayerParams() {}
 
-void
-MushyLayerParams::computeDerivedBCs ()
+void MushyLayerParams::computeDerivedBCs()
 {
   pout() << "MushyLayerParams::computeDerivedBCs ThetaInitial=" << ThetaInitial
-      << ", H top = " << bcValEnthalpyHi[SpaceDim-1] << endl;
+         << ", H top = " << bcValEnthalpyHi[SpaceDim - 1] << endl;
   // Now do defaults for the other boundary values
-  for (int dir = 0; dir < SpaceDim; dir++) {
+  for (int dir = 0; dir < SpaceDim; dir++)
+  {
     Real bulkCHi = bcValBulkConcentrationHi[dir];
     Real bulkCLo = bcValBulkConcentrationLo[dir];
 
@@ -193,37 +139,29 @@ MushyLayerParams::computeDerivedBCs ()
       bulkCLo = ThetaInitial;
     }
 
-    ::computeBoundingEnergy (bcValEnthalpyHi[dir],
-                             bulkCHi, bcValSolidusHi[dir],
-                             bcValLiquidusHi[dir], bcValEutecticHi[dir],
-                             specificHeatRatio, stefan, compositionRatio,
-                             waterDistributionCoeff, thetaEutectic,
-                             ThetaEutectic);
-    ::computeEnthalpyVars (bcValEnthalpyHi[dir], bulkCHi,
-                           bcValPorosityHi[dir], bcValTemperatureHi[dir],
-                           bcValLiquidConcentrationHi[dir],
-                           bcValSolidConcentrationHi[dir], bcValSolidusHi[dir],
-                           bcValLiquidusHi[dir], bcValEutecticHi[dir],
-                           specificHeatRatio, stefan, compositionRatio,
-                           waterDistributionCoeff, thetaEutectic,
-                           ThetaEutectic);
+    ::computeBoundingEnergy(
+        bcValEnthalpyHi[dir], bulkCHi, bcValSolidusHi[dir],
+        bcValLiquidusHi[dir], bcValEutecticHi[dir], specificHeatRatio, stefan,
+        compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+    ::computeEnthalpyVars(
+        bcValEnthalpyHi[dir], bulkCHi, bcValPorosityHi[dir],
+        bcValTemperatureHi[dir], bcValLiquidConcentrationHi[dir],
+        bcValSolidConcentrationHi[dir], bcValSolidusHi[dir],
+        bcValLiquidusHi[dir], bcValEutecticHi[dir], specificHeatRatio, stefan,
+        compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
 
-    ::computeBoundingEnergy (bcValEnthalpyLo[dir], bulkCLo,
-                             bcValSolidusLo[dir],
-                             bcValLiquidusLo[dir], bcValEutecticLo[dir],
-                             specificHeatRatio, stefan, compositionRatio,
-                             waterDistributionCoeff, thetaEutectic,
-                             ThetaEutectic);
-    ::computeEnthalpyVars (bcValEnthalpyLo[dir], bulkCLo,
-                           bcValPorosityLo[dir], bcValTemperatureLo[dir],
-                           bcValLiquidConcentrationLo[dir],
-                           bcValSolidConcentrationLo[dir], bcValSolidusLo[dir],
-                           bcValLiquidusLo[dir], bcValEutecticLo[dir],
-                           specificHeatRatio, stefan, compositionRatio,
-                           waterDistributionCoeff, thetaEutectic,
-                           ThetaEutectic);
-    bcValPermeabilityHi[dir] = calculatePermeability (bcValPorosityHi[dir]);
-    bcValPermeabilityLo[dir] = calculatePermeability (bcValPorosityLo[dir]);
+    ::computeBoundingEnergy(
+        bcValEnthalpyLo[dir], bulkCLo, bcValSolidusLo[dir],
+        bcValLiquidusLo[dir], bcValEutecticLo[dir], specificHeatRatio, stefan,
+        compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+    ::computeEnthalpyVars(
+        bcValEnthalpyLo[dir], bulkCLo, bcValPorosityLo[dir],
+        bcValTemperatureLo[dir], bcValLiquidConcentrationLo[dir],
+        bcValSolidConcentrationLo[dir], bcValSolidusLo[dir],
+        bcValLiquidusLo[dir], bcValEutecticLo[dir], specificHeatRatio, stefan,
+        compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+    bcValPermeabilityHi[dir] = calculatePermeability(bcValPorosityHi[dir]);
+    bcValPermeabilityLo[dir] = calculatePermeability(bcValPorosityLo[dir]);
 
     if (dir == SpaceDim - 1)
     {
@@ -239,20 +177,29 @@ MushyLayerParams::computeDerivedBCs ()
     }
   }
 
-  pout() << "After computeDerivedBCs: " << endl << "          ";
-    Vector<string> direction; direction.push_back("x"); direction.push_back("y"); direction.push_back("z");
-    for (int dir=0; dir < SpaceDim; dir ++)
-    {
-      pout() << "| " << direction[dir] << "(lo)         | " << direction[dir] << "(hi)         ";
-    }
-    pout () << endl;
+  LOG("After computeDerivedBCs: ");
+  LOG_NOEND("         ");
+  Vector<string> direction;
+  direction.push_back("x");
+  direction.push_back("y");
+  direction.push_back("z");
+  for (int dir = 0; dir < SpaceDim; dir++)
+  {
+    pout() << "| " << direction[dir] << "(lo)         | " << direction[dir]
+           << "(hi)         ";
+  }
+  pout() << endl;
 
-//    printBCs("H", bcTypeEnthalpyLo, bcTypeEnthalpyHi, bcValEnthalpyLo, bcValEnthalpyHi);
-//    printBCs("C", bcTypeBulkConcentrationLo, bcTypeBulkConcentrationHi, bcValBulkConcentrationLo, bcValBulkConcentrationHi);
-    printBCs("T", bcTypeTemperatureLo, bcTypeTemperatureHi, bcValTemperatureLo, bcValTemperatureHi);
-    printBCs("Sl", bcTypeLiquidConcentrationLo, bcTypeLiquidConcentrationHi, bcValLiquidConcentrationLo, bcValLiquidConcentrationHi);
-    printBCs("porosity", bcTypePorosityLo, bcTypePorosityHi, bcValPorosityLo, bcValPorosityHi);
-
+  //    printBCs("H", bcTypeEnthalpyLo, bcTypeEnthalpyHi, bcValEnthalpyLo,
+  //    bcValEnthalpyHi); printBCs("C", bcTypeBulkConcentrationLo,
+  //    bcTypeBulkConcentrationHi, bcValBulkConcentrationLo,
+  //    bcValBulkConcentrationHi);
+  printBCs("T", bcTypeTemperatureLo, bcTypeTemperatureHi, bcValTemperatureLo,
+           bcValTemperatureHi);
+  printBCs("Sl", bcTypeLiquidConcentrationLo, bcTypeLiquidConcentrationHi,
+           bcValLiquidConcentrationLo, bcValLiquidConcentrationHi);
+  printBCs("porosity", bcTypePorosityLo, bcTypePorosityHi, bcValPorosityLo,
+           bcValPorosityHi);
 }
 
 void MushyLayerParams::getParameters()
@@ -286,7 +233,8 @@ void MushyLayerParams::getParameters()
 
   ppParams.query("heleShaw", heleShaw);
 
-  // I don't think I necessarily need these, if I'm specifying non dimensional parameters
+  // I don't think I necessarily need these, if I'm specifying non dimensional
+  // parameters
   ppParams.query("viscosity", viscosity);
   ppParams.query("heatConductivityLiquid", heatConductivityLiquid);
   ppParams.query("heatConductivitySolid", heatConductivitySolid);
@@ -322,15 +270,18 @@ void MushyLayerParams::getParameters()
   ppParams.query("fixedTempDirection", fixedTempDirection);
   ppParams.query("inflowVelocity", inflowVelocity);
 
-
-  ppBC.query("sinusoidal_temperature_bc_timescale", sinusoidal_temperature_bc_timescale);
-  ppBC.query("sinusoidal_temperature_bc_amplitude", sinusoidal_temperature_bc_amplitude);
+  ppBC.query("sinusoidal_temperature_bc_timescale",
+             sinusoidal_temperature_bc_timescale);
+  ppBC.query("sinusoidal_temperature_bc_amplitude",
+             sinusoidal_temperature_bc_amplitude);
   ppBC.query("sinusoidal_temperature_bc_av", sinusoidal_temperature_bc_av);
-  ppBC.query("sinusoidal_temperature_bc_phase_diff", sinusoidal_temperature_bc_phase_diff);
+  ppBC.query("sinusoidal_temperature_bc_phase_diff",
+             sinusoidal_temperature_bc_phase_diff);
 
   ppBC.query("timeDependent", m_timeDependentBC);
 
-  //Derived parameters. Can enforce these if needed (e.g. for benchmarking with a reduced model)
+  // Derived parameters. Can enforce these if needed (e.g. for benchmarking with
+  // a reduced model)
   if (ppParams.contains("deltaSalt"))
   {
     ppParams.get("deltaSalt", deltaSalt);
@@ -340,14 +291,13 @@ void MushyLayerParams::getParameters()
     deltaSalt = (eutecticComposition - initialComposition);
   }
 
-
   if (ppParams.contains("deltaTemp"))
   {
     ppParams.get("deltaTemp", deltaTemp);
   }
   else
   {
-    deltaTemp = - liquidusSlope * deltaSalt;
+    deltaTemp = -liquidusSlope * deltaSalt;
   }
 
   if (ppParams.contains("stefan"))
@@ -365,7 +315,8 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    compositionRatio = (1-waterDistributionCoeff) * eutecticComposition / deltaSalt;
+    compositionRatio =
+        (1 - waterDistributionCoeff) * eutecticComposition / deltaSalt;
   }
 
   if (ppParams.contains("liquidHeatDiffusivity"))
@@ -374,7 +325,8 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    liquidHeatDiffusivity = heatConductivityLiquid/(liquidDensity * specificHeatLiquid);
+    liquidHeatDiffusivity =
+        heatConductivityLiquid / (liquidDensity * specificHeatLiquid);
   }
 
   if (ppParams.contains("heatConductivityRatio"))
@@ -383,7 +335,7 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    heatConductivityRatio = heatConductivitySolid/heatConductivityLiquid;
+    heatConductivityRatio = heatConductivitySolid / heatConductivityLiquid;
   }
 
   if (ppParams.contains("specificHeatRatio"))
@@ -392,7 +344,7 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    specificHeatRatio = specificHeatSolid/specificHeatLiquid;
+    specificHeatRatio = specificHeatSolid / specificHeatLiquid;
   }
 
   if (ppParams.contains("lewis"))
@@ -401,7 +353,7 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    lewis = liquidHeatDiffusivity/liquidSoluteDiffusivity;
+    lewis = liquidHeatDiffusivity / liquidSoluteDiffusivity;
   }
 
   if (ppParams.contains("reynolds"))
@@ -410,7 +362,7 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    reynolds = liquidDensity*liquidHeatDiffusivity/viscosity;
+    reynolds = liquidDensity * liquidHeatDiffusivity / viscosity;
   }
 
   if (ppParams.contains("prandtl"))
@@ -419,9 +371,8 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    prandtl = viscosity/liquidDensity*liquidHeatDiffusivity;
+    prandtl = viscosity / liquidDensity * liquidHeatDiffusivity;
   }
-
 
   if (ppParams.contains("darcy"))
   {
@@ -429,17 +380,17 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    darcy = referencePermeability / (height*height);
+    darcy = referencePermeability / (height * height);
   }
 
-//  if (pp.contains("nonDimReluctance"))
-//  {
-//    pp.get("nonDimReluctance", nonDimReluctance);
-//  }
-//  else
-//  {
-//    nonDimReluctance = referencePermeability*12/(d*d);
-//  }
+  //  if (pp.contains("nonDimReluctance"))
+  //  {
+  //    pp.get("nonDimReluctance", nonDimReluctance);
+  //  }
+  //  else
+  //  {
+  //    nonDimReluctance = referencePermeability*12/(d*d);
+  //  }
 
   if (ppParams.contains("heleShawPermeability"))
   {
@@ -447,15 +398,14 @@ void MushyLayerParams::getParameters()
   }
   else if (ppParams.contains("nonDimReluctance"))
   {
-    Real rel  = 0.0;
+    Real rel = 0.0;
     ppParams.get("nonDimReluctance", rel);
-    heleShawPermeability = 1.0/rel;
+    heleShawPermeability = 1.0 / rel;
   }
   else
   {
-    heleShawPermeability = d*d/(12*referencePermeability);
+    heleShawPermeability = d * d / (12 * referencePermeability);
   }
-
 
   if (ppParams.contains("nonDimHeleShawCooling"))
   {
@@ -463,7 +413,8 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    nonDimHeleShawCooling = heleShawCoolingCoeff * (height*height)/heatConductivityLiquid;
+    nonDimHeleShawCooling =
+        heleShawCoolingCoeff * (height * height) / heatConductivityLiquid;
   }
 
   if (ppParams.contains("rayleighTemp"))
@@ -472,8 +423,9 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    rayleighTemp = thermalExpansivity*liquidDensity*gravitationalAcceleration*height*
-        deltaTemp*referencePermeability / (liquidHeatDiffusivity*viscosity);
+    rayleighTemp = thermalExpansivity * liquidDensity *
+                   gravitationalAcceleration * height * deltaTemp *
+                   referencePermeability / (liquidHeatDiffusivity * viscosity);
   }
 
   if (ppParams.contains("rayleighComp"))
@@ -482,12 +434,13 @@ void MushyLayerParams::getParameters()
   }
   else
   {
-    rayleighComposition = solutalExpansivity*liquidDensity*gravitationalAcceleration*height*
-        deltaSalt*referencePermeability /
-        (liquidHeatDiffusivity*viscosity);
+    rayleighComposition = solutalExpansivity * liquidDensity *
+                          gravitationalAcceleration * height * deltaSalt *
+                          referencePermeability /
+                          (liquidHeatDiffusivity * viscosity);
   }
 
-  timescale = height*height/liquidHeatDiffusivity;
+  timescale = height * height / liquidHeatDiffusivity;
 
   // Optional parameters
   //  bottomTemp = -999;
@@ -495,15 +448,14 @@ void MushyLayerParams::getParameters()
   //  pp.query("bottomTemp", bottomTemp);
   //  pp.query("topTemp", topTemp);
 
-
-  //Some nondimensional parameters and boundary conditions
+  // Some nondimensional parameters and boundary conditions
   if (ppParams.contains("nonDimVel"))
   {
     ppParams.get("nonDimVel", nonDimVel);
   }
   else
   {
-//    nonDimVel = (height/liquidHeatDiffusivity) * V;
+    //    nonDimVel = (height/liquidHeatDiffusivity) * V;
     nonDimVel = 0.0;
   }
 
@@ -531,21 +483,20 @@ void MushyLayerParams::getParameters()
   plumeBounds.resize(2);
   if (ppParams.contains("plumeBounds"))
   {
-    std::vector<Real>  temp = std::vector<Real>();
+    std::vector<Real> temp = std::vector<Real>();
     ppParams.getarr("plumeBounds", temp, 0, 2);
     //    for (int dir=0; dir<SpaceDim; dir++)
     //    {
     //      plumeBounds[dir] = temp[dir];
     //    }
-    plumeBounds[0] = temp[0]; plumeBounds[1] = temp[1];
+    plumeBounds[0] = temp[0];
+    plumeBounds[1] = temp[1];
   }
-
 
   ppParams.query("enthalpyPlume", HPlumeInflow);
   ppParams.query("bulkConcPlume", ThetaPlumeInflow);
 
-
-//  ParmParse ppBC("bc");
+  //  ParmParse ppBC("bc");
 
   // Define BC objects
   bcTypeVelLo.resize(SpaceDim, PhysBCUtil::SolidWall);
@@ -587,31 +538,33 @@ void MushyLayerParams::getParameters()
   parseBCs("velHi", &bcTypeVelHi, required);
 
   // By default, set enthalpy and bulk conc to be the same as scalar bcs
-  for (int dir=0; dir<SpaceDim; dir++)
+  for (int dir = 0; dir < SpaceDim; dir++)
   {
     bcTypeBulkConcentrationLo[dir] = bcTypeScalarLo[dir];
-    bcTypeBulkConcentrationHi[dir] =  bcTypeScalarHi[dir];
+    bcTypeBulkConcentrationHi[dir] = bcTypeScalarHi[dir];
     bcTypeEnthalpyLo[dir] = bcTypeScalarLo[dir];
-    bcTypeEnthalpyHi[dir] =  bcTypeScalarHi[dir];
+    bcTypeEnthalpyHi[dir] = bcTypeScalarHi[dir];
 
     bcTypeLiquidConcentrationLo[dir] = bcTypeScalarLo[dir];
-    bcTypeLiquidConcentrationHi[dir] =  bcTypeScalarHi[dir];
+    bcTypeLiquidConcentrationHi[dir] = bcTypeScalarHi[dir];
     bcTypeTemperatureLo[dir] = bcTypeScalarLo[dir];
-    bcTypeTemperatureHi[dir] =  bcTypeScalarHi[dir];
+    bcTypeTemperatureHi[dir] = bcTypeScalarHi[dir];
   }
 
-  // Porosity is slightly different - by defualt, want fixed porosity at top and bottom (already set) and neumann conditions at sides
+  // Porosity is slightly different - by defualt, want fixed porosity at top and
+  // bottom (already set) and neumann conditions at sides
   bcTypePorosityLo[0] = PhysBCUtil::Neumann;
   bcTypePorosityHi[0] = PhysBCUtil::Neumann;
   bcTypePermeabilityLo[0] = PhysBCUtil::Neumann;
   bcTypePermeabilityHi[0] = PhysBCUtil::Neumann;
 
-
   // BC values. User must specify H, C and velocity as a minimum
-  // If we have specified any options in our param files, overwrite defaults with them
+  // If we have specified any options in our param files, overwrite defaults
+  // with them
 
   //
-  // Optional extra BCs, if not specified, these are computed from the H and C already provided
+  // Optional extra BCs, if not specified, these are computed from the H and C
+  // already provided
 
   parseBCs("enthalpyLo", &bcTypeEnthalpyLo);
   parseBCs("enthalpyHi", &bcTypeEnthalpyHi);
@@ -640,8 +593,7 @@ void MushyLayerParams::getParameters()
   parseBCVals("bulkConcentrationLoVal", bcValBulkConcentrationLo, required);
   parseBCVals("bulkConcentrationHiVal", bcValBulkConcentrationHi, required);
 
-
-  for (int dir=0; dir < SpaceDim; dir++)
+  for (int dir = 0; dir < SpaceDim; dir++)
   {
     bcValPressureHi[dir] = 0.0;
     bcValPressureLo[dir] = 0.0;
@@ -651,8 +603,8 @@ void MushyLayerParams::getParameters()
   if (ppParams.contains("pressureHead"))
   {
     ppParams.query("pressureHead", pressureHead);
-    bcValPressureHi[SpaceDim-1] = pressureHead;
-    bcValPressureLo[SpaceDim-1] = 0.0;
+    bcValPressureHi[SpaceDim - 1] = pressureHead;
+    bcValPressureLo[SpaceDim - 1] = 0.0;
   }
 
   parseBCVals("bcValPressureHi", bcValPressureHi);
@@ -667,7 +619,7 @@ void MushyLayerParams::getParameters()
   max_bc_iter = 2;
   ppMain.query("max_bc_iter", max_bc_iter);
 
-  max_bc_residual= 1e-5;
+  max_bc_residual = 1e-5;
   ppMain.query("max_bc_residual", max_bc_residual);
 
   bc_relax_coeff = 0.5;
@@ -676,22 +628,20 @@ void MushyLayerParams::getParameters()
   bc_nonlinear_solve_method = NonlinearBCSolveMethods::picard;
   ppMain.query("nonlinear_bc_solve_method", bc_nonlinear_solve_method);
 
-
   // For the plume
-  ::computeBoundingEnergy(HPlumeInflow, ThetaPlumeInflow, HSolidusPlume, HLiquidusPlume, HEutecticPlume,
-                          specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff,
+  ::computeBoundingEnergy(HPlumeInflow, ThetaPlumeInflow, HSolidusPlume,
+                          HLiquidusPlume, HEutecticPlume, specificHeatRatio,
+                          stefan, compositionRatio, waterDistributionCoeff,
                           thetaEutectic, ThetaEutectic);
-  ::computeEnthalpyVars(HPlumeInflow, ThetaPlumeInflow, porosityPlume, thetaPlumeInflow,
-                        ThetaLPlumeInflow, ThetaSPlumeInflow,
+  ::computeEnthalpyVars(HPlumeInflow, ThetaPlumeInflow, porosityPlume,
+                        thetaPlumeInflow, ThetaLPlumeInflow, ThetaSPlumeInflow,
                         HSolidusPlume, HLiquidusPlume, HEutecticPlume,
-                        specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff,
-                        thetaEutectic, ThetaEutectic);
+                        specificHeatRatio, stefan, compositionRatio,
+                        waterDistributionCoeff, thetaEutectic, ThetaEutectic);
   permeabilityPlume = this->calculatePermeability(porosityPlume);
-
 
   // Now do defaults for the other boundary values
   computeDerivedBCs();
-
 
   // Now BC values
   parseBCVals("liquidConcentrationLoVal", bcValLiquidConcentrationLo);
@@ -714,30 +664,24 @@ void MushyLayerParams::getParameters()
     bcTypeVelHi[0] = PhysBCUtil::Outflow;
     bcTypeVelHi[1] = PhysBCUtil::Inflow;
 
-    bcTypeVelLo[0]  =PhysBCUtil::noShear;
-    bcTypeVelLo[1]  =PhysBCUtil::noShear;
-
-
+    bcTypeVelLo[0] = PhysBCUtil::noShear;
+    bcTypeVelLo[1] = PhysBCUtil::noShear;
   }
-  else if (physicalProblem == m_mushyLayer )
+  else if (physicalProblem == m_mushyLayer)
   {
-
-
-
   }
-
-
 
   // Now sort out nondimensionalisation
-  if (!isDarcyBrinkman()
-      && m_nondimensionalisation != m_diffusiveTime_advectiveVel)
+  if (!isDarcyBrinkman() &&
+      m_nondimensionalisation != m_diffusiveTime_advectiveVel)
   {
-    MayDay::Error("Need to choose diffusive timescale/advection velocity scale for solving Darcy flow.");
+    MayDay::Error("Need to choose diffusive timescale/advection velocity scale "
+                  "for solving Darcy flow.");
   }
 
   if (m_nondimensionalisation == m_darcyTime_advectiveVel)
   {
-    pout() << "Darcy timescale, advective velocity scale" << endl;
+    LOG("Darcy timescale, advective velocity scale");
 
     // To avoid dividing by 0 when Da = Pr = 0
     if (darcy == prandtl)
@@ -746,28 +690,26 @@ void MushyLayerParams::getParameters()
     }
     else
     {
-      m_heatDiffusionCoeff = darcy/prandtl;
+      m_heatDiffusionCoeff = darcy / prandtl;
     }
-    m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
+    m_saltDiffusionCoeff = m_heatDiffusionCoeff / lewis;
     m_viscosityCoeff = darcy;
 
-    m_buoyancyTCoeff = rayleighTemp*darcy*darcy*prandtl;
-    m_buoyancySCoeff = rayleighComposition*darcy*darcy*prandtl;
+    m_buoyancyTCoeff = rayleighTemp * darcy * darcy * prandtl;
+    m_buoyancySCoeff = rayleighComposition * darcy * darcy * prandtl;
     m_darcyCoeff = 1.0;
     m_advectionCoeff = 1.0;
-
-
   }
   else if (m_nondimensionalisation == m_diffusiveTime_advectiveVel)
   {
-    pout() << "Diffusive timescale, advective velocity scale" << endl;
+    LOG("Diffusive timescale, advective velocity scale");
 
     m_heatDiffusionCoeff = 1.0;
-    m_saltDiffusionCoeff = 1/lewis;
+    m_saltDiffusionCoeff = 1 / lewis;
     m_viscosityCoeff = prandtl;
-    m_buoyancyTCoeff = prandtl*rayleighTemp;
-    m_buoyancySCoeff = prandtl*rayleighComposition;
-    m_darcyCoeff = prandtl/darcy;
+    m_buoyancyTCoeff = prandtl * rayleighTemp;
+    m_buoyancySCoeff = prandtl * rayleighComposition;
+    m_darcyCoeff = prandtl / darcy;
     m_advectionCoeff = 1.0;
 
     if (!isDarcyBrinkman())
@@ -779,77 +721,78 @@ void MushyLayerParams::getParameters()
   else if (m_nondimensionalisation == m_darcyTime_darcyVel)
   {
 
-    pout() << "Darcy timescale, darcy velocity scale" << endl;
+    LOG("Darcy timescale, darcy velocity scale");
 
-
-    m_heatDiffusionCoeff = darcy/prandtl;
-    m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
+    m_heatDiffusionCoeff = darcy / prandtl;
+    m_saltDiffusionCoeff = m_heatDiffusionCoeff / lewis;
     m_viscosityCoeff = darcy;
-    m_buoyancyTCoeff = 1.0; //rayleighTemp*darcy*darcy*prandtl;
-    m_buoyancySCoeff = rayleighComposition/rayleighTemp; //rayleighComposition*darcy*darcy*prandtl;
+    m_buoyancyTCoeff = 1.0; // rayleighTemp*darcy*darcy*prandtl;
+    m_buoyancySCoeff = rayleighComposition /
+                       rayleighTemp; // rayleighComposition*darcy*darcy*prandtl;
     m_darcyCoeff = 1.0;
-    m_advectionCoeff = rayleighTemp*darcy*darcy/prandtl;
+    m_advectionCoeff = rayleighTemp * darcy * darcy / prandtl;
   }
   else if (m_nondimensionalisation == m_advectiveTime_darcyVel)
   {
-    pout() << "Advective timescale, darcy velocity scale" << endl;
+    LOG("Advective timescale, darcy velocity scale");
 
-    m_heatDiffusionCoeff = 1/(darcy*rayleighTemp);
-    m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
-    m_viscosityCoeff = prandtl/(darcy*rayleighTemp);
-    m_buoyancyTCoeff = prandtl/(darcy*rayleighTemp);
-    m_buoyancySCoeff = m_buoyancyTCoeff*(rayleighComposition/rayleighTemp);
-    m_darcyCoeff = prandtl/(darcy*darcy*rayleighTemp);
+    m_heatDiffusionCoeff = 1 / (darcy * rayleighTemp);
+    m_saltDiffusionCoeff = m_heatDiffusionCoeff / lewis;
+    m_viscosityCoeff = prandtl / (darcy * rayleighTemp);
+    m_buoyancyTCoeff = prandtl / (darcy * rayleighTemp);
+    m_buoyancySCoeff = m_buoyancyTCoeff * (rayleighComposition / rayleighTemp);
+    m_darcyCoeff = prandtl / (darcy * darcy * rayleighTemp);
     m_advectionCoeff = 1.0;
   }
   else if (m_nondimensionalisation == m_buoyancyTime_advectiveVel)
   {
-    pout() << "Buoyancy timescale, advective velocity scale" << endl;
+    LOG("Buoyancy timescale, advective velocity scale");
 
     Real R = rayleighComposition;
     if (R == 0)
     {
       if (rayleighTemp == 0)
       {
-        MayDay::Error("MushyLayerParams - Can't nondimensionalise with buoyancy timescale if RaT=RaC=0!!");
+        MayDay::Error("MushyLayerParams - Can't nondimensionalise with "
+                      "buoyancy timescale if RaT=RaC=0!!");
       }
       R = rayleighTemp;
     }
 
-    m_heatDiffusionCoeff = 1/sqrt(R*prandtl);
-    m_saltDiffusionCoeff = m_heatDiffusionCoeff/lewis;
+    m_heatDiffusionCoeff = 1 / sqrt(R * prandtl);
+    m_saltDiffusionCoeff = m_heatDiffusionCoeff / lewis;
 
-    m_viscosityCoeff = sqrt(prandtl/R);
+    m_viscosityCoeff = sqrt(prandtl / R);
 
-    m_darcyCoeff = (1/darcy)*sqrt(prandtl/R);
+    m_darcyCoeff = (1 / darcy) * sqrt(prandtl / R);
     m_advectionCoeff = 1.0;
 
     // Avoid dividing by zero
     if (rayleighComposition != 0)
     {
       m_buoyancySCoeff = 1;
-      m_buoyancyTCoeff = rayleighTemp/rayleighComposition;
+      m_buoyancyTCoeff = rayleighTemp / rayleighComposition;
     }
     else
     {
       m_buoyancySCoeff = 0;
       m_buoyancyTCoeff = 1;
     }
-
   }
   else
   {
     MayDay::Error("Unknown non dimensionalisation");
   }
 
-  // Finally, option to manually set certain terms if we want (for testing purposes)
-  ppMain.query("heatDiffusionCoeff", m_heatDiffusionCoeff );
-  ppMain.query("saltDiffusionCoeff",  m_saltDiffusionCoeff);
-  ppMain.query("viscosityCoeff", m_viscosityCoeff );
-  ppMain.query("buoyancyTCoeff", m_buoyancyTCoeff );
+  // Finally, option to manually set certain terms if we want (for testing
+  // purposes)
+  ppMain.query("heatDiffusionCoeff", m_heatDiffusionCoeff);
+  ppMain.query("saltDiffusionCoeff", m_saltDiffusionCoeff);
+  ppMain.query("viscosityCoeff", m_viscosityCoeff);
+  ppMain.query("buoyancyTCoeff", m_buoyancyTCoeff);
   ppMain.query("buoyancySCoeff", m_buoyancySCoeff);
-  ppMain.query("darcyCoeff",  m_darcyCoeff );
-  ppMain.query("advectionCoeff",  m_advectionCoeff );
+  ppMain.query("darcyCoeff", m_darcyCoeff);
+  ppMain.query("advectionCoeff", m_advectionCoeff);
 
   ppBio.query("activeTracerDiffusionCoeff", activeTracerDiffusionCoeff);
   ppBio.query("passiveTracerDiffusionCoeff", passiveTracerDiffusionCoeff);
@@ -860,26 +803,36 @@ void MushyLayerParams::getParameters()
   // uncomment to print the parameters
   //  printParameters();
 
-  pout() << "BCs used: " << endl << "          ";
-    Vector<string> direction; direction.push_back("x"); direction.push_back("y"); direction.push_back("z");
-    for (int dir=0; dir < SpaceDim; dir ++)
-    {
-      pout() << "| " << direction[dir] << "(lo)         | " << direction[dir] << "(hi)         ";
-    }
-    pout () << endl;
+  LOG("BCs used: ");
+  LOG_NOEND("         ");
+  Vector<string> direction;
+  direction.push_back("x");
+  direction.push_back("y");
+  direction.push_back("z");
+  for (int dir = 0; dir < SpaceDim; dir++)
+  {
+    pout() << "| " << direction[dir] << "(lo)         | " << direction[dir]
+           << "(hi)         ";
+  }
+  pout() << endl;
 
-    printBCs("H", bcTypeEnthalpyLo, bcTypeEnthalpyHi, bcValEnthalpyLo, bcValEnthalpyHi);
-    printBCs("C", bcTypeBulkConcentrationLo, bcTypeBulkConcentrationHi, bcValBulkConcentrationLo, bcValBulkConcentrationHi);
-    printBCs("T", bcTypeTemperatureLo, bcTypeTemperatureHi, bcValTemperatureLo, bcValTemperatureHi);
-    printBCs("Sl", bcTypeLiquidConcentrationLo, bcTypeLiquidConcentrationHi, bcValLiquidConcentrationLo, bcValLiquidConcentrationHi);
-    printBCs("porosity", bcTypePorosityLo, bcTypePorosityHi, bcValPorosityLo, bcValPorosityHi);
-
+  printBCs("H", bcTypeEnthalpyLo, bcTypeEnthalpyHi, bcValEnthalpyLo,
+           bcValEnthalpyHi);
+  printBCs("C", bcTypeBulkConcentrationLo, bcTypeBulkConcentrationHi,
+           bcValBulkConcentrationLo, bcValBulkConcentrationHi);
+  printBCs("T", bcTypeTemperatureLo, bcTypeTemperatureHi, bcValTemperatureLo,
+           bcValTemperatureHi);
+  printBCs("Sl", bcTypeLiquidConcentrationLo, bcTypeLiquidConcentrationHi,
+           bcValLiquidConcentrationLo, bcValLiquidConcentrationHi);
+  printBCs("porosity", bcTypePorosityLo, bcTypePorosityHi, bcValPorosityLo,
+           bcValPorosityHi);
 }
 
-void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool required)
+void MushyLayerParams::parseBCs(string a_name, Vector<int> *a_bcHolder,
+                                bool required)
 {
-  std::vector<int>  temp = std::vector<int>();
-  std::vector<string>  temp_str = std::vector<string>();
+  std::vector<int> temp = std::vector<int>();
+  std::vector<string> temp_str = std::vector<string>();
   ParmParse ppBC("bc");
 
   if (ppBC.contains(a_name))
@@ -899,7 +852,7 @@ void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool req
       temp.resize(temp_str.size());
 
       // Convert strings to numbers
-      for (int idir=0; idir<SpaceDim; idir++)
+      for (int idir = 0; idir < SpaceDim; idir++)
       {
         if (temp_str[idir] == "noflux")
         {
@@ -976,17 +929,16 @@ void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool req
 
         else
         {
-          pout() << "Unknown BC " << temp_str[idir] << endl;
+          LOG("Unknown BC " << temp_str[idir]);
           temp[idir] = 0;
         }
       }
     }
 
-
-    for (int idir=0; idir<SpaceDim; idir++)
+    for (int idir = 0; idir < SpaceDim; idir++)
     {
       // We're parsing bc types here, so the values should be >= 0
-      if (temp[idir] !=-1)
+      if (temp[idir] != -1)
       {
         (*a_bcHolder)[idir] = temp[idir];
       }
@@ -996,22 +948,23 @@ void MushyLayerParams::parseBCs(string a_name, Vector<int>* a_bcHolder, bool req
   {
     if (required)
     {
-      pout() << "Can't find BC " << a_name << endl;
+      LOG("Can't find BC " << a_name);
       MayDay::Error("Couldn't find BC");
     }
   }
 }
 
-void MushyLayerParams::parseBCVals(string a_name, RealVect& a_bcHolder, bool required)
+void MushyLayerParams::parseBCVals(string a_name, RealVect &a_bcHolder,
+                                   bool required)
 {
-  std::vector<Real>  temp = std::vector<Real>();
+  std::vector<Real> temp = std::vector<Real>();
   ParmParse ppBC("bc");
 
   if (ppBC.contains(a_name))
   {
     ppBC.getarr(a_name.c_str(), temp, 0, SpaceDim);
 
-    for (int idir=0; idir<SpaceDim; idir++)
+    for (int idir = 0; idir < SpaceDim; idir++)
     {
       a_bcHolder[idir] = temp[idir];
     }
@@ -1020,16 +973,13 @@ void MushyLayerParams::parseBCVals(string a_name, RealVect& a_bcHolder, bool req
   {
     if (required)
     {
-      pout() << "Can't find BC " << a_name << endl;
+      LOG("Can't find BC " << a_name);
       MayDay::Error("Couldn't find BC");
     }
   }
 }
 
-bool MushyLayerParams::isViscous()
-{
-  return (m_viscosityCoeff > 0);
-}
+bool MushyLayerParams::isViscous() { return (m_viscosityCoeff > 0); }
 
 bool MushyLayerParams::isDarcyBrinkman()
 {
@@ -1043,48 +993,47 @@ bool MushyLayerParams::isDarcyBrinkman()
   }
 }
 
-void MushyLayerParams::setTime(Real a_time)
-{
-  m_time = a_time;
-
-
-}
-
+void MushyLayerParams::setTime(Real a_time) { m_time = a_time; }
 
 Real MushyLayerParams::calculatePermeability(Real liquidFraction)
 {
   Real permeability = -1.0;
-  Real solidFraction = 1-liquidFraction;
+  Real solidFraction = 1 - liquidFraction;
   //    Real referencePerm = params.referencePermeability;
 
   if (permeabilityFunction == PermeabilityFunctions::m_pureFluid)
   {
     permeability = 1;
   }
-  else if (permeabilityFunction == PermeabilityFunctions::m_cubicPermeability)
+  else if (permeabilityFunction ==
+           PermeabilityFunctions::m_cubicPermeability)
   {
-    permeability = pow(liquidFraction,3);
+    permeability = pow(liquidFraction, 3);
   }
   else if (permeabilityFunction == PermeabilityFunctions::m_kozenyCarman)
   {
-    permeability = pow(liquidFraction,3) / pow(solidFraction,2);
+    permeability = pow(liquidFraction, 3) / pow(solidFraction, 2);
   }
-  else if(permeabilityFunction == PermeabilityFunctions::m_logPermeability)
+  else if (permeabilityFunction == PermeabilityFunctions::m_logPermeability)
   {
-    permeability = - pow(liquidFraction,2) * log(solidFraction);
+    permeability = -pow(liquidFraction, 2) * log(solidFraction);
   }
-  else if(permeabilityFunction == PermeabilityFunctions::m_porosityPermeability)
+  else if (permeabilityFunction ==
+           PermeabilityFunctions::m_porosityPermeability)
   {
     permeability = liquidFraction;
   }
-  else if(permeabilityFunction == PermeabilityFunctions::m_permeabilityXSquared)
+  else if (permeabilityFunction ==
+           PermeabilityFunctions::m_permeabilityXSquared)
   {
-    MayDay::Error("Can't calculate permeability for x^2 from just the porosity");
+    MayDay::Error(
+        "Can't calculate permeability for x^2 from just the porosity");
   }
   else
   {
     permeability = -1;
-    MayDay::Error("amrMushyLayer::calculatePermeability() - Unknown permeability function");
+    MayDay::Error("amrMushyLayer::calculatePermeability() - Unknown "
+                  "permeability function");
   }
 
   Real finalPermeability = permeability;
@@ -1095,9 +1044,9 @@ Real MushyLayerParams::calculatePermeability(Real liquidFraction)
     // Want to take harmonic mean of cell permeability and this permeability
 
     //    Real nonDimCellPerm = d*d / (12 * darcy * height*height);
-//    Real nonDimCellPerm = 1/nonDimReluctance; // = d*d/(12*K_0)
+    //    Real nonDimCellPerm = 1/nonDimReluctance; // = d*d/(12*K_0)
 
-    finalPermeability = 1 / (1/heleShawPermeability + 1/permeability);
+    finalPermeability = 1 / (1 / heleShawPermeability + 1 / permeability);
   }
 
   // Place a cap on the minimum permeability allowed to avoid dividing by 0
@@ -1105,37 +1054,38 @@ Real MushyLayerParams::calculatePermeability(Real liquidFraction)
   //  finalPermeability = Max(finalPermeability, minPermAllowed);
 
   return finalPermeability;
-
 }
 
-Real MushyLayerParams::
-directionalSolidificationMushyZ(Real theta, Real zEutectic)
+Real MushyLayerParams::directionalSolidificationMushyZ(Real theta,
+                                                       Real zEutectic)
 {
-  //Catch a few special situations
+  // Catch a few special situations
   if (stefan == 0)
   {
-    //No mushy layer
+    // No mushy layer
     return zEutectic;
   }
 
-  Real A = 0.5*(compositionRatio + thetaInf + stefan);
-  Real B = sqrt(A*A - compositionRatio * thetaInf - stefan);
-  Real alpha = A+B;
-  Real beta = A-B;
+  Real A = 0.5 * (compositionRatio + thetaInf + stefan);
+  Real B = sqrt(A * A - compositionRatio * thetaInf - stefan);
+  Real alpha = A + B;
+  Real beta = A - B;
 
-  Real vel = nonDimVel/this->m_heatDiffusionCoeff;
+  Real vel = nonDimVel / this->m_heatDiffusionCoeff;
 
-  Real z =  zEutectic - (1/vel) * (  ((alpha - compositionRatio) / (alpha-beta)) * log((alpha)/(alpha - theta)) +
-      ((compositionRatio - beta)  / (alpha-beta)) * log((beta) /(beta - theta))        );
+  Real z =
+      zEutectic - (1 / vel) * (((alpha - compositionRatio) / (alpha - beta)) *
+                                   log((alpha) / (alpha - theta)) +
+                               ((compositionRatio - beta) / (alpha - beta)) *
+                                   log((beta) / (beta - theta)));
 
   return z;
 }
 
-void MushyLayerParams::
-printParameters()
+void MushyLayerParams::printParameters()
 {
 
-  pout() << "Parameters: " << endl;
+  LOG("Parameters: ");
 
   SHOW(physicalProblem);
   SHOW(viscosity);
@@ -1148,8 +1098,8 @@ printParameters()
   SHOW(thermalExpansivity);
   SHOW(solutalExpansivity);
   SHOW(eutecticTemp);
-//  SHOW(bottomTemp);
-//  SHOW(topTemp);
+  //  SHOW(bottomTemp);
+  //  SHOW(topTemp);
   SHOW(eutecticComposition);
   SHOW(initialComposition);
   SHOW(liquidusSlope);
@@ -1174,7 +1124,7 @@ printParameters()
   SHOW(nonDimVel);
   SHOW(nonDimHeleShawCooling);
   SHOW(timescale);
-//  SHOW(nonDimReluctance);
+  //  SHOW(nonDimReluctance);
   SHOW(heleShawPermeability);
 
   SHOW(thetaEutectic);
@@ -1182,27 +1132,26 @@ printParameters()
   SHOW(thetaInitialLiquidus);
   SHOW(thetaInitial);
   SHOW(thetaInterface);
-//  SHOW(thetaBottom);
-//  SHOW(thetaTop);
+  //  SHOW(thetaBottom);
+  //  SHOW(thetaTop);
   SHOW(ThetaEutectic);
   SHOW(ThetaInitial);
   SHOW(ThetaInf);
-//  SHOW(ThetaTop);
-//  SHOW(ThetaBottom);
-//  SHOW(ThetaLBottom);
+  //  SHOW(ThetaTop);
+  //  SHOW(ThetaBottom);
+  //  SHOW(ThetaLBottom);
   SHOW(ThetaLInitial);
-//  SHOW(ThetaLTop);
-//  SHOW(porosityTop);
-//  SHOW(porosityBottom);
-//  SHOW(HBottom);
-//  SHOW(HTop);
+  //  SHOW(ThetaLTop);
+  //  SHOW(porosityTop);
+  //  SHOW(porosityBottom);
+  //  SHOW(HBottom);
+  //  SHOW(HTop);
   SHOW(Hinitial);
 }
 
 Real MushyLayerParams::concToTheta(const Real C)
 {
-  Real Theta = (C - referenceSalinity) /
-      deltaSalt;
+  Real Theta = (C - referenceSalinity) / deltaSalt;
   return Theta;
 }
 
@@ -1211,8 +1160,6 @@ Real MushyLayerParams::tempTotheta(const Real T)
   Real theta = (T - referenceTemperature) / deltaTemp;
   return theta;
 }
-
-
 
 int MushyLayerParams::getVelBCType(int dir, Side::LoHiSide side)
 {
@@ -1231,8 +1178,7 @@ int MushyLayerParams::getVelBCType(int dir, Side::LoHiSide side)
   return bcType;
 }
 
-
-void MushyLayerParams::writeToHDF5(HDF5HeaderData& a_header) const
+void MushyLayerParams::writeToHDF5(HDF5HeaderData &a_header) const
 {
   a_header.m_real["C"] = compositionRatio;
   a_header.m_real["k"] = heatConductivityRatio;
@@ -1249,33 +1195,31 @@ string MushyLayerParams::getTimescale() const
 {
   switch (m_nondimensionalisation)
   {
-    case m_advectiveTime_darcyVel:
-      return s_ADVECTIVE_TIMESCALE;
-      break;
+  case m_advectiveTime_darcyVel:
+    return s_ADVECTIVE_TIMESCALE;
+    break;
 
-    case m_diffusiveTime_advectiveVel:
-      return s_DIFFUSIVE_TIMESCALE;
-      break;
+  case m_diffusiveTime_advectiveVel:
+    return s_DIFFUSIVE_TIMESCALE;
+    break;
 
-    case     m_darcyTime_advectiveVel:
-      return s_DARCY_TIMESCALE;
-      break;
+  case m_darcyTime_advectiveVel:
+    return s_DARCY_TIMESCALE;
+    break;
 
-    case  m_darcyTime_darcyVel:
-      return s_DARCY_TIMESCALE;
-      break;
+  case m_darcyTime_darcyVel:
+    return s_DARCY_TIMESCALE;
+    break;
 
-    case  m_buoyancyTime_advectiveVel:
-      return s_BUOYANCY_TIMESCALE;
-      break;
+  case m_buoyancyTime_advectiveVel:
+    return s_BUOYANCY_TIMESCALE;
+    break;
 
-    default:
-      MayDay::Error("Unknown nondimensionalisation");
-      return "";
-      break;
-
+  default:
+    MayDay::Error("Unknown nondimensionalisation");
+    return "";
+    break;
   }
-
 }
 
 // Utility function
@@ -1283,9 +1227,9 @@ Real MushyLayerParams::computePorosity(Real H, Real C)
 {
   CH_TIME("MushyLayerParams::computePorosity");
 
-  Real porosity = ::computePorosity(H, C, compositionRatio,  specificHeatRatio,
-                                  stefan,  waterDistributionCoeff,  specificHeatRatio,
-                                  thetaEutectic,  ThetaEutectic);
+  Real porosity = ::computePorosity(
+      H, C, compositionRatio, specificHeatRatio, stefan, waterDistributionCoeff,
+      specificHeatRatio, thetaEutectic, ThetaEutectic);
 
   return porosity;
 }
@@ -1297,88 +1241,91 @@ Real MushyLayerParams::compute_dHdT(Real H, Real C)
   H_s = std::nan("1");
   H_l = std::nan("1");
 
-
-  ::computeBoundingEnergy(H_e, C, H_s, H_l, H_e, specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+  ::computeBoundingEnergy(H_e, C, H_s, H_l, H_e, specificHeatRatio, stefan,
+                          compositionRatio, waterDistributionCoeff,
+                          thetaEutectic, ThetaEutectic);
 
   if (H <= H_s)
-    {
-      dHdT = 1/specificHeatRatio;
-    }
-    else if (H > H_s && H <= H_e)
-    {
-      dHdT = 0;
-    }
-    else if (H > H_e && H < H_l)
-    {
-      Real porosity = computePorosityMushyLayer( H,  C,  compositionRatio,  specificHeatRatio,
-                                                 stefan,  waterDistributionCoeff);
-//      theta = - (C + compositionRatio*(1-porosity)) / (porosity + waterDistributionCoeff*(1-porosity));
-      Real A = compositionRatio*(specificHeatRatio-1) - stefan;
-      Real B = H + compositionRatio*(1-2*specificHeatRatio) - C*(specificHeatRatio-1);
-      Real Cc = specificHeatRatio*(compositionRatio + C);
+  {
+    dHdT = 1 / specificHeatRatio;
+  }
+  else if (H > H_s && H <= H_e)
+  {
+    dHdT = 0;
+  }
+  else if (H > H_e && H < H_l)
+  {
+    Real porosity =
+        computePorosityMushyLayer(H, C, compositionRatio, specificHeatRatio,
+                                  stefan, waterDistributionCoeff);
+    //      theta = - (C + compositionRatio*(1-porosity)) / (porosity +
+    //      waterDistributionCoeff*(1-porosity));
+    Real A = compositionRatio * (specificHeatRatio - 1) - stefan;
+    Real B = H + compositionRatio * (1 - 2 * specificHeatRatio) -
+             C * (specificHeatRatio - 1);
+    Real Cc = specificHeatRatio * (compositionRatio + C);
 
-
-      dHdT = pow(porosity,2) * (C+compositionRatio)*(-2*A)/(1 + B/sqrt(pow(B,2) - 4*A*Cc));
-    }
-    else
-    {
-      dHdT = 1;
-    }
+    dHdT = pow(porosity, 2) * (C + compositionRatio) * (-2 * A) /
+           (1 + B / sqrt(pow(B, 2) - 4 * A * Cc));
+  }
+  else
+  {
+    dHdT = 1;
+  }
 
   return dHdT;
-
 }
 
 Real MushyLayerParams::computeTemperature(Real H, Real C)
 {
   CH_TIME("MushyLayerParams::computeTemperature");
 
-  Real temperature = ::computeTemperature(H, C, compositionRatio,  specificHeatRatio,
-                                  stefan,  waterDistributionCoeff,  specificHeatRatio,
-                                  thetaEutectic,  ThetaEutectic);
+  Real temperature = ::computeTemperature(
+      H, C, compositionRatio, specificHeatRatio, stefan, waterDistributionCoeff,
+      specificHeatRatio, thetaEutectic, ThetaEutectic);
 
   return temperature;
 }
 
-void MushyLayerParams::computeDiagnosticVars(Real H, Real C, Real T, Real porosity, Real Cl, Real Cs)
+void MushyLayerParams::computeDiagnosticVars(Real H, Real C, Real T,
+                                             Real porosity, Real Cl, Real Cs)
 {
   Real H_s, H_l, H_e;
-  ::computeBoundingEnergy(H, C, H_s, H_l, H_e,
-                          specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+  ::computeBoundingEnergy(H, C, H_s, H_l, H_e, specificHeatRatio, stefan,
+                          compositionRatio, waterDistributionCoeff,
+                          thetaEutectic, ThetaEutectic);
   ::computeEnthalpyVars(H, C, porosity, T, Cl, Cs, H_s, H_l, H_e,
-                        specificHeatRatio, stefan, compositionRatio, waterDistributionCoeff, thetaEutectic, ThetaEutectic);
+                        specificHeatRatio, stefan, compositionRatio,
+                        waterDistributionCoeff, thetaEutectic, ThetaEutectic);
 }
-
 
 string MushyLayerParams::getVelocityScale() const
 {
   switch (m_nondimensionalisation)
   {
-    case m_advectiveTime_darcyVel:
-      return s_DARCY_VELOCITY_SCALE;
-      break;
+  case m_advectiveTime_darcyVel:
+    return s_DARCY_VELOCITY_SCALE;
+    break;
 
-    case m_diffusiveTime_advectiveVel:
-      return s_ADVECTIVE_VELOCITY_SCALE;
-      break;
+  case m_diffusiveTime_advectiveVel:
+    return s_ADVECTIVE_VELOCITY_SCALE;
+    break;
 
-    case     m_darcyTime_advectiveVel:
-      return s_ADVECTIVE_VELOCITY_SCALE;
-      break;
+  case m_darcyTime_advectiveVel:
+    return s_ADVECTIVE_VELOCITY_SCALE;
+    break;
 
-    case  m_darcyTime_darcyVel:
-      return s_DARCY_VELOCITY_SCALE;
-      break;
+  case m_darcyTime_darcyVel:
+    return s_DARCY_VELOCITY_SCALE;
+    break;
 
-    case  m_buoyancyTime_advectiveVel:
-      return s_ADVECTIVE_VELOCITY_SCALE;
-      break;
+  case m_buoyancyTime_advectiveVel:
+    return s_ADVECTIVE_VELOCITY_SCALE;
+    break;
 
-    default:
-      MayDay::Error("Unknown nondimensionalisation");
-      return "";
-      break;
-
+  default:
+    MayDay::Error("Unknown nondimensionalisation");
+    return "";
+    break;
   }
-
 }

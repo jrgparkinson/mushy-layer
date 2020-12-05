@@ -1,5 +1,5 @@
 import unittest
-from MushyPltFile import MushyPltFile, latexify, latexify2
+from plotting.MushyPltFile import MushyPltFile, latexify, latexify2
 import matplotlib.pyplot as plt
 
 class TestPltFile(unittest.TestCase):

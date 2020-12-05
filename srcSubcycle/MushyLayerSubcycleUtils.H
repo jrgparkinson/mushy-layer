@@ -21,24 +21,19 @@
 
 #include "NamespaceHeader.H"
 
-
-
 /// Make the AMRLevelMushyLayerFactory object
 /**
  * Mainly just loading all the MushyLayerOptions.
  */
-extern void
-getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact);
-
+extern void getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory> &a_fact);
 
 /// Create the AMR object.
 /**
  */
-extern void
-defineAMR(AMR&                                          a_amr,
-          RefCountedPtr<AMRLevelMushyLayerFactory>&  a_fact,
-          const ProblemDomain&                          a_prob_domain,
-          const Vector<int>&                            a_refRat);
+extern void defineAMR(AMR &a_amr,
+                      RefCountedPtr<AMRLevelMushyLayerFactory> &a_fact,
+                      const ProblemDomain &a_prob_domain,
+                      const Vector<int> &a_refRat);
 
 /// Setup the AMR object ready for the run
 /**
@@ -47,9 +42,7 @@ defineAMR(AMR&                                          a_amr,
  * 2) Do a new run with fixed grids
  * 3) Do a new run with adaptive grids
  */
-extern void
-setupAMRForAMRRun(AMR&                                          a_amr);
-
+extern void setupAMRForAMRRun(AMR &a_amr);
 
 /****/
 

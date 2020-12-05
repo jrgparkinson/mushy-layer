@@ -6,11 +6,11 @@
  */
 
 #include "Diagnostics.h"
-#include <iostream>
+#include "Logging.H"
 #include "NamespaceHeader.H"
+#include <iostream>
 
-
-Diagnostics::Diagnostics ()
+Diagnostics::Diagnostics()
 {
   m_diagnostics.resize(numDiagnostics, nullptr);
   m_diagnosticNames.resize(numDiagnostics);
@@ -37,10 +37,14 @@ Diagnostics::Diagnostics ()
   m_diagnosticNames[DiagnosticNames::diag_dSdt] = "dSdt";
   m_diagnosticNames[DiagnosticNames::diag_dTdt] = "dTdt";
   m_diagnosticNames[DiagnosticNames::diag_time] = "time";
-  m_diagnosticNames[DiagnosticNames::diag_HorizAvSalinity0] = "horizontallyAveragedSalinity_0";
-  m_diagnosticNames[DiagnosticNames::diag_HorizAvSalinity20] = "horizontallyAveragedSalinity_20";
-  m_diagnosticNames[DiagnosticNames::diag_HorizAvSalinity40] = "horizontallyAveragedSalinity_40";
-  m_diagnosticNames[DiagnosticNames::diag_HorizAvSalinity60] = "horizontallyAveragedSalinity_60";
+  m_diagnosticNames[DiagnosticNames::diag_HorizAvSalinity0] =
+      "horizontallyAveragedSalinity_0";
+  m_diagnosticNames[DiagnosticNames::diag_HorizAvSalinity20] =
+      "horizontallyAveragedSalinity_20";
+  m_diagnosticNames[DiagnosticNames::diag_HorizAvSalinity40] =
+      "horizontallyAveragedSalinity_40";
+  m_diagnosticNames[DiagnosticNames::diag_HorizAvSalinity60] =
+      "horizontallyAveragedSalinity_60";
   m_diagnosticNames[DiagnosticNames::diag_avSalinity] = "averageLiquidSalinity";
   m_diagnosticNames[DiagnosticNames::diag_mushDepth] = "mushyLayerDepth";
 
@@ -50,38 +54,50 @@ Diagnostics::Diagnostics ()
   m_diagnosticNames[DiagnosticNames::diag_chimneySpacing] = "chimneySpacing";
   m_diagnosticNames[DiagnosticNames::diag_chimneyWidth] = "chimneyWidth";
 
-  m_diagnosticNames[DiagnosticNames::diag_heatFluxAbsMismatch] = "Fh_abs_mismatch";
-  m_diagnosticNames[DiagnosticNames::diag_saltFluxAbsMismatch] = "Fs_abs_mismatch";
-  m_diagnosticNames[DiagnosticNames::diag_heatFluxRelMismatch] = "Fh_rel_mismatch";
-  m_diagnosticNames[DiagnosticNames::diag_saltFluxRelMismatch] = "Fs_rel_mismatch";
+  m_diagnosticNames[DiagnosticNames::diag_heatFluxAbsMismatch] =
+      "Fh_abs_mismatch";
+  m_diagnosticNames[DiagnosticNames::diag_saltFluxAbsMismatch] =
+      "Fs_abs_mismatch";
+  m_diagnosticNames[DiagnosticNames::diag_heatFluxRelMismatch] =
+      "Fh_rel_mismatch";
+  m_diagnosticNames[DiagnosticNames::diag_saltFluxRelMismatch] =
+      "Fs_rel_mismatch";
 
-  m_diagnosticNames[DiagnosticNames::diag_averageVerticalSaltFlux] = "Fs_vertical_av";
+  m_diagnosticNames[DiagnosticNames::diag_averageVerticalSaltFlux] =
+      "Fs_vertical_av";
   m_diagnosticNames[DiagnosticNames::diag_Fs10] = "Fs_vert_10pc";
   m_diagnosticNames[DiagnosticNames::diag_Fs20] = "Fs_vert_20pc";
   m_diagnosticNames[DiagnosticNames::diag_Fs30] = "Fs_vert_30pc";
   m_diagnosticNames[DiagnosticNames::diag_Fs40] = "Fs_vert_40pc";
   m_diagnosticNames[DiagnosticNames::diag_Fs50] = "Fs_vert_50pc";
 
-  m_diagnosticNames[DiagnosticNames::diag_L2FsVertDiffusion] = "L2FsVertDiffusion";
+  m_diagnosticNames[DiagnosticNames::diag_L2FsVertDiffusion] =
+      "L2FsVertDiffusion";
   m_diagnosticNames[DiagnosticNames::diag_L2FsVertFluid] = "L2FsVertFluid";
   m_diagnosticNames[DiagnosticNames::diag_L2FsVertFrame] = "L2FsVertFrame";
 
-  m_diagnosticNames[DiagnosticNames::diag_L1FsVertDiffusion] = "L1FsVertDiffusion";
+  m_diagnosticNames[DiagnosticNames::diag_L1FsVertDiffusion] =
+      "L1FsVertDiffusion";
   m_diagnosticNames[DiagnosticNames::diag_L1FsVertFluid] = "L1FsVertFluid";
   m_diagnosticNames[DiagnosticNames::diag_L1FsVertFrame] = "L1FsVertFrame";
 
-  m_diagnosticNames[DiagnosticNames::diag_L0FsVertDiffusion] = "L0FsVertDiffusion";
+  m_diagnosticNames[DiagnosticNames::diag_L0FsVertDiffusion] =
+      "L0FsVertDiffusion";
   m_diagnosticNames[DiagnosticNames::diag_L0FsVertFluid] = "L0FsVertFluid";
   m_diagnosticNames[DiagnosticNames::diag_L0FsVertFrame] = "L0FsVertFrame";
 
   m_diagnosticNames[DiagnosticNames::diag_maxLambda] = "LambdaMax";
   m_diagnosticNames[DiagnosticNames::diag_sumLambda] = "LambdaSum";
-  m_diagnosticNames[DiagnosticNames::diag_postRegridLambda] = "LambdaPostRegrid";
+  m_diagnosticNames[DiagnosticNames::diag_postRegridLambda] =
+      "LambdaPostRegrid";
   m_diagnosticNames[DiagnosticNames::diag_maxVel] = "maxVel";
-  m_diagnosticNames[DiagnosticNames::diag_maxFreestreamCorrection] = "maxFreestreamCorrection";
+  m_diagnosticNames[DiagnosticNames::diag_maxFreestreamCorrection] =
+      "maxFreestreamCorrection";
 
-  m_diagnosticNames[DiagnosticNames::diag_mushyAverageBulkConc] = "mushAvBulkConc";
-  m_diagnosticNames[DiagnosticNames::diag_mushyAveragePorosity] = "mushAvPorosity";
+  m_diagnosticNames[DiagnosticNames::diag_mushyAverageBulkConc] =
+      "mushAvBulkConc";
+  m_diagnosticNames[DiagnosticNames::diag_mushyAveragePorosity] =
+      "mushAvPorosity";
   m_diagnosticNames[DiagnosticNames::diag_mushyVol] = "mushVol";
 
   // Sanity check to ensure we have given all the diagnostics names
@@ -89,7 +105,8 @@ Diagnostics::Diagnostics ()
   {
     if (m_diagnosticNames[i].empty())
     {
-      MayDay::Error("Diagnostics::Diagnostics() - a diagnostic doesn't have a name specified.");
+      MayDay::Error("Diagnostics::Diagnostics() - a diagnostic doesn't have a "
+                    "name specified.");
     }
 
     // Default: print all diagnostics
@@ -99,14 +116,14 @@ Diagnostics::Diagnostics ()
   movingAverageTimescale = 0;
   m_verbosity = 0;
   m_convergenceCriteria = 1e-4;
-  m_level=0;
-
+  m_level = 0;
+  m_printAllLevels = true;
 
   m_defined = false;
-
 }
 
-void Diagnostics::define(Real a_movingAverageTimescale, int a_verbosity, Real a_convCrit, int a_level, bool a_printAllLevels)
+void Diagnostics::define(Real a_movingAverageTimescale, int a_verbosity,
+                         Real a_convCrit, int a_level, bool a_printAllLevels)
 {
   movingAverageTimescale = a_movingAverageTimescale;
   m_verbosity = a_verbosity;
@@ -125,23 +142,24 @@ void Diagnostics::define(Real a_movingAverageTimescale, int a_verbosity, Real a_
 
   if (m_verbosity > 2)
   {
-    pout() << "Diagnostics::define with timescale = " << a_movingAverageTimescale << std::endl;
+    LOG("Diagnostics::define with timescale = " << a_movingAverageTimescale);
   }
 
   m_defined = true;
 }
 
-Diagnostics::~Diagnostics ()
+Diagnostics::~Diagnostics()
 {
   // trying to solve memory leak
   for (int i = 0; i < numDiagnostics; i++)
-    {
-      delete m_diagnostics[i];
-      m_diagnostics[i] = nullptr;
-    }
+  {
+    delete m_diagnostics[i];
+    m_diagnostics[i] = nullptr;
+  }
 }
 
-void Diagnostics::addDiagnostic(DiagnosticNames a_diagnostic, Real a_time, Real value)
+void Diagnostics::addDiagnostic(DiagnosticNames a_diagnostic, Real a_time,
+                                Real value)
 {
   int index = getIndex(a_time);
 
@@ -158,11 +176,11 @@ void Diagnostics::addDiagnostic(DiagnosticNames a_diagnostic, Real a_time, Real 
   if (index < m_diagnostics[a_diagnostic]->size())
   {
     (*m_diagnostics[a_diagnostic])[index] = value;
-
   }
   else
   {
-    // Just in case we've got out of sync, add NaN entries to get vectors up to size
+    // Just in case we've got out of sync, add NaN entries to get vectors up to
+    // size
     while (index > m_diagnostics[a_diagnostic]->size())
     {
       Real NaN;
@@ -170,12 +188,11 @@ void Diagnostics::addDiagnostic(DiagnosticNames a_diagnostic, Real a_time, Real 
     }
 
     m_diagnostics[a_diagnostic]->push_back(value);
-
   }
-
 }
 
-Real Diagnostics::getDiagnostic(DiagnosticNames a_diagnostic, Real a_time, int timestepOffset)
+Real Diagnostics::getDiagnostic(DiagnosticNames a_diagnostic, Real a_time,
+                                int timestepOffset)
 {
   Real val = 1.0e200;
 
@@ -198,7 +215,8 @@ Real Diagnostics::getDiagnostic(DiagnosticNames a_diagnostic, Real a_time, int t
   return val;
 }
 
-Real Diagnostics::getMovingAverage(DiagnosticNames a_diagnostic, Real a_endTime, Real a_timeSpan)
+Real Diagnostics::getMovingAverage(DiagnosticNames a_diagnostic, Real a_endTime,
+                                   Real a_timeSpan)
 {
   Real movingAverage = 0;
 
@@ -214,12 +232,13 @@ Real Diagnostics::getMovingAverage(DiagnosticNames a_diagnostic, Real a_endTime,
     }
   }
 
-  movingAverage = movingAverage/Ntimesteps;
+  movingAverage = movingAverage / Ntimesteps;
 
   return movingAverage;
 }
 
-Real Diagnostics::getRateOfChange(DiagnosticNames a_diagnostic, Real a_endTime, Real a_dt)
+Real Diagnostics::getRateOfChange(DiagnosticNames a_diagnostic, Real a_endTime,
+                                  Real a_dt)
 {
   Real rateOfChange = 1.0e200;
 
@@ -229,13 +248,14 @@ Real Diagnostics::getRateOfChange(DiagnosticNames a_diagnostic, Real a_endTime, 
 
   if (thisDiag.size() > index && index > 0)
   {
-    rateOfChange = (thisDiag[index] - thisDiag[index-1])/a_dt;
+    rateOfChange = (thisDiag[index] - thisDiag[index - 1]) / a_dt;
   }
 
   return rateOfChange;
 }
 
-Real Diagnostics::getSecondRateOfChange(DiagnosticNames a_diagnostic, Real a_endTime, Real a_dt)
+Real Diagnostics::getSecondRateOfChange(DiagnosticNames a_diagnostic,
+                                        Real a_endTime, Real a_dt)
 {
   Real rateOfChange = 1.0e200;
 
@@ -245,26 +265,29 @@ Real Diagnostics::getSecondRateOfChange(DiagnosticNames a_diagnostic, Real a_end
 
   if (thisDiag.size() > index && index > 1)
   {
-    rateOfChange = (thisDiag[index] + thisDiag[index-2] - thisDiag[index-1])/(a_dt*a_dt);
+    rateOfChange =
+        (thisDiag[index] + thisDiag[index - 2] - thisDiag[index - 1]) /
+        (a_dt * a_dt);
   }
 
   return rateOfChange;
 }
 
-bool Diagnostics::movingAverageHasConverged(DiagnosticNames a_diagnostic, Real a_time, Real a_dt)
+bool Diagnostics::movingAverageHasConverged(DiagnosticNames a_diagnostic,
+                                            Real a_time, Real a_dt)
 {
 
   // Consider the moving average
-  if( (a_time - m_times[0]) > 2*movingAverageTimescale)
+  if ((a_time - m_times[0]) > 2 * movingAverageTimescale)
   {
-    Real movingAverageDiff = std::abs(getMovingAverage(a_diagnostic, a_time, movingAverageTimescale) - getMovingAverage(a_diagnostic, a_time, 2*movingAverageTimescale));
+    Real movingAverageDiff = std::abs(
+        getMovingAverage(a_diagnostic, a_time, movingAverageTimescale) -
+        getMovingAverage(a_diagnostic, a_time, 2 * movingAverageTimescale));
 
-    if (m_verbosity > 0)
-    {
-      pout() << "Difference in moving average (" << m_diagnosticNames[a_diagnostic] << ") = " << movingAverageDiff << std::endl;
-    }
+    LOG("Difference in moving average (" << m_diagnosticNames[a_diagnostic]
+                                         << ") = " << movingAverageDiff);
 
-    if ( movingAverageDiff < m_convergenceCriteria )
+    if (movingAverageDiff < m_convergenceCriteria)
     {
       return true;
     }
@@ -295,15 +318,16 @@ bool Diagnostics::diagnosticIsIncluded(const DiagnosticNames a_diag)
 
 void Diagnostics::printHeader()
 {
-  if (m_printAllLevels || m_level==0)
+  if (m_printAllLevels || m_level == 0)
   {
-    m_diagnosticsFile.open(m_diagnosticsFileName, std::ios_base::app); // open file in append mode
+    m_diagnosticsFile.open(m_diagnosticsFileName,
+                           std::ios_base::app); // open file in append mode
     printHeader(m_diagnosticsFile);
     m_diagnosticsFile.close();
   }
 }
 
-void Diagnostics::printHeader(std::ofstream& a_file)
+void Diagnostics::printHeader(std::ofstream &a_file)
 {
   for (int i = 0; i < m_diagsToPrint.size(); i++)
   {
@@ -312,29 +336,28 @@ void Diagnostics::printHeader(std::ofstream& a_file)
     a_file << m_diagnosticNames[diag_i];
 
     // Add a comma to separate entries unless it's the final entry
-    if (i < m_diagsToPrint.size()-1)
+    if (i < m_diagsToPrint.size() - 1)
     {
       a_file << ",";
     }
   }
 
   a_file << endl;
-
 }
 
 void Diagnostics::printDiagnostics(Real a_time)
 {
   CH_TIME("Diagnostics::printDiagnostics");
 
-  if (m_printAllLevels || m_level==0)
+  if (m_printAllLevels || m_level == 0)
   {
 
-    pout() << "Print diagnostics (level " << m_level << ", time " << a_time << ")" << endl;
+    LOG("Print diagnostics (level " << m_level << ", time " << a_time << ")");
 
-    m_diagnosticsFile.open(m_diagnosticsFileName, std::ios_base::app); // open file in append mode
+    m_diagnosticsFile.open(m_diagnosticsFileName,
+                           std::ios_base::app); // open file in append mode
     printDiagnostics(a_time, m_diagnosticsFile);
     m_diagnosticsFile.close();
-
 
     // Open latest diags file and delete contents, then rewrite
     std::string latestFilename = "diagnosticsLatest.csv";
@@ -342,16 +365,15 @@ void Diagnostics::printDiagnostics(Real a_time)
     {
       latestFilename = "diagnosticsLatest." + std::to_string(m_level) + ".csv";
     }
-    m_diagnosticsFileLatest.open(latestFilename, std::ofstream::out | std::ofstream::trunc);
+    m_diagnosticsFileLatest.open(latestFilename,
+                                 std::ofstream::out | std::ofstream::trunc);
     printHeader(m_diagnosticsFileLatest);
     printDiagnostics(a_time, m_diagnosticsFileLatest);
     m_diagnosticsFileLatest.close();
   }
 }
-void Diagnostics::printDiagnostics(Real a_time, std::ofstream& a_file)
+void Diagnostics::printDiagnostics(Real a_time, std::ofstream &a_file)
 {
-//  pout() << "Printing diagnostics to " << a_file.c_str << endl;
-
   for (int i = 0; i < m_diagsToPrint.size(); i++)
   {
     DiagnosticNames diag_i = m_diagsToPrint[i];
@@ -361,7 +383,7 @@ void Diagnostics::printDiagnostics(Real a_time, std::ofstream& a_file)
     a_file << setprecision(10) << diag;
 
     // Add a comma to separate entries unless it's the final entry
-    if (i < m_diagsToPrint.size()-1)
+    if (i < m_diagsToPrint.size() - 1)
     {
       a_file << ",";
     }
@@ -369,7 +391,6 @@ void Diagnostics::printDiagnostics(Real a_time, std::ofstream& a_file)
 
   a_file << endl;
 }
-
 
 int Diagnostics::getIndex(Real a_time)
 {

@@ -23,27 +23,21 @@
 /**
  *  Factory to create AMRLevelMushyLayer
  */
-class AMRLevelMushyLayerFactory: public AMRLevelFactory
+class AMRLevelMushyLayerFactory : public AMRLevelFactory
 {
 public:
-
   /// Constructor
   /**
    */
   AMRLevelMushyLayerFactory(MushyLayerOptions opt, MushyLayerParams params);
 
-
   /// Destructor
-  virtual ~AMRLevelMushyLayerFactory()
-  {
-  }
-
+  virtual ~AMRLevelMushyLayerFactory() {}
 
   /// Create new AMRLevel
-  virtual AMRLevel* new_amrlevel() const;
+  virtual AMRLevel *new_amrlevel() const;
 
 protected:
-
   /// Options for how to solve the equations and run the code
   MushyLayerOptions m_options;
 
@@ -51,16 +45,12 @@ protected:
   MushyLayerParams m_params;
 
 private:
-
   /// Weak construction is disallowed
-  AMRLevelMushyLayerFactory()
-  {
-    MayDay::Error("invalid operator");
-  }
+  AMRLevelMushyLayerFactory() { MayDay::Error("invalid operator"); }
 
   // Disallowed for all the usual reasons
-  void operator=(const AMRLevelMushyLayerFactory&);
-  AMRLevelMushyLayerFactory(const AMRLevelMushyLayerFactory&);
+  void operator=(const AMRLevelMushyLayerFactory &);
+  AMRLevelMushyLayerFactory(const AMRLevelMushyLayerFactory &);
 };
 
 #include "NamespaceFooter.H"

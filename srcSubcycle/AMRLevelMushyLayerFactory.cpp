@@ -9,22 +9,22 @@
  */
 #endif
 
-#include "AMRLevel.H"
 #include "AMRLevelMushyLayerFactory.H"
+#include "AMRLevel.H"
 #include "NamespaceHeader.H"
 
-
-AMRLevelMushyLayerFactory::
-AMRLevelMushyLayerFactory( MushyLayerOptions a_opt, MushyLayerParams a_params) : m_options(a_opt), m_params(a_params) {}
+AMRLevelMushyLayerFactory::AMRLevelMushyLayerFactory(MushyLayerOptions a_opt,
+                                                     MushyLayerParams a_params)
+    : m_options(a_opt), m_params(a_params) {}
 
 // Virtual constructor
-AMRLevel* AMRLevelMushyLayerFactory::new_amrlevel() const
+AMRLevel *AMRLevelMushyLayerFactory::new_amrlevel() const
 {
   // Create a new AMRLevelAdvectDiffuse
-  AMRLevelMushyLayer* amrMLPtr = new AMRLevelMushyLayer(m_options, m_params);
+  AMRLevelMushyLayer *amrMLPtr = new AMRLevelMushyLayer(m_options, m_params);
 
   // Return it
-  return (static_cast <AMRLevel*> (amrMLPtr));
+  return (static_cast<AMRLevel *>(amrMLPtr));
 }
 
 #include "NamespaceFooter.H"

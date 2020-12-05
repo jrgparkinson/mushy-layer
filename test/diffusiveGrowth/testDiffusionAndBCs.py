@@ -20,7 +20,7 @@ from pathlib import Path
 from chombopy.inputs import read_inputs, write_inputs
 import subprocess
 import shutil
-from MushyPltFile import MushyPltFile, latexify2
+from plotting.MushyPltFile import MushyPltFile, latexify2
 from mushyLayerRunUtils import get_mushy_layer_dir, get_executable_name
 
 

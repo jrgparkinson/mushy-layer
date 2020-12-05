@@ -1,23 +1,46 @@
 {
-"configurations": [
-    {
-        "name": "(gdb) Launch [DEBUG]",
-        "type": "cppdbg",
-        "request": "launch",
-        "program": "${workspaceFolder}/execSubcycle/mushyLayer2d.Linux.64.mpiCC.gfortran.DEBUG.MPI.ex",
-        "args": ["inputs"],
-        "stopAtEntry": false,
-        "cwd": "${workspaceFolder}/execSubcycle",
-        "environment": [],
-        "externalConsole": false,
-        "MIMode": "gdb",
-        "setupCommands": [
-            {
-                "description": "Enable pretty-printing for gdb",
-                "text": "-enable-pretty-printing",
-                "ignoreFailures": true
-            }
-        ]
-    },
-]
+    "configurations": [
+        {
+            "name": "(gdb) Launch [DEBUG]",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/execSubcycle/mushyLayer2d.Linux.64.mpiCC.gfortran.DEBUG.MPI.ex",
+            "args": [
+                "inputs"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/execSubcycle",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug nan failure",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/execSubcycle/mushyLayer2d.Linux.64.mpiCC.gfortran.DEBUG.MPI.ex",
+            "args": [
+                "inputs.4x2zmushyLayer_32-2lev-restart"
+            ],
+            "stopAtEntry": false,
+            "cwd": "/home/parkinsonjl/AGU20/finallyisolatedathefailure",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+    ]
 }

@@ -29,7 +29,6 @@ C     -----------------------------------------------------------------
       
       comp = 0
       
-      
       CHF_MULTIDO[region; i; j; k]
 
         if (H(CHF_IX[i;j;k],comp) .le. H_s(CHF_IX[i;j;k],comp)) then
@@ -132,6 +131,18 @@ C        print *, "WARNING, C=", a_C, "! Setting C=", validC
          c =  (compositionRatio + validC)*specificHeatRatio +
      &				waterDistributionCoeff * H		 
          porosity = (-b -sqrt(b*b - 4*a*c))/(2*a);
+         
+C	     If H and C are inconsistent (e.g. following regridding and interpolation from coarser levels)
+C        Then we may have b*b -4*a*c < 0 => porosity=NAN. In these cases, set porosity=1 for now.
+C        In such scenarios, the issue seems to then resolve itself by the next timestep.
+C        However, going forward we should fix the root cause of this issue.        
+C         if (porosity .ne. porosity) then
+C         	print *, "WARNING, porosity is nan"
+C         	print *, "H,C=", H, ",", a_C
+C         	print *, "comp_ratio, water_dist, specific_heat, stefan=", compositionRatio, ",", waterDistributionCoeff, ",", specificHeatRatio, ",", stefan
+C         	print *, "a,b,c,porosity=", a, ",", b, ",", c, ",", porosity
+C            porosity = 1
+C         endif
          
       endif
 
@@ -444,6 +455,11 @@ C     -----------------------------------------------------------------
           TCL(CHF_IX[i;j;k],THcomp) = HC(CHF_IX[i;j;k],THcomp) - stefan
           TCL(CHF_IX[i;j;k],CCLcomp) = HC(CHF_IX[i;j;k],CCLcomp)
         endif
+        
+C       Debugging
+C 		print *, "(i,j) = (", i, ", ", j, ")"
+C 	    print *, "H, C, chi, T, C_l: ", HC(CHF_IX[i;j;k],THcomp), ",", HC(CHF_IX[i;j;k],CClcomp), ",", porosity, ",", TCL(CHF_IX[i;j;k],THcomp), ",", TCL(CHF_IX[i;j;k],CClcomp)
+ 	       
      
       CHF_ENDDO
      
