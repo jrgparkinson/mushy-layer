@@ -761,7 +761,6 @@ Real AMRLevelMushyLayer::advance()
     }
 
     bool doFRupdates = true;
-//    bool compute_uDelU = !m_opt.implicitAdvectionSolve && doAdvectiveSrc;
     bool compute_uDelU = doAdvectiveSrc;
     bool doProjection = true;
     computeCCvelocity(advectionSourceTerm, m_time-m_dt, m_dt, doFRupdates, doProjection, compute_uDelU);
@@ -842,13 +841,9 @@ void AMRLevelMushyLayer::setVelZero(FArrayBox& a_vel, const FArrayBox& a_porosit
         a_vel(its(), comp) = 0;
       }
     }
-
-
-
   }
   else
   {
-
     Box region = a_vel.box();
     region &= a_porosity.box();
 
@@ -856,7 +851,6 @@ void AMRLevelMushyLayer::setVelZero(FArrayBox& a_vel, const FArrayBox& a_porosit
                           CHF_CONST_FRA(a_porosity),
                           CHF_BOX(region),
                           CHF_CONST_REAL(a_limit));
-
   }
 }
 
