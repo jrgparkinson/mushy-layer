@@ -495,6 +495,30 @@ void MushyLayerParams::getParameters()
 
   ppParams.query("enthalpyPlume", HPlumeInflow);
   ppParams.query("bulkConcPlume", ThetaPlumeInflow);
+  
+  
+  
+  
+  //// jb - attempting to add multiple dirichlet BC values option for Enthalpy (maybe Salinity in future)
+  ////    - currently keeping things in one spot, can redistribute after they're checked
+  
+  ////        here i'm introducing the boundaries for where the AltVal will occur
+  diriBounds.resize(2);
+  if (ppParams.contains("diriBounds"))
+    {
+    std::vector<Real>  temp = std::vector<Real>();
+    ppParams.getarr("diriBounds", temp, 0, 2);
+    diriBounds[0] = temp[0]; diriBounds[1] = temp[1];
+    }
+
+  ////        these are the AltVals
+  parseBCVals("enthalpyAltLoVal", bcAltValEnthalpyLo, required);
+  parseBCVals("enthalpyAltHiVal", bcAltValEnthalpyHi, required);
+
+  ////        recompute bounding energy and enthalpy vars???
+  
+  
+  
 
   //  ParmParse ppBC("bc");
 
