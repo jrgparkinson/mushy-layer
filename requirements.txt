@@ -15,7 +15,7 @@ jupyter-console==6.0.0
 jupyter-core==4.4.0
 matplotlib==3.0.2
 mock
-notebook==5.7.8
+notebook==6.1.5
 numpy==1.16.0
 pandas==0.24.0
 pytest
