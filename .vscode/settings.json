@@ -1,5 +1,15 @@
 {
     "files.associations": {
         "*.ChF": "fortran"
-    }
+    },
+    "files.exclude": {
+        "**/.git": true,   
+        "**/.venv": true,   
+        "**/matlab": true,  
+    },
+    "files.watcherExclude": {
+        "**/.git/**": true,
+        "**/.venv/**": true,
+      }
+    
 }

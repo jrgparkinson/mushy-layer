@@ -18,10 +18,6 @@ on:
       - '**/workflows/**'
 
 env:
-  CHOMBO_ROOT: /home/runner/chombo
-  CHOMBO_HOME: /home/runner/chombo/lib
-  HDF5_PATH: /home/runner/hdf5-dir
-  LD_LIBRARY_PATH: /home/runner/hdf5-dir/lib
   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
   REGRESSIONS_PATH: /home/runner/work/mushy-layer/mushy-layer/test/regression
   TEST_PATH: /home/runner/work/mushy-layer/mushy-layer/test
@@ -36,92 +32,13 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Setup environmental variables
-        run: |
-          echo "CHOMBO_HOME=$(echo $HOME)/chombo/lib" >> $GITHUB_ENV
-          echo "CHOMBO_ROOT=$(echo $HOME)/chombo" >> $GITHUB_ENV
-          echo "HDF5_PATH=$(echo $HOME)/hdf5-dir" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH):$(echo $HDF5_PATH)/lib" >> $GITHUB_ENV
-
-      - name: Info
-        run: |
-          echo $CHOMBO_HOME
-          echo $HOME
-          echo $LD_LIBRARY_PATH
-          echo $GITHUB_WORKSPACE
-
-      - name: Update package list
-        run: sudo apt-get update
-
-      - name: Install csh
-        run: sudo apt-get install csh
-
-      - name: Install gfortran
-        run: sudo apt-get install gfortran
-
-      - name: Install lbas etc.
-        run: sudo apt-get install libblas-dev liblapack-dev
-
-      - name: Check package versions
-        run: |
-          which gfortran
-          gfortran --version
-
-          which make
-          make --version
-
-          which g++
-          g++ --version
-
-          which perl
-          perl --version
-
-      - name: Cache HDF5
-        id: cache-hdf5v2
-        uses: actions/cache@v1
+      - uses: jrgparkinson/chombo-action@v1.5
         with:
-          path: ${{ env.HDF5_PATH }}
-          key: ${{ runner.os }}-hdf5v2
+          compile_opts: 'DIM=2'
 
-      - name: Download and install HDF5
-        if: steps.cache-hdf5v2.outputs.cache-hit != 'true'
+      - name: Compile Chombo 3D
         run: |
-          wget 'https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.21/src/hdf5-1.8.21.tar.gz'
-          tar -zxvf hdf5-1.8.21.tar.gz
-          ls
-          cd hdf5-1.8.21
-          ./configure --prefix=$HDF5_PATH
-          make
-          make install
-
-      - name: Cache Chombo
-        id: cache-chombov2
-        uses: actions/cache@v1
-        with:
-          path: ${{ env.CHOMBO_ROOT }}
-          key: ${{ runner.os }}-chombov2
-
-      - name: Download Chombo
-        if: steps.cache-chombov2.outputs.cache-hit != 'true'
-        run: |
-          svn --username ${{ secrets.SVN_USERNAME }} --password \
-            ${{ secrets.SVN_PASSWORD }} co \
-            https://anag-repo.lbl.gov/svn/Chombo/release/3.2  $CHOMBO_ROOT
-
-      - name: Verify
-        run: |
-          echo "$HDF5_PATH:"
-          ls $HDF5_PATH
-          echo "---------------------------"
-          echo "$CHOMBO_HOME"
-          ls $CHOMBO_HOME
-
-      - name: Compile Chombo
-        run: |
-          cp $GITHUB_WORKSPACE/mk/Make.defs.local.github \
-            $CHOMBO_HOME/mk/Make.defs.local
           cd $CHOMBO_HOME
-          make lib DIM=2
           make lib DIM=3
 
       - name: Compile ChomboCompare
@@ -135,7 +52,6 @@ jobs:
           cd $GITHUB_WORKSPACE/execSubcycle
           make all DIM=2
           make all DIM=3
-
 
       # Do regression tests
 
