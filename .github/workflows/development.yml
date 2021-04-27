@@ -8,6 +8,7 @@ on:
     paths-ignore:
       - '.github/**'
       - '**/workflows/**'
+      - 'requirements.txt'
 
   pull_request:
     branches:
@@ -16,6 +17,7 @@ on:
     paths-ignore:
       - '.github/**'
       - '**/workflows/**'
+      - 'requirements.txt'
 
 env:
   CHOMBO_ROOT: /home/runner/chombo
