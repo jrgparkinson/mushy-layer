@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - uses: jrgparkinson/chombo-action@v1.6
+      - uses: jrgparkinson/chombo-action@v1.7
         with:
           compile_opts: 'DIM=2'
 
