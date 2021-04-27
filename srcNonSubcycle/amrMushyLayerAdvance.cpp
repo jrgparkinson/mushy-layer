@@ -262,8 +262,6 @@ amrMushyLayer::timeStep()
 
   updateEnthalpyVariables();
 
-
-
   //Post timestep operations:
 
 
@@ -693,8 +691,6 @@ doImplicitVelocityReflux(int m_level)
   }
 }
 
-
-
 void amrMushyLayer::
 updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
 {
@@ -855,21 +851,15 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
 
         y = y + m_amrDx[lev]/2;
 
-
-
         //				thetaAdvectionError[dit](iv, 0) = m_parameters.rayleighTemp * (-1 + cos(M_PI*x) *
         //						(-M_PI * alpha * cos(M_PI*y) + 0.5  * alpha*sin(M_PI*y) )
         //						+ (M_PI/4) * alpha*alpha*sin(2*M_PI*y) );
         thetaAdvectionAnalytic[dit](iv, 0) = - m_parameters.rayleighTemp * perturbation * (
             - 0.5 * cos(M_PI*x) + 0.5 * M_PI * perturbation * cos(M_PI*y)) * sin(M_PI*y) ;
 
-
-
       } //finish loop over intvects in box
 
       logMessage(10, "    amrMushyLayerAdvance::updateVelocity - finished make U^* on grid");
-
-
 
     } // finish loop over boxes
 
@@ -960,8 +950,6 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
   proj.getGradPressure(m_vectorNew[m_gradPressure]);
   proj.getGradPressureEdge(gradPressureEdge);
 
-
-
   //Apply BCs
   for (int lev=0; lev<=m_finest_level; lev++)
   {
@@ -971,8 +959,6 @@ updateVelocityComp(Vector<DisjointBoxLayout> activeGrids, Real alpha)
   }
 
   logMessage(10, "    amrMushyLayerAdvance::updateVelocity - calculate errors");
-
-
 
   // Need to clean up memory
   proj.undefine();
@@ -1078,8 +1064,6 @@ doCFInterpTest()
 
 
 
-
-
 Real amrMushyLayer::
 calculateMaxDiff(Vector<LevelData<FArrayBox> * > a_phiNew, Vector<LevelData<FArrayBox> * > a_phiOld)
 {
@@ -1141,8 +1125,6 @@ calculateMaxDiff(Vector<RefCountedPtr<LevelData<FArrayBox> > > a_phiNew, Vector<
 }
 
 
-
-
 void amrMushyLayer::
 applyBCs(const int a_var, const int lev)
 {
@@ -1185,8 +1167,6 @@ applyBCs(const int a_var, const int lev)
     return;
 //  }
 
-
-
   DataIterator dit = m_amrGrids[lev].dataIterator();
   {
     for (dit.begin(); dit.ok(); ++dit)
@@ -1204,8 +1184,6 @@ applyBCs(const int a_var, const int lev)
                           m_amrDomains[lev],
                           m_amrDx[lev],
                           a_homogeneous);
-
-
 
       //Grow box b to include the ghost cells we want to fill
       b.grow(m_num_ghost);
@@ -1513,8 +1491,6 @@ calculateThetaLSourceTerm(Vector<LevelData<FArrayBox>* > V_dThetadz_n, Vector<Le
 
 //Calculate (1/Le) * grad (porosity* grad Theta_l)
 
-
-
 void amrMushyLayer::makeAdvectionTerm(const int a_var,
                                       const Vector<LevelData<FArrayBox>* > a_source,
                                       const Vector<LevelData<FluxBox>* > a_advVel,
@@ -1726,8 +1702,6 @@ getPressureVCcoefs(Vector<RefCountedPtr<LevelData<FArrayBox> > >& aCoef,
 }
 
 
-
-
 void
 amrMushyLayer::getFluidAdvection(const int lev)
 {
@@ -1829,8 +1803,6 @@ amrMushyLayer::getFluidAdvection(const int lev)
   }
 
 
-
-
   //	for (DataIterator dit = m_vectorNew[VectorVars::m_fluidVel][lev]->dataIterator(); dit.ok(); ++dit)
   //		{
   //
@@ -1842,8 +1814,6 @@ amrMushyLayer::getFluidAdvection(const int lev)
   //		}
 
 }
-
-
 
 void amrMushyLayer::removeNanValues(FArrayBox& fab)
 {

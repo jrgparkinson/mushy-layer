@@ -9,7 +9,6 @@
 #include "LevelAdvect.H"
 #include "ExtrapFillPatch.H"
 #include "FineInterp.H"
-//#include "LevelFluxRegisterEdge.H"
 
 
 void
@@ -210,8 +209,6 @@ amrMushyLayer::initialize()
   pp.query("minStep", m_minTimestep);
 
 
-
-
   if (m_max_level > 0)
   {
     pp.getarr("ref_ratio", m_refinement_ratios, 0, m_max_level);
@@ -346,8 +343,6 @@ amrMushyLayer::initialize()
 
 
 
-
-
     int finest_level = -1;
     if (usePredefinedGrids)
     {
@@ -391,8 +386,6 @@ amrMushyLayer::initialize()
 
     setupFluxRegisters();
 
-
-
     Vector<DisjointBoxLayout> activeGrids;
     activeGrids.resize(m_finest_level+1);
 
@@ -406,8 +399,6 @@ amrMushyLayer::initialize()
     //		updateVelocity(activeGrids);
 
   } //end if restarting from a checkpoint file
-
-
 
 
   // set up counter of number of cells
@@ -475,10 +466,6 @@ amrMushyLayer::initialize()
       //regrid();
     }
   }
-
-
-
-
 
 
 
@@ -646,11 +633,7 @@ amrMushyLayer::initGrids(int a_finest_level)
     }
   } // end while more levels to do
 
-
-
 }
-
-
 
 void
 amrMushyLayer::initData()
@@ -880,8 +863,6 @@ amrMushyLayer::setupFixedGrids(const std::string& a_gridFile)
       }
     }
 
-
-
     // now loop over levels, starting with level 1
     int numGrids = 0;
     for (int lev=1; lev<inNumLevels; lev++)
@@ -923,8 +904,6 @@ amrMushyLayer::setupFixedGrids(const std::string& a_gridFile)
         gridvect[lev][i] = bx;
       } // end loop over boxes on this level
 
-
-
     } // end loop over levels
   } // end if serial proc
 
@@ -959,11 +938,7 @@ amrMushyLayer::setupFixedGrids(const std::string& a_gridFile)
 
   initData();
 
-
-
 }
-
-
 
 
 
@@ -1047,8 +1022,6 @@ amrMushyLayer::setupAdvectionSolvers()
                                    hasCoarser,
                                    hasFiner,
                                    m_num_ghost);
-
-
 
 
 
@@ -1196,8 +1169,6 @@ amrMushyLayer::setupPoissonSolvers(
 
 
 
-
-
 }
 
 void
@@ -1243,8 +1214,6 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
   m_refluxAMRMG->setSolverParameters(numSmooth, numSmooth, numSmooth, numMG,
                                      maxIter, tolerance, hang, normThresh);
   m_refluxAMRMG->m_verbosity=mgverb;
-
-
 
   //	Multigrid solver for theta variable coefficient operator
   //  m_amrSolverVCtheta = RefCountedPtr<AMRMultiGrid<LevelData<FArrayBox> > > (new AMRMultiGrid<LevelData<FArrayBox> >);
@@ -1345,8 +1314,6 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
 //                                        maxIter, tolerance, hang, normThresh);
 //  s_multiCompFASMG->m_verbosity = mgverb;
 
-
-
 // Doesn't currently work. Potential issue is that LevelTGA dosn't like my custom operator.
 //  s_enthalpySalinityTGA = RefCountedPtr<LevelTGA>(
 //      new LevelTGA(activeGrids, m_refinement_ratios, m_amrDomains[0], HCOpFact,
@@ -1398,8 +1365,6 @@ amrMushyLayer::setupMultigrid(Vector<DisjointBoxLayout>& activeGrids)
       m_refinement_ratios,
       numLevels,
       s_verbosity-1));
-
-
 
 
 }
@@ -1585,8 +1550,6 @@ thetaVCOpCoeffs(Real& alpha, Real& beta,
     }
   }
 }
-
-
 
 void
 amrMushyLayer::getLevelAdvectionsVars(const int a_var,

@@ -70,8 +70,6 @@ main(int a_argc, char* a_argv[])
 #endif
   { //scoping trick
 
-
-
     // Check for an input file
     char* inFile = nullptr;
 
@@ -145,8 +143,6 @@ main(int a_argc, char* a_argv[])
     // AMR expects max_level + 1 values of ref_ratio
     // so add a dummy value
     ref_ratios.push_back(1);
-
-
 
     mushyLayer(stopTime, nstop_int, ref_ratios);
   }

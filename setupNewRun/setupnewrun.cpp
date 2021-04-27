@@ -39,8 +39,6 @@ void getBoxes(Vector<Box>& outBoxes, Box newDomain,
     MayDay::Abort("Base grid size must be greater than blocking factor");
   }
 
-
-
   Tuple<Vector<int>,SpaceDim> box_sizes;
   IntVect num_grids;
   IntVect base_size;
@@ -109,8 +107,6 @@ int main(int argc, char* argv[])
 
   char* in_file = argv[1];
   ParmParse pp(argc-2, argv+2, nullptr, in_file);
-
-
 
 #ifdef CH_MPI
   MPI_Barrier(Chombo_MPI::comm);
@@ -255,8 +251,6 @@ int main(int argc, char* argv[])
   {
     LOG("Refining data with refinement factor: " << refinement);
 
-
-
     // Refine current data/domain
     // DO this from finest level down, so we have the coarsest level available for interpolation if needed
     for (int level = finest_level; level >= 0; level--)
@@ -313,8 +307,6 @@ int main(int argc, char* argv[])
       ml->shiftData(dir, xShift);
     }
   }
-
-
 
   // Add melt pond if required
   if (addMeltPond)
@@ -474,6 +466,4 @@ int main(int argc, char* argv[])
   MPI_Finalize();
 #endif
 } // end main
-
-
 

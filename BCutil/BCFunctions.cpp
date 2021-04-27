@@ -118,7 +118,6 @@ void ConstantDiriBC(FArrayBox&      a_state,
     a_value = 0;
   }
 
-
   FORT_DIRIBC(CHF_FRA(a_state),
               CHF_REAL(a_value),
               CHF_BOX(toRegion),
@@ -150,7 +149,6 @@ void ConstantNeumBC(FArrayBox&      a_state,
   {
     a_value = 0;
   }
-
 
   FORT_NEUMBC(CHF_FRA(a_state),
               CHF_REAL(a_value),
@@ -200,9 +198,7 @@ void VariableFluxBC(FArrayBox&      a_state,
     IntVect ivFrom = iv - isign*BASISV(a_dir);
     a_state(iv, a_comp) = a_state(ivFrom, a_comp) + a_dx*flux;
   }
-
 }
-
 
 void ExtrapBC(FArrayBox&      a_state,
               const Box&      a_valid,
@@ -376,8 +372,6 @@ void OnlyInflowBC(FArrayBox&      a_state,
                 CHF_INT(isign),
                 CHF_INT(a_dir),
                 CHF_INT(a_comp));
-
-
 }
 
 void PressureInflowOutflow(FArrayBox&      a_state,

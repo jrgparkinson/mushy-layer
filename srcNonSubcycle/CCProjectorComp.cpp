@@ -27,7 +27,6 @@
 #include "EdgeToCell.H"
 #include "PiecewiseLinearFillPatchFace.H"
 #include "VCAMRPoissonOp2.H"
-//#include "NodeQuadCFInterp2.H"
 
 #ifdef CH_USE_HDF5
 #include "CH_HDF5.H"
@@ -61,8 +60,6 @@ int CCProjectorComp::getLevel() const
 {
 	return m_level;
 }
-
-
 
 // ------------------------------------------------------
 Real CCProjectorComp::etaLambda() const
@@ -418,8 +415,6 @@ CCProjectorComp::define(const Vector<DisjointBoxLayout>& a_amrGrids,
 		setValLevel(*m_eSync[lev], 0);
 	}
 
-
-
 	// define persistent storage
 
 
@@ -522,8 +517,6 @@ void CCProjectorComp::variableSetUp()
 
 }
 
-
-
 void CCProjectorComp::limitSolverCoarsening(bool a_limitSolverCoarsening)
 {
 	m_limitSolverCoarsening = a_limitSolverCoarsening;
@@ -568,37 +561,12 @@ void CCProjectorComp::gradPhi(LevelData<FArrayBox>& a_gradPhi, int a_dir) const
 	//	} // end loop over grids
 }
 
-// --------------------------------------------------------------
-// note that this function assumes that all BC's on phi have been set
-//void CCProjectorComp::gradPhi(LevelData<FluxBox>& a_gradPhi) const
-//{
-//	Gradient::levelGradientMAC(a_gradPhi, m_phi, m_dx);
-//}
-
 ///
 void
 CCProjectorComp::gradPhiComp(Vector<RefCountedPtr<LevelData<FluxBox> > >& a_gradPhi) const
 {
 	//	Gradient::levelGradientMAC(a_gradPhi, m_phi, m_dx);
 	MayDay::Error("gradPhiComp - not implemented");
-	//	LevelData<FArrayBox>* a_phiCrsePtr = nullptr;
-	//	LevelData<FArrayBox>* a_phiFinePtr = nullptr;
-	//
-	//	for (int lev=0; lev <= finest_level; lev++)
-	//	{
-	//		if (lev > 0)
-	//		{
-	//			a_phiCrsePtr = &(*m_phi[lev-1]);
-	//
-	//		}
-	//		if (lev < finest_level)
-	//		{
-	//			a_phiFinePtr = &(*m_phi[lev+1]);
-	//		}
-	//
-	//		Gradient::compGradientMAC(*a_gradPhi[lev], *m_phi[lev], a_phiCrsePtr, a_phiFinePtr ,m_amrDx[lev],
-	//				m_refinementRatio[lev-1], m_refinementRatio[lev], m_amrDomains[lev]);
-	//	}
 }
 
 
@@ -607,22 +575,6 @@ CCProjectorComp::gradPhiComp(Vector<RefCountedPtr<LevelData<FluxBox> > >& a_grad
 void CCProjectorComp::gradPi(LevelData<FArrayBox>& a_gradPi, int a_dir) const
 {
 	MayDay::Error("gradPi - not implemented");
-	//	Gradient::compGradientCC();
-	//
-	//	for (int lev=0; lev <= finest_level; lev++)
-	//	{
-	//		DataIterator dit = a_gradPi.dataIterator();
-	//
-	//		for (dit.reset(); dit.ok(); ++dit)
-	//		{
-	//			// call FORTRAN subroutine directly...
-	//			FORT_GRADCC(CHF_FRA1(a_gradPi[dit],0),
-	//					CHF_CONST_FRA1(m_Pi[dit],0),
-	//					CHF_BOX(getBoxes()[dit]),
-	//					CHF_CONST_REAL(m_dx),
-	//					CHF_INT(a_dir));
-	//		}
-	//	}
 }
 
 // --------------------------------------------------------------
@@ -2151,8 +2103,6 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 			 a_uFaceFinePtr = nullptr;
 		}
 
-
-
 		QuadCFInterp velCFInterp;
 		if (lev > 0)
 		{
@@ -2223,8 +2173,6 @@ CCProjectorComp::projectVelocity(Vector<LevelData<FArrayBox> *> a_U,
 
 
 	} // end loop over levels
-
-
 
 	for (int lev=0; lev<=finest_level; lev++)
 	{

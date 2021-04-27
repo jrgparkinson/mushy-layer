@@ -179,8 +179,6 @@ amrMushyLayer::writePlotFile(int iteration)
 				numPlotComps,
 				m_ghostVect);
 
-
-
 		//First do scalar vars
 		for (int a_var = 0; a_var<m_numVars; a_var++)
 		{
@@ -257,15 +255,11 @@ amrMushyLayer::writePlotFile(int iteration)
 				file_index, SpaceDim);
 	}
 
-
-
 	if (m_printAnalyticSoln)
 	{
 		sprintf(iter_str, "%s/%s-analytic.%dd.hdf5", m_output_folder.c_str(), m_plot_prefix.c_str(),
 				SpaceDim);
 	}
-
-
 
 
 	string filename(iter_str);
@@ -616,8 +610,6 @@ amrMushyLayer::readCheckpointFile(HDF5Handle& a_handle)
 		m_dVector[a_var].resize(m_max_level+1);
 	}
 
-
-
 	// now read in level-by-level data
 	for (int lev=0; lev<= m_max_level; lev++)
 	{
@@ -707,8 +699,6 @@ amrMushyLayer::readCheckpointFile(HDF5Handle& a_handle)
 						ghostVect));
 
 
-
-
 				LevelData<FArrayBox>& new_data = *m_scalarNew[a_var][lev];
 				const int dataStatus = read<FArrayBox>(a_handle,
 						new_data,
@@ -775,8 +765,6 @@ amrMushyLayer::readCheckpointFile(HDF5Handle& a_handle)
 			{
 				MayDay::Error("Couldn't read in frame advection data");
 			}
-
-
 
 		} // end if this level is defined
 	} // end loop over levels

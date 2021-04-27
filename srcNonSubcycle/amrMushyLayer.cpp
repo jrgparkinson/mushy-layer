@@ -48,8 +48,6 @@ using std::endl;
 #include "computeNorm.H"
 #include "utils_F.H"
 
-//#include "FourthOrderFillPatch.H"
-
 // small parameter defining when times are equal
 #define TIME_EPS 1.0e-12
 
@@ -72,8 +70,6 @@ amrMushyLayer::~amrMushyLayer()
   // clean up memory
   for (int lev=0; lev<m_fluidAdv.size(); lev++)
   {
-
-
 
     // Vector vars
     for (int a_var = 0; a_var<m_numVectorVars; a_var++)
@@ -287,8 +283,6 @@ updateEnthalpyVariables()
     LevelData<FArrayBox>& liquidus = *m_scalarNew[ScalarVars::m_enthalpyLiquidus][lev];
     LevelData<FArrayBox>& eutectic = *m_scalarNew[ScalarVars::m_enthalpyEutectic][lev];
 
-
-
     ::updateEnthalpyVariables(HC, theta, compositionLiquid, compositionSolid, porosity,
                               solidus, liquidus, eutectic,
                               m_parameters);
@@ -374,8 +368,6 @@ amrMushyLayer::regrid()
     BRMeshRefine meshrefine(m_amrDomains[0], m_refinement_ratios,
                             m_fill_ratio, m_block_factor,
                             m_nesting_radius, m_max_box_size);
-
-
 
     new_finest_level = meshrefine.regrid(new_grids, tagVect,
                                          lbase, top_level,
@@ -503,8 +495,6 @@ amrMushyLayer::regrid()
       }
 
 
-
-
       //Now fill ghost cells from coarser level.
       //			PiecewiseLinearFillPatch filler(m_amrGrids[lev], //this level
       //					m_amrGrids[lev-1], //coarser level
@@ -520,8 +510,6 @@ amrMushyLayer::regrid()
                                     1,  // 1 component
                                     m_amrDomains[lev]); //problem domain on the fine level
 
-
-
       QuadCFInterp quadFillerVector(m_amrGrids[lev], //this level
                                     &(m_amrGrids[lev-1]), //coarser level
                                     m_amrDx[lev], //fine dx
@@ -530,13 +518,9 @@ amrMushyLayer::regrid()
                                     m_amrDomains[lev]); //problem domain on the fine level
 
 
-
-
       logMessage(20,  "    amrMushyLayer::regrid - fill ghost cells");
       for (int a_var=0; a_var < m_numVars; a_var++)
       {
-
-
 
         //This fills exterior ghost cells
         applyBCs(a_var, lev);
@@ -643,8 +627,6 @@ amrMushyLayer::regrid()
   logMessage(8,  "    amrMushyLayer::regrid - finished regridding");
 
 } 
-
-
 
 void 
 amrMushyLayer::tagCells(Vector<IntVectSet>& a_tags)
@@ -851,8 +833,6 @@ amrMushyLayer::computeDt()
   {
     m_dt = fixed_dt;
   }
-
-
 
 
 }

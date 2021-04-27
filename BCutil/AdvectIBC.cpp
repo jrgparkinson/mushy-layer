@@ -65,7 +65,6 @@ PhysIBC* AdvectIBC::new_physIBC()
 {
   AdvectIBC* retval = new AdvectIBC();
   retval->m_velocity = m_velocity;
-  //  retval->m_probtype = m_probtype;
   retval->m_isBCvalSet = m_isBCvalSet;
   retval->m_isBCtypeSet = m_isBCtypeSet;
   retval->m_isSlopeValSet = m_isSlopeValSet;
@@ -97,7 +96,6 @@ PhysIBC* AdvectIBC::new_physIBC()
         retval->m_bcType[dir][1][comp]  = m_bcType[dir][1][comp] ;
       }
 
-
       if (m_isSlopeValSet)
       {
         retval->m_slopeVal[dir][0] = m_slopeVal[dir][0];
@@ -123,20 +121,15 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
   if (!m_domain.isPeriodic(a_dir))
   {
     // This needs to be fixed.
-    // CH_assert(m_isBCvalSet);
     CH_assert(a_WGdnv.nComp() == m_numComps);
-
-    //int comp = 0; // This BC class only supports one component at the moment
 
     for (int comp = 0; comp < m_numComps; comp++)
     {
-
       int lohisign;
       Box tmp = a_WGdnv.box() & m_domain;
       Real bcVal;
       int bcType;
       Real plumeVal = m_plumeVals[comp];
-
 
       // Determine which side and thus shifting directions
       if (a_side == Side::Lo)
@@ -144,8 +137,6 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
         lohisign = -1;
         bcVal = m_bcVal[a_dir][0][comp];
         bcType = m_bcType[a_dir][0][comp];
-
-
       }
       else
       {
@@ -201,7 +192,6 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
           if (!dit.ok())
           {
             LOG("AdvectIBC error - velocity field doesn't include boundary");
-            //			                            return;
           }
 
           advVel = &(*m_advVel)[dit];
@@ -239,8 +229,6 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
             break;
 
           case m_inflowOutflow:
-
-
             // For inflow - flux = boundary value
             // for outflow - flux = extrapolation
             FORT_ADVINFLOWOUTFLOW(CHF_FRA(a_WGdnv),
@@ -252,10 +240,6 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
                                   CHF_CONST_INT(a_dir),
                                   CHF_BOX(boundaryBox),
                                   CHF_CONST_INT(comp));
-
-
-
-
             break;
 
           case m_extrap:
@@ -269,8 +253,6 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
                                 CHF_CONST_INT(a_dir),
                                 CHF_BOX(boundaryBox),
                                 CHF_CONST_INT(comp));
-
-
             break;
 
           case m_plumeInflow:
@@ -287,10 +269,7 @@ void AdvectIBC::primBC(FArrayBox&            a_WGdnv,
                                 CHF_CONST_INT(a_dir),
                                 CHF_BOX(boundaryBox),
                                 CHF_CONST_INT(comp));
-
             break;
-
-
         } // end loop over different bc types
 
       } // end if domain contains box
@@ -309,43 +288,7 @@ void AdvectIBC::setBdrySlopes(FArrayBox&       a_dW,
                               const int&       a_dir,
                               const Real&      a_time)
 {
-
-
-
   // We don't know what the slopes should be, so do nothing here
-//  Box b = a_dW.box();
-//
-//  // Iterate over sides
-//  for (SideIterator sit = SideIterator(); sit.ok(); ++sit)
-//  {
-//    Box loBox(b);
-//    loBox.shiftHalf(a_dir,sign(side));
-//
-//    if (!m_domain.contains(tmp))
-//    {
-//      tmp &= m_domain;
-//
-//      Box boundaryBox;
-//
-//      // Find the strip of cells next to the domain boundary
-//      if (side == Side::Lo)
-//      {
-//        boundaryBox = bdryLo(tmp,a_dir);
-//      }
-//      else
-//      {
-//        boundaryBox = bdryHi(tmp,a_dir);
-//      }
-//
-//      for (BoxIterator bit = BoxIterator(boundaryBox); bit.ok(); ++bit)
-//      {
-//        // Could potentially fill slope BCs here
-//      }
-//
-//
-//    }
-//  }
-
 }
 
 // Set up initial conditions
@@ -362,7 +305,7 @@ AdvectIBC::advectionVel(const RealVect& a_advVel)
   m_velocity = a_advVel;
 }
 
-///
+/// get advection velocity
 const RealVect&
 AdvectIBC::advectionVel() const
 {
@@ -391,7 +334,6 @@ AdvectIBC::setBoundaryValues(RealVect a_bcVals, IntVect a_bcType,
     m_isBCtypeSet = true;
 }
 
-
 void
 AdvectIBC::setBoundaryValue(Real a_bcVal, int a_bcType, int a_dir,
                             Side::LoHiSide a_hiLo, int a_comp)
@@ -413,12 +355,8 @@ AdvectIBC::setBoundaryValue(Real a_bcVal, int a_bcType, int a_dir,
 
 void AdvectIBC::setPlume(Vector<Real> a_plumeVals, Vector<Real> plumeBounds)
 {
-//  m_bcValPlume = plumeVal,
- m_plumeBounds = plumeBounds;
-
+  m_plumeBounds = plumeBounds;
   m_plumeVals = a_plumeVals;
-
-//  int temp=0;
 }
 
 void
@@ -436,7 +374,6 @@ AdvectIBC::setBCType(int a_bcType, int a_dir,
 
   m_isBCtypeSet = true;
 }
-
 
 void AdvectIBC::setAdvVel(LevelData<FluxBox>* a_advVel)
 {
@@ -467,30 +404,12 @@ void
 AdvectIBC::setSlopeValue(Real a_slopeVal, int a_dir,
                          Side::LoHiSide a_hiLo)
 {
-  //  if (a_hiLo == Side::Lo)
-  //  {
-  //    m_slopeVal[a_dir][0] = a_slopeVal;
-  //  }
-  //  else
-  //  {
-  //    m_slopeVal[a_dir][1] = a_slopeVal;
-  //  }
+  // do nothing
 }
 
 Real
 AdvectIBC::getSlopeValue(int a_dir, Side::LoHiSide a_hiLo) const
 {
-  //  Real bcval;
-  //  if (a_hiLo == Side::Lo)
-  //  {
-  //    bcval = m_slopeVal[a_dir][0];
-  //  }
-  //  else
-  //  {
-  //    bcval = m_slopeVal[a_dir][1];
-  //  }
-  //
-  //  return bcval;
   return -1.0;
 }
 

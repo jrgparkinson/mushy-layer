@@ -43,8 +43,6 @@ extern "C"
     CH_assert(a_comp < a_state.nComp());
     ExtrapBC(a_state, a_valid, a_dir, a_side, a_order, a_comp);
   }
-
-
 }
 
 /// Constant value boundary condition function
@@ -117,7 +115,6 @@ public:
 
   /// Position where plume ends
   Real m_plumeEnd;
-
 
   /// Default constructor
   InflowValueFunction()
@@ -220,7 +217,6 @@ public:
       {
         if (*a_pos > m_plumeStart && *a_pos < m_plumeEnd)
         {
-          //          a_value[comp] = m_inflowValue;
           Real x = (*a_pos - m_plumeStart)/(m_plumeEnd-m_plumeStart);
 
           Real w = m_params->inflowVelocity * ( 0.5*0.5 - (x-0.5)*(x-0.5)  ) / (0.5*0.5);
@@ -229,8 +225,6 @@ public:
         }
         else
         {
-          //          a_value[comp] = m_value;
-          //          a_value[comp] = m_params->rayleighComposition * m_params->ThetaTop;
           a_value[comp] = 0;
         }
       }
@@ -261,9 +255,6 @@ public:
 
   /// Interval to fill
   Interval m_interval;
-
-
-
 
   /// Default constructor
   AbstractScalarBCFunction()
@@ -408,7 +399,6 @@ public:
         IntVect ivClose = ivTo - isign*BASISV(a_idir);
         IntVect ivFar = ivTo - 2*isign*BASISV(a_idir);
 
-
         getDomainFacePosition(facePos, ivClose, a_dx, a_idir, a_side);
 
         a_value(facePos.dataPtr(), &a_idir, &a_side, value);
@@ -448,8 +438,6 @@ public:
     int isign = sign(a_side);
     RealVect facePos;
 
-    //    Box toRegion = adjCellBox(a_valid, a_dir, a_side, 1);
-    //      toRegion.shift(a_dir, isign);
     toRegion &= a_state.box();
 
     Box fromRegion = toRegion;
@@ -467,19 +455,14 @@ public:
         IntVect ivClose = ivTo - isign*BASISV(a_dir);
         IntVect ivFar = ivTo - 2*isign*BASISV(a_dir);
 
-
         getDomainFacePosition(facePos, ivClose, a_dx, a_dir, a_side);
 
         a_value(facePos.dataPtr(), &a_dir, &a_side, value);
         for (int icomp = a_interval.begin(); icomp <= a_interval.end(); icomp++)
         {
-          //            Real phi1 = a_state(ivClose, icomp);
-          //            Real phi2 = a_state(ivFar, icomp);
-
           if (value[icomp] == 0)
           {
             // can do higher order stuff here because I've done the maths
-            //              a_state(ivTo, icomp) = (1/5)*(phi2 - 4*phi1);
             a_state(ivTo, icomp) += Real(isign)*a_dx*value[icomp];
           }
           else
@@ -493,8 +476,6 @@ public:
     }
   }
 };
-
-
 
 /// Boundary condition function for fields which are advected and diffused
 /**
@@ -518,8 +499,6 @@ public:
 
   /// BC value on the hi side. First index refers to direction, second to component
   m_customHiBCVal;
-
-
 
   /// Constructor
   AdvectDiffuseScalarBC(bool a_isDefined,
@@ -555,8 +534,6 @@ public:
 
     a_homogeneous = a_homogeneous || m_homogeneous;
 
-
-    //int order = m_params.m_BCAccuracy;
     // always use 1st order for stability
     int order = 1;
 
@@ -570,8 +547,6 @@ public:
         for (sit.reset(); sit.ok(); ++sit)
         {
           Side::LoHiSide side = sit();
-          //          int isign = sign(side);
-
           if (a_valid.sideEnd(side)[idir] ==
               domainBox.sideEnd(side)[idir])
           {
@@ -580,8 +555,6 @@ public:
             for (int comp = m_interval.begin(); comp <= m_interval.end(); comp++)
             {
               Real boundaryValue;
-
-
               int bcType;
 
               if (side == Side::Lo)
@@ -645,7 +618,9 @@ public:
                   {
                     case PhysBCUtil::FixedTemperature:
                       T_ref = boundaryValue;
-                      b = 1.0;  // the (+) sign is important here in terms of driving the bc lower if our estimated boundary temperature is too high (and vice versa)
+                      // the (+) sign is important here in terms of driving the 
+                      // bc lower if our estimated boundary temperature is too high (and vice versa)
+                      b = 1.0;  
 
                       break;
 
@@ -751,8 +726,6 @@ public:
                         Real face_pos = m_dx*(iv_interior[perp_dir] + 0.5);
                         if (face_pos < no_flux_position_limit || a_homogeneous)
                         {
-                          // no flux below z = some value (0.75) for now
-  //                        bcVal = 0.0;
                           // No flux boundaries are easy:
                           a_state(ivto, comp) = a_state(iv_interior, comp);
                         }
@@ -760,9 +733,10 @@ public:
                         {
                           CH_TIME("BCFunctions::FixedTempBC::nonlinearsolve");
 
-                          // Compute BC valute to satisfy some boundary condition whose residual is computed by the residual object.
-
-                          // Get the temperature at the interior cell (which won't change) so we can compute fluxes across the boundary
+                          // Compute BC valute to satisfy some boundary
+                          // condition whose residual is computed by the residual object.
+                          // Get the temperature at the interior cell (which won't change)
+                          // so we can compute fluxes across the boundary
                           Real interior_temperature = m_params.computeTemperature(interior_enthalpy, interior_bulk_concentration);
 
                           // Initial guess of the enthalpy in the ghost cell is the 0th order extrapolation from inside the domain
@@ -860,8 +834,6 @@ public:
   } // end operator() function
 };
 
-
-
 /// Apply extrapolation boundary conditions to a flux component
 /**
  * Extrapolation BCs for the specified component of a flux box.
@@ -932,8 +904,6 @@ public:
   }
 
 };
-
-
 
 /// Boundary conditions for velocity (edge-centred)
 /**
@@ -1199,12 +1169,7 @@ public:
 
                     Box sbox = a_state.box();
                     Box bc_box = (*velBCValComp).box();
-
-
-
                     a_state.copy(*velBCValComp, toRegion, 0, toRegion, 0, a_state.nComp());
-
-
                   }
 
                   break;
@@ -1506,12 +1471,6 @@ public:
                   // always no-flow
                   if (idir == m_comp)
                   {
-
-                    //                    DiriBC(aliasStateFab, a_valid, a_dx,
-                    //                           a_homogeneous,
-                    //                           BCValueHolder(zeroFunc),
-                    //                           idir, side, order);
-
                     order = 1;
                     OnlyInflowBC(aliasStateFab,
                                  a_valid,
@@ -1543,12 +1502,8 @@ public:
                       order = 1;
                       ExtraBC(aliasStateFab, a_valid,
                               idir, side, order, fab_comp);
-                      //                                                                          ExtrapBC(aliasStateFab, a_valid, idir, side, order);
                     }
                   } // end if tangential
-
-
-
 
                   break;
                 }
@@ -1568,7 +1523,6 @@ public:
                   // normal component - no gradient
                   if (idir == m_comp)
                   {
-                    //                    ExtrapBC(aliasStateFab, a_valid, idir, side, order);
                     NeumBC(aliasStateFab, a_valid, a_dx,
                            a_homogeneous,
                            BCValueHolder(zeroFunc),
@@ -1642,9 +1596,6 @@ public:
   }
 };
 
-
-
-
 /// Boundary conditions for the streamfunction \f$ \psi \f$
 class StreamFunctionBC: public AbstractScalarBCFunction
 {
@@ -1660,8 +1611,6 @@ public:
                                                          a_advVel,
                                                          a_dx)
 {}
-
-
   /// Apply BC
   void operator()(FArrayBox&           a_state,
                   const Box&           a_valid,
@@ -1675,8 +1624,6 @@ public:
 
       RefCountedPtr<ConstValueFunction>
       zeroFunc(new ConstValueFunction(0.0, a_state.nComp()));
-
-
 
       for (int idir = 0; idir < SpaceDim; idir++)
       {
@@ -1721,8 +1668,6 @@ public:
                   break;
                 }
 
-
-
                 default :
                 {
                   MayDay::Error("StreamFunctionBC - unknown BC type");
@@ -1756,8 +1701,6 @@ public:
                                                                          a_advVel,
                                                                          a_dx)
 {}
-
-
   /// Apply BC
   void operator()(FArrayBox&           a_state,
                   const Box&           a_valid,
@@ -1770,10 +1713,6 @@ public:
       const Box& domainBox = a_domain.domainBox();
 
       RefCountedPtr<ConstValueFunction> zeroFunc(new ConstValueFunction(0.0, a_state.nComp()));
-
-
-
-
       RefCountedPtr<InflowValueFunction> inflowFunc(new InflowValueFunction(0.0, a_state.nComp(),
                                                                             -m_params.inflowVelocity,
                                                                             m_params.plumeBounds[0],
@@ -1816,27 +1755,20 @@ public:
                 case PhysBCUtil::OutflowNormal :
                 case PhysBCUtil::OutflowPressureGrad :
                 {
-                  // Fix as first order for stability ?
-                      //                  int order = 1;
                   DiriBC(a_state, a_valid, a_dx,
                          a_homogeneous,
                          BCValueHolder(zeroFunc),
                          idir, side, order);
-
-
                   break;
                 }
                 case PhysBCUtil::VelInflowOutflow:
                 {
-                  //                  int order = 1;
                   PressureInflowOutflow(a_state, a_valid, a_dx,
                                         a_homogeneous,
                                         m_advVel, // advection velocity
                                         0, // dirichlet value (outflow)
                                         0, // neumann value (inflow)
                                         idir, side, order, m_dx);
-
-
 
                   break;
                 }
@@ -1870,7 +1802,6 @@ public:
 
                   NeumBC(a_state, a_valid, a_dx,
                          a_homogeneous,
-                         //                         BCValueHolder(inflowFuncNeum),
                          BCValueHolder(zeroFunc),
                          idir, side);
                   break;
@@ -1942,14 +1873,11 @@ public:
                   Real                 a_dx,
                   bool                 a_homogeneous)
   {
-
-
     // a_state is FACE-centered, now in m_comp direction;
     // a_valid is CELL-centered
     if (m_comp >= 0)
     {
       const Box& domainBox = a_domain.domainBox();
-
 
       // loop over directions
       for (int idir = 0; idir < SpaceDim; idir++)
@@ -1969,7 +1897,6 @@ public:
               Real bcVal = (side == Side::Lo) ? m_bcValLo[idir][0] :  m_bcValHi[idir][0];
 
               RefCountedPtr<ConstValueFunction> bc(new ConstValueFunction(bcVal, a_state.nComp()));
-
 
               if (bcType == PhysBCUtil::Dirichlet)
               {
@@ -2005,8 +1932,6 @@ public:
                 }
               }
 
-
-
             } // if ends match
           } // end iteration over sides
         } // if not periodic in this direction
@@ -2018,8 +1943,6 @@ public:
     }
   }
 };
-
-
 
 /// Boundary conditions for porosity, \f$ \chi \f$, and permeability \f$\Pi\f$
 class BasicPorosityPermeabilityBCFunction: public AdvectDiffuseScalarBC
@@ -2050,8 +1973,6 @@ public:
                                                                                                        a_customLoBCVal,
                                                                                                        a_customHiBCVal)
 { }
-
-
   /// Apply BC
   void operator()(FArrayBox&           a_state,
                   const Box&           a_valid,
@@ -2072,23 +1993,7 @@ public:
     {
       a_homogeneous = m_homogeneous;
     }
-    //    RefCountedPtr<ConstValueFunction>
-    //    topBC(new ConstValueFunction(permeabilityTop, a_state.nComp()));
-
-    //    RefCountedPtr<ConstValueFunction>
-    //    bottomBC(new ConstValueFunction(m_bottomVal[0], a_state.nComp()));
-    //
-    //    RefCountedPtr<ConstValueFunction>
-    //    sideBC(new ConstValueFunction(0, a_state.nComp()));
-    //
-    //    RefCountedPtr<InflowValueFunction>
-    //    topBC(new InflowValueFunction(m_topVal[0],
-    //                                  a_state.nComp(),
-    //                                  m_plumeVal[0],
-    //                                  m_params.plumeBounds[0], m_params.plumeBounds[1]));
-
     int order = 1;
-
     const Box& domainBox = a_domain.domainBox();
     int comp = 0;
 
@@ -2100,7 +2005,6 @@ public:
         for (sit.reset(); sit.ok(); ++sit)
         {
           Side::LoHiSide side = sit();
-          //          int isign = sign(side);
           if (a_valid.sideEnd(side)[idir] ==
               domainBox.sideEnd(side)[idir])
           {
@@ -2111,11 +2015,8 @@ public:
             RefCountedPtr<ConstValueFunction>
             bc(new ConstValueFunction(bcVal, a_state.nComp()));
 
-
             if (bcType == 0)
             {
-
-
               DiriBC(a_state,
                      a_valid,
                      a_dx,
@@ -2137,55 +2038,12 @@ public:
                      idir,
                      side);
             }
-            //            if (idir == 0)
-              //            {
-            //              //x direction
-            //              NeumBC(a_state,
-            //                     a_valid,
-            //                     a_dx,
-            //                     a_homogeneous,
-            //                     BCValueHolder(sideBC),
-            //                     idir,
-            //                     side);
-            //            }
-            //            else if(idir == 1)
-            //            {
-            //
-            //              //y direction
-            //
-            //              if (isign > 0)
-            //              {
-            //                DiriBC(a_state,
-            //                       a_valid,
-            //                       a_dx,
-            //                       a_homogeneous,
-            //                       BCValueHolder(topBC),
-            //                       idir,
-            //                       side,
-            //                       order);
-            //
-            //              }
-            //              else if (isign < 0)
-            //              {
-            //                DiriBC(a_state,
-            //                       a_valid,
-            //                       a_dx,
-            //                       a_homogeneous,
-            //                       BCValueHolder(bottomBC),
-            //                       idir,
-            //                       side,
-            //                       order);
-            //              }
           }
-
         }
       }
     }
   }
-
-
 };
-
 
 /// Boundary condition for reflux correction
 /**
@@ -2439,8 +2297,6 @@ public:
   }
 };
 
-
-
 // ---------------------------------------------------------------
 /// Boundary condition for the pressure gradient
 /**
@@ -2610,9 +2466,6 @@ public:
                 ExtraBC(a_state, a_valid,
                         idir, side, order, comp);
               }
-
-
-
             } // end condition of matching coordinates
           } // end loop over both sides
         } // end if not periodic in this direction
@@ -2707,8 +2560,6 @@ public:
                 }
               }
 
-
-
               int order = 1;
 
               for (int ghost_i = m_ghost.begin(); ghost_i <=m_ghost.end(); ghost_i++)
@@ -2736,8 +2587,6 @@ public:
     }
   }
 };
-
-
 
 /// This class only fills cells on the interior of the domain!
 class BasicExtrapInteriorFunction: public BCFunction
@@ -2830,8 +2679,6 @@ public:
   }
 };
 
-
-
 Tuple<BCHolder, SpaceDim>
 PhysBCUtil::velExtrapBC(Interval ghostInterval) const
 {
@@ -2844,21 +2691,6 @@ PhysBCUtil::velExtrapBC(Interval ghostInterval) const
   }
   return bcVec;
 }
-
-//Tuple<BCHolder, SpaceDim>
-//PhysBCUtil::velExtrapInterior(int n_ghost) const
-//{
-//  Tuple<BCHolder, SpaceDim> bcVec;
-//  bool isHomogeneous = false;
-//  for (int idir=0; idir<SpaceDim; idir++)
-//  {
-//    Interval intvl(idir, idir);
-//
-//    bcVec[idir] = extrapVelFuncInterior(isHomogeneous, idir,
-//                                        intvl, n_ghost);
-//  }
-//  return bcVec;
-//}
 
 BCHolder PhysBCUtil::viscousRefluxBC(int a_dir, bool a_isViscous) const
 {
@@ -2923,8 +2755,6 @@ PhysBCUtil::edgeVelFuncBC(bool a_isViscous,
   }
   return bcVec;
 }
-
-
 
 Tuple<BCHolder, SpaceDim>
 PhysBCUtil::porosityFaceBC() const
@@ -2999,8 +2829,6 @@ PhysBCUtil::fluxExtrapBC() const
 
   return bcVec;
 }
-
-
 
 
 BCHolder PhysBCUtil::basicECVelFuncBC(bool a_isHomogeneous,
@@ -3091,8 +2919,6 @@ BCHolder PhysBCUtil::FreestreamCorrFuncBC() const
   return BCHolder(freestreamCorrBCFunction);
 }
 
-
-
 /// For subcycled code
 BCHolder PhysBCUtil::BasicPressureFuncBC(bool a_isHomogeneous) const
 {
@@ -3111,8 +2937,6 @@ BCHolder PhysBCUtil::velFuncBC(int a_idir, bool a_viscous, Interval interval) co
   return basicCCVelFuncBC(isHomogeneous, a_viscous, a_idir,
                           interval);
 }
-
-
 
 // ---------------------------------------------------------------
 /// Be very careful with this function - it fills CF ghost cells
@@ -3164,12 +2988,8 @@ BCHolder PhysBCUtil::TracerBC(bool a_homogeneous, LevelData<FluxBox>* a_advVel, 
 
   for (int dir =0; dir<SpaceDim; dir++)
   {
-//    customLoBC.push_back(Vector<int>(1, m_params.bcTypeLiquidConcentrationLo[dir]));
-//    customHiBC.push_back(Vector<int>(1, m_params.bcTypeLiquidConcentrationHi[dir]));
-
     customLoBCVal.push_back(Vector<Real>(1, a_boundaryVal));
     customHiBCVal.push_back(Vector<Real>(1, a_boundaryVal));
-
   }
 
   RefCountedPtr<AdvectDiffuseScalarBC>
@@ -3183,8 +3003,6 @@ BCHolder PhysBCUtil::TracerBC(bool a_homogeneous, LevelData<FluxBox>* a_advVel, 
 
   return BCHolder(bc);
 }
-
-
 
 
 BCHolder PhysBCUtil::BasicthetaFuncBC(bool a_homogeneous, LevelData<FluxBox>* a_advVel) const
@@ -3432,10 +3250,6 @@ PhysBCUtil::scalarTraceTSl_IBC() const
     bcValHi[dir] = m_params.bcValLiquidConcentrationHi[dir];
   }
 
-  //  if (m_params.nonDimVel != 0.0)
-  //  {
-  //    bcTypeHi[SpaceDim-1] = AdvectIBC::m_inflowOutflow;
-  //  }
   applyFrameAdvectionBC(bcTypeHi, bcTypeLo);
 
   newIBCPtr->setBoundaryValues(bcValLo, bcTypeLo,  Side::Lo,
@@ -3449,8 +3263,6 @@ PhysBCUtil::scalarTraceTSl_IBC() const
   plumeVals.push_back(m_params.thetaPlumeInflow);
   plumeVals.push_back(m_params.ThetaLPlumeInflow);
   newIBCPtr->setPlume(plumeVals, m_params.plumeBounds);
-
-
 
   return newIBCPtr;
 }
@@ -3473,8 +3285,6 @@ PhysBCUtil::scalarTraceIBC(RealVect bcValLo, RealVect bcValHi,
   Vector<Real> plumeVals;
   plumeVals.push_back(plumeVal);
   newIBCPtr->setPlume(plumeVals, m_params.plumeBounds);
-
-
 
 
   return newIBCPtr;
@@ -3526,8 +3336,6 @@ BCHolder PhysBCUtil::noFluxBC() const
 
   return BCHolder(bc);
 }
-
-
 
 BCHolder PhysBCUtil::BasicPorosityFuncBC(bool a_homogeneous) const
 {
@@ -3764,19 +3572,12 @@ BCHolder PhysBCUtil::BasicSolidusBC(bool a_homogeneous,
   return BCHolder(bcFunction);
 }
 
-
-
 BCHolder PhysBCUtil::temperatureLiquidSalinityBC(bool a_homogeneous) const
 {
   //temperature BC for comp 0, liquid salinity BC for comp 1
   Vector<Real> topVals, bottomVals, plumeVals;
   topVals.resize(2); bottomVals.resize(2); plumeVals.resize(2);
-  //  topVals[0] = m_params.thetaTop;
-  //  bottomVals[0] = m_params.thetaBottom;
   plumeVals[0] = m_params.thetaPlumeInflow;
-
-  //  topVals[1] = m_params.ThetaLTop;
-  //  bottomVals[1] = m_params.ThetaLBottom;
   plumeVals[1] = m_params.ThetaLPlumeInflow;
 
   Vector<Vector<int> > bcLo, bcHi;
@@ -3818,8 +3619,6 @@ BCHolder PhysBCUtil::temperatureLiquidSalinityBC(bool a_homogeneous) const
 
   return BCHolder(bcFunc);
 }
-
-
 
 
 BCHolder PhysBCUtil::enthalpySalinityBC(bool a_homogeneous) const
@@ -3978,8 +3777,6 @@ BCHolder PhysBCUtil::extrapVelFuncInterior(bool a_isHomogeneous,
 }
 
 
-
-
 // ---------------------------------------------------------------
 BCHolder PhysBCUtil::basicCCVelFuncBC(bool a_isHomogeneous,
                                       bool a_isViscous,
@@ -3995,10 +3792,6 @@ BCHolder PhysBCUtil::basicCCVelFuncBC(bool a_isHomogeneous,
 
   return BCHolder(basicCCVelBCFunction);
 }
-
-
-
-
 
 void  PhysBCUtil::setAdvVel(LevelData<FluxBox>* a_advVel)
 {
@@ -4043,8 +3836,6 @@ PhysBCUtil::~PhysBCUtil()
 {
 }
 
-
-
 // ---------------------------------------------------------------
 PhysBCUtil&
 PhysBCUtil::operator= (const PhysBCUtil& rhs)
@@ -4068,22 +3859,6 @@ PhysBCUtil::PhysBCUtil(const PhysBCUtil& rhs) :   m_loBC(rhs.m_loBC),
 void
 PhysBCUtil::setBCs()
 {
-  //	ParmParse ppBC("physBC");
-  //
-  //	vector<int> tempBC(SpaceDim);
-  //
-  //	ppBC.getarr("lo", tempBC, 0, SpaceDim);
-  //	for (int idir=0; idir<SpaceDim; idir++)
-  //	{
-  //		m_loBC[idir] = tempBC[idir];
-  //	}
-  //
-  //	ppBC.getarr("hi", tempBC, 0, SpaceDim);
-  //	for (int idir=0; idir<SpaceDim; idir++)
-  //	{
-  //		m_hiBC[idir] = tempBC[idir];
-  //	}
-
   for (int idir=0; idir<SpaceDim; idir++)
   {
     m_hiBC[idir] = SolidWall;
@@ -4119,8 +3894,6 @@ void PhysBCUtil::convertBCType(const int a_implicitBC,  const Real a_implicitVal
                                int& a_explicitBC, Real& a_explicitVal) const
 {
   // Default BCs
-  //  int ibcType = AdvectIBC::m_dirichlet;
-
   switch (a_implicitBC)
   {
     case PhysBCUtil::Dirichlet:
@@ -4182,17 +3955,6 @@ void PhysBCUtil::updateTimeDependentBCs()
     // Make sure we're doing dirichlet
     CH_assert(m_params.bcTypeTemperatureHi[dir] == PhysBCUtil::Dirichlet);
 
-
-    // dimensionless 0.1 mangitude is about 2 degrees C
-//     m_params.sinusoidal_temperature_bc_timescale = 1;
-//     m_params.sinusoidal_temperature_bc_amplitude = 0.5;
-//     m_params.sinusoidal_temperature_bc_av = 0.5;
-//     m_params.sinusoidal_temperature_bc_phase_diff = 0.0;
-//    Real T = bcValTemperatureHi[dir] - amplitude*sin(2*M_PI*a_time/timescale);
-
-    // Ensure T isn't less than freezing
-//    T = max(T, 0.001);
-
     m_params.bcValTemperatureHi[dir] = m_params.sinusoidal_temperature_bc_av + m_params.sinusoidal_temperature_bc_amplitude
         *sin(2*M_PI*(m_params.sinusoidal_temperature_bc_phase_diff + m_time/m_params.sinusoidal_temperature_bc_timescale) );
 
@@ -4206,7 +3968,5 @@ PhysBCUtil::Time() const
 {
   return m_time;
 }
-
-
 
 
