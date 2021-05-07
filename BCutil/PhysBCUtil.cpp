@@ -829,6 +829,85 @@ public:
                   }
               }
 
+              //// jb: trying to add in the implementation of the MultiDiri BC
+	            else if (bcType == PhysBCUtil::MultiDiri)
+              {
+
+                // This is a special case
+
+	 	            int Tcomp = 0;                        // jb: I assume this is the indexing code to enter the new enthalpy BC into a_state
+
+                CH_TIME("BCFunctions::MultiDiri");    // jb: not sure what this does, but when i looked at the above example
+		                                        // (BCFunctions::MixedTemperatureSalinityBC) i didn't see it in BCFunctions.cpp
+
+		            int isign = sign(side);
+
+                //                                  NonlinearTemperatureBC* residual;
+
+                // Pull alternate BC geometry and value
+                Real alt_val = 0.0, diri_start = 0.0, diri_end = 0.0;      // jb: dummy vars to get modified by input BC vals
+
+		            if (side == Side::Lo)
+		            {
+		              alt_val = m_params.bcAltValEnthalpyLo.getBC(idir, side);;  // jb: not sure if this is how to properly pull the vals? still wrapping my head
+		                                                                 // around the whole class/object/method structure of cpp and how to pass variabless
+		              base_val = m_params.bcValEnthalpyLo.getBC(idir, side);;
+		            else
+		              alt_val = m_params.bcAltValEnthalpyHi.getBC(idir, side);;
+		              base_val = m_params.bcValEnthalpyHi.getBC(idir, side);;
+		            }
+		  
+                diri_start = m_params.diriBounds[0];
+		            diri_end = m_params.diriBounds[1];
+
+                Box toRegion = adjCellBox(a_valid, idir, side, 1);
+                toRegion &= a_state.box();
+
+                Real ghostVal = 0.0;
+
+		            // ??? is the box iterator going to sweep throught the boundary s.t. ivto and ivto_interior are
+		            //     the values we want to test to see if they are in the alt_val bounds?
+		            //     i.e. when diri_start < iv_interior < diri_end set ghostVal to alt_val
+                for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+                {
+                  // TODO - should write this in fortran for speed
+                  CH_TIME("BCFunctions::MultiDiri::loopOverBox");
+
+		              /* I'm grabbing the locations of the interior boxes as i want to text if they are in the region that should 
+		              get a modified dirichlet BC */
+                  IntVect ivto = bit();
+                  IntVect iv_interior = ivto - isign*BASISV(idir);
+		              RealVect loc;
+		              Real x, y, z;
+		              getLocation(iv_interior, loc, m_dx);
+
+		              /* I think idir is iterating over the direction (in 2D either x or y) and if it is an x idir boundary (vertical wall) i want to see if the
+		              y value of loc is within the diribounds, conversesly in the y direction i want to see if the x value of loc is within the diriBounds   */
+		              if (idir == 0)
+		              {
+			              if (loc[1] >= diri_start && loc[1] <= diri_end)
+			              {
+			                ghostVal = alt_val;
+			              else
+			                ghostVal = base_val;
+			              }
+		              else if (idir == 1)
+			              if (loc[0] >= diri_start && loc[0] <= diri_end)
+			              {
+			                ghostVal = alt_val;
+			              else
+				              ghostVal = base_val;
+			              }
+		              }
+
+		              // Pass the newly calculated enthalpy BC value to the a_state object
+		              a_state(ivto, Tcomp) = ghostVal;
+
+                }
+
+
+              }
+
               else
               {
                 // All other BCs (e.g. dirichlet, neumann) are applied here.
