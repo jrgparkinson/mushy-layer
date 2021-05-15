@@ -9,7 +9,10 @@
 #define SRC_MUSHYLAYERPARAMS_H_
 
 #include <cmath>
+#include "ParmParse.H"
 #include "LoHiSide.H"
+#include "parstream.H"
+#include "CH_Timer.H"
 #include "RealVect.H"
 #include "CH_HDF5.H"
 #include "BCInfo.h"
@@ -20,33 +23,27 @@
 Contains immunity flag definitions
 */
 
-enum NonlinearBCSolveMethods
-{
+enum NonlinearBCSolveMethods {
   picard,
   newton
 };
 
 /// Different options for enforced porosity
-enum ParamsPorosityFunctions
-{
-  /// Sets porosity to it's boundary value on the bottom of the domain, i.e.
-  /// MushyLayerParams::bcValPorosityLo[0]
+enum ParamsPorosityFunctions {
+  /// Sets porosity to it's boundary value on the bottom of the domain, i.e. MushyLayerParams::bcValPorosityLo[0]
   m_porosityConstant,
 
   /// Porosity varies linearly from the middle to the boundary.
   /**
-   * Porosity = 1.0 in the middle, and takes the value given by
-   * MushyLayerParams::bcValPorosityLo[0] on all sides. There is a box in the
-   * middle of width
-   * MushyLayerOptions::fixedPorosityFractionalInnerRadius*domain width which is
-   * all at porosity = 1.0.
+   * Porosity = 1.0 in the middle, and takes the value given by MushyLayerParams::bcValPorosityLo[0] on all sides.
+   * There is a box in the middle of width MushyLayerOptions::fixedPorosityFractionalInnerRadius*domain width which
+   * is all at porosity = 1.0.
    */
   m_porosityLinear,
 
   /// Gaussian profile.
   /**
-   * \f$ \chi =  \chi_b + \chi_{max} \exp\left[-((x-x_c)^2 + (y-y_c)^2)/(s L)
-   * \right]\f$
+   * \f$ \chi =  \chi_b + \chi_{max} \exp\left[-((x-x_c)^2 + (y-y_c)^2)/(s L) \right]\f$
    *
    * where \f$ \chi_b \f$ is the porosity enforced at the bottom boundary,
    *
@@ -54,8 +51,7 @@ enum ParamsPorosityFunctions
    *
    * \f$ (x_c, y_c)\f$ is the centre of the domain.
    *
-   * \f$ s \f$, the standard deviation for the gaussian, is given by
-   * MushyLayerOptions::FixedPorositySTD
+   * \f$ s \f$, the standard deviation for the gaussian, is given by MushyLayerOptions::FixedPorositySTD
    *
    * \f$ L \f$, the domain width, is given by MushyLayerOptions::domainWidth
    *
@@ -63,14 +59,11 @@ enum ParamsPorosityFunctions
    *    */
   m_porosityGaussian,
 
-  /// Gaussian profile but with highest porosity at the edge of the domain,
-  /// rather than in the middle
+  /// Gaussian profile but with highest porosity at the edge of the domain, rather than in the middle
   /**
-   * \f$ \chi =  \chi_b \left\{ 1 - \chi_{max} \exp\left[-((x-x_c)^2 +
-   * (y-y_c)^2)/(s L) \right] \right\} \f$
+   * \f$ \chi =  \chi_b \left\{ 1 - \chi_{max} \exp\left[-((x-x_c)^2 + (y-y_c)^2)/(s L) \right] \right\} \f$
    *
-   * where all the variables are defined as the same way as in
-   * m_porosityGaussian
+   * where all the variables are defined as the same way as in m_porosityGaussian
    */
   m_porosityEdge,
 
@@ -78,8 +71,7 @@ enum ParamsPorosityFunctions
   /**
    * \f$ \chi = 1- 0.3 \alpha (y/H)^2  \sin [\pi x / (2 L)] \f$
    *
-   * where \f$ \alpha = \min(4.0, t / \tau) \f$, with the timescale \f$ \tau \f$
-   * defined by MushyLayerOptions::porosityTimescale
+   * where \f$ \alpha = \min(4.0, t / \tau) \f$, with the timescale \f$ \tau \f$ defined by MushyLayerOptions::porosityTimescale
    *
    * \f$ H \f$ is the domain height,
    *
@@ -89,13 +81,11 @@ enum ParamsPorosityFunctions
 };
 
 /// How does the fluid viscosity depend on the solute concentration (if at all)?
-enum ViscosityFunction
-{
+enum ViscosityFunction {
   /// Uniform viscosity, \f$ \mu = 1.0 \f$ everywhere
   uniformViscosity,
 
-  /// Viscosity varies linearly with liquid concentration, from 1 to \f$
-  /// \mu_{max} \f$
+  /// Viscosity varies linearly with liquid concentration, from 1 to \f$ \mu_{max} \f$
   /**
    * \f$ \mu = 1 + (\mu_{max} - 1)(\Theta_l + \mathcal{C})/\mathcal{C} \f$
    *
@@ -104,9 +94,9 @@ enum ViscosityFunction
   linearViscosity,
 };
 
+
 /// Different possible permeability functions
-enum PermeabilityFunctions
-{
+enum PermeabilityFunctions {
   /// Permeability = 1.0
   m_pureFluid,
 
@@ -119,18 +109,15 @@ enum PermeabilityFunctions
   /// Logarithmic function: \f$ \Pi = - \chi^2 \log (1-\chi) \f$
   m_logPermeability,
 
-  /// Permeability varies in space. Currently \f$ \Pi = -exp(-(x-0.5)^2/\alpha)
-  /// \f$ where \f$\alpha=0.02\f$ is some scale.
+  /// Permeability varies in space. Currently \f$ \Pi = -exp(-(x-0.5)^2/\alpha) \f$ where \f$\alpha=0.02\f$ is some scale.
   m_permeabilityXSquared,
 
   /// Permeability = porosity, i.e. \f$ \pi = \chi \f$
   m_porosityPermeability
 };
 
-/// Different physical problems. Most of these, labelled (Old) should be
-/// considered fragile.
-enum PhysicalProblems
-{
+/// Different physical problems. Most of these, labelled (Old) should be considered fragile.
+enum PhysicalProblems {
   /// Mushy layer - coupled fluid flow, heat, and salt transfer
   m_mushyLayer,
 
@@ -155,8 +142,7 @@ enum PhysicalProblems
   /// (Old) Heating at the sidewalls, with a fixed porosity
   m_sidewallHeating,
 
-  /// (Old) Horton-Rogers-Lapwood problem: heating at the top and bottom in a
-  /// fixed porous medium
+  /// (Old) Horton-Rogers-Lapwood problem: heating at the top and bottom in a fixed porous medium
   m_HRL,
 
   /// (Old) Rayleigh-Benard convection (pure fluid - no porosity effects)
@@ -183,622 +169,632 @@ enum PhysicalProblems
 
 /// Class to handle the physical parameters of a mushy layer simulation
 /**
- * This includes material properties, boundary conditions, initial conditions
- * and more. Properties are read in and then non-dimensionalised here.
+ * This includes material properties, boundary conditions, initial conditions and more.
+ * Properties are read in and then non-dimensionalised here.
  */
-class MushyLayerParams
-{
+class MushyLayerParams {
 public:
-  /// Default constructor
-  MushyLayerParams();
+        /// Default constructor
+	MushyLayerParams();
 
-  /// Default destructor
-  virtual ~MushyLayerParams();
+	/// Default destructor
+	virtual ~MushyLayerParams();
 
-  /// Benchmark problem to solve
-  PhysicalProblems physicalProblem;
 
-  Real
-      /// Viscosity, \f$ \eta \f$, used in rayleigh number calculations
-      viscosity,
+	/// Benchmark problem to solve
+	PhysicalProblems physicalProblem;
 
-      /// Liquid heat conductivity, \f$ k_l \f$.
-      heatConductivityLiquid,
+	Real
+	/// Viscosity, \f$ \eta \f$, used in rayleigh number calculations
+	viscosity,
 
-      /// Solid heat conductivity, \f$ k_s \f$.
-      heatConductivitySolid,
+	/// Liquid heat conductivity, \f$ k_l \f$.
+	heatConductivityLiquid,
 
-      /// Specific heat capacity of the liquid phase, \f$ c_l \f$.
-      specificHeatLiquid,
+	/// Solid heat conductivity, \f$ k_s \f$.
+	heatConductivitySolid,
 
-      /// Specific heat capacity of the solid phase, \f$c_s\f$.
-      specificHeatSolid,
+	/// Specific heat capacity of the liquid phase, \f$ c_l \f$.
+	specificHeatLiquid,
 
-      /// Density of the liquid
-      liquidDensity,
+	/// Specific heat capacity of the solid phase, \f$c_s\f$.
+	specificHeatSolid,
 
-      /// Latent heat for liquid->solid phase change
-      latentHeatDissolution,
+	/// Density of the liquid
+	liquidDensity,
 
-      /// Thermal expansivity (\f$\mbox{K}^{-1} \f$)
-      thermalExpansivity,
+	/// Latent heat for liquid->solid phase change
+	latentHeatDissolution,
 
-      /// Solutal expansitivity ( \f$\mbox{(g/kg)}^{-1}\f$ )
-      solutalExpansivity,
+	/// Thermal expansivity (\f$\mbox{K}^{-1} \f$)
+	thermalExpansivity,
 
-      /// Temperature at the eutectic point
-      eutecticTemp,
+	/// Solutal expansitivity ( \f$\mbox{(g/kg)}^{-1}\f$ )
+	solutalExpansivity,
 
-      // Temperature at the bottom of the domain
-      //	bottomTemp,
+	/// Temperature at the eutectic point
+	eutecticTemp,
 
-      // Temperature at the top of the domain
-      //	topTemp,
+	// Temperature at the bottom of the domain
+//	bottomTemp,
 
-      /// Bulk concentration at the eutectic point
-      eutecticComposition,
+	// Temperature at the top of the domain
+//	topTemp,
 
-      /// Initial bulk concentration
-      initialComposition,
+	/// Bulk concentration at the eutectic point
+	eutecticComposition,
 
-      /// Slope of the linearised liquidus \f$\mbox{ K (g/kg)}^{-1} \f$
-      liquidusSlope,
+	/// Initial bulk concentration
+	initialComposition,
 
-      /// Water distribution coefficient, \f$ p_c \f$
-      /**
-       * ratio of solid to liquid concentration, \f$ S_s/S_l \f$.
-       */
-      waterDistributionCoeff,
+	/// Slope of the linearised liquidus \f$\mbox{ K (g/kg)}^{-1} \f$
+	liquidusSlope,
 
-      /// Hele-Shaw cooling coefficient - not currently in use
-      heleShawCoolingCoeff,
+	/// Water distribution coefficient, \f$ p_c \f$
+	/**
+	 * ratio of solid to liquid concentration, \f$ S_s/S_l \f$.
+	 */
+	waterDistributionCoeff,
 
-      /// Diffusivity of salt in the liquid phase, \f$ D_l \f$
-      liquidSoluteDiffusivity,
+	/// Hele-Shaw cooling coefficient - not currently in use
+	heleShawCoolingCoeff,
 
-      /// Hele-Shaw cell width - not currently in use
-      d,
+	/// Diffusivity of salt in the liquid phase, \f$ D_l \f$
+	liquidSoluteDiffusivity,
 
-      /// Domain height
-      height,
+	/// Hele-Shaw cell width - not currently in use
+	d,
 
-      /// Domain width - not currently in use
-      width,
+	/// Domain height
+	height,
 
-      /// Reference permeability \f$ K_0 \f$
-      referencePermeability,
+	/// Domain width - not currently in use
+	width,
 
-      /// Gravitational acceleration, \f$ g \f$
-      gravitationalAcceleration,
+	/// Reference permeability \f$ K_0 \f$
+	referencePermeability,
 
-      /// Frame advection velocity \f$ V \f$
-      V;
+	/// Gravitational acceleration, \f$ g \f$
+	gravitationalAcceleration,
 
-  // Derived parameters
+	/// Frame advection velocity \f$ V \f$
+	V;
 
-  /// Temperature differenece used for nondimensionalisation
-  /**
-   * \f$ \Delta T = - \Gamma \Delta S \f$
-   */
-  Real deltaTemp,
+	//Derived parameters
 
-      /// Salt difference used for nondimensionalisation
-      /**
-       * \f$ \Delta S = S_e - S_i \f$
-       */
-      deltaSalt,
+	/// Temperature differenece used for nondimensionalisation
+	/**
+	 * \f$ \Delta T = - \Gamma \Delta S \f$
+	 */
+	Real deltaTemp,
 
-      /// Stefan number
-      /**
-       * \f[  = \frac{L}{c_{p,l} (T_i - T_e)} \f]
-       */
-      stefan,
-
-      /// Composition ratio = \f$ \frac{S_e (p_c - 1)}{S_i -S_e} \f$
-      compositionRatio,
-
-      /// Heat diffusivity in the liquid phase
-      liquidHeatDiffusivity,
-
-      /// Thermal conductivity ratio \f$ \bar{k} = k_s/k_l \f$
-      heatConductivityRatio,
-
-      /// Specific heat ratio \f$ \bar{c} = c_s/c_l \f$
-      specificHeatRatio,
+	/// Salt difference used for nondimensionalisation
+	/**
+	 * \f$ \Delta S = S_e - S_i \f$
+	 */
+	deltaSalt,
 
-      /// Lewis number \f$ Le = \kappa_l/D_l \f$
-      lewis,
+	/// Stefan number
+	/**
+	 * \f[  = \frac{L}{c_{p,l} (T_i - T_e)} \f]
+	 */
+	stefan,
 
-      /// Darcy number \f$ K_0/h^2 \f$
-      /**
-       * Set to zero to turn off viscosity.
-       */
-      darcy,
+	/// Composition ratio = \f$ \frac{S_e (p_c - 1)}{S_i -S_e} \f$
+	compositionRatio,
 
-      /// Non dimensional reluctance of the hele-shaw cell
-      /**
-       * Inverse of permeability. Equivalent to the Darcy number if Katz &
-       * Worster (2008) Reluctance = 12 K_0/d^2 = Da * 12 * (h/d)^2
-       */
-      nonDimReluctance,
+	/// Heat diffusivity in the liquid phase
+	liquidHeatDiffusivity,
 
-      /// Dimensionless Hele-Shaw cell permeability
-      /**
-       * \f$ \Pi_H = d^2/(12 K_0)\f$. Inverse of nonDimReluctance.
-       */
-      heleShawPermeability,
+	/// Thermal conductivity ratio \f$ \bar{k} = k_s/k_l \f$
+	heatConductivityRatio,
 
-      /// Reynolds number \f$ \rho_0 \kappa_l / \eta \f$. Not used any more.
-      reynolds,
+	/// Specific heat ratio \f$ \bar{c} = c_s/c_l \f$
+	specificHeatRatio,
 
-      /// Prandtl number \f$ \eta / \rho_0 \kappa_l \f$
-      prandtl,
+	/// Lewis number \f$ Le = \kappa_l/D_l \f$
+	lewis,
 
-      /// Rayleigh number for temperature contributions to buoyancy
-      /**
-       * \f[ Ra_T = \frac{\rho_0 g h K_0 \alpha (T_i - T_e)}{\kappa_l \eta} \f]
-       */
-      rayleighTemp,
+	/// Darcy number \f$ K_0/h^2 \f$
+	/**
+	 * Set to zero to turn off viscosity.
+	 */
+	darcy,
 
-      /// Rayleigh number for salinity contributions to buoyancy
-      /**
-       * \f[ Ra_T = \frac{\rho_0 g h K_0 \beta (S_i - S_e)}{\kappa_l \eta} \f]
-       */
-      rayleighComposition,
+	/// Non dimensional reluctance of the hele-shaw cell
+	/**
+	 * Inverse of permeability. Equivalent to the Darcy number if Katz & Worster (2008)
+	 * Reluctance = 12 K_0/d^2 = Da * 12 * (h/d)^2
+	 */
+	nonDimReluctance,
 
-      /// Timescale for nondimensionalisation - not currently used
-      /**
-       * \f$ \tau = h^2 / \kappa_l \f$
-       */
-      timescale;
+	/// Dimensionless Hele-Shaw cell permeability
+	/**
+	 * \f$ \Pi_H = d^2/(12 K_0)\f$. Inverse of nonDimReluctance.
+	 */
+	heleShawPermeability,
 
-  /// How to nondimensionalise the governing equations
-  int m_nondimensionalisation;
 
-  /// Different options for nondimensionalisation
-  enum nondimensionalisations
-  {
-    /// Diffusive timescale, advective velocity scale
-    m_diffusiveTime_advectiveVel,
 
-    /// Darcy timescales, advective velocity scale
-    m_darcyTime_advectiveVel,
+	/// Reynolds number \f$ \rho_0 \kappa_l / \eta \f$. Not used any more.
+	reynolds,
 
-    /// Darcy timescale, darcy velocity scale
-    m_darcyTime_darcyVel,
+	/// Prandtl number \f$ \eta / \rho_0 \kappa_l \f$
+	prandtl,
 
-    /// Advective timescale, darcy velocity scale
-    m_advectiveTime_darcyVel,
+	/// Rayleigh number for temperature contributions to buoyancy
+	/**
+	 * \f[ Ra_T = \frac{\rho_0 g h K_0 \alpha (T_i - T_e)}{\kappa_l \eta} \f]
+	 */
+	rayleighTemp,
 
-    /// Buoyancy timescale, advective velocity scale
-    m_buoyancyTime_advectiveVel,
+	/// Rayleigh number for salinity contributions to buoyancy
+	/**
+	         * \f[ Ra_T = \frac{\rho_0 g h K_0 \beta (S_i - S_e)}{\kappa_l \eta} \f]
+	         */
+	rayleighComposition,
 
-    /// Number of nondimensional schemes
-    m_num_nondimensionalisations
-  };
+	/// Timescale for nondimensionalisation - not currently used
+	/**
+	 * \f$ \tau = h^2 / \kappa_l \f$
+	 */
+	timescale;
 
-  static string s_DARCY_TIMESCALE;
-  static string s_DIFFUSIVE_TIMESCALE;
-  static string s_BUOYANCY_TIMESCALE;
-  static string s_ADVECTIVE_TIMESCALE;
+	/// How to nondimensionalise the governing equations
+	  int m_nondimensionalisation;
 
-  static string s_ADVECTIVE_VELOCITY_SCALE;
-  static string s_DARCY_VELOCITY_SCALE;
+	  /// Different options for nondimensionalisation
+	  enum nondimensionalisations
+	  {
+	    /// Diffusive timescale, advective velocity scale
+	    m_diffusiveTime_advectiveVel,
 
-  /// Heat diffusion coefficient
-  Real m_heatDiffusionCoeff,
+	    /// Darcy timescales, advective velocity scale
+	    m_darcyTime_advectiveVel,
 
-      /// Salt diffusion coefficient
-      m_saltDiffusionCoeff,
+	    /// Darcy timescale, darcy velocity scale
+	    m_darcyTime_darcyVel,
 
-      /// Active tracer diffusion coefficient
-      activeTracerDiffusionCoeff,
+	    /// Advective timescale, darcy velocity scale
+	    m_advectiveTime_darcyVel,
 
-      /// Passive tracer diffusion coefficient
-      passiveTracerDiffusionCoeff,
+	    /// Buoyancy timescale, advective velocity scale
+	    m_buoyancyTime_advectiveVel,
 
-      /// Initial value of active tracer
-      activeTracerInitVal,
+	    /// Number of nondimensional schemes
+	    m_num_nondimensionalisations
+	  };
 
-      /// Initial value of passive tracer
-      passiveTracerInitVal,
+	  static string s_DARCY_TIMESCALE;
+	  static string s_DIFFUSIVE_TIMESCALE;
+	  static string s_BUOYANCY_TIMESCALE;
+	  static string s_ADVECTIVE_TIMESCALE;
 
-      /// Viscosity
-      m_viscosityCoeff,
+	  static string s_ADVECTIVE_VELOCITY_SCALE;
+	  static string s_DARCY_VELOCITY_SCALE;
 
-      /// Buoyancy due to temperature
-      m_buoyancyTCoeff,
+	  /// Heat diffusion coefficient
+	  Real m_heatDiffusionCoeff,
 
-      /// Buoyancy due to liquid concentration
-      m_buoyancySCoeff,
+	  /// Salt diffusion coefficient
+	  m_saltDiffusionCoeff,
 
-      /// Darcy coefficient
-      m_darcyCoeff,
+	  /// Active tracer diffusion coefficient
+	  activeTracerDiffusionCoeff,
 
-      /// Coefficient for advection terms
-      m_advectionCoeff;
+	  /// Passive tracer diffusion coefficient
+	  passiveTracerDiffusionCoeff,
 
-  /// Constant body force, which we add to the buoyancy
-  /**
-   * Buoyancy \f$ = \chi  (Ra_T  \theta - Ra_c*\Theta_l) \mathbf{k} +
-   * \mathbf{F}_B \f$
-   *
-   * where \f$ \mathbf{F}_B \f$ is the buoyancy force
-   */
-  Real body_force;
+	  /// Initial value of active tracer
+	  activeTracerInitVal,
 
-  /// Dimensionless frame advection velocity
-  Real nonDimVel,
+	  /// Initial value of passive tracer
+	  passiveTracerInitVal,
 
-      /// Dimensionless hele-shaw cooling coefficient
-      nonDimHeleShawCooling,
+	  /// Viscosity
+	  m_viscosityCoeff,
 
-      /// Dimensionless temperature at the eutectic, \f$ \theta_e \f$
-      thetaEutectic,
+	  /// Buoyancy due to temperature
+	  m_buoyancyTCoeff,
 
-      /// Dimensionless temperature at infinity, \f$ \theta_\infty \f$
-      thetaInf,
+	  /// Buoyancy due to liquid concentration
+	  m_buoyancySCoeff,
 
-      /// Dimensionless initial temperature calculated from liquidus (not
-      /// currently used)
-      thetaInitialLiquidus,
+	  /// Darcy coefficient
+	  m_darcyCoeff,
 
-      /// Dimensionless initial temperature \f$ \theta_i \f$
-      thetaInitial,
+	  /// Coefficient for advection terms
+	  m_advectionCoeff;
 
-      /// Dimensionless temperature at mush-liquid interface
-      /**
-       * Used particularly for solidification without flow benchmark problem
-       */
-      thetaInterface,
 
-      /// Dimensionless bulk concentration at the eutectic \f$ \Theta_e \f$
-      ThetaEutectic,
+	/// Constant body force, which we add to the buoyancy
+	  /**
+	   * Buoyancy \f$ = \chi  (Ra_T  \theta - Ra_c*\Theta_l) \mathbf{k} + \mathbf{F}_B \f$
+	   *
+	   * where \f$ \mathbf{F}_B \f$ is the buoyancy force
+	   */
+	Real body_force;
 
-      /// Dimensionless initial bulk concentration  \f$ \Theta_i \f$
-      ThetaInitial,
+	/// Dimensionless frame advection velocity
+	Real nonDimVel,
 
-      /// Dimensionless far field bulk concentration \f$ \Theta_\infty \f$
-      ThetaInf,
+	/// Dimensionless hele-shaw cooling coefficient
+	nonDimHeleShawCooling,
 
-      /// Dimensionless initial liquid concentration \f$ \Theta_{l,i} \f$
-      ThetaLInitial,
+	/// Dimensionless temperature at the eutectic, \f$ \theta_e \f$
+	thetaEutectic,
 
-      /// Dimensionless initial solid concentration \f$ \Theta_{s,i} \f$
-      ThetaSInitial,
+	/// Dimensionless temperature at infinity, \f$ \theta_\infty \f$
+	thetaInf,
 
-      /// Dimensionless initial enthalpy
-      Hinitial,
+	/// Dimensionless initial temperature calculated from liquidus (not currently used)
+	thetaInitialLiquidus,
 
-      /// For plumes
+	/// Dimensionless initial temperature \f$ \theta_i \f$
+	thetaInitial,
 
-      /// Temperature inflow value in plume
-      thetaPlumeInflow,
+	/// Dimensionless temperature at mush-liquid interface
+	/**
+	 * Used particularly for solidification without flow benchmark problem
+	 */
+	thetaInterface,
 
-      /// Enthalpy inflow value in plume
-      HPlumeInflow,
 
-      /// Bulk concentration inflow value in plume
-      ThetaPlumeInflow,
+	/// Dimensionless bulk concentration at the eutectic \f$ \Theta_e \f$
+	ThetaEutectic,
 
-      /// Liquid concentration inflow value in plume
-      ThetaLPlumeInflow,
+	/// Dimensionless initial bulk concentration  \f$ \Theta_i \f$
+	ThetaInitial,
 
-      /// Solid concentration inflow value in plume
-      ThetaSPlumeInflow,
+	/// Dimensionless far field bulk concentration \f$ \Theta_\infty \f$
+	ThetaInf,
 
-      /// Porosity inflow value in plume
-      porosityPlume,
 
-      /// Permeability inflow value in plume
-      permeabilityPlume,
 
-      /// Liquidus inflow value in plume
-      HLiquidusPlume,
+	/// Dimensionless initial liquid concentration \f$ \Theta_{l,i} \f$
+	ThetaLInitial,
 
-      /// Eutectic inflow value in plume
-      HEutecticPlume,
 
-      /// Solidus inflow value in plume
-      HSolidusPlume;
 
-  /// Reference temperature for nondimensionalisation
-  Real referenceTemperature,
+	/// Dimensionless initial solid concentration \f$ \Theta_{s,i} \f$
+	ThetaSInitial,
 
-      /// Reference salinity for nondimensionalisation
-      referenceSalinity;
 
-  /// Inflow velocity, when required
-  Real inflowVelocity;
 
-  /// Pressure difference between top and bottom boundaries
-  Real pressureHead;
+	/// Dimensionless initial enthalpy
+	Hinitial,
 
-  /// Specify start and end of an inflow plume
-  Vector<Real> plumeBounds;
 
-  /// Velocity boundary conditions (lo side, for each spatial direction)
-  Vector<int> bcTypeVelLo,
+        /// For plumes
 
-      /// Velocity boundary conditions (hi side, for each spatial direction)
-      bcTypeVelHi,
 
-      /// Enthalpy boundary conditions (lo side, for each spatial direction)
-      bcTypeEnthalpyLo,
+	/// Temperature inflow value in plume
+        thetaPlumeInflow,
 
-      /// Enthalpy boundary conditions (hi side, for each spatial direction)
-      bcTypeEnthalpyHi,
+        /// Enthalpy inflow value in plume
+        HPlumeInflow,
 
-      /// Bulk concentration boundary conditions (lo side, for each spatial
-      /// direction)
-      bcTypeBulkConcentrationLo,
+        /// Bulk concentration inflow value in plume
+        ThetaPlumeInflow,
 
-      /// Bulk concentration boundary conditions (hi side, for each spatial
-      /// direction)
-      bcTypeBulkConcentrationHi,
+        /// Liquid concentration inflow value in plume
+        ThetaLPlumeInflow,
 
-      /// Temperature boundary conditions (low side, for each spatial direction)
-      bcTypeTemperatureLo,
+        /// Solid concentration inflow value in plume
+        ThetaSPlumeInflow,
 
-      /// Temperature boundary conditions (hi side, for each spatial direction)
-      bcTypeTemperatureHi,
+        /// Porosity inflow value in plume
+        porosityPlume,
 
-      /// Liquid concentration boundary conditions (low side, for each spatial
-      /// direction)
-      bcTypeLiquidConcentrationLo,
+        /// Permeability inflow value in plume
+        permeabilityPlume,
 
-      /// Liquid concentration boundary conditions (hi side, for each spatial
-      /// direction)
-      bcTypeLiquidConcentrationHi,
+        /// Liquidus inflow value in plume
+        HLiquidusPlume,
 
-      /// Porosity boundary conditions (low side, for each spatial direction)
-      bcTypePorosityLo,
+        /// Eutectic inflow value in plume
+        HEutecticPlume,
 
-      /// Porosity boundary conditions (hi side, for each spatial direction)
-      bcTypePorosityHi,
+        /// Solidus inflow value in plume
+        HSolidusPlume;
 
-      /// Permeability boundary conditions (low side, for each spatial
-      /// direction)
-      bcTypePermeabilityLo,
+	/// Reference temperature for nondimensionalisation
+	Real referenceTemperature,
 
-      /// Permeability boundary conditions (hi side, for each spatial direction)
-      bcTypePermeabilityHi;
+	/// Reference salinity for nondimensionalisation
+	referenceSalinity;
 
-  Real sinusoidal_temperature_bc_timescale, sinusoidal_temperature_bc_amplitude,
-      sinusoidal_temperature_bc_av, sinusoidal_temperature_bc_phase_diff;
+	/// Inflow velocity, when required
+	Real inflowVelocity;
 
-  /// Unified BCs for all scalars (lo side, for each spatial direction)
-  Vector<int> bcTypeScalarLo,
+	/// Pressure difference between top and bottom boundaries
+	Real pressureHead;
 
-      /// Unified BCs for all scalars (hi side, for each spatial direction)
-      bcTypeScalarHi;
+	/// Specify start and end of an inflow plume
+	Vector<Real> plumeBounds;
 
-  /// Vector containing boundary values
+    /// For mixed dirichlet boundary conditions
+    /// Specify the location and magnitude of the multi-valued Dirichlet boundary switch
+    /// Location where Dirichlet BCs switch Low edges
+    RealVect    bcDiriSwitchLo,
 
-  /// Enthalpy BCs on hi-side boundaries
-  RealVect bcValEnthalpyHi,
+                /// Location where Dirichlet BCs switch High edges
+                bcDiriSwitchHi,
 
-      /// Enthalpy BCs on lo-side boundaries
-      bcValEnthalpyLo,
+                /// Deviation from base Dirichlet BC value on Low edges
+                bcAltValTemperatureLo,
 
-      /// Bulk Concentration BCs on hi-side boundaries
-      bcValBulkConcentrationHi,
+                /// Deviation from base Dirichlet BC value on High edges
+                bcAltValTemperatureHi;
 
-      /// Bulk Concentration BCs on lo-side boundaries
-      bcValBulkConcentrationLo,
+	/// Velocity boundary conditions (lo side, for each spatial direction)
+	Vector<int> bcTypeVelLo,
 
-      /// Temperature BCs on hi-side boundaries
-      bcValTemperatureHi,
+	/// Velocity boundary conditions (hi side, for each spatial direction)
+	bcTypeVelHi,
 
-      /// Temperature BCs on lo-side boundaries
-      bcValTemperatureLo,
+	/// Enthalpy boundary conditions (lo side, for each spatial direction)
+	bcTypeEnthalpyLo,
 
-      /// Liquid concentration BCs on lo-side boundaries
-      bcValLiquidConcentrationLo,
+	/// Enthalpy boundary conditions (hi side, for each spatial direction)
+	bcTypeEnthalpyHi,
 
-      /// Liquid concentration BCs on hi-side boundaries
-      bcValLiquidConcentrationHi,
+	/// Bulk concentration boundary conditions (lo side, for each spatial direction)
+	bcTypeBulkConcentrationLo,
 
-      /// Porosity BCs on lo-side boundaries
-      bcValPorosityLo,
+	/// Bulk concentration boundary conditions (hi side, for each spatial direction)
+	bcTypeBulkConcentrationHi,
 
-      /// Porosity BCs on hi-side boundaries
-      bcValPorosityHi,
+	///Temperature boundary conditions (low side, for each spatial direction)
+	bcTypeTemperatureLo,
 
-      /// Permeability BCs on lo-side boundaries
-      bcValPermeabilityLo,
+	/// Temperature boundary conditions (hi side, for each spatial direction)
+	bcTypeTemperatureHi,
 
-      /// Permeability BCs on hi-side boundaries
-      bcValPermeabilityHi,
+	/// Liquid concentration boundary conditions (low side, for each spatial direction)
+	bcTypeLiquidConcentrationLo,
 
-      /// Velocity BCs on hi-side boundaries
-      bcValVelHi,
+	/// Liquid concentration boundary conditions (hi side, for each spatial direction)
+	bcTypeLiquidConcentrationHi,
 
-      /// Velocity BCs on lo-side boundaries
-      bcValVelLo,
+	/// Porosity boundary conditions (low side, for each spatial direction)
+	bcTypePorosityLo,
 
-      /// Solidus BCs on hi-side boundaries
-      bcValSolidusHi,
+	/// Porosity boundary conditions (hi side, for each spatial direction)
+	bcTypePorosityHi,
 
-      /// Solidus BCs on lo-side boundaries
-      bcValSolidusLo,
+	/// Permeability boundary conditions (low side, for each spatial direction)
+	bcTypePermeabilityLo,
 
-      /// Liquidus BCs on hi-side boundaries
-      bcValLiquidusHi,
+	/// Permeability boundary conditions (hi side, for each spatial direction)
+	bcTypePermeabilityHi;
 
-      /// Liquidus BCs on lo-side boundaries
-      bcValLiquidusLo,
+	Real
+	sinusoidal_temperature_bc_timescale,
+	sinusoidal_temperature_bc_amplitude,
+	sinusoidal_temperature_bc_av,
+	sinusoidal_temperature_bc_phase_diff;
 
-      /// Eutectic BCs on hi-side boundaries
-      bcValEutecticHi,
+	/// Unified BCs for all scalars (lo side, for each spatial direction)
+	Vector<int> bcTypeScalarLo,
 
-      /// Eutectic BCs on lo-side boundaries
-      bcValEutecticLo,
+	/// Unified BCs for all scalars (hi side, for each spatial direction)
+	bcTypeScalarHi;
 
-      /// Solid concentration BCs on lo-side boundaries
-      bcValSolidConcentrationLo,
+	/// Vector containing boundary values
 
-      /// Solid concentration BCs on hi-side boundaries
-      bcValSolidConcentrationHi,
+	/// Enthalpy BCs on hi-side boundaries
+	RealVect bcValEnthalpyHi,
 
-      /// Pressure BCs on hi/lo sides.
-      /**
-       * Note that the type of pressure bc is determine from the
-       * type of velocity bc specified, as the two are coupled.
-       * The values specified here are only used for enforcing a pressure head
-       */
-      bcValPressureHi,
+	/// Enthalpy BCs on lo-side boundaries
+	bcValEnthalpyLo,
 
-      /// Pressure BC on the low side of the domain in each direction (x, y, z)
-      bcValPressureLo;
+	/// Bulk Concentration BCs on hi-side boundaries
+	bcValBulkConcentrationHi,
 
-  BCInfo
-      /// Position along each face, below which to enforce no heat flux (above
-      /// this position, enforce some other specified heat flux)
-      m_bc_noFluxLimit,
+	/// Bulk Concentration BCs on lo-side boundaries
+	bcValBulkConcentrationLo,
 
-      /// Reference temperature for radiation boundary conditions
-      m_bc_bTref,
+	/// Temperature BCs on hi-side boundaries
+	bcValTemperatureHi,
 
-      /// Some generic variable which can be used in various boundary conditions
-      /// if required
-      m_bc_b, m_bc_a;
+	/// Temperature BCs on lo-side boundaries
+	bcValTemperatureLo,
 
-  int max_bc_iter;
+	/// Liquid concentration BCs on lo-side boundaries
+	bcValLiquidConcentrationLo,
 
-  int bc_nonlinear_solve_method;
+	/// Liquid concentration BCs on hi-side boundaries
+	bcValLiquidConcentrationHi,
 
-  Real max_bc_residual;
+	/// Porosity BCs on lo-side boundaries
+	bcValPorosityLo,
 
-  /// For nonlinear BCs solve
-  Real bc_relax_coeff;
+	/// Porosity BCs on hi-side boundaries
+	bcValPorosityHi,
 
-  /// First or second order BCs
-  int m_BCAccuracy;
+	/// Permeability BCs on lo-side boundaries
+	bcValPermeabilityLo,
 
-  /// Accuracy for pressure bcs
-  int m_pressureBCAccuracy;
+	/// Permeability BCs on hi-side boundaries
+	bcValPermeabilityHi,
 
-  /// Time, in case BCs are time-dependent
-  Real m_time;
+	/// Velocity BCs on hi-side boundaries
+	bcValVelHi,
 
-  /// To specify which of timeDependentBCtypes we want to use
-  int m_timeDependentBC;
+	/// Velocity BCs on lo-side boundaries
+	bcValVelLo,
 
-  /// Possible time dependences for BCs
-  /**
-   * These are implemented in PhysBCUtil::updateTimeDependentBCs()
-   * With the parameters for each option contained with this MushyLayerParams
-   * object. You can add your own options to the list below, then implement them
-   * in PhysBCUtil::updateTimeDependentBCs()
-   */
-  enum timeDependentBCtypes
-  {
-    m_constant,
-    m_sinusoid, // val = constant val + m_BCamplitude * sin(2 pi t/m_BCtimescale
-                // + phase_shift)
-    m_custom
-  };
+	/// Solidus BCs on hi-side boundaries
+	bcValSolidusHi,
 
-  /// Amplitude of time periodic boundary conditions
-  Real m_BCamplitude;
+	/// Solidus BCs on lo-side boundaries
+	bcValSolidusLo,
 
-  /// Time scale (period) for time periodic boundary conditions
-  Real m_BCtimescale;
+	/// Liquidus BCs on hi-side boundaries
+	bcValLiquidusHi,
 
-  /// 0 means sidewall heating, 1 means vertical heating (sea ice)
-  int fixedTempDirection;
+	/// Liquidus BCs on lo-side boundaries
+	bcValLiquidusLo,
 
-  /// Which permeability function should we use?
-  PermeabilityFunctions permeabilityFunction;
+	/// Eutectic BCs on hi-side boundaries
+	bcValEutecticHi,
 
-  /// Are we running the experiment in a Hele-Shaw cell?
-  bool heleShaw;
+	/// Eutectic BCs on lo-side boundaries
+	bcValEutecticLo,
 
-  /// For cases where want to impose a porosity, e.g. for benchmarking
-  ParamsPorosityFunctions m_porosityFunction;
+	/// Solid concentration BCs on lo-side boundaries
+	bcValSolidConcentrationLo,
 
-  /// For when we want the fluid viscosity to depend on the solute concentration
-  ViscosityFunction m_viscosityFunction;
+	/// Solid concentration BCs on hi-side boundaries
+	bcValSolidConcentrationHi,
 
-  /// Maximum dimensionless viscosity the fluid can have
-  /**
-   * Only used when m_viscosityFunction is not = 0
-   */
-  Real max_viscosity;
+	/// Pressure BCs on hi/lo sides.
+	/**
+	 * Note that the type of pressure bc is determine from the
+	 * type of velocity bc specified, as the two are coupled.
+	 * The values specified here are only used for enforcing a pressure head
+	 */
+	bcValPressureHi,
 
-  Vector<string> m_scalarBCTypes;
-  Vector<string> m_vectorBCTypes;
+	/// Pressure BC on the low side of the domain in each direction (x, y, z)
+	bcValPressureLo;
 
-  /// Get all parameters from the inputs file
-  void getParameters();
 
-  /// Write out parameters to the command line (pout)
-  void printParameters();
+	BCInfo
+	/// Position along each face, below which to enforce no heat flux (above this position, enforce some other specified heat flux)
+	m_bc_noFluxLimit,
 
-  /// Calculate \f$ z(\theta) \f$ for the directional solidification without
-  /// flow benchmark
-  Real directionalSolidificationMushyZ(Real theta, Real zEutectic = 1.0);
+	/// Reference temperature for radiation boundary conditions
+	m_bc_bTref,
 
-  /// Read in BCs from the inputs file
-  void parseBCs(string a_name, Vector<int> *a_bcHolder, bool required = false);
+	/// Some generic variable which can be used in various boundary conditions if required
+	m_bc_b,
+	m_bc_a;
 
-  /// Read in BC vals from inputs file
-  void parseBCVals(string a_name, RealVect &a_bcHolder, bool required = false);
+	int max_bc_iter;
 
-  /// Convert dimensional to non-dimensional temperature
-  Real tempTotheta(const Real T);
+	int bc_nonlinear_solve_method;
 
-  /// Convert dimensional to non-dimensional composition
-  Real concToTheta(const Real C);
+	Real max_bc_residual;
 
-  /// Get the velocity boundary condition
-  int getVelBCType(int dir, Side::LoHiSide side);
+	/// For nonlinear BCs solve
+	Real bc_relax_coeff;
 
-  /// Compute permeability from porosity
-  Real calculatePermeability(Real liquidFraction);
+	/// First or second order BCs
+	int m_BCAccuracy;
 
-  /// Set the time, might be used for BCs
-  void setTime(Real a_time);
+	/// Accuracy for pressure bcs
+	int m_pressureBCAccuracy;
 
-  /// Write out the key parameters to hdf5 file, so that solution can be
-  /// reconstructed
-  void writeToHDF5(HDF5HeaderData &a_header) const;
+	/// Time, in case BCs are time-dependent
+	Real m_time;
 
-  /// Returns a string indicating the velocity scale used for
-  /// nondimensionalisation
-  string getVelocityScale() const;
+	/// To specify which of timeDependentBCtypes we want to use
+	int m_timeDependentBC;
 
-  /// Utility function to compute porosity given a single enthalpy/bulk
-  /// concentration value
-  Real computePorosity(Real H, Real C);
+	/// Possible time dependences for BCs
+	/**
+	 * These are implemented in PhysBCUtil::updateTimeDependentBCs()
+	 * With the parameters for each option contained with this MushyLayerParams object.
+	 * You can add your own options to the list below, then implement them in PhysBCUtil::updateTimeDependentBCs()
+	 */
+	enum timeDependentBCtypes{
+	  m_constant,
+	  m_sinusoid, // val = constant val + m_BCamplitude * sin(2 pi t/m_BCtimescale + phase_shift)
+	  m_custom
+	};
 
-  Real compute_dHdT(Real H, Real C);
 
-  /// Utility function to compute temperature given a single enthalpy/bulk
-  /// concentration value
-  Real computeTemperature(Real H, Real C);
+	/// Amplitude of time periodic boundary conditions
+	Real m_BCamplitude;
 
-  /// Compute everything from enthalpy and bulk concentration
-  // todo - implement
-  void computeDiagnosticVars(Real H, Real C, Real T, Real porosity, Real Cl,
-                             Real Cs);
+	/// Time scale (period) for time periodic boundary conditions
+	Real m_BCtimescale;
 
-  /// Returns a string indicating the time scale used for nondimensionalisation
-  string getTimescale() const;
 
-  /// Returns whether or not we're solving the Darcy-Brinkman equation
-  bool isDarcyBrinkman();
 
-  /// Returns whether or not the problem we're solving contains viscous terms
-  bool isViscous();
 
-  /// Compute boundary conditions for fields which can be found from the
-  /// enthalpy and salinity via the phase diagram
-  void computeDerivedBCs();
+	/// 0 means sidewall heating, 1 means vertical heating (sea ice)
+	int fixedTempDirection;
 
-  void printBCs(string bcName, Vector<int> bcTypeLo, Vector<int> bcTypeHi,
-                RealVect bcValLo, RealVect bcValHi);
+	/// Which permeability function should we use?
+	PermeabilityFunctions permeabilityFunction;
+
+	/// Are we running the experiment in a Hele-Shaw cell?
+	bool heleShaw;
+
+	/// For cases where want to impose a porosity, e.g. for benchmarking
+	ParamsPorosityFunctions m_porosityFunction;
+
+	/// For when we want the fluid viscosity to depend on the solute concentration
+	ViscosityFunction m_viscosityFunction;
+
+	/// Maximum dimensionless viscosity the fluid can have
+	/**
+	 * Only used when m_viscosityFunction is not = 0
+	 */
+	Real max_viscosity;
+
+	/// Get all parameters from the inputs file
+	void getParameters();
+
+	/// Write out parameters to the command line (pout)
+	void printParameters();
+
+	/// Calculate \f$ z(\theta) \f$ for the directional solidification without flow benchmark
+	Real directionalSolidificationMushyZ(Real theta, Real zEutectic=1.0);
+
+	/// Read in BCs from the inputs file
+	void parseBCs(string a_name, Vector<int>* a_bcHolder, bool required = false);
+
+	/// Read in BC vals from inputs file
+	void parseBCVals(string a_name, RealVect& a_bcHolder, bool required = false);
+
+	/// Convert dimensional to non-dimensional temperature
+	Real tempTotheta(const Real T);
+
+	/// Convert dimensional to non-dimensional composition
+	Real concToTheta(const Real C);
+
+	/// Get the velocity boundary condition
+	int getVelBCType(int dir, Side::LoHiSide side);
+
+	/// Compute permeability from porosity
+	Real calculatePermeability(Real liquidFraction);
+
+	/// Set the time, might be used for BCs
+	void setTime(Real a_time);
+
+	/// Write out the key parameters to hdf5 file, so that solution can be reconstructed
+	void writeToHDF5(HDF5HeaderData& a_header) const;
+
+	/// Returns a string indicating the velocity scale used for nondimensionalisation
+	string getVelocityScale() const;
+
+	/// Utility function to compute porosity given a single enthalpy/bulk concentration value
+	Real computePorosity(Real H, Real C);
+
+	Real compute_dHdT(Real H, Real C);
+
+	/// Utility function to compute temperature given a single enthalpy/bulk concentration value
+	Real computeTemperature(Real H, Real C);
+
+	/// Compute everything from enthalpy and bulk concentration
+	//todo - implement
+	void computeDiagnosticVars(Real H, Real C, Real T, Real porosity, Real Cl, Real Cs);
+
+	/// Returns a string indicating the time scale used for nondimensionalisation
+	string getTimescale() const;
+
+	/// Returns whether or not we're solving the Darcy-Brinkman equation
+	bool isDarcyBrinkman();
+
+	/// Returns whether or not the problem we're solving contains viscous terms
+	bool isViscous();
+
+	/// Compute boundary conditions for fields which can be found from the enthalpy and salinity via the phase diagram
+	void computeDerivedBCs ();
 };
 
 #endif /* SRC_MUSHYLAYERPARAMS_H_ */

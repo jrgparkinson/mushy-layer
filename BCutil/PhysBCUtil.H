@@ -124,12 +124,12 @@ public:
 	   * The liquid salinity is given by \f$(\Theta_l)_g = - \theta_g\f$  if \f$0 < \chi < 1\f$, and \f$ (\Theta_l)_g = (\Theta_l)_i \f$ otherwise.
 	   *
 	   */
-	  MixedBCTemperatureSalinity,		
+	  MixedBCTemperatureSalinity,
 
 	  /// Multiple Dirichlet Values (#10)
 	  MultiDiri
 
-	  /* jb: Multiple Dirichlet BCs per side, where alternate value is active over the diriBounds vector */
+	  /* jb: Multiple Dirichlet BCs per side, where alternate value is active after diri_switch */
 
 	};
 
