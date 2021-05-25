@@ -8,12 +8,11 @@
             ],
             "defines": [
                 "CH_SPACEDIM=3",
-                "CH_LANG_CC=1",
-                "CH_LANG_FORT=1"
+                "CH_LANG_CC=1"
             ],
             "compilerPath": "/usr/bin/clang-6.0",
             "cStandard": "c11",
-            "cppStandard": "c++14",
+            "cppStandard": "c++11",
             "intelliSenseMode": "clang-x64"
         }
     ],
