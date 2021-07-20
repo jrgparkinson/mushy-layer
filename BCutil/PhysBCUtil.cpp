@@ -803,6 +803,94 @@ public:
                   }
               }
 
+              //// jb: adding in the implementation of the MultiDiri BC
+              else if (bcType == PhysBCUtil::MultiDiri)
+              {
+
+                  // This is a special case
+
+                  int Tcomp = 0;                        // jb: I assume this is the indexing code to enter the new temperature BC into a_state
+
+                  CH_TIME("BCFunctions::MultiDiri");    // jb: not sure what this does, but when i looked at the above example
+                  // (BCFunctions::MixedTemperatureSalinityBC) i didn't see it in BCFunctions.cpp
+
+                  int isign = sign(side);
+
+                  //                                  NonlinearTemperatureBC* residual;
+
+                  // Pull alternate BC geometry and value
+                  Real alt_val = 0.0, base_val = 0.0, diri_switch = 0.0;      // jb: dummy vars to get modified by input BC vals
+
+                  if (side == Side::Lo)
+                  {
+                      alt_val = m_params.bcAltValTemperatureLo[idir];;  // jb: not sure if this is how to properly pull the vals? still wrapping my head
+                      // around the whole class/object/method structure of cpp and how to pass variabless
+                      base_val = m_params.bcValTemperatureLo[idir];;
+                      diri_switch = m_params.bcDiriSwitchLo[idir];;
+                  }
+                  else
+                  {
+                      alt_val = m_params.bcAltValTemperatureHi[idir];;
+                      base_val = m_params.bcValTemperatureHi[idir];;
+                      diri_switch = m_params.bcDiriSwitchHi[idir];;
+                  }
+
+                  Box toRegion = adjCellBox(a_valid, idir, side, 1);
+                  toRegion &= a_state.box();
+
+                  Real ghostVal = 0.0;
+
+                  // ??? is the box iterator going to sweep through the boundary s.t. ivto and ivto_interior are
+                  //     the values we want to test to see if they are in the alt_val bounds?
+                  //     i.e. when diri_start < iv_interior < diri_end set ghostVal to alt_val
+                  for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+                  {
+                      // TODO - should write this in fortran for speed
+                      CH_TIME("BCFunctions::MultiDiri::loopOverBox");
+
+                      /* I'm grabbing the locations of the interior boxes as i want to test if they are in the region that should
+                      get a modified dirichlet BC */
+                      IntVect ivto = bit();
+                      IntVect iv_interior = ivto - isign*BASISV(idir);
+                      RealVect loc;
+                      Real x, y, z;
+                      // getLocation(iv_interior, loc, m_dx);
+                      // getLocation(iv_interior, m_dx, x, y, z);
+                      getLocation(ivto, m_dx, x, y, z);
+
+                      /* I think idir is iterating over the direction (in 2D either x or y) and if it is an x idir boundary (vertical wall) i want to see if the
+                      y value of loc is greater than diri_switch, conversely in the y direction i want to see if the x value of loc is greater than diri_switch   */
+                      if (idir == 0)
+                      {
+                          if (y >= diri_switch)
+                          {
+                              ghostVal = alt_val;
+                          }
+                          else if (y < diri_switch)
+                          {
+                              ghostVal = base_val;
+                          }
+                      }
+                      else if (idir == 1)
+                      {
+                          if (x >= diri_switch)
+                          {
+                              ghostVal = alt_val;
+                          }
+                          else if (x < diri_switch)
+                          {
+                              ghostVal = base_val;
+                          }
+                      }
+
+                      // Pass the newly calculated Temperature BC value to the a_state object
+                      a_state(ivto, Tcomp) = ghostVal;
+
+                  }
+
+
+              } // End of MultiDiri
+
               else
               {
                 // All other BCs (e.g. dirichlet, neumann) are applied here.

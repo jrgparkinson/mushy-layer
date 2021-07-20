@@ -1214,6 +1214,22 @@ void AMRLevelMushyLayer::initialDataDefault()
   }
 }
 
+void AMRLevelMushyLayer::initialDataLens()
+{
+    // domain filled with fluid at the liquidus temp (not handcuffed to bottom BC) for top AND bottom freezing
+    Real H =  m_parameters.stefan + 1.01;
+    Real C =  -1.0;
+
+    DataIterator dit = m_grids.dataIterator();
+    for (dit.reset(); dit.ok(); ++dit)
+    {
+        (*m_scalarNew[ScalarVars::m_enthalpy])[dit].setVal(H);
+        (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit].setVal(C);
+
+    }
+
+}
+
 void AMRLevelMushyLayer::initialDataSidewallHeating()
 {
   // heating in x direction, i.e. left/right walls;
@@ -2119,6 +2135,9 @@ void AMRLevelMushyLayer::initialData()
     {
     case 1:
       initialDataPorousHole();
+      break;
+    case 2:
+      initialDataLens();
       break;
     default:
       initialDataDefault();

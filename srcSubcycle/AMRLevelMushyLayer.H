@@ -272,6 +272,9 @@ public:
   /// Mushy layer with a porous hole in the middle
   void initialDataPorousHole();
 
+  /// Initial data for a pure fluid with top and bottom cold boundaries
+  void initialDataLens();
+
   /// Initial data for a test case with regions of zero porosity
   void initialDataZeroPorosityTest();
 
