@@ -496,6 +496,20 @@ void MushyLayerParams::getParameters()
   ppParams.query("enthalpyPlume", HPlumeInflow);
   ppParams.query("bulkConcPlume", ThetaPlumeInflow);
 
+    //// jb - attempting to add multiple dirichlet BC values option for Enthalpy (maybe Salinity in future)
+    ////    - currently keeping things in one spot, can redistribute after they're checked
+
+    ////        here i'm introducing the boundaries for where the AltVal will occur
+
+    parseBCVals("diriSwitchLo", bcDiriSwitchLo);
+    parseBCVals("diriSwitchHi", bcDiriSwitchHi);
+
+    ////        these are the AltVals
+    parseBCVals("temperatureAltValLo", bcAltValTemperatureLo);
+    parseBCVals("temperatureAltValHi", bcAltValTemperatureHi);
+
+    //// end multidiri mod
+
   //  ParmParse ppBC("bc");
 
   // Define BC objects

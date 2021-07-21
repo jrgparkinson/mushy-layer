@@ -517,6 +517,20 @@ public:
   /// Specify start and end of an inflow plume
   Vector<Real> plumeBounds;
 
+    /// For mixed dirichlet boundary conditions
+    /// Specify the location and magnitude of the multi-valued Dirichlet boundary switch
+    /// Location where Dirichlet BCs switch Low edges
+    RealVect    bcDiriSwitchLo,
+
+    /// Location where Dirichlet BCs switch High edges
+    bcDiriSwitchHi,
+
+    /// Deviation from base Dirichlet BC value on Low edges
+    bcAltValTemperatureLo,
+
+    /// Deviation from base Dirichlet BC value on High edges
+    bcAltValTemperatureHi;
+
   /// Velocity boundary conditions (lo side, for each spatial direction)
   Vector<int> bcTypeVelLo,
 

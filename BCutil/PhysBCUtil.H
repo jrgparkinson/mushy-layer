@@ -126,6 +126,10 @@ public:
 	   */
 	  MixedBCTemperatureSalinity,
 
+	  /// Multiple Dirichlet Values (#10)
+	  MultiDiri
+
+	  /* jb: Multiple Dirichlet BCs per side, where alternate value is active after diri_switch */
 
 	};
 
