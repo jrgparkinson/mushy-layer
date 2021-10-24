@@ -48,3 +48,5 @@ visitlog.py
 /zzindex.html
 *.ipynb_checkpoints*
 /requirements (copy).txt
+time.table
+*.out
