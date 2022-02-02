@@ -127,9 +127,14 @@ public:
 	  MixedBCTemperatureSalinity,
 
 	  /// Multiple Dirichlet Values (#10)
-	  MultiDiri
+	  MultiDiri,
 
-	  /* jb: Multiple Dirichlet BCs per side, where alternate value is active after diri_switch */
+	  /** jb: Multiple Dirichlet BCs per side, where alternate value is active after diri_switch */
+
+	  /// Linear Dirichlet BC (#11)
+	  /** jb: Modification of MultDiri, where BC is a linear temperature that varies from the base temperature
+      *  value at the DiriSwitch point to a temperature defined at the edge corners */
+	  LinDiri
 
 	};
 

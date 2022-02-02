@@ -891,6 +891,84 @@ public:
 
               } // End of MultiDiri
 
+              //// jb: adding in the implementation of the LinDiri BC
+              else if (bcType == PhysBCUtil::LinDiri)
+              {
+
+                  // This is a special case
+
+                  int Tcomp = 0;
+
+                  CH_TIME("BCFunctions::LinDiri");
+
+                  int isign = sign(side);
+
+                  //                                  NonlinearTemperatureBC* residual;
+
+                  // Pull alternate BC geometry and value
+                  Real corner_val = 0.0, base_val = 0.0, diri_switch = 0.0, domain_size = 0.0;
+
+                  if (side == Side::Lo)
+                  {
+                      corner_val = m_params.bcCornerTemperatureLo[idir];;
+                      base_val = m_params.bcValTemperatureLo[idir];;
+                      diri_switch = m_params.bcDiriSwitchLo[idir];;
+                      domain_size = m_params.bcDomainSize[idir];;
+                  }
+                  else
+                  {
+                      corner_val = m_params.bcCornerTemperatureHi[idir];;
+                      base_val = m_params.bcValTemperatureHi[idir];;
+                      diri_switch = m_params.bcDiriSwitchHi[idir];;
+                      domain_size = m_params.bcDomainSize[idir];;
+                  }
+
+                  Box toRegion = adjCellBox(a_valid, idir, side, 1);
+                  toRegion &= a_state.box();
+
+                  Real ghostVal = 0.0;
+
+                  for (BoxIterator bit = BoxIterator(toRegion); bit.ok(); ++bit)
+                  {
+                      // TODO - should write this in fortran for speed
+                      CH_TIME("BCFunctions::LinDiri::loopOverBox");
+
+                      IntVect ivto = bit();
+                      IntVect iv_interior = ivto - isign*BASISV(idir);
+                      RealVect loc;
+                      Real x, y, z;
+                      getLocation(ivto, m_dx, x, y, z);
+
+                      if (idir == 0)
+                      {
+                          if (y >= diri_switch)
+                          {
+                              ghostVal = base_val-((base_val-corner_val)/(domain_size-diri_switch))*(y-diri_switch);
+                          }
+                          else if (y < diri_switch)
+                          {
+                              ghostVal = base_val;
+                          }
+                      }
+                      else if (idir == 1)
+                      {
+                          if (x >= diri_switch)
+                          {
+                              ghostVal = base_val-((base_val-corner_val)/(domain_size-diri_switch))*(x-diri_switch);
+                          }
+                          else if (x < diri_switch)
+                          {
+                              ghostVal = base_val;
+                          }
+                      }
+
+                      a_state(ivto, Tcomp) = ghostVal;
+
+                  }
+
+
+              } // End of LinDiri
+
               else
               {
                 // All other BCs (e.g. dirichlet, neumann) are applied here.
