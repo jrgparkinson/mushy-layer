@@ -104,6 +104,14 @@ MushyLayerParams::MushyLayerParams()
   m_scalarBCTypes.push_back("noflux");
   m_scalarBCTypes.push_back("open");
   m_scalarBCTypes.push_back("inflow");
+  m_scalarBCTypes.push_back("robin");
+  m_scalarBCTypes.push_back("variableFlux");
+  m_scalarBCTypes.push_back("fixedTemperature");
+  m_scalarBCTypes.push_back("temperatureFlux");
+  m_scalarBCTypes.push_back("temperatureFluxRadiation");
+  m_scalarBCTypes.push_back("mixedBCTemperatureSalinity");
+  m_scalarBCTypes.push_back("multiDiri");
+  m_scalarBCTypes.push_back("linDiri");
 
   m_vectorBCTypes.push_back("noflow");
   m_vectorBCTypes.push_back("inflowVelocity");
@@ -509,6 +517,17 @@ void MushyLayerParams::getParameters()
     parseBCVals("temperatureAltValHi", bcAltValTemperatureHi);
 
     //// end multidiri mod
+
+    //// jb - adding linear dirichlet boundary conditions, using defined corner temperature values
+    ////      to describe a linear dirichlet boundary condition from the point of the DiriSwitch to the
+    ////      corner temperature
+
+    parseBCVals("temperatureCornerValLo",bcCornerTemperatureLo);
+    parseBCVals("temperatureCornerValHi",bcCornerTemperatureHi);
+
+    parseBCVals("domainSize",bcDomainSize);
+
+    //// end LinDiri mod
 
   //  ParmParse ppBC("bc");
 

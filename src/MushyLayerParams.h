@@ -529,7 +529,17 @@ public:
     bcAltValTemperatureLo,
 
     /// Deviation from base Dirichlet BC value on High edges
-    bcAltValTemperatureHi;
+    bcAltValTemperatureHi,
+
+    /// Boundary temperatures at corners of domain (top left, bottom right) - Low edges (for LinDiri)
+    bcCornerTemperatureLo,
+
+    /// Boundary temperatures at corners of domain (top right, top right) - High edges (for LinDiri)
+    bcCornerTemperatureHi,
+
+    /// Domain size [y x] - possibly redundant as this is just [domainHeight domainWidth], but not
+    ///                     sure how to call those into this vector
+    bcDomainSize;
 
   /// Velocity boundary conditions (lo side, for each spatial direction)
   Vector<int> bcTypeVelLo,
