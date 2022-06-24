@@ -846,5 +846,3 @@ protected:
 
 #endif
 
-
-
