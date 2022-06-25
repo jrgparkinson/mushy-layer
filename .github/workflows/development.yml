@@ -8,7 +8,6 @@ on:
     paths-ignore:
       - '.github/**'
       - '**/workflows/**'
-      - 'requirements.txt'
 
   pull_request:
     branches:
@@ -17,7 +16,6 @@ on:
     paths-ignore:
       - '.github/**'
       - '**/workflows/**'
-      - 'requirements.txt'
 
 env:
   PYTHONPATH: /home/runner/work/mushy-layer/mushy-layer/test:/home/runner/work/mushy-layer/mushy-layer/plotting
