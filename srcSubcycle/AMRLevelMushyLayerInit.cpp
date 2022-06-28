@@ -1230,6 +1230,30 @@ void AMRLevelMushyLayer::initialDataLens()
 
 }
 
+void AMRLevelMushyLayer::initialDataLinearGradient()
+{
+  // Iterate over the different boxes on this level of refinement
+  DataIterator dit = m_grids.dataIterator();
+  for (dit.reset(); dit.ok(); ++dit)
+  {
+    // Iterate over the cells within each box
+    BoxIterator bit((*m_scalarNew[0])[dit].box());
+    for (bit.reset(); bit.ok(); ++bit)
+    {
+      // This is the location of the grid cell in indexing space
+      IntVect iv = bit();
+      // Get the location of this grid cell in x-y space
+      RealVect loc;
+      getLocation(iv, loc, m_dx);
+      // Set the enthalpy = -stefan number*z, where z is the vertical co-ordinate
+      // note that loc[1] is the vertical co-ordinate
+      (*m_scalarNew[ScalarVars::m_enthalpy])[dit](iv) = -m_parameters.stefan*loc[1];
+      // Set the bulk concentration
+      (*m_scalarNew[ScalarVars::m_bulkConcentration])[dit](iv) = -1.0;
+    }
+  }
+}
+
 void AMRLevelMushyLayer::initialDataSidewallHeating()
 {
   // heating in x direction, i.e. left/right walls;
@@ -2138,6 +2162,9 @@ void AMRLevelMushyLayer::initialData()
       break;
     case 2:
       initialDataLens();
+      break;
+    case 3:   // if main.initData = 2, use this function:
+      initialDataLinearGradient();
       break;
     default:
       initialDataDefault();
