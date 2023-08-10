@@ -50,3 +50,5 @@ visitlog.py
 /requirements (copy).txt
 time.table
 *.out
+bin
+share

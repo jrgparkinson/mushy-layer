@@ -34,8 +34,10 @@ jobs:
       - name: Setup latex
         run: |
           whereis latex
-          sudo apt-get install texlive-fonts-recommended texlive-fonts-extra
+          sudo apt-get install texlive-full texlive-fonts-recommended texlive-fonts-extra
           sudo apt-get install dvipng
+          whereis latex
+          pdflatex --version
 
       - name: Info
         run: |
@@ -46,10 +48,10 @@ jobs:
 
       # Do regression tests
 
-      - name: Set up Python 3.6
+      - name: Set up Python 3.10
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6
+          python-version: '3.10'
 
       - name: Cache pip
         uses: actions/cache@v1
@@ -61,7 +63,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install python dependencies
-        run: pip install -r requirements.txt
+        run: pip install --upgrade pip && pip install -r requirements.txt
 
       - name: Setup for tests
         run: |
@@ -72,41 +74,3 @@ jobs:
         run: |
           cd $UNIT_TEST_PATH
           py.test
-
-#          coverage run testPltFile.py
-#          coverage html
-
-      # - uses: actions/upload-artifact@v1
-      #   name: Upload unit test results
-      #   with:
-      #     name: python-unit-test-results
-      #     path: ${{ env.UNIT_TEST_PATH }}
-
-      # - uses: actions/checkout@v2
-      #   name: Checkout master
-      #   with:
-      #     ref: master
-      #     path: master
-
-      # Allow job to succeed if this fails
-      # as multiple commits may lead to synchronisation issues
-      # - name: Push coverage to repo
-      #   continue-on-error: true
-      #   run: |
-      #     ls
-      #     cd $UNIT_TEST_PATH/coverage_html_report
-      #     mkdir -p $UNIT_TEST_PUBLISH/$BRANCH_NAME
-      #     cp . $UNIT_TEST_PUBLISH/$BRANCH_NAME -r
-      #     cd $UNIT_TEST_PUBLISH/$BRANCH_NAME
-      #     git config --global user.name 'jparkinson'
-      #     git config --global user.email 'jamie.parkinson@gmail.com'
-      #     git add .
-      #     git commit -m "Unittest coverage"
-      #     git push
-
-      # - name: Request Github Pages build job
-      #   run: >-
-      #     curl -L -X POST 
-      #     -H "Content-Type: application/json"
-      #     -H "Authorization: token ${{ secrets.GITHUB_PAT}}"
-      #     "https://api.github.com/repos/${{ github.repository }}/pages/builds"
