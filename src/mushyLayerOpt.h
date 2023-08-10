@@ -423,6 +423,9 @@ struct MushyLayerOptions
   /// Minimum dt allowed
   Real minDt;
 
+  // dt below which we don't consider the simulation to have converged
+  Real min_dt_convergence;
+
   /// Maximum dt allowed
   Real max_dt;
 
