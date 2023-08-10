@@ -27,14 +27,15 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v1
 
-      - uses: jrgparkinson/chombo-action@v1.7
+      - uses: jrgparkinson/chombo-action@v1.11
         with:
           compile_opts: 'DIM=2'
+          chombo_tag: c00e7b6214dccce2690c9c96940b9d915a14a26b
 
       - name: Compile Chombo 3D
         run: |
@@ -55,10 +56,10 @@ jobs:
 
       # Do regression tests
 
-      - name: Set up Python 3.6
+      - name: Set up Python 3.10
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6
+          python-version: '3.10'
 
       - name: Cache pip
         uses: actions/cache@v1

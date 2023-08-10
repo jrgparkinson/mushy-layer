@@ -365,14 +365,13 @@ def latexify(fig_width=None, fig_height=None):
         fig_height = fig_width * golden_mean  # height in inches
 
     # Need the mathsrfs package for \mathscr if text.usetex = True
-    params = {'text.latex.preamble': ['\\usepackage{gensymb}', '\\usepackage{mathrsfs}', '\\usepackage{amsmath}'],
+    params = {'text.latex.preamble': '\\usepackage{gensymb}\n\\usepackage{mathrsfs}\n\\usepackage{amsmath}',
               'axes.labelsize': font_size, 'axes.titlesize': font_size, 'legend.fontsize': font_size,
               'xtick.labelsize': font_size, 'ytick.labelsize': font_size, 'font.size': font_size,
               'xtick.direction': 'in', 'ytick.direction': 'in', 'lines.markersize': 3, 'lines.linewidth': linewidth,
               'text.usetex': True, 'figure.figsize': [fig_width, fig_height], 'font.family': 'serif', 'backend': 'ps'}
 
     if 'osx' in socket.gethostname():
-        # params['text.usetex'] = False
         params['pgf.texsystem'] = 'pdflatex'
         os.environ['PATH'] = os.environ['PATH'] + ':/Library/TeX/texbin/:/usr/local/bin/'
 

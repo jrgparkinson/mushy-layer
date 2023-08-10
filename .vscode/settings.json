@@ -10,6 +10,7 @@
     "files.watcherExclude": {
         "**/.git/**": true,
         "**/.venv/**": true,
-      }
+    },
+    "git.ignoreLimitWarning": true
     
 }
