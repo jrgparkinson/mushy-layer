@@ -218,7 +218,7 @@ bool AMRLevelMushyLayer::convergedToSteadyState()
   //    m_doAutomaticRestart = false;
   //  }
 
-  if (hasConverged && m_dt < 1e-10)
+  if (hasConverged && m_dt < m_opt.min_dt_convergence)
   {
     LOG_INFO("All fields converged but dt < 1e-10 so keep solving");
     return false;

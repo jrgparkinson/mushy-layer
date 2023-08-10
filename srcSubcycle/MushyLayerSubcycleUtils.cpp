@@ -908,6 +908,8 @@ void getAMRFactory(RefCountedPtr<AMRLevelMushyLayerFactory> &a_fact)
   //  opt.maxEta = -1;
   //  ppMain.query("max_eta", opt.maxEta); // let user specify different max eta
   //  if they want
+  opt.min_dt_convergence = 1e-10;
+  ppMain.query("min_dt_convergence", opt.min_dt_convergence);
 
   opt.minDt = 1e-7;
   ppMain.query("min_dt", opt.minDt);
