@@ -786,45 +786,46 @@ Real AMRLevelMushyLayer::advance()
   return -1;
 }
 
-void AMRLevelMushyLayer::addHeatSource(LevelData<FArrayBox> &src)
+void AMRLevelMushyLayer::addHeatSource(LevelData<FArrayBox>& src)
 {
   // This is where we add in a heat source, if required
-  Real gaussian_heat_source_size = 0.0;
-  Real gaussian_heat_source_width = 0.0;
-  Real gaussian_heat_source_depth = 0.0;
-  Real gaussian_heat_source_xpos = m_domainWidth / 2;
+      Real gaussian_heat_source_size = 0.0;
+      Real gaussian_heat_source_width = 0.0;
+      Real gaussian_heat_source_depth = 0.0;
+      Real gaussian_heat_source_xpos = m_domainWidth/2;
 
-  ParmParse ppHeatSource("heatSource");
-  ppHeatSource.query("size", gaussian_heat_source_size);
-  ppHeatSource.query("width", gaussian_heat_source_width);
-  ppHeatSource.query("depth", gaussian_heat_source_depth);
+      ParmParse ppHeatSource("heatSource");
+      ppHeatSource.query("size", gaussian_heat_source_size);
+      ppHeatSource.query("width", gaussian_heat_source_width);
+      ppHeatSource.query("depth", gaussian_heat_source_depth);
   //    ppHeatSource.query("depth", gaussian_heat_source_depth);
-  ppHeatSource.query("xpos", gaussian_heat_source_xpos);
+      ppHeatSource.query("xpos", gaussian_heat_source_xpos);
 
-  if (gaussian_heat_source_size != 0.0)
-  {
-    for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
-    {
-      for (BoxIterator bit = BoxIterator(m_grids[dit]); bit.ok(); ++bit)
+      // enthalpy is in the first component of the source term
+      int Hcomp = 0;
+
+      if (gaussian_heat_source_size != 0.0)
       {
-        IntVect iv = bit();
-        RealVect loc;
-        ::getLocation(iv, loc, m_dx);
+        for (DataIterator dit = m_grids.dataIterator(); dit.ok(); ++dit)
+        {
+          for (BoxIterator bit = BoxIterator(m_grids[dit]); bit.ok(); ++bit)
+          {
+            IntVect iv = bit();
+            RealVect loc;
+            ::getLocation(iv, loc, m_dx);
 
-        // Set the 0th component (enthalpy)
-        src[dit](iv, 0) =
-            gaussian_heat_source_size /
-            (gaussian_heat_source_width * sqrt(2 * M_PI)) *
-            exp(-0.5 * pow((loc[0] - gaussian_heat_source_xpos) /
-                               gaussian_heat_source_width,
-                           2)) *
-            0.5 *
-            (1 + tanh(10 * (loc[1] -
-                            (m_domainHeight - gaussian_heat_source_depth))));
+            Real porosity = (*m_scalarNew[ScalarVars::m_porosity])[dit](iv);
+
+            src[dit](iv, Hcomp) = (1-porosity)*gaussian_heat_source_size/(gaussian_heat_source_width*sqrt(2*M_PI))
+                * exp(-0.5*pow((loc[0]-gaussian_heat_source_xpos)/gaussian_heat_source_width, 2))
+                * 0.5*(1 + tanh(10*(loc[1]-(m_domainHeight-gaussian_heat_source_depth) ) ));
+
+          }
+
+        }
       }
-    }
-  }
 }
+
 
 void AMRLevelMushyLayer::setVelZero(FArrayBox &a_vel,
                                     const FArrayBox &a_porosity,

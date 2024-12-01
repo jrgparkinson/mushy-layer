@@ -275,6 +275,9 @@ public:
   /// Initial data for a pure fluid with top and bottom cold boundaries
   void initialDataLens();
 
+  /// Initial data for a linear enthalpy gradient
+  void initialDataLinearGradient();
+
   /// Initial data for a test case with regions of zero porosity
   void initialDataZeroPorosityTest();
 
